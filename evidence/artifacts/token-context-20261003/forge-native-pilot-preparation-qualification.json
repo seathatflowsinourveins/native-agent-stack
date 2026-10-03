@@ -1,0 +1,37 @@
+{
+  "study": "token-context-20261003",
+  "operation": "Private first-stage engineering pilot preparation; no model/grader called by this preparation unit",
+  "source_pins": {
+    "promptfoo": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "slop_code_bench": "31ceea3add480edb33431e70475c4c70597e6b31",
+    "scb_problems": "38d627ecf668a88f88f8d260f8df8df6116e9b03"
+  },
+  "eight_rendered_immutable_inputs_bytes": 36553,
+  "original_spec_vs_rendered": "Native renderer strips canary HTML and substitutes entrypoint; separate hashes, no byte-identity claim",
+  "binding_checks": {
+    "initial_packet": 74,
+    "qualified_prefix_source_packet": 35,
+    "all_match": true
+  },
+  "native_validations": {
+    "calls": 2,
+    "codex_exit": 0,
+    "claude_exit": 0,
+    "actual_stdout_configuration_valid": true,
+    "node_unknown_model_table_and_experimental_warning_retained": true,
+    "scope": "Shape/source only; no eval/model/grader"
+  },
+  "byte_identical_qualified_prefix_config_sha256": {
+    "codex": "9b3decf95fb9b3dc7293940eecf01a6d18cd591c5b88d0f50dcbdea5108a9a33",
+    "claude": "db4ce355e1dd17a24b28c5c11dde1d70a295d0e1da58cc8358b8e37d94e1559e"
+  },
+  "counter_schema_and_role_plan": "Fresh native main/one bounded max child; serial explicit returned UUID for checkpoints2\u20138; exact native responses/modelUsage countonce with resume correction. Separate stopped-case native grader; no tests/reference exposed to models.",
+  "pilot_registration_sha256": "c63dac8d85ce567fee7ddca1e6716b6de5bc00aa93ade21db9fc35cde0584025",
+  "later_execution_status": "Separate root registered first-stage native pilot has started; results are not asserted in this preparation receipt",
+  "limits": [
+    "Process-local write/Bash sandbox requested, not universal in-process Read/Write/Edit or filesystem confinement proof. Task explicitly forbids corpus/reference/auth/credential/peer/network access.",
+    "Native case/runtime/counter/resume/compaction/child effort and candidate quality remain execution gates.",
+    "Eight genuine checkpoints may not naturally compact; no protection inference or P2 weakening.",
+    "No comparison/freeze/default/goal acceptance; grader dependency closure remains its prior separate limitation."
+  ]
+}

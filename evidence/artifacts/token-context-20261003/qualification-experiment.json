@@ -59,7 +59,13 @@
       "retrieval-functional",
       "context-isolation-read",
       "native-command-schema",
-      "forge-local-grader"
+      "forge-local-grader",
+      "context-short-container",
+      "meter-artifact-overhead",
+      "context-parent-dwell",
+      "context-dwell-artifacts",
+      "forge-native-shape",
+      "forge-native-pilot-original"
     ],
     "roles": [
       "command-worker",
@@ -164,7 +170,16 @@
     "Existing named QMD search exact title/get docid span; fixed original15lines equality, no model",
     "Native codex exec -m gpt-6-astra -c model_reasoning_effort=max --sandbox read-only --json; process-local requested keyless pool route; read-only admission judgment",
     "Native Promptfoo command-carrier-native-schema eval; fresh main/child native structural-output diagnostic control",
-    "slop-code --quiet eval-snapshot <unchanged upstream checkpoint1 reference snapshot> -o <owned output> -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json"
+    "slop-code --quiet eval-snapshot <unchanged upstream checkpoint1 reference snapshot> -o <owned output> -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json",
+    "Pinned Inspector2.9 native initialize/list/index/search through inspected owned Docker stdio containers; separate native stop",
+    "Existing tools/token-report/token_manifest.py count_files(config,paths):159\u2013165 with gpt-tokenizer4.0.0/o200k_base; eleven separate original boundaries",
+    "Inspector2.9 native ctx_execute_file fixed70sec fixture with requested100000ms timeout",
+    "Promptfoo0.123.1 native directMCP eval same fixed70sec fixture with supported100000/110000ms limits",
+    "Existing token_manifest.count_files API on exact fixture/native reply/original directMCP output with o200k_base",
+    "Promptfoo0.123.1 native validate config -c original prepared Codex Forge JSON; actual Configuration is valid stdout",
+    "Promptfoo0.123.1 native validate config -c original prepared Claude Forge JSON; actual Configuration is valid stdout",
+    "Native Promptfoo package-bin eval registered original Forge checkpoint1 codex case, evaluator no-cache/repeat1/concurrency1; original relative -c config path",
+    "Native Promptfoo package-bin eval registered original Forge checkpoint1 claude case, evaluator no-cache/repeat1/concurrency1; original relative -c config path"
   ],
   "observations": [
     {
@@ -1375,6 +1390,285 @@
         "total": 0,
         "native_retries": null
       }
+    },
+    {
+      "id": "context-short-container-lifecycle",
+      "task": "context-short-container",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 31,
+      "evidence_class": "native_cli_execution",
+      "scope": "Five short model-free containers, actual mounts/store persistence/shutdown only;30sec parent guard unexercised, no client/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-container-short-qualification.json",
+          "sha256": "d2d3e1b4cc0005b38bb97bb2d4a193d949f98064203a1fcff44fefd3549c70aa"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "meter-artifact-report-boundaries",
+      "task": "meter-artifact-overhead",
+      "role": "meter-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 32,
+      "evidence_class": "native_cli_execution",
+      "scope": "Single maintained artifact counter invocation; no native model call by this executable, no provider or workflow savings claim",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-artifact-overhead-qualification.json",
+          "sha256": "5867f55bc7e20b8e585aaed32616aa38ae16b5eab7514d734a2c863a0a65397b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-inspector-parent-dwell",
+      "task": "context-parent-dwell",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 33,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate model-free native parent-lifecycle attempts, not repair/regrade/model/protection/default acceptance",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-parent-dwell-qualification.json",
+          "sha256": "2c758f93605c428e3bb90604fc8fe4fadab8d3bc466adb00de0f140f8b97ac8b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-promptfoo-parent-dwell",
+      "task": "context-parent-dwell",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 34,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate model-free native parent-lifecycle attempts, not repair/regrade/model/protection/default acceptance",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-parent-dwell-qualification.json",
+          "sha256": "2c758f93605c428e3bb90604fc8fe4fadab8d3bc466adb00de0f140f8b97ac8b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-dwell-artifact-boundaries",
+      "task": "context-dwell-artifacts",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 35,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free selected artifact or native shape validation only; no runtime/client/quality/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-parent-dwell-qualification.json",
+          "sha256": "2c758f93605c428e3bb90604fc8fe4fadab8d3bc466adb00de0f140f8b97ac8b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-shape-codex",
+      "task": "forge-native-shape",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 36,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free selected artifact or native shape validation only; no runtime/client/quality/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-preparation-qualification.json",
+          "sha256": "80b936a6136a8d5e1875d146a3d3d6f62c1518f68a793b42c664a8d1380a7860"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-shape-claude",
+      "task": "forge-native-shape",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 37,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free selected artifact or native shape validation only; no runtime/client/quality/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-preparation-qualification.json",
+          "sha256": "80b936a6136a8d5e1875d146a3d3d6f62c1518f68a793b42c664a8d1380a7860"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-pilot-original-codex",
+      "task": "forge-native-pilot-original",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 38,
+      "evidence_class": "native_cli_execution",
+      "scope": "Preserved failed source/runtime engineering feasibility attempt before code; no comparison/default/P2 acceptance",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-original-failures.json",
+          "sha256": "1c06312516721f3d1ea8e6faff031475f46fb08d13f4f5c7657ad49fe928586e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-pilot-original-claude",
+      "task": "forge-native-pilot-original",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 39,
+      "evidence_class": "native_cli_execution",
+      "scope": "Preserved failed source/runtime engineering feasibility attempt before code; no comparison/default/P2 acceptance",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-original-failures.json",
+          "sha256": "1c06312516721f3d1ea8e6faff031475f46fb08d13f4f5c7657ad49fe928586e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -1457,6 +1751,22 @@
     {
       "run_id": "native-command-schema-codex",
       "reason": "Preregistered N5 actual native Codex schema flag exposure remains UNPROVEN; source/config inference and gold PASS do not satisfy that condition."
+    },
+    {
+      "run_id": "context-inspector-parent-dwell",
+      "reason": "Pinned InspectorCLI ignores supplied timeout and fails original fixed70sec call at60sec; signal15/die143 cleanup remains distinct."
+    },
+    {
+      "run_id": "context-promptfoo-parent-dwell",
+      "reason": "Native directMCP returns0 with sustained guard/cleanup, but preregistered exact244byte response oracle fails;352byte source-derived carrier match is diagnostic only."
+    },
+    {
+      "run_id": "forge-native-pilot-original-codex",
+      "reason": "Native schema400with no emitted counters"
+    },
+    {
+      "run_id": "forge-native-pilot-original-claude",
+      "reason": "SDK loader fails before native query because root passed relativeconfig; source-bound zeros are placeholders, notbilling."
     }
   ],
   "limitations": [
@@ -1485,7 +1795,12 @@
     "Native Astra/max admission HOLD adds67800separate research tokens, three unique exact responses matched endpoint/snapshot; no cached/reasoning subset double count. Rejected missing-cwd launch occurred before a process and has no native usage record. A later official generic Docker stdio reference closes source discovery only, not CM qualification.",
     "Independent publication critic narrowed retrieval mutations:none to no explicit layer changes; internal existing-tool state writes are unknown. Pre-existing untracked .serena state is preserved, without inspecting its configuration or inferring causation.",
     "Native schema control163417 includes Codex child47140, absent from116277harness endpoint.2goldPASS does not establish N5nativeflag exposure; retain UNPROVEN and estimatedClaude.4062966USD, unknowninvoice/retries. Originalfailed30files unchanged. Localnativegrader40PASS is separatemodel-freeupstreamreference evidence, not model/candidate/P2 acceptance.",
-    "Publication-unit5 first registry import failed before mutation; native validation exit1 correctly reported three stale registrations and six unlisted receipts. Supported package import and scoped registration correct that publication error; original output is retained."
+    "Publication-unit5 first registry import failed before mutation; native validation exit1 correctly reported three stale registrations and six unlisted receipts. Supported package import and scoped registration correct that publication error; original output is retained.",
+    "Publication-unit6 source readers initially guessed missing source directories and an absent failed_attempts key. Native errors precede runtime/model calls; selected filesystem locators and actual failures_and_skips schema correct the metadata reads without re-running measurements.",
+    "Short-container prior manifest check passed10176; current independent/root check matches10174 and reports2missing copied historical npm debuglogs. Current custody is partial, original source/runtime results and manifest unchanged.",
+    "Two registered native Forge pilot attempts fail before code: Codex400strictschema/type error with native usage unemitted; Claude SDK resolution fails because root used relativeconfig and pinned loader falls back to cwd. Separate source-supported recovery registration retains both failures. No shape-validation/import/typed-copy metadata substitutes runtime/P2 acceptance.",
+    "Original-failed packet hash projection first used worktree cwd for relative manifest paths. Corrected read anchors each path at the actual private packet directory; no original files, runtime observations or model calls changed.",
+    "Unit6 sanitization changed the public meter-artifact receipt bytes while leaving its experiment anchor stale; consistency check correctly failed. Public anchor now matches sanitized bytes, private original hashes/measurements remain unchanged; failed validator outputs retained."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -1536,7 +1851,16 @@
       "astra-context-isolation",
       "native-command-schema-codex",
       "native-command-schema-claude",
-      "forge-local-grader-reference"
+      "forge-local-grader-reference",
+      "context-short-container-lifecycle",
+      "meter-artifact-report-boundaries",
+      "context-inspector-parent-dwell",
+      "context-promptfoo-parent-dwell",
+      "context-dwell-artifact-boundaries",
+      "forge-native-shape-codex",
+      "forge-native-shape-claude",
+      "forge-native-pilot-original-codex",
+      "forge-native-pilot-original-claude"
     ],
     "coverage_artifact": null
   }

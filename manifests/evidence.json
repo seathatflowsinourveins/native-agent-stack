@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
-      "sha256": "7b95ada21bed88a04967ae95dece6a24b86e800584fef84211ae9a26ab6e9d2a",
-      "bytes": 37786
+      "sha256": "fc995a78d00f78dfea5e6dbf31ee9e910a3785f723b29c7e3c189e17cabc5569",
+      "bytes": 46329
     },
     {
       "path": "docs/direct-results.md",
@@ -45335,6 +45335,11 @@
       "bytes": 9122
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/context-container-short-qualification.json",
+      "sha256": "d2d3e1b4cc0005b38bb97bb2d4a193d949f98064203a1fcff44fefd3549c70aa",
+      "bytes": 4130
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/context-isolation-astra-read.json",
       "sha256": "c14ccc68f87d002d37af441301598f779df7587dc058af84499e4eac410972c1",
       "bytes": 4491
@@ -45345,9 +45350,24 @@
       "bytes": 10761
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/context-parent-dwell-qualification.json",
+      "sha256": "2c758f93605c428e3bb90604fc8fe4fadab8d3bc466adb00de0f140f8b97ac8b",
+      "bytes": 5049
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/forge-local-grader-qualification.json",
       "sha256": "17db8ce847c844ea4468f55fbc9736f2c516b50691d56c5e2950a0e87c7419cf",
       "bytes": 4127
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-original-failures.json",
+      "sha256": "1c06312516721f3d1ea8e6faff031475f46fb08d13f4f5c7657ad49fe928586e",
+      "bytes": 5197
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-preparation-qualification.json",
+      "sha256": "80b936a6136a8d5e1875d146a3d3d6f62c1518f68a793b42c664a8d1380a7860",
+      "bytes": 2234
     },
     {
       "path": "evidence/artifacts/token-context-20261003/forge-preparation-qualification.json",
@@ -45360,9 +45380,24 @@
       "bytes": 2739
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/landscape-followup-source-qualification.json",
+      "sha256": "0e9c1685ef85e32f073e76648c6fde75ca9ffdfd2b1db6aaa64d2a01becd0c15",
+      "bytes": 2644
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/meter-artifact-overhead-qualification.json",
+      "sha256": "5867f55bc7e20b8e585aaed32616aa38ae16b5eab7514d734a2c863a0a65397b",
+      "bytes": 10735
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/meter-compaction-qualification.json",
       "sha256": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670",
       "bytes": 4056
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/meter-job-verdict-qualification.json",
+      "sha256": "3e1c6c96471da74698942cb9582f1f13eb07ab390c29d3640342b2345f2d9a38",
+      "bytes": 9521
     },
     {
       "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
@@ -45395,6 +45430,11 @@
       "bytes": 8759
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/native-sdk-loader-source-qualification.json",
+      "sha256": "5709f16ad37d98e54c83c71f4ba11b6eb4baf6a6acb4e74c33d77a11947e8431",
+      "bytes": 2245
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/native-structured-baseline-qualification.json",
       "sha256": "ea06789baee978a8aeb5b1a1af6059f1b787f9e9832c2277b00f46f8bad427b3",
       "bytes": 14986
@@ -45411,8 +45451,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "079a8a3dbb9478fc06c7ea5f874cd816e42fc9b4a6e998aa1437e45283847b62",
-      "bytes": 58248
+      "sha256": "52ac04648a9fec921c2457db3a1e348cb2615e7ac69e752ba2c0f638522336c2",
+      "bytes": 71081
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",

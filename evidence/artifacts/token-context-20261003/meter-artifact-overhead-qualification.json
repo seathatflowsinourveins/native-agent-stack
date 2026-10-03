@@ -1,0 +1,190 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "maintained_artifact_counter_execution",
+  "operation": "One existing token_manifest.count_files call; neither unchanged-upstream acceptance nor provider/model comparison",
+  "status": "PASS exact UTF-8 artifact count; accounting quality is assessed independently",
+  "measurement_input_manifest_sha256": "e30050f52d896f75bf07af54eef627f9fe8ab0394a965ee40bdd2a8e2898dc1f",
+  "software": {
+    "repository_head": "c56954a404d75dda1d3296438ac496d205541acc",
+    "reporter_path": "<study-checkout>/tools/token-report/token_manifest.py",
+    "reporter_sha256": "57c98b9b1389315a06de47f59d6d4708e00f44959e02a717f14e0c500365b8b4",
+    "supported_api": "token_manifest.count_files(config,paths):159-165",
+    "tokenizer_name": "gpt-tokenizer",
+    "tokenizer_version": "4.0.0",
+    "encoding": "o200k_base",
+    "module_path": "<private-study>/toon-qualification/tokenizer/node_modules/gpt-tokenizer/cjs/encoding/o200k_base.js",
+    "module_sha256": "51ad895a49b5acb36368ae67639ebe3463e360df63e46553afe2f75421f6abcb",
+    "package_sha256": "5c1517b19eb0165a04f1eeab33bc0843b5d338cd3b517a26710ee0af5144b7ee",
+    "node_path": "<installed-node24.21.0>"
+  },
+  "actual_native_invocation": {
+    "record": "artifact-count-invocation.json",
+    "sha256": "febd8fe26bc9fb9018b81d1613e927280a048d0790cc79205e79963c310c5a83",
+    "exit_code": 0,
+    "native_tool_wall_seconds": 0.184527786,
+    "started_utc": "2026-10-03T07:03:45.777035+00:00",
+    "completed_utc": "2026-10-03T07:03:46.031821+00:00",
+    "stdout_sha256": "455ab0b4cf9d9bfc8e8a9ad66b0132b1eabe00dfef7bd70204e0e776936de00d",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_bytes": 0
+  },
+  "artifacts": [
+    {
+      "alias": "m1_codex_original_released_report",
+      "path": "<private-study>/meter-qualification/full.stdout.json",
+      "bytes": 658,
+      "sha256": "17e66f8fc6b382b1b9ba29dbcbc89fe5830063e4ae7422d6108ff65256f53daf",
+      "boundary": "Complete original UTF-8 stdout, including released report identity/model metadata and formatting",
+      "overlap_group": "m1_codex_report",
+      "o200k_tokens": 259,
+      "post_count_sha256": "17e66f8fc6b382b1b9ba29dbcbc89fe5830063e4ae7422d6108ff65256f53daf"
+    },
+    {
+      "alias": "m1_claude_original_released_report",
+      "path": "<private-study>/meter-qualification/claude.stdout.json",
+      "bytes": 588,
+      "sha256": "310c04c0f9bb29dbcef907c265c95310c4b90332570769aa2bb4c653278e489b",
+      "boundary": "Complete original UTF-8 stdout, including released report metadata and formatting",
+      "overlap_group": "m1_claude_report",
+      "o200k_tokens": 226,
+      "post_count_sha256": "310c04c0f9bb29dbcef907c265c95310c4b90332570769aa2bb4c653278e489b"
+    },
+    {
+      "alias": "m2_codex_original_released_report",
+      "path": "<private-study>/promptfoo-qualification/native-accounting-second-attempt/meter-m2-full.stdout.json",
+      "bytes": 725,
+      "sha256": "223c80e0730137c11061708543d6e480408d67c3de0938b088dd104e14f3f1de",
+      "boundary": "Complete original UTF-8 stdout from failed accounting check, including released report identity/model metadata and formatting",
+      "overlap_group": "m2_usage",
+      "o200k_tokens": 287,
+      "post_count_sha256": "223c80e0730137c11061708543d6e480408d67c3de0938b088dd104e14f3f1de"
+    },
+    {
+      "alias": "m1_codex_selected_usage_input",
+      "path": "<private-study>/meter-qualification/full-counters/rollout-2026-10-03T03-22-52-<private-native-id>.jsonl",
+      "bytes": 15326,
+      "sha256": "ffcd66890d97ca2c8595777fa91ddae87a9bdd28a7d7f52f6907136578c2cfab",
+      "boundary": "Existing selected usage-only native input with exact records and legacy snapshots; not the cheapest adequate aggregate presentation",
+      "overlap_group": "m1_codex_report",
+      "o200k_tokens": 4722,
+      "post_count_sha256": "ffcd66890d97ca2c8595777fa91ddae87a9bdd28a7d7f52f6907136578c2cfab"
+    },
+    {
+      "alias": "m1_claude_selected_usage_input",
+      "path": "<private-study>/meter-qualification/claude-counters/study/<private-native-id>.jsonl",
+      "bytes": 7092,
+      "sha256": "16ffdddb3806723e19e65b854aea58cacedc65ca95a249ef95a776b0263fea9e",
+      "boundary": "Existing seven usage-only assistant snapshots/two chronological request-message pairs; not a fresh model input or complete query aggregate",
+      "overlap_group": "m1_claude_report",
+      "o200k_tokens": 2277,
+      "post_count_sha256": "16ffdddb3806723e19e65b854aea58cacedc65ca95a249ef95a776b0263fea9e"
+    },
+    {
+      "alias": "m2_native_usage_legacy_checkpoint_input",
+      "path": "<private-study>/promptfoo-qualification/native-accounting-second-attempt/codex-root-through-third-compaction.jsonl",
+      "bytes": 299794,
+      "sha256": "3e1710a8d2d4d0c5eb86a724228de58c9565cc0dbcd6303fce363077e96abd92",
+      "boundary": "Existing usage-only input:199 exact responses,245 legacy snapshots,three repeated checkpoint references",
+      "overlap_group": "m2_usage",
+      "o200k_tokens": 94506,
+      "post_count_sha256": "3e1710a8d2d4d0c5eb86a724228de58c9565cc0dbcd6303fce363077e96abd92"
+    },
+    {
+      "alias": "m2_native_canonical_request_projection",
+      "path": "<private-study>/promptfoo-qualification/native-accounting-second-attempt/codex-root-third-compaction-canonical-requests.jsonl",
+      "bytes": 160385,
+      "sha256": "aada0ef795129c43a9411de405730644781f2358f17579d34812accdc50f376c",
+      "boundary": "Existing199-response canonical native accounting projection; alternative view of the same input, not an independent addition",
+      "overlap_group": "m2_usage",
+      "o200k_tokens": 55550,
+      "post_count_sha256": "aada0ef795129c43a9411de405730644781f2358f17579d34812accdc50f376c"
+    },
+    {
+      "alias": "m2_native_common_category_projection",
+      "path": "<private-study>/meter-verdict-proposal/m2-native-aggregate-projection.json",
+      "bytes": 165,
+      "sha256": "832158ade0238383c233fe28d384d041eef2400ddcbe054c769c726ea31fa59b",
+      "boundary": "New compact JSON projection of the already frozen native six-category aggregate, preserving inclusive/subset semantics",
+      "overlap_group": "m2_usage",
+      "o200k_tokens": 44,
+      "post_count_sha256": "832158ade0238383c233fe28d384d041eef2400ddcbe054c769c726ea31fa59b"
+    },
+    {
+      "alias": "m2_meter_common_category_projection",
+      "path": "<private-study>/meter-verdict-proposal/m2-meter-common-category-projection.json",
+      "bytes": 165,
+      "sha256": "6ee7872521a28d0c95f7e971ea10a0ca01eb61b8e5b9d5a626d680bcb9d35f2a",
+      "boundary": "New compact JSON projection of original returned report into the same six native category names; preserves the accounting mismatch",
+      "overlap_group": "m2_usage",
+      "o200k_tokens": 44,
+      "post_count_sha256": "6ee7872521a28d0c95f7e971ea10a0ca01eb61b8e5b9d5a626d680bcb9d35f2a"
+    },
+    {
+      "alias": "m1_exact_only_synthetic_failure_diagnostic",
+      "path": "<private-study>/meter-qualification/exact.stderr.txt",
+      "bytes": 88,
+      "sha256": "548a5ecc6029bb061b4e5b24b28166551e82c70b847cf063d7901ee980b9586f",
+      "boundary": "Complete original stderr of exact-only synthetic negative control; separate from full successful CLI output",
+      "overlap_group": null,
+      "o200k_tokens": 37,
+      "post_count_sha256": "548a5ecc6029bb061b4e5b24b28166551e82c70b847cf063d7901ee980b9586f"
+    },
+    {
+      "alias": "m2_exact_only_synthetic_failure_diagnostic",
+      "path": "<private-study>/promptfoo-qualification/native-accounting-second-attempt/meter-m2-exact-only.stderr.txt",
+      "bytes": 88,
+      "sha256": "2e8dc16a2c14407bd06a47b6b0a3e6fbcc452472786fc249c875f872bdb124de",
+      "boundary": "Complete original stderr of exact-only synthetic negative control; separate from full failed-accounting CLI output",
+      "overlap_group": null,
+      "o200k_tokens": 38,
+      "post_count_sha256": "2e8dc16a2c14407bd06a47b6b0a3e6fbcc452472786fc249c875f872bdb124de"
+    }
+  ],
+  "projection_sources": {
+    "m2-native-aggregate-projection.json": {
+      "path": "<private-study>/promptfoo-qualification/native-accounting-second-attempt/codex-root-third-compaction-preregistration.json",
+      "sha256": "9f5264fdbdc73c3a080f95d660694a303e2b7b0d9ec2dbb14d4be3486e51836c",
+      "json_pointer": "/expected_native_top_level_only/usage"
+    },
+    "m2-meter-common-category-projection.json": {
+      "path": "<private-study>/promptfoo-qualification/native-accounting-second-attempt/meter-m2-full.stdout.json",
+      "sha256": "223c80e0730137c11061708543d6e480408d67c3de0938b088dd104e14f3f1de",
+      "mapping": "inputTokens+cacheReadTokens+cacheCreationTokens => input_tokens; read/write/output/reasoning/total are explicit mapped fields"
+    }
+  },
+  "artifact_result": {
+    "original_reports_o200k": {
+      "m1_codex": 259,
+      "m1_claude": 226,
+      "m2_codex": 287
+    },
+    "m2_common_category_json": {
+      "native_bytes": 165,
+      "native_o200k_tokens": 44,
+      "meter_bytes": 165,
+      "meter_o200k_tokens": 44,
+      "same_categories_and_counts": false,
+      "semantic_accounting_pass": false
+    },
+    "native_request_input_views": {
+      "m2_full_usage_legacy_checkpoint_tokens": 94506,
+      "m2_canonical_requests_tokens": 55550,
+      "overlap": "Alternative views of the same fixed199 native responses. Do not add them or interpret their difference as lossless compression or actual model exposure."
+    },
+    "failure_diagnostic_tokens": {
+      "m1_synthetic_exact_only": 37,
+      "m2_synthetic_exact_only": 38
+    }
+  },
+  "non_additive_rule": "Reports, native inputs, canonical requests and aggregate projections overlap within each group; never sum them as savings or provider usage. Diagnostics are separate failed-attempt artifacts. No artifact here was necessarily presented to a model.",
+  "provider_tokens_saved": null,
+  "provider_cost_saved": null,
+  "model_invocation_scope": "No native model calls from the retained ccusage CLI/count_files subprocesses; coordinator/research/worker usage is a separate scope, not a zero-cost study.",
+  "unknowns": [
+    "Native versus candidate matched end-to-end CPU/RSS/reporting-time comparison",
+    "Whole-model prompt framing, actual artifact exposure and provider savings",
+    "Invoice charges and usage not emitted by the declared native endpoints"
+  ],
+  "quality_preservation": "Equal44-token common-category presentations retain different numeric values; M2 critical accounting failure remains FAIL. Original report fields and negative-control errors remain preserved.",
+  "private_original_receipt_sha256": "5f0764c4d8966d7606c69868137edd72e2e0e9eaa0d2429e5571dd4be0f420bd"
+}

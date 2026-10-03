@@ -1,0 +1,175 @@
+{
+  "study": "token-context-20261003",
+  "operation": "Private proposed metering job verdict from reused M1/M2 evidence plus one artifact-only measurement",
+  "status": "Qualified proposal: native baseline wins for tested accounting scope; final job/study acceptance pending",
+  "north_star_action": "Source-faithful long research/engineering with counted-once native usage and no false provider-saving claim",
+  "source_pins": {
+    "ccusage": "ccusage/ccusage@d9821088b98aa536c7a385aa1a4579d6fa02269b (20.0.26)",
+    "native_codex": "openai/codex@rust-v0.160.0",
+    "reporter": "native-agent-stack@c56954a404d75dda1d3296438ac496d205541acc tools/token-report/token_manifest.py:159-165",
+    "artifact_tokenizer": "gpt-tokenizer4.0.0/o200k_base"
+  },
+  "proposed_plain_verdict": "Native baseline wins within the required exact native-accounting scope demonstrated by these fixed inputs.",
+  "protocol_outcome": "native retained: candidate excluded",
+  "what_is_measured": "Accounting correctness advantage on a fixed199-response Codex native main-thread corpus, not causal token/cost/reporting-speed superiority",
+  "why_existing_evidence_is_decisive": "M2 preregistration required exact categories and explicitly excludes the released meter scope on mismatch; protocol49,53,73 preserves that exclusion without manufacturing model arms or relaxing quality. The no-install tie rule is not invoked: the meters did not both reconcile.",
+  "M1": {
+    "codex_main_unique_responses": 9,
+    "codex_total": 476440,
+    "claude_final_request_message_pairs": 2,
+    "claude_total": 90543,
+    "selected_categories_reconcile": true,
+    "scope": "Selected main-thread projections only; seven chronological Claude snapshots are not summed",
+    "exact_only_control": "Synthetic legacy-removal negative:exit1; not another native session",
+    "claude_display_zero_cost": "Missing costUSD makes returned0 unknown monetary cost, not free use"
+  },
+  "M2": {
+    "frozen_cutoff": "2026-10-03T04:32:15.579Z",
+    "native_source_prefix": {
+      "cutoff_record_type": "compacted",
+      "cutoff_timestamp": "2026-10-03T04:32:15.579Z",
+      "bytes": 9166678,
+      "line_count": 2102,
+      "sha256": "8ac153fdd7ece1ea7226ed7ede11fa595a8f9da1646304422d1bfbb2a704c2e8"
+    },
+    "input_projection_sha256": "3e1710a8d2d4d0c5eb86a724228de58c9565cc0dbcd6303fce363077e96abd92",
+    "top_level_exact_responses": 199,
+    "checkpoint_references": 3,
+    "checkpoint_references_already_counted": true,
+    "native_categories": {
+      "input_tokens": 25441585,
+      "cached_input_tokens": 24683520,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 177690,
+      "reasoning_output_tokens": 68259,
+      "total_tokens": 25619275
+    },
+    "released_meter_categories": {
+      "input_tokens": 24813461,
+      "cached_input_tokens": 24063744,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 151998,
+      "reasoning_output_tokens": 68259,
+      "total_tokens": 24965459
+    },
+    "native_minus_meter": {
+      "input_tokens": 628124,
+      "cached_input_tokens": 619776,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 25692,
+      "reasoning_output_tokens": 0,
+      "total_tokens": 653816
+    },
+    "compaction_response_totals": [
+      225104,
+      207996,
+      220716
+    ],
+    "total_omission_matches_compactions": true,
+    "native_thread_endpoint_matches_exact_sum": true,
+    "meter_matches_last_legacy_snapshot": true,
+    "native_cli_exit": 0,
+    "accounting_quality": "FAIL",
+    "exact_only_control": "Synthetic legacy-removal negative:exit1; fails to recognize these exact records",
+    "stdout_sha256": "223c80e0730137c11061708543d6e480408d67c3de0938b088dd104e14f3f1de",
+    "outer_native_wall_scope": "Full CLI native outer-tool wall0.459141102s; no matched native projection timing baseline, no speed verdict"
+  },
+  "count_once": "Unique response IDs, rejecting conflicting duplicates; compacted latest-record and thread/turn/legacy snapshots reconcile only. Cached/write/reasoning subsets are not additions. M1 and M2 are distinct inputs, not a whole-study trajectory total.",
+  "artifact_overhead": {
+    "receipt": "artifact-report-overhead-receipt.json",
+    "sha256": "5f0764c4d8966d7606c69868137edd72e2e0e9eaa0d2429e5571dd4be0f420bd",
+    "complete_original_reports_o200k": {
+      "m1_codex": 259,
+      "m1_claude": 226,
+      "m2_codex": 287
+    },
+    "m2_same_category_projections_o200k": {
+      "native": 44,
+      "meter": 44
+    },
+    "same_category_quality": "FAIL; equal presentation size does not repair omitted compaction use",
+    "provider_tokens_saved": null,
+    "provider_cost_saved": null
+  },
+  "unchanged_upstream_evidence": "Pinned native Cargo workspace:944pass/0fail/3ignored. Released synthetic legacy replay/fork/cumulative tests passed; full Nix CI and new-format live child/advisor/resume/retry coverage are not implied.",
+  "unresolved_criteria": [
+    {
+      "criterion": "Whole-role/continuity meter completeness",
+      "state": "UNQUALIFIED in M1/M2",
+      "detail": "Live child/fork/advisor/retry/resume and Claude natural-compaction formats were not compared here. Released legacy fixture success cannot establish current exact-record completeness."
+    },
+    {
+      "criterion": "Reporting efficiency",
+      "state": "ARTIFACT COUNTS MEASURED; WORKFLOW ADVANTAGE UNPROVEN",
+      "detail": "Original complete report sizes and overlapping fixed input/common projections are bound. No paired runtime/CPU/RSS, required-extra-reporting capability or provider-savings comparison exists."
+    },
+    {
+      "criterion": "Provider/invoice provenance",
+      "state": "UNKNOWN OUTSIDE DECLARED NATIVE ENDPOINTS",
+      "detail": "Completed native response IDs bind the observed corpus. Best-effort native response usage does not identify every HTTP/retry/billable request. Invoice/subscription spend is unknown; no-cost/missingPricing/display0 are not money."
+    },
+    {
+      "criterion": "Fresh main/child native invocation and final study acceptance",
+      "state": "NOT ESTABLISHED BY THESE M1/M2 INPUTS",
+      "detail": "The protocol requires a separate both-client fresh main/child contract after default qualification, final bound protocol/read/head and actual PR acceptance. Reuse other passing evidence only if its bindings match; do not mark this proposal or the goal complete."
+    }
+  ],
+  "completeness_critic": [
+    "The current release/main compaction parsing drift is a source lead, not passing evidence for20.0.26; a new pin needs its own unchanged tests and fixed exact reconciliation.",
+    "Per-request helper/advisor/retry provenance, current child/fork/replay/resume formats and interrupted transport remain outside the selected corpus.",
+    "Actual natural compaction tests accounting coverage only; protection quality, continuity, occupancy and other token layers remain separate.",
+    "No broad metering SOTA, automatic profile/tool adoption, full-provider billing, performance victory or goal-completion claim."
+  ],
+  "source_bindings": [
+    {
+      "label": "draft_protocol",
+      "path": "<study-checkout>/evidence/artifacts/token-context-20261003/protocol.md",
+      "sha256": "b12611a39d5e858e1de8b1acd22eedc67dc3df6a5b76be4b192106107e150ca6",
+      "locators": "M1:47; M2:49; qualification:53; all-attempt:61; count-once:63-65; outcome:73; artifact-boundary:75; freeze/publication:79-87"
+    },
+    {
+      "label": "M1_receipt",
+      "path": "<study-checkout>/evidence/artifacts/token-context-20261003/meter-qualification.json",
+      "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b",
+      "locators": "integration_checks; upstream_test; limitations"
+    },
+    {
+      "label": "M2_receipt",
+      "path": "<study-checkout>/evidence/artifacts/token-context-20261003/meter-compaction-qualification.json",
+      "sha256": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670",
+      "locators": "preregistration; native; released_meter; omissions; limits"
+    },
+    {
+      "label": "M2_preregistration",
+      "path": "<private-study>/promptfoo-qualification/native-accounting-second-attempt/codex-root-third-compaction-preregistration.json",
+      "sha256": "9f5264fdbdc73c3a080f95d660694a303e2b7b0d9ec2dbb14d4be3486e51836c",
+      "locators": "expected_native_top_level_only; compactions; comparison_rule"
+    },
+    {
+      "label": "released_parser",
+      "path": "<private-study>/ccusage-source/rust/adapters/codex/src/parser.rs",
+      "sha256": "b5ab26bf9b46974797e95031d3f34972ff7d2835e8956dfc6699c290789da490",
+      "locators": "113-131,318-328"
+    },
+    {
+      "label": "native_protocol",
+      "path": "/tmp/nas-token-meter-source/codex__codex-rs__protocol__src__protocol.rs",
+      "sha256": "d3d3d384da91b2824c10091de4331a2bc26ec5474887ed0aef1e3f3c4ae110f4",
+      "locators": "1933-1936,2240-2272"
+    },
+    {
+      "label": "native_exec",
+      "path": "/tmp/nas-token-codex-exec-jsonl-0160.rs",
+      "sha256": "bc296541b385f9b4ca2c28cc638e25a8d6b1332b2cd67f5a03eaa97a3d612b19",
+      "locators": "118-128,509-510,533-534"
+    }
+  ],
+  "independent_review": {
+    "verdict": "ACCEPT narrow accounting scope only",
+    "artifact_or_source_hashes_verified": 30,
+    "unchanged_upstream_test_source_files_verified": 501,
+    "root_projection_of_delivered_conclusion_sha256": "66f4de941f7bb5507af16de008d64491e78a72974cb3c059a0bc581e6996b8be",
+    "original_worker_message_retained_in_root_session": true,
+    "not_user_approval": true
+  }
+}
