@@ -2,6 +2,25 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "north-star-publication-security-convergence-20261002",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "A bounded native Claude review conditionally supported the inactive historical WSL retrieval archive policy, and the same-host peer acknowledged non-overlapping ownership. Implemented guard, mutation and attribution checks passed; ordinary controls still detect the historical advisory, while the isolated expiring archive scan and all three inventory scans pass. Fresh exact-head required CI remains pending at publication.",
+      "limitations": [
+        "This is an archive-only security exception through 2026-11-02T00:00:00Z; braces 3.0.3 is not patched or declared safe. QMD activation is refused and future runnable retrieval requires separate normally scanned qualified source and lock.",
+        "The first native review timed out without a verdict. The completed review exceeded its 450-word constraint with 566 words and reported an internal Claude Fable 5.1 advisor alongside Opus 5.5.",
+        "Native policy agreement and peer acknowledgement do not establish implementation, runtime or CI acceptance. The model reviewed base revision 999eebd; independent source controls qualify the subsequent implementation.",
+        "Two of 193 affected source tests skipped: no frozen workflow exemptions existed, and PyYAML was unavailable. The text workflow parser was tested. Nine portable-default tests also passed.",
+        "The native three-part SARIF controller uses the exact inventory and pinned scanner, but does not execute GitHub's Bash mapfile block or upload SARIF. Exact workflow execution remains a fresh CI gate.",
+        "The installed Codex 0.160.0 default service tier and Sol/Ultra fields were source/schema checked without a model request. The generic Ultra template correction does not qualify older portable pins, SDK routes or explicit Max profiles.",
+        "Full-stack readiness remains false. Surviving workstation, account, historical-data fitness, native paper faults and broader lifecycle gates retain their separate ownership and acceptance requirements.",
+        "Whole-task usage, failed-request settlement, escaped-descendant cleanup, billing and net savings remain unknown. Raw sessions, personal paths and authentication/configuration details remain private."
+      ],
+      "path": "evidence/receipts/north-star-publication-security-convergence-20261002.json"
+    },
+    {
       "id": "nautilus-spy-stress-two-processes-20261002",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -3972,9 +3991,14 @@
       "bytes": 2547
     },
     {
+      "path": ".github/osv-scanner-frozen-wsl-retrieval.toml",
+      "sha256": "949738750fff3878608d44b873001a91bdb903661bf46bc1b7fb2ad0becff2cc",
+      "bytes": 1291
+    },
+    {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "f47d554c18935ff97156d1fb59b423896cb5bb644b08222828759ab605babb71",
-      "bytes": 10955
+      "sha256": "76f5b378687a6fa32977c7d51d66de89ae195b4a4b7edab2a3c458fe530e7d6e",
+      "bytes": 11020
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4053,8 +4077,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "1df67c92865aa16f53cbb9b451fa3fa82a83a50950dc20a8efeea227f93f6240",
-      "bytes": 11346
+      "sha256": "3a390947f34d0b244dee7adfe97ade5b4e22cc9cc130dde94c2d852d39aeb7da",
+      "bytes": 12714
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -4428,8 +4452,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "87aed5466cb8cb4bf14227e763dbe9f9a7f270f5cbedfb407bc5d39ea9912679",
-      "bytes": 14510
+      "sha256": "6f14c8635290b5f1da350fb6f6dc784087eac4a36c571dbd5767adc28cd0d497",
+      "bytes": 14682
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -6669,8 +6693,13 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/README.md",
-      "sha256": "e15a193803dfee256bd81d303ff1b309820b42ca16b2af9252f66d7137a494b3",
-      "bytes": 6575
+      "sha256": "31da660adfe46c73759af86458a20c32dc144c317988558ecde291579cf717ae",
+      "bytes": 6844
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/archive-policy-20261002.json",
+      "sha256": "99962aba83c708efd1eb54351a43f1c06d685e4b3496e3d9a8fdd9d4e39273a2",
+      "bytes": 1575
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
@@ -6723,6 +6752,11 @@
       "bytes": 12226
     },
     {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-future-before-archive-20261002.py.txt",
+      "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
+      "bytes": 16427
+    },
+    {
       "path": "blueprints/convergence-practice/wsl-retrieval/run-initial.py.txt",
       "sha256": "50012822197f88a736b1eddfa7f3b81a425a86af183051cc3da06bc0514cb2f0",
       "bytes": 14888
@@ -6734,8 +6768,8 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
-      "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
-      "bytes": 16427
+      "sha256": "728f4e52d6929cde6ef64c731f9c6aeb06e21703616ceb2face33ee10996c116",
+      "bytes": 17150
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/decoy/other.md",
@@ -15868,6 +15902,11 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+      "sha256": "39b7e7d1205ad4fa11628b0922fadfd2881fdfa705c9d649a285ba4c79e2bbc1",
+      "bytes": 10110
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
       "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
       "bytes": 8312
@@ -15926,6 +15965,11 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
       "bytes": 16881
+    },
+    {
+      "path": "docs/decisions/2026-10-02-wsl-retrieval-archive.md",
+      "sha256": "cadf4733be8e660fa1b821bc7237af8015348689037f5c549c4d9ea40c6b779c",
+      "bytes": 4669
     },
     {
       "path": "docs/direct-results.md",
@@ -47958,6 +48002,11 @@
       "bytes": 9846
     },
     {
+      "path": "evidence/receipts/north-star-publication-security-convergence-20261002.json",
+      "sha256": "e49fc239ce8d35c1fcb1455d495edea0799b97777a5a9cff77c33f517d3e0319",
+      "bytes": 7616
+    },
+    {
       "path": "evidence/receipts/notification-types-20260929.json",
       "sha256": "7f5422e2b4d7c60801b48d735619689802b3b353199e149c2667c586cc90cf5d",
       "bytes": 24695
@@ -48949,8 +48998,8 @@
     },
     {
       "path": "scripts/validate_convergence.py",
-      "sha256": "f8087ceb7a103130808b0cdc2b071cac02edf5fc6dd3e21870618b99c7678367",
-      "bytes": 14985
+      "sha256": "c49751ef44c8e30324dae87f7939678a30003c24cca6f6d3c5d73c60c1907aa7",
+      "bytes": 16429
     },
     {
       "path": "scripts/validate_foundation.py",
@@ -48961,6 +49010,11 @@
       "path": "scripts/verify_nautilus_ci.py",
       "sha256": "e14e3372815747eefa800f3538f30eabfb4fab7025ccc507bb0b946e67d2292f",
       "bytes": 8608
+    },
+    {
+      "path": "scripts/wsl_retrieval_archive.py",
+      "sha256": "0a72c6f465ce259104743969d7034c639c2a9602f75238298530a4e739fcd9a6",
+      "bytes": 9233
     },
     {
       "path": "tests/__init__.py",
@@ -49389,8 +49443,8 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "98f8071ed61b3a78e584f01bece20511b08446ac753984ce41896d5fcdcd4000",
-      "bytes": 33199
+      "sha256": "df4e4cf07abaf1971e473103dd1576360dee89728ffcbcbfd3a7ad0e41677901",
+      "bytes": 33258
     },
     {
       "path": "tests/test_codex_worker_lane.py",
@@ -49809,8 +49863,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "31780dc60ea10f55597dbc984628fa22019a0a0c3cc63727f2a684fff2ea383e",
-      "bytes": 46337
+      "sha256": "998fb13fb290a3dc953debf9a3d1dc6eaad773ee37cbbe2fb923e2641153532d",
+      "bytes": 47055
     },
     {
       "path": "tests/test_path_safety.py",
@@ -49869,8 +49923,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "6f1ecd5731cb676c0b50ee54a15375eeea4858742b460723046211b756ea3448",
-      "bytes": 43257
+      "sha256": "0a79268e2e97bb57584db28e2c9bc01fc38695252649536082e42c4af5c50407",
+      "bytes": 43290
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -50059,8 +50113,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "f9b5b418ac5bd232aaad49f20bec2d2cdef556e31c8fb87397a4ad0ede0e21b3",
-      "bytes": 87393
+      "sha256": "0e4ef22bbf2f3a225c6ffc4710869b4b72e1f2c0b111883c2bd1a315f355fcdb",
+      "bytes": 87715
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -50096,6 +50150,11 @@
       "path": "tests/test_wsl_retrieval.py",
       "sha256": "83353f3ccaa8bc01518f529846bf92167f7e21023e430ef8523af3e129afd903",
       "bytes": 12720
+    },
+    {
+      "path": "tests/test_wsl_retrieval_archive.py",
+      "sha256": "ffd93b454808bf6dd929c2bdbfc9012c6e14cfb051d09c0b319c7d99f1320fc0",
+      "bytes": 21361
     },
     {
       "path": "tests/test_zizmor_negative_control.py",

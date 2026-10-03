@@ -79,31 +79,31 @@ source bodies, URI scope, stale updates, erased failures and unsupported claims.
 A zero audit exit means retained facts are consistent; its result explicitly
 reports `native_acceptance_established: false`. It cannot repair missing evidence.
 
-## Future command capture and supported installation
+## Inactive archive and command capture
 
-[run.py](run.py) is a future recording aid. It now retains each attempted command's
+[run.py](run.py) refuses `--mode qmd` before any effects. An independent read-only
+archive preflight validates metadata, the recorder hash, lock and expiry before
+any recorder mode can create state or launch commands. The harmless offline
+[audit](audit.py) remains available. Its source-only recording helper retains each attempted command's
 sanitized argument vector and working directory before launch, preserves argument
 boundaries, and records failed launches and timeouts. Private path roots become
 scope markers such as `<RUN>` and `<NODE>`; original historical facts receive no
 fabricated fields. Mocked regressions exercise this recording without invoking
 native retrieval. Both previously executed runner versions remain archived.
 
-For a separately authorized fresh QMD trial, follow the maintained
-[QMD native recipe](../../../recipes/README.md#component-catalog-install-and-check) and
-[native token fixture guidance](../../../docs/native-token-ci.md). The supported
-installation control is:
+The original future recorder remains byte-exact in
+[run-future-before-archive-20261002.py.txt](run-future-before-archive-20261002.py.txt).
+The unchanged experiment's original evaluation hash resolves only to that inert
+snapshot under [archive-policy-20261002.json](archive-policy-20261002.json).
+Production validation independently verifies the guarded current source and all
+historical fingerprints before the single-lock archival scanner exception.
 
-```sh
-NODE_LLAMA_CPP_SKIP_DOWNLOAD=true npm install --global \
-  --prefix "$NEW_OWNED_QMD_PREFIX" @tobilu/qmd@2.8.3
-```
-
-Required npm dependency lifecycle scripts remain enabled. Do not reuse the
-historical blanket `--ignore-scripts` command as a fresh-host recipe. The retained
-lock and optional-backend assertions describe the historical prefix; they do not
-prove compatibility of a newly installed prefix. Use the maintained native fixture
-for current supported installation acceptance, retaining its actual install and
-runtime commands and outputs. This review performs no install or native rerun.
+This archive provides no active QMD installation or activation recipe. A future
+independent trial requires a separate normally scanned qualified source and lock
+with supported installation and complete command capture. It must not restore this
+archive as its runtime environment. See the
+[dated archival decision](../../../docs/decisions/2026-10-02-wsl-retrieval-archive.md)
+for exact scope, owner, UTC expiry and fail-closed controls.
 
 Acceptance requires recovered verifiable historical invocation evidence or a
 separately authorized reachable-host trial with supported installation and complete

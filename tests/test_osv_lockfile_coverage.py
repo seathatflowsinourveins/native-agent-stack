@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 INVENTORY = ROOT / ".github/osv-scanner-lockfiles.json"
 CONFIG = ROOT / ".github/osv-scanner.toml"
 FROZEN_CONFIG = ".github/osv-scanner-frozen-macos.toml"
+WSL_FROZEN_CONFIG = ".github/osv-scanner-frozen-wsl-retrieval.toml"
 WORKFLOW = ROOT / ".github/workflows/security-scan.yml"
 # Dependency lockfile and manifest names in this repository or supported by OSV-Scanner v2's
 # source extractors (docs/supported_languages_and_lockfiles.md at v2.6.0).
@@ -83,6 +84,12 @@ IGNORE_ALLOWED_LOCKS = {
 # advisory. FROZEN_LOCKS binds each such config to the one lock it is for: its advisories, the lock's sha256 (a changed lock needs a new review)
 # and the repository path of the evidence.
 FROZEN_LOCKS = {
+    "blueprints/convergence-practice/wsl-retrieval/package-lock.json": {
+        "config": WSL_FROZEN_CONFIG,
+        "advisories": ["GHSA-vfj7-8cjw-p6xm"],
+        "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+        "evidence": "docs/decisions/2026-10-02-wsl-retrieval-archive.md",
+    },
     # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
     "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
         "config": FROZEN_CONFIG,
@@ -568,12 +575,15 @@ class FrozenScanTests(unittest.TestCase):
     def test_the_workflow_scans_each_config_in_its_own_invocation(self):
         text = self.workflow
         configs = {lock["config"] for lock in FROZEN_LOCKS.values()}
-        self.assertEqual(re.findall(r"(?m)^\s+frozen_config=(\S+)$", text), sorted(configs))
+        self.assertEqual(sorted(re.findall(r"(?m)^\s+(?:frozen_config|wsl_config)=(\S+)$", text)), sorted(configs))
         for needle in ('select(has("config") | not)', 'select(.config == $config)', "--config .github/osv-scanner.toml", '--config "$frozen_config"',
-                       '$(( ${#lockfiles[@]} + ${#frozen[@]} ))', 'jq \'.lockfiles | length\' "$inventory"', "osv-scanner-frozen-macos.sarif"):
+                        '$(( ${#lockfiles[@]} + ${#frozen[@]} + ${#wsl[@]} ))', 'jq \'.lockfiles | length\' "$inventory"', "osv-scanner-frozen-macos.sarif",
+                        "osv-scanner-frozen-wsl-retrieval.sarif", 'python3 scripts/wsl_retrieval_archive.py --root . --json || exit $?'):
             self.assertIn(needle, text, needle)
         # the frozen scan never gets the ordinary lock list, and the ordinary scan never gets the frozen one
         self.assertIn('"${frozen[@]}")', text)
+        self.assertIn('"${wsl[@]}")', text)
+        self.assertLess(text.index('python3 scripts/wsl_retrieval_archive.py'), text.index('"${scan[@]}"'))
         self.assertEqual(text.count('"${lockfiles[@]}")'), 1)
 
     def test_the_partition_check_catches_a_mutant_inventory(self):

@@ -10,8 +10,10 @@ import re
 
 if __package__:
     from .validate import Validator, _json_without_duplicates
+    from .wsl_retrieval_archive import RECORD as ARCHIVE_RECORD, POINTER as ARCHIVE_POINTER, resolve_evaluation
 else:
     from validate import Validator, _json_without_duplicates
+    from wsl_retrieval_archive import RECORD as ARCHIVE_RECORD, POINTER as ARCHIVE_POINTER, resolve_evaluation
 
 REPO = Path(__file__).resolve().parents[1]
 CONTRACT = REPO / "blueprints/convergence-practice"
@@ -57,10 +59,18 @@ def structure(value, schema, definitions, label, errors):
         errors.append(f"{label}: below minimum")
 
 
-def check_artifacts(value, validator, label="record"):
+def check_artifacts(value, validator, label="record", *, record_path=None, record_sha=None,
+                    pointer="", archival_bindings=None):
     if isinstance(value, dict):
         if set(value) == {"path", "sha256"}:
             path = validator.path(value["path"], label)
+            if record_path == ARCHIVE_RECORD and pointer == ARCHIVE_POINTER:
+                try:
+                    path, witness = resolve_evaluation(validator.root, record_path, record_sha, pointer, value)
+                    archival_bindings.append(witness)
+                except ValueError as error:
+                    validator.error(str(error))
+                    return
             if path is not None:
                 try:
                     with path.open("rb") as handle:
@@ -71,10 +81,15 @@ def check_artifacts(value, validator, label="record"):
                     validator.error(f"{label}: artifact unreadable")
         else:
             for key, item in value.items():
-                check_artifacts(item, validator, f"{label}.{key}")
+                escaped = key.replace("~", "~0").replace("/", "~1")
+                check_artifacts(item, validator, f"{label}.{key}", record_path=record_path,
+                                record_sha=record_sha, pointer=pointer + "/" + escaped,
+                                archival_bindings=archival_bindings)
     elif isinstance(value, list):
         for index, item in enumerate(value):
-            check_artifacts(item, validator, f"{label}[{index}]")
+            check_artifacts(item, validator, f"{label}[{index}]", record_path=record_path,
+                            record_sha=record_sha, pointer=pointer + "/" + str(index),
+                            archival_bindings=archival_bindings)
 
 
 def accepted(run):
@@ -186,18 +201,24 @@ def validate_record(root, relative_path):
         return {"valid": False, "errors": ["root: symlinks are forbidden"], "observations": 0}
     path = validator.path(relative_path, "record")
     record = None
+    archival_bindings = []
     if path is not None:
         try:
             record = read_json(path)
             schema = read_json(CONTRACT / "contract.schema.json")
             structure(record, schema, schema["$defs"], "record", validator.errors)
             if not validator.errors:
-                check_artifacts(record, validator)
+                check_artifacts(record, validator, record_path=relative_path,
+                                record_sha=hashlib.sha256(path.read_bytes()).hexdigest(),
+                                archival_bindings=archival_bindings)
                 consistency(record, validator)
         except (OSError, ValueError):
             validator.error("record: unreadable or invalid JSON")
-    return {"valid": not validator.errors, "errors": validator.errors,
-            "observations": len(record.get("observations", [])) if isinstance(record, dict) and isinstance(record.get("observations"), list) else 0}
+    result = {"valid": not validator.errors, "errors": validator.errors,
+              "observations": len(record.get("observations", [])) if isinstance(record, dict) and isinstance(record.get("observations"), list) else 0}
+    if archival_bindings:
+        result["archival_bindings"] = archival_bindings
+    return result
 
 
 def recorded_paths(root):

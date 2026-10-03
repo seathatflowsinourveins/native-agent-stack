@@ -129,8 +129,8 @@ class RenderConfigTests(unittest.TestCase):
         # rust-v0.157.1: live search in every sandbox (core/src/config/mod.rs), no startup update check on a pinned
         # client (config/src/config_toml.rs L520-523), no shell snapshot of exported variables
         # (shell-command/src/shell_snapshot_exports.rs), and no trust for dated directories that no longer exist.
-        # The user's 2026-09-30 defaults are Sol/Ultra coordination and Sol/Max generic children, supported by
-        # rust-v0.159.2 models-manager/models.json and core/src/agent/child_config.rs L204-249. Selected role
+        # The 2026-10-02 portable defaults are Sol/Ultra coordination and generic children. The historical Max
+        # evidence remains in the dated policy; model gating and child precedence use core/src/agent/child_config.rs L204-249. Selected role
         # configs still apply afterwards (L62-73). The gateway route lives only in the omniroute profile. Both
         # models are the one CODEX_MODEL placeholder, which CodexModelTests renders from each platform's Codex pin.
         import tomllib  # Python 3.11+, as above
@@ -142,7 +142,7 @@ class RenderConfigTests(unittest.TestCase):
         self.assertIs(user["features"]["shell_snapshot"], False)  # exported secrets never land in a snapshot file
         self.assertIs(user["agents"]["enabled"], True)
         self.assertEqual(user["agents"]["max_concurrent_threads_per_session"], 3)
-        self.assertEqual(user["agents"]["default_subagent_reasoning_effort"], "max")
+        self.assertEqual(user["agents"]["default_subagent_reasoning_effort"], "ultra")
         self.assertEqual(user["agents"]["default_subagent_model"], FIXTURE_VALUES["CODEX_MODEL"])
         self.assertEqual(user["model"], FIXTURE_VALUES["CODEX_MODEL"])
         self.assertEqual(user["model_reasoning_effort"], "ultra")

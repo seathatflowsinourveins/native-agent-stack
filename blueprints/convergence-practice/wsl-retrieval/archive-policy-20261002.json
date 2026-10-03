@@ -1,0 +1,36 @@
+{
+  "schema_version": "wsl-retrieval-archival-binding/1",
+  "source_revision": "999eebd76f57f459294fa4c3d5626676aff66451",
+  "owner_issue": "https://github.com/seathatflowsinourveins/native-agent-stack/issues/384",
+  "issued_utc": "2026-10-03T00:00:00Z",
+  "expires_utc": "2026-11-02T00:00:00Z",
+  "activation_allowed": false,
+  "automatic_renewal": false,
+  "record": {
+    "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+    "sha256": "a029dc2d8de56dd387202e5bffc341ad9d0a163e93f7bc01954b932f4ecf0244"
+  },
+  "pointer": "/frozen_inputs/evaluation/3",
+  "declared_artifact": {
+    "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+    "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12"
+  },
+  "snapshot": {
+    "path": "blueprints/convergence-practice/wsl-retrieval/run-future-before-archive-20261002.py.txt",
+    "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12"
+  },
+  "guarded_runner": {
+    "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+    "sha256": "728f4e52d6929cde6ef64c731f9c6aeb06e21703616ceb2face33ee10996c116"
+  },
+  "lock": {
+    "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+    "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb"
+  },
+  "scanner_config": ".github/osv-scanner-frozen-wsl-retrieval.toml",
+  "advisory": "GHSA-vfj7-8cjw-p6xm",
+  "workflow": {
+    "path": ".github/workflows/security-scan.yml",
+    "sha256": "3a390947f34d0b244dee7adfe97ade5b4e22cc9cc130dde94c2d852d39aeb7da"
+  }
+}

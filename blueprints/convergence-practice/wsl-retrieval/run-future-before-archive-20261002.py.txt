@@ -11,27 +11,11 @@ import re
 import shutil
 import sqlite3
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, unquote, urlsplit
 
 HERE = Path(__file__).resolve().parent
-
-
-def archive_preflight(parser):
-    """Read-only second barrier before any future-recorder effects."""
-    search_path = list(sys.path)
-    try:
-        sys.path.insert(0, str(HERE.parents[2]))
-        from scripts.wsl_retrieval_archive import validate_archive
-        result = validate_archive(HERE.parents[2])
-    except (ImportError, OSError, ValueError, IndexError):
-        parser.error('archive_preflight_denied: validator unavailable')
-    finally:
-        sys.path[:] = search_path
-    if not result['valid']:
-        parser.error('archive_preflight_denied: ' + '; '.join(result['errors']))
 
 
 def sha(path):
@@ -93,9 +77,6 @@ def main():
     parser.add_argument('--node', type=Path)
     parser.add_argument('--package-prefix', type=Path)
     args = parser.parse_args()
-    if args.mode == 'qmd':
-        parser.error('archived_qmd_activation_denied')
-    archive_preflight(parser)
     if platform.system() != 'Linux' or platform.machine() != 'x86_64':
         raise ValueError('Linux x86_64 required')
     os.umask(0o077)
