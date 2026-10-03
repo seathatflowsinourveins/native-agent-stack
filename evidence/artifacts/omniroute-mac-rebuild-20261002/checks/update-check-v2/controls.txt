@@ -1,0 +1,15 @@
+$ omniroute-update-check.py --scan-file <this build tarball, sha256 d602dc42...>
+{
+  "sol_catalog": true,
+  "alpha_search_route": true,
+  "carries_both": true
+}
+$ omniroute-update-check.py --capability v3.8.51
+{
+  "version": "3.8.51",
+  "tarball": "https://registry.npmjs.org/omniroute/-/omniroute-3.8.51.tgz",
+  "integrity": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==",
+  "sol_catalog": false,
+  "alpha_search_route": false,
+  "carries_both": false
+}

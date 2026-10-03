@@ -1,0 +1,15 @@
+#!/bin/bash
+# Dry functional test of the version-2 update check in a scratch state folder: a previous record names v3.8.50 and
+# marks nothing closed, so the run must report a new release (v3.8.51), read its package, find neither capability,
+# and log (not post) one notification; the Codex follow step must log a would-restart instead of restarting.
+set -u
+D=<scratch>/a2/uc2
+STATE_ROOT=$D/state-test
+rm -rf "$STATE_ROOT"; mkdir -p "$STATE_ROOT/native-agent-stack"
+cat > "$STATE_ROOT/native-agent-stack/omniroute-update.json" <<'JSON'
+{"latest_release": "v3.8.50", "carried": [{"pr": 13788, "closed_unmerged": false}, {"pr": 15167, "closed_unmerged": false}]}
+JSON
+cp "$D/omniroute-update-check.py" "$D/run-copy.py"
+OMNIROUTE_UPDATE_CHECK_DRY=1 XDG_STATE_HOME="$STATE_ROOT" /usr/bin/python3 "$D/run-copy.py"
+echo "exit=$?"
+/usr/bin/python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print('record:',{k:d[k] for k in ('check_version','latest_release','new_release','official_release_carries_everything')},'capability:',{k:d.get('capability',{}).get(k) for k in ('version','sol_catalog','alpha_search_route','carries_both')},'carried:',[(c['pr'],c['state'],c['closed_unmerged']) for c in d['carried']])" "$STATE_ROOT/native-agent-stack/omniroute-update.json"

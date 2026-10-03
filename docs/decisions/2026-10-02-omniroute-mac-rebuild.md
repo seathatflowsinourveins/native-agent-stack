@@ -48,6 +48,46 @@ answered 401 too, and its port preflight counted a browser's open dashboard conn
 several times before it bound; the new build's preflight counts listeners only (upstream #14812). OmniRoute wrote its
 own pre-migration database backup before migrating; it was not needed.
 
+## Update, 2026-10-03
+
+This update answers the first two items of issue 624's LE-18, which are addressed to the Mac OmniRoute service owner.
+The details are in `evidence/artifacts/omniroute-mac-rebuild-20261002/le18-20261003.json`.
+
+- **Running build.**
+  - The listener on port 20128 started at the switch, 2026-10-02T03:44:48Z, from this build.
+  - The installed package's `dist/BUILD_SHA` reads `6f246e84a`.
+  - The retained tarball hashes to the build manifest's `d602dc42…`.
+- **The process title `omniroute (v16.3.5)`** names the bundled Next.js version, not OmniRoute's. Next sets
+  `next-server (v16.3.5)`, and OmniRoute's startup instrumentation renames it.
+- **Effort read-back is still not done.** One GPT-6.1 Sol call at body effort `max` answered 200.
+  - The gateway's call-log APIs record each call's model, provider, account, token counts and reasoning source, but no
+    effort field.
+  - The first limit below stands.
+- **Update check, version 2,** deployed with version 1 kept beside it as the rollback. It still installs nothing. It
+  adds notifications for:
+  - a carried upstream PR closed without a merge, once per closure;
+  - a new official release, with a read of its npm package for the two capabilities this build carries, checked by
+    structure: a GPT-6.1 Sol model object in the server bundle, and the `/api/v1/alpha/search/route` entry of the
+    server's route manifest together with its route file. The result is a notice, not a switch gate; a switch still
+    has to pass the switch tool's probe gate.
+
+  The deployed script is the one revised after this change's automated review (10:02Z):
+  - Reads are bounded per package, per file and in total.
+  - A notification counts only when it was delivered, and the state that suppresses a repeat is written after delivery.
+  - A failed package read keeps the release pending.
+  - A failed PR lookup keeps the PR's previous record.
+
+  Tests, retained in `checks/update-check-v2/`:
+  - A 16-case suite passes. It stops at its first case against the first deployment, whose literal scan also accepted a
+    decoy package.
+  - This build's own package carries both capabilities; release v3.8.51 carries neither.
+  - A dry run against a scratch state folder reports a new release and logs its notification.
+  - The first real run of the revised script changed nothing.
+  - The receipt records a completeness critic: what was not observed (a real new release, desktop delivery, the
+    scheduled run) and what was not read.
+- **Not done here:** LE-18's third item, the `omniroute` row of `manifests/stack.json`. It is the lane:shared manifest
+  owner's change.
+
 ## Limits
 
 - Upstream effort on the wire was not read back on this host: the gateway's call log sits in its credential-bearing

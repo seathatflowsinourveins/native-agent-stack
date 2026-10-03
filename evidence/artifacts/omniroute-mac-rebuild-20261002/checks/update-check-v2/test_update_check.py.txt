@@ -1,0 +1,128 @@
+"""Tests of the version-2 OmniRoute update check (dry mode, stubbed GitHub and npm reads, synthetic packages).
+
+Run: OMNIROUTE_UPDATE_CHECK_DRY=1 python3 test_update_check.py <path to the script under test>
+Each case prints one line; the process exits 1 when any case fails."""
+import importlib.util
+import io
+import json
+import os
+import sys
+import tarfile
+import tempfile
+from contextlib import redirect_stdout
+from pathlib import Path
+
+os.environ["OMNIROUTE_UPDATE_CHECK_DRY"] = "1"
+spec = importlib.util.spec_from_file_location("uc", sys.argv[1])
+assert spec and spec.loader
+uc = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(uc)
+FAILED = []
+
+
+def case(name, ok, detail=""):
+    print(("PASS " if ok else "FAIL ") + name + (f" ({detail})" if detail and not ok else ""))
+    if not ok:
+        FAILED.append(name)
+
+
+def package(files):
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w:gz") as tar:
+        for name, body in files.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(body)
+            tar.addfile(info, io.BytesIO(body))
+    return buf.getvalue()
+
+
+def run(prs, previous, tag="v3.8.51", published="2026-09-30T01:41:50Z", cap=None, deliver=True):
+    state = Path(tempfile.mkdtemp()) / "native-agent-stack"
+    state.mkdir(parents=True)
+    if previous is not None:
+        (state / "omniroute-update.json").write_text(json.dumps(previous))
+    uc.STATE = state
+
+    def fake(path):
+        if path.endswith("releases/latest"):
+            return {"tag_name": tag, "published_at": published}
+        value = prs[int(path.rsplit("/", 1)[1])]
+        if isinstance(value, Exception):
+            raise value
+        return value
+
+    uc.gh_json = fake
+    uc.capability = lambda t: dict(cap or {"version": t, "carries_both": True})
+    real_notify = uc.notify
+    if not deliver:
+        uc.notify = lambda message: (uc.log({"notification_failed": message}), False)[1]
+    out = io.StringIO()
+    with redirect_stdout(out):
+        uc.upstream_notice()
+    uc.notify = real_notify
+    notes = [json.loads(line)["notification"] for line in out.getvalue().splitlines() if '"notification"' in line]
+    return json.loads((state / "omniroute-update.json").read_text()), notes
+
+
+OPEN = {"state": "open", "merged_at": None}
+CLOSED = {"state": "closed", "merged_at": None}
+MERGED = {"state": "closed", "merged_at": "2026-09-29T00:00:00Z"}
+
+# Closed without a merge: one notification, none on the next run.
+rec, notes = run({13788: OPEN, 15167: CLOSED}, {"latest_release": "v3.8.51"})
+case("closed PR notifies once", any("15167" in n for n in notes) and rec["carried"][1]["notified_closed"])
+rec2, notes2 = run({13788: OPEN, 15167: CLOSED}, rec)
+case("closed PR is not notified again", not any("15167" in n for n in notes2))
+# A failed delivery leaves the closure unacknowledged, so the next run notifies again.
+rec3, _ = run({13788: OPEN, 15167: CLOSED}, {"latest_release": "v3.8.51"}, deliver=False)
+case("failed delivery is not acknowledged", rec3["carried"][1].get("notified_closed") is False, rec3["carried"][1])
+_, notes4 = run({13788: OPEN, 15167: CLOSED}, rec3)
+case("failed delivery is retried", any("15167" in n for n in notes4))
+# A failed PR lookup keeps the PR's previous record (closure history survives).
+rec5, notes5 = run({13788: OPEN, 15167: RuntimeError("HTTP 502")}, rec)
+case("failed lookup keeps the recorded closure", rec5["carried"][1]["closed_unmerged"] is True
+     and rec5["carried"][1]["notified_closed"] is True and "lookup_error" in rec5["carried"][1], rec5["carried"][1])
+case("failed lookup does not re-notify", not any("15167" in n for n in notes5))
+# A new release whose package read fails stays pending and is read again next run.
+rec6, notes6 = run({13788: OPEN, 15167: OPEN}, {"latest_release": "v3.8.50"}, cap={"version": "3.8.51", "error": "timeout"})
+case("failed package read keeps the release pending", rec6["latest_release"] == "v3.8.50"
+     and rec6["pending_release"] == "v3.8.51" and not notes6, rec6)
+rec7, notes7 = run({13788: OPEN, 15167: OPEN}, rec6, cap={"version": "3.8.51", "carries_both": False})
+case("pending release is read again and then advanced", rec7["latest_release"] == "v3.8.51"
+     and rec7["new_release"] and any("v3.8.51" in n for n in notes7), rec7)
+# The capability result is kept on later runs.
+rec8, notes8 = run({13788: OPEN, 15167: OPEN}, rec7)
+case("capability result carried forward", rec8["capability"] == rec7["capability"] and not rec8["new_release"]
+     and not notes8, rec8)
+# Every carried PR merged before the latest release: one carries-everything notice per release tag.
+rec9, notes9 = run({13788: MERGED, 15167: MERGED}, {"latest_release": "v3.8.51"})
+case("carries-everything notice", any("carries every PR" in n for n in notes9) and rec9["notified_ready_for"] == "v3.8.51")
+_, notes10 = run({13788: MERGED, 15167: MERGED}, rec9)
+case("carries-everything notice once per tag", not any("carries every PR" in n for n in notes10))
+
+# Structural scan: decoy strings outside the structures count for nothing.
+decoy = package({"package/dist/.build/next/server/chunks/a.js": b'/* gpt-6.1-sol alpha/search */ var x = "gpt-6.1-sol";',
+                 "package/README.md": b"gpt-6.1-sol /v1/alpha/search"})
+r = uc.scan(decoy)
+case("decoy strings are not capabilities", not r["sol_catalog"] and not r["alpha_search_route"], r)
+real = package({"package/dist/.build/next/server/chunks/b.js": b'x=[{id:"gpt-6.1-sol",name:"GPT-6.1 Sol",supportsReasoning:!0}]',
+                "package/dist/.build/next/server/app-paths-manifest.json":
+                    json.dumps({"/api/v1/alpha/search/route": "app/api/v1/alpha/search/route.js"}).encode(),
+                "package/dist/.build/next/server/app/api/v1/alpha/search/route.js": b"export {}"})
+r = uc.scan(real)
+case("model object and manifest route are capabilities", r["sol_catalog"] and r["alpha_search_route"], r)
+missing_route_file = package({"package/dist/.build/next/server/app-paths-manifest.json":
+                              json.dumps({"/api/v1/alpha/search/route": "app/api/v1/alpha/search/route.js"}).encode()})
+r = uc.scan(missing_route_file)
+case("manifest entry without its route file is not a route", not r["alpha_search_route"], r)
+# Decompression bounds: a member over the per-file limit is skipped, not read.
+uc.MAX_MEMBER = 1024
+big = package({"package/dist/.build/next/server/chunks/big.js": b'{id:"gpt-6.1-sol",name:"GPT-6.1 Sol"}' + b" " * 4096})
+r = uc.scan(big)
+case("member over the read limit is skipped", not r["sol_catalog"] and r.get("skipped_over_member_limit"), r)
+uc.MAX_MEMBER, uc.MAX_TOTAL = 64 * 1024 * 1024, 10
+r = uc.scan(real)
+case("total decompressed limit stops the scan", r.get("error") == "decompressed size over the read limit", r)
+
+print(f"{'FAILED ' + str(len(FAILED)) if FAILED else 'all passed'}")
+sys.exit(1 if FAILED else 0)

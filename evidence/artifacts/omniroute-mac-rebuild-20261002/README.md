@@ -12,6 +12,9 @@ check. The decision is [`docs/decisions/2026-10-02-omniroute-mac-rebuild.md`](..
 | `checks/switch-1.log`, `checks/switch-2.log` | The first switch (rolled back) and the second (passed) |
 | `launchd/*.plist.json` | The gateway's launch agent before and after, and the update-check agent (home paths masked) |
 | `scripts/*.txt` | The build, switch, probe, wrapper and update-check scripts as they ran (paths masked) |
+| `le18-20261003.json` | The 2026-10-03 follow-up for issue 624, LE-18: running-build fingerprint, the process title, the update-check state, the effort read-back limit, and version 2 of the update check with its tests |
+| `scripts/omniroute-update-check.v2.py.txt` | Version 2 of the update check as deployed on 2026-10-03 after review (version 1 stays as `omniroute-update-check.py.txt`) |
+| `checks/update-check-v2/` | Version 2's test suite and its output, the red check against the first deployment, the positive and negative capability controls, the dry run and the first real run (paths masked) |
 
 Paths are masked as `<HOME>` and `<build-dir>`. The gateway's data directory and every credential were left
 unopened; the placeholder key in the launch agent is the documented non-secret loopback value.
