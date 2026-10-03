@@ -51,7 +51,9 @@
       "context-current-tools",
       "meter-compaction",
       "native-resume",
-      "resume-read"
+      "resume-read",
+      "native-command-baseline",
+      "native-structured-baseline"
     ],
     "roles": [
       "command-worker",
@@ -147,7 +149,9 @@
     "Same released ccusage command on separately labelled exact-only synthetic control",
     "Promptfoo eval -c resume-calibration.json --no-cache --repeat1 --max-concurrency1; native supported explicit parent UUIDs",
     "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max read-only; missing keyless environment prerequisite",
-    "Same native read with one non-secret process-local placeholder and explicit requested pool URL"
+    "Same native read with one non-secret process-local placeholder and explicit requested pool URL",
+    "Promptfoo native package bin eval -c command-baseline/config.json --no-cache --repeat1 --max-concurrency1; fresh native parent/child C1/C2/C3",
+    "Promptfoo native package bin eval -c structured-baseline/config.json --no-cache --repeat1 --max-concurrency1; fresh native main/child focused jq QA and root-string controls"
   ],
   "observations": [
     {
@@ -955,6 +959,130 @@
         "total": 127466,
         "native_retries": null
       }
+    },
+    {
+      "id": "native-command-baseline-codex",
+      "task": "native-command-baseline",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 22,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fresh main/child native focused-command functional/accounting qualification; excluded RTK comparator stays unrun",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-baseline-qualification.json",
+          "sha256": "6b97431d58e1572fb8e507923e7cfd58a2221fef3fa72698ca9efd163c2204d1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 27444,
+        "cache_creation": 0,
+        "cache_read": 119936,
+        "output": 2659,
+        "reasoning_in_output": 1047,
+        "total": 150039,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-baseline-claude",
+      "task": "native-command-baseline",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 22,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fresh main/child native focused-command functional/accounting qualification; excluded RTK comparator stays unrun",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-baseline-qualification.json",
+          "sha256": "6b97431d58e1572fb8e507923e7cfd58a2221fef3fa72698ca9efd163c2204d1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1393,
+        "cache_creation": 17234,
+        "cache_read": 31405,
+        "output": 10009,
+        "reasoning_in_output": 7363,
+        "total": 60041,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-structured-baseline-codex",
+      "task": "native-structured-baseline",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 23,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fresh main/child native focused JSON semantic/accounting qualification; no TOON model arm or savings claim",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-structured-baseline-qualification.json",
+          "sha256": "ea06789baee978a8aeb5b1a1af6059f1b787f9e9832c2277b00f46f8bad427b3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 27223,
+        "cache_creation": 0,
+        "cache_read": 96000,
+        "output": 2414,
+        "reasoning_in_output": 834,
+        "total": 125637,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-structured-baseline-claude",
+      "task": "native-structured-baseline",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 23,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fresh main/child native focused JSON semantic/accounting qualification; no TOON model arm or savings claim",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-structured-baseline-qualification.json",
+          "sha256": "ea06789baee978a8aeb5b1a1af6059f1b787f9e9832c2277b00f46f8bad427b3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1569,
+        "cache_creation": 17409,
+        "cache_read": 31522,
+        "output": 9377,
+        "reasoning_in_output": 6794,
+        "total": 59877,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -1013,6 +1141,14 @@
     {
       "run_id": "astra-resume-startup-failure",
       "reason": "Native profile missing process-local keyless prerequisite before model response; reported/billed usage unknown; corrected by supported non-secret placeholder without saved changes"
+    },
+    {
+      "run_id": "native-command-baseline-codex",
+      "reason": "Original C3 separately captured stream prerequisite remains UNPROVEN despite schema PASS; prospective actual-carrier contract does not relabel this attempt"
+    },
+    {
+      "run_id": "native-command-baseline-claude",
+      "reason": "Original C3 separately captured stream prerequisite remains UNPROVEN despite schema PASS; prospective actual-carrier contract does not relabel this attempt"
     }
   ],
   "limitations": [
@@ -1028,7 +1164,11 @@
     "S1 fixed questions now allow adequate focused native computation; no useful natural TOON opportunity is manufactured.",
     "Initial local consistency check rejected duplicate task/role/condition attempt tuples; per-task attempt identifiers were corrected before publication, without repeating measurements.",
     "Resume unit counts38268 additional tokens, not178735 returned endpoints; prior140467 repeats. Selected fresh420746 plus delta459014 is not whole-study usage. Consequential Astra5exact responses127466 are separate research overhead. Unknown startup/billing/helper-provenance and naturalP2 remain unknown. Common case timeout is supported; aborted evaluator zeros are placeholders.",
-    "Publication checker first invocation used unsupported --experiment flag and exited2 before validation. Native --help establishes positional record arguments; correction uses that supported interface. This is a checker invocation failure, not a model or measurement rerun."
+    "Publication checker first invocation used unsupported --experiment flag and exited2 before validation. Native --help establishes positional record arguments; correction uses that supported interface. This is a checker invocation failure, not a model or measurement rerun.",
+    "Fresh command schema2PASS and12eligible calls do not satisfy original separately captured stream contract. C3 stream condition retained UNPROVEN; native210080 tokens include both children and known helper bucket, not savings. Prospective native returned-carrier contract does not relabel this attempt.",
+    "The first publication-unit4 consistency check failed because new command tasks and failed run reasons were omitted from the declared record. Those metadata declarations were corrected without changing native outputs or repeating measurements. A follow-up inspection also guessed an absent top-level tasks key; actual declarations are in frozen_inputs.",
+    "Focused JSON native185514tokens reconciles parent/children/helper once; harness136252 excludes Codex child49262. Eight calls and semantic controls PASS only within this unit; no TOON model arm or efficiency/default/freeze. A root inspection initially assumed prior packet keys; actual structured packet uses roles/native_usage_count_once and was read before publication.",
+    "Publication-unit4 validate rejected new public native UUIDs. Identifiers were removed into private custody; role labels/hash-bound selected captures preserve proof without publishing local session identifiers. No measurements changed."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -1066,7 +1206,11 @@
       "native-resume-codex",
       "native-resume-claude",
       "astra-resume-startup-failure",
-      "astra-resume-correction"
+      "astra-resume-correction",
+      "native-command-baseline-codex",
+      "native-command-baseline-claude",
+      "native-structured-baseline-codex",
+      "native-structured-baseline-claude"
     ],
     "coverage_artifact": null
   }

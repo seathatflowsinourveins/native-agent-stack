@@ -1,0 +1,346 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Fresh main/child native focused JSON semantic/accounting qualification; no TOON model arm or savings claim",
+  "source_pins": {
+    "fixture": "toon-format/toon@a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+    "harness": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8"
+  },
+  "native_versions": {
+    "claude_cli": "2.1.288 from native assistant frames",
+    "claude_sdk": "0.3.263 installed pinned package",
+    "codex_cli": "0.160.0 from own session_meta",
+    "codex_sdk": "0.160.0 installed pinned package",
+    "jq": "Preregistered1.8.1; model command carriers do not emit version",
+    "promptfoo": "0.123.1"
+  },
+  "native_execution": {
+    "evaluation_duration_ms": 162065,
+    "exit_and_completion_evidence": "Coordinator independently confirmed native PTY exit0 at2026-10-03T05:42:15Z; no separate completion/exit artifact supplied",
+    "exit_code": 0,
+    "observed_completed_at": "2026-10-03T05:42:15Z",
+    "runtime_options": {
+      "cache": false,
+      "eventSource": "cli",
+      "maxConcurrency": 1,
+      "maxEvalTimeMs": 1800000,
+      "repeat": 1,
+      "showProgressBar": false,
+      "timeoutMs": 900000
+    },
+    "schema_errors": 0,
+    "schema_failures": 0,
+    "schema_successes": 2,
+    "started_at": "2026-10-03T05:38:56Z"
+  },
+  "config_sha256": "5cd60ccb3161f45f7017db14d889d10eba003dfeb31adffe4dc3da7adfc89bee",
+  "preregistration_sha256": "70bb2554bd09fe824d5047c9cce5a4955d4e2080ccb8beabfc6dc5df5271ee96",
+  "preregistered_conditions": [
+    {
+      "condition": "All two-actor JSON schema values pass in both clients",
+      "evidence": "Both native schema grades pass; actual main+child outputs and all8 native tool outputs independently match fixture facts and exact U+FEFF string controls.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "Each native main/child independently invokes both fixed commands; actual eight eligible invocations observed",
+      "evidence": "Two declared commands per role,8 total; no extra shell executions in selected native records.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "Observed child binding/modelmax and complete native query/parent+child usage reconcile",
+      "evidence": "Canonical native child bindings, recorded client/model/max effort, unique-response or final-modelUsage accounting reconcile.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "Original fixture hashes unchanged",
+      "evidence": "All4 preregistered fixture hashes and config hash unchanged after execution.",
+      "verdict": "PASS"
+    }
+  ],
+  "overall_declared_contract": "PASS for preregistered functioning/semantic/accounting unit only",
+  "roles": {
+    "claude_child": {
+      "effort": "max",
+      "model": "claude-opus-5-5",
+      "unique_requests": 2,
+      "usage": {
+        "cache_creation_input_tokens": 4989,
+        "cache_read_input_tokens": 4090,
+        "input_tokens": 4,
+        "output_tokens": 2052,
+        "thinking_tokens": 1316,
+        "total_tokens": 11135
+      }
+    },
+    "claude_main": {
+      "effort": "max",
+      "model": "claude-opus-5-5",
+      "unique_requests": 2,
+      "usage": {
+        "cache_creation_input_tokens": 12420,
+        "cache_read_input_tokens": 27432,
+        "input_tokens": 4,
+        "output_tokens": 7305,
+        "thinking_tokens": 5478,
+        "total_tokens": 47161
+      }
+    },
+    "codex_child": {
+      "effort": "max",
+      "model": "gpt-6.1-sol",
+      "unique_responses": 2,
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 35584,
+        "input_tokens": 48403,
+        "output_tokens": 859,
+        "reasoning_output_tokens": 382,
+        "total_tokens": 49262
+      }
+    },
+    "codex_main": {
+      "effort": "max",
+      "model": "gpt-6.1-sol",
+      "unique_responses": 4,
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 60416,
+        "input_tokens": 74820,
+        "output_tokens": 1555,
+        "reasoning_output_tokens": 452,
+        "total_tokens": 76375
+      }
+    }
+  },
+  "native_usage_count_once": {
+    "claude_agent_result_trailer_total": 6321,
+    "claude_full_child_total": 11135,
+    "claude_known_haiku_total": 1581,
+    "claude_native_final_modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "canonicalModel": "claude-haiku-4-5",
+        "costBasis": "list",
+        "costUSD": 0.0016610000000000001,
+        "inputTokens": 1561,
+        "outputTokens": 20,
+        "provider": "firstParty",
+        "thinkingTokens": 0,
+        "webSearchRequests": 0
+      },
+      "claude-opus-5-5": {
+        "cacheCreationInputTokens": 17409,
+        "cacheReadInputTokens": 31522,
+        "canonicalModel": "claude-opus-5-5",
+        "costBasis": "list",
+        "costUSD": 0.3177814,
+        "inputTokens": 8,
+        "outputTokens": 9357,
+        "provider": "firstParty",
+        "thinkingTokens": 6794,
+        "webSearchRequests": 0
+      }
+    },
+    "claude_opus_parent_plus_child_total": 58296,
+    "claude_whole_aggregate": {
+      "cacheCreationInputTokens": 17409,
+      "cacheReadInputTokens": 31522,
+      "inputTokens": 1569,
+      "outputTokens": 9377,
+      "thinkingTokens": 6794,
+      "total_tokens": 59877,
+      "webSearchRequests": 0
+    },
+    "codex_whole": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 96000,
+      "input_tokens": 123223,
+      "output_tokens": 2414,
+      "reasoning_output_tokens": 834,
+      "total_tokens": 125637
+    },
+    "difference_excluded_codex_child": 49262,
+    "promptfoo_returned_total": 136252,
+    "scope_notes": [
+      "Codex payload.thread_id scopes bound child; parent session_id and copied ancestor metadata are not separate usage.",
+      "Claude final chronological request/message usage snapshots counted once; native modelUsage includes parent+child+known Haiku row, so raw child is reconciliation only.",
+      "Claude child trailer6321 is final request only and is not added to aggregate.",
+      "Codex cached input and all reasoning/thinking are subset counters; Claude ordinary/cache-creation/cache-read buckets are counted once."
+    ],
+    "whole_run_total": 185514
+  },
+  "cost": {
+    "claude_native_list_estimate_usd": 0.31944239999999996,
+    "codex_native_cost": "Not supplied by selected usage counters",
+    "invoice_verified": false
+  },
+  "invocations": {
+    "carrier_fidelity": "Exact native returned strings preserved including trailing-newline differences; original process-stream split is not reconstructed",
+    "eligible_command_repeats_or_retry_executions_observed": 0,
+    "eligible_count": 8,
+    "exit_scope": "Codex numeric0 explicit for all4 commands; Claude successful results explicit but numeric0 remains inferred",
+    "extra_shell_executions_in_selected_records": 0,
+    "observed_total_shell_executions": 8,
+    "per_role": 2,
+    "eligible_rate": "8/8 directed fixed opportunities; not natural TOON use"
+  },
+  "semantic_fidelity": {
+    "all_four_actors_bom_values_match": true,
+    "all_source_qa_values_match": true,
+    "bom_types": [
+      "string",
+      "string",
+      "string"
+    ],
+    "bom_values": [
+      "\ufeff8",
+      "\ufeffabc",
+      "\ufeff"
+    ],
+    "control_classes": "Pinned published repository array wrapped unchanged under repositories; BOM controls are locally authored synthetic root strings, not unchanged upstream fixtures",
+    "published_fixture_sha256": "d038c1a4436a3c0cd59e82287fa591b1c2a426aae7ac47f74413ef9c63c7eea6",
+    "qa": {
+      "branch": "master",
+      "count": "100",
+      "forks": "57365",
+      "input": "github.compact.json",
+      "source": "benchmarks/data/github-repos.json@v4.1.1",
+      "stars": "530712",
+      "watchers": "6594"
+    },
+    "upstream_array_equals_derived_repositories": true
+  },
+  "fixture_after_checks": [
+    {
+      "after_sha256": "1835a5f3cf40810d777b07b8539e6a00fed7c200e3990666a1e60f5258b52ddf",
+      "bytes": 34642,
+      "class": "Derived representation of pinned upstream repository-array fixture",
+      "expected_sha256": "1835a5f3cf40810d777b07b8539e6a00fed7c200e3990666a1e60f5258b52ddf",
+      "matches": true,
+      "name": "github.compact.json"
+    },
+    {
+      "after_sha256": "f67cbb5ac1f98c69bfaf43da0c47835313cb14fc1187bb51af0bd81e083d01c7",
+      "bytes": 10,
+      "class": "Local synthetic U+FEFF root-string fidelity control",
+      "expected_sha256": "f67cbb5ac1f98c69bfaf43da0c47835313cb14fc1187bb51af0bd81e083d01c7",
+      "matches": true,
+      "name": "bom-number.json"
+    },
+    {
+      "after_sha256": "667569432ab4e2171c29e9745d327d88a510348e36b89946d90a6a1e832f9352",
+      "bytes": 12,
+      "class": "Local synthetic U+FEFF root-string fidelity control",
+      "expected_sha256": "667569432ab4e2171c29e9745d327d88a510348e36b89946d90a6a1e832f9352",
+      "matches": true,
+      "name": "bom-text.json"
+    },
+    {
+      "after_sha256": "b7c58cde73867e91b418bf117613d7a09ddfed3c8aaa2f7fc0a0665c1cec679b",
+      "bytes": 9,
+      "class": "Local synthetic U+FEFF root-string fidelity control",
+      "expected_sha256": "b7c58cde73867e91b418bf117613d7a09ddfed3c8aaa2f7fc0a0665c1cec679b",
+      "matches": true,
+      "name": "bom-only.json"
+    }
+  ],
+  "retained_private_artifacts": {
+    "config.json": "5cd60ccb3161f45f7017db14d889d10eba003dfeb31adffe4dc3da7adfc89bee",
+    "preregistration.json": "70bb2554bd09fe824d5047c9cce5a4955d4e2080ccb8beabfc6dc5df5271ee96",
+    "results.json": "257e5b7b8158eccbf5aa684fb57152f7cb1e61beaa4af2f3dd062e812d4664dd",
+    "eval.stdout": "aee4ed4aeb505096c70dab17c47a85b37d2053bc2d78056916c01e53f71b5200",
+    "eval.stderr": "d7ec5f8eba40a546a80f75c3fea387acc4e456b44fa39a70b4673e93fde10c90",
+    "started.txt": "e5c634944d58dd71d3b8228482b1d0a786618e51fcf7ab5a4b3e3dfb18e9225e",
+    "validate.stdout": "101dfc06d8446db7dfdb302d083739ee86e6bea493794bffc128af33c51de83e",
+    "validate.stderr": "0b7efd480369f28a885a4a3d8ed24c246bd2fe505e536ac955273be0f60d3041",
+    "accounting-conclusions.json": "975fbed76b7147582e040ecb986133f3da7c485d2b7476c9018c299deee48506",
+    "claude_child-usage-metadata.jsonl": "42498a527f7e28cc4fa8f58b6a187e0dabc2d4986559f916b1866d67b6dfc2ea",
+    "claude_main-usage-metadata.jsonl": "52c103101e719cf3b1f118f9a8d057a50de8f2b22f8a271bb0f6255a1b0f381d",
+    "codex_child-usage-metadata.jsonl": "fce62fb3c02f31900b3030d3f3f63d9074eec21143280835c71b35aa89971f13",
+    "codex_main-usage-metadata.jsonl": "02570969e0a4f9f80d1cf3cc6c9cd84582a1e08f58fc94dc49c2c846959db5e1",
+    "eligible-command-invocations.jsonl": "de9a06471d6871ae39ae776daf551d72184eceec809874c769228bef5e88e8c8",
+    "extra-command-invocations.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "full-native-counter-detail.json": "5c664cfb79c2b6e362c48f68029cb31fce3d156609469355f202af6a5e51fd08",
+    "native-result-usage.json": "df183ae79f6b5f07f957e05a3d8daeaa0051e74cb511041064f928092818b6fe",
+    "semantic-fidelity.json": "ed0cb4f1b3a3e824729875f5c6630e970557c6d5f5fcf453bab1183ea3a83e1e",
+    "source-captures.json": "91b7e77954bdc5e7835f4490383e17ead560386a88e9cbf418888f70b2daa09a",
+    "artifacts.json": "93bfc36d87985bfee538117cdef44ce322ff66a7e8a86ad3f729a6141d69d193"
+  },
+  "native_source_captures": [
+    {
+      "capture_bytes": 106214,
+      "capture_sha256": "bcbf6cb164c54694a42eb5a31fba3978ecfed40bc80d255a8443179dfa56c1ea",
+      "complete_lines": 43,
+      "record_type_counts": {
+        "event_msg": 17,
+        "inter_agent_communication_metadata": 1,
+        "response_item": 17,
+        "session_meta": 1,
+        "token_usage_record": 4,
+        "turn_context": 1,
+        "world_state": 2
+      },
+      "role": "codex_main"
+    },
+    {
+      "capture_bytes": 168330,
+      "capture_sha256": "ed2c604bab1c06c318835a6193df0ebbdc60c93c0c0de8712462078a8012b69c",
+      "complete_lines": 33,
+      "record_type_counts": {
+        "event_msg": 12,
+        "inter_agent_communication_metadata": 1,
+        "response_item": 12,
+        "session_meta": 2,
+        "token_usage_record": 2,
+        "turn_context": 2,
+        "world_state": 2
+      },
+      "role": "codex_child"
+    },
+    {
+      "capture_bytes": 132620,
+      "capture_sha256": "430740a1812dfba1ac5d313202e9ccb494308e801ee3afc1d432d7afaa6b2ddb",
+      "complete_lines": 37,
+      "record_type_counts": {
+        "ai-title": 3,
+        "assistant": 5,
+        "atis-latch": 4,
+        "attachment": 14,
+        "cost-state": 1,
+        "last-prompt": 4,
+        "queue-operation": 2,
+        "user": 4
+      },
+      "role": "claude_main"
+    },
+    {
+      "capture_bytes": 39694,
+      "capture_sha256": "cd9fc2d222a418e6afb72acdf233a384edc819334db81a834ed43940428824fc",
+      "complete_lines": 17,
+      "record_type_counts": {
+        "assistant": 5,
+        "attachment": 9,
+        "user": 3
+      },
+      "role": "claude_child"
+    }
+  ],
+  "limitations": [
+    "No TOON model arm, superiority, savings, default selection, protection or comparative freeze is established.",
+    "Uniform published repository rows plus preserved root-string controls do not create a natural TOON-conversion opportunity; the earlier unrestricted TOON root-string defect stays retained.",
+    "Haiku1581 tokens are known in native aggregate, but independent raw helper request binding, class and helper invocation count remain unknown.",
+    "No selected native compaction/retry records or duplicate eligible executions observed; backend abort/retry delivery, outside-query-pipeline helpers and background global state remain uncovered.",
+    "Numeric Claude process exits and original separate process streams are not exported by the selected returned carriers; success/inference labels stay explicit.",
+    "This is live integration evidence using native Promptfoo and locally authored assertions/controls, not unchanged upstream test acceptance.",
+    "The source-shape inspection initially assumed an object and produced excessive public fixture output; subsequent analysis used shape checks and compact projections. Corrected exact array equality and locator are retained."
+  ],
+  "independent_completeness_read": {
+    "verdict": "accept_publication_unit",
+    "role": "Sol6.1/max independent structured critic",
+    "scope": "Independently checked native counters/actor invocations/exact data and hashes; not TOON comparison/default/freeze/P2/final-goal acceptance",
+    "reviewed_receipt_sha256": "45657b30922562ff3f9e85f4c233ca2241020bdfe31a2a7a6b8b8290e56cc0c0",
+    "next_sweep": "Helper identity/class, numeric Claude exits, interrupted transport/retries/aborts, outside-pipeline coverage, numeric precision/duplicate keys and broader structured inputs"
+  },
+  "native_identifier_custody": "Native session/thread/child identifiers remain only in selected private originals; public roles and returned source hashes bind the sanitized receipt."
+}
