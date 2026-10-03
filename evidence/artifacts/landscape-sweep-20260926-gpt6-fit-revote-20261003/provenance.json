@@ -1,0 +1,381 @@
+{
+ "schema_version": 1,
+ "run_id": "landscape-sweep-20260926-gpt6-fit-revote-20261003",
+ "frozen_from": "landscape-sweep-20260926 (Workflow wf_8397ada1-777), first-round GPT-6 fit jobs that never returned",
+ "templates": {
+  "harness_commit": "1b0e4598f",
+  "fill": [
+   "2026-09-26",
+   32,
+   "2026-09-25"
+  ],
+  "prompts_sha256": "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4",
+  "recorded_prompts_sha256": "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4",
+  "templates_json_sha256": "12fc198d596490abd9ce3716572053eceea906553edd7b02a5ebe8e2cb1e0cc6"
+ },
+ "inputs": {
+  "source": "evidence/artifacts/landscape-sweep-20260926/inputs (PR #363)",
+  "SHA256SUMS_sha256": "c026bdf60c8971465b962d181a218e3ad6d75321e8d48cceb03a18e12a9dd251"
+ },
+ "props": "sweep.js JSON.stringify(forRefuters(kept)) as the run's wrapper task text carried it (wf_8397ada1-777 gpt6-refute-fit:<layer> transcripts, session 06bd7d2d); returns.json shortens 40-hex commit ids, so it cannot reproduce them",
+ "composer": "tools/sota-convergence/landscape-sweep/make_prompt.py at e88d59e4b fit (output identical to the 1b0e4598f copy and to the 2026-09-26 prototype make_prompt.py)",
+ "schema": "tools/sota-convergence/landscape-sweep/schemas/votes.json (unchanged since 1b0e4598f)",
+ "layers": [
+  {
+   "layer_id": "native-clients",
+   "job_id": "gpt6-fit-native-clients",
+   "missing_votes": 8,
+   "prompt_sha256": "98f715cf7dbfec8cb5d6ec3c43c85e4a9fc51a1203648b91ca17673364289ae7",
+   "prompt_bytes": 28741,
+   "prompt_lines": 204,
+   "props_sha256": "dbe53950782e3fabbd3546cbbd79ae6a23547f4348e8c3618ad92dc774a7f02f",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "98f715cf7dbfec8cb5d6ec3c43c85e4a9fc51a1203648b91ca17673364289ae7",
+    "match": true
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "lines": 204
+    },
+    "ours": {
+     "lines": 204
+    },
+    "match": true
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/native-clients.json",
+   "input_sha256": "5392a70f60bab1e93c9ea4cfd9b28ba63cc5bbd61f78202337241db4a888445d"
+  },
+  {
+   "layer_id": "instructions-skills",
+   "job_id": "gpt6-fit-instructions-skills",
+   "missing_votes": 8,
+   "prompt_sha256": "add898f898173368aa7bc62b4e0cf2b994fcac3477fe2950d1f031fec29e6791",
+   "prompt_bytes": 36445,
+   "prompt_lines": 323,
+   "props_sha256": "e758581703af97a0baf7192c37bcc4e6f9e1d98b5971b9d9062171f1e5e16a7d",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "14345b18a54ca652d73aa95e2e63cb8e24a77b4b82ad9cc8412d09736063d1bd",
+    "match": false
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "bytes": 36445
+    },
+    "ours": {
+     "bytes": 36445
+    },
+    "match": true
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/instructions-skills.json",
+   "input_sha256": "9df1adbd661dc2d950801fbf5550deffc192eec256859d8d92578866ab13061f"
+  },
+  {
+   "layer_id": "workers",
+   "job_id": "gpt6-fit-workers",
+   "missing_votes": 8,
+   "prompt_sha256": "713830a859c3e9f0b7df6abed4b92002a273b0a8b03adf7c74ae8543c7c65867",
+   "prompt_bytes": 33205,
+   "prompt_lines": 239,
+   "props_sha256": "9dd8324b62e7ca337ebb7abf33d2fce742287c491e94a5834677c34d6253cd44",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "713830a859c3e9f0b7df6abed4b92002a273b0a8b03adf7c74ae8543c7c65867",
+    "match": true
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "lines": 240
+    },
+    "ours": {
+     "lines": 239
+    },
+    "match": false
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/workers.json",
+   "input_sha256": "66632940ce41135ad47c7096749bfdc2c89f79267a4e2d332116ab0cbb4f2f73"
+  },
+  {
+   "layer_id": "isolation",
+   "job_id": "gpt6-fit-isolation",
+   "missing_votes": 8,
+   "prompt_sha256": "70733aa5b2a2e7796120aacdcee34ad03894a187de971858472af31cc5f7768b",
+   "prompt_bytes": 27448,
+   "prompt_lines": 160,
+   "props_sha256": "73e9891c79c249e5742a6124949b1e0cbbe6364d5573b0b59e0b09f1afa56a3d",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "70733aa5b2a2e7796120aacdcee34ad03894a187de971858472af31cc5f7768b",
+    "match": true
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "lines": 160
+    },
+    "ours": {
+     "lines": 160
+    },
+    "match": true
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/isolation.json",
+   "input_sha256": "151cf43901bb1c289918075787142f79545ccdce4faff629bcb27ecf69f61d77"
+  },
+  {
+   "layer_id": "code-navigation",
+   "job_id": "gpt6-fit-code-navigation",
+   "missing_votes": 8,
+   "prompt_sha256": "1700214fee096e4796d6715cbb7f3591964f17c41ad49ecdfa00e3767bba0d58",
+   "prompt_bytes": 32779,
+   "prompt_lines": 257,
+   "props_sha256": "7308d5bc23dcf64b1b9e8c82af5b7d94d24243f65703af8fe2bc34ba7053f651",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "2565464ab9373b2b86f8443de5b0ed04a85e6b085fec8d39bb0660628cbc2fb8",
+    "match": false
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "lines": 257
+    },
+    "ours": {
+     "lines": 257
+    },
+    "match": true
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/code-navigation.json",
+   "input_sha256": "24b52b2a76adf530b43ea24bb8217872d44dc5d51e93ba85658cc3980f3c8254"
+  },
+  {
+   "layer_id": "document-retrieval",
+   "job_id": "gpt6-fit-document-retrieval",
+   "missing_votes": 7,
+   "prompt_sha256": "0eaae00e80eb1efaf978bda7a5e4022450c4fa536111d97cefa3e3eb8d88955e",
+   "prompt_bytes": 28607,
+   "prompt_lines": 186,
+   "props_sha256": "a2b9fe413be5321b0b0f552188e85f6301da3bb12e16452747564e83b22cd577",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "0eaae00e80eb1efaf978bda7a5e4022450c4fa536111d97cefa3e3eb8d88955e",
+    "match": true
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "lines": 186
+    },
+    "ours": {
+     "lines": 186
+    },
+    "match": true
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/document-retrieval.json",
+   "input_sha256": "96aab9e8a66ba7807083285fc48464cdd7b8df0a885917fb61c87dbbf419629d"
+  },
+  {
+   "layer_id": "semantic-rag",
+   "job_id": "gpt6-fit-semantic-rag",
+   "missing_votes": 8,
+   "prompt_sha256": "090982d71d2701f33274730af8ba919a7ada33ef1539c4e28d9bcc68d7e1301b",
+   "prompt_bytes": 31094,
+   "prompt_lines": 230,
+   "props_sha256": "2b2ef9927b9153ca2fba7acd8f671a9d23a7825ecfe0af1ea7f4c4e752d35e72",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "090982d71d2701f33274730af8ba919a7ada33ef1539c4e28d9bcc68d7e1301b",
+    "match": true
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "lines": 230
+    },
+    "ours": {
+     "lines": 230
+    },
+    "match": true
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/semantic-rag.json",
+   "input_sha256": "50b17e0d8e409a637e77f272ff80b551f65a4ff8f14b267cbe92454adcd3234a"
+  },
+  {
+   "layer_id": "durable-memory",
+   "job_id": "gpt6-fit-durable-memory",
+   "missing_votes": 8,
+   "prompt_sha256": "d457897f1f07873f0b3e1fb1b7d401288b202288f35e1199fe6632ea2124bf90",
+   "prompt_bytes": 31734,
+   "prompt_lines": 216,
+   "props_sha256": "6de4a467b1c234d7da0c6e29e1cf3722b2d153809b909b283ed94b10061bd382",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "d457897f1f07873f0b3e1fb1b7d401288b202288f35e1199fe6632ea2124bf90",
+    "match": true
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "bytes": 31734
+    },
+    "ours": {
+     "bytes": 31734
+    },
+    "match": true
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/durable-memory.json",
+   "input_sha256": "b5dad1db5a24534df6d5dfc35ae9ea7e15ab3283dd06562edccfbc2791f0715f"
+  },
+  {
+   "layer_id": "web-research",
+   "job_id": "gpt6-fit-web-research",
+   "missing_votes": 8,
+   "prompt_sha256": "62ef76aff0054a07ae4e8b3f3ff321cf3124b03a23ec40b0967d86bc39efc2f4",
+   "prompt_bytes": 31781,
+   "prompt_lines": 188,
+   "props_sha256": "f5d1305663ee50348ed12c57b379720c9dc6a8a9eba34eac12b1848a776a7ba8",
+   "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f",
+   "check_adhoc_revote_20260926_prompt_sha256": {
+    "recorded": "62ef76aff0054a07ae4e8b3f3ff321cf3124b03a23ec40b0967d86bc39efc2f4",
+    "match": true
+   },
+   "check_inrun_wrapper_prompt_size": {
+    "recorded": {
+     "lines": 188
+    },
+    "ours": {
+     "lines": 188
+    },
+    "match": true
+   },
+   "input_path": "evidence/artifacts/landscape-sweep-20260926/inputs/web-research.json",
+   "input_sha256": "4fe346ad204784a0e4490fd21794a758ede0ddd16ead253145af011f4f491a88"
+  }
+ ],
+ "missing_votes_total": 71,
+ "workflow_run": "wf_555874dd-5a7",
+ "superseded_launch": {
+  "workflow_run": "wf_8066ceb5-b9a",
+  "status": "killed 2026-10-03T07:03:12Z",
+  "agents": "planner only (305,181 tokens and 71 tool calls by the runtime's count); it returned nothing and nothing of it was used"
+ },
+ "label_note": "run_id is a label. Nothing in this flow reads it: codex_job.py never reads sweep_id, make_result.py refuses a GPT-6-only supplement, and record_verdicts.py RUN_ID_PATTERN [0-9A-Za-z]+ rejects it. A later verdict wave cites this record under its own alphanumeric run id.",
+ "props_retention": "evidence copies of jobs/<layer>/props.json stay byte-identical (full 40-hex ids). gitleaks 8.30.1 with .gitleaks.toml at e88d59e4b found 0 leaks in the nine props.json files; its 3 findings in jobs/ are code-navigation/prompt.txt lines 23, 176 and 254 (sourcegraph-access-token on pin ids)",
+ "label": "landscape-sweep-20260926-gpt6-fit-revote-20261003",
+ "source": {
+  "file": "<work-dir>/jobs/PROVENANCE.json",
+  "sha256": "9b1078128df4ea0b9140dfb7b79a8079104ff34ed550a588bfda5f49c8d138a3",
+  "added_here": [
+   "label",
+   "superseded_launch.agents usage",
+   "source",
+   "props_copies",
+   "input_check",
+   "lane_prompts_note",
+   "regeneration"
+  ]
+ },
+ "props_copies": {
+  "native-clients": {
+   "path": "props/native-clients.json",
+   "sha256": "dbe53950782e3fabbd3546cbbd79ae6a23547f4348e8c3618ad92dc774a7f02f",
+   "bytes": 17879,
+   "byte_identical_to_job_props": true
+  },
+  "instructions-skills": {
+   "path": "props/instructions-skills.json",
+   "sha256": "e758581703af97a0baf7192c37bcc4e6f9e1d98b5971b9d9062171f1e5e16a7d",
+   "bytes": 20990,
+   "byte_identical_to_job_props": true
+  },
+  "workers": {
+   "path": "props/workers.json",
+   "sha256": "9dd8324b62e7ca337ebb7abf33d2fce742287c491e94a5834677c34d6253cd44",
+   "bytes": 21465,
+   "byte_identical_to_job_props": true
+  },
+  "isolation": {
+   "path": "props/isolation.json",
+   "sha256": "73e9891c79c249e5742a6124949b1e0cbbe6364d5573b0b59e0b09f1afa56a3d",
+   "bytes": 17756,
+   "byte_identical_to_job_props": true
+  },
+  "code-navigation": {
+   "path": "props/code-navigation.json",
+   "sha256": "7308d5bc23dcf64b1b9e8c82af5b7d94d24243f65703af8fe2bc34ba7053f651",
+   "bytes": 20991,
+   "byte_identical_to_job_props": true
+  },
+  "document-retrieval": {
+   "path": "props/document-retrieval.json",
+   "sha256": "a2b9fe413be5321b0b0f552188e85f6301da3bb12e16452747564e83b22cd577",
+   "bytes": 18377,
+   "byte_identical_to_job_props": true
+  },
+  "semantic-rag": {
+   "path": "props/semantic-rag.json",
+   "sha256": "2b2ef9927b9153ca2fba7acd8f671a9d23a7825ecfe0af1ea7f4c4e752d35e72",
+   "bytes": 19485,
+   "byte_identical_to_job_props": true
+  },
+  "durable-memory": {
+   "path": "props/durable-memory.json",
+   "sha256": "6de4a467b1c234d7da0c6e29e1cf3722b2d153809b909b283ed94b10061bd382",
+   "bytes": 19887,
+   "byte_identical_to_job_props": true
+  },
+  "web-research": {
+   "path": "props/web-research.json",
+   "sha256": "f5d1305663ee50348ed12c57b379720c9dc6a8a9eba34eac12b1848a776a7ba8",
+   "bytes": 21107,
+   "byte_identical_to_job_props": true
+  }
+ },
+ "input_check": "each input_sha256 equals the file's line in evidence/artifacts/landscape-sweep-20260926/inputs/SHA256SUMS (sha256 c026bdf60c8971465b962d181a218e3ad6d75321e8d48cceb03a18e12a9dd251) and the bytes of evidence/artifacts/landscape-sweep-20260926/inputs/<layer>.json",
+ "lane_prompts_note": "<work-dir>/lane/staged.json prompts_sha256 fc50cc4583f5c22eab4284edb95beadafc1b9c8f753238042c2682af4c5ebacb is the lane's own 2026-10-03 templates (its probe prompt); the nine fit prompts come from the frozen 2026-09-26 templates above, and each fit job's inputs.json prompt_sha256 equals its layer's prompt_sha256 here",
+ "regeneration": {
+  "verified_at": "2026-10-03T09:59:23Z",
+  "steps": [
+   "git archive 1b0e4598f tools/sota-convergence/landscape-sweep | tar -x -C <h>",
+   "cd <h>/tools/sota-convergence/landscape-sweep && python3 -c 'import pathlib, build_args, sweep_common as sc; t = build_args.fill_build(build_args.load_templates(), \"2026-09-26\", 32, \"2026-09-25\"); print(sc.prompts_sha256(t)); sc.write_json(pathlib.Path(\"<dir>\") / \"templates.json\", t)'",
+   "python3 tools/sota-convergence/landscape-sweep/make_prompt.py --work-dir <dir> fit evidence/artifacts/landscape-sweep-20260926/inputs/<layer>.json evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/<layer>.json | sha256sum"
+  ],
+  "work_dir_rule": "<dir> must lie outside every git repository (codex_job.resolve_work_dir refuses one inside); /tmp can carry a sandbox .git, so prefer a directory under /var/tmp or the home state directory",
+  "prompts_sha256": "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4",
+  "templates_json_sha256": "12fc198d596490abd9ce3716572053eceea906553edd7b02a5ebe8e2cb1e0cc6",
+  "layers": {
+   "native-clients": {
+    "prompt_sha256": "98f715cf7dbfec8cb5d6ec3c43c85e4a9fc51a1203648b91ca17673364289ae7",
+    "matches_recorded": true
+   },
+   "instructions-skills": {
+    "prompt_sha256": "add898f898173368aa7bc62b4e0cf2b994fcac3477fe2950d1f031fec29e6791",
+    "matches_recorded": true
+   },
+   "workers": {
+    "prompt_sha256": "713830a859c3e9f0b7df6abed4b92002a273b0a8b03adf7c74ae8543c7c65867",
+    "matches_recorded": true
+   },
+   "isolation": {
+    "prompt_sha256": "70733aa5b2a2e7796120aacdcee34ad03894a187de971858472af31cc5f7768b",
+    "matches_recorded": true
+   },
+   "code-navigation": {
+    "prompt_sha256": "1700214fee096e4796d6715cbb7f3591964f17c41ad49ecdfa00e3767bba0d58",
+    "matches_recorded": true
+   },
+   "document-retrieval": {
+    "prompt_sha256": "0eaae00e80eb1efaf978bda7a5e4022450c4fa536111d97cefa3e3eb8d88955e",
+    "matches_recorded": true
+   },
+   "semantic-rag": {
+    "prompt_sha256": "090982d71d2701f33274730af8ba919a7ada33ef1539c4e28d9bcc68d7e1301b",
+    "matches_recorded": true
+   },
+   "durable-memory": {
+    "prompt_sha256": "d457897f1f07873f0b3e1fb1b7d401288b202288f35e1199fe6632ea2124bf90",
+    "matches_recorded": true
+   },
+   "web-research": {
+    "prompt_sha256": "62ef76aff0054a07ae4e8b3f3ff321cf3124b03a23ec40b0967d86bc39efc2f4",
+    "matches_recorded": true
+   }
+  },
+  "prompt_txt_published": false
+ }
+}
