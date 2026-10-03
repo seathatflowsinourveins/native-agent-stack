@@ -77,7 +77,15 @@
       "usage-cost-metering",
       "p1-first-aa",
       "p1-prefreeze-opus-read",
-      "p1-prefreeze-astra-read"
+      "p1-prefreeze-astra-read",
+      "unit9-hook-pilot",
+      "unit9-trace-pilot",
+      "unit9-group-recovery",
+      "unit9-method-astra",
+      "unit9-method-opus",
+      "unit9-profile-initial",
+      "unit9-profile-repair",
+      "unit9-source-defaults"
     ],
     "roles": [
       "command-worker",
@@ -119,7 +127,7 @@
   },
   "predeclared_metrics": {
     "quality_rule": "Historical prerequisite contracts remain unchanged. Original P1 actual212input freeze/all56quality predicates retained; first A/A mechanics UNKNOWN/NOTPASS stops55latercases and commonjudge. P2 and a future distinct measurable comparison remain open.",
-    "usage_rule": "Exact unique response/request counters counted once; cached/reasoning subsets not added. Research reads are overhead, not treatment savings. CLI/tests/artifacts do not substitute for provider counters. Unknown fields remain null; whole study coverage is partial."
+    "usage_rule": "Exact unique response/request counters counted once; cached/reasoning subsets not added. Research reads are overhead, not treatment savings. CLI/tests/artifacts do not substitute for provider counters. Unknown fields remain null; whole study coverage is partial. Unit9 review/pilot usage is outside arms; source/default views reuse previous counters without adding them. Distinct R2 addendum binds fixed within-client endpoint/BCa/joint quality/terminal stop; producers unfrozen."
   },
   "runtime_and_platform": {
     "platform": "Declared Linux/amd64 destination with rootless Docker; disposable official Rust containers for native tests",
@@ -206,7 +214,15 @@
     "Nine preregistered native ccusage20.0.26 daily/codex-daily JSON commands on fixed usage-only copies in owned network-none read-only containers; no models",
     "One supported Promptfoo0.123.1 native eval for frozen codex-01 AA1, no-cache/repeat1/max-concurrency1/no-share and process-local adaptive scheduler disabled; original absolute invocation retained privately.",
     "One native read-only claude -p Opus/max prefreeze source read, exact frozen42inputs; final797words exceeds650word gate",
-    "One native read-only codex exec gpt-6-astra/max prefreeze source read, exact frozen129inputs; final391words within550word gate"
+    "One native read-only codex exec gpt-6-astra/max prefreeze source read, exact frozen129inputs; final391words within550word gate",
+    "Native Promptfoo eval fresh Claude directed released Docker hooks/main+max child",
+    "Native Codex0.160 readonly trace probe plus unchanged native debug trace-reduce",
+    "Native Promptfoo eval distinct frozen Claude MCP Tini process-group configuration; directed main+max child",
+    "Native codex exec gpt-6-astra/max keyless pool readonly consequential observable-contract judgment",
+    "Native claude -p Opus/max restricted Read-only immutable prefreeze method read",
+    "Native Codex sandbox named-profile allowed harmless control, original quoted flattened path syntax",
+    "Native Codex sandbox distinct frozen unquoted dot-free profile allowed harmless control",
+    "Pinned native release/source and existing-record checks; three limited native default decisions"
   ],
   "observations": [
     {
@@ -2161,6 +2177,254 @@
         "total": 774709,
         "native_retries": null
       }
+    },
+    {
+      "id": "unit9-original-claude-hook-pilot",
+      "task": "unit9-hook-pilot",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 55,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate directed fourfact pilot; original ready-markerFAIL retained, directchildhook/APIinputUNKNOWN; inclusive102295 known native query scope only, not comparative/protection.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-claude-hook-pilot.json",
+          "sha256": "62e366f02b0d8b1cda6830cc0343ee496aae08b6cda9395fb5dde5703707b065"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1412,
+        "cache_creation": 23105,
+        "cache_read": 70228,
+        "output": 7550,
+        "reasoning_in_output": 5023,
+        "total": 102295,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-native-codex-trace-pilot",
+      "task": "unit9-trace-pilot",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 56,
+      "evidence_class": "native_cli_execution",
+      "scope": "Native seven responses/first-full+five-delta chain/fourfact fidelity captured; owned process cleanup visibilityUNKNOWN, encrypted assignment/complete deferred charging/backendhelpers unknown. Narrow capture evidence, not whole admission/P1regrade.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-codex-trace-pilot.json",
+          "sha256": "66b4e67004906f66163a68c93cd5bf4edd8ad15f6bed139ed0acd83a67dc35df"
+        }
+      ],
+      "usage": {
+        "uncached_input": 28981,
+        "cache_creation": 0,
+        "cache_read": 107008,
+        "output": 1665,
+        "reasoning_in_output": 782,
+        "total": 137654,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-cm-native-group-recovery",
+      "task": "unit9-group-recovery",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 57,
+      "evidence_class": "native_cli_execution",
+      "scope": "Exact oneattempt fourfact/mainchild/tool/ownedMCP native marker cleanup integration PASS; livePGID observed, marker absent before operator cleanup. Original markerFAIL unchanged; individual signal/directchildhook/APIinputUNKNOWN; no natural-use/protection/P2/default.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-cm-group-recovery-pilot.json",
+          "sha256": "599a16357f6dc71e5aee66417e3d8c6239c52a4e77cd0a1f807bc3abc061ad9b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1412,
+        "cache_creation": 24927,
+        "cache_read": 66198,
+        "output": 13200,
+        "reasoning_in_output": 8255,
+        "total": 105737,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-prospective-method-astra",
+      "task": "unit9-method-astra",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 58,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate source-method judgment452words<=550/all8boundinputs match/five disjoint native records; fair observable estimand lead and limited defaults, not approval/runtimeacceptance. Wire/backend/helper/invoiceUNKNOWN.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-prospective-method-judgment.json",
+          "sha256": "3e549e38c5c69d368186762f85dbca8c64b45df3c0f8bbce07d5988dffd91375"
+        }
+      ],
+      "usage": {
+        "uncached_input": 39247,
+        "cache_creation": 0,
+        "cache_read": 52480,
+        "output": 5137,
+        "reasoning_in_output": 3714,
+        "total": 96864,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-p1-r2-opus-method-read",
+      "task": "unit9-method-opus",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 59,
+      "evidence_class": "native_cli_execution",
+      "scope": "Family source-method lead completed; wordlimitFAIL557>550 retained, sixinputsunchanged. Two finalized groups/nativefinal/coststate57770; stream snapshot mismatch retained. No regrade/producerfreeze/approval/wirecomplete claim.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-opus-method-read.json",
+          "sha256": "534f0a9e5778f26d1b00228eb1a8634aa3dae1a50f897ea0b4f08f58a7bc1f5b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 6361,
+        "cache_read": 7948,
+        "output": 43457,
+        "reasoning_in_output": 41800,
+        "total": 57770,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-native-profile-initial",
+      "task": "unit9-profile-initial",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 60,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free source-backed nativeCLI allowed1/stdout0/stderr88 before command; deniedUNRUN. Nativeusage unavailable, no model launched/nozeroaccountclaim; namedprofile not universally unsupported.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-native-profile-failures.json",
+          "sha256": "4446bb73180ec78b4ebfb2672b683c70ab08ec1a4d4660581443f600504232a1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-native-profile-repair",
+      "task": "unit9-profile-repair",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 61,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free bounded Sol repair allowed1/stdout0/stderr133, bwrap installedclientnotvisible; deniedUNRUN/all11inputhashesmatch. Nativeusage unavailable/no model launched, nozeroaccountclaim; producerbundle unprepared.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-native-profile-failures.json",
+          "sha256": "4446bb73180ec78b4ebfb2672b683c70ab08ec1a4d4660581443f600504232a1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-sources-and-scoped-defaults",
+      "task": "unit9-source-defaults",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 62,
+      "evidence_class": "offline_artifact_check",
+      "scope": "No new producer run: existing210080command/185514structured/nativeparser views reused, neveradded. Limited prerequisite/fidelity/inclusive accounting defaults, not powered provider superiority. Currentrelease metadata unchanged; source-only constraints/retrieval owner pending.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
+          "sha256": "361c1c0f407508d2b09f4eae425d2aaf182ed1ba239c5d190abfe51190c36fa5"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -2299,6 +2563,26 @@
     {
       "run_id": "unit8-prefreeze-opus-read",
       "reason": "797words exceeds650word cap; original answer/counters retained; conditional readiness is source opinion only."
+    },
+    {
+      "run_id": "unit9-original-claude-hook-pilot",
+      "reason": "Separate directed fourfact pilot; original ready-markerFAIL retained, directchildhook/APIinputUNKNOWN; inclusive105? no:102295 known native query scope only, not comparative/protection."
+    },
+    {
+      "run_id": "unit9-native-codex-trace-pilot",
+      "reason": "Native seven responses/first-full+five-delta chain/fourfact fidelity captured; owned process cleanup visibilityUNKNOWN, encrypted assignment/complete deferred charging/backendhelpers unknown. Narrow capture evidence, not whole admission/P1regrade."
+    },
+    {
+      "run_id": "unit9-p1-r2-opus-method-read",
+      "reason": "Family source-method lead completed; wordlimitFAIL557>550 retained, sixinputsunchanged. Two finalized groups/nativefinal/coststate57770; stream snapshot mismatch retained. No regrade/producerfreeze/approval/wirecomplete claim."
+    },
+    {
+      "run_id": "unit9-native-profile-initial",
+      "reason": "Model-free source-backed nativeCLI allowed1/stdout0/stderr88 before command; deniedUNRUN. Nativeusage unavailable, no model launched/nozeroaccountclaim; namedprofile not universally unsupported."
+    },
+    {
+      "run_id": "unit9-native-profile-repair",
+      "reason": "Model-free bounded Sol repair allowed1/stdout0/stderr133, bwrap installedclientnotvisible; deniedUNRUN/all11inputhashesmatch. Nativeusage unavailable/no model launched, nozeroaccountclaim; producerbundle unprepared."
     }
   ],
   "limitations": [
@@ -2306,7 +2590,7 @@
     "Source/runtime qualification receipts bind private original outputs through hashes and independent coordinator observation; sanitized summaries are not upstream acceptance by themselves",
     "Context Mode selected source-built tests and shipped current-tool Inspector operations are complete within their receipts. Full/frozen-dependency acceptance, native-client hooks/continuity and comparative binding remain pending.",
     "Three research reads share no study comparison: summaries reconcile native streams but are not independent invoices. Whole-research usage and paid costs remain unknown",
-    "No powered comparisons, measured default promotion or accepted final PR yet",
+    "No powered provider comparisons or accepted final PR; documented native command/JSON/meter defaults are limited prerequisite/fidelity/inclusive accounting decisions.",
     "The latest native Claude query modelUsage covers only its upstream-declared pipeline; native list estimates are not invoices.",
     "The two selected live calibrations include Codex child exact records; broader goal/research usage is not declared complete.",
     "Actual root natural compaction validates accounting coverage only; fixed P2 quality/resume remains open.",
@@ -2334,15 +2618,16 @@
     "Original-failed packet hash projection first used worktree cwd for relative manifest paths. Corrected read anchors each path at the actual private packet directory; no original files, runtime observations or model calls changed.",
     "Unit6 sanitization changed the public meter-artifact receipt bytes while leaving its experiment anchor stale; consistency check correctly failed. Public anchor now matches sanitized bytes, private original hashes/measurements remain unchanged; failed validator outputs retained.",
     "Unit7 native role/functionality and artifact/program/source checks remain pre-freeze. Lifecycle missed views and reader-cleanup error preserved; writable engineering feasibility does not substitute for read-only P2 until independently bound.",
-    "First fixed schedule yields0accepted confirmatorycases; no ratio/CI, saving, protection, native-baselinewin or default inferred. Native trace/hook qualifications do not retrofit it."
+    "First fixed schedule yields0accepted confirmatorycases; no ratio/CI, saving, protection, native-baselinewin or default inferred. Native trace/hook qualifications do not retrofit it.",
+    "Unit9 original markerFAIL/native trace processvisibilityUNKNOWN and OpuswordFAIL remain; distinct groupcleanupPASS is integrationonly. Namedprofile original and repairallowedcontrolsFAIL/deniedUNRUN; R2producerbundle unprepared. Hiddeninputs/billing/nativeP2/retrievalowner remain open."
   ],
   "decision_and_scope": {
     "decision": "trial",
-    "scope": "Selected source/runtime prerequisites, separate source reviews and original stopped frozen P1 first A/A; no comparative/default activation",
+    "scope": "Selected source/runtime prerequisites, original stopped P1, separate native observation/lifecycle/method units and limited documented native defaults; no powered comparative/default claim for context protection",
     "qualification_run_ids": []
   },
   "rollback": "Keep existing native client/profile/defaults. Disposable study state can be removed through owned native cleanup after evidence custody; no peer state is changed.",
-  "next_decision_changing_test": "Qualify supported native request exposure and released hook/main-child admission under separate prospective contracts, preserving original P1 failure. Then a distinct fixed comparison with prefreeze Opus/max read and complete native counters; natural compaction/resume and unchanged quality remain separate gates. No RTK rescue or failed-gate waiver.",
+  "next_decision_changing_test": "Resolve native interface/producer binding after bounded Sol repair through Astra/max; separately freeze observable R2 onlywhenclient-specific admission/source/quality/counters qualify. Natural-compaction/same-session-resume P2 and owner-bound retrieval remain separate.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",
@@ -2409,7 +2694,15 @@
       "meter-expanded-role-accounting",
       "p1-first-aa-codex-01",
       "unit8-prefreeze-opus-read",
-      "unit8-prefreeze-astra-read"
+      "unit8-prefreeze-astra-read",
+      "unit9-original-claude-hook-pilot",
+      "unit9-native-codex-trace-pilot",
+      "unit9-cm-native-group-recovery",
+      "unit9-prospective-method-astra",
+      "unit9-p1-r2-opus-method-read",
+      "unit9-native-profile-initial",
+      "unit9-native-profile-repair",
+      "unit9-sources-and-scoped-defaults"
     ],
     "coverage_artifact": null
   }

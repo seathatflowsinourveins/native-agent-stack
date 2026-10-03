@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Keep token/context practice faithful and recoverable for complex source-grounded US-equities R&D.",
+  "status": "SOURCE_JUDGMENT_COMPLETE; R2_PRODUCERS_NOT_FROZEN",
+  "original_study": "P1STOP/55UNRUN_FINAL/commonjudgeUNRUN remain unchanged. No B or judged P1 data existed when distinct observable estimand was proposed.",
+  "native_Astra": {
+    "client": "Codex0.160.0",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "native_exit": 0,
+    "disjoint_responses": 5,
+    "input_including_cached": 91727,
+    "cached_input_subset": 52480,
+    "output": 5137,
+    "reasoning_output_subset": 3714,
+    "total": 96864,
+    "word_bound": "452<=550 PASS",
+    "input_bindings": 8,
+    "all_input_hashes_match": true,
+    "actual_wire_or_backend_identity": "UNKNOWN beyond native serialized/client records"
+  },
+  "judgment": "A separate assigned-configuration comparison is fair on identifiable native usage plus unchanged fixed-task quality. Unknown encrypted child/ClaudeAPI inputs preclude plaintext equivalence or complete billing claims; B lifecycle and P2 remain separate. Scoped command/JSON/meter defaults permitted by prerequisite/fidelity/accounting evidence.",
+  "root_bound_addendum": {
+    "sha256": "248373903c42ebb01b1c0f2b2620d68b239e41ff60d09e9ec726094b193677b1",
+    "binding_sha256": "d9c9262c61eeb35de0090765e3720e28d31192eb0aa052b26947d2cad25fa626",
+    "before_recovery_freeze": true,
+    "scope": "Client-specific inclusive scalar, non-circular native role/response inventory, terminal stop, paired BCa statistic, all-quality joint gate, carryover/gold/tool scope and native-compaction definition. No producer freeze."
+  },
+  "bindings_sha256": {
+    "native_journal": "9fe580e985b63a7b820b8710250b7b135c838807f48f6ba297300464a2f06c59",
+    "worker_receipt": "5ab32eb20c0c4a57308fd93fa7185869b4de9e8f85eb0fdcab3d6ca3a4902271",
+    "root_independent_native_verification": "4d7238947795344597a0624fe71b7f8afd8b05d2df7f72c42d4cacfb92531e49"
+  },
+  "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc; Promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8; native record paths/pins retained privately.",
+  "limits": "Review overhead outside arms, not approval/default acceptance/protection. Native invoice/unreported helper coverage unknown.",
+  "completeness_critic": "Effective permissions, linked native records, treatment lifecycle and substantial natural-compaction/resume remain next bounded runtime gaps."
+}

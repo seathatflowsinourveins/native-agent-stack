@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "publication_state": "ROOT_SANITIZED_NATIVE_QUALIFICATION",
+  "worker_acceptance_claim": false,
+  "date": "2026-10-03",
+  "title": "Session-local plugin and native hook-event source constraints",
+  "north_star_action": "Qualify native tool, context, lifecycle and accounting evidence for long, high-quality US-equities research and cumulative engineering sessions.",
+  "study_boundary": {
+    "original_p1": "Separate from the stopped P1 MECHANICS_NOT_PASS study; no replay, replacement or post-hoc pass.",
+    "p2": "HOLD; genuine natural automatic compaction and same-session resume quality remain unmeasured.",
+    "comparison": "No savings, protection, natural-use rate, default or comparative treatment acceptance is claimed."
+  },
+  "privacy": "Sanitized returned metadata only. Original transcripts, request bodies, identifiers, credential/header values and host locations remain private.",
+  "scope": "Source-only candidate class. No native plugin loading, direct hook-event capture, installation, model, container, daemon or configuration launch performed.",
+  "source_pins": [
+    {
+      "repository": "mksglu/context-mode",
+      "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "version": "1.0.169"
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "version": "0.123.1"
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "release": "v2.1.288",
+      "installed_help": "retained native help"
+    },
+    {
+      "package": "@anthropic-ai/claude-agent-sdk",
+      "version": "0.3.263"
+    }
+  ],
+  "supported_interfaces": {
+    "native_session_loader": "--plugin-dir loads a directory or zip for that session only.",
+    "sdk_session_loader": "Options.plugins supports local plugins; skipMcpDiscovery is a separate supported SDK mode when the host owns MCP connections.",
+    "native_event_format": "--print --verbose --output-format stream-json --include-hook-events is the supported direct stream surface.",
+    "system_hook_record_fields": [
+      "hook_id",
+      "hook_name",
+      "hook_event",
+      "session_id",
+      "uuid",
+      "stdout",
+      "stderr",
+      "output",
+      "outcome",
+      "optional exit_code"
+    ],
+    "native_event_record_limit": "No promise of hook stdin, tool-use identity, agent identity or API input schemas; actual future emission remains UNRUN.",
+    "promptfoo_carrier": "Pinned provider forwards includeHookEvents but only retains assistant/user/result branches, dropping system hook messages. Extra skipMcpDiscovery admission through its declared type/path plugin configuration remains unqualified."
+  },
+  "full_plugin_owned_only_admission": "HOLD: the released manifest autoloads startup, hooks and skills; loading for one session does not make bootstrap side effects session-local.",
+  "source_declared_constraints": [
+    "Startup can repair default native Claude registry/settings/cache and deploy a global SessionStart healing hook.",
+    "Linux startup can normalize and rewrite released hook configuration.",
+    "Missing or incompatible native SQLite dependencies can trigger npm install/rebuild and ABI binary writes.",
+    "Missing HTML dependencies can trigger detached npm installs. Existing Bun can be re-executed; this is not a Bun-install claim.",
+    "Session/error storage defaults and legacy content cleanup are not confined by the selected working directory.",
+    "Default readiness scans shared temporary markers, probes process liveness or trusts recent freshness; startup refreshes and intends deletion on shutdown. Source intent does not overwrite the pilot marker-cleanup failure.",
+    "Captured container dependencies do not establish host-native compatibility or prove every installation/rebuild branch inactive."
+  ],
+  "boundary": "The observed Settings Docker command-hook integration remains separate from unchanged native full-plugin admission. Direct native system-event capture may address carrier loss; it does not by itself qualify hooks, compaction, resume, semantic recall or cost.",
+  "future_execution": "UNRUN",
+  "original_bindings_sha256": {
+    "source_receipt": "8eeaf95b08bcfe408b182bbb19c75631f741846ac8ed1af2057a831c04e249d6",
+    "source_bindings": "03354f738882fb79894f89db7fc2664008d315908caca0a58938c38d35616b9c",
+    "source_artifact_manifest": "9af0e6ce3387d5ff26219f284bad0d1d808b90b667620915b3446a01acd33b77",
+    "coordinator_upstream_primary_verification": "f2f49ff03659d12f44d44730c3d814400098c654215d7f285964a47de6c20308"
+  },
+  "completeness_critic": {
+    "missed_modality": "Native plugin discovery under managed restrictions/trust, main-child hook-input attribution, automatic compaction/resume, cleanup and resource pressure.",
+    "source_gap": "A supported write-confined bootstrap/compatible runtime recipe preserving native authentication and defaults; source metadata does not supply live acceptance.",
+    "next_candidate_class": "Maintained native session-local plugin and full hook-system-event modalities; evaluate explicit isolation before activation. Independent whole-task semantic oracle remains a separate P2 gate."
+  },
+  "coordinator_binding_verification": "All named original SHA256 identities matched; independently bound native counter and upstream primary checks remain distinct."
+}

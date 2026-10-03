@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Bind effective native producer read scopes for faithful token/context R&D without exposing grader/gold or changing native accounts.",
+  "status": "TWO_DISTINCT_MODEL_FREE_NATIVE_PREREQUISITES_NOTPASS; DENIED_CONTROLS_UNRUN",
+  "native_client": "Codex0.160.0 exact existing ELF",
+  "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc codex-rs/utils/cli/src/config_override.rs and codex-rs/config/src/overrides.rs",
+  "attempts": [
+    {
+      "kind": "initial quoted flattened path representation",
+      "native_help_exit": 0,
+      "allowed_control_exit": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 88,
+      "stderr_sha256": "1b9a88f3afe92d7690f247b4009a323e4cd61984e5528fe3e578f82758d41a74",
+      "outcome": "Native value parser preserves override key; key application splits literally on periods and does not unquote. Path rejected before cat.",
+      "denied": "UNRUN",
+      "receipt_sha256": "43be3ad857e66d1638f3ec4993d0740313cc86c664d317ecd92a0ecde0b3cd09"
+    },
+    {
+      "kind": "distinct unquoted dot-free path repair",
+      "native_allowed_started_utc": "2026-10-03T13:08:26.932199+00:00",
+      "native_allowed_completed_utc": "2026-10-03T13:08:27.027633+00:00",
+      "allowed_control_exit": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 133,
+      "stderr_sha256": "2f04a17c1ab9b72543470831d23f1fcafc7a6b9fc0f36564fe4312e9ce558e51",
+      "outcome": "bwrap could not execute the installed Codex ELF outside the granted roots. Configuration parsing advanced; command/runtime route did not qualify.",
+      "denied": "UNRUN",
+      "frozen_input_count": 11,
+      "all_input_hashes_match": true,
+      "freeze_sha256": "4dfe2ffc21ce3d7aa16da06b1e24167f95d4ccbda480614454e236fa9f2efeae",
+      "receipt_sha256": "305960a8739e530f4ce97ef4c7d56d377edc48acf69febd5afedc7027e563b73"
+    }
+  ],
+  "scope": "Native model-free CLI controls using harmless fixtures; no actual gold/auth read, no models/providers/producer cases, no retry/regrade/fallback.",
+  "original_study": "P1STOP unchanged. R2producerbundle unprepared/unfrozen; neither attempt proves runtime shell, Agent or MCP confinement.",
+  "remaining_native_carrier_seam": "Native inline TOML/rawSDK overrides are source-supported, but selected Promptfoo provider does not forward rawSDK option. Dotted installed client/mandatory skill leaf roots remain pending.",
+  "next_action": "Failure unresolved after one bounded Sol repair triggers nativeAstra/max consequential native-interface judgment from selected source/returned artifacts; no authored adapter or further speculative trial.",
+  "upstream_primary_root_verification": "Two returned pinned GitHub files matched native Git blobs and copied source SHA256 before distinct freeze.",
+  "completeness_critic": "Serializer/value-parser/key-application/compiler/nativehelper mount and Agent/MCP scopes are separate interfaces. Preserve native sign-ins/cache/discovery and never infer no capture from silence."
+}

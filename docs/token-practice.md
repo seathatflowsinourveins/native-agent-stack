@@ -7,6 +7,8 @@ attaches native results, dashboard screenshots and complete component coverage.
 Read this guide on demand when selecting a context
 lane, interpreting native counters, or designing a measured comparison.
 
+The [2026-10-03 distribution qualification](decisions/2026-10-03-token-native-scoped-defaults.md) retains native commands, compact JSON for unrestricted tested data and finalized native client records for known inclusive accounting. Candidate prerequisite/fidelity/accounting failures are distinct from provider-token superiority. Context protection, natural compaction/resume and architecture-owned retrieval qualification remain open; historical workstation profiles below retain their own evidence scope.
+
 The [foundation setup and evidence](foundation-stack.md) adds the repaired
 Python/JavaScript retrieval configuration, fresh native client checks and the
 optional pinned OmniRoute install. It includes the exact returned counters,

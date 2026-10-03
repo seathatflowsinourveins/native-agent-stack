@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "publication_state": "ROOT_SANITIZED_NATIVE_QUALIFICATION",
+  "worker_acceptance_claim": false,
+  "date": "2026-10-03",
+  "title": "Codex native trace, input exposure and role counters pilot",
+  "north_star_action": "Qualify native tool, context, lifecycle and accounting evidence for long, high-quality US-equities research and cumulative engineering sessions.",
+  "study_boundary": {
+    "original_p1": "Separate from the stopped P1 MECHANICS_NOT_PASS study; no replay, replacement or post-hoc pass.",
+    "p2": "HOLD; genuine natural automatic compaction and same-session resume quality remain unmeasured.",
+    "comparison": "No savings, protection, natural-use rate, default or comparative treatment acceptance is claimed."
+  },
+  "privacy": "Sanitized returned metadata only. Original transcripts, request bodies, identifiers, credential/header values and host locations remain private.",
+  "scope": "One separately registered native Codex capture calibration and unchanged upstream offline reduction; no Context Mode treatment or P1 replay.",
+  "source_pins": [
+    {
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "version": "0.160.0",
+      "surface": "native rollout trace, production request wiring, native offline reducer and protocol"
+    },
+    {
+      "model": "gpt-6.1-sol",
+      "native_persisted_role_effort": "max",
+      "serialized_reasoning_effort": "max in all seven requests",
+      "backend_identity_and_effort": "UNKNOWN beyond serialized/native client records"
+    }
+  ],
+  "native_returned_observations": {
+    "roles": "One main and one native child with distinct original response identities.",
+    "fixture": {
+      "bytes": 244,
+      "fact_lines": 4,
+      "kind": "fixed synthetic calibration fixture; values omitted"
+    },
+    "source_fidelity": "Both directed original reads returned exact original bytes and all four complete fact lines.",
+    "native_commands": {
+      "directed_original_reads": 2,
+      "mandatory_child_guidance_reads": 1,
+      "recorded_total": 3,
+      "recorded_exits_zero": true
+    },
+    "capture": "Native CLI exited zero; 61 contiguous events and seven inference starts/completions; native offline reducer exited zero and reported completed.",
+    "encrypted_child_assignment": "UNKNOWN: opaque assignment is outside the fresh declared plaintext scope. No decryption or strict negative no-facts-forwarding claim.",
+    "owned_process_cleanup_visibility": "UNKNOWN: positive owned PID observation was missed; an empty late scoped lookup is not global absence proof."
+  },
+  "serialized_input_exposure": {
+    "first_request_per_role": "Observed native ResponsesLite tool-definition and readable developer-instruction components in the first request for both roles.",
+    "structured_output_schema": "Observed parent schema matches the frozen schema; no child output schema was recorded. Schema content is not published.",
+    "incremental_continuation": {
+      "initial_full_role_requests": 2,
+      "subsequent_requests_with_previous_response_id": 5,
+      "observation": "Later requests use native incremental previous-response links; they are not expected to repeat the first full tool-definition prefix. Coordinator metadata checks reconcile the captured chain."
+    },
+    "scope_limit": "Serialized client input is observed. Complete advertised/deferred catalog charging, backend transformations, helpers and actual invoice remain UNKNOWN.",
+    "correction": "Root initially assumed a full tools prefix in every request and hit KeyError before writing. First-per-role schema plus incremental continuation is the source-supported correction retained this turn. This does not regrade P1."
+  },
+  "native_usage": {
+    "main": {
+      "distinct_responses": 4,
+      "input_tokens": 72912,
+      "output_tokens": 1014,
+      "total_tokens": 73926
+    },
+    "child": {
+      "distinct_responses": 3,
+      "input_tokens": 63077,
+      "output_tokens": 651,
+      "total_tokens": 63728
+    },
+    "combined_disjoint": {
+      "distinct_responses": 7,
+      "input_tokens": 135989,
+      "output_tokens": 1665,
+      "total_tokens": 137654,
+      "cached_input_subset": 107008,
+      "cache_write_input_subset": 0,
+      "reasoning_output_subset": 782
+    },
+    "native_cli_parent_only_total": 73926,
+    "captured_failed_or_cancelled_attempts": 0,
+    "count_once": "Distinct original responses are counted once across disjoint native threads. Trace, raw journal, cumulative prefixes, final native/provider and parent CLI views overlap and are not added. Cache is an input subset and reasoning is an output subset.",
+    "helper_scope": "No extra thread/model/response identities recorded in the exact bundle; backend helpers beyond capture UNKNOWN.",
+    "billing": "Actual invoice UNKNOWN; no new tokenization or savings inference."
+  },
+  "original_bindings_sha256": {
+    "pilot_receipt": "88f54ab13f88db5b2a3d02ef6814064e5ebfd82e43746fe0ade15b196ae6d431",
+    "native_usage": "9a27aa86a0f1240eaa22347af0256f2db25730df4d2c3108e38ac108eafa6a52",
+    "source_bindings": "0e758a869fe2b2f9b7c0400c1a68c8098e0a46f0d104310efd4aade91051fabd",
+    "request_exposure_projection": "5d92260f825a01c66547695aad1ab64ba70b62e73cdce496d7154b0b16f5a63b",
+    "coordinator_native_verification": "8817095ebc06af3ac5f78e630ad5d613a7da4b738ad11418c16a845f53c8be43",
+    "upstream_capture_primary_verification": "e515fcc6005988c4269c2e19d01759689c5a94056a5923bf51ccff4423ecb3b3",
+    "upstream_wiring_primary_verification": "cbc4c5c4ad10e9c3b456bb0b2b406ae04c428af494555314c9a4f78a921e2191"
+  },
+  "completeness_critic": {
+    "missed_modality": "Genuine natural compaction and same-session resume on substantial cumulative real work; synthetic four-fact fidelity cannot substitute.",
+    "source_gap": "Backend transformed input, helper and billing scopes; encrypted assignment remains unknown.",
+    "next_candidate_class": "Supported native capture/scheduling paired with maintained long cumulative task corpora and an independent semantic oracle; no authored bridge or padding."
+  },
+  "coordinator_binding_verification": "All named original SHA256 identities matched; independently bound native counter and upstream primary checks remain distinct."
+}

@@ -15806,8 +15806,13 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
-      "sha256": "f40a38b59e156e652568e34152743e1a8c047235a9d42322602bb72c9461bddf",
-      "bytes": 64699
+      "sha256": "c1f3635a4e582ecb95399585016ca7e8addb6a8e6b82d088429b3c82eb245a5b",
+      "bytes": 69269
+    },
+    {
+      "path": "docs/decisions/2026-10-03-token-native-scoped-defaults.md",
+      "sha256": "264bdee8a83dbc0dcd988f646edb53be816368112df27d4e2dfcb5aea7fd0ece",
+      "bytes": 4118
     },
     {
       "path": "docs/direct-results.md",
@@ -16171,8 +16176,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "b43af443e3ec7dd81efe16f7adc6ead8fe99a4748bc59a541f8ca8696799b80e",
-      "bytes": 587560
+      "sha256": "79bf6fe0324567656cd1210e2d6afadfdc7f9a3e38d636c548eeefd463a7af86",
+      "bytes": 588988
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -16186,8 +16191,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "7b4e30e942e4d3c49680b8443a3d58603224316b2b44dbe4006deecdd5cf2ed0",
-      "bytes": 39853
+      "sha256": "66ee576ca80d76e3f0fa08c9f1b45734f89980c7f26de906dd3963c190ad56ed",
+      "bytes": 40362
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -45546,8 +45551,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "eee44438381ecd170d0f25d2d1e5d36d0862971f841958233cb86c941ef14999",
-      "bytes": 94502
+      "sha256": "e5e87c18a767ae92e1516929bbdc518f8124f8ba6d3a448ae82a2cb4280f9e72",
+      "bytes": 106627
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -45598,6 +45603,56 @@
       "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
       "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6",
       "bytes": 19909
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-claude-hook-pilot.json",
+      "sha256": "62e366f02b0d8b1cda6830cc0343ee496aae08b6cda9395fb5dde5703707b065",
+      "bytes": 6678
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-cm-group-recovery-pilot.json",
+      "sha256": "599a16357f6dc71e5aee66417e3d8c6239c52a4e77cd0a1f807bc3abc061ad9b",
+      "bytes": 4587
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-codex-trace-pilot.json",
+      "sha256": "66b4e67004906f66163a68c93cd5bf4edd8ad15f6bed139ed0acd83a67dc35df",
+      "bytes": 6294
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-completeness-critic.md",
+      "sha256": "3e0317821baddffb5e62db89f497dba659de72a2566ff81aef86b1afc04911fc",
+      "bytes": 5357
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-native-profile-failures.json",
+      "sha256": "4446bb73180ec78b4ebfb2672b683c70ab08ec1a4d4660581443f600504232a1",
+      "bytes": 3033
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-opus-method-read.json",
+      "sha256": "534f0a9e5778f26d1b00228eb1a8634aa3dae1a50f897ea0b4f08f58a7bc1f5b",
+      "bytes": 2801
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-plugin-event-constraints.json",
+      "sha256": "aa04f3a276ab9ce67acaa0404ef0a34b29cb46660cb67fa26fdca8f3b5f86bea",
+      "bytes": 5350
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-prospective-method-judgment.json",
+      "sha256": "3e549e38c5c69d368186762f85dbca8c64b45df3c0f8bbce07d5988dffd91375",
+      "bytes": 2517
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-retrieval-source-closure.md",
+      "sha256": "8513cc18ce22c807272caba741b95da37449805827774a79bd47e0963dfb85cc",
+      "bytes": 1906
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
+      "sha256": "361c1c0f407508d2b09f4eae425d2aaf182ed1ba239c5d190abfe51190c36fa5",
+      "bytes": 6200
     },
     {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",

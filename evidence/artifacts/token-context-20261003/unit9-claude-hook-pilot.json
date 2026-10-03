@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "publication_state": "ROOT_SANITIZED_NATIVE_QUALIFICATION",
+  "worker_acceptance_claim": false,
+  "date": "2026-10-03",
+  "title": "Claude directed Read and Context Mode hook pilot",
+  "north_star_action": "Qualify native tool, context, lifecycle and accounting evidence for long, high-quality US-equities research and cumulative engineering sessions.",
+  "study_boundary": {
+    "original_p1": "Separate from the stopped P1 MECHANICS_NOT_PASS study; no replay, replacement or post-hoc pass.",
+    "p2": "HOLD; genuine natural automatic compaction and same-session resume quality remain unmeasured.",
+    "comparison": "No savings, protection, natural-use rate, default or comparative treatment acceptance is claimed."
+  },
+  "privacy": "Sanitized returned metadata only. Original transcripts, request bodies, identifiers, credential/header values and host locations remain private.",
+  "scope": "One separately registered fresh functional calibration using released scripts through explicit Docker command hooks; this is integration evidence, not unchanged full-plugin admission.",
+  "source_pins": [
+    {
+      "repository": "mksglu/context-mode",
+      "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "version": "1.0.169",
+      "artifact": "unchanged shipped bundle and released hook scripts"
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "version": "0.123.1"
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "release": "v2.1.288",
+      "native_client": "explicit native 2.1.288, distinct from SDK embedded 2.1.263"
+    },
+    {
+      "package": "@anthropic-ai/claude-agent-sdk",
+      "version": "0.3.263"
+    },
+    {
+      "repository": "ccusage/ccusage",
+      "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "implementation": "Rust Claude adapter selection predicates; artifact projection, no meter CLI execution"
+    },
+    {
+      "official_node_image_digest": "sha256:5cbc7caba8c2c0f0bca675d1b61b9f2857e1cf1853c6164ee9dd409501a936e7",
+      "node": "24.21.0",
+      "npm": "11.19.0"
+    }
+  ],
+  "native_returned_observations": {
+    "roles": "One main and exactly one foreground child; native journals record Opus 5.5 and max effort for both. Backend execution identity remains outside this native scope.",
+    "fixture": {
+      "bytes": 244,
+      "fact_lines": 4,
+      "kind": "fixed synthetic calibration fixture; fact values omitted"
+    },
+    "directed_calls": {
+      "per_role": {
+        "Read": 1,
+        "ctx_index": 1,
+        "ctx_search": 1
+      },
+      "foreground_Agent": 1,
+      "task_directed_total": 7,
+      "additional_StructuredOutput": 1
+    },
+    "original_literal_oracle": "Retained native result satisfies all four literal fact lines for both roles. This bounded result does not establish whole admission or protection.",
+    "assignment": "Main plaintext equals the registered task; the native child first user message contains the actual Agent task.",
+    "api_input_schema_exposure": "UNKNOWN; returned structured-output data is not an API input-schema record."
+  },
+  "native_usage": {
+    "main_opus": {
+      "distinct_response_groups": 5,
+      "tokens": 66485
+    },
+    "child_opus": {
+      "distinct_response_groups": 4,
+      "tokens": 34403
+    },
+    "disjoint_opus": 100888,
+    "separate_finalized_helper_aggregate": 1407,
+    "finalized_native_inclusive_query_total": 102295,
+    "helper_response_identity": "UNKNOWN in the exact selected role journals; finalized helper aggregate is retained separately.",
+    "count_once": "100888 plus 1407 explains the inclusive 102295. Role/raw/final/provider views are alternatives, never added again. Thinking and cache subviews overlap existing totals.",
+    "counter_selection": "Finalized request/message identity groups match maintained maximal-total selection predicates. Rust and TypeScript implementations are not conflated.",
+    "billing": "Native reported list-cost view only; actual wire usage and invoice cost UNKNOWN."
+  },
+  "hook_and_lifecycle": {
+    "observed_hooks": {
+      "SessionStart": 1,
+      "UserPromptSubmit": 1,
+      "PreToolUse": 3,
+      "PostToolUse": 3,
+      "Stop": 1
+    },
+    "main_capture": "One deduplicated file-read path event observed; this does not prove storage or restoration of all four values.",
+    "child_temporal_hook_binding": "Positive fixed Read-matcher pre/post containers occurred wholly inside the unique native child Read interval.",
+    "direct_child_hook_input_and_per_role_capture": "UNKNOWN; quiet child journal is not absence evidence.",
+    "retained_hook_container_exits": "Nine retained containers exited zero; exit zero alone is not protection.",
+    "mcp_topology": "Actual isolated mounts and init/npm/shell/Node ancestry observed; one connection may serve both roles.",
+    "original_native_marker_cleanup": "FAIL: readiness marker survived native MCP shutdown.",
+    "root_recovery": "Original marker and cleanup metadata retained before manual removal; nine owned containers removed and observer terminated separately. Recovery does not overwrite the original failure.",
+    "process_scope": "Only positively owned containers and selected known process IDs were observed; no global absence claim."
+  },
+  "original_bindings_sha256": {
+    "pilot_receipt": "d43a09168ee2007a76b947e627623bcdc0451d41d569adb2f621b3d872386f25",
+    "pilot_artifact_manifest": "3872ff4c0c768e87dbb63b069ce6dece0feef9d9e09f9083a01219954d7abdcd",
+    "native_returned_output": "0b393bd70316354752a3a80b306198175f7c44633f8260dc1c9a23a058edefa1",
+    "counter_projection": "4bb32d563d2ad549ed7be7ba548a5e6eec5a2a4bdd23d48acfaf8cd3329ff898",
+    "role_hook_projection": "e552c6ac6b313cdb1c5e6e0c5435105300e926d1b490d90f01f9ea13584b9790",
+    "root_cleanup_projection": "41c27a6684d944cf661a65ecdc6182f3a3e188153c5c740240c8558b42c3b404",
+    "coordinator_counter_verification": "5dc056c848d70668effafda35d682248af3d1be0a36fa80de9fb3fb2680bb3be"
+  },
+  "completeness_critic": {
+    "missed_modality": "Automatic PreCompact/resume injection, rule-content restoration, large MCP/browser/PDF/Bash inputs and resource exhaustion remain unqualified.",
+    "source_gap": "Safe supported native hook-event and input-attribution retention; actual schema exposure remains unknown.",
+    "next_candidate_class": "Session-local native plugin loading with explicit bootstrap confinement; full-plugin admission remains held."
+  },
+  "coordinator_binding_verification": "All named original SHA256 identities matched; independently bound native counter and upstream primary checks remain distinct."
+}
