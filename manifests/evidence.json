@@ -35788,8 +35788,8 @@
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/port-record-20261003.md",
-      "sha256": "83e0eeda2d2265396f9e3804453eca815a3fba88c8bde1570f96b12a42c5ac56",
-      "bytes": 11590
+      "sha256": "18e5778a8f3125bbc8f427572d1dc016c0575cc47227d431ea833927812190e8",
+      "bytes": 11810
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/publication-checks.json",
