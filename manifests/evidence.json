@@ -4163,8 +4163,8 @@
     },
     {
       "path": ".github/workflows/runtime-worker-skills-freshness.yml",
-      "sha256": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9",
-      "bytes": 2020
+      "sha256": "8b04e586023763796b78a7cea39a385aedca52456ff0de70be3edee5365607e4",
+      "bytes": 5756
     },
     {
       "path": ".github/workflows/security-scan.yml",
@@ -9346,6 +9346,16 @@
       "path": "blueprints/retrieval-quality-v2/verification-review-20260926/rederive_real_qmd_receipts.py",
       "sha256": "df268219b74a432cfc49b1e53e9911cfd8c632fc86d07a963719472ab26022fa",
       "bytes": 2690
+    },
+    {
+      "path": "blueprints/runtime-workers/PLAN.md",
+      "sha256": "af1f42844acf985cb73106d13522473422e30b7195c07c7e1aa12f23fe2aa5b6",
+      "bytes": 5697
+    },
+    {
+      "path": "blueprints/runtime-workers/README.md",
+      "sha256": "19ceafae91a9f5419f9e9f819b73f9354740ae727a2c25179a6c76932ab6ef58",
+      "bytes": 12084
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
@@ -15218,6 +15228,11 @@
       "bytes": 20197
     },
     {
+      "path": "catalogs/foundation/runtime-jobs.json",
+      "sha256": "a2ab6710550aaf18d8067084ee0a9214c0b45b2211a11c4d9104adbce5d75344",
+      "bytes": 20353
+    },
+    {
       "path": "catalogs/foundation/surfaces.json",
       "sha256": "be845c04926aa9bd1d7824911839090d8e636e6016d9a641bb683ad1c951aef1",
       "bytes": 20383
@@ -16061,6 +16076,11 @@
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
       "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
       "bytes": 19619
+    },
+    {
+      "path": "docs/decisions/2026-10-03-runtime-job-qualification.md",
+      "sha256": "47611e94bfb3583fa418fd0bea51639f5eb78957bff26aa99dcafa6b60b65eea",
+      "bytes": 23882
     },
     {
       "path": "docs/direct-results.md",
