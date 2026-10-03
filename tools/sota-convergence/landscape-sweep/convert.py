@@ -213,7 +213,7 @@ def gpt6_meta(entry, keys=("status", "output", "usage", "started", "finished")) 
     entry = as_dict(entry)
     meta = {key: entry.get(key) for key in keys}
     meta.update({key: entry[key] for key in ("model", "effort", "codex_version", "limit", "usage_status", "inputs",
-                                              "attempts") if key in entry})
+                                              "attempts", "route") if key in entry})
     return meta
 
 
@@ -432,6 +432,17 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                 continue
             suffix = "-followup" if rnd == "followup" else ""
             cd, gd, fg = r.get("claude_discover"), r.get("gpt6_discover"), r.get("fit_gpt6")
+            routes = {}
+            for name, entry in (("discover", gd), ("fit", fg)):
+                route = as_dict(entry).get("route")
+                # sweep.js copies fixed result fields; the runner's sibling route.json is the transport receipt.
+                route_file = work / "gpt6" / f"gpt6-{name}-{layer_id}{suffix}" / "route.json" if work else None
+                if route_file is not None and route_file.is_file():
+                    route = load_json(route_file)
+                if isinstance(route, dict) and route:
+                    routes[name] = route
+            if "fit" in routes and isinstance(fg, dict):
+                fg = {**fg, "route": routes["fit"]}
             returned[rnd] = [family for family, value in (("claude", cd), ("gpt6", gpt6_out(gd))) if value is not None]
             if len(returned[rnd]) < 2:
                 degraded.append(f"{layer_id}:{rnd}")
@@ -443,6 +454,8 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             raw[rnd] = {"claude_discover": cd, "gpt6_discover": gpt6_meta(gd), "dropped": r.get("dropped"),
                         "fit_gpt6_meta": gpt6_meta(fg, ("status", "usage", "started", "finished")),
                         "followup_reason": r.get("followup_reason")}
+            if routes:
+                raw[rnd]["gpt6_routes"] = routes
             check = {name: copy_check(work, f"gpt6-{name}-{layer_id}{suffix}", entry)
                      for name, entry in (("discover", gd), ("fit", fg))}
             check = {name: value for name, value in check.items() if value is not None}
@@ -547,6 +560,7 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                                   **({k: cv.get(k) for k in vote_fields} if cv else {"missing": True}),
                                   "skills_used": row["skills"]["fit_claude"]},
                        "gpt6": {"model": gpt6_model, "effort": gpt6_effort,
+                                **({"route": gmeta["route"]} if gmeta.get("route") else {}),
                                 **({k: gv.get(k) for k in vote_fields} if gv else {"missing": True}),
                                 "skills_used": row["skills"]["fit_gpt6"]}}
             if not fv:
@@ -612,9 +626,13 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     # A skills run's layers all come from the skills catalog (build_inputs.py --modality skills; one modality a run).
     skills_run = bool(rounds_by_layer) and all(rounds[0]["catalog"] == SKILLS_CATALOG
                                                for rounds in rounds_by_layer.values())
+    route_limits = (["GPT-6 transport-only native-to-OmniRoute failover is recorded per job in raw gpt6_routes; "
+                     "bound native inputs stay unchanged. Gateway standalone web search uses OmniRoute's /alpha/search "
+                     "backend; native search recall and outbound max-effort parity are unqualified."]
+                    if any(r.get("gpt6_routes") for layer in returns["raw"].values() for r in layer.values()) else [])
     lanes = {"lanes": [{"lane": lane, "result": {"layers": lane_layers, "calls": calls_total,
                                                  "limits": [*method_limits(models, gpt6_model_text, skills_run),
-                                                            *limits]},
+                                                            *route_limits, *limits]},
                         "proposals": proposals}],
              "critic": res.get("critic"), "lost": lost}
     failures_summary = {layer_id: [f"{f['round']}:{f['cause']}" for f in items]

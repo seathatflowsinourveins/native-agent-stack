@@ -6,7 +6,7 @@
   codex_call.sh [--work-dir DIR] result <job-id>              one JSON line: status, exit, started, finished,
                                                               usage, usage_status, output_text, stderr_tail,
                                                               limit, limit_marker, model, effort, request_effort, web_search,
-                                                              codex_version, inputs, attempts, quota, failure
+                                                              codex_version, inputs, attempts, quota, failure, route
 
 `start` detaches one job and returns at once. The job waits for a semaphore slot (an fcntl lock on
 <lock dir>/slot-<n>, held by the runner and by codex itself, so a killed runner never frees a slot early), then runs
@@ -49,16 +49,26 @@ trace level Codex logs model response data (codex-rs/codex-api/src/sse/responses
 --gpt6-model / --slots / --lock-dir); defaults gpt-6-astra, 3 slots, <work-dir>/locks. The codex binary is the one
 on PATH.
 
-Usage limit: when Codex reports "hit your usage limit", or an HTTP 429 that carries no usage-limit body ("exceeded
+Opt-in native failover (staged.json codex.fallback, build_args.py --gpt6-fallback omniroute): a native limit or
+quota gate archives the native attempt unchanged, writes LIMIT-native with its reason and reported reset time,
+and reruns the same prompt/schema at the same effort in the held slot and total deadline. The transport-only inline
+provider keeps --ignore-user-config and the caller's CODEX_HOME/AGENTS.md, enables standalone web search, disables
+shell snapshots, excludes OMNIROUTE_API_KEY from model-run shells, and uses cx/<native model>-max. inputs.json stays
+byte-identical; route.json and result.route describe the actual route and OmniRoute's /alpha/search backend.
+While LIMIT-native exists, a no-model account/rateLimits/read probe precedes each new job: only explicit
+ordinaryUsageAllowed true removes that marker; otherwise the job goes directly to the gateway. No reset credit is
+consumed. Gateway 429s count only in error/turn.failed events and write LIMIT with reason "gateway pool 429".
+
+Usage limit without fallback: when Codex reports "hit your usage limit", or an HTTP 429 that carries no usage-limit body ("exceeded
 retry limit, last status: 429 Too Many Requests"; Codex retries no 429, so it prints that for the first one:
-codex-rs/model-provider-info/src/lib.rs, codex-api/src/api_bridge.rs and protocol/src/error.rs at rust-v0.157.1), the
+codex-rs/model-provider-info/src/lib.rs, codex-api/src/api_bridge.rs and protocol/src/error.rs at rust-v0.159.3), the
 job ends with exit 3 and writes <work-dir>/LIMIT. A pooled gateway answers 429 when its accounts are exhausted, as it
 did for nine jobs on 2026-09-29 while the workflow went on spending Claude stages; the report cannot tell that from a
 brief rate limit, so the marker holds a reason and no reset time. While that file exists no job starts and jobs still
 waiting for a slot end with exit 3, so the coordinator can stop and notify. Only Codex's own error reports count: the
 `error` / `turn.failed` events that `codex exec --json` prints on stdout (openai/codex rust-v0.155.1,
 codex-rs/exec/src/exec_events.rs and event_processor_with_jsonl_output.rs), and,
-only when no turn completed, an ERROR/Error line on stderr. Model content (item.* events: messages, web results,
+only when no turn completed, an ERROR/Error line on stderr (gateway HTTP 429s require JSON events). Model content (item.* events: messages, web results,
 cited pages) never counts: on 2026-09-26 a grep of the whole event stream matched a cited README's "Usage
 limitation" and set the marker falsely.
 
@@ -67,8 +77,8 @@ after a job gets its slot and before every attempt, the runner runs `codex_quota
 copy build_args.py staged beside this file, else the checkout's scripts/codex_quota.py), which reads the account's
 usage snapshot through `codex app-server` (account/rateLimits/read) and exits 3 when a window's used_percent reaches
 the percent, rateLimitReachedType is set or ordinaryUsageAllowed is false. Exit 3 is refused like a usage limit: the
-job ends with exit 3 before codex starts, and <work-dir>/LIMIT (when absent) and the job's stderr.txt get the
-reason, so the coordinator can tell the user to reset. Every probe is recorded in <job>/quota.json (`result` gives
+job ends with exit 3 before codex starts unless its staged fallback continues it, and <work-dir>/LIMIT (when absent) and the job's stderr.txt get the
+reason, so the coordinator can report the reset time. Every probe is recorded in <job>/quota.json (`result` gives
 its summary as `quota`); a probe that fails (no codex, timeout after codex.quota_timeout_s, default 30 s, an error
 answer, a missing script) is recorded and never blocks the job.
 
@@ -196,12 +206,15 @@ OMNIROUTE_REQUEST_HEADERS = ("x-omniroute-compression", "x-omniroute-no-cache", 
                              "x-omniroute-strip-reasoning")
 HEADER_VALUE = re.compile(r"[!#-\[\]-~](?:[ !#-\[\]-~]{0,126}[!#-\[\]-~])?")
 PROVIDERS = ("native", "omniroute")
+LOOPBACK_V1_URL = re.compile(r"http://(?:127\.0\.0\.1|localhost):([0-9]{1,5})/v1")
+FALLBACK_KEY_ENV = "OMNIROUTE_API_KEY"
+FALLBACK_SEARCH_BACKEND = "omniroute:/alpha/search"
 ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]{0,63}")
 PROFILE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Everything one attempt writes; an earlier attempt's files move together to attempts/<n>/.
 ATTEMPT_FILES = ("events.jsonl", "stderr.txt", "last.json", "started", "finished", "exit", "slot", "model",
                  "codex_version", "done", "prompt.txt", "schema.json", "inputs.json", "runner.log", "quota.json",
-                 "failure.json")
+                 "failure.json", "route.json")
 EXIT_LIMIT, EXIT_TIMEOUT, EXIT_NO_CODEX, EXIT_REFUSED = 3, 124, 127, 2
 EXIT_NO_KEY = 6  # a gateway lane whose API key variable is unset in the runner's environment
 EXIT_IDLE = 125
@@ -311,6 +324,18 @@ def settings(base: Path) -> dict:
     if out["codex_home"] is not None and out["quota_stop_percent"] is not None:
         raise UsageError("codex.quota_stop_percent reads the native Codex login's usage; it cannot gate a gateway "
                          "provider's account pool, so it must be absent when codex.provider is not native")
+    out["fallback"] = staged.get("fallback")
+    if out["fallback"] is not None:
+        fallback = out["fallback"]
+        if not isinstance(fallback, dict) or fallback.get("provider") != "omniroute":
+            raise UsageError("codex.fallback must stage the omniroute provider")
+        if out["provider"] != "native" or "/" in out["model"]:
+            raise UsageError("codex.fallback needs the native provider and a model without a provider segment")
+        url = fallback.get("base_url")
+        match = LOOPBACK_V1_URL.fullmatch(url) if isinstance(url, str) else None
+        if match is None or not 1 <= int(match[1]) <= 65535:
+            raise UsageError("codex.fallback.base_url must be a loopback http URL ending in /v1 with port 1-65535")
+        out["fallback"] = {"provider": "omniroute", "base_url": url}
     return out
 
 
@@ -506,11 +531,13 @@ def turn_usage(directory: Path) -> dict | None:
     return usage if reported else None
 
 
-def limit_kind(directory: Path) -> str | None:
+def limit_kind(directory: Path, provider: str | None = None) -> str | None:
     """"usage" when Codex itself reported the usage limit, "http_429" when it reported an HTTP 429 without one: in an
     `error` / `turn.failed` event, or, when none matched and no turn completed, in one of its own error lines on stderr.
     A completed turn was not limited, whatever a diagnostic line quotes. Within one source (events, else stderr) a
     usage-limit report wins over a 429 report."""
+    if provider is None:
+        provider = (read_json(directory / "route.json") or read_json(directory / "inputs.json") or {}).get("provider")
     parsed = events(directory)
     kinds = set()
     for event in parsed:
@@ -525,7 +552,8 @@ def limit_kind(directory: Path) -> str | None:
     if not kinds and not any(event.get("type") == "turn.completed" for event in parsed):
         for line in (read(directory / "stderr.txt") or "").splitlines():
             if STDERR_ERROR_LINE.match(line):
-                kinds.update(kind for kind, pattern in LIMIT_PATTERNS if pattern.search(line))
+                kinds.update(kind for kind, pattern in LIMIT_PATTERNS
+                             if pattern.search(line) and (kind != "http_429" or provider != "omniroute"))
     return "usage" if "usage" in kinds else ("http_429" if kinds else None)
 
 
@@ -553,8 +581,9 @@ def codex_env(lane: dict | None = None) -> dict:
     CODEX_HOME points at the staged lane-local home, never at the caller's; the key variable passes through as it is
     and is never written anywhere."""
     env = {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
-    if lane is not None and lane.get("codex_home") is not None:
-        env["CODEX_HOME"] = str(lane["codex_home"])
+    if lane is not None:
+        if lane.get("codex_home") is not None:
+            env["CODEX_HOME"] = str(lane["codex_home"])
         if not (env.get(lane["api_key_env"]) or "").strip() and lane.get("api_key_placeholder"):
             env[lane["api_key_env"]] = lane["api_key_placeholder"]  # keyless loopback gateway; a real key wins
     return env
@@ -649,6 +678,15 @@ def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict 
         head = [codex, "exec", *(["-p", lane["profile"]] if lane.get("profile") else [])]
     else:
         head = [codex, "exec", "--ignore-user-config"]
+    if lane is not None and lane.get("transport_only"):
+        # Supported inline provider overrides (openai/codex rust-v0.159.3 model-provider-info/src/lib.rs).
+        # Keep the native CODEX_HOME/AGENTS.md and --ignore-user-config; no lane home or MCP profile loads.
+        provider = {"name": "OmniRoute", "base_url": lane["base_url"], "env_key": FALLBACK_KEY_ENV,
+                    "wire_api": "responses", "requires_openai_auth": False, "supports_standalone_web_search": True}
+        block = "{ " + ", ".join(f"{key} = {json.dumps(value)}" for key, value in provider.items()) + " }"
+        head.extend(["-c", 'model_provider="omniroute"', "-c", f"model_providers.omniroute={block}",
+                     "-c", "features.standalone_web_search=true", "-c", "features.shell_snapshot=false",
+                     "-c", f'shell_environment_policy.filters.{FALLBACK_KEY_ENV}="exclude"'])
     # Keep the built-in provider defaults (rust-v0.159.2, codex-rs/model-provider-info/src/lib.rs:492-510).
     # Codex rides out an outage shorter than idle_timeout_s; a longer one is stopped by the watchdog and
     # retried once, budget permitting (codex-rs/core/src/responses_retry.rs:71-96). Error notices are not progress.
@@ -802,7 +840,8 @@ def quota_gate(base: Path, directory: Path, config: dict) -> str | None:
         record["error"] = f"{QUOTA_SCRIPT} is neither beside the runner nor in the checkout's scripts/"
     else:
         try:
-            done = subprocess.run([sys.executable, "-B", str(script), "--json", "--gate", repr(float(percent)),
+            done = subprocess.run([sys.executable, "-B", str(script), "--json",
+                                   *(["--gate", repr(float(percent))] if percent is not None else []),
                                    "--timeout", repr(float(config['quota_timeout_s']))],
                                   cwd=str(base / "empty"), stdin=subprocess.DEVNULL, capture_output=True, text=True,
                                   timeout=config["quota_timeout_s"] + QUOTA_BACKSTOP_S, env=codex_env(), check=False)
@@ -841,10 +880,10 @@ def quota_summary(directory: Path) -> dict | None:
             "error": record.get("error")}
 
 
-def mark_limit(base: Path, text: str) -> None:
-    """Create <work-dir>/LIMIT holding text; an existing marker (another job's reason, a real limit) is kept."""
+def mark_limit(base: Path, text: str, *, marker: str = "LIMIT") -> None:
+    """Create the lane marker holding text; keep an existing marker's original reason."""
     try:
-        fd = os.open(base / "LIMIT", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+        fd = os.open(base / marker, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
     except FileExistsError:
         return
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
@@ -853,6 +892,56 @@ def mark_limit(base: Path, text: str) -> None:
 
 def limit_reason(base: Path) -> str:
     return " ".join((read(base / "LIMIT") or "").split())[:400]
+
+
+def mark_native_limit(base: Path, directory: Path, reason: str | None = None) -> str:
+    """Keep the native reason and its reported reset time; an unknown reset stays unknown."""
+    if reason is None:
+        messages = []
+        for event in events(directory):
+            message = (event.get("message") if event.get("type") == "error" else
+                       (event.get("error") or {}).get("message") if event.get("type") == "turn.failed"
+                       and isinstance(event.get("error"), dict) else None)
+            if isinstance(message, str) and any(pattern.search(message) for _, pattern in LIMIT_PATTERNS):
+                messages.append(message)
+        if not messages:
+            messages = [line for line in (read(directory / "stderr.txt") or "").splitlines()
+                        if STDERR_ERROR_LINE.match(line) and any(pattern.search(line) for _, pattern in LIMIT_PATTERNS)]
+        reason = next((message for message in messages if LIMIT_PHRASE.search(message)),
+                      messages[-1] if messages else "native Codex limit")
+    reset = re.search(r"try again at\s+([^\n]+)", reason, re.IGNORECASE)
+    quota = quota_summary(directory) or {}
+    record = {"reason": reason, "reset_time": reset[1] if reset else quota.get("resets_at_utc")}
+    mark_limit(base, json.dumps(record, sort_keys=True), marker="LIMIT-native")
+    return reason
+
+
+def refresh_native_limit(base: Path, directory: Path, config: dict) -> None:
+    """A no-model account/rateLimits/read probe; only explicit ordinaryUsageAllowed true clears the marker.
+
+    Percentages and reset timestamps are not recovery evidence (openai/codex rust-v0.159.3,
+    app-server-protocol/src/protocol/v2/account.rs, GetAccountRateLimitsResponse).
+    """
+    quota_gate(base, directory, {**config, "quota_stop_percent": None})
+    record = read_json(directory / "quota.json") or {}
+    report = record.get("report") or {}
+    if record.get("status") == "ok" and report.get("ordinary_usage_allowed") is True:
+        (base / "LIMIT-native").unlink(missing_ok=True)
+
+
+def fallback_route(base: Path, directory: Path, config: dict, *, reason: str | None = None,
+                   native_attempt: int | None = None) -> dict:
+    """Record the transport separately from bound native inputs, and return the gateway attempt settings."""
+    marker = read_json(base / "LIMIT-native") or {}
+    model = config["model"]
+    gateway_model = f"cx/{model if model.endswith('-max') else model + '-max'}"
+    route = {"provider": "omniroute", "fallback_from": "native",
+             "reason": reason or marker.get("reason") or "LIMIT-native marker present",
+             "native_model": model, "gateway_model": gateway_model, "native_attempt": native_attempt,
+             "search_backend": FALLBACK_SEARCH_BACKEND}
+    write_atomic(directory / "route.json", json.dumps(route, sort_keys=True) + "\n")
+    return {**config, **config["fallback"], "model": gateway_model, "transport_only": True,
+            "api_key_env": FALLBACK_KEY_ENV, "api_key_placeholder": "local-loopback", "quota_stop_percent": None}
 
 
 def signal_group(pgid: int, signum: int) -> bool:
@@ -997,19 +1086,36 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
     (base / "empty").mkdir(exist_ok=True)
     saved = {name: (directory / name).read_bytes() for name in ("prompt.txt", "schema.json", "inputs.json")
              if (directory / name).exists()}
+    attempt_config = config
+    if config["fallback"] is not None and (base / "LIMIT-native").exists():
+        refresh_native_limit(base, directory, config)
+        if (base / "LIMIT-native").exists():
+            attempt_config = fallback_route(base, directory, config)
+            saved["route.json"] = (directory / "route.json").read_bytes()
+            lane = attempt_config
     capacity_retries = idle_retries = 0
     while True:
         if (base / "LIMIT").exists():
             write_atomic(directory / "stderr.txt", "LIMIT marker present; retry did not start\n")
             finish(directory, EXIT_LIMIT, "limit")
             return EXIT_LIMIT
-        if config["quota_stop_percent"] is not None:
-            reason = quota_gate(base, directory, config)
+        if attempt_config["quota_stop_percent"] is not None:
+            reason = quota_gate(base, directory, attempt_config)
             if reason is not None:
                 text = (f"quota gate: {reason}; codex.quota_stop_percent {config['quota_stop_percent']:g}; checked "
                         f"{utc_now()} before {job} started")
-                mark_limit(base, text)
                 write_atomic(directory / "stderr.txt", text + "\n")
+                if config["fallback"] is not None:
+                    mark_native_limit(base, directory, text)
+                    finish(directory, EXIT_LIMIT, "quota", terminal=False)
+                    number = archive_attempt(directory, keep_runner_log=True)
+                    for name, data in saved.items():
+                        (directory / name).write_bytes(data)
+                    attempt_config = fallback_route(base, directory, config, reason=text, native_attempt=number)
+                    saved["route.json"] = (directory / "route.json").read_bytes()
+                    lane = attempt_config
+                    continue
+                mark_limit(base, text)
                 finish(directory, EXIT_LIMIT, "quota")
                 return EXIT_LIMIT
         if (base / "LIMIT").exists():
@@ -1027,18 +1133,32 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
             return EXIT_TIMEOUT
         write_atomic(directory / "started", utc_now() + "\n")
         write_atomic(directory / "slot", f"{slot}\n")
-        write_atomic(directory / "model", config["model"] + "\n")
+        write_atomic(directory / "model", attempt_config["model"] + "\n")
         if version:
             write_atomic(directory / "codex_version", version + "\n")
         with open(directory / "events.jsonl", "wb") as output, open(directory / "stderr.txt", "wb") as errors:
-            process = subprocess.Popen(codex_argv(codex, directory, config["model"], prompt, lane, version,
+            process = subprocess.Popen(codex_argv(codex, directory, attempt_config["model"], prompt, lane, version,
                                                  config["effort"], config["web_search"]),
                                        cwd=str(base / "empty"), stdin=subprocess.DEVNULL, stdout=output, stderr=errors,
                                        pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env(lane))
             code, failure = wait_process(process, directory, config, deadline)
-        kind = limit_kind(directory)
+        kind = limit_kind(directory, attempt_config["provider"])
         incomplete = completion_error(directory) if code == 0 else None
-        if kind == "http_429":
+        if kind is not None and config["fallback"] is not None and attempt_config["provider"] == "native":
+            reason = mark_native_limit(base, directory)
+            finish(directory, EXIT_LIMIT, kind, terminal=False)
+            number = archive_attempt(directory, keep_runner_log=True)
+            for name, data in saved.items():
+                (directory / name).write_bytes(data)
+            attempt_config = fallback_route(base, directory, config, reason=reason, native_attempt=number)
+            saved["route.json"] = (directory / "route.json").read_bytes()
+            lane = attempt_config
+            continue
+        if kind == "http_429" and attempt_config["provider"] == "omniroute":
+            mark_limit(base, f"gateway pool 429; first seen {utc_now()} in {job}; no reset time is reported; "
+                       "the report cannot distinguish pool exhaustion from a transient 429; read the gateway pool "
+                       "and remove this file when it has capacity")
+        elif kind == "http_429":
             mark_limit(base, f"HTTP 429 from the route (Codex retries no 429), first seen {utc_now()} in {job}; the report "
                        "carries no reset time and cannot tell an exhausted pool from a brief rate limit: read the account "
                        "pool (scripts/codex_quota.py for a native login, the gateway for a pooled route) and remove this "
@@ -1159,6 +1279,7 @@ def result(base: Path, job: str) -> dict:
     out["attempts"] = [attempt_summary(path) for path in sorted(
         (p for p in (directory / "attempts").glob("*") if p.name.isdigit()), key=lambda p: int(p.name))]
     out["quota"] = quota_summary(directory)
+    out["route"] = read_json(directory / "route.json")
     out["failure"] = failure
     return out
 
@@ -1171,7 +1292,7 @@ def attempt_summary(path: Path) -> dict:
             "finished": (read(path / "finished") or "").strip() or None,
             "usage": usage, "usage_status": usage_status(path, usage),
             "limit": limit_error(path), "inputs": read_json(path / "inputs.json"),
-            "quota": quota_summary(path), "failure": failure}
+            "quota": quota_summary(path), "failure": failure, "route": read_json(path / "route.json")}
 
 
 def main(argv: list[str] | None = None) -> int:

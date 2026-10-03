@@ -348,6 +348,55 @@ Before a full run through the gateway, run the lane's parity check on the staged
 - reported usage;
 - whether hosted web search passes through for a custom provider.
 
+#### Automatic native-to-OmniRoute failover (`--gpt6-fallback omniroute`)
+
+Stage a native lane with an explicit fallback to the keyless loopback gateway:
+
+```sh
+python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --layers "$LAYERS" \
+  --gpt6-fallback omniroute --fallback-codex-host 127.0.0.1:20128
+```
+
+The fallback is off unless `staged.json` carries `codex.fallback`. The host flag names the gateway's loopback
+address and port (default `127.0.0.1:20128`). The stager requires a native primary provider and a bare native model
+name. It records the fallback provider and base URL without creating a lane home. Restaging changes no frozen
+templates, `prompts_sha256.txt`, workflow arguments or embedded script when only provider/fallback flags change.
+Stop an active Workflow before updating its staged runtime; an existing work directory needs `--force` to restage.
+
+When the native attempt reports a limit, the runner archives that attempt unchanged under `attempts/<n>/`, writes
+`<W>/LIMIT-native`, and sends the same prompt and schema through OmniRoute in the held slot, within the same total
+deadline. A staged native quota gate can take this path before making a native model call. `LIMIT-native` holds a
+JSON reason and `reset_time`; a missing reset time stays `null`. New jobs with that marker first run the existing
+`codex_quota.py --json` probe, which calls `account/rateLimits/read` without a model turn. Only a successful report
+with explicit `ordinaryUsageAllowed: true` clears the marker. Otherwise those jobs go directly to the gateway.
+Percentages, a passed reset timestamp and a failed or nullable probe do not establish native recovery.
+
+The fallback keeps the native `CODEX_HOME`, its global `AGENTS.md`, `--ignore-user-config`, read-only sandbox,
+staged effort and web-search mode. Its inline provider has `wire_api = "responses"`, `requires_openai_auth = false`,
+`env_key = "OMNIROUTE_API_KEY"` and `supports_standalone_web_search = true`. It enables standalone web search,
+disables shell snapshots, filters the key out of model-run shells, and requests `cx/<native model>-max` under the
+gateway's suffix convention. An unset key variable receives the `local-loopback` placeholder. It loads no new
+lane-local profile or MCP configuration. The supported overrides follow
+[Codex 0.159.3's provider schema](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/model-provider-info/src/lib.rs).
+
+`inputs.json` remains byte-identical to the native attempt. The separate `route.json` records `provider`,
+`fallback_from`, `reason`, `native_model`, `gateway_model`, `native_attempt` and `search_backend`. A job that goes
+directly to the gateway has `native_attempt: null`, because it has no native attempt of its own. `result` returns
+the route and each archived route; later retries preserve it. `convert.py` reads the original sibling receipt,
+because the Workflow wrapper copies a fixed set of result fields. It retains the route in raw metadata and GPT-6
+fit votes and adds the gateway search limitation to the lane.
+
+The installed gateway's carried
+[search adapter](https://github.com/amsjavan/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/src/app/api/v1/alpha/search/route.ts)
+handles `/alpha/search` through its web-search registry with a DuckDuckGo fallback. It supports `search_query` and
+rejects `open`, `click`, `find` and `screenshot`. Prompt equality does not establish tool or search-recall parity.
+Outbound effort and operation-level parity remain unqualified until the gateway's measured parity check passes.
+The implementation never consumes a reset credit or changes the shared gateway's settings, combos or keys.
+
+The [failover decision](../../../docs/decisions/2026-10-03-gpt-lane-omniroute-failover.md) records sources and
+synthetic checks. Native upstream provider failover or a measured parity failure of this gateway route overturns
+the choice.
+
 #### Staging on the framework instance (20129)
 
 The default gateway stays 20128: `--omniroute-base-url` defaults to `http://127.0.0.1:20128/v1`, the model to `cx/gpt-6-astra`, and no provider headers are sent. To stage the lane on the framework OmniRoute instance at port 20129, which compresses a request and then passes it to 20128 through its `sharedgw` node:
@@ -802,14 +851,18 @@ new run from the latest retained record, and say so when no record exists yet.
   and then returns the job as unfinished. The vote then counts as missing and the layer is reopened, and a job that
   finishes later makes `convert.py` exit 4 (`file_only`). Keep the number of queued GPT-6 jobs small relative to the
   slots.
-- **Usage limit.** A real Codex usage-limit error writes `<W>/LIMIT`. After that no job starts, and jobs still
-  waiting for a slot end with exit 3. Stop the Workflow and tell the user the reset time, which the job's
+- **Usage limit.** With the staged native fallback, a native limit writes `<W>/LIMIT-native` and the held job
+  continues over OmniRoute as described above. With no fallback, a real Codex usage-limit error writes `<W>/LIMIT`.
+  After `LIMIT` appears no job starts, and jobs still waiting for a slot end with exit 3. Stop the Workflow and tell the user the reset time, which the job's
   `stderr.txt` or its `error` event gives. An HTTP 429 with no usage-limit body counts as a limit too. Codex retries
-  no 429 (`retry_429` is false for every provider, `codex-rs/model-provider-info/src/lib.rs` at rust-v0.157.1), so it
+  no 429 (`retry_429` is false for every provider,
+  [Codex 0.159.3 provider source](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/model-provider-info/src/lib.rs#L447)), so it
   prints `exceeded retry limit, last status: 429 Too Many Requests` for the first one, as an `error` or `turn.failed`
   event (`RetryLimitReachedError`, built in `codex-rs/codex-api/src/api_bridge.rs`). A pooled gateway answers so when
   its accounts are exhausted, and the report cannot tell that from a brief rate limit, so the first such job stops the
-  sweep: `LIMIT` then holds a reason and no reset time. Read the account pool (`scripts/codex_quota.py` for a native
+  sweep: a gateway attempt counts this text only in `error` or `turn.failed` events, never in `item.*` content or
+  stderr quotes. `LIMIT` then holds the reason `gateway pool 429` and no reset time. With staged failover this
+  means the native and gateway paths are exhausted; for a gateway primary it stops that route. Read the account pool (`scripts/codex_quota.py` for a native
   login, the gateway for a pooled route) and remove `LIMIT` when it has capacity; after a usage limit, remove it only
   after the reset. The 2026-09-29 run had no such stop: nine of its twelve follow-up GPT-6 jobs ended in 429 after one
   or two seconds each, the Workflow finished its Claude follow-up stages (the round cost $88 at Claude list price, see
@@ -863,7 +916,8 @@ new run from the latest retained record, and say so when no record exists yet.
   runs the staged `codex_quota.py --json --gate 95`. That reads the account's usage snapshot through the native
   `codex app-server` method `account/rateLimits/read` (no model turn, no transcript, no credential file) and
   reports the gate when a window's `used_percent` reaches the percent, `rateLimitReachedType` is set or
-  `ordinaryUsageAllowed` is false. The job then ends with exit 3 before codex starts, and `<W>/LIMIT` (when absent)
+  `ordinaryUsageAllowed` is false. With a staged fallback the refused native attempt is archived and the job
+  continues on the gateway. Otherwise the job ends with exit 3 before codex starts, and `<W>/LIMIT` (when absent)
   and the job's `stderr.txt` name the reason, the used percent and the reset time: stop and tell the user, as for
   a usage limit. Every probe is kept in its attempt's `quota.json` (earlier attempts under `attempts/<n>/`), and
   `result` summarizes the current one as `quota`. A probe that
@@ -871,7 +925,13 @@ new run from the latest retained record, and say so when no record exists yet.
   there and never blocks the job; the usage-limit rule above still catches a real limit. A running sweep keeps the
   runtime it was staged with, so a work directory staged before this gate existed has no gate.
 - **Resume.** `Workflow({scriptPath: "<W>/sweep.embedded.js", resumeFromRunId: "wf_..."})` replays the unchanged
-  agent calls from the cache.
+  agent calls from the cache. This includes a GPT wrapper that returned `failed_exit_3`: it is a completed agent
+  result, so resume does not call `start` again even after capacity returns. After confirming capacity and clearing
+  `LIMIT`, start a **new Workflow run with the provider and frozen prompts unchanged**. Successful GPT jobs return
+  `already done`; failed GPT jobs archive the old attempt and rerun. Claude agents rerun too. A coordinator can also
+  explicitly start a failed GPT job with `codex_call.sh start`, but a cached Workflow return will not pick up its new
+  result. Restaging the primary provider changes job inputs and reruns finished GPT jobs as well. The automatic
+  fallback avoids caching the intermediate native limit by completing both attempts within the same held job.
 - **WebSearch cap.** Claude Code allows one session at most `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` WebSearch
   calls (default 200, from v2.1.212). The count covers the main conversation and every subagent, workflow children
   included. A capped call returns a notice that tells the worker to go on without searching; nobody sees an error

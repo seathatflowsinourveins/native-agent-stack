@@ -512,7 +512,8 @@ def git_state(repo_root: Path) -> dict:
 
 def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: bool, stars, gpt6_model: str,
           slots: int, lock_dir, skills_checked_at: str | None, embed_script: bool, force: bool,
-          repo_root: Path = REPO_ROOT, quota_stop_percent: float | None = None, lane: dict | None = None) -> dict:
+          repo_root: Path = REPO_ROOT, quota_stop_percent: float | None = None, lane: dict | None = None,
+          fallback: dict | None = None) -> dict:
     jobs = [path.name for path in (work / "gpt6").glob("*") if path.is_dir()] if (work / "gpt6").is_dir() else []
     if jobs and not force:
         raise ValueError(f"{work}/gpt6 already holds {len(jobs)} job(s) from an earlier run; move gpt6/ and prompts/ "
@@ -574,6 +575,8 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
         codex["lock_dir"] = str(Path(lock_dir).expanduser().resolve())
     if quota_stop_percent is not None:
         codex["quota_stop_percent"] = quota_stop_percent
+    if fallback is not None:
+        codex["fallback"] = fallback
     if lane is not None:
         codex.update(stage_lane_home(work, model=gpt6_model, base_url=lane["base_url"], host=lane["host"],
                                      profile=lane["profile"], repo_root=repo_root,
@@ -622,6 +625,10 @@ def main(argv=None) -> int:
                         help="native: Codex's own login (default). omniroute: a lane-local CODEX_HOME that routes "
                              f"Codex through the local OmniRoute gateway with the token-stack MCP servers; the key "
                              f"comes from ${OMNIROUTE_KEY_ENV} in the harness's environment")
+    parser.add_argument("--gpt6-fallback", choices=("omniroute",),
+                        help="opt in to transport-only native-limit failover, keeping the native prompt and inputs")
+    parser.add_argument("--fallback-codex-host", metavar="HOST:PORT",
+                        help="keyless loopback fallback gateway (default 127.0.0.1:20128); needs --gpt6-fallback")
     parser.add_argument("--omniroute-base-url", default=OMNIROUTE_DEFAULT_URL,
                         help=f"loopback OmniRoute Responses endpoint (default {OMNIROUTE_DEFAULT_URL})")
     parser.add_argument("--codex-host", metavar="HOST",
@@ -671,6 +678,17 @@ def main(argv=None) -> int:
             raise ValueError("--gpt6-model is not a model name")
         if args.omniroute_header and args.gpt6_provider != "omniroute":
             raise ValueError("--omniroute-header needs --gpt6-provider omniroute: the native lane has no provider block")
+        fallback = None
+        if args.fallback_codex_host and not args.gpt6_fallback:
+            raise ValueError("--fallback-codex-host needs --gpt6-fallback omniroute")
+        if args.gpt6_fallback:
+            if args.gpt6_provider != "native" or slash:
+                raise ValueError("--gpt6-fallback needs the native provider and a model without a provider segment")
+            host = args.fallback_codex_host or "127.0.0.1:20128"
+            match = re.fullmatch(r"(?:127\.0\.0\.1|localhost):([0-9]{1,5})", host)
+            if match is None or not 1 <= int(match[1]) <= 65535:
+                raise ValueError("--fallback-codex-host must be 127.0.0.1:PORT or localhost:PORT (1-65535)")
+            fallback = {"provider": "omniroute", "base_url": f"http://{host}/v1"}
         lane = None
         if args.gpt6_provider == "omniroute":
             if args.quota_stop_percent is not None:
@@ -708,7 +726,8 @@ def main(argv=None) -> int:
         summary = stage(work, sweep_id=args.sweep_id, run_date=args.date, selected=selected, test=bool(args.smoke),
                         stars=stars_path, gpt6_model=gpt6_model, slots=args.slots, lock_dir=args.lock_dir,
                         skills_checked_at=args.skills_checked_at, embed_script=not args.no_embed, force=args.force,
-                        repo_root=args.repo_root.resolve(), quota_stop_percent=args.quota_stop_percent, lane=lane)
+                        repo_root=args.repo_root.resolve(), quota_stop_percent=args.quota_stop_percent, lane=lane,
+                        fallback=fallback)
     except (ValueError, OSError, KeyError) as error:
         print(f"build_args.py: {error}", file=sys.stderr)
         return 2
