@@ -14,14 +14,19 @@ route:
     # Codex lane alerts: critical ones reach the alert topic, the rest go to their own topic, which can be muted on its own.
     # No ntfy priority is set: with template=alertmanager, ntfy 2.28.0 renders without the query priority
     # (server/server_template.go L58, L103 at 10cb6506), so a priority parameter would be a promise it does not keep.
+    # Each lane is its own group. A child route inherits its parent's group_by unless it sets one (Alertmanager v0.34.1
+    # docs/configuration.md L193-194, L209-219; dispatch/route.go L74, L90-95), and the lane rules sum job away, so the
+    # inherited [alertname, job, scope] would batch every lane of one alert into one notification with one status.
     - match:
         scope: codex-lanes
         severity: critical
       receiver: local-ntfy
+      group_by: [alertname, scope, ecosystem_lane]
       continue: false
     - match:
         scope: codex-lanes
       receiver: local-ntfy-lanes
+      group_by: [alertname, scope, ecosystem_lane]
       continue: false
 receivers:
   - name: local-ntfy

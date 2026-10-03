@@ -12,11 +12,14 @@
 # SDK does (sdk/src/resource/env.rs at v0.31.0: split on commas, then on the first '=', key and value trimmed; the
 # last duplicate wins). The script is POSIX sh apart from its shebang, so macOS bash 3.2 runs it.
 #
-# Every other entry is kept, unchanged, after the new id. A Codex lane names itself this way: its launch exports
-# OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<root|runtime|token|trading> and starts codex through this launcher, so
-# the process exports service.instance.id=<fresh>,ecosystem.lane=<lane>. A child started through the launcher with
-# that environment keeps the lane next to its <inherited>/<fresh> id. The Collector keeps a short lowercase lane
-# name only and makes it the ecosystem_lane metric label (collector.yaml, transform/privacy and exporters.prometheus).
+# Every other entry is kept, unchanged, after the new id. A Codex lane names itself with ECOSYSTEM_LANE: its launch
+# runs ECOSYSTEM_LANE=<root|runtime|token|trading> codex ..., and this launcher appends ecosystem.lane=<lane>, so the
+# process exports service.instance.id=<fresh>,ecosystem.lane=<lane>. The value must match the Collector's pattern,
+# ^[a-z][a-z0-9_-]{0,31}$; any other value is dropped with a warning on stderr that does not repeat it, and codex
+# still starts. An empty value names no lane. An ecosystem.lane entry already in OTEL_RESOURCE_ATTRIBUTES (a key that
+# trims to ecosystem.lane, with an '=', which the SDK reads as the attribute: env.rs L45-58 at v0.31.0) wins, so a
+# child started through the launcher from a lane process keeps the lane next to its <inherited>/<fresh> id. The
+# Collector makes the lane the ecosystem_lane metric label (collector.yaml, transform/privacy and exporters.prometheus).
 # @CODEX_BIN@ is the absolute path of the real codex executable; see observability/collector/README.md for
 # installing a rendered copy in place of the codex link on PATH.
 set -eu
@@ -37,6 +40,7 @@ __codex_identity_attributes() {
   [ -n "$__codex_identity_id" ] || __codex_identity_id="pid$$-$(date +%s)"
   __codex_identity_inherited=""
   __codex_identity_kept=""
+  __codex_identity_listed_lane=""
   __codex_identity_rest="${OTEL_RESOURCE_ATTRIBUTES:-}"
   while [ -n "$__codex_identity_rest" ]; do
     case "$__codex_identity_rest" in
@@ -51,9 +55,27 @@ __codex_identity_attributes() {
       __codex_identity_value="${__codex_identity_value#"${__codex_identity_value%%[![:space:]]*}"}"
       __codex_identity_inherited="${__codex_identity_value%"${__codex_identity_value##*[![:space:]]}"}"
     elif [ -n "$__codex_identity_entry" ]; then
+      if [ "$__codex_identity_key" = ecosystem.lane ] && [ "$__codex_identity_entry" != "${__codex_identity_entry#*=}" ]; then
+        __codex_identity_listed_lane=1
+      fi
       __codex_identity_kept="${__codex_identity_kept:+$__codex_identity_kept,}$__codex_identity_entry"
     fi
   done
+  # ECOSYSTEM_LANE (see the header). The characters are listed, not ranged: in bash 3.2 a [a-z] range follows the
+  # locale's collation. The warning is written before the result and cannot fail the substitution under set -e.
+  __codex_identity_lane="${ECOSYSTEM_LANE:-}"
+  if [ -n "$__codex_identity_lane" ] && [ -z "$__codex_identity_listed_lane" ]; then
+    case "$__codex_identity_lane" in
+      [abcdefghijklmnopqrstuvwxyz]*[!abcdefghijklmnopqrstuvwxyz0123456789_-]*) __codex_identity_lane="" ;;
+      [abcdefghijklmnopqrstuvwxyz]*) [ "${#__codex_identity_lane}" -le 32 ] || __codex_identity_lane="" ;;
+      *) __codex_identity_lane="" ;;
+    esac
+    if [ -n "$__codex_identity_lane" ]; then
+      __codex_identity_kept="${__codex_identity_kept:+$__codex_identity_kept,}ecosystem.lane=$__codex_identity_lane"
+    else
+      printf '%s\n' 'codex identity launcher: ECOSYSTEM_LANE ignored; a lane name matches ^[a-z][a-z0-9_-]{0,31}$' >&2 || :
+    fi
+  fi
   # A final sentinel prevents command substitution from stripping an inherited attribute's trailing newlines.
   printf '%s.' "service.instance.id=${__codex_identity_inherited:+$__codex_identity_inherited/}${__codex_identity_id}${__codex_identity_kept:+,$__codex_identity_kept}"
 }

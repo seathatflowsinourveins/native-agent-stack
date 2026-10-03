@@ -15,10 +15,13 @@ import fcntl
 import json
 import re
 import runpy
+import socket
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
+import urllib.request
 from pathlib import Path
 from unittest.mock import patch
 
@@ -38,6 +41,9 @@ _PINNED = {item["id"]: item["version"]
            for item in json.loads((ROOT / "observability/backends/pins.json").read_text())["components"]}
 PROMTOOL = _TOOLS_ROOT / f"ecosystem-prometheus-{_PINNED['prometheus']}/promtool"
 AMTOOL = _TOOLS_ROOT / f"ecosystem-alertmanager-{_PINNED['alertmanager']}/amtool"
+ALERTMANAGER_BIN = _TOOLS_ROOT / f"ecosystem-alertmanager-{_PINNED['alertmanager']}/alertmanager"
+# The lane routes' own grouping (ecosystem-alertmanager.yml.example); the negative control below removes these lines.
+LANE_GROUP_BY = "      group_by: [alertname, scope, ecosystem_lane]\n"
 
 EXPECTED_ALERTS = {
     "EquitiesOrderStateDivergence",
@@ -205,6 +211,32 @@ class AlertmanagerTemplateTests(unittest.TestCase):
         matched = [r for r in sub_routes if r.get("match", {}).get("scope") == "equities-broker"]
         self.assertEqual(len(matched), 1)
         self.assertEqual(matched[0]["receiver"], "local-ntfy")
+
+    @unittest.skipUnless(HAVE_YAML, "optional PyYAML structural check")
+    def test_both_lane_routes_group_by_lane_and_the_other_routes_inherit(self):
+        # The lane rules sum job away, so the inherited [alertname, job, scope] would put every lane in one group.
+        doc = yaml.safe_load(ALERTMANAGER.read_text())
+        routes = doc["route"]["routes"]
+        lanes = [r for r in routes if r.get("match", {}).get("scope") == "codex-lanes"]
+        self.assertEqual(len(lanes), 2)
+        self.assertEqual([r["group_by"] for r in lanes], [["alertname", "scope", "ecosystem_lane"]] * 2)
+        self.assertEqual(doc["route"]["group_by"], ["alertname", "job", "scope"])
+        self.assertEqual([r for r in routes if r not in lanes and "group_by" in r], [])
+        self.assertEqual(ALERTMANAGER.read_text().count(LANE_GROUP_BY), 2)
+
+    def test_operator_instructions_subscribe_to_and_poll_every_topic(self):
+        # A topic missing from the setup and verification instructions has no subscriber, although Alertmanager
+        # reports a successful delivery (PR #671 review).
+        topics = re.findall(r"url: 'http://127\.0\.0\.1:18080/([a-z-]+)\?template=alertmanager'", ALERTMANAGER.read_text())
+        self.assertEqual(topics, ["ecosystem-alerts", "ecosystem-lanes"])
+        backends = (ROOT / "observability/backends/README.md").read_text()
+        overview = (ROOT / "observability/README.md").read_text()
+        for topic in topics:
+            with self.subTest(topic=topic):
+                poll = f"curl --fail --silent 'http://127.0.0.1:18080/{topic}/json?poll=1&since=all'"
+                self.assertIn(poll, backends)
+                self.assertIn(poll, overview)
+                self.assertIn(f"`http://127.0.0.1:18080/{topic}`", backends)
 
 
 @unittest.skipUnless(PROMTOOL.exists() and AMTOOL.exists(),
@@ -413,10 +445,18 @@ class CodexLaneRuleTests(unittest.TestCase):
         ])
 
 
+def free_port() -> int:
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        return probe.getsockname()[1]
+
+
 @unittest.skipUnless(AMTOOL.exists(), "amtool not installed at the documented ecosystem tool path")
 class CodexLaneRouteTests(unittest.TestCase):
     """``amtool config routes test`` over configure.py's rendered Alertmanager config: lane warnings go to their own (separate, mutable)
-    topic, critical lane alerts to the alert topic, and the other routes are unchanged. native_proven when it runs."""
+    topic, critical lane alerts to the alert topic, and the other routes are unchanged. That command prints receivers only
+    (in simple, extended and json output alike), so the grouping test runs the pinned Alertmanager itself on the rendered
+    config, with alerts added by the pinned amtool, and reads its groups API. native_proven when it runs."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -438,6 +478,89 @@ class CodexLaneRouteTests(unittest.TestCase):
         self.assertIn("/ecosystem-lanes?template=alertmanager'", self.config.read_text())
         # ntfy 2.28.0 ignores a query priority in template mode (server_template.go L58, L103 at 10cb6506), so none is promised.
         self.assertNotIn("priority=", self.config.read_text())
+
+    def test_every_lane_routes_alike(self):
+        for lane in ("root", "trading"):
+            with self.subTest(lane=lane):
+                self.assertRoute("local-ntfy-lanes", "alertname=CodexLaneGoalBlocked", "scope=codex-lanes",
+                                 "severity=warning", f"ecosystem_lane={lane}")
+                self.assertRoute("local-ntfy", "alertname=CodexLaneUsageLimited", "scope=codex-lanes",
+                                 "severity=critical", f"ecosystem_lane={lane}")
+
+    @unittest.skipUnless(ALERTMANAGER_BIN.exists(), "alertmanager not installed at the documented ecosystem tool path")
+    def test_two_lanes_form_two_groups_and_without_the_lane_grouping_share_one(self):
+        # A socket that is bound but never listens refuses every connection, so no webhook of these instances can reach
+        # the live ntfy that the rendered receivers name.
+        with socket.socket() as refusing:
+            refusing.bind(("127.0.0.1", 0))
+            text, count = re.subn(r"url: 'http://127\.0\.0\.1:\d+/",
+                                  f"url: 'http://127.0.0.1:{refusing.getsockname()[1]}/", self.config.read_text())
+            self.assertEqual(count, 2)
+
+            def group(alert, lane):
+                return ("alertname", alert), ("ecosystem_lane", lane), ("scope", "codex-lanes")
+
+            self.assertEqual(self.groups(text), [
+                ("local-ntfy", group("CodexLaneUsageLimited", "root"), ("root",)),
+                ("local-ntfy", group("CodexLaneUsageLimited", "trading"), ("trading",)),
+                ("local-ntfy-lanes", group("CodexLaneGoalBlocked", "root"), ("root",)),
+                ("local-ntfy-lanes", group("CodexLaneGoalBlocked", "trading"), ("trading",))])
+            # Negative control: without the override both routes inherit [alertname, job, scope], and the two lanes
+            # share one group (one notification, one status) per alert.
+            inherited, removed = re.subn(re.escape(LANE_GROUP_BY), "", text)
+            self.assertEqual(removed, 2)
+            self.assertEqual(self.groups(inherited), [
+                ("local-ntfy", (("alertname", "CodexLaneUsageLimited"), ("scope", "codex-lanes")), ("root", "trading")),
+                ("local-ntfy-lanes", (("alertname", "CodexLaneGoalBlocked"), ("scope", "codex-lanes")),
+                 ("root", "trading"))])
+
+    def groups(self, text):
+        """Run the pinned Alertmanager on text, add a warning and a critical lane alert for each of two lanes with the
+        pinned amtool, and return /api/v2/alerts/groups as sorted (receiver, group labels, lanes) once all four are in."""
+        root = Path(tempfile.mkdtemp(dir=self.tmp.name))
+        (root / "data").mkdir()
+        config = root / "alertmanager.yml"
+        config.write_text(text)
+        address = f"127.0.0.1:{free_port()}"
+        url = f"http://{address}"
+        with open(root / "alertmanager.log", "w") as log:
+            process = subprocess.Popen(
+                [str(ALERTMANAGER_BIN), f"--config.file={config}", f"--storage.path={root / 'data'}",
+                 f"--web.listen-address={address}", "--cluster.listen-address="],
+                stdout=log, stderr=subprocess.STDOUT)
+            try:
+                deadline = time.time() + 30
+                while True:
+                    try:
+                        urllib.request.urlopen(f"{url}/-/ready", timeout=1).read()
+                        break
+                    except OSError:
+                        if time.time() > deadline or process.poll() is not None:
+                            self.fail((root / "alertmanager.log").read_text())
+                        time.sleep(0.2)
+                for lane in ("root", "trading"):
+                    for alert, severity in (("CodexLaneGoalBlocked", "warning"), ("CodexLaneUsageLimited", "critical")):
+                        result = subprocess.run(
+                            [str(AMTOOL), "alert", "add", f"--alertmanager.url={url}", f"alertname={alert}",
+                             "scope=codex-lanes", f"severity={severity}", f"ecosystem_lane={lane}"],
+                            capture_output=True, text=True)
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                # The dispatcher groups alerts asynchronously; read until it holds all four.
+                deadline = time.time() + 10
+                while True:
+                    groups = json.loads(urllib.request.urlopen(f"{url}/api/v2/alerts/groups", timeout=5).read())
+                    if sum(len(g["alerts"]) for g in groups) == 4 or time.time() > deadline:
+                        break
+                    time.sleep(0.2)
+            finally:
+                process.terminate()
+                try:
+                    process.wait(timeout=20)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+        return sorted((g["receiver"]["name"], tuple(sorted(g["labels"].items())),
+                       tuple(sorted(a["labels"]["ecosystem_lane"] for a in g["alerts"]))) for g in groups)
 
 
 if __name__ == "__main__":
