@@ -181,14 +181,10 @@
           "name": "OpenAI Agents SDK",
           "repository": "https://github.com/openai/openai-agents-python",
           "disposition": "unqualified",
-          "why_not_default": "Source review corrected on 2026-10-03. The managed Agents API requires OPENAI_API_KEY and bills at API rates. The open-source SDK supports OpenAI-compatible endpoints through OPENAI_BASE_URL; its experimental codex_tool launches the local Codex CLI and can use the existing Codex login with the inherited environment when no API key override is passed. SDK requests through OmniRoute have not been measured. AD-5 remains a hold: no demonstrated orchestration requirement or accepted three-arm comparison, and codex_tool is still experimental. The 2026-09-21 SDK table has no OpenAI Agents SDK row; the older API-backed premise does not establish blanket native-account incompatibility.",
+          "why_not_default": "The only evidence is source review. catalogs/us-equities/agents-operations.json line 1611 describes it as API-backed. Line 1624 says 'Prospective commands; not executed'. Lines 1634-1635 say 'No provider API call or model comparison performed' and that it 'Does not inherit Codex account entitlement'. Because it is API-backed, it does not meet the requirement to use existing native accounts. Correction from the earlier round: docs/foundation-closure-20260921.md is dropped from the refs because it does not mention this SDK.",
           "evidence_class": "source_review",
           "evidence_refs": [
-            "docs/decisions/2026-10-03-foundation-catalog-drift.md",
-            "https://developers.openai.com/api/docs/guides/agents-api/overview",
-            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/exec.py#L226-L240",
-            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/config.md#L84-L88",
-            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/tools.md#L890-L894"
+            "catalogs/us-equities/agents-operations.json"
           ],
           "source": "lane:claude"
         },
@@ -220,8 +216,7 @@
           "native Claude Code CLI (2.1.278 or current pin)",
           "native Codex CLI/app-server (0.155.1 or current pin)",
           "Claude Agent SDK on the same account and fixture",
-          "Codex SDK on the same account and fixture",
-          "OpenAI Agents SDK codex_tool on the same Codex login and fixture, only after the AD-5 orchestration requirement and experimental-status hold can be revisited"
+          "Codex SDK on the same account and fixture"
         ],
         "fixture_paths": [
           "blueprints/convergence-practice/native-recovery/claude/README.md",
@@ -260,7 +255,7 @@
         "MCPorter's referenced readiness output includes a Context Mode daemon error; version and listing success do not establish functional bridge recovery."
       ],
       "checked_at": "2026-09-22",
-      "verdict_overturn_when": "Change the verdict only on an executed comparison, not on source review. The condition has two parts. First, the native path cannot deliver a structured-event, custom-tool or programmatic-session capability that an application needs. Second, an SDK arm (Claude Agent SDK, Codex SDK or OpenAI Agents SDK codex_tool) passes the same frozen recovery fixture on the same account. OpenAI Agents SDK codex_tool remains held under AD-5 until a demonstrated orchestration requirement, graduation from experimental and an accepted frozen three-arm comparison with complete usage and effect/recovery checks justify adoption; see docs/decisions/2026-10-03-foundation-catalog-drift.md. The fixtures are blueprints/convergence-practice/native-recovery/claude/ (checkpoint, SIGINT, same-session finalize) and blueprints/convergence-practice/native-recovery/ (Codex interrupt and same-thread resume). The SDK arm must match the receipt checks: same session/thread ID, checkpoint unchanged and checkpoint executed once. The offline oracles must still pass: 'python3 -m unittest tests.test_native_recovery' and 'python3 -m unittest discover -s blueprints/convergence-practice/native-recovery/claude -p test_*.py'. A separate trigger: either native client fails a rerun of the same-prompt read-only research task recorded in evidence/artifacts/full-stack-convergence-20260921/native-client-results.json on the intended host. That task has 11 tool results and no tool errors."
+      "verdict_overturn_when": "Change the verdict only on an executed comparison, not on source review. The condition has two parts. First, the native path cannot deliver a structured-event, custom-tool or programmatic-session capability that an application needs. Second, an SDK arm (Claude Agent SDK or Codex SDK) passes the same frozen recovery fixture on the same account. The fixtures are blueprints/convergence-practice/native-recovery/claude/ (checkpoint, SIGINT, same-session finalize) and blueprints/convergence-practice/native-recovery/ (Codex interrupt and same-thread resume). The SDK arm must match the receipt checks: same session/thread ID, checkpoint unchanged and checkpoint executed once. The offline oracles must still pass: 'python3 -m unittest tests.test_native_recovery' and 'python3 -m unittest discover -s blueprints/convergence-practice/native-recovery/claude -p test_*.py'. A separate trigger: either native client fails a rerun of the same-prompt read-only research task recorded in evidence/artifacts/full-stack-convergence-20260921/native-client-results.json on the intended host. That task has 11 tool results and no tool errors."
     },
     {
       "catalog": "foundation",

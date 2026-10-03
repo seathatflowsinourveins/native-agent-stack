@@ -8,13 +8,30 @@ unmeasured runtime or transferring historical acceptance to another host.
 
 ## Decision and alternatives
 
-Keep every current OpenAI Agents SDK row unqualified, add the missing
-agent-sdks candidate and foundation-layer description, and correct the
-native-client overturn arms. Retain the AD-5 hold on experimental
-codex_tool adoption. The alternatives were preserving the contradictory
-conditional/unqualified labels or promoting the extension on source
-compatibility alone. Neither supplies the missing application requirement
-and measured qualification.
+Keep every current OpenAI Agents SDK candidate row unqualified, and add the
+missing agent-sdks candidate and foundation-layer description. Retain the
+AD-5 hold on experimental codex_tool adoption. The alternatives were
+preserving the contradictory conditional/unqualified labels or promoting
+the extension on source compatibility alone. Neither supplies the missing
+application requirement and measured qualification.
+
+Correction, 2026-10-03 (coordinator, before merge): the native-clients
+layer's `alternatives[2]` text (the API-backed premise), its
+`overturn_protocol.arms` and its `verdict_overturn_when` are fields of the
+frozen layer-verdict row of wave 20260922
+(`catalogs/sota-convergence/layer-verdicts-20260922.json`). Hosted
+`validate` ("Check layer-verdict generator output is current") and
+`verdict-review-gate` ("1 changed row(s), 1 violation(s)") refused the
+first head `226f0794` because a frozen row may change only when it is
+re-recorded under a new run id with a sealed cross-family review
+(`tools/sota-convergence/build_verdicts.py`, `scripts/verdict_review_gate.py`).
+This PR therefore leaves those three fields byte-identical to main. Their
+premise correction and the codex_tool overturn arm are carried forward as
+an open item for that re-record: the next native-clients/agent-sdks verdict
+wave, which also covers the census item on the 28 refutations caused by
+missing GPT-6 votes. Until then the frozen row's wording stands as recorded,
+and this record and the corrected candidate rows state the accurate
+premise.
 
 Replace the foundation gateway's September 27 build description with the
 two dated workstation build observations below. Retaining the replaced
