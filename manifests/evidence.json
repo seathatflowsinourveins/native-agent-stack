@@ -3903,7 +3903,7 @@
     },
     {
       "id": "agent-browser-0382-qualification-20261003",
-      "kind": "native_cli_e2e",
+      "kind": "compatibility_attempt",
       "component_ids": [
         "agent-browser"
       ],
@@ -3924,8 +3924,9 @@
       "claim": "W1-r2 records install exit 0 and native synthetic integration results: /api/health returned {\"database\":\"ok\",\"version\":\"13.2.3\",\"commit\":\"90ffed056f0884267356c12a0eeb72a022af53f1\"}; anonymous POST /api/datasources returned 403; the query output reports 36 targets, 36 http_ok, 36 result_ok, 36 frames and errors []. The upgrade record reports migration_log rows 719 before and after. W1b independently repeated --version (\"grafana version 13.2.3\", exit 0) and server --version (\"Version 13.2.3 (commit: 90ffed056f0884267356c12a0eeb72a022af53f1, branch: release-13.2.3#patched)\", exit 0), and rehashed the archive to 6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235.",
       "limitations": [
         "SMOKE EVIDENCE CLASS: locally authored synthetic integration checks run in a private user/net/pid namespace (unshare ... --mount-proc), not upstream acceptance and not check_persistence.py (which restarts host units and was deliberately not run). No real credentials (inline synthetic GF_SECURITY_* constants; the configure.py-generated scratch ecosystem-grafana.env files were never read or used), no live service reachable (the namespace has only its own loopback).",
-        "LIMITS: not tested: browser rendering (the stat/table/Loki visual issues above are unverified here), real Prometheus/Loki data or production cardinality, Grafana-managed alerting, a restart onto the host's real database, Grafana's own upstream test suite.",
-        "W1b reuses the recorded W1-r2 synthetic integration outputs; it does not replay the namespace smoke or activate the host service. The tarball build commit and public tag commit are recorded separately."
+        "LIMITS: not tested: browser rendering (stat/table/Loki issues #132901, #132502 and #132879 are unverified here), real Prometheus/Loki data or production cardinality, Grafana-managed alerting, a restart onto the host's real database, Grafana's own upstream test suite.",
+        "W1b reuses the recorded W1-r2 synthetic integration outputs; it does not replay the namespace smoke or activate the host service. The tarball build commit and public tag commit are recorded separately.",
+        "All three CVE reachability statements concern repository provisioning only. The upgrade preserves the database; existing users/Editor memberships, Grafana-managed alert rules, shared dashboards/sharing tokens, and additional datasources/stored credential configuration were not inspected. The live-database check remains an open host item."
       ],
       "path": "evidence/receipts/grafana-1323-qualification-20261003.json"
     }
@@ -4353,8 +4354,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "5983755efa1ab190683df638343ff4a29e666110d595382ccdde67b79a26a16a",
-      "bytes": 31686
+      "sha256": "8df0a0b802e078ab6f76c5cb218c4a99b12319709a831f989618823e0776da40",
+      "bytes": 31826
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -9744,8 +9745,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "3559bbc04419a58ee456fe0751974cdeba4a0e7ebcd17c854e7728322068b9d9",
-      "bytes": 483862
+      "sha256": "aebd9b5f6a3f4ffa97b00a1d702f49545e8fe07856375288787d49b8dac8d78a",
+      "bytes": 484432
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15094,8 +15095,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "dbe644e46f9ba45badea3412a9b02e26c0bdae8b1b68d5e3833c84e04baa002f",
-      "bytes": 259475
+      "sha256": "8c69adddc04a945d7a8b1652fc786ac1c7597f2920755f576a2008cf3d030603",
+      "bytes": 259480
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15834,8 +15835,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-currency-wave-w1b.md",
-      "sha256": "95d6e443e340b99f6415837ef058535da805a28e3ffeecfbfc57c7a2ad1818eb",
-      "bytes": 12309
+      "sha256": "41447359a95efe3dcd0e5df03969353f47bdcb53e2366727aefcd11234e6230a",
+      "bytes": 16291
     },
     {
       "path": "docs/direct-results.md",
@@ -17814,8 +17815,8 @@
     },
     {
       "path": "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
-      "sha256": "9e0f0549c3fe041caf3f433cec23fb247ffce60ff0a1ae25288699cfd670c605",
-      "bytes": 13820
+      "sha256": "12a72072978b21d012eb337685b396bf3ddc225fe07dcc336fd5fe9c4d3253d9",
+      "bytes": 47321
     },
     {
       "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/github-metadata.json",
@@ -17849,8 +17850,8 @@
     },
     {
       "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json",
-      "sha256": "ef1d4b7aa6dde0b6978adb88e3def7123ab1b52dd2492037b289ea41cda70b4f",
-      "bytes": 28411
+      "sha256": "febed953a2049eeea3345770e27d88a0375b29ba222956399792e70c9fce260c",
+      "bytes": 30509
     },
     {
       "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-fresh.stdout.txt",
@@ -17869,13 +17870,23 @@
     },
     {
       "path": "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
-      "sha256": "46d5ed22a716c2018c796ea86bc8048c279f6384962344ab5a8f0e52f2069085",
-      "bytes": 5894
+      "sha256": "5fb0e0f31cbcb1448d70c271b840cf252d6922069440a87b33ba6f387107d0e6",
+      "bytes": 6515
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stderr.txt",
+      "sha256": "7379e23243ff91eda3a028f525c3b2506ea1b5d3af8494718d1bd7d086e3a146",
+      "bytes": 129476
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stdout.txt",
+      "sha256": "218009ef7d10a4a842bbb74f17cacb1afed3ca4cf06f2e084ebf9d7c2a9ec82d",
+      "bytes": 150
     },
     {
       "path": "evidence/artifacts/currency-wave-w1b-20261003/review-decisions.json",
-      "sha256": "2f8fe8722f95c865d810bae87f7deac8fc239a2beb928b2e4906f885cb52f80b",
-      "bytes": 32124
+      "sha256": "b163526176d933371fb64c3fd15adef9fb4851838bdf5fa1fd2ad3ef267ac5fc",
+      "bytes": 32284
     },
     {
       "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
@@ -47839,8 +47850,8 @@
     },
     {
       "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json",
-      "sha256": "f11041b144f8873f82e7976fdb473a4e1a153672c7590fd6e1e737b80f3cd272",
-      "bytes": 3805
+      "sha256": "051bd9e94f82426529f6d1a779c4427535cdcfdf584d3909c47b19b5f46cb3a8",
+      "bytes": 4842
     },
     {
       "path": "evidence/receipts/agent-browser-lna-20260930.json",
@@ -48074,8 +48085,8 @@
     },
     {
       "path": "evidence/receipts/grafana-1323-qualification-20261003.json",
-      "sha256": "b07ec5c949172545a97750c621b2e2f326ca30b476ebc10b86a16d7774d08b45",
-      "bytes": 4010
+      "sha256": "51acc9245a3a0f1e349cec54c94537cbaf3d1592770ab2d7a61eaf7b4b70944b",
+      "bytes": 6314
     },
     {
       "path": "evidence/receipts/guard-k3-verification-20260930.json",
@@ -48914,18 +48925,18 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "89f62f3626bdab43be904f22d8fa9b05b2865fdd9e7c72d93fda5e2433d4d858",
-      "bytes": 100707
+      "sha256": "dd58aa19de52ef04e2ce4875add2ab4f10e33e0ccd876c7559dc315832b99145",
+      "bytes": 100852
     },
     {
       "path": "observability/README.md",
-      "sha256": "a86eaf6b97c970d6c1f162faca6688675e9e087a89774ab12524ea98ed81086c",
-      "bytes": 15457
+      "sha256": "903e4c9c67eab3f98ed7b5527a949b820ba8291b81826c0229ef45ec83c70790",
+      "bytes": 15572
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "728fd5790e3523d83c7ad8d19207844aded0058186d589f50d4f470ff0ea75bd",
-      "bytes": 25028
+      "sha256": "eddf75816d3c43f5d1e06b6bb57c5213edf3452c52ded6bbbf4c625093ec99ae",
+      "bytes": 25100
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
