@@ -49,7 +49,9 @@
       "native-calibration",
       "context-source-tests",
       "context-current-tools",
-      "meter-compaction"
+      "meter-compaction",
+      "native-resume",
+      "resume-read"
     ],
     "roles": [
       "command-worker",
@@ -142,7 +144,10 @@
     "Pinned Inspector2.9.0 native tools/call ctx_execute on shipped Context Mode sentinel",
     "Pinned Inspector2.9.0 native tools/call ctx_search after separate native ctx_index",
     "ccusage codex session --id SELECTED --json --offline --no-cost --speed standard; preregistered native third-compaction cutoff",
-    "Same released ccusage command on separately labelled exact-only synthetic control"
+    "Same released ccusage command on separately labelled exact-only synthetic control",
+    "Promptfoo eval -c resume-calibration.json --no-cache --repeat1 --max-concurrency1; native supported explicit parent UUIDs",
+    "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max read-only; missing keyless environment prerequisite",
+    "Same native read with one non-secret process-local placeholder and explicit requested pool URL"
   ],
   "observations": [
     {
@@ -826,6 +831,130 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "native-resume-codex",
+      "task": "native-resume",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 19,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze functional/accounting qualification only; no saving/protection/default adoption",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-resume-qualification.json",
+          "sha256": "a9f147289e39f82411183ce5e791de09ee4c6340562f54141e5cccca4c882188"
+        }
+      ],
+      "usage": {
+        "uncached_input": 327,
+        "cache_creation": 0,
+        "cache_read": 19712,
+        "output": 45,
+        "reasoning_in_output": 11,
+        "total": 20084,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-resume-claude",
+      "task": "native-resume",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 19,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze functional/accounting qualification only; no saving/protection/default adoption",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-resume-qualification.json",
+          "sha256": "a9f147289e39f82411183ce5e791de09ee4c6340562f54141e5cccca4c882188"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 386,
+        "cache_read": 17670,
+        "output": 126,
+        "reasoning_in_output": 77,
+        "total": 18184,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-resume-startup-failure",
+      "task": "resume-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 20,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze functional/accounting qualification only; no saving/protection/default adoption",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
+          "sha256": "2d5861a2204cfd48189919e0bda935d090c15ae3670f92fe12adb4863b5cfe72"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-resume-correction",
+      "task": "resume-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 21,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze functional/accounting qualification only; no saving/protection/default adoption",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
+          "sha256": "2d5861a2204cfd48189919e0bda935d090c15ae3670f92fe12adb4863b5cfe72"
+        }
+      ],
+      "usage": {
+        "uncached_input": 30906,
+        "cache_creation": 0,
+        "cache_read": 91392,
+        "output": 5168,
+        "reasoning_in_output": 2404,
+        "total": 127466,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -872,6 +1001,18 @@
     {
       "run_id": "meter-compaction-exact-only",
       "reason": "Synthetic projection without legacy token_count records remains unparsed"
+    },
+    {
+      "run_id": "native-resume-codex",
+      "reason": "SDK per-query endpoint assumption fails: restored parent total116496 vs new exact20084; schemaPASS remains distinct"
+    },
+    {
+      "run_id": "native-resume-claude",
+      "reason": "SDK reset-on-resume assumption fails under native2.1.288 override: restored62239 vs new18184; schemaPASS remains distinct"
+    },
+    {
+      "run_id": "astra-resume-startup-failure",
+      "reason": "Native profile missing process-local keyless prerequisite before model response; reported/billed usage unknown; corrected by supported non-secret placeholder without saved changes"
     }
   ],
   "limitations": [
@@ -885,7 +1026,9 @@
     "Actual root natural compaction validates accounting coverage only; fixed P2 quality/resume remains open.",
     "Context Mode selected source tests and shipped Inspector checks are distinct; non-frozen dependencies/full original recovery remain limits.",
     "S1 fixed questions now allow adequate focused native computation; no useful natural TOON opportunity is manufactured.",
-    "Initial local consistency check rejected duplicate task/role/condition attempt tuples; per-task attempt identifiers were corrected before publication, without repeating measurements."
+    "Initial local consistency check rejected duplicate task/role/condition attempt tuples; per-task attempt identifiers were corrected before publication, without repeating measurements.",
+    "Resume unit counts38268 additional tokens, not178735 returned endpoints; prior140467 repeats. Selected fresh420746 plus delta459014 is not whole-study usage. Consequential Astra5exact responses127466 are separate research overhead. Unknown startup/billing/helper-provenance and naturalP2 remain unknown. Common case timeout is supported; aborted evaluator zeros are placeholders.",
+    "Publication checker first invocation used unsupported --experiment flag and exited2 before validation. Native --help establishes positional record arguments; correction uses that supported interface. This is a checker invocation failure, not a model or measurement rerun."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -919,7 +1062,11 @@
       "context-current-execute",
       "context-current-search",
       "meter-native-compaction-gap",
-      "meter-compaction-exact-only"
+      "meter-compaction-exact-only",
+      "native-resume-codex",
+      "native-resume-claude",
+      "astra-resume-startup-failure",
+      "astra-resume-correction"
     ],
     "coverage_artifact": null
   }

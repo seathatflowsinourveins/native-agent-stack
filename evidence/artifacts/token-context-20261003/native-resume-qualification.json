@@ -1,0 +1,179 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Supported native resume functional/accounting calibration, not P2 or a comparison",
+  "source_pins": [
+    "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "openai/codex@rust-v0.160.0",
+    "@anthropic-ai/claude-agent-sdk@0.3.263"
+  ],
+  "native_execution": {
+    "completed": "2026-10-03T05:03:40Z",
+    "errors": 0,
+    "exit": 0,
+    "failures": 0,
+    "started": "2026-10-03T05:03:04Z",
+    "successes": 2,
+    "evaluator_duration_ms": 24321
+  },
+  "preregistration_sha256": "0c3704b2364bc33edba71c2dfebd1895eb6decaab02ac0cb15177e3d96b8ead6",
+  "config_sha256": "cd2c4866742b11186c4957a17a9a18f0a3de2f6a644fd95637f66097416dc31c",
+  "prefix_integrity": {
+    "before_prefixes_match": 3,
+    "before_prefixes_expected": 3,
+    "bound_claude_child_unchanged": true
+  },
+  "codex": {
+    "client": "0.160.0",
+    "sdk": "0.160.0",
+    "requested_model": "gpt-6.1-sol",
+    "recorded_model": "gpt-6.1-sol",
+    "effort": "max",
+    "backend_resolved_model": null,
+    "before_parent_usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 79744,
+      "input_tokens": 95403,
+      "output_tokens": 1009,
+      "reasoning_output_tokens": 576,
+      "total_tokens": 96412
+    },
+    "returned_parent_cumulative_usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 99456,
+      "input_tokens": 115442,
+      "output_tokens": 1054,
+      "reasoning_output_tokens": 587,
+      "total_tokens": 116496
+    },
+    "new_unique_response_count": 1,
+    "new_native_usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 19712,
+      "input_tokens": 20039,
+      "output_tokens": 45,
+      "reasoning_output_tokens": 11,
+      "total_tokens": 20084
+    },
+    "prior_bound_child_tokens": 40875,
+    "new_tool_calls": 0,
+    "new_child_activity": 0,
+    "new_compactions": 0,
+    "source_contract_conflict": "SDK dist/index.d.ts119\u2013135 describes usage during a turn; tagged native exec lines118\u2013128,509\u2013510,533\u2013534 uses thread totals. Actual returned counter restores previous parent usage and excludes the bound child."
+  },
+  "claude": {
+    "client": "2.1.288",
+    "sdk": "0.3.263",
+    "requested_model": "opus",
+    "recorded_model": "claude-opus-5-5",
+    "effort": "max",
+    "backend_resolved_model": null,
+    "before_aggregate": {
+      "cacheCreationInputTokens": 3146,
+      "cacheReadInputTokens": 37305,
+      "inputTokens": 1067,
+      "outputTokens": 2537,
+      "thinkingTokens": 1709,
+      "total_tokens": 44055,
+      "webSearchRequests": 0
+    },
+    "returned_restored_aggregate": {
+      "cacheCreationInputTokens": 3532,
+      "cacheReadInputTokens": 54975,
+      "inputTokens": 1069,
+      "outputTokens": 2663,
+      "thinkingTokens": 1786,
+      "total_tokens": 62239,
+      "webSearchRequests": 0
+    },
+    "new_unique_request_count": 1,
+    "new_native_request_usage": {
+      "cache_creation_input_tokens": 386,
+      "cache_read_input_tokens": 17670,
+      "input_tokens": 2,
+      "output_tokens": 126,
+      "thinking_tokens": 77,
+      "total_tokens": 18184
+    },
+    "unchanged_known_helper_tokens": 1074,
+    "independent_helper_request_id": false,
+    "new_tool_calls": 0,
+    "new_children": 0,
+    "new_compactions": 0,
+    "estimated_cost_usd": {
+      "after": 0.090787,
+      "before": 0.081637,
+      "delta": 0.00915,
+      "native_hasUnknownModelCost": false,
+      "scope": "Native list estimate; not provider invoice"
+    },
+    "source_contract_conflict": "SDK sdk.d.ts5030\u20135038 says resumed queries start fresh. Actual native override final modelUsage and cost-state restore prior aggregate including bound child and unchanged helper row. Cause/general version behavior unestablished."
+  },
+  "preregistered_conditions": [
+    {
+      "condition": "Both native clients resume exactly their declared parent UUID",
+      "evidence": "Native new turn/assistant records and provider result preserve both declared UUIDs.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "All four fact values pass retained deterministic schema",
+      "evidence": "Both unchanged native is-json schema assertions pass; evaluator exit0,2 successes,0 failures,0 errors.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "No new tool/read/child/network/write calls",
+      "evidence": "No new native model-tool calls, child binding/activity or compaction; selected bound Claude child is byte-identical; native Claude server-tool web counters0. Native transport/log writes and outside-pipeline helpers are not an absence claim.",
+      "verdict": "PASS within observed model-tool scope"
+    },
+    {
+      "condition": "Claude latestmodelUsage is this query only; prior lifetime cost-state/raw totals reconcile separately and are not added",
+      "evidence": "Native Claude cost-state and raw final modelUsage restore prior44055 plus new18184=62239; total estimated cost also restores prior0.081637 plus0.00915=0.090787.",
+      "verdict": "FAIL"
+    },
+    {
+      "condition": "Codex unique response IDs added since retained before-prefix match returned per-query main usage; no child usage invented",
+      "evidence": "One new exact response totals20084; returned main-thread usage116496 restores prior96412. Child usage was not invented or added to returned main counter.",
+      "verdict": "FAIL"
+    }
+  ],
+  "count_once": {
+    "both_fresh_calibrations_retained_total": 420746,
+    "fresh_plus_actual_resume_delta_total": 459014,
+    "not_a_whole_study_or_savings_total": true,
+    "prior_tokens_represented_again_in_returned_endpoints": 140467,
+    "resume_new_native_tokens": 38268,
+    "returned_resume_counter_sum": 178735
+  },
+  "usage_scope": "Only two previously identified fresh calibrations and this supported resume. Raw requests, native aggregates and endpoint deltas are reconciled alternative views, not additive. Research overhead, not savings or whole-study usage.",
+  "retained_private_artifacts": {
+    "resume-calibration-preregistration.json": "0c3704b2364bc33edba71c2dfebd1895eb6decaab02ac0cb15177e3d96b8ead6",
+    "resume-calibration.json": "cd2c4866742b11186c4957a17a9a18f0a3de2f6a644fd95637f66097416dc31c",
+    "resume-calibration-results.json": "a4cdf73de648fefbe91b3d19b8abba5ad664f326da3eab0ec31359a21978fd1a",
+    "resume-calibration.started.txt": "9ebbacdd2b50e94cb58c6118e882f0172187e31e7613cfc34ef35efd223127fa",
+    "resume-calibration.completed.txt": "6fcb9a2a6ec84fc7c94f4950705d6c2ed94b3ddfb231a50abba1798d1d5917a0",
+    "resume-calibration.exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "resume-calibration-eval.stdout": "5dd49b1fac2cde10b0f95e73ddc50af78c0e2bcd07c73680c8ad16e8449eef70",
+    "resume-calibration-eval.stderr": "07ff9c8cc13cfe6b2a6d2f512fc4d09d6f347b8b047814d075fe783cac5bcd40",
+    "claude-bound-child-append.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "claude-parent-append.jsonl": "25b12507c51618dd0bce25ba28ee2e2684cf169944251173d3bfff8c56cf659b",
+    "codex-parent-append.jsonl": "7938622dccf101799c17882625255e3f3eb8a0df34a8480edf4a48b07b60d4a2",
+    "native-result-usage.json": "3d2dabff985894dba3ed88eeaccff625d521ff9676b14ede491cf0915dc62f29",
+    "prefix-integrity.json": "4e91a28503d129217236f7ec93eeaa58233e5042cacf3b1a80965ceded293a82",
+    "resume-accounting-conclusions.json": "08db5b0d6e3660ce6333a03752d8f44bd18ea369557a8c9a202dc09890f6cf88"
+  },
+  "limitations": [
+    "Natural compaction/resume continuity P2 remains untested by this unit; no new compaction record occurs.",
+    "No advisor, billed-abort/retry, outside-query-pipeline helper or provider-invoice coverage is established.",
+    "Known unchanged Haiku1074 is counted once in restored native aggregate; its raw helper request provenance remains unbound.",
+    "No new model tools/children are present in the selected append, but background native effects and unrelated session histories were not scanned.",
+    "Both accounting preregistration failures remain failures despite evaluator exit0/schema2PASS.",
+    "SDK-declared reset versus native-observed restoration requires the coordinator's consequential judgment; no worker launched one."
+  ],
+  "consequential_read": "resume-counter-astra-read.json: ACCEPT-CORRECTION only; protocol NOT FROZEN",
+  "independent_completeness_read": {
+    "verdict": "accept_publication_unit",
+    "role": "Sol6.1/max source critic",
+    "scope": "Checked arithmetic, source distinction and14retained artifact hashes; not final-goal/default/freeze/P2 acceptance",
+    "precision_correction": "24321ms is evaluator duration; recorded process start/completion span36s"
+  }
+}
