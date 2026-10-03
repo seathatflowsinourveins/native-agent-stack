@@ -1,0 +1,29 @@
+{
+"tests.test_alpha": [
+"tests.test_alpha.AlphaTests.test_expected_failure",
+"tests.test_alpha.AlphaTests.test_passes",
+"tests.test_alpha.AlphaTests.test_skipped",
+"tests.test_alpha.AlphaTests.test_subtests_pass"
+],
+"tests.test_beta": [
+"tests.test_beta.BetaTests.test_errors",
+"tests.test_beta.BetaTests.test_fails",
+"tests.test_beta.BetaTests.test_subtest_fails"
+],
+"tests.test_delta": [
+"tests.test_delta.DeltaTests.test_passes",
+"delta_extra_tests.ExtraTests.test_from_wrapper"
+],
+"tests.test_epsilon": [
+"tests.test_epsilon.EpsilonTests.test_one",
+"tests.test_epsilon.EpsilonTests.test_two"
+],
+"tests.test_gamma": [
+"tests.test_gamma.GammaFixtureError.test_never_runs",
+"tests.test_gamma.GammaTests.test_prints_output",
+"tests.test_gamma.GammaTests.test_unexpected_success"
+],
+"tests.test_secret_path_guard": [
+"tests.test_secret_path_guard.TailTests.test_timing"
+]
+}

@@ -1,0 +1,64 @@
+test_expected_failure (tests.test_alpha.AlphaTests.test_expected_failure) ... expected failure
+test_passes (tests.test_alpha.AlphaTests.test_passes) ... ok
+test_skipped (tests.test_alpha.AlphaTests.test_skipped) ... skipped 'planted skip'
+test_subtests_pass (tests.test_alpha.AlphaTests.test_subtests_pass) ... ok
+test_errors (tests.test_beta.BetaTests.test_errors) ... ERROR
+test_fails (tests.test_beta.BetaTests.test_fails) ... FAIL
+test_subtest_fails (tests.test_beta.BetaTests.test_subtest_fails)
+A failing subtest with a docstring. ... 
+  test_subtest_fails (tests.test_beta.BetaTests.test_subtest_fails) (value=2)
+A failing subtest with a docstring. ... FAIL
+test_passes (tests.test_delta.DeltaTests.test_passes) ... ok
+test_from_wrapper (delta_extra_tests.ExtraTests.test_from_wrapper) ... ok
+test_one (tests.test_epsilon.EpsilonTests.test_one) ... ok
+test_two (tests.test_epsilon.EpsilonTests.test_two) ... ok
+setUpClass (tests.test_gamma.GammaFixtureError) ... ERROR
+test_prints_output (tests.test_gamma.GammaTests.test_prints_output) ... ok
+test_unexpected_success (tests.test_gamma.GammaTests.test_unexpected_success) ... unexpected success
+test_timing (tests.test_secret_path_guard.TailTests.test_timing) ... ok
+
+======================================================================
+ERROR: test_errors (tests.test_beta.BetaTests.test_errors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<work>/suite/tests/test_beta.py", line 10, in test_errors
+    raise RuntimeError("planted error")
+RuntimeError: planted error
+
+======================================================================
+ERROR: setUpClass (tests.test_gamma.GammaFixtureError)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<work>/suite/tests/test_gamma.py", line 8, in setUpClass
+    raise RuntimeError("planted setUpClass error")
+RuntimeError: planted setUpClass error
+
+======================================================================
+FAIL: test_fails (tests.test_beta.BetaTests.test_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<work>/suite/tests/test_beta.py", line 7, in test_fails
+    self.assertEqual("left", "right")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 'left' != 'right'
+- left
++ right
+
+
+======================================================================
+FAIL: test_subtest_fails (tests.test_beta.BetaTests.test_subtest_fails) (value=2)
+A failing subtest with a docstring.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<work>/suite/tests/test_beta.py", line 16, in test_subtest_fails
+    self.assertEqual(value, 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: 2 != 1
+
+======================================================================
+UNEXPECTED SUCCESS: test_unexpected_success (tests.test_gamma.GammaTests.test_unexpected_success)
+----------------------------------------------------------------------
+Ran 14 tests in 0.052s
+
+FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+output between records

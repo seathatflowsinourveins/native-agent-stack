@@ -1,0 +1,6 @@
+test_timing (tests.test_secret_path_guard.TailTests.test_timing) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.050s
+
+OK

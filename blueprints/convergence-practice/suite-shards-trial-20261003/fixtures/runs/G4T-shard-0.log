@@ -1,0 +1,9 @@
+test_expected_failure (tests.test_alpha.AlphaTests.test_expected_failure) ... expected failure
+test_passes (tests.test_alpha.AlphaTests.test_passes) ... ok
+test_skipped (tests.test_alpha.AlphaTests.test_skipped) ... skipped 'planted skip'
+test_subtests_pass (tests.test_alpha.AlphaTests.test_subtests_pass) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+OK (skipped=1, expected failures=1)

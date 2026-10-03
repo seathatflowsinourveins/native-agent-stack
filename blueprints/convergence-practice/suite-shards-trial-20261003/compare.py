@@ -1,0 +1,839 @@
+#!/usr/bin/env python3
+"""Independent, stdlib-only oracle of the suite-shards trial (2026-10-03).
+
+It reads the run directories of actual GitHub-hosted runs, decides whether each sharded arm ran exactly the
+tests the serial production command (arm S) ran on the same OS, with exactly the same outcomes, and applies
+the preregistered speed rule. README.md states every rule and the input layout.
+
+  python3 compare.py verdict --results DIR --inventory DIR --expected-sha SHA [--os OS] [--needs FILE]
+                     --out result.json [--summary-md FILE] [--checkout-status FILE]
+  python3 compare.py controls --dir DIR --os OS --job-result RESULT [--expected-sha SHA] [--out FILE]
+
+verdict exits 0 when result.json was written (the outcome is inside it) and 2 for unusable arguments.
+controls exits 0 when the control run met every expectation and 1 otherwise.
+
+Every log is parsed by logparse.py, the first trial's parser copied unchanged. The shard lists come from the
+inventory artifact and are re-derived with make_shards.py, this directory's frozen generator.
+"""
+
+from __future__ import annotations
+
+import argparse
+import collections
+import dataclasses
+import hashlib
+import json
+import re
+import shlex
+import sys
+from fractions import Fraction
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+import logparse  # noqa: E402
+import make_shards  # noqa: E402
+
+SCHEMA = "suite-shards-oracle/1"
+OSES = tuple(make_shards.ARMS)
+SERIAL_ARM = "S"
+SERIAL_COMMAND = ("python3", "-m", "unittest", "-v")
+REPEATS = 3
+# The speed rule's thresholds as exact rationals: no ratio is rounded before it is compared.
+MEDIAN_RATIO_MAX = Fraction(3, 5)
+MAX_RATIO_MAX = Fraction(3, 4)
+# The monotonic and wall-clock lengths of a test phase must agree within max(5 s, 1 % of the wall clock).
+CLOCK_TOLERANCE_NS = 5 * 10 ** 9
+CLOCK_TOLERANCE_PART = Fraction(1, 100)
+RUN_DIR_RE = re.compile(r"^(?P<os>macos-15|ubuntu-24\.04)-(?:(?P<arm>[A-Za-z0-9]+)-r(?P<rep>[1-9][0-9]*)"
+                        r"|(?P<controls>controls))$")
+JOB_STATUSES = ("success", "failure", "cancelled")
+# The jobs of each trial workflow, as the compare job's needs context names them, and the results under which
+# the rule applies. A cancelled or skipped job makes the run incomplete, never a rule outcome.
+NEEDS_RESULTS = {"inventory": ("success", "failure"), "serial": ("success", "failure"),
+                 "shards": ("success", "failure"), "controls": ("success", "failure"),
+                 "controls-check": ("success", "failure")}
+# The control run (README.md, "Controls"): four shards of one parallel group, each one control module run with
+# the arms' shard command in an empty directory. The job is expected to fail.
+CONTROL_JOB_RESULT = "failure"
+CONTROL_SHARDS = (
+    {"module": "test_ctl_pass", "expect": "pass",
+     "records": (("test", "test_ctl_pass.Pass.test_one", "ok"), ("test", "test_ctl_pass.Pass.test_two", "ok"))},
+    {"module": "test_ctl_fail", "expect": "fail",
+     "records": (("test", "test_ctl_fail.Fail.test_fails", "FAIL"), ("test", "test_ctl_fail.Fail.test_passes", "ok"))},
+    {"module": "test_ctl_crash", "expect": "crash", "started": "test_ctl_crash.Crash.test_exits", "exit": 3},
+    {"module": "test_ctl_hang", "expect": "killed", "started": "test_ctl_hang.Hang.test_sleeps"},
+)
+CONTROL_ENV_NAME = "SUITE_SHARDS_ENV_PROBE"
+SIGNALS = ("SIGINT", "SIGQUIT")
+LIST_CAP = 200
+
+
+def arms_of(os_name: str) -> tuple:
+    """The preregistered arms of an OS: S, then the shard arms in make_shards.ARMS order (G before GT)."""
+    return (SERIAL_ARM,) + tuple(make_shards.ARMS[os_name])
+
+
+def _cap(items, cap: int = 5) -> str:
+    items = list(items)
+    shown = ", ".join(str(item) for item in items[:cap])
+    return f"[{shown}{', ...' if len(items) > cap else ''}] ({len(items)})"
+
+
+def sha256_of(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def read_json(path: Path):
+    """The parsed JSON at path, or None when it is missing or invalid."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def read_text(path: Path) -> str | None:
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+
+
+def read_exit(path: Path) -> tuple:
+    """(exit status or None, problem or None) from a one-integer file."""
+    raw = read_text(path)
+    if raw is None:
+        return None, f"{path.name} is missing"
+    if not re.fullmatch(r"-?[0-9]+", raw.strip()):
+        return None, f"{path.name} is not one integer: {raw.strip()[:40]!r}"
+    return int(raw.strip()), None
+
+
+def command_tokens(text: str | None):
+    try:
+        return shlex.split(text) if text is not None else None
+    except ValueError:
+        return None
+
+
+# --------------------------------------------------------------------------- inventory
+
+
+@dataclasses.dataclass
+class Inventory:
+    ids: set
+    count: int
+    module_ids: dict
+    lists: dict  # {arm: {"shards": [[module, ...], ...], "tail": [module, ...]}}
+    report: dict | None
+    problems: list
+    sha256: dict
+
+
+def load_inventory(directory: Path, os_name: str | None, weights: Path | None) -> Inventory:
+    """The inventory artifact: the discovery ids, the file-to-ids map and every shard arm's lists of os_name.
+    weights, when given, re-derives the lists with make_shards.py. Any problem gives the OS no verdict."""
+    problems = []
+    text = read_text(directory / "inventory.txt")
+    ids = []
+    if text is None:
+        problems.append("inventory.txt is missing")
+    else:
+        ids = text.split("\n")
+        if ids and ids[-1] == "":
+            ids.pop()
+        if not ids or ids != sorted(set(ids)) or any(not item or item != item.strip() for item in ids):
+            problems.append("inventory.txt is empty or not the sorted, de-duplicated id list inventory.py writes")
+    module_ids = read_json(directory / "module_ids.json")
+    if not isinstance(module_ids, dict) or not all(isinstance(owned, list) for owned in module_ids.values()):
+        problems.append("module_ids.json is missing or not {module: [ids]}")
+        module_ids = {}
+    owners = collections.Counter(item for owned in module_ids.values() for item in owned)
+    if module_ids and (set(owners) != set(ids) or any(count > 1 for count in owners.values())):
+        problems.append("module_ids.json does not give every inventory id exactly one test file")
+    report = read_json(directory / "report.json")
+    if not isinstance(report, dict) or report.get("ok") is not True or report.get("parity") is not True:
+        problems.append("report.json is missing or does not record a passed inventory gate (ok and parity true)")
+    elif os_name and report.get("os") != os_name:
+        problems.append(f"report.json is for {report.get('os')!r}, not {os_name}")
+    lists = {}
+    if os_name:
+        modules = sorted(module_ids)
+        for arm, spec in make_shards.ARMS[os_name].items():
+            try:
+                shards = [make_shards.read_list(directory / "shards" / arm / f"shard-{index}.txt")
+                          for index in range(spec["shards"])]
+                tail = make_shards.read_list(directory / "shards" / arm / "tail.txt")
+            except (OSError, make_shards.ShardError) as error:
+                problems.append(f"shards/{arm}: unreadable lists ({error})")
+                continue
+            lists[arm] = {"shards": shards, "tail": tail}
+            problems.extend(f"shards/{arm}: {problem}" for problem in make_shards.coverage_problems(modules, lists[arm]))
+            if tail != list(spec["tail"]):
+                problems.append(f"shards/{arm}: tail {tail} is not the preregistered tail {list(spec['tail'])}")
+        if weights is not None and modules:
+            try:
+                plan = make_shards.plan_for(os_name, modules, make_shards.load_weights(weights))
+                for arm, arm_plan in plan.items():
+                    if lists.get(arm) != {"shards": arm_plan["shards"], "tail": arm_plan["tail"]}:
+                        problems.append(f"shards/{arm}: the lists are not make_shards.py's lists for these test "
+                                        "files and the frozen weights")
+            except make_shards.ShardError as error:
+                problems.append(f"make_shards.py: {error}")
+    return Inventory(set(ids), len(ids), module_ids, lists, report if isinstance(report, dict) else None, problems,
+                     {name: sha256_of(directory / name) for name in ("inventory.txt", "module_ids.json", "report.json")})
+
+
+# --------------------------------------------------------------------------- run directories
+
+
+@dataclasses.dataclass
+class Log:
+    label: str
+    modules: list
+    command: str | None = None
+    exit_code: int | None = None
+    parsed: logparse.ParsedLog | None = None
+    probe: dict | None = None
+    problems: list = dataclasses.field(default_factory=list)
+
+
+@dataclasses.dataclass
+class Run:
+    name: str
+    os: str
+    arm: str
+    repeat: int
+    meta: dict | None = None
+    runtime: dict | None = None
+    timing: dict | None = None
+    checkout_status: str | None = None
+    logs: list = dataclasses.field(default_factory=list)
+    problems: list = dataclasses.field(default_factory=list)
+    mismatches: list = dataclasses.field(default_factory=list)
+    mismatch_total: int = 0
+    missing_ids: list = dataclasses.field(default_factory=list)
+    extra_ids: list = dataclasses.field(default_factory=list)
+    repeated_ids: list = dataclasses.field(default_factory=list)
+
+    @property
+    def step_ns(self) -> int | None:
+        value = (self.timing or {}).get("step_ns")
+        return value if isinstance(value, int) and not isinstance(value, bool) and value > 0 else None
+
+    @property
+    def python_version(self):
+        return (self.meta or {}).get("python_version")
+
+    @property
+    def job_status(self):
+        return (self.meta or {}).get("job_status")
+
+
+def common_problems(path: Path, os_name: str, arm: str, repeat: int, expected_sha: str | None, timed: bool) -> tuple:
+    """(meta, runtime, timing, checkout status, problems) for the files every run directory holds."""
+    problems = []
+    meta = read_json(path / "meta.json")
+    if not isinstance(meta, dict):
+        problems.append("meta.json is missing or not a JSON object")
+        meta = None
+    else:
+        for field, wanted in (("os", os_name), ("arm", arm), ("repeat", repeat)):
+            if meta.get(field) != wanted:
+                problems.append(f"meta.json {field} {meta.get(field)!r} differs from the directory name ({wanted!r})")
+        if not isinstance(meta.get("python_version"), str) or not meta["python_version"]:
+            problems.append("meta.json python_version is missing")
+        if meta.get("job_status") not in JOB_STATUSES:
+            problems.append(f"meta.json job_status {meta.get('job_status')!r} is not one of {list(JOB_STATUSES)}")
+        elif meta["job_status"] == "cancelled":
+            problems.append("the job was cancelled (job_status cancelled): a partial run")
+        if expected_sha and meta.get("checkout_sha") != expected_sha:
+            problems.append(f"checkout_sha {meta.get('checkout_sha')!r} is not the pull request head {expected_sha}")
+    runtime = read_json(path / "runtime.json")
+    if not isinstance(runtime, dict):
+        problems.append("runtime.json is missing or not JSON: the run attempt is unrecorded")
+        runtime = None
+    elif runtime.get("run_attempt") != "1":
+        # GITHUB_RUN_ATTEMPT is "1" for a run's first attempt (github/docs contexts.md at 03d2e24b, line 209).
+        problems.append(f"run_attempt {runtime.get('run_attempt')!r}: only a run's first attempt counts (a job re-run "
+                        "voids the run)")
+    timing = None
+    if timed:
+        timing = read_json(path / "timing.json")
+        problems.extend(timing_problems(timing))
+        if not isinstance(timing, dict):
+            timing = None
+    status = read_text(path / "git-status.txt")
+    if status is None:
+        problems.append("git-status.txt is missing: the checkout status after the run is unrecorded")
+    elif status.strip() == "git status failed":
+        problems.append("git-status.txt says git status failed: the checkout status after the run is unrecorded")
+    elif status != "":
+        problems.append(f"the checkout was not clean after the run: {_cap(status.splitlines())}")
+    return meta, runtime, timing, status, problems
+
+
+def timing_problems(timing) -> list:
+    if not isinstance(timing, dict):
+        return ["timing.json is missing or not JSON: the test phase was not timed"]
+    problems = [f"timing.json: {problem}" for problem in timing.get("problems") or []]
+    step, wall = timing.get("step_ns"), timing.get("wall_ns")
+    if not isinstance(step, int) or isinstance(step, bool) or step <= 0:
+        problems.append("timing.json step_ns is not a positive integer")
+    elif not isinstance(wall, int) or isinstance(wall, bool) or wall <= 0:
+        problems.append("timing.json wall_ns is not a positive integer")
+    elif abs(step - wall) > max(CLOCK_TOLERANCE_NS, CLOCK_TOLERANCE_PART * wall):
+        problems.append(f"the monotonic ({step} ns) and wall-clock ({wall} ns) lengths of the test phase disagree")
+    return problems
+
+
+def read_log(path: Path, label: str, prefix: str | None, modules: list) -> Log:
+    """One command's files and the per-log rules. prefix None is the S layout (log.txt, exit-code.txt,
+    command.txt, no probe); otherwise <prefix>.log, <prefix>.exit, <prefix>.command and <prefix>.probe.json."""
+    names = (("log.txt", "exit-code.txt", "command.txt", None) if prefix is None
+             else (f"{prefix}.log", f"{prefix}.exit", f"{prefix}.command", f"{prefix}.probe.json"))
+    log_name, exit_name, command_name, probe_name = names
+    log = Log(label, list(modules))
+    text = read_text(path / log_name)
+    if text is None:
+        log.problems.append(f"{log_name} is missing")
+    elif not text.strip():
+        log.problems.append(f"{log_name} is empty")
+    else:
+        log.parsed = logparse.parse_log(text)
+    log.exit_code, problem = read_exit(path / exit_name)
+    if problem:
+        log.problems.append(problem)
+    log.command = read_text(path / command_name)
+    if log.command is None:
+        log.problems.append(f"{command_name} is missing")
+    elif command_tokens(log.command) != list(SERIAL_COMMAND) + list(modules):
+        log.problems.append(f"{command_name} is not the preregistered command `python3 -m unittest -v`"
+                            f"{' followed by its ' + str(len(modules)) + ' listed modules' if modules else ''}")
+    if probe_name is not None:
+        log.probe = read_json(path / probe_name)
+        if not isinstance(log.probe, dict):
+            log.problems.append(f"{probe_name} is missing or not JSON")
+            log.probe = None
+    parsed = log.parsed
+    if parsed is not None:
+        log.problems.extend(f"{log_name}: {anomaly}" for anomaly in parsed.anomalies)
+        if parsed.mode != "serial":
+            log.problems.append(f"{log_name}: a unittest-parallel header in a unittest log")
+        if parsed.status_word is not None and log.exit_code is not None:
+            # Zero versus non-zero: CPython's unittest exits 1 on failure and 5 when no test ran (CPY main.py,
+            # v3.13.16 :271-277, v3.12.3 :282-288, as the first trial's oracle cites).
+            if (parsed.status_word == "OK") != (log.exit_code == 0):
+                log.problems.append(f"{log_name}: exit status {log.exit_code} disagrees with the status line "
+                                    f"{parsed.status_word}")
+    return log
+
+
+def covered_ids(parsed: logparse.ParsedLog, candidates) -> set:
+    """Ids behind a failed or skipped setUpClass or setUpModule, which CPY suite.py:117-118 never runs."""
+    covered = set()
+    for key, outcome in parsed.fixtures:
+        name, _, parent = key.partition(" (")
+        parent = parent[:-1]
+        if name in ("setUpClass", "setUpModule") and outcome in ("ERROR", "skipped"):
+            covered.update(item for item in candidates if item.startswith(parent + "."))
+    return covered
+
+
+def read_run(path: Path, os_name: str, arm: str, repeat: int, inventory: Inventory, expected_sha: str | None) -> Run:
+    run = Run(path.name, os_name, arm, repeat)
+    run.meta, run.runtime, run.timing, run.checkout_status, run.problems = common_problems(
+        path, os_name, arm, repeat, expected_sha, timed=True)
+    if arm not in arms_of(os_name):
+        run.problems.append(f"arm {arm} is not preregistered for {os_name}")
+        return run
+    if arm == SERIAL_ARM:
+        run.logs = [read_log(path, "S", None, [])]
+    else:
+        wanted = inventory.lists.get(arm)
+        if wanted is None:
+            run.problems.append(f"the inventory holds no lists for {arm}")
+            return run
+        try:
+            mine = {"shards": [make_shards.read_list(path / f"shard-{index}.txt")
+                               for index in range(len(wanted["shards"]))],
+                    "tail": make_shards.read_list(path / "tail.txt")}
+        except (OSError, make_shards.ShardError) as error:
+            mine = None
+            run.problems.append(f"the run's shard lists are missing or invalid ({error})")
+        if mine is not None and mine != wanted:
+            run.problems.append("the run's shard lists are not the inventory artifact's lists for this arm")
+        for index, modules in enumerate(wanted["shards"]):
+            run.logs.append(read_log(path, f"shard-{index}", f"shard-{index}", modules))
+        if wanted["tail"]:
+            run.logs.append(read_log(path, "tail", "tail", wanted["tail"]))
+        elif (path / "tail.log").exists():
+            run.problems.append("tail.log exists although the arm has no tail")
+    for log in run.logs:
+        run.problems.extend(f"{log.label}: {problem}" for problem in log.problems)
+        if log.probe is not None and log.probe.get("python_version") != run.python_version:
+            run.problems.append(f"{log.label}: the step ran python {log.probe.get('python_version')!r}, the job "
+                                f"recorded {run.python_version!r}")
+        if arm != SERIAL_ARM and log.parsed is not None:
+            wanted_ids = {item for module in log.modules for item in inventory.module_ids.get(module, [])}
+            accounted = log.parsed.started_ids() | covered_ids(log.parsed, wanted_ids)
+            if accounted != wanted_ids:
+                run.problems.append(f"{log.label}: its executed ids are not its modules' ids (missing "
+                                    f"{_cap(sorted(wanted_ids - accounted))}, extra "
+                                    f"{_cap(sorted(accounted - wanted_ids))})")
+    started = collections.Counter(ex.test_id for log in run.logs if log.parsed for ex in log.parsed.executions)
+    accounted = set(started)
+    for log in run.logs:
+        if log.parsed is not None:
+            accounted |= covered_ids(log.parsed, inventory.ids)
+    run.repeated_ids = sorted(item for item, count in started.items() if count > 1)
+    run.missing_ids = sorted(inventory.ids - accounted)
+    run.extra_ids = sorted(accounted - inventory.ids)
+    if run.repeated_ids:
+        run.problems.append(f"{len(run.repeated_ids)} ids ran more than once: {_cap(run.repeated_ids)}")
+    if run.missing_ids:
+        run.problems.append(f"{len(run.missing_ids)} inventory ids never ran: {_cap(run.missing_ids)}")
+    if run.extra_ids:
+        run.problems.append(f"{len(run.extra_ids)} ids outside the inventory ran: {_cap(run.extra_ids)}")
+    return run
+
+
+def groups(logs: list) -> dict:
+    """Records of all logs grouped by test id (subtests under their test) or fixture key, as sorted tuples."""
+    grouped = collections.defaultdict(list)
+    for log in logs:
+        if log.parsed is None:
+            continue
+        for kind, key, outcome in log.parsed.records():
+            grouped[key.split(" ", 1)[0] if kind == "subtest" else key].append((kind, key, outcome))
+    return {group: tuple(sorted(items)) for group, items in grouped.items()}
+
+
+# --------------------------------------------------------------------------- controls
+
+
+def check_controls(path: Path, os_name: str, job_result: str | None, expected_sha: str | None = None) -> dict:
+    """The control run against CONTROL_SHARDS (README.md, "Controls"); passed only when every expectation holds."""
+    if not path.is_dir():
+        return {"passed": False, "present": False, "problems": ["no control run directory"], "shards": [],
+                "job_result": job_result}
+    _meta, runtime, _timing, _status, problems = common_problems(path, os_name, "controls", 1, expected_sha, timed=False)
+    foreground = read_json(path / "foreground.probe.json")
+    if not isinstance(foreground, dict):
+        problems.append("foreground.probe.json is missing or not JSON")
+        foreground = {}
+    if job_result != CONTROL_JOB_RESULT:
+        problems.append(f"the control job's result is {job_result!r}, expected {CONTROL_JOB_RESULT!r} (a failing, a "
+                        "crashing and a killed shard must fail the job)")
+    shards = []
+    for index, spec in enumerate(CONTROL_SHARDS):
+        label = f"shard-{index}"
+        listed = read_text(path / f"{label}.txt")
+        log = read_log(path, label, label, [spec["module"]])
+        probe = log.probe or {}
+        signals = probe.get("signals") or {}
+        entry = {"shard": index, "module": spec["module"], "expect": spec["expect"], "exit_code": log.exit_code,
+                 "ran": log.parsed.ran if log.parsed else None,
+                 "status_word": log.parsed.status_word if log.parsed else None,
+                 "signals": {name: (signals.get(name) or {}).get("handler") for name in SIGNALS},
+                 "ignored": {name: (signals.get(name) or {}).get("ignored") for name in SIGNALS},
+                 "env_propagated": (probe.get("env_present") or {}).get(CONTROL_ENV_NAME),
+                 "python_version": probe.get("python_version")}
+        # read_log's own messages: "<label>.command ..." for the command rule, "<label>.probe.json ..." for the probe.
+        command_and_probe = [problem for problem in log.problems
+                             if problem.startswith((f"{label}.command", f"{label}.probe.json"))]
+        others = [problem for problem in log.problems if problem not in command_and_probe]
+        mine = list(command_and_probe)
+        if listed is None or listed.split() != [spec["module"]]:
+            mine.append(f"{label}.txt does not list exactly {spec['module']}")
+        if log.probe is not None:
+            if entry["env_propagated"] is not True:
+                mine.append(f"{label}: {CONTROL_ENV_NAME}, exported through GITHUB_ENV by an earlier step, is not set "
+                            "in this background step")
+            if entry["python_version"] != foreground.get("python_version"):
+                mine.append(f"{label}: python {entry['python_version']!r} in the background step, "
+                            f"{foreground.get('python_version')!r} in the foreground step")
+        parsed = log.parsed
+        if parsed is None:
+            mine.append(f"{label}.log is missing or empty")
+        elif spec["expect"] in ("pass", "fail"):
+            mine.extend(others)
+            got, want = collections.Counter(parsed.records()), collections.Counter(spec["records"])
+            if got != want:
+                mine.append(f"{label}: records differ (missing {_cap(sorted(map(str, (want - got).elements())))}, "
+                            f"unexpected {_cap(sorted(map(str, (got - want).elements())))})")
+            if spec["expect"] == "pass" and (parsed.status_word != "OK" or log.exit_code != 0):
+                mine.append(f"{label}: expected OK and exit 0, got {parsed.status_word} and {log.exit_code}")
+            if spec["expect"] == "fail" and (parsed.status_word != "FAILED" or log.exit_code in (None, 0)):
+                mine.append(f"{label}: expected FAILED and a non-zero exit, got {parsed.status_word} and {log.exit_code}")
+        else:
+            if spec["started"] not in parsed.started_ids():
+                mine.append(f"{label}: {spec['started']} never started")
+            if parsed.status_word is not None:
+                mine.append(f"{label}: a summary ({parsed.status_word}) although the test should have ended the process")
+            if spec["expect"] == "crash" and log.exit_code != spec["exit"]:
+                mine.append(f"{label}: exit status {log.exit_code}, expected {spec['exit']} from os._exit")
+            if spec["expect"] == "killed" and (path / f"{label}.exit").exists():
+                mine.append(f"{label}: an exit status ({log.exit_code}) was written, so the 1-minute step limit did "
+                            "not stop the step")
+        entry["problems"], entry["passed"] = mine, not mine
+        problems.extend(mine)
+        shards.append(entry)
+    return {"passed": not problems, "present": True, "problems": problems[:LIST_CAP], "job_result": job_result,
+            "run_attempt": (runtime or {}).get("run_attempt"),
+            "foreground_signals": {name: ((foreground.get("signals") or {}).get(name) or {}).get("handler")
+                                   for name in SIGNALS},
+            "background_ignores_sigint": any(entry["ignored"].get("SIGINT") is True for entry in shards),
+            "background_ignores_sigquit": any(entry["ignored"].get("SIGQUIT") is True for entry in shards),
+            "shards": shards}
+
+
+# --------------------------------------------------------------------------- verdict
+
+
+def exact_median(values: list) -> Fraction:
+    ordered = sorted(Fraction(value) for value in values)
+    middle = len(ordered) // 2
+    return ordered[middle] if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+
+
+def seconds(value: Fraction | None):
+    return None if value is None else round(float(value), 3)
+
+
+def ratio_text(value: Fraction) -> str:
+    return f"{value.numerator}/{value.denominator}"
+
+
+def job_result(needs, job: str):
+    entry = needs.get(job) if isinstance(needs, dict) else None
+    return entry.get("result") if isinstance(entry, dict) else None
+
+
+def partial_reasons(os_name: str, runs: list, needs, controls: dict, min_repeats: int) -> list:
+    """Why this OS's workflow run is cancelled or partial (then no rule outcome applies), else []."""
+    reasons = []
+    if isinstance(needs, dict):
+        for job, allowed in NEEDS_RESULTS.items():
+            result = job_result(needs, job)
+            if result not in allowed:
+                reasons.append(f"job {job}: result {result!r}")
+    present = {(run.arm, run.repeat) for run in runs}
+    for arm in arms_of(os_name):
+        missing = [str(repeat) for repeat in range(1, min_repeats + 1) if (arm, repeat) not in present]
+        if missing:
+            reasons.append(f"arm {arm}: no run directory for repeat {', '.join(missing)}")
+    cancelled = sorted(run.name for run in runs if run.job_status == "cancelled")
+    if cancelled:
+        reasons.append(f"cancelled jobs: {', '.join(cancelled)}")
+    if not controls.get("present"):
+        reasons.append("no control run directory")
+    return reasons
+
+
+def compare_with_baseline(os_name: str, by_arm: dict, baseline: dict) -> None:
+    """Flaky ids from the eligible S runs; every sharded run's records against the first eligible S run."""
+    serial = [run for run in by_arm[SERIAL_ARM] if not run.problems]
+    versions = sorted({run.python_version for run in serial})
+    baseline.update(s_runs=len(by_arm[SERIAL_ARM]), s_eligible=len(serial), python_versions=versions)
+    if len(versions) > 1:
+        for run in serial:
+            run.problems.append(f"the eligible S runs used different python versions {versions}")
+        serial = []
+    reference, flaky = None, set()
+    if serial:
+        grouped = [groups(run.logs) for run in serial]
+        keys = set().union(*grouped)
+        flaky = {key for key in keys if len({g.get(key, ()) for g in grouped}) > 1}
+        baseline["flaky_ids"], baseline["flaky_total"] = sorted(flaky)[:1000], len(flaky)
+        reference = grouped[0]
+    for arm in arms_of(os_name)[1:]:
+        for run in by_arm[arm]:
+            if reference is None:
+                run.problems.append("no eligible S baseline on this OS")
+                continue
+            if run.python_version not in versions:
+                run.problems.append(f"python {run.python_version!r} differs from S {versions}")
+            mine = groups(run.logs)
+            diffs = [{"id": key, "S": [list(r) for r in reference.get(key, ())], "arm": [list(r) for r in mine.get(key, ())]}
+                     for key in sorted((set(reference) | set(mine)) - flaky) if reference.get(key) != mine.get(key)]
+            run.mismatch_total, run.mismatches = len(diffs), diffs[:LIST_CAP]
+            if diffs:
+                run.problems.append(f"{len(diffs)} ids differ from the S baseline: {_cap([d['id'] for d in diffs])}")
+
+
+def verdict_for_os(os_name: str, runs: list, inventory: Inventory, controls: dict, needs, min_repeats: int) -> dict:
+    report = {"outcome": None, "selected_arm": None, "reasons": [], "arms": {},
+              "baseline": {"flaky_ids": [], "flaky_total": 0}}
+    if job_result(needs, "inventory") == "failure":
+        report.update(outcome="no verdict", reasons=["the inventory gate failed (job inventory: result 'failure'), "
+                                                     "so no arm ran"])
+        return report
+    if inventory.problems:
+        partial = partial_reasons(os_name, runs, needs, controls, min_repeats)
+        report.update(outcome="incomplete" if partial else "no verdict",
+                      reasons=["the inventory artifact is unusable: " + "; ".join(inventory.problems[:10])]
+                      + (["a cancelled or partial run: " + "; ".join(partial)] if partial else []))
+        return report
+    by_arm = {arm: sorted((run for run in runs if run.arm == arm), key=lambda run: run.repeat)
+              for arm in arms_of(os_name)}
+    compare_with_baseline(os_name, by_arm, report["baseline"])
+    s_times = [Fraction(run.step_ns, 10 ** 9) for run in by_arm[SERIAL_ARM] if run.step_ns is not None]
+    medians = {}
+    for arm in arms_of(os_name):
+        mine = by_arm[arm]
+        eligible = [run for run in mine if not run.problems]
+        times = [Fraction(run.step_ns, 10 ** 9) for run in mine if run.step_ns is not None]
+        reasons = []
+        if len(mine) < min_repeats:
+            reasons.append(f"{len(mine)} runs, the preregistration needs {min_repeats}")
+        if len(eligible) != len(mine):
+            reasons.append(f"{len(mine) - len(eligible)} ineligible runs")
+        if arm != SERIAL_ARM and not controls.get("passed"):
+            reasons.append("the controls of this OS did not pass")
+        entry = {"runs": len(mine), "eligible_runs": len(eligible), "eligible": not reasons, "reasons": reasons,
+                 "seconds": [seconds(value) for value in times]}
+        if times and len(times) == len(mine):
+            medians[arm] = exact_median(times)
+            entry.update(median_seconds=seconds(medians[arm]), min_seconds=seconds(min(times)),
+                         max_seconds=seconds(max(times)))
+            if arm != SERIAL_ARM and s_times:
+                median_ratio = medians[arm] / exact_median(s_times)
+                max_ratio = max(times) / min(s_times)
+                entry.update(median_vs_s_median=round(float(median_ratio), 4), max_vs_s_fastest=round(float(max_ratio), 4),
+                             median_vs_s_median_exact=ratio_text(median_ratio),
+                             max_vs_s_fastest_exact=ratio_text(max_ratio),
+                             meets_speed_rule=median_ratio <= MEDIAN_RATIO_MAX and max_ratio <= MAX_RATIO_MAX)
+        report["arms"][arm] = entry
+    partial = partial_reasons(os_name, runs, needs, controls, min_repeats)
+    if partial:
+        report.update(outcome="incomplete", reasons=["a cancelled or partial run, not a rule outcome: " + "; ".join(partial)])
+        return report
+    if not report["arms"][SERIAL_ARM]["eligible"]:
+        report.update(outcome="no verdict",
+                      reasons=["the S baseline is not eligible: " + "; ".join(report["arms"][SERIAL_ARM]["reasons"])])
+        return report
+    order = arms_of(os_name)
+    candidates = [arm for arm in order[1:] if report["arms"][arm]["eligible"] and arm in medians]
+    if not candidates:
+        report.update(outcome="reject", reasons=["no sharded arm is eligible"])
+        return report
+    fastest = min(candidates, key=lambda arm: (medians[arm], order.index(arm)))
+    report["fastest_eligible_arm"] = fastest
+    entry = report["arms"][fastest]
+    if not entry.get("meets_speed_rule"):
+        report.update(outcome="reject", reasons=[
+            f"the fastest eligible arm {fastest} misses the speed rule (median {entry.get('median_vs_s_median_exact')} "
+            f"of the S median, slowest {entry.get('max_vs_s_fastest_exact')} of the fastest S run; the rule allows "
+            f"{ratio_text(MEDIAN_RATIO_MAX)} and {ratio_text(MAX_RATIO_MAX)})"])
+        return report
+    report.update(outcome="adopt", selected_arm=fastest)
+    return report
+
+
+def run_summary(run: Run) -> dict:
+    item = {"name": run.name, "os": run.os, "arm": run.arm, "repeat": run.repeat, "eligible": not run.problems,
+            "reasons": run.problems[:LIST_CAP], "reasons_total": len(run.problems), "step_ns": run.step_ns,
+            "step_seconds": seconds(Fraction(run.step_ns, 10 ** 9)) if run.step_ns else None,
+            "run_attempt": (run.runtime or {}).get("run_attempt"), "job_status": run.job_status,
+            "checkout_clean": None if run.checkout_status is None else run.checkout_status == "",
+            "mismatch_total": run.mismatch_total, "mismatches": run.mismatches, "missing_total": len(run.missing_ids),
+            "missing_ids": run.missing_ids[:LIST_CAP], "extra_total": len(run.extra_ids),
+            "extra_ids": run.extra_ids[:LIST_CAP], "repeated_total": len(run.repeated_ids), "logs": []}
+    for field in ("python_version", "platform", "runner_image", "checkout_sha"):
+        item[field] = (run.meta or {}).get(field)
+    item["clock"] = (run.timing or {}).get("clock")
+    for log in run.logs:
+        parsed = log.parsed
+        signals = (log.probe or {}).get("signals") or {}
+        item["logs"].append({"label": log.label, "modules": len(log.modules), "exit_code": log.exit_code,
+                             "ran": parsed.ran if parsed else None, "status_word": parsed.status_word if parsed else None,
+                             "status_counts": parsed.status_counts if parsed else None,
+                             "notes_total": len(parsed.notes) if parsed else None,
+                             "python_version": (log.probe or {}).get("python_version"),
+                             "sigint_ignored": (signals.get("SIGINT") or {}).get("ignored"),
+                             "sigquit_ignored": (signals.get("SIGQUIT") or {}).get("ignored"),
+                             "env_present": (log.probe or {}).get("env_present")})
+    return item
+
+
+def load_runs(results: Path, inventory: Inventory, expected_sha: str | None) -> tuple:
+    runs, control_dirs, ignored = [], {}, []
+    for entry in sorted(results.iterdir()) if results.is_dir() else []:
+        match = RUN_DIR_RE.match(entry.name) if entry.is_dir() else None
+        if not match:
+            ignored.append(entry.name)
+        elif match.group("controls"):
+            control_dirs[match.group("os")] = entry
+        else:
+            runs.append(read_run(entry, match.group("os"), match.group("arm"), int(match.group("rep")), inventory,
+                                 expected_sha))
+    return runs, control_dirs, ignored
+
+
+def checkout_report(results: Path) -> dict:
+    """The clean-checkout rule on its own: every run directory's git-status.txt exists and is empty."""
+    items = []
+    for entry in sorted(results.iterdir()) if results.is_dir() else []:
+        if not entry.is_dir():
+            continue
+        status = read_text(entry / "git-status.txt")
+        clean = status == ""
+        items.append({"name": entry.name, "clean": clean, "status": None if status is None else status[:4000],
+                      "reason": None if clean else ("git-status.txt is missing" if status is None else
+                                                    "the checkout was not clean after the run")})
+    dirty = [item["name"] for item in items if not item["clean"]]
+    return {"schema": "suite-shards-checkout-status/1", "rule": "every run directory's git-status.txt exists and is empty",
+            "runs": items, "dirty": dirty, "ok": bool(items) and not dirty}
+
+
+def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, os_name: str | None, needs,
+                 min_repeats: int = REPEATS, weights: Path | None = HERE / "weights.json") -> dict:
+    probe = load_inventory(inventory_dir, None, None)
+    runs_seen = sorted({RUN_DIR_RE.match(entry.name).group("os") for entry in
+                        (results.iterdir() if results.is_dir() else []) if entry.is_dir() and RUN_DIR_RE.match(entry.name)})
+    measured = [os_name] if os_name else runs_seen
+    controls, verdicts, all_runs, ignored = {}, {}, [], []
+    for os_key in OSES:
+        if os_key not in measured:
+            verdicts[os_key] = {"outcome": "no verdict", "selected_arm": None, "arms": {},
+                                "baseline": {"flaky_ids": [], "flaky_total": 0},
+                                "reasons": [f"no run directory: this result covers {', '.join(measured) or 'no OS'}; "
+                                            f"{os_key} is measured by its own trial workflow"]}
+            continue
+        inventory = load_inventory(inventory_dir, os_key, weights)
+        runs, control_dirs, ignored = load_runs(results, inventory, expected_sha)
+        mine = [run for run in runs if run.os == os_key]
+        all_runs.extend(mine)
+        controls[os_key] = (check_controls(control_dirs[os_key], os_key, job_result(needs, "controls"), expected_sha)
+                            if os_key in control_dirs else
+                            {"passed": False, "present": False, "problems": ["no control run directory"], "shards": []})
+        if isinstance(needs, dict) and job_result(needs, "controls-check") != "success":
+            controls[os_key]["passed"] = False
+            controls[os_key]["problems"] = controls[os_key].get("problems", []) + [
+                f"the controls-check job's result is {job_result(needs, 'controls-check')!r}, not 'success'"]
+        verdicts[os_key] = verdict_for_os(os_key, mine, inventory, controls[os_key], needs, min_repeats)
+        probe = inventory
+    return {
+        "schema": SCHEMA,
+        "decision_rule": {
+            "serial_baseline": "S needs three runs, each with a complete summary, an exit status that agrees with its "
+                               "status line, executed ids equal to the inventory with each id once, the exact command "
+                               "python3 -m unittest -v, a clean checkout, run_attempt 1, the pull request head and a "
+                               "valid step time; the eligible S runs share one python version",
+            "sharded_arm": "every run eligible: every shard log (and the tail) complete, its exit status consistent with "
+                           "its status line, the exact command python3 -m unittest -v <its list>, its list equal to the "
+                           "inventory's, its executed ids equal to its modules' ids, the union over all logs equal to "
+                           "the inventory with each id once, its (kind, key, outcome) records equal to the first "
+                           "eligible S run outside the flaky ids, the same python version as S in every step, a clean "
+                           "checkout, run_attempt 1, the pull request head and a valid step time; at least three runs; "
+                           "the controls of the OS passed",
+            "speed": "take the eligible sharded arm with the smallest median step time (a tie goes to the arm without "
+                     "a tail); adopt it only if its median <= 3/5 of the S median and its slowest run <= 3/4 of the "
+                     "fastest S run, compared as exact fractions; otherwise reject, with no fall-through; no eligible "
+                     "sharded arm rejects; an ineligible S gives no verdict",
+            "incomplete": "a cancelled or skipped job, a missing run directory or a cancelled job status makes the OS "
+                          "incomplete, which is recorded as such and is not a rule outcome",
+        },
+        "inputs": {"expected_sha": expected_sha, "os": os_name, "min_repeats": min_repeats,
+                   "inventory": {"ids": probe.count, "test_files": len(probe.module_ids), "sha256": probe.sha256,
+                                 "problems": probe.problems[:LIST_CAP],
+                                 "python_version": (probe.report or {}).get("python_version"),
+                                 "lists_recomputed": weights is not None},
+                   "needs": needs, "ignored_entries": ignored},
+        "controls": controls,
+        "runs": [run_summary(run) for run in all_runs],
+        "verdicts": verdicts,
+    }
+
+
+def summary_markdown(result: dict) -> str:
+    def number(value, digits=1):
+        return "-" if value is None else (f"{value:.{digits}f}" if isinstance(value, float) else str(value))
+
+    lines = ["### Suite-shards oracle (compare.py)", "",
+             "| OS | Arm | Runs | Eligible runs | Median s | Min s | Max s | Median / S median | Max / S fastest "
+             "| Arm eligible |",
+             "|---|---|---|---|---|---|---|---|---|---|"]
+    for os_name, verdict in result["verdicts"].items():
+        for arm, entry in verdict["arms"].items():
+            lines.append(f"| {os_name} | {arm} | {entry['runs']} | {entry['eligible_runs']} | "
+                         f"{number(entry.get('median_seconds'))} | {number(entry.get('min_seconds'))} | "
+                         f"{number(entry.get('max_seconds'))} | {number(entry.get('median_vs_s_median'), 3)} | "
+                         f"{number(entry.get('max_vs_s_fastest'), 3)} | {'yes' if entry['eligible'] else 'no'} |")
+    lines.append("")
+    for os_name, verdict in result["verdicts"].items():
+        reasons = "; ".join(verdict["reasons"])
+        lines.append(f"- **{os_name}**: {verdict['outcome']}"
+                     f"{' ' + verdict['selected_arm'] if verdict['selected_arm'] else ''}"
+                     f"{' (' + reasons + ')' if reasons else ''}; flaky ids in S: {verdict['baseline']['flaky_total']}")
+    for os_name, control in result["controls"].items():
+        exits = ", ".join(f"{item['module']} {'killed (no exit status)' if item['exit_code'] is None else item['exit_code']}"
+                          for item in control.get("shards", []))
+        lines.append(f"- controls {os_name}: {'passed' if control.get('passed') else 'FAILED'} (job result "
+                     f"{control.get('job_result')}; {exits or 'no shard'}); background steps ignore SIGINT: "
+                     f"{control.get('background_ignores_sigint')}, SIGQUIT: {control.get('background_ignores_sigquit')}")
+    bad = [run["name"] for run in result["runs"] if not run["eligible"]]
+    lines.append(f"- ineligible arm-runs: {', '.join(bad) if bad else 'none'}")
+    inventory = result["inputs"]["inventory"]
+    lines.append(f"- inventory: {inventory['ids']} ids in {inventory['test_files']} test files; "
+                 f"problems: {len(inventory['problems'])}")
+    return "\n".join(lines) + "\n"
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
+    commands = parser.add_subparsers(dest="command", required=True)
+    verdict = commands.add_parser("verdict")
+    verdict.add_argument("--results", required=True, type=Path)
+    verdict.add_argument("--inventory", required=True, type=Path)
+    verdict.add_argument("--expected-sha", required=True)
+    verdict.add_argument("--os", choices=OSES, help="the OS this workflow measures (default: every OS with runs)")
+    verdict.add_argument("--needs", type=Path, help="the compare job's needs context as JSON")
+    verdict.add_argument("--out", required=True, type=Path)
+    verdict.add_argument("--summary-md", type=Path)
+    verdict.add_argument("--checkout-status", type=Path)
+    verdict.add_argument("--min-repeats", type=int, default=REPEATS)
+    verdict.add_argument("--skip-list-recompute", action="store_true",
+                         help="do not re-derive the inventory's lists with make_shards.py (for local checks of "
+                              "lists made elsewhere; result.json records it)")
+    controls = commands.add_parser("controls")
+    controls.add_argument("--dir", required=True, type=Path)
+    controls.add_argument("--os", required=True, choices=OSES)
+    controls.add_argument("--job-result", required=True)
+    controls.add_argument("--expected-sha")
+    controls.add_argument("--out", type=Path)
+    args = parser.parse_args(argv)
+    if args.command == "controls":
+        report = check_controls(args.dir, args.os, args.job_result, args.expected_sha)
+        if args.out:
+            args.out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        print(f"controls {args.os}: {'passed' if report['passed'] else 'FAILED'}")
+        for problem in report["problems"]:
+            print(f"  {problem}")
+        return 0 if report["passed"] else 1
+    needs = None
+    if args.needs is not None:
+        needs = read_json(args.needs)
+        if not isinstance(needs, dict):
+            print("compare.py: --needs is not a JSON object", file=sys.stderr)
+            return 2
+    result = build_result(args.results, args.inventory, args.expected_sha, args.os, needs, args.min_repeats,
+                          None if args.skip_list_recompute else HERE / "weights.json")
+    args.out.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    if args.summary_md:
+        args.summary_md.write_text(summary_markdown(result), encoding="utf-8")
+    if args.checkout_status:
+        args.checkout_status.write_text(json.dumps(checkout_report(args.results), indent=2, sort_keys=True) + "\n",
+                                        encoding="utf-8")
+    for os_name, entry in result["verdicts"].items():
+        print(f"{os_name}: {entry['outcome']} {entry['selected_arm'] or ''}".rstrip())
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

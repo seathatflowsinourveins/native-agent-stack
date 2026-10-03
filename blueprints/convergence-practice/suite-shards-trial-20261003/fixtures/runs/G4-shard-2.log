@@ -1,0 +1,8 @@
+test_one (tests.test_epsilon.EpsilonTests.test_one) ... ok
+test_two (tests.test_epsilon.EpsilonTests.test_two) ... ok
+test_timing (tests.test_secret_path_guard.TailTests.test_timing) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.050s
+
+OK

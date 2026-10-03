@@ -1,0 +1,55 @@
+{
+  "arms": {
+    "G4": {
+      "default_weight_modules": [],
+      "modules_per_shard": [
+        1,
+        1,
+        2,
+        2
+      ],
+      "predicted_seconds": [
+        4.0,
+        3.0,
+        3.5,
+        3.5
+      ],
+      "tail": [],
+      "tail_predicted_seconds": 0.0
+    },
+    "G4T": {
+      "default_weight_modules": [],
+      "modules_per_shard": [
+        1,
+        1,
+        1,
+        2
+      ],
+      "predicted_seconds": [
+        4.0,
+        3.0,
+        2.0,
+        2.5
+      ],
+      "tail": [
+        "tests.test_secret_path_guard"
+      ],
+      "tail_predicted_seconds": 2.5
+    }
+  },
+  "default_weight_ms": 2333,
+  "discovery_ids": 15,
+  "ids_loaded_by_name": 15,
+  "ok": true,
+  "os": "ubuntu-24.04",
+  "parity": true,
+  "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "problems": [],
+  "python_implementation": "CPython",
+  "python_version": "3.13.16",
+  "schema": "suite-shards-inventory/1",
+  "stale_weights": [],
+  "test_files": 6,
+  "test_files_without_tests": [],
+  "unique_discovery_ids": 15
+}

@@ -1,0 +1,21 @@
+test_passes (tests.test_delta.DeltaTests.test_passes) ... ok
+test_from_wrapper (delta_extra_tests.ExtraTests.test_from_wrapper) ... ok
+setUpClass (tests.test_gamma.GammaFixtureError) ... ERROR
+test_prints_output (tests.test_gamma.GammaTests.test_prints_output) ... ok
+test_unexpected_success (tests.test_gamma.GammaTests.test_unexpected_success) ... unexpected success
+
+======================================================================
+ERROR: setUpClass (tests.test_gamma.GammaFixtureError)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<work>/suite/tests/test_gamma.py", line 8, in setUpClass
+    raise RuntimeError("planted setUpClass error")
+RuntimeError: planted setUpClass error
+
+======================================================================
+UNEXPECTED SUCCESS: test_unexpected_success (tests.test_gamma.GammaTests.test_unexpected_success)
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (errors=1, unexpected successes=1)
+output between records

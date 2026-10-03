@@ -1,0 +1,24 @@
+{
+  "env_present": {
+    "CHILD_USAGE_SHELL_PARSER": false,
+    "LANDSCAPE_SWEEP_SKILLS_YAML": false,
+    "PROMOTION_GATE_PYTHON": false,
+    "REQUIRE_PROMOTION_GATE_VENV": false,
+    "SUITE_SHARDS_ENV_PROBE": false
+  },
+  "python_executable": "<python>/bin/python3",
+  "python_full_version": "3.13.16 (main, Oct  1 2026, 20:59:14) [Clang 22.1.3 ]",
+  "python_version": "3.13.16",
+  "signals": {
+    "SIGINT": {
+      "default": true,
+      "handler": "<built-in function default_int_handler>",
+      "ignored": false
+    },
+    "SIGQUIT": {
+      "default": true,
+      "handler": "<Handlers.SIG_DFL: 0>",
+      "ignored": false
+    }
+  }
+}

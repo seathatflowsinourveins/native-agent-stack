@@ -1,0 +1,9 @@
+test_passes (tests.test_delta.DeltaTests.test_passes) ... ok
+test_from_wrapper (delta_extra_tests.ExtraTests.test_from_wrapper) ... ok
+test_one (tests.test_epsilon.EpsilonTests.test_one) ... ok
+test_two (tests.test_epsilon.EpsilonTests.test_two) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK

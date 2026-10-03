@@ -1,0 +1,13 @@
+{
+  "schema": "suite-shards-weights/1",
+  "unit": "seconds",
+  "source": "fixture weights of make_fixtures.py",
+  "weights": {
+    "tests.test_alpha": 4.0,
+    "tests.test_beta": 3.0,
+    "tests.test_gamma": 2.0,
+    "tests.test_delta": 1.5,
+    "tests.test_epsilon": 1.0,
+    "tests.test_secret_path_guard": 2.5
+  }
+}

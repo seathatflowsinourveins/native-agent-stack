@@ -1,0 +1,271 @@
+{
+  "controls": [
+    {
+      "command": "python3 -m unittest -v test_ctl_pass",
+      "exit_code": 0,
+      "file": "controls/shard-0.log",
+      "module": "test_ctl_pass"
+    },
+    {
+      "command": "python3 -m unittest -v test_ctl_fail",
+      "exit_code": 1,
+      "file": "controls/shard-1.log",
+      "module": "test_ctl_fail"
+    },
+    {
+      "command": "python3 -m unittest -v test_ctl_crash",
+      "exit_code": 3,
+      "file": "controls/shard-2.log",
+      "module": "test_ctl_crash"
+    },
+    {
+      "command": "python3 -m unittest -v test_ctl_hang",
+      "exit_code": null,
+      "file": "controls/shard-3.log",
+      "module": "test_ctl_hang"
+    }
+  ],
+  "evidence_class": "synthetic fixture: real local runs of a fixture suite and of the controls, not a GitHub-hosted runner",
+  "files": [
+    {
+      "file": "controls/foreground.probe.json",
+      "sha256": "c34dd18ab6161322cd89f5df39b97df98a90da636cb107f186ce02705b273086"
+    },
+    {
+      "file": "controls/shard-0.log",
+      "sha256": "f25993da6e4d499d57cb90f2ae466ee330e21b11af1f9a4ca31ebd01f4a91367"
+    },
+    {
+      "file": "controls/shard-0.probe.json",
+      "sha256": "3ef6257a33b904317330cfe42ea75428f3918bc28afd68988a41b21bf5af5538"
+    },
+    {
+      "file": "controls/shard-1.log",
+      "sha256": "d96586d0e0f4d56942e48bd83c6bfffe48f397da972d4d2f7d53868517220d7b"
+    },
+    {
+      "file": "controls/shard-1.probe.json",
+      "sha256": "3ef6257a33b904317330cfe42ea75428f3918bc28afd68988a41b21bf5af5538"
+    },
+    {
+      "file": "controls/shard-2.log",
+      "sha256": "8b82ab471624517a831d7bbe332c73dedf15981431507ced7cb48be8c7f9e88e"
+    },
+    {
+      "file": "controls/shard-2.probe.json",
+      "sha256": "3ef6257a33b904317330cfe42ea75428f3918bc28afd68988a41b21bf5af5538"
+    },
+    {
+      "file": "controls/shard-3.log",
+      "sha256": "4ee70ce57f64709fb153093840e3cbbf00e70b1d6a3281d923b8f1be53f05a22"
+    },
+    {
+      "file": "controls/shard-3.probe.json",
+      "sha256": "3ef6257a33b904317330cfe42ea75428f3918bc28afd68988a41b21bf5af5538"
+    },
+    {
+      "file": "inventory/inventory.txt",
+      "sha256": "d496298d250c50e76918deec71507238626cbf2f90f952f4adc98de8da295518"
+    },
+    {
+      "file": "inventory/module_ids.json",
+      "sha256": "ff2dc7366c771e5fd33e711c31f0e0bc18e1f024e68c8e74473b3b5c504db8c2"
+    },
+    {
+      "file": "inventory/report.json",
+      "sha256": "3e2dce5643d445a21a7f73b5d13a916fde325f0f42c8545f8bda0892d9347970"
+    },
+    {
+      "file": "inventory/shards/G4/shard-0.txt",
+      "sha256": "4cced5a9ce3a7750c906f0b5fa1a9892247e1eac10b3909f93af86d20a4c8aa5"
+    },
+    {
+      "file": "inventory/shards/G4/shard-1.txt",
+      "sha256": "68ced2c7bdd4cabfcddf4e2a2099823752ce2e69c0ca071af4d409093ed4573f"
+    },
+    {
+      "file": "inventory/shards/G4/shard-2.txt",
+      "sha256": "1eac0b78f96457746a11b344b3522d24dfaaafec762831b99d923ae18617a422"
+    },
+    {
+      "file": "inventory/shards/G4/shard-3.txt",
+      "sha256": "e912f83496f467101d683ddda0f899f526a08320a0d84f73b036548e35ea445e"
+    },
+    {
+      "file": "inventory/shards/G4/tail.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "inventory/shards/G4T/shard-0.txt",
+      "sha256": "4cced5a9ce3a7750c906f0b5fa1a9892247e1eac10b3909f93af86d20a4c8aa5"
+    },
+    {
+      "file": "inventory/shards/G4T/shard-1.txt",
+      "sha256": "68ced2c7bdd4cabfcddf4e2a2099823752ce2e69c0ca071af4d409093ed4573f"
+    },
+    {
+      "file": "inventory/shards/G4T/shard-2.txt",
+      "sha256": "0ce51d2fef28efe10729fe351a0cd137542cac82e521245beace76acea372aa3"
+    },
+    {
+      "file": "inventory/shards/G4T/shard-3.txt",
+      "sha256": "a37f7eb0e0a41ffe505ce75798df1cbed5284d900fc2864cfc3a47a3940756e3"
+    },
+    {
+      "file": "inventory/shards/G4T/tail.txt",
+      "sha256": "f50dc18df037de5f79745a45c34b834b8a110451c94bccdf2601df001de9bf55"
+    },
+    {
+      "file": "runs/G4-shard-0.log",
+      "sha256": "dd4b961964da67afba2418e1b5aa14e17f067c29b108e11205567acc3777a7e0"
+    },
+    {
+      "file": "runs/G4-shard-1.log",
+      "sha256": "6d2482a84c3414fc9f3d19a1f104a7d75ca2955dd17e45a91876676c3a95735c"
+    },
+    {
+      "file": "runs/G4-shard-2.log",
+      "sha256": "f1f0607c3752ec910149836f6e48dcebb03e6bdc9198ec24602c679265571411"
+    },
+    {
+      "file": "runs/G4-shard-3.log",
+      "sha256": "e3d8b84fd96c6a57f3c3d22a9580c13cef281d60199e5241d346454ba6ec1b16"
+    },
+    {
+      "file": "runs/G4T-shard-0.log",
+      "sha256": "dd4b961964da67afba2418e1b5aa14e17f067c29b108e11205567acc3777a7e0"
+    },
+    {
+      "file": "runs/G4T-shard-1.log",
+      "sha256": "6d2482a84c3414fc9f3d19a1f104a7d75ca2955dd17e45a91876676c3a95735c"
+    },
+    {
+      "file": "runs/G4T-shard-2.log",
+      "sha256": "25df704d1413375ad466c6256b5c2cd6df38da15a5345d20129f34823364173c"
+    },
+    {
+      "file": "runs/G4T-shard-3.log",
+      "sha256": "014993312d4a1d67b92eeb6945497378a1895378f87bcca666e0b8c0945b579a"
+    },
+    {
+      "file": "runs/G4T-tail.log",
+      "sha256": "815c4973a776fe33beeb5502f281e545a834863fb6f16851e24e6a13dbfdbc00"
+    },
+    {
+      "file": "runs/S-r1.log",
+      "sha256": "3a341d389108ceec013610fe34b607e80f1b27c9888f23372d1bed84bb8f4a7f"
+    },
+    {
+      "file": "runs/S-r2.log",
+      "sha256": "3a341d389108ceec013610fe34b607e80f1b27c9888f23372d1bed84bb8f4a7f"
+    },
+    {
+      "file": "runs/S-r3.log",
+      "sha256": "3a341d389108ceec013610fe34b607e80f1b27c9888f23372d1bed84bb8f4a7f"
+    },
+    {
+      "file": "weights-fixture.json",
+      "sha256": "ddf20bb273b19101e814c853d0c8f5dc9e8dcff4f5a5f52610740e057f2edd5d"
+    }
+  ],
+  "fixture_os": "ubuntu-24.04",
+  "generator": "make_fixtures.py --work <scratch>",
+  "hang_limit_seconds": 3,
+  "host": {
+    "machine": "x86_64",
+    "python_version": "3.13.16",
+    "system": "Linux"
+  },
+  "runs": [
+    {
+      "arm": "S",
+      "command": "python3 -m unittest -v",
+      "exit_code": 1,
+      "file": "runs/S-r1.log",
+      "repeat": 1
+    },
+    {
+      "arm": "S",
+      "command": "python3 -m unittest -v",
+      "exit_code": 1,
+      "file": "runs/S-r2.log",
+      "repeat": 2
+    },
+    {
+      "arm": "S",
+      "command": "python3 -m unittest -v",
+      "exit_code": 1,
+      "file": "runs/S-r3.log",
+      "repeat": 3
+    },
+    {
+      "arm": "G4",
+      "command": "python3 -m unittest -v tests.test_alpha",
+      "exit_code": 0,
+      "file": "runs/G4-shard-0.log",
+      "list": "shard-0"
+    },
+    {
+      "arm": "G4",
+      "command": "python3 -m unittest -v tests.test_beta",
+      "exit_code": 1,
+      "file": "runs/G4-shard-1.log",
+      "list": "shard-1"
+    },
+    {
+      "arm": "G4",
+      "command": "python3 -m unittest -v tests.test_epsilon tests.test_secret_path_guard",
+      "exit_code": 0,
+      "file": "runs/G4-shard-2.log",
+      "list": "shard-2"
+    },
+    {
+      "arm": "G4",
+      "command": "python3 -m unittest -v tests.test_delta tests.test_gamma",
+      "exit_code": 1,
+      "file": "runs/G4-shard-3.log",
+      "list": "shard-3"
+    },
+    {
+      "arm": "G4T",
+      "command": "python3 -m unittest -v tests.test_alpha",
+      "exit_code": 0,
+      "file": "runs/G4T-shard-0.log",
+      "list": "shard-0"
+    },
+    {
+      "arm": "G4T",
+      "command": "python3 -m unittest -v tests.test_beta",
+      "exit_code": 1,
+      "file": "runs/G4T-shard-1.log",
+      "list": "shard-1"
+    },
+    {
+      "arm": "G4T",
+      "command": "python3 -m unittest -v tests.test_gamma",
+      "exit_code": 1,
+      "file": "runs/G4T-shard-2.log",
+      "list": "shard-2"
+    },
+    {
+      "arm": "G4T",
+      "command": "python3 -m unittest -v tests.test_delta tests.test_epsilon",
+      "exit_code": 0,
+      "file": "runs/G4T-shard-3.log",
+      "list": "shard-3"
+    },
+    {
+      "arm": "G4T",
+      "command": "python3 -m unittest -v tests.test_secret_path_guard",
+      "exit_code": 0,
+      "file": "runs/G4T-tail.log",
+      "list": "tail"
+    }
+  ],
+  "sanitized_prefixes": {
+    "<home>": "a home directory",
+    "<python>": "the interpreter's prefix",
+    "<work>": "the scratch directory"
+  },
+  "schema": "suite-shards-fixtures/1"
+}

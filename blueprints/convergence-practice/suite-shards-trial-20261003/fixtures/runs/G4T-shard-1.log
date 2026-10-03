@@ -1,0 +1,41 @@
+test_errors (tests.test_beta.BetaTests.test_errors) ... ERROR
+test_fails (tests.test_beta.BetaTests.test_fails) ... FAIL
+test_subtest_fails (tests.test_beta.BetaTests.test_subtest_fails)
+A failing subtest with a docstring. ... 
+  test_subtest_fails (tests.test_beta.BetaTests.test_subtest_fails) (value=2)
+A failing subtest with a docstring. ... FAIL
+
+======================================================================
+ERROR: test_errors (tests.test_beta.BetaTests.test_errors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<work>/suite/tests/test_beta.py", line 10, in test_errors
+    raise RuntimeError("planted error")
+RuntimeError: planted error
+
+======================================================================
+FAIL: test_fails (tests.test_beta.BetaTests.test_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<work>/suite/tests/test_beta.py", line 7, in test_fails
+    self.assertEqual("left", "right")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 'left' != 'right'
+- left
++ right
+
+
+======================================================================
+FAIL: test_subtest_fails (tests.test_beta.BetaTests.test_subtest_fails) (value=2)
+A failing subtest with a docstring.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<work>/suite/tests/test_beta.py", line 16, in test_subtest_fails
+    self.assertEqual(value, 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: 2 != 1
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=2, errors=1)

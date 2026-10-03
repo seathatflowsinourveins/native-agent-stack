@@ -1,0 +1,7 @@
+test_one (test_ctl_pass.Pass.test_one) ... ok
+test_two (test_ctl_pass.Pass.test_two) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
