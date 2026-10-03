@@ -13373,6 +13373,11 @@
       "bytes": 7703
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-over-limit-review-fixes-20261003.json",
+      "sha256": "e881a728a693575b185f7ebbb00b5bd2248703431fe687b149b0f7f394f608e9",
+      "bytes": 10029
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-stress-20261002.json",
       "sha256": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039",
       "bytes": 6098
