@@ -39,8 +39,8 @@ wiped at boot. They were then kept outside the checkout, and this receipt copied
 | Saved output | `replay_r2.json` | `7bc87e20402e96fd3624b63bc9dfc3b1cd08668cef0222c23471a6c7f23cf21c` | 711 | The record's replay of B0, B′, (a-mac), (a-all) and (b2). |
 | Saved output | `replay_final.json` | `db740c8e9736f42d88ea06892a0d7c69b346df10830e717b60dd61ea5920675c` | 1249 | The previous round's outcome for each of the 25 classified failures under B0. |
 | Saved output | `sim_r2.json` | `84eaa304af37193799659f847cc2f24cd0aa70572f01e116ae5efd2555deceb9` | 783 | The 5-slot first-in-first-out simulation's outputs (an inference; its code was not retained). |
-| Receipt check | `replay.py` | `ecd0e81da9770ae0b1b76f7a4f3d82a3b97a00e9e83b160a42238cc6e90118ad` | 12974 | Re-runs the replay; see below. |
-| Receipt check | `replay-output.txt` | `5db05889dc24bbbf0cc307fac0364e569906a199badf91eb2265900ce49af436` | 3802 | Its output, run on 2026-10-03 by the implementing pull request at `nice -n 19`. |
+| Receipt check | `replay.py` | `3ffb9ab2c8a329971f72c5fa31b0938c824939e94835eac731667551360656d4` | 13574 | Re-runs the replay; see below. |
+| Receipt check | `replay-output.txt` | `6f93c05ad9251552c31914ec8c51212fea8d716e5faba14865f6a9ac044a619f` | 4924 | Its output, run on 2026-10-03 by the implementing pull request at `nice -n 19`, and re-run in its repair round. |
 | Receipt check | `replay-exit.txt` | `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa` | 2 | Its exit code, `0`. |
 
 `manifests/evidence.json` registers every file here, this README included.
@@ -97,15 +97,20 @@ comparison matched. The method is in the script's docstring; in short, a pattern
 a head SHA without a file list counts as a full run, and no module is dropped as deleted, because the file lists carry
 no deletion status.
 
-**Result on 2026-10-03** (`replay-output.txt`, exit 0): every checked figure matched. That covers the 89 patterns
-(equal to the record's list, matching 151 files at the base, none dead); the 1,069 pull-request jobs and their 348.8
-slot-hours; the full, skipped and changed-tests counts and slot-hours of B0, B′, (a-mac), (a-all) and (b2), including
-(b2)'s 0.67 and 1.23 min changed-tests estimate; the 18 D1 rows and their escapes per candidate; the pull-request rows
-of the 30-run table; both families' label counts over the 25; the main-commit exposure; and the 1,211 pull-request
-runs with a `changes` result. Two figures do not reproduce, and the record's §10 says so:
+**Result on 2026-10-03** (the implementing pull request's run, exit 0): every checked figure matched. That covers the
+89 patterns (equal to the record's list, matching 151 files at the base, none dead); the 1,069 pull-request jobs and
+their 348.8 slot-hours; the full, skipped and changed-tests counts and slot-hours of B0, B′, (a-mac), (a-all) and
+(b2), including (b2)'s 0.67 and 1.23 min changed-tests estimate; the 18 D1 rows and their escapes per candidate; the
+pull-request rows of the 30-run table; both families' label counts over the 25; the main-commit exposure; and the
+1,211 pull-request runs with a `changes` result.
 
-- `sim_r2.json` gives (b2) with B+ as 339.9 slot-hours and a pull-request wait p90 of 1.7 min, while the record states
-  319.6 and 1.4. The simulation code was not retained, so neither can be re-run.
+**Repair-round re-run, 2026-10-03** (the current `replay-output.txt`, exit 0, at `nice -n 19`): the same checks, plus
+one per simulated figure the record states for D, B0, B′, (a-all) and (b2), with and without B+, compared with
+`sim_r2.json`. All match. These compare the record with the saved output; they re-run no simulation, because its code
+was not retained. Before the repair round the record gave (b2) with B+ as 319.6 slot-hours and a pull-request wait p90
+of 1.4 min, which no saved output supports; it now gives the saved 339.9 and 1.7. (a-mac) and (b1) have no saved
+simulation output. One figure does not reproduce, and the record's §10 says so:
+
 - The record's "52 of 1,211" counts skipped `bootstrap-macos` check runs across all events, one of them a
   `workflow_dispatch` run. Among the pull-request runs it is 51.
 
@@ -113,4 +118,6 @@ runs with a `changes` result. Two figures do not reproduce, and the record's §1
 
 On 2026-10-03, before commit: `python3 scripts/validate.py --scan-file` over every file here and every file the
 implementing pull request changed found none of the repository's private-content patterns, and gitleaks 8.30.1
-(`gitleaks dir` with the repository's `.gitleaks.toml`, `--redact`) found no leaks in the same files.
+(`gitleaks dir` with the repository's `.gitleaks.toml`, `--redact`) found no leaks in the same files. The repair round
+ran both scans again, before commit, over the six files it changed: this README, `replay.py`, `replay-output.txt`, the
+record, the workflow and `tests/test_workflow_hardening.py`. Neither found anything.

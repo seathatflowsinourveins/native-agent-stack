@@ -68,7 +68,8 @@ jobs:
   # It fails safe: every failure path below (a missing payload SHA, mktemp, a failed `git diff`) calls
   # fail_safe, which writes bootstrap=true and macos=true. `macos` is always the last output written, so a
   # step that stops part way leaves it empty, and the needs-gated jobs below read an empty output as full
-  # (`!= 'false'`, never `== 'true'`).
+  # (`!= 'false'`, never `== 'true'`). validate-macos also reads `needs.changes.result`: a `changes` job that
+  # did not succeed runs it in full whatever outputs it wrote. The bootstrap-* jobs read the outputs only.
   changes:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
@@ -805,16 +806,18 @@ jobs:
   validate-macos:
     needs: changes
     # !cancelled() replaces the implicit success() of `needs` (changes is skipped off pull_request, and a
-    # failed changes job must still run this job). `!= 'false'`, never `== 'true'`: an empty output
-    # (changes failed, cancelled or skipped) runs the full job.
-    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.macos != 'false' || needs.changes.outputs.macos_tests != '') }}
+    # failed changes job must still run this job). A `changes` result other than success runs the full job
+    # whatever outputs it wrote: outputs and result are separate properties of `needs.<job_id>`, and a job can
+    # write its outputs before it fails. `!= 'false'`, never `== 'true'`: an empty output runs the full job.
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.result != 'success' || needs.changes.outputs.macos != 'false' || needs.changes.outputs.macos_tests != '') }}
     runs-on: macos-15
     # Raised from 30 to 60 on 2026-09-29: after #502 this job took 1148s in run 36572588263 (limit 1800s) and
     # the #381 token-E2E tooling still to merge adds an estimated 900 to 1300s of tests on this slower runner.
     timeout-minutes: 60
     env:
-      # 'full' is the fallback branch: only a pull_request whose changes job wrote macos=false runs changed-tests.
-      VALIDATE_MACOS_MODE: ${{ (github.event_name == 'pull_request' && needs.changes.outputs.macos == 'false') && 'changed-tests' || 'full' }}
+      # 'full' is the fallback branch: only a pull_request whose changes job succeeded and wrote macos=false runs
+      # changed-tests.
+      VALIDATE_MACOS_MODE: ${{ (github.event_name == 'pull_request' && needs.changes.result == 'success' && needs.changes.outputs.macos == 'false') && 'changed-tests' || 'full' }}
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -989,6 +992,17 @@ jobs:
               exit 1
             fi
           done
+          # Per-module zero-test guard. unittest merges the named modules into one suite and prints one aggregate
+          # "Ran N tests" line, so a module with no test beside a module with tests would pass the aggregate
+          # guard below. Each module must load at least one test case, decided by the exit code, not by parsing
+          # output. A module that fails to import loads a failing test case, so the run below reports it.
+          count_tests='import sys, unittest; sys.exit(0 if unittest.defaultTestLoader.loadTestsFromName(sys.argv[1]).countTestCases() else 1)'
+          for module in "${modules[@]}"; do
+            if ! python3 -c "$count_tests" "$module"; then
+              echo "::error::changed-tests mode: unittest loads no test from $module: untested, not passed"
+              exit 1
+            fi
+          done
           python3 -m unittest -v "${modules[@]}" >full-suite-macos.log 2>&1
           code=$?
           set -e
@@ -996,7 +1010,8 @@ jobs:
           skipped="$(sed -n -E 's/^(OK|FAILED) \(.*skipped=([0-9]+).*$/\2/p' full-suite-macos.log | tail -n 1)"
           echo "validate-macos changed-tests mode: ran ${ran:-0} tests from: $MODULES. Skipped: ${skipped:-0}. The full suite did not run; this is a scoped result, not a macOS full-suite pass." >> "$GITHUB_STEP_SUMMARY"
           tail -n 5 full-suite-macos.log
-          # Zero-test guard: a selection that runs no test is untested, not passed.
+          # Aggregate zero-test guard: a selection that runs no test is untested, not passed. It also covers modules
+          # that load test cases but run none, as when every class skips in setUpClass.
           if [ "${ran:-0}" -eq 0 ]; then
             echo "::error::changed-tests mode ran no test: untested, not passed (docs/acceptance-evidence-policy.md)"
             exit 1

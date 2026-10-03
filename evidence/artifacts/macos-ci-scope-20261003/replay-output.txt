@@ -31,5 +31,13 @@ OK       Aall: main commits skipped / of those touching tests/*.py / run changed
 OK       B2: main commits skipped / of those touching tests/*.py / run changed-tests: measured (142, 0, 90), expected (142, 0, 90)
 OK       pull_request runs with a changes result: measured 1211, expected 1211
 NOTE     the bootstrap gate skipped bootstrap-macos on 51 of them; the record's 52 counts skipped bootstrap-macos check runs across all events, one of them a workflow_dispatch run
-NOTE     sim_r2.json (saved simulation output, not re-run): B2 367.7 slot-h, B2+ 339.9 slot-h, p90 1.7 min; the record states 319.6 slot-h and 1.4 min for (b2) with B+
+OK       D: simulated total macOS slot-h and PR wait p90 min (sim_r2.json D, not re-run): measured (579.7, 19.2), expected (579.7, 19.2)
+OK       B0: simulated total macOS slot-h and PR wait p90 min (sim_r2.json B0, not re-run): measured (358.5, 1.8), expected (358.5, 1.8)
+OK       B0 with B+: simulated total macOS slot-h and PR wait p90 min (sim_r2.json B0+, not re-run): measured (308.6, 0.9), expected (308.6, 0.9)
+OK       B′: simulated total macOS slot-h and PR wait p90 min (sim_r2.json Bp, not re-run): measured (363.8, 1.8), expected (363.8, 1.8)
+OK       B′ with B+: simulated total macOS slot-h and PR wait p90 min (sim_r2.json B+, not re-run): measured (315.7, 1.1), expected (315.7, 1.1)
+OK       (a-all): simulated total macOS slot-h and PR wait p90 min (sim_r2.json Aall, not re-run): measured (446.8, 5.4), expected (446.8, 5.4)
+OK       (a-all) with B+: simulated total macOS slot-h and PR wait p90 min (sim_r2.json Aall+, not re-run): measured (419.1, 4.1), expected (419.1, 4.1)
+OK       (b2): simulated total macOS slot-h and PR wait p90 min (sim_r2.json B2, not re-run): measured (367.7, 2.4), expected (367.7, 2.4)
+OK       (b2) with B+: simulated total macOS slot-h and PR wait p90 min (sim_r2.json B2+, not re-run): measured (339.9, 1.7), expected (339.9, 1.7)
 PASS: 0 mismatch(es)

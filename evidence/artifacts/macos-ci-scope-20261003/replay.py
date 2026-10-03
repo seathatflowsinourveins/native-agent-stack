@@ -19,8 +19,9 @@ tests/ path selects full mode. The file lists carry no deletion status, so no mo
 (the job drops it). The changed-tests duration estimate is the record's: 0.5 min of setup plus the selected modules'
 test counts (modcount.json, 0 for a module absent at the base) at 1,974 s / 9,849 tests each.
 
-Not re-run here: the 5-slot simulation (sim_r2.json holds its saved outputs; its code was not retained), the queue and
-time-to-result tables, and the classifications (runs30.json holds both families' labels as recorded).
+Not re-run here: the 5-slot simulation (sim_r2.json holds its saved outputs; its code was not retained, so the record's
+simulated figures are only compared with sim_r2.json), the queue and time-to-result tables, and the classifications
+(runs30.json holds both families' labels as recorded).
 """
 
 from __future__ import annotations
@@ -236,10 +237,16 @@ def main():
     report.note(f"the bootstrap gate skipped bootstrap-macos on {gated} of them; the record's 52 counts skipped "
                 "bootstrap-macos check runs across all events, one of them a workflow_dispatch run")
 
+    # The record's simulated columns (§3.5 and §5) against the saved simulation output. The simulation code was not
+    # retained, so this compares figures and re-runs nothing. (a-mac) and (b1) have no saved output.
     simulation = load("sim_r2.json")
-    report.note(f"sim_r2.json (saved simulation output, not re-run): B2 {simulation['B2']['slot_h']} slot-h, "
-                f"B2+ {simulation['B2+']['slot_h']} slot-h, p90 {simulation['B2+']['p90']} min; the record states "
-                "319.6 slot-h and 1.4 min for (b2) with B+")
+    stated = (("D", "D", (579.7, 19.2)), ("B0", "B0", (358.5, 1.8)), ("B0 with B+", "B0+", (308.6, 0.9)),
+              ("B′", "Bp", (363.8, 1.8)), ("B′ with B+", "B+", (315.7, 1.1)), ("(a-all)", "Aall", (446.8, 5.4)),
+              ("(a-all) with B+", "Aall+", (419.1, 4.1)), ("(b2)", "B2", (367.7, 2.4)),
+              ("(b2) with B+", "B2+", (339.9, 1.7)))
+    for name, key, figures in stated:
+        report.check(f"{name}: simulated total macOS slot-h and PR wait p90 min (sim_r2.json {key}, not re-run)",
+                     (simulation[key]["slot_h"], simulation[key]["p90"]), figures)
 
     print(f"{'PASS' if report.mismatches == 0 else 'FAIL'}: {report.mismatches} mismatch(es)")
     return 0 if report.mismatches == 0 else 1

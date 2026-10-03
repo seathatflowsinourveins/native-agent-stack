@@ -6,7 +6,10 @@ verification base below), as the coordinator's brief directed, from the draft wi
 edits of §6 and adds the receipt `evidence/artifacts/macos-ci-scope-20261003/`. Edits to the draft's text: this status
 line; repository paths in place of working-copy names; the paragraph after the data table that names the receipt;
 §6.8 (implementation notes); §8.1's last paragraph; one bullet in §10; and the implementing PR's re-reads in the SOTA
-sources. The ruleset does not change.
+sources. The ruleset does not change. The repair round for the Codex root's source review of head `0eceddab` and one
+review thread (§11) then edited §2's fail-safe and zero-test bullets, the simulated (b2) figures in §3.5 and §5,
+§5.4's precedent, §6.2's drift guard, §6.5's receipt bullet, §6.7 (control (f′)), §6.8, §9, §10, §11 and the SOTA
+sources.
 
 **Asked by:** the user, 2026-10-03: retire or narrow the macOS lane if it causes stagnation without real benefit, and
 decide by evidence and research convergence.
@@ -120,13 +123,17 @@ Narrowing beats retirement, because the lane caught a real Mac-host defect, even
 - **Full.**
   - Trigger: the PR changes a path in `MACOS_PATTERNS`, the list in §6.2. It has the previous round's 67 patterns plus
     22 added in review, 89 in all.
-  - The job also runs in full when the `changes` job fails or cannot decide. This is the fail-safe.
+  - The job also runs in full when the `changes` job cannot decide (it then writes `macos=true`), writes no `macos`
+    output, or does not succeed, whatever outputs it wrote. This is the fail-safe (§6.8).
 - **Changed tests.**
   - Trigger: the PR changes no listed path, but changes top-level test modules (`tests/test_*.py`).
   - The same required job runs only those modules on macos-15.
   - If anything else under `tests/` changes (helpers, fixtures, data, nested paths), the job runs in full instead.
   - If every changed module was deleted, nothing is selected and the job is skipped (untested), as below.
-  - If a selected module runs zero tests, the job fails rather than pass vacuously.
+  - If unittest loads no test case from a selected module, the job fails before any test runs and names that
+    module, rather than pass vacuously. If the selection loads tests but runs none, the job also fails.
+  - Skips are not failures: a module whose tests all skip on macOS can pass, and the step summary gives the number of
+    skipped tests (§6.8).
 - **Skipped.**
   - Trigger: the PR changes neither a listed path nor a test module.
   - GitHub counts the skipped required job as passing. This record counts it as untested.
@@ -386,7 +393,7 @@ re-run-workflows-and-jobs]
 | (a-mac): plus the 117 test modules that import or name a listed module (86 new) | 578 | 0 | 491 (45.9%) | 179.1 | 409.9 (373.0) | 3.1 (2.5) | 1 (#426, open) | 0 | not computed |
 | (a-all): plus `tests/*` | 702 | 0 | 367 (34.3%) | 216.0 | 446.8 (419.1) | 5.4 (4.1) | 0 | 0 | 142 / 0 |
 | (b1): plus a fixed smoke run (the 7-module adoption gate) on every otherwise-skipped PR | 439 | 630 smoke runs, about 2.65 min each [inference] | 0 | 160.8 [inference] | 391.7 | 3.2 | 5. The smoke set holds none of the failing modules. | 2 | 232 / 90 |
-| **(b2): plus changed-tests mode (this decision)** | **441** | **261; median 0.67, p90 1.23 min [inference]** | **367 (34.3%)** | **136.8 [inference]** | **367.7 (319.6)** | **2.4 (1.4)** | **0** | **0** | **142 / 0; another 90 run changed-tests** |
+| **(b2): plus changed-tests mode (this decision)** | **441** | **261; median 0.67, p90 1.23 min [inference]** | **367 (34.3%)** | **136.8 [inference]** | **367.7 (339.9)** | **2.4 (1.7)** | **0** | **0** | **142 / 0; another 90 run changed-tests** |
 
 Notes on the table:
 - The critic's exposure figure, 92 of 225 gated-out main commits touching `tests/*.py`, used 355 commits at
@@ -397,6 +404,8 @@ Notes on the table:
   around that average. The VM provisioning for the 261 extra jobs is not measured.
 - The (a-mac) set comes from a static scan: a test module that imports, or names by path literal, a listed non-test
   module. It covers 117 of the 234 test modules.
+- The simulated columns for D, B0, B′, (a-all) and (b2) are the saved outputs in `sim_r2.json`. (a-mac) and (b1) have
+  no saved output; their simulated figures are the owner's report of a run that was not retained (§10).
 - **Exposure while main is red.** When main is red on macOS only, every full-mode PR stalls. That is 41.3% of PR jobs
   under (b2), against 65.7% under (a-all). Under (b2), a changed-tests PR stalls only if it changes the failing module.
   [measured: R]
@@ -489,12 +498,12 @@ The record's rule order is: gates, then what the Mac host needs, then throughput
 | --- | --- | --- |
 | Full-suite PR jobs | 441 | 702 |
 | PR slot-hours | 136.8 [inference] | 216.0 |
-| Total macOS slot-hours, sim, with B+ | 319.6 | 419.1 |
-| PR wait p90, sim (direction only) | 1.4 min | 4.1 min |
+| Total macOS slot-hours, sim, with B+ | 339.9 | 419.1 |
+| PR wait p90, sim (direction only) | 1.7 min | 4.1 min |
 
-**B+ (D5)** saves another 48 slot-hours in simulation (367.7 → 319.6). It costs nothing at the merge gate, because the
-bootstrap jobs are not required and the Mac uses neither Homebrew nor the launchd agents. The previous round's 2.1-min
-bootstrap durations exclude VM provisioning, so this understates the saving. [inference]
+**B+ (D5)** saves another 27.8 slot-hours in simulation (367.7 → 339.9, `sim_r2.json`). It costs nothing at the merge
+gate, because the bootstrap jobs are not required and the Mac uses neither Homebrew nor the launchd agents. The previous
+round's 2.1-min bootstrap durations exclude VM provisioning, so this understates the saving. [inference]
 
 ### 4. Fewer moving parts
 
@@ -502,16 +511,20 @@ bootstrap durations exclude VM provisioning, so this understates the saving. [in
 - one new `changes` output;
 - about 15 step-level guards;
 - a module-name validator;
-- a zero-test guard.
+- a zero-test guard, per module and in aggregate (§6.8).
 
 This criterion ranks last, and (b2) wins on the ones before it. The hardening tests in §6.3 pin every one of the four.
 
-**The research precedent for running only edited tests before merge** [doc]:
-- PyTorch's target-determination heuristic `EditedByPR`. It runs the test files that a PR edits at top confidence
-  (`tools/testing/target_determination/heuristics/edited_by_pr.py`, `_get_modified_tests`, read from `main` on
-  2026-10-03).
+**Research precedent, and its limits** [doc]:
+- PyTorch's target-determination heuristic `EditedByPR` gives each test file a PR edits the top score
+  (`tools/testing/target_determination/heuristics/edited_by_pr.py:29-37`, `_get_modified_tests`, at
+  pytorch/pytorch@dd5cbc42). That is prioritization, not exclusive gating: the edited tests rank first, and which
+  tests run is decided across all heuristics. Only with target determination enabled does `test/run_test.py` run the
+  top 25% and leave out the rest (`:2452-2458`), and its default leaves that off on macOS (`:1698-1712`,
+  `not IS_MACOS`). It supports running a PR's edited tests first; it is not precedent for running only them.
 - Google's pre-submit testing of affected targets, with full post-submit runs and culprit rollback (Memon et al.,
-  ICSE-SEIP 2017). This record's T1 is a small version of that rollback discipline.
+  ICSE-SEIP 2017). This record's T1 is a small version of that rollback discipline. This record's selector does no
+  affected-target analysis: it is a fixed path list plus the changed test modules (§9).
 
 ## 6. Exact changes (one implementing PR)
 
@@ -789,6 +802,10 @@ fnmatch]
 It runs over non-test code, excluding `tests/`, `evidence/`, `docs/`, `catalogs/`, `*.md` and `*.json`. It finds 27
 files at `6112d14d4`: 21 are covered, and 6 are excluded with a reason. [measured]
 
+The guard is textual: it flags files whose text matches its terms. It computes no imports and no dependency graph, so
+Mac-run code that carries none of the terms is caught only by review against C1 to C8. C6's import closure
+(`closure.json` in the receipt) was computed once for this record; no test recomputes it.
+
 **Recorded exclusions.** The drift-guard test carries these in an `EXCLUDED` map.
 
 | Path | Why it is not listed |
@@ -889,7 +906,8 @@ required check. [doc: troubleshooting-required-status-checks]
 - **`adoption/platforms/macos-arm64.md:865-866`.** Say when `validate-macos` runs each mode. Say that the Mac's key
   acceptance suites are listed, so changes to them always run in full.
 - **This record, plus a sanitized measurement receipt under `evidence/`.**
-  - The receipt holds G, R, M, the simulation code and its outputs, and the dual-family classification counts.
+  - The receipt holds G, R, M, the simulation's saved outputs, and the dual-family classification counts. The
+    simulation code was not retained (§10).
   - Add its `manifests/evidence.json` entry.
   - The receipt is `evidence/artifacts/macos-ci-scope-20261003/`. Its README lists each file with its sha256, says
     where the working copies came from, and gives the command that re-runs the replay.
@@ -937,6 +955,8 @@ unless stated.
   empty, and `validate-macos` concludes `SKIPPED`, not `SUCCESS`.
 - **(e) A changed helper runs in full.** The PR changes a non-module file under `tests/`.
 - **(f) Fail-safe.** The PR's `changes` step exits before writing outputs. `validate-macos` runs in full.
+- **(f′) Failure after the outputs.** The PR's `changes` job fails after writing `macos=false`. `validate-macos` runs
+  in full (§6.8). Not run when the repair round added it.
 - **(g) Push runs are unchanged.** The first push to main after the merge runs in full.
 
 ### 6.8 Implementation notes (2026-10-03, implementing PR)
@@ -970,6 +990,28 @@ Where the implementation goes beyond the §6.1 sketch, and why. None of these ch
   it finds the same 27 files as `git grep -I -E` with that expression: 21 covered and 6 excluded.
 - **actionlint.** §6.1 and §6.3 name actionlint 1.7.12. The repository's `validate` job has run kjanat/actionlint
   1.17.0 since 2026-09-28 (`.github/workflows/validate.yml:76-92`), and that run checks this workflow.
+- **The `changes` result (repair round, root finding 2).** The gate adds `needs.changes.result != 'success'`, and the
+  mode's changed-tests branch adds `needs.changes.result == 'success'`. A `changes` job that does not succeed now runs
+  the full job whatever outputs it wrote. Outputs and result are separate properties of `needs.<job_id>` (contexts
+  reference, `contexts.md:777-779` at github/docs@2bd66de8), and `changes` writes its outputs before its step summary,
+  so a job that failed after that write could carry `macos=false`. `!cancelled()` already replaces the implicit
+  `success()` (`expressions.md:322`). The bootstrap-* gates still read the outputs only: they are not required, and
+  §2 promises no failure fallback for them. Whether GitHub keeps a failed job's outputs was not observed on a hosted
+  run; the gate no longer depends on it.
+- **Per-module zero-test guard (repair round, root finding 1).** Before unittest runs, the changed-tests step loads
+  each selected module on its own with `unittest.defaultTestLoader.loadTestsFromName` and fails, naming the module,
+  when `countTestCases()` is 0; the exit code decides, so output printed at import cannot fool it. The aggregate
+  check alone could not see an empty module beside a nonempty one: unittest merges the named modules into one suite
+  (`Lib/unittest/loader.py:203-208` at CPython f6650f9a) and prints one count (`runner.py:254-256`). The aggregate
+  guard stays for a selection that loads tests but runs none, as when every class skips in `setUpClass`
+  (`suite.py:117-119`, `:241-243`). A module that fails to import loads one failing test case, so the run reports
+  the error.
+- **Tests for the repair round.** `ValidateMacosGateEvaluationTests` evaluates the gate and the mode, with a
+  test-local evaluator of the documented operator semantics, over every event, `changes` result and output value, and
+  compares them with §2's table. Its negative control is the gate and mode at `0eceddab`, which give changed-tests or
+  a skip for a failed `changes` job that wrote `macos=false`. `ChangedTestsStepRunTests` adds a module with no test,
+  alone and beside a module with tests: the step fails and names it. Its negative control removes the per-module
+  guard: the mixed selection then passes with "Ran 1 test", which is the aggregate check root found insufficient.
 
 ## 7. Rollback
 
@@ -1080,6 +1122,17 @@ main's push runs and acts as above.
     on Darwin before merging.
 - **The list may be incomplete.** The import closure is static, and some data that Mac-run code consumes is excluded by
   decision: `adoption/templates/**`, `adoption/hosts/**`, and agent and skill content.
+- **The selector is a fixed list.** An ordinary path the list does not name, whether a new file or one that meets C1
+  to C8 but was missed, reads as not Mac-relevant by design: the PR is skipped, or runs only its changed test modules.
+  The fail-safe covers errors and malformed test paths, not unknown paths. The drift guard (§6.2) is a textual check
+  over fixed terms, not dependency-graph discovery.
+- **Owner reports.** The replay, the queue simulation and both families' classifications are reports by this record's
+  owner lane. The receipt check (§10) re-ran the replay on the same saved inputs; nobody else re-executed any of them,
+  and none is native upstream acceptance. The simulation code was not retained, so no simulated figure can be re-run.
+- **A failed job's outputs.** Whether GitHub keeps the outputs of a `changes` job that failed was not exercised on a
+  hosted run. The gate no longer depends on it (§6.8); control (f′) in §6.7 would observe it.
+- **Skips pass.** A module whose tests all skip on macOS can pass changed-tests mode. The step summary reports the
+  skip count, and a selection whose run reports "Ran 0 tests" still fails.
 - **Unmeasured load.**
   - Other repositories in the account share the 5 macOS slots, and their usage is unknown.
   - macOS jobs outside this workflow were not measured, for example `hardware-profile-smoke.yml`'s `macos-profile` job.
@@ -1122,12 +1175,16 @@ main's push runs and acts as above.
   pull-request replay from G, R and M with the shipped `MACOS_PATTERNS` and matched every figure it checks: the five
   candidate rows of §3.5 (counts, slot-hours, and (b2)'s 0.67 / 1.23 min estimate), the 18 D1 rows and their escapes,
   the pull-request rows of the 30-run table, the main-commit exposure and the coverage (89 patterns, 151 files, none
-  dead). Its output is `replay-output.txt` beside it. Two figures do not reproduce, and the decision rests on neither:
-  - The saved simulation output, `sim_r2.json`, gives (b2) with B+ as 339.9 slot-hours and a PR wait p90 of 1.7 min,
-    not the 319.6 and 1.4 in §3.5 and §5, so "B+ saves another 48 slot-hours" reads 27.8 on the saved output. The
-    simulation code was not retained, so neither figure can be re-run. (b2) stays below (a-all)'s 419.1 either way.
+  dead). Its output is `replay-output.txt` beside it, from its re-run in the repair round, which added the simulation
+  check below. One figure does not reproduce, and the decision does not rest on it:
   - "52 of 1,211" (§3.1): 52 counts skipped `bootstrap-macos` check runs across all events, one of them a
     `workflow_dispatch` run. The pull-request figure is 51 of 1,211 (4.2%).
+- **Simulated figures.** The simulation code was not retained, so no simulated figure can be re-run. `sim_r2.json`
+  holds the saved outputs for D, B0, B′, (a-all) and (b2), each with and without B+. Until the repair round, §3.5 and
+  §5 gave (b2) with B+ as 319.6 slot-hours and a PR wait p90 of 1.4 min, figures no saved output supports. They now
+  give the saved 339.9 and 1.7, so B+ saves 27.8 slot-hours, not 48, and `replay.py` checks those two figures against
+  `sim_r2.json`. (b2) stays below (a-all)'s 419.1 either way. The simulated figures for (a-mac) and (b1) in §3.5 have
+  no saved output.
 
 ## 11. Review disposition
 
@@ -1145,6 +1202,19 @@ main's push runs and acts as above.
 | D10 | **Fixed.** A Support request is a lever. Whether it is available to a `User` account is not verified. |
 | D11 | **Fixed.** `PushNetTests` pins `manifests/evidence.json`. The record states that the net is coverage by coincidence, names its gap, and adds overturn 8. |
 | D12 | **Fixed.** Queue medians are given on one basis (1.2 / 0.94 / 0.68). "52 of 1,211" is corrected. REST and G are reported side by side, not as agreement. The 25-run tallies sum correctly. PR #666 closed at 18:17:17Z. The simulation is presented as direction only. |
+
+**Repair round (2026-10-03): the Codex root's source review of head `0eceddab`, and one review thread.**
+- **Root finding 1, the per-module zero-test guarantee: fixed** (§2, §6.8). Test: a module with no test, alone or
+  beside a module with tests, fails the step and is named. Control: without the per-module guard, the aggregate check
+  passes the mixed selection.
+- **Root finding 2, the failure fallback: fixed** with `needs.changes.result` in the gate and the mode (§6.8). Test:
+  the gate and mode, evaluated over every input, give §2's table. Control: the outputs-only gate and mode of
+  `0eceddab` give changed-tests or a skip for a failed `changes` job that wrote `macos=false`.
+- **The limits root asked to keep explicit:** the fixed selector (§9), the textual drift guard (§6.2, §9), `EditedByPR`
+  as prioritization, not exclusive gating (§5.4), and the replay, simulation and classifications as owner reports, with
+  the simulation code not retained (§9, §10).
+- **Review thread "Use the retained simulation result" (P2): fixed.** §3.5 and §5 use `sim_r2.json`'s 339.9
+  slot-hours and 1.7 min, B+ saves 27.8 slot-hours, and `replay.py` checks both figures (§10).
 
 ## SOTA sources
 
@@ -1180,6 +1250,22 @@ main's push runs and acts as above.
   - `tools/testing/target_determination/heuristics/__init__.py`.
 - Memon et al., "Taming Google-Scale Continuous Testing", ICSE-SEIP 2017. Pre-submit testing of affected targets,
   post-submit runs and culprit rollback.
+
+**Re-read in the repair round (2026-10-03), at fixed commits:**
+- github/docs@2bd66de8cea336061c9ea060c9b37385136e6ab3, `content/actions/reference/workflows-and-actions/`:
+  `contexts.md:777-779` (`needs.<job_id>.outputs`, and `needs.<job_id>.result` with the values `success`, `failure`,
+  `cancelled` and `skipped`); `expressions.md:30` (falsy values), `:52-68` (the operators, and case-insensitive string
+  comparison) and `:322` (a status check function replaces the default `success()`).
+- actions/runner@d7bc179baf11a02110b46cfbbc4040f74ac3f60a, `src/Sdk/DTExpressions2/Expressions2/Sdk/Operators/`:
+  `And.cs:33-49` and `Or.cs:33-49` (`&&` and `||` return an operand's value, which the `cond && 'a' || 'b'` mode
+  expression relies on).
+- python/cpython@f6650f9ad73359051f3e558c2431a109bc016664, `Lib/unittest/`: `loader.py:203-208` (the named modules
+  merged into one suite), `runner.py:254-256` (one aggregate "Ran N tests" line), `main.py:283-288` (exit status 5
+  only when no test ran and none was skipped), `suite.py:117-119` and `:241-243` (a class that skips in `setUpClass`
+  runs no test, and the skip is recorded).
+- pytorch/pytorch@dd5cbc42760c3a3dfd33cbee0628b6667f8021d2: `tools/testing/target_determination/heuristics/`
+  `edited_by_pr.py:29-37`; `test/run_test.py:1698-1712` (the `--enable-td` default, off on macOS) and `:2452-2458`
+  (the top 25% with target determination, else all tests).
 
 **Change-based gating and subsets of a platform's tests on PRs.** These were cited in the previous round and not
 re-read in this one:

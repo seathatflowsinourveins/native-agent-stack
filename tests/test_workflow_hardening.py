@@ -14,6 +14,7 @@ from pathlib import Path
 import ast
 import fnmatch
 import hashlib
+import itertools
 import json
 import os
 import re
@@ -1238,8 +1239,12 @@ CHANGES_STEP = "Detect which bootstrap- and macOS-relevant paths changed"
 CHANGED_TESTS_STEP = "Run the changed test modules (changed-tests mode)"
 FULL_MODE_IF = "env.VALIDATE_MACOS_MODE == 'full'"
 CHANGED_TESTS_IF = "env.VALIDATE_MACOS_MODE == 'changed-tests'"
-# The changed-tests step's zero-test guard (docs/decisions/2026-10-03-macos-ci-scope.md, section 6.1).
+# The changed-tests step's aggregate zero-test guard (docs/decisions/2026-10-03-macos-ci-scope.md, section 6.1).
 ZERO_TEST_GUARD = 'if [ "${ran:-0}" -eq 0 ]; then'
+# Its per-module zero-test guard (the same record, section 6.8): unittest sums the named modules into one suite and
+# prints one aggregate "Ran N tests" line (CPython f6650f9ad73359051f3e558c2431a109bc016664, Lib/unittest/loader.py
+# :203-208 and runner.py:254-255), so a module with no test beside one with tests passes the aggregate guard.
+PER_MODULE_GUARD = 'if ! python3 -c "$count_tests" "$module"; then'
 
 
 def run_block(step_text):
@@ -1262,12 +1267,14 @@ def changes_script(text=None):
     return run_block(step_block(jobs(text)["changes"], CHANGES_STEP))
 
 
-def validate_macos_mode(outputs):
-    """The mode docs/decisions/2026-10-03-macos-ci-scope.md (section 2) gives validate-macos on a pull_request for
-    the ``changes`` outputs ``outputs``: a ``macos`` other than 'false', an empty one included, is full; otherwise a
-    nonempty ``macos_tests`` is changed-tests; otherwise skipped. The job-level ``if:`` and ``VALIDATE_MACOS_MODE``
-    that implement this table are pinned as text in AdoptionBootstrapMacosRequiredTests."""
-    if outputs.get("macos", "") != "false":
+def validate_macos_mode(outputs, result="success", event="pull_request"):
+    """The mode docs/decisions/2026-10-03-macos-ci-scope.md (section 2) gives validate-macos for the ``changes``
+    outputs ``outputs``, its ``result`` and the triggering ``event``: full off a pull_request; on a pull_request
+    full when `changes` did not succeed, whatever it wrote, or when its ``macos`` is anything but 'false' (an empty
+    one included); otherwise changed-tests for a nonempty ``macos_tests`` and skipped for an empty one. The
+    job-level ``if:`` and ``VALIDATE_MACOS_MODE`` are pinned as text in AdoptionBootstrapMacosRequiredTests and
+    evaluated against this table in ValidateMacosGateEvaluationTests."""
+    if event != "pull_request" or result != "success" or outputs.get("macos", "") != "false":
         return "full"
     return "changed-tests" if outputs.get("macos_tests", "") else "skip"
 
@@ -1297,19 +1304,22 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
     def assert_validate_macos_gate(self, condition, mode):
         """The gate of docs/decisions/2026-10-03-macos-ci-scope.md, section 6.3 (D9): a status function, so the job
         is evaluated when `changes` is skipped (every push, schedule and dispatch run) or failed; full on every
-        event but pull_request; on a pull_request full unless `changes` wrote macos=false, and changed-tests only
-        with a nonempty module list; `!= 'false'`, never `== 'true'`, so an empty output (changes failed,
-        cancelled or skipped) runs the full job; and 'full' as the mode's fallback branch."""
+        event but pull_request; on a pull_request full unless `changes` succeeded and wrote macos=false, and
+        changed-tests only with a nonempty module list; a `changes` result other than success runs the full job
+        whatever outputs it wrote (section 6.8: outputs and result are separate `needs` properties); `!= 'false'`,
+        never `== 'true'`, so an empty output runs the full job; and 'full' as the mode's fallback branch."""
         self.assertIsNotNone(condition, "validate-macos needs its job-level if:")
         self.assertRegex(condition, r"!cancelled\(\)|always\(\)",
                          "an implicit success() from `needs: changes` would skip the required check whenever "
                          "changes is skipped or fails")
-        for term in ("github.event_name != 'pull_request'", "needs.changes.outputs.macos != 'false'",
-                     "needs.changes.outputs.macos_tests != ''"):
+        for term in ("github.event_name != 'pull_request'", "needs.changes.result != 'success'",
+                     "needs.changes.outputs.macos != 'false'", "needs.changes.outputs.macos_tests != ''"):
             self.assertIn(term, condition)
         self.assertNotIn("== 'true'", condition, "an empty output (changes failed or cancelled) must run in full")
         self.assertIsNotNone(mode, "validate-macos's job-level env defines VALIDATE_MACOS_MODE")
-        self.assertIn("github.event_name == 'pull_request' && needs.changes.outputs.macos == 'false'", mode)
+        self.assertIn("github.event_name == 'pull_request' && needs.changes.result == 'success' && "
+                      "needs.changes.outputs.macos == 'false'", mode,
+                      "changed-tests only when changes succeeded: a failed changes job may have written macos=false")
         self.assertRegex(mode, r"&& 'changed-tests' \|\| 'full' \}\}$", "'full' is the fallback branch")
 
     def test_validate_macos_gate_fails_safe(self):
@@ -1379,6 +1389,9 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
             "no changed-tests term": (condition.replace(" || needs.changes.outputs.macos_tests != ''", ""), mode),
             "changed-tests as the fallback": (condition, mode.replace("&& 'changed-tests' || 'full'",
                                                                       "&& 'full' || 'changed-tests'")),
+            # Codex root review of 0eceddab, finding 2: the gate and the mode must each read the changes result.
+            "no result term in the gate": (condition.replace(" || needs.changes.result != 'success'", ""), mode),
+            "no result term in the mode": (condition, mode.replace(" && needs.changes.result == 'success'", "")),
         }
         for label, (weak_condition, weak_mode) in controls.items():
             with self.subTest(label):
@@ -1468,6 +1481,164 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         (normal,) = output_writes(script[body.end():])
         self.assertEqual([key for key, _ in normal], ["macos_tests", "bootstrap", "macos"])
         self.assertEqual(len(re.findall(r'>> "\$GITHUB_OUTPUT"', script)), 2, "no other output write")
+
+
+# The GitHub Actions expression subset that validate-macos's gate and mode use, with the documented semantics
+# (github/docs@2bd66de8cea336061c9ea060c9b37385136e6ab3, content/actions/reference/workflows-and-actions/
+# expressions.md): false, 0, -0, '' and null are falsy (:30); the operators bind in the order of the table at :52-65
+# (`!`, then `==` and `!=`, then `&&`, then `||`); string comparison ignores case (:68). `&&` returns its first falsy
+# operand or else its last, and `||` its first truthy operand or else its last, which the `cond && 'a' || 'b'` idiom
+# relies on (actions/runner@d7bc179baf11a02110b46cfbbc4040f74ac3f60a,
+# src/Sdk/DTExpressions2/Expressions2/Sdk/Operators/And.cs:33-49 and Or.cs:33-49).
+EXPRESSION_TOKEN = re.compile(r"\s*(?:(?P<string>'(?:[^']|'')*')|(?P<operator>&&|\|\||==|!=|!|\(|\))"
+                              r"|(?P<name>[A-Za-z_][A-Za-z0-9_.-]*))")
+
+
+def expression_truthy(value):
+    return value not in (False, 0, "", None)
+
+
+def evaluate_expression(expression, context):
+    """Evaluate a GitHub Actions expression, with or without its ``${{ }}``, over ``context``: a map from each
+    property path (``needs.changes.result``) and status call (``cancelled()``) the expression reads to its value.
+    Only string literals, property paths, ``cancelled()``, ``!``, ``==``, ``!=``, ``&&``, ``||`` and parentheses
+    are known; anything else raises, as does a name ``context`` lacks, so no test passes on an unmodelled term.
+    Comparisons take strings only, as every compared operand here is one. A test oracle for this subset, not an
+    Actions evaluator: job-level conditions are evaluated by the Actions service."""
+    text = expression.strip()
+    if text.startswith("${{") and text.endswith("}}"):
+        text = text[3:-2]
+    tokens, position = [], 0
+    while text[position:].strip():
+        match = EXPRESSION_TOKEN.match(text, position)
+        if match is None:
+            raise ValueError(f"unsupported expression text at {text[position:]!r}")
+        tokens.append((match.lastgroup, match.group(match.lastgroup)))
+        position = match.end()
+
+    def peek(index):
+        return tokens[index] if index < len(tokens) else (None, None)
+
+    def either(index):
+        value, index = both(index)
+        while peek(index) == ("operator", "||"):
+            right, index = both(index + 1)
+            value = value if expression_truthy(value) else right
+        return value, index
+
+    def both(index):
+        value, index = comparison(index)
+        while peek(index) == ("operator", "&&"):
+            right, index = comparison(index + 1)
+            value = right if expression_truthy(value) else value
+        return value, index
+
+    def comparison(index):
+        left, index = unary(index)
+        if peek(index) in (("operator", "=="), ("operator", "!=")):
+            operator = peek(index)[1]
+            right, index = unary(index + 1)
+            if not (isinstance(left, str) and isinstance(right, str)):
+                raise ValueError(f"comparison of a non-string: {left!r} {operator} {right!r}")
+            left = (left.casefold() == right.casefold()) == (operator == "==")
+        return left, index
+
+    def unary(index):
+        if peek(index) == ("operator", "!"):
+            value, index = unary(index + 1)
+            return not expression_truthy(value), index
+        return primary(index)
+
+    def primary(index):
+        kind, token = peek(index)
+        if (kind, token) == ("operator", "("):
+            value, index = either(index + 1)
+            if peek(index) != ("operator", ")"):
+                raise ValueError("unbalanced parenthesis")
+            return value, index + 1
+        if kind == "string":
+            return token[1:-1].replace("''", "'"), index + 1
+        if kind == "name":
+            if tokens[index + 1:index + 3] == [("operator", "("), ("operator", ")")]:
+                return context[f"{token}()"], index + 3
+            return context[token], index + 1
+        raise ValueError(f"unexpected {token!r} in {expression!r}")
+
+    value, index = either(0)
+    if index != len(tokens):
+        raise ValueError(f"unparsed tail {tokens[index:]!r} in {expression!r}")
+    return value
+
+
+class ValidateMacosGateEvaluationTests(unittest.TestCase):
+    """validate-macos's job-level ``if:`` and ``VALIDATE_MACOS_MODE``, evaluated with evaluate_expression for every
+    event, `changes` result and output combination, give validate_macos_mode's mode (docs/decisions/
+    2026-10-03-macos-ci-scope.md, sections 2 and 6.8). In particular a `changes` job that did not succeed runs the
+    full job whatever outputs it wrote (Codex root review of 0eceddab, finding 2). The negative control is the gate
+    and mode at 0eceddab, which read the outputs only."""
+
+    # validate-macos's gate and mode at 0eceddab0cec33d8ff4f55233a097093cf4e5ac1, before the repair.
+    OUTPUTS_ONLY_GATE = ("${{ !cancelled() && (github.event_name != 'pull_request' || "
+                         "needs.changes.outputs.macos != 'false' || needs.changes.outputs.macos_tests != '') }}")
+    OUTPUTS_ONLY_MODE = ("${{ (github.event_name == 'pull_request' && needs.changes.outputs.macos == 'false') && "
+                         "'changed-tests' || 'full' }}")
+    EVENTS = ("pull_request", "push", "schedule", "workflow_dispatch")
+    # The values of needs.<job_id>.result (github/docs@2bd66de8, contexts.md:779).
+    RESULTS = ("success", "failure", "cancelled", "skipped")
+    MACOS = ("true", "false", "")
+    MODULES = ("", "tests.test_zz_probe")
+
+    @classmethod
+    def setUpClass(cls):
+        header = jobs(ADOPTION_BOOTSTRAP.read_text(encoding="utf-8"))["validate-macos"].split("\n    steps:\n", 1)[0]
+        cls.gate = block_if(header)
+        cls.mode_text = re.search(r"(?m)^      VALIDATE_MACOS_MODE: ([^\n]+)$", header).group(1)
+
+    def cases(self):
+        return itertools.product(self.EVENTS, self.RESULTS, self.MACOS, self.MODULES)
+
+    @staticmethod
+    def run_mode(gate, mode, event, result, macos, modules):
+        """'skip' when ``gate`` is false, else the value of ``mode``, for a run that was not cancelled."""
+        context = {"github.event_name": event, "needs.changes.result": result, "needs.changes.outputs.macos": macos,
+                   "needs.changes.outputs.macos_tests": modules, "cancelled()": False}
+        return evaluate_expression(mode, context) if expression_truthy(evaluate_expression(gate, context)) else "skip"
+
+    def test_the_oracle_follows_the_documented_semantics(self):
+        context = {"a.b": "X", "cancelled()": False}
+        for expression, value in (("'a' && 'b'", "b"), ("'' && 'b'", ""), ("'' || 'b'", "b"), ("'a' || 'b'", "a"),
+                                  ("a.b == 'x'", True), ("a.b != 'x'", False), ("!''", True), ("!cancelled()", True),
+                                  ("!('a' && '')", True), ("'' || 'a' && 'b'", "b"), ("${{ 'it''s' }}", "it's")):
+            with self.subTest(expression):
+                self.assertEqual(evaluate_expression(expression, context), value)
+        for unsupported in ("a.c == 'x'", "contains(a.b, 'X')", "a.b < 'y'", "('a'", "'a' 'b'"):
+            with self.subTest(unsupported), self.assertRaises((KeyError, ValueError)):
+                evaluate_expression(unsupported, context)
+
+    def test_the_gate_and_mode_give_the_records_mode_for_every_input(self):
+        for event, result, macos, modules in self.cases():
+            with self.subTest(event=event, result=result, macos=macos, modules=modules):
+                self.assertEqual(self.run_mode(self.gate, self.mode_text, event, result, macos, modules),
+                                 validate_macos_mode({"macos": macos, "macos_tests": modules}, result, event))
+
+    def test_a_changes_job_that_failed_after_writing_macos_false_runs_in_full(self):
+        for result in ("failure", "cancelled"):
+            for modules in self.MODULES:
+                with self.subTest(result=result, modules=modules):
+                    self.assertEqual(self.run_mode(self.gate, self.mode_text, "pull_request", result, "false",
+                                                   modules), "full")
+
+    def test_control_the_outputs_only_gate_and_mode_scope_or_skip_a_failed_changes_job(self):
+        self.assertNotIn("needs.changes.result", self.OUTPUTS_ONLY_GATE + self.OUTPUTS_ONLY_MODE)
+        disagreements = {case for case in self.cases()
+                         if self.run_mode(self.OUTPUTS_ONLY_GATE, self.OUTPUTS_ONLY_MODE, *case)
+                         != validate_macos_mode({"macos": case[2], "macos_tests": case[3]}, case[1], case[0])}
+        self.assertEqual(disagreements, {("pull_request", result, "false", modules)
+                                         for result in ("failure", "cancelled", "skipped") for modules in self.MODULES})
+        self.assertEqual(self.run_mode(self.OUTPUTS_ONLY_GATE, self.OUTPUTS_ONLY_MODE, "pull_request", "failure",
+                                       "false", "tests.test_zz_probe"), "changed-tests")
+        self.assertEqual(self.run_mode(self.OUTPUTS_ONLY_GATE, self.OUTPUTS_ONLY_MODE, "pull_request", "failure",
+                                       "false", ""), "skip")
 
 
 def macos_job_inputs():
@@ -1694,7 +1865,11 @@ class ValidateMacosModeTests(unittest.TestCase):
         self.assertIn('read -r -a modules <<< "$MODULES"', script)
         self.assertIn('if [ "${#modules[@]}" -eq 0 ]; then', script, "an empty selection would run discovery")
         self.assertIn(ZERO_TEST_GUARD, script, "a selection that runs no test would pass vacuously")
+        self.assertIn(PER_MODULE_GUARD, script, "a module with no test beside a module with tests would pass")
+        self.assertIn("countTestCases()", script)
         self.assertIn('python3 -m unittest -v "${modules[@]}"', script)
+        self.assertLess(script.index(PER_MODULE_GUARD), script.index('python3 -m unittest -v "${modules[@]}"'),
+                        "each module is counted before unittest runs")
 
     def test_the_changed_tests_step_reads_modules_through_env_and_keeps_its_guards(self):
         step = step_block(self.job, CHANGED_TESTS_STEP)
@@ -1706,9 +1881,11 @@ class ValidateMacosModeTests(unittest.TestCase):
 
     def test_control_the_step_text_without_the_guard_line_fails(self):
         script = run_block(step_block(self.job, CHANGED_TESTS_STEP))
-        self.assertEqual(script.count(ZERO_TEST_GUARD), 1)
-        with self.assertRaises(AssertionError):
-            self.assert_changed_tests_guards(script.replace(ZERO_TEST_GUARD, "if false; then"))
+        for guard in (ZERO_TEST_GUARD, PER_MODULE_GUARD):
+            with self.subTest(guard):
+                self.assertEqual(script.count(guard), 1)
+                with self.assertRaises(AssertionError):
+                    self.assert_changed_tests_guards(script.replace(guard, "if false; then"))
 
     def test_the_changes_script_admits_only_existing_well_formed_top_level_modules(self):
         script = changes_script(self.text)
@@ -1879,10 +2056,13 @@ class ChangesModeComputationTests(unittest.TestCase):
 @unittest.skipUnless(shutil.which("bash"), "the changed-tests step needs bash, as the runner has")
 class ChangedTestsStepRunTests(unittest.TestCase):
     """The changed-tests step executed as GitHub runs it, in a scratch checkout of probe test modules with `python3`
-    this interpreter: a passing selection passes with a scoped summary; a failing one fails; a selection that
-    runs no test, an empty selection and a malformed name fail. As a discriminating control, a python3 that
-    reports "Ran 0 tests" and exits 0 (unittest before 3.12 did; 3.12 added exit status 5) fails the step only
-    while the zero-test guard is in place."""
+    this interpreter: a passing selection passes with a scoped summary; a failing one fails; a module with no test
+    fails the step before unittest runs, alone or beside a module with tests (Codex root review of 0eceddab,
+    finding 1); a selection that loads tests but runs none fails; an empty selection and a malformed name fail.
+    Discriminating controls: without the per-module guard, a module with no test beside a module with tests
+    passes, since unittest reports one aggregate count; and a python3 that reports "Ran 0 tests" and exits 0
+    (unittest before 3.12 did; 3.12 added exit status 5) fails the step only while the aggregate guard is in
+    place."""
 
     PROBES = {
         "tests/__init__.py": "",
@@ -1893,6 +2073,11 @@ class ChangedTestsStepRunTests(unittest.TestCase):
         "tests/test_zz_skip.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    @unittest.skip('probe')\n"
                                  "    def test_skipped(self):\n        pass\n",
         "tests/test_zz_empty.py": "import unittest\n",
+        # Loads one test case, but its class skips in setUpClass, so unittest runs none (CPython
+        # Lib/unittest/suite.py:117-119 and :241-243 at f6650f9a: the tests are not started, the skip is recorded).
+        "tests/test_zz_classskip.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    @classmethod\n"
+                                      "    def setUpClass(cls):\n        raise unittest.SkipTest('probe')\n\n"
+                                      "    def test_never_started(self):\n        pass\n",
     }
     OLD_UNITTEST = '#!/bin/sh\nprintf "\\nRan 0 tests in 0.000s\\n\\nOK\\n" >&2\nexit 0\n'
 
@@ -1940,10 +2125,38 @@ class ChangedTestsStepRunTests(unittest.TestCase):
         self.assertIn("ran 2 tests from:", summary)
         self.assertIn("Skipped: 1.", summary)
 
-    def test_a_selection_that_runs_no_test_fails_as_untested(self):
-        code, output, _, _ = self.run_step("tests.test_zz_empty")
+    def test_a_module_with_no_test_fails_before_unittest_runs(self):
+        code, output, _, log = self.run_step("tests.test_zz_empty")
+        self.assertEqual(code, 1, output)
+        self.assertIn("unittest loads no test from tests.test_zz_empty: untested, not passed", output)
+        self.assertIsNone(log, "the per-module guard fails the step before unittest runs")
+
+    def test_a_module_with_no_test_beside_a_module_with_tests_fails_naming_it(self):
+        for modules in ("tests.test_zz_pass tests.test_zz_empty", "tests.test_zz_empty tests.test_zz_pass"):
+            with self.subTest(modules):
+                code, output, _, log = self.run_step(modules)
+                self.assertEqual(code, 1, output)
+                self.assertIn("unittest loads no test from tests.test_zz_empty: untested, not passed", output)
+                self.assertNotIn("from tests.test_zz_pass", output)
+                self.assertIsNone(log, "the per-module guard fails the step before unittest runs")
+
+    def test_control_without_the_per_module_guard_the_aggregate_check_passes_the_mixed_selection(self):
+        # The aggregate check alone, as at 0eceddab: unittest sums both modules into one suite and reports "Ran 1
+        # test", so the step passes although tests.test_zz_empty has no test.
+        self.assertEqual(self.script.count(PER_MODULE_GUARD), 1)
+        unguarded = self.script.replace(PER_MODULE_GUARD, "if false; then")
+        code, output, summary, log = self.run_step("tests.test_zz_pass tests.test_zz_empty", script=unguarded)
+        self.assertEqual(code, 0, output)
+        self.assertIn("ran 1 tests from: tests.test_zz_pass tests.test_zz_empty", summary)
+        self.assertIn("Ran 1 test in", log)
+
+    def test_a_selection_that_loads_tests_but_runs_none_fails_as_untested(self):
+        # The aggregate guard's own case with a real interpreter: the per-module count passes the setUpClass-skip
+        # module, and unittest reports "Ran 0 tests" with OK (skipped=1) and exit status 0.
+        code, output, _, log = self.run_step("tests.test_zz_classskip")
         self.assertEqual(code, 1, output)
         self.assertIn("changed-tests mode ran no test: untested, not passed", output)
+        self.assertIn("Ran 0 tests in", log)
 
     def test_an_empty_or_malformed_selection_fails_before_unittest_runs(self):
         for label, modules, message in (("empty", "", "received no test module"),
@@ -1956,6 +2169,7 @@ class ChangedTestsStepRunTests(unittest.TestCase):
                 self.assertIsNone(log, "unittest never ran, so discovery could not run the whole suite")
 
     def test_control_the_zero_test_guard_is_what_fails_a_vacuous_pass(self):
+        # The stub exits 0 for every call, the per-module count included, so the run reaches the aggregate guard.
         code, output, _, _ = self.run_step("tests.test_zz_empty", python3=self.OLD_UNITTEST)
         self.assertEqual(code, 1, output)
         self.assertEqual(self.script.count(ZERO_TEST_GUARD), 1)
