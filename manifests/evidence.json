@@ -3880,6 +3880,22 @@
         "No production-quality or token-efficiency comparison is claimed, and no unrelated session or authentication store was read."
       ],
       "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
+    },
+    {
+      "id": "native-sdk-role-mcp-followup-20261002",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "Retained Claude SDK evidence supports bounded reviewer/researcher cases, minimal inline MCP and one native deny-rule pair; prior researcher failures remain FAIL and complete role qualification remains incomplete.",
+      "limitations": [
+        "Independent case ACCEPT is not complete role qualification. Reviewer negative grading remains missing; researcher wrong-fact/citation/attribution rejection was not controlled.",
+        "Synthetic MCP0/1/1 controls discriminate callback presence and terminal success only. The separate native armed0/disarmed1 pair supports one actual deny-rule observation; definition visibility unknown, no can_use_tool callback configured.",
+        "Earlier query timestamps unknown; deny-pair UTC intervals captured. Counters retain separate scopes; interrupted whole-query usage/cost unknown. No billed-cost or efficiency claim.",
+        "Selected QMD/Serena, recovery, containment, complete lifecycle and whole-host qualification remain open; process samples are bounded and staging is not managed-upgrade acceptance.",
+        "Sanitized projections only; private original hashes, failed cases and corrections retained. No new provider/test/control execution or shared edits."
+      ],
+      "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json"
     }
   ],
   "files": [
@@ -35485,6 +35501,11 @@
       "bytes": 4419
     },
     {
+      "path": "evidence/artifacts/native-sdk-role-mcp-followup-20261002/trials.json",
+      "sha256": "169cffd09aa246b00ca146bb7c3d223be7a5a129029280fc2433b41c6a38e72f",
+      "bytes": 36065
+    },
+    {
       "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
       "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
       "bytes": 111
@@ -47703,6 +47724,11 @@
       "path": "evidence/receipts/native-sandbox-network-20260920.json",
       "sha256": "e934457a442f01bcf564fa1e37777f35e6a64eff0455c572efb382a6c652dd4b",
       "bytes": 2504
+    },
+    {
+      "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json",
+      "sha256": "8d0952e3dd717428f0f2ff5d4bfd9f3765682887cff8fc0450069252e528787f",
+      "bytes": 6284
     },
     {
       "path": "evidence/receipts/native-service-reboot-20260920.json",
