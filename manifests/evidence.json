@@ -16106,8 +16106,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "c4a9fd33a3c574d3e3e4c65f927d240192367d06a2ab65f1c61aad2290ea03f3",
-      "bytes": 183292
+      "sha256": "5c83639c4a66d8a05643a5041a02d536c660e9d15808369104a47a7eac3eb0d3",
+      "bytes": 183361
     },
     {
       "path": "docs/stack.md",
@@ -31821,8 +31821,8 @@
     },
     {
       "path": "evidence/artifacts/k4-timing-gc-20261003/summary.json",
-      "sha256": "f38f975a5794bfa946a2760a58d786cff4c65b1bad5b0be9c9220bcbe9be5c51",
-      "bytes": 18374
+      "sha256": "4569f912234abf37f455c7653b2dd468b633bb40b3a8b18e442db02f3a4fe4ff",
+      "bytes": 19674
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
