@@ -4118,8 +4118,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "5652d4b17406fbecbe640348dd2cb2b4207fb43aabfe7a5aa25da4213523b99f",
-      "bytes": 53922
+      "sha256": "dd54caae28434981f9174a695eb5a8ea9f2ad0f3bfe74a063f9238b84e6073bd",
+      "bytes": 55326
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -15979,8 +15979,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-macos-ci-scope.md",
-      "sha256": "f7f878bc2bc2fa123c6e29b0f958247fe852816b7e391a08efdd86829e5704f3",
-      "bytes": 76157
+      "sha256": "5af6945bef16c92dcd730b4da9e8b3bf9db34a2207eb4b17c0c3c4ce5133c0be",
+      "bytes": 84655
     },
     {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
@@ -34429,8 +34429,8 @@
     },
     {
       "path": "evidence/artifacts/macos-ci-scope-20261003/README.md",
-      "sha256": "191dd8576286eeff11a55044efc68f9e9bf2a3cab2a5e6d610a8f094115f36a5",
-      "bytes": 11257
+      "sha256": "c5253b45ed54d1011e34015282ed512d1a7c4fa4b712de14792b376d76164220",
+      "bytes": 11928
     },
     {
       "path": "evidence/artifacts/macos-ci-scope-20261003/c5wide.txt",
@@ -34514,13 +34514,13 @@
     },
     {
       "path": "evidence/artifacts/macos-ci-scope-20261003/replay-output.txt",
-      "sha256": "5db05889dc24bbbf0cc307fac0364e569906a199badf91eb2265900ce49af436",
-      "bytes": 3802
+      "sha256": "6f93c05ad9251552c31914ec8c51212fea8d716e5faba14865f6a9ac044a619f",
+      "bytes": 4924
     },
     {
       "path": "evidence/artifacts/macos-ci-scope-20261003/replay.py",
-      "sha256": "ecd0e81da9770ae0b1b76f7a4f3d82a3b97a00e9e83b160a42238cc6e90118ad",
-      "bytes": 12974
+      "sha256": "3ffb9ab2c8a329971f72c5fa31b0938c824939e94835eac731667551360656d4",
+      "bytes": 13574
     },
     {
       "path": "evidence/artifacts/macos-ci-scope-20261003/replay_final.json",
@@ -51374,8 +51374,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "dab85af44b50a3df38dafa848cda7aad392494b83709b4b55aa774d47ffa5eab",
-      "bytes": 126297
+      "sha256": "72ef5cefa9352c55d41ece3770050209c273b8675c3459cd531136653e20810e",
+      "bytes": 140273
     },
     {
       "path": "tests/test_workflow_security.py",
