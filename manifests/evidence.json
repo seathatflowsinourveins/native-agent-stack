@@ -31916,8 +31916,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
-      "sha256": "baf84a6f0c79222f8dfa9f99f4996dd69e212db2713d22d9b0d297ca5b4e9e62",
-      "bytes": 17254
+      "sha256": "5e3e9947ef20142df98efecdc0b1e89d509ae930e95a569677f553eeea6409a8",
+      "bytes": 19297
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_555874dd-5a7.json",
@@ -31928,6 +31928,16 @@
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_8066ceb5-b9a.json",
       "sha256": "08d919b086fbcc2394b3e8a57e54c8da168a528afb31625bbd17fa933236526f",
       "bytes": 45181
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-client-check-20261003.txt",
+      "sha256": "736029c51aaf60bab6ea6effbf38f845bbabf78a914136fcc07899a1b25711ef",
+      "bytes": 6252
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-upstream-check-20261003.json",
+      "sha256": "a70fececaa1d61b1d832be50fea8c7f79ea32f4b189dbbf655bb84546302a675",
+      "bytes": 3007
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/jobs.json",
@@ -31981,8 +31991,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/provenance.json",
-      "sha256": "f940bf32a2fbf001ae777426dd6280dcf4adde6b1ba37fbddca9715e7cc8fe2d",
-      "bytes": 15636
+      "sha256": "2eece801e62af156d518abc8ee9ceb8051101168419ee3334bf1797c17435bf8",
+      "bytes": 15903
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
