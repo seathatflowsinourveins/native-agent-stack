@@ -608,13 +608,15 @@ class MoverPaperCommandWiring(unittest.TestCase):
             self.sell_blocked_ports -= 1
             self.ports.append(port)
             self.port_kwargs.append((list(symbols), kwargs.get("required_quote_symbols")))
+            self.transport_timeouts.append({name: kwargs.get(name) for name in
+                                            ("quote_timeout", "order_quote_max_age_seconds")})
             self.broker = port
             return port
 
         def fake_checkpoint(key, secret, *, after, before_request, **kwargs):
             for _ in range(3):
                 before_request("read")
-            return {"account": self.observation([])["account"], "fees": []}
+            return {"account": self.observation([])["account"], "fees": list(self.checkpoint_fees)}
 
         args = [command, "--env-file", str(Path(root) / "unused.env"), "--output", str(out),
                 "--state-root", str(Path(root) / "state")]
@@ -645,7 +647,9 @@ class MoverPaperCommandWiring(unittest.TestCase):
         self.sell_blocked_ports = 0
         self.ports = []
         self.port_kwargs = []
+        self.transport_timeouts = []
         self.path_points = None
+        self.checkpoint_fees = []
 
     def fast_config(self, root):
         """config-mover.json with a 1 s recovery order timeout (the example uses 10 s)."""
@@ -681,18 +685,19 @@ class MoverPaperCommandWiring(unittest.TestCase):
             code, receipt = self.run_paper(root, "cli-2")
             self.assertEqual((code, receipt["status"], receipt["session"]["number"]), (0, "passed", 2))
             self.assertFalse(receipt["inter_trial_cash_changed"])
-            self.broker.cash += D("5.00")    # activity outside the lane between trials is recorded, not refused
+            self.broker.cash += D("5.00")    # an unexplained account gain must not become a new baseline
             code, receipt = self.run_paper(root, "cli-2b")
-            self.assertEqual((code, receipt["status"], receipt["inter_trial_cash_changed"]), (0, "passed", True))
-            self.assertEqual(json.loads((state / "mover" / "trial.json").read_text())["inter_trial_cash_change_usd"],
-                             "5.00")
+            self.assertEqual((code, receipt["status"], receipt.get("reason")),
+                             (2, "not_started", "next_trial_cash_mismatch"))
+            self.assertEqual(json.loads((state / "mover" / "trial.json").read_text())["trial_id"], "cli-2")
+            self.broker.cash -= D("5.00")    # independent fixture removes its deliberately injected gain
             (state / "adaptive").mkdir()
             code, receipt = self.run_paper(root, "cli-3")
             self.assertEqual((code, receipt["reason"]), (2, "account_shared_with_adaptive_lane"))
             code, receipt = self.run_paper(root, "cli-4", "--allow-shared-account")
             self.assertEqual((code, receipt["status"], receipt["shared_account_override"]), (0, "passed", True))
             trial = json.loads((state / "mover" / "trial.json").read_text())
-            self.assertEqual([h["session_number"] for h in trial["history"]], [1, 2, 3, 4])
+            self.assertEqual([h["session_number"] for h in trial["history"]], [1, 2, 3])
 
     def test_a_later_session_on_other_symbols_recovers_and_recover_clears_the_lane(self):
         # The mover ledger keeps every session's intents; session 2 trades other symbols than
