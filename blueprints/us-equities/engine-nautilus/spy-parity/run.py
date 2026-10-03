@@ -204,7 +204,15 @@ def _load(name, path):
 CONVERT = _load("spy_parity_convert", SOURCE / "convert.py")
 FIXTURE = _load("spy_parity_fixture", SOURCE / "fixture_strategy.py")
 DISTRIBUTION = _load("spy_parity_distribution", SOURCE / "distribution_module.py")
-COSTS = _load("spy_parity_costs", SOURCE / "cost_models.py")
+
+
+def load_cost_models(case):
+    """The zero-cost case never executes the stress-only dependency."""
+    if case["id"] == "one_zero":
+        return None
+    if case["id"] != "one_stress":
+        raise ValueError("unsupported_case:" + case["id"])
+    return _load("spy_parity_costs", SOURCE / "cost_models.py")
 
 
 def case_settings(case_id):
@@ -599,7 +607,7 @@ def run_once(rows, events, out: Path, label: str, case=None, instrument=None, ve
     case = CASE if case is None else case
     instrument = INSTRUMENT if instrument is None else instrument
     venue_config = VENUE if venue_config is None else venue_config
-    fill_model, fee_model = (COSTS.build_models(case, instrument)
+    fill_model, fee_model = (load_cost_models(case).build_models(case, instrument)
                              if case["id"] == "one_stress" else (None, None))
     random.seed(SEED)
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
@@ -841,7 +849,7 @@ def main():
 
     receipt = {
         "schema_version": 2,
-        "id": "spy-parity-one-zero-v2",
+        "id": "spy-parity-" + case["id"].replace("_", "-") + "-v2",
         "gate": "G-a",
         "case": case["id"],
         "evidence_class": EVIDENCE_CLASS,

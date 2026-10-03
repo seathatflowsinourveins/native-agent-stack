@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace
 import textwrap
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -33,7 +34,7 @@ class OverLimitTests(unittest.TestCase):
 
     def refusal_record(self, module):
         # Synthetic data is confined to this mutation test, never an engine export.
-        return {'intents': [module.decision_intent(self.rows())], 'bars_seen': 2, 'engine_iterations': 2,
+        record = {'intents': [module.decision_intent(self.rows())], 'bars_seen': 2, 'engine_iterations': 2,
                 'errors': [], 'native_fills': [], 'open_orders': 0, 'open_positions': 0,
                 'engine_error_lines': [], 'distribution_module_record': {'errors': [], 'emissions': [], 'acknowledgements': []},
                 'fill_model_calls': [], 'native_account_type': 'MARGIN',
@@ -42,7 +43,7 @@ class OverLimitTests(unittest.TestCase):
                 'native_orders': [{'client_order_id': 'SPY-OVER-LIMIT-1', 'type': 'MARKET',
                                    'side': 'BUY', 'quantity': '1217', 'filled_qty': '0', 'status': 'DENIED'}],
                 'native_order_events': [
-                    {'type': 'OrderInitialized', 'client_order_id': 'SPY-OVER-LIMIT-1'},
+                    {'type': 'OrderInitialized', 'client_order_id': 'SPY-OVER-LIMIT-1', 'ts_event': 1577826000 * 10**9},
                     {'type': 'OrderDenied', 'client_order_id': 'SPY-OVER-LIMIT-1',
                      'ts_event': 1577826000 * 10**9,
                      'reason': 'INITIAL_MARGIN_EXCEEDS_FREE_BALANCE: free=100000.00 USD, margin=195937.00 USD'}],
@@ -50,6 +51,8 @@ class OverLimitTests(unittest.TestCase):
                                   'balance_free': '100000.00 USD', 'initial_margin': '0.00 USD',
                                   'maintenance_margin': '0.00 USD', 'position_count': 0}
                                  for row in self.rows()]}
+        record['native_callback_events'] = copy.deepcopy(record['native_order_events'])
+        return record
 
     def test_configuration_uses_standard_fixed_half_margin_without_bypass(self):
         config = self.module().configuration()
@@ -239,6 +242,89 @@ class OverLimitTests(unittest.TestCase):
     def test_no_synthetic_native_record_builder_in_production(self):
         module = self.module()
         self.assertNotIn('test_refusal_record', Path(module.__file__).read_text())
+
+    def test_lost_or_changed_callback_stream_cannot_pass_refusal_comparison(self):
+        module = self.module()
+        record = self.refusal_record(module)
+        record['native_callback_events'] = copy.deepcopy(record['native_order_events'])
+        expected = module.CMP.oracle_case(json.loads((ROOT / 'blueprints/us-equities/historical-simulation/receipt.json').read_text()), 'over_limit')
+        self.assertFalse([c for c in module.refusal_checks(record, self.rows(), expected) if not c['pass']])
+        for mutation in ['missing', 'empty', 'lost_initialized', 'lost_denied', 'reversed', 'extra', 'reason', 'id', 'timestamp']:
+            changed = copy.deepcopy(record)
+            events = changed['native_callback_events']
+            if mutation == 'missing': del changed['native_callback_events']
+            if mutation == 'empty': events.clear()
+            if mutation == 'lost_initialized': events.pop(0)
+            if mutation == 'lost_denied': events.pop()
+            if mutation == 'reversed': events.reverse()
+            if mutation == 'extra': events.append(copy.deepcopy(events[-1]))
+            if mutation == 'reason': events[-1]['reason'] = 'NO_MARKET_PRICE'
+            if mutation == 'id': events[-1]['client_order_id'] = 'OTHER'
+            if mutation == 'timestamp': events[-1]['ts_event'] += 1
+            with self.subTest(mutation=mutation):
+                self.assertTrue([c for c in module.refusal_checks(changed, self.rows(), expected) if not c['pass']])
+
+    def test_successor_mapping_selection_stays_scoped_and_binds_complete_sources(self):
+        module = self.module()
+        with tempfile.TemporaryDirectory(prefix='spy-successor-mapping-') as folder:
+            fixture = Path(folder)
+            for name in module.reviewed_files():
+                (fixture / name).write_bytes((SOURCE / name).read_bytes())
+            selected = fixture / 'mapping-manifest-over-limit-successor-test.json'
+            mapping = json.loads((SOURCE / module.MANIFEST).read_text())
+            # A synthetic test mapping, never native qualification or a receipt.
+            mapping['sealed_stress_source_sha256'] = {n: module.RUN.digest(fixture / n)
+                                                     for n in module.RUN.stress_reviewed_files()}
+            selected.write_text(json.dumps(mapping))
+            with patch.object(module, 'SOURCE', fixture):
+                self.assertEqual(module.select_mapping_manifest(selected), selected)
+                self.assertEqual(module._bound_manifest(selected)[0], mapping)
+                names = module.reviewed_files(selected.name)
+                self.assertEqual(len(names), 13)
+                self.assertIn(selected.name, names)
+                self.assertNotIn(module.MANIFEST, names)
+                binding = module.mapping_binding(selected)
+                self.assertEqual(binding, {'path': selected.name, 'sha256': module.RUN.digest(selected)})
+                module.require_mapping_binding(binding, selected)
+                for changed in [{'path': module.MANIFEST, 'sha256': binding['sha256']},
+                                {'path': selected.name, 'sha256': '0' * 64}]:
+                    with self.assertRaises(ValueError): module.require_mapping_binding(changed, selected)
+                before = copy.deepcopy(mapping)
+                mapping['sealed_stress_source_sha256']['run.py'] = '0' * 64
+                selected.write_text(json.dumps(mapping))
+                with self.assertRaisesRegex(ValueError, 'qualified_stress_source_changed:run.py'):
+                    module._bound_manifest(selected)
+                mapping = before
+                del mapping['sealed_stress_source_sha256']['run.py']
+                selected.write_text(json.dumps(mapping))
+                with self.assertRaisesRegex(ValueError, 'sealed_stress_source'):
+                    module._bound_manifest(selected)
+                with self.assertRaises(ValueError): module.select_mapping_manifest(SOURCE / module.MANIFEST)
+                selected.unlink()
+                selected.symlink_to(SOURCE / module.MANIFEST)
+                with self.assertRaises(ValueError): module.select_mapping_manifest(selected)
+
+    def test_original_mapping_refuses_changed_stress_source_without_waiver(self):
+        with self.assertRaisesRegex(ValueError, 'qualified_stress_source_changed:'):
+            self.module()._bound_manifest()
+
+    def test_cli_selected_manifest_reaches_binder_for_run_and_compare(self):
+        module = self.module()
+        selected = SOURCE / module.MANIFEST
+        for operation in ['run', 'compare']:
+            argv = ['over_limit.py', operation, '--lean-data', '/unused', '--out', '/unused-out',
+                    '--mapping-manifest', str(selected)]
+            argv += (['--review-record', '/unused-review', '--harness-commit', 'b' * 40] if operation == 'run'
+                     else ['--receipt', '/unused-receipt', '--source-dir', str(SOURCE)])
+            with self.subTest(operation=operation), patch.object(sys, 'argv', argv), \
+                    patch.object(module, '_bound_manifest', side_effect=ValueError('stop_after_selection')) as bound:
+                with self.assertRaisesRegex(ValueError, 'stop_after_selection'):
+                    module.main()
+                bound.assert_called_once_with(selected)
+        argv = ['over_limit.py', 'compare', '--lean-data', '/unused', '--out', '/unused-out',
+                '--receipt', '/unused-receipt', '--source-dir', str(SOURCE / 'historical-source-v2-a2ad39a')]
+        with patch.object(sys, 'argv', argv), self.assertRaisesRegex(ValueError, 'source_directory_not_supported'):
+            module.main()
 
     def test_order_ownership_and_adjacent_calls_match_compiled_strategy_api(self):
         module = self.module()

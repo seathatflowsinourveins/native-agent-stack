@@ -60,6 +60,8 @@ from pathlib import Path
 import sys
 
 SOURCE = Path(__file__).resolve().parent
+HISTORICAL_SOURCE = "historical-source-v2-a2ad39a"
+HISTORICAL_SOURCE_METADATA_SHA256 = "19f568f037570322ea49575a0f2dd4ab93b4bf47e6cf16b1ec95a6c85617709e"
 REQUIRED_LIMITS = ("event_seconds_abs", "fill_quantity_abs", "fill_price_usd_abs", "fees_usd_abs",
                    "dividend_usd_abs", "cash_usd_abs", "end_cash_usd_abs", "final_quantity_abs")
 MARKET_ON_OPEN = "market_on_open_proxy"
@@ -230,9 +232,27 @@ def known_short_sessions(manifest: dict) -> dict:
 def check_local_sources(receipt: dict, source_dir=None) -> None:
     """Every harness file the receipt hashed must still be that file on disk."""
     base = Path(source_dir or SOURCE)
+    if base.is_symlink() or not base.is_dir():
+        raise ValueError("source_directory_not_declared")
+    if base.resolve() != SOURCE.resolve():
+        if base.resolve() != (SOURCE / HISTORICAL_SOURCE).resolve():
+            raise ValueError("source_directory_not_declared")
+        metadata_path = SOURCE / (HISTORICAL_SOURCE + ".json")
+        if (metadata_path.is_symlink() or not metadata_path.is_file()
+                or digest(metadata_path) != HISTORICAL_SOURCE_METADATA_SHA256):
+            raise ValueError("historical_source_metadata_changed")
+        metadata = json.loads(metadata_path.read_text())
+        if (metadata["directory"] != HISTORICAL_SOURCE
+                or metadata["files"] != receipt.get("local_source_sha256")):
+            raise ValueError("historical_source_receipt_binding_mismatch")
+        actual = {p.name: digest(p) for p in base.iterdir() if p.is_file() and not p.is_symlink()}
+        if actual != metadata["files"]:
+            raise ValueError("historical_source_files_mismatch")
     for name, recorded in sorted(receipt.get("local_source_sha256", {}).items()):
+        if Path(name).name != name:
+            raise ValueError("local_source_name_not_a_leaf:" + name)
         path = base / name
-        if not path.is_file():
+        if path.is_symlink() or not path.is_file():
             raise ValueError("local_source_missing:" + name)
         if digest(path) != recorded:
             raise ValueError("local_source_sha256_mismatch:" + name)
@@ -348,6 +368,11 @@ def bind(receipt: dict, tolerances_path: Path, manifest_path: Path, oracle_path=
             raise ValueError("tolerances_sha256_disagrees_with_manifest")
         if receipt.get("schema_version") != 2:
             raise ValueError("receipt_is_not_a_v2_receipt")
+        if receipt.get("case") != manifest["case_configuration"]["case"]:
+            raise ValueError("case_disagrees_with_manifest:" + str(receipt.get("case")))
+        expected_id = "spy-parity-" + receipt["case"].replace("_", "-") + "-v2"
+        if receipt.get("id") != expected_id:
+            raise ValueError("receipt_id_disagrees_with_case:" + str(receipt.get("id")))
         sources = (*V2_SOURCES, *STRESS_REVIEWED_FILES) if stress else V2_SOURCES
         missing = [name for name in sources if name not in receipt.get("local_source_sha256", {})]
         if missing:
@@ -1230,6 +1255,8 @@ def main() -> int:
     parser.add_argument("--lean-data", type=Path,
                         help="Retained LEAN Data root; re-derives the bars instead of --bars")
     parser.add_argument("--case", help="Optional: must equal the receipt's own case")
+    parser.add_argument("--source-dir", type=Path,
+                        help="Explicit current harness or sealed historical v2 source directory; no fallback")
     parser.add_argument("--verdict", type=Path, help="Optional path for the machine-readable verdict")
     args = parser.parse_args()
 
@@ -1238,7 +1265,8 @@ def main() -> int:
         args.manifest = SOURCE / Path(receipt["mapping_manifest"]["path"]).name
     if args.case and args.case != receipt["case"]:
         raise ValueError("requested_case_is_not_the_receipt_case:" + args.case)
-    limits, manifest = bind(receipt, args.tolerances, args.manifest, args.oracle, args.plan)
+    limits, manifest = bind(receipt, args.tolerances, args.manifest, args.oracle, args.plan,
+                            args.source_dir)
     oracle = oracle_case(json.loads(args.oracle.read_text()), receipt["case"])
     bars = load_bars(args.bars, args.lean_data, receipt, manifest)
     verdict = compare(receipt, oracle, limits, manifest, bars,

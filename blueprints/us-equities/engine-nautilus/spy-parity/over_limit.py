@@ -59,8 +59,26 @@ def decision_intent(rows):
             'decision_price': row['c'], 'client_order_id': 'SPY-OVER-LIMIT-1'}
 
 
-def reviewed_files():
-    return (*RUN.stress_reviewed_files(), 'over_limit.py', MANIFEST, PREREGISTRATION)
+def reviewed_files(manifest_name=MANIFEST):
+    return (*RUN.stress_reviewed_files(), 'over_limit.py', manifest_name, PREREGISTRATION)
+
+
+def select_mapping_manifest(path=None):
+    selected = Path(path) if path is not None else SOURCE / MANIFEST
+    if (selected.is_symlink() or not selected.is_file() or selected.parent.resolve() != SOURCE.resolve()
+            or not selected.name.startswith('mapping-manifest-over-limit-') or selected.suffix != '.json'):
+        raise ValueError('over_limit_mapping_manifest_selection_invalid')
+    return selected
+
+
+def mapping_binding(path):
+    selected = select_mapping_manifest(path)
+    return {'path': selected.name, 'sha256': RUN.digest(selected)}
+
+
+def require_mapping_binding(recorded, path):
+    if recorded != mapping_binding(path):
+        raise ValueError('over_limit_selected_mapping_binding_changed')
 
 
 def require_review(review, hashes, started_utc, revision):
@@ -171,6 +189,15 @@ def refusal_checks(run, rows, expected):
     check('native_denial_timestamps', [derived['ts_event_ns']], [e.get('ts_event') for e in denied])
     check('native_denial_ids', [derived['client_order_id']], [e.get('client_order_id') for e in denied])
     check('native_initial_margin_denial', [True], [initial_margin_denial(e.get('reason')) for e in denied])
+    callbacks = run.get('native_callback_events')
+    check('native_callback_stream_present', True, isinstance(callbacks, list))
+    callbacks = callbacks if isinstance(callbacks, list) else []
+    check('native_callback_types', ['OrderInitialized', 'OrderDenied'], [e.get('type') for e in callbacks])
+    check('native_callback_ids', [derived['client_order_id']] * 2, [e.get('client_order_id') for e in callbacks])
+    check('native_callback_timestamps', [derived['ts_event_ns']] * 2, [e.get('ts_event') for e in callbacks])
+    check('native_callbacks_match_order_archive', events, callbacks)
+    check('native_callback_initial_margin_denial', [True],
+          [initial_margin_denial(e.get('reason')) for e in callbacks if e.get('type') == 'OrderDenied'])
     if len(denied) == 1 and initial_margin_denial(denied[0].get('reason')):
         free, margin = re.findall(r'([0-9]+\.[0-9]{2}) USD', denied[0]['reason'])
         check('denial_free_balance', Decimal('100000'), Decimal(free))
@@ -292,7 +319,8 @@ def _run_once(rows, events, out, preflight):
     out.mkdir(parents=True, exist_ok=False, mode=0o700)
     usd, venue = Currency.from_str('USD'), Venue('SIM')
     instrument = native_instrument()
-    fill, fee = RUN.COSTS.build_models(config['case'], config['instrument'])
+    costs = RUN.load_cost_models(RUN.case_settings('one_stress')[0])
+    fill, fee = costs.build_models(config['case'], config['instrument'])
     module = RUN.DISTRIBUTION.build_module(events, 'SPY.SIM', 'USD')
     strategy_class = _build_strategy(rows, instrument.id, venue, usd,
                                      [event['ex_instant_ns'] for event in events])
@@ -374,13 +402,15 @@ def _run_once(rows, events, out, preflight):
     return run
 
 
-def _bound_manifest():
-    mapping = json.loads((SOURCE / MANIFEST).read_text())
+def _bound_manifest(path=None):
+    mapping = json.loads(select_mapping_manifest(path).read_text())
     inherited, effective = RUN.load_bound_manifests('one_stress')
     if RUN.digest(SOURCE / RUN.MANIFEST_STRESS) != mapping['inherits']['sha256']:
         raise ValueError('over_limit_inherited_stress_manifest_changed')
     if configuration() != mapping['configuration']:
         raise ValueError('over_limit_configuration_differs_from_preregistered')
+    if set(mapping['sealed_stress_source_sha256']) != set(RUN.stress_reviewed_files()):
+        raise ValueError('over_limit_sealed_stress_source_set_changed')
     for name, digest in mapping['sealed_stress_source_sha256'].items():
         if RUN.digest(SOURCE / name) != digest:
             raise ValueError('qualified_stress_source_changed:' + name)
@@ -395,18 +425,29 @@ def main():
     replay.add_argument('--out', type=Path, required=True)
     replay.add_argument('--review-record', type=Path, required=True)
     replay.add_argument('--harness-commit', required=True)
+    replay.add_argument('--mapping-manifest', type=Path,
+                        help='Reviewed mapping JSON inside this harness; defaults to the original sealed mapping')
     compare = sub.add_parser('compare')
     compare.add_argument('--lean-data', type=Path, required=True)
     compare.add_argument('--receipt', type=Path, required=True)
     compare.add_argument('--out', type=Path, required=True)
     compare.add_argument('--oracle', type=Path, default=RUN.HISTORICAL / 'receipt.json')
+    compare.add_argument('--mapping-manifest', type=Path,
+                         help='Must match the selected name and digest frozen before the run')
+    compare.add_argument('--source-dir', type=Path,
+                         help='Explicit current over-limit harness only; the v2 eight-file archive is inapplicable')
     args = parser.parse_args()
-    mapping, inherited, effective = _bound_manifest()
+    if args.operation == 'compare' and args.source_dir is not None:
+        if args.source_dir.is_symlink() or args.source_dir.resolve() != SOURCE.resolve():
+            raise ValueError('over_limit_source_directory_not_supported')
+    selected_manifest = select_mapping_manifest(args.mapping_manifest)
+    selected_binding = mapping_binding(selected_manifest)
+    mapping, inherited, effective = _bound_manifest(selected_manifest)
     conversion = RUN.CONVERT.convert(args.lean_data, **RUN.WINDOW,
                                      known_short_sessions=RUN.known_short_sessions(effective))
     if conversion['input_hashes'] != inherited['inputs']['frozen_sha256']:
         raise ValueError('over_limit_frozen_inputs_changed')
-    source_hashes = {name: RUN.digest(SOURCE / name) for name in reviewed_files()}
+    source_hashes = {name: RUN.digest(SOURCE / name) for name in reviewed_files(selected_manifest.name)}
     if args.operation == 'run':
         started = datetime.now(timezone.utc).isoformat()
         review = json.loads(args.review_record.read_text())
@@ -421,7 +462,7 @@ def main():
         args.out.mkdir(mode=0o700, parents=True, exist_ok=False)
         frozen = {'argv': list(sys.argv), 'configuration': configuration(),
                   'input_sha256': conversion['input_hashes'], 'source_sha256': source_hashes,
-                  'mapping_sha256': RUN.digest(SOURCE / MANIFEST),
+                  'mapping_sha256': selected_binding['sha256'], 'mapping_manifest': selected_binding,
                   'review_sha256': RUN.digest(args.review_record), 'isolation': isolation}
         RUN.save(args.out / 'frozen-arguments.private.json', frozen)
         preflight = {'review': review, 'source_hashes': source_hashes, 'started_utc': started,
@@ -447,6 +488,7 @@ def main():
         return
     receipt = json.loads(args.receipt.read_text())
     frozen = receipt['frozen_arguments']
+    require_mapping_binding(frozen.get('mapping_manifest'), selected_manifest)
     frozen_path = args.receipt.parent / 'frozen-arguments.private.json'
     if RUN.digest(frozen_path) != receipt['frozen_arguments_sha256'] or json.loads(frozen_path.read_text()) != frozen:
         raise ValueError('over_limit_preengine_argument_record_changed')
@@ -456,7 +498,7 @@ def main():
     require_isolation(frozen['isolation'])
     if list(sys.argv) not in review.get('authorized_compare_argvs', []):
         raise ValueError('over_limit_compare_argv_not_preregistered')
-    for field, expected in [('source_sha256', source_hashes), ('mapping_sha256', RUN.digest(SOURCE / MANIFEST)),
+    for field, expected in [('source_sha256', source_hashes), ('mapping_sha256', selected_binding['sha256']),
                             ('review_sha256', RUN.digest(review_path)), ('input_sha256', conversion['input_hashes']),
                             ('configuration', configuration())]:
         if frozen[field] != expected:

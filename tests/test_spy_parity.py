@@ -4,13 +4,19 @@ These are synthetic boundary fixtures for the gate G-a harness. They do not run
 the engine, do not touch a broker and do not establish parity by themselves.
 """
 import hashlib
+import ast
+from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
+import io
 import json
 import re
 from decimal import Decimal
 from pathlib import Path
 import tempfile
+import shutil
+import sys
 import unittest
+from unittest.mock import patch
 import uuid
 import zipfile
 
@@ -775,7 +781,7 @@ class BindingTests(unittest.TestCase):
 
     def test_bind_reports_a_missing_harness_file(self):
         with tempfile.TemporaryDirectory() as tmp:
-            with self.assertRaisesRegex(ValueError, "local_source_missing:"):
+            with self.assertRaisesRegex(ValueError, "source_directory_not_declared"):
                 COMPARE.check_local_sources(self.receipt, Path(tmp))
 
     def test_bind_pins_the_frozen_plan_and_case_configuration(self):
@@ -1027,19 +1033,19 @@ class StressMappingTests(unittest.TestCase):
             RUN.case_settings("two_stress")
 
     def test_adverse_prices_match_frozen_oracle_exactly(self):
-        self.assertTrue(hasattr(RUN, "COSTS"), "native stress cost mapping missing")
+        costs = RUN.load_cost_models(RUN.case_settings("one_stress")[0])
         oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
         for side, raw, wanted in (("BUY", "323.5800", "324.227160"),
                                   ("SELL", "291.6900", "291.106620")):
-            self.assertEqual(RUN.COSTS.adverse_price(raw, side, "0.002", 6), Decimal(wanted))
+            self.assertEqual(costs.adverse_price(raw, side, "0.002", 6), Decimal(wanted))
         self.assertEqual([f["price"] for f in oracle["fills"]],
                          [Decimal("324.22716"), Decimal("291.10662")])
-        self.assertEqual(RUN.COSTS.adverse_price("1.2345675", "BUY", "0", 6),
+        self.assertEqual(costs.adverse_price("1.2345675", "BUY", "0", 6),
                          Decimal("1.234568"))
-        self.assertEqual(RUN.COSTS.adverse_price("1.2345665", "SELL", "0", 6),
+        self.assertEqual(costs.adverse_price("1.2345665", "SELL", "0", 6),
                          Decimal("1.234566"))
         with self.assertRaisesRegex(ValueError, "invalid_order_side"):
-            RUN.COSTS.adverse_price("100", "UNKNOWN", "0.002", 6)
+            costs.adverse_price("100", "UNKNOWN", "0.002", 6)
 
     def test_stress_cash_reconstructs_without_a_second_rounding_stage(self):
         oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
@@ -1116,7 +1122,7 @@ class StressMappingTests(unittest.TestCase):
         usd = Currency.from_str("USD")
         equity = Equity(InstrumentId.from_str("SPY.SIM"), Symbol("SPY"), usd, 6,
                         Price.from_str("0.000001"), 0, 0, lot_size=Quantity.from_int(1))
-        fill_model, fee_model = RUN.COSTS.build_models(case, instrument)
+        fill_model, fee_model = RUN.load_cost_models(case).build_models(case, instrument)
         for side, raw, expected in ((OrderSide.BUY, "323.580000", "324.227160"),
                                     (OrderSide.SELL, "291.690000", "291.106620")):
             order = StopMarketOrder(trader_id=TraderId("TEST-001"), strategy_id=StrategyId("TEST-001"),
@@ -2255,6 +2261,104 @@ class V2VerdictRuleTests(unittest.TestCase):
                       RUN.sizing_limitation(intents, receipt["distribution_ledger"]))
         self.assertIn("no intent of this run follows",
                       RUN.sizing_limitation(receipt["intents"][:1], receipt["distribution_ledger"]))
+
+class ReviewThreadRegressionTests(unittest.TestCase):
+    def test_runner_import_does_not_execute_unbound_cost_models(self):
+        original = importlib.util.spec_from_file_location
+        def refuse_costs(name, path, *args, **kwargs):
+            if Path(path).name == "cost_models.py":
+                raise AssertionError("unbound cost module executed during runner import")
+            return original(name, path, *args, **kwargs)
+        with patch.object(importlib.util, "spec_from_file_location", side_effect=refuse_costs):
+            runner = _load("spy_parity_import_without_costs", SOURCE / "run.py")
+        with patch.object(runner, "_load", side_effect=AssertionError("zero case loaded costs")):
+            self.assertIsNone(runner.load_cost_models(runner.case_settings("one_zero")[0]))
+        token = object()
+        with patch.object(runner, "_load", return_value=token) as loaded:
+            self.assertIs(runner.load_cost_models(runner.case_settings("one_stress")[0]), token)
+            loaded.assert_called_once_with("spy_parity_costs", SOURCE / "cost_models.py")
+
+    def test_production_receipt_identity_matches_each_selected_case(self):
+        main = next(n for n in ast.parse((SOURCE / "run.py").read_text()).body
+                    if isinstance(n, ast.FunctionDef) and n.name == "main")
+        receipt = next(n.value for n in ast.walk(main) if isinstance(n, ast.Assign)
+                       and any(isinstance(t, ast.Name) and t.id == "receipt" for t in n.targets))
+        expression = next(value for key, value in zip(receipt.keys, receipt.values)
+                          if isinstance(key, ast.Constant) and key.value == "id")
+        for case, wanted in [("one_zero", "spy-parity-one-zero-v2"), ("one_stress", "spy-parity-one-stress-v2")]:
+            with self.subTest(case=case):
+                self.assertEqual(eval(compile(ast.Expression(expression), "receipt identity", "eval"),
+                                      vars(RUN), {"case": {"id": case}}), wanted)
+
+    def test_comparator_rejects_a_receipt_identity_contradicting_its_bound_case(self):
+        plan = ROOT / "blueprints/us-equities/historical-simulation/plan.json"
+        for case, wanted, wrong in [
+                ("one_zero", "spy-parity-one-zero-v2", "spy-parity-one-stress-v2"),
+                ("one_stress", "spy-parity-one-stress-v2", "spy-parity-one-zero-v2")]:
+            _, effective = RUN.load_bound_manifests(case)
+            name = RUN.MANIFEST_STRESS if case == "one_stress" else RUN.MANIFEST_V2
+            prereg = RUN.PREREGISTRATION_STRESS if case == "one_stress" else "PREREGISTRATION-v2.md"
+            receipt = _rebound_to_current_harness(json.loads(RECEIPT_V2.read_text()))
+            receipt.update(case=case, id=wanted,
+                           mapping_manifest={"path": name, "sha256": COMPARE.digest(SOURCE / name)},
+                           preregistration={"sha256": COMPARE.digest(SOURCE / prereg)},
+                           case_configuration={**receipt["case_configuration"],
+                                               **RUN.case_settings(case)[0],
+                                               **effective["case_configuration"],
+                                               "venue_modules": receipt["case_configuration"]["venue_modules"]})
+            if case == "one_stress":
+                receipt["local_source_sha256"].update(
+                    {n: COMPARE.digest(SOURCE / n) for n in RUN.stress_reviewed_files()})
+            with self.subTest(case=case):
+                COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / name, LEAN_RECEIPT, plan)
+                for invalid in (wrong, None):
+                    receipt["id"] = invalid
+                    with self.subTest(invalid=invalid), self.assertRaisesRegex(
+                            ValueError, "receipt_id_disagrees_with_case"):
+                        COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / name,
+                                     LEAN_RECEIPT, plan)
+
+    def test_production_cli_explicitly_binds_original_receipt_to_archive(self):
+        argv = ["compare.py", "--receipt", str(RECEIPT_V2), "--source-dir",
+                str(SOURCE / "historical-source-v2-a2ad39a")]
+        with patch.object(sys, "argv", argv), redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()), \
+                patch.object(COMPARE, "load_bars", return_value=None), \
+                patch.object(COMPARE, "precondition_context", return_value={}), \
+                patch.object(COMPARE, "compare", return_value={"checks": [], "verdict": "PASS"}):
+            # Actual source/manifest/oracle/plan binding runs; only the subsequent
+            # economic stage is synthetic. No engine or new qualification.
+            self.assertEqual(COMPARE.main(), 0)
+
+    def test_explicit_archive_rejects_metadata_file_drift_and_invalid_selection(self):
+        receipt = json.loads(RECEIPT_V2.read_text())
+        with tempfile.TemporaryDirectory(prefix="spy-archive-binding-") as folder:
+            fixture = Path(folder)
+            name = "historical-source-v2-a2ad39a"
+            shutil.copytree(SOURCE / name, fixture / name)
+            metadata = fixture / (name + ".json")
+            metadata.write_bytes((SOURCE / metadata.name).read_bytes())
+            with patch.object(COMPARE, "SOURCE", fixture):
+                COMPARE.check_local_sources(receipt, fixture / name)
+                before = metadata.read_bytes()
+                metadata.write_bytes(before + b"\n")
+                with self.assertRaisesRegex(ValueError, "historical_source_metadata"):
+                    COMPARE.check_local_sources(receipt, fixture / name)
+                metadata.write_bytes(before)
+                archived = fixture / name / "run.py"
+                before = archived.read_bytes()
+                archived.write_bytes(before + b"\n")
+                with self.assertRaises(ValueError):
+                    COMPARE.check_local_sources(receipt, fixture / name)
+                archived.write_bytes(before)
+                archived.unlink()
+                archived.symlink_to(SOURCE / name / "run.py")
+                with self.assertRaises(ValueError):
+                    COMPARE.check_local_sources(receipt, fixture / name)
+                with self.assertRaises(ValueError):
+                    COMPARE.check_local_sources(receipt, SOURCE / name)
+        with self.assertRaisesRegex(ValueError, "local_source_sha256_mismatch"):
+            COMPARE.check_local_sources(receipt)  # No automatic archive fallback.
+
 
 if __name__ == "__main__":
     unittest.main()
