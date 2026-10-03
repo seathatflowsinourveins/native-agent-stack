@@ -32,12 +32,17 @@ CHUB_FEEDBACK = "0"
 
 # Allow user-scope servers the same startup window in separate worktrees.
 # RawMcpServerConfig.startup_timeout_sec:
-# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/config.schema.json
-# Default is 30 s (codex-mcp/src/rmcp_client.rs:103); connection_manager.rs consumes it.
-# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L103
+# https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/config.schema.json
+# Default is 30 s (codex-mcp/src/rmcp_client.rs:105); the timeout applies per startup step.
+# https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/codex-mcp/src/rmcp_client.rs#L105
 # Partial tables retain user commands; profile 21 < project 25 < -c 30 (source in header).
 [mcp_servers.serena]
 startup_timeout_sec = 60
+# Wait for Serena before the first turn, or fail session start; preserve the other servers' optional startup.
+# openai/codex@rust-v0.160.0:codex-rs/config/src/mcp_types.rs:248-256;
+# codex-rs/codex-mcp/src/connection_manager/required.rs:35,61 (identical at rust-v0.159.3).
+# Trial and scope: docs/decisions/2026-09-26-codex-worker-lane.md, addendum 2026-10-03.
+required = true
 
 [mcp_servers.codebase-memory]
 startup_timeout_sec = 60

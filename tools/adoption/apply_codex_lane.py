@@ -122,6 +122,8 @@ EXCEPTIONS_MARKER = "native-agent-stack:rtk-exceptions"
 # behaviour below was read and probed at 0.157.1; at 0.159.2 the source it cites is unchanged (compared at the two tag
 # commits on 2026-09-30) and CodexIntegrationTests ran again against the real binary.
 CODEX_VERSION = "0.159.3"
+REQUIRED_FAILURE = "required MCP servers failed to initialize: "
+REQUIRED_FAILURE_LIMIT = 2000  # characters retained from the aggregate error, as in #436's pinned port source
 CONTEXT_MODE_VERSION = "1.0.169"
 # start.mjs of context-mode 1.0.169: the npm install and the plugin pin 6f0cc684 carry the same file.
 START_MJS_SHA256 = "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b"
@@ -323,6 +325,41 @@ def worker_command() -> str:
     """How a worker lane starts: the profile plus the pinned flags, stdin closed."""
     pins = " ".join(f"'{flag}'" if '"' in flag else flag for flag in worker_pins())
     return f"codex exec -p {PROFILE_NAME} {pins} -s <sandbox> ... < /dev/null"
+
+
+def required_servers() -> list[str]:
+    """Required servers in the worker profile, sorted as upstream validates them.
+
+    openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/connection_manager.rs:270-275 and
+    connection_manager/required.rs:17-63 (identical at rust-v0.159.3).
+    """
+    profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
+    return sorted(name for name, table in profile.get("mcp_servers", {}).items() if table.get("required") is True)
+
+
+def required_failure_text(stderr: str) -> str:
+    """The last aggregate required-server error, with its multiline details; empty when none is present.
+
+    Failure prefix: openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/connection_manager/required.rs:61.
+    Parser port: PR #436 b18d9f031fdf854e74f59586529df1022e805975, this file.
+    """
+    at = stderr.rfind(REQUIRED_FAILURE)
+    return stderr[at:].strip() if at >= 0 else ""
+
+
+def required_start_failures(stderr: str) -> list[str]:
+    """Required names from the aggregate error, in order and once each, best effort.
+
+    A nested '<name>: ' after '; ' can resemble another server's diagnostic, so retain the full bounded
+    text beside the names. Port source: #436 b18d9f031fdf854e74f59586529df1022e805975, this file.
+    """
+    text = required_failure_text(stderr)
+    required, names = set(required_servers()), []
+    for part in text[len(REQUIRED_FAILURE):].split("; ") if text else []:
+        match = re.match(r"([A-Za-z0-9_-]+): ", part)
+        if match and match.group(1) in required and match.group(1) not in names:
+            names.append(match.group(1))
+    return names
 
 
 def agents_block() -> str:
@@ -773,7 +810,14 @@ def readbacks(codex: str, env: dict, wrapper: list[str] | None, cwd: Path, omnir
         inputs.append(("prompt_input_omniroute", ["-p", OMNIROUTE_PROFILE]))
     for label, extra in inputs:
         got = run_codex(codex, [*extra, "debug", "prompt-input", "probe"], env, cwd, wrapper=wrapper)
-        out[label] = prompt_input_counts(got.stdout) if got.returncode == 0 else {"error": last_line(got.stderr)}
+        if got.returncode == 0:
+            out[label] = prompt_input_counts(got.stdout)
+            continue
+        out[label] = {"error": last_line(got.stderr)}
+        failure = required_failure_text(got.stderr)
+        if failure:
+            out[label]["required_failure"] = {"text": failure[:REQUIRED_FAILURE_LIMIT],
+                                              "names_best_effort": required_start_failures(got.stderr)}
     profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
     out["profile_servers"] = {}
     for name in sorted(profile.get("mcp_servers", {})):
@@ -816,10 +860,18 @@ def check_readbacks(found: dict, eco_root: str) -> list[str]:
     labelled = [("default", plain), ("-p stack-worker", profiled)]
     if "prompt_input_omniroute" in found:
         labelled.append((f"-p {OMNIROUTE_PROFILE}", found["prompt_input_omniroute"]))
+    not_started = [label for label, counts in labelled if counts.get("required_failure")]
+    for label in not_started:
+        failure = dict(labelled)[label]["required_failure"]
+        problems.append(f"{label} prompt input: required MCP servers did not start (read from the error, best "
+                        f"effort: {', '.join(failure['names_best_effort']) or 'none'}): {failure['text']}")
+    labelled = [(label, counts) for label, counts in labelled if label not in not_started]
     for label, counts in labelled:
         if counts.get("top_rule") != 1 or counts.get("rtk_exceptions") != 1 or counts.get("prefix_rule", 0) < 1:
             problems.append(f"{label} prompt input: {counts}")
-    for label, counts in labelled[1:]:
+    for label, counts in labelled:
+        if label == "default":
+            continue
         if not counts.get("no_spawn_unless_asked") or counts.get("proactive_delegation"):
             problems.append(f"the {label} profile's effort did not reach the prompt input "
                             "(max turns proactive delegation off)")
@@ -1079,7 +1131,7 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         latest.unlink()
     latest.symlink_to(run.name)
     print(f"run record: {run}/record.json")
-    print(f"to undo: python3 {Path(__file__).resolve().relative_to(ROOT)} --rollback {run}"
+    print(f"to undo: python3 {Path(__file__).resolve().relative_to(ROOT)} --rollback {run.resolve()}"
           + (f" --codex-home {plan.codex_home}" if args.codex_home else ""))
     env = codex_env(plan.codex_home)
     try:
@@ -1180,7 +1232,7 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         record["error"] = str(error)
         write_record(run, record)
         print(f"FAILED: {error}")
-        print(f"undo with: python3 {Path(__file__).resolve().relative_to(ROOT)} --rollback {run}"
+        print(f"undo with: python3 {Path(__file__).resolve().relative_to(ROOT)} --rollback {run.resolve()}"
               + (f" --codex-home {plan.codex_home}" if args.codex_home else ""))
         return 3
     record["status"] = "applied"

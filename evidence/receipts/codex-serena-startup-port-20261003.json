@@ -1,0 +1,3150 @@
+{
+  "schema_version": 1,
+  "kind": "codex_serena_startup_trial",
+  "date": "2026-10-03",
+  "base_commit": "cac8700ba914950266272347468bff7ad630a4bf",
+  "port_source": {
+    "pr": 436,
+    "head": "b18d9f031fdf854e74f59586529df1022e805975"
+  },
+  "evidence_class": "local_integration",
+  "inputs": "synthetic stdio MCP servers and loopback fake Responses endpoint",
+  "codex_version": "0.159.3",
+  "target_codex_version": "0.160.0",
+  "provider_execution": false,
+  "host_apply": false,
+  "token_measurements": null,
+  "preregistration": "docs/decisions/2026-09-26-codex-worker-lane.md#addendum-2026-10-03-serena-at-the-first-turn-port-of-436",
+  "trial_command": "env TMPDIR=/var/tmp/claude-codex-startup NAS_CODEX_INTEGRATION=1 NAS_CODEX_STARTUP_TRIAL=1 NAS_CODEX_STARTUP_OBSERVATIONS=<PRIVATE_CAPTURE> nice -n 19 <BWRAP_WRITABLE_TMPDIR_OVERLAY> python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests.test_serena_startup_trial",
+  "trial_exit_code": 0,
+  "trial_returned_output": "Ran 1 test in 129.972s\n\nOK",
+  "isolation": "bwrap --unshare-net; scratch HOME and CODEX_HOME; only Serena enabled; no sign-in, real MCP server, gateway or model",
+  "scratch_policy": "The outer bwrap namespace binds an authorized scratch directory at the required TMPDIR and has a private /tmp; no host apply or outside-root write. --bind, --ro-bind, --unshare-net and --tmpfs are confirmed by the installed bubblewrap 0.9.0 --help.",
+  "sanitization": "Only diagnostic stderr lines retained; Codex session banner, generated session IDs and synthetic prompt/answer removed. Scratch Codex-home and root paths become <CODEX_HOME> and <SCRATCH>. Executable is named codex. Private mount/capture paths are placeholders; exact wrapped argv and original returned captures are retained in private custody. Request bodies/headers are never retained in the published receipt.",
+  "criteria": {
+    "delay_initialize_sec": 2.5,
+    "runs_per_arm_per_fixture": 3,
+    "first_turn_tool": "mcp__serena__fixture_serena",
+    "oracle": "ALL_TOOLS names from the second request custom_tool_call_output, after the first answer invokes code-mode exec",
+    "pass": "Serena is on the first turn for every successful startup within its configured timeout",
+    "preference": [
+      "no new configuration-owner map entry",
+      "lower added latency",
+      "explicit failure rather than silent degradation"
+    ]
+  },
+  "arms": {
+    "control": "unchanged main profile",
+    "A": "mcp_servers.serena.required=true",
+    "B": "mcp_optional_startup_grace_ms=0",
+    "C": {
+      "status": "excluded",
+      "reason": "process-scoped catalog cache starts empty in a fresh process",
+      "source": "openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/tool_catalog_cache.rs:36-49"
+    }
+  },
+  "runs": [
+    {
+      "arm": "control",
+      "fixture": "delayed_initialize",
+      "run": 1,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 1.568545,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 1.603249,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 6.732239,
+      "started_at_utc": "2026-10-03T19:53:09Z",
+      "ended_at_utc": "2026-10-03T19:53:16Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 1.568545,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "control",
+      "fixture": "delayed_initialize",
+      "run": 2,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 1.477847,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 1.511734,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 6.629576,
+      "started_at_utc": "2026-10-03T19:53:16Z",
+      "ended_at_utc": "2026-10-03T19:53:23Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 1.477847,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "control",
+      "fixture": "delayed_initialize",
+      "run": 3,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 1.762726,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 1.792581,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 6.880691,
+      "started_at_utc": "2026-10-03T19:53:23Z",
+      "ended_at_utc": "2026-10-03T19:53:30Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 1.762726,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "control",
+      "fixture": "cannot_start",
+      "run": 1,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 0.637889,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 0.6666,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 5.778881,
+      "started_at_utc": "2026-10-03T19:53:31Z",
+      "ended_at_utc": "2026-10-03T19:53:36Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 0.637889,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "control",
+      "fixture": "cannot_start",
+      "run": 2,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 0.519297,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 0.551482,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 5.678131,
+      "started_at_utc": "2026-10-03T19:53:37Z",
+      "ended_at_utc": "2026-10-03T19:53:43Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 0.519297,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "control",
+      "fixture": "cannot_start",
+      "run": 3,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 0.632459,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 0.663004,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 5.777845,
+      "started_at_utc": "2026-10-03T19:53:43Z",
+      "ended_at_utc": "2026-10-03T19:53:49Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 0.632459,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "A",
+      "fixture": "delayed_initialize",
+      "run": 1,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 3.174493,
+          "deferred_tool_guidance": true,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 3.212553,
+          "deferred_tool_guidance": true,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "mcp__serena__fixture_serena",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 8.333642,
+      "started_at_utc": "2026-10-03T19:53:49Z",
+      "ended_at_utc": "2026-10-03T19:53:58Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "2e3a95ef2dfafe17c8ca8b8c85ca665f22ca87734de0b1446b602ec4c8c5ae47",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 3.174493,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "mcp__serena__fixture_serena",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "A",
+      "fixture": "delayed_initialize",
+      "run": 2,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 3.308461,
+          "deferred_tool_guidance": true,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 3.341447,
+          "deferred_tool_guidance": true,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "mcp__serena__fixture_serena",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 8.433619,
+      "started_at_utc": "2026-10-03T19:53:58Z",
+      "ended_at_utc": "2026-10-03T19:54:07Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "2e3a95ef2dfafe17c8ca8b8c85ca665f22ca87734de0b1446b602ec4c8c5ae47",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 3.308461,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "mcp__serena__fixture_serena",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "A",
+      "fixture": "delayed_initialize",
+      "run": 3,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 3.160008,
+          "deferred_tool_guidance": true,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 3.191433,
+          "deferred_tool_guidance": true,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "mcp__serena__fixture_serena",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 8.28364,
+      "started_at_utc": "2026-10-03T19:54:07Z",
+      "ended_at_utc": "2026-10-03T19:54:15Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "2e3a95ef2dfafe17c8ca8b8c85ca665f22ca87734de0b1446b602ec4c8c5ae47",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 3.160008,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "mcp__serena__fixture_serena",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "A",
+      "fixture": "cannot_start",
+      "run": 1,
+      "exit": 1,
+      "stderr": "2026-10-03T19:54:16.846130Z ERROR codex_core::session: Failed to create session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: connection closed: initialize response: connection closed: initialize response\nError: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: connection closed: initialize response: connection closed: initialize response (code -32603)",
+      "requests": [],
+      "elapsed_sec": 5.477237,
+      "started_at_utc": "2026-10-03T19:54:16Z",
+      "ended_at_utc": "2026-10-03T19:54:21Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "2e3a95ef2dfafe17c8ca8b8c85ca665f22ca87734de0b1446b602ec4c8c5ae47",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": null,
+      "first_turn_tools": []
+    },
+    {
+      "arm": "A",
+      "fixture": "cannot_start",
+      "run": 2,
+      "exit": 1,
+      "stderr": "2026-10-03T19:54:22.498978Z ERROR codex_core::session: Failed to create session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: connection closed: initialize response: connection closed: initialize response\nError: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: connection closed: initialize response: connection closed: initialize response (code -32603)",
+      "requests": [],
+      "elapsed_sec": 5.526917,
+      "started_at_utc": "2026-10-03T19:54:22Z",
+      "ended_at_utc": "2026-10-03T19:54:27Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "2e3a95ef2dfafe17c8ca8b8c85ca665f22ca87734de0b1446b602ec4c8c5ae47",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": null,
+      "first_turn_tools": []
+    },
+    {
+      "arm": "A",
+      "fixture": "cannot_start",
+      "run": 3,
+      "exit": 1,
+      "stderr": "2026-10-03T19:54:28.579138Z ERROR codex_core::session: Failed to create session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: connection closed: initialize response: connection closed: initialize response\nError: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: connection closed: initialize response: connection closed: initialize response (code -32603)",
+      "requests": [],
+      "elapsed_sec": 5.526881,
+      "started_at_utc": "2026-10-03T19:54:28Z",
+      "ended_at_utc": "2026-10-03T19:54:33Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "2e3a95ef2dfafe17c8ca8b8c85ca665f22ca87734de0b1446b602ec4c8c5ae47",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": null,
+      "first_turn_tools": []
+    },
+    {
+      "arm": "B",
+      "fixture": "delayed_initialize",
+      "run": 1,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 2.98633,
+          "deferred_tool_guidance": true,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 3.018566,
+          "deferred_tool_guidance": true,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "mcp__serena__fixture_serena",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 8.133179,
+      "started_at_utc": "2026-10-03T19:54:34Z",
+      "ended_at_utc": "2026-10-03T19:54:42Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "29010349b2979950616873524a13b543a902640f5a35daedf173002a809f4e2b",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 2.98633,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "mcp__serena__fixture_serena",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "B",
+      "fixture": "delayed_initialize",
+      "run": 2,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 3.001203,
+          "deferred_tool_guidance": true,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 3.030992,
+          "deferred_tool_guidance": true,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "mcp__serena__fixture_serena",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 8.133947,
+      "started_at_utc": "2026-10-03T19:54:42Z",
+      "ended_at_utc": "2026-10-03T19:54:51Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "29010349b2979950616873524a13b543a902640f5a35daedf173002a809f4e2b",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 3.001203,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "mcp__serena__fixture_serena",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "B",
+      "fixture": "delayed_initialize",
+      "run": 3,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 2.975756,
+          "deferred_tool_guidance": true,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 3.00867,
+          "deferred_tool_guidance": true,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "mcp__serena__fixture_serena",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 8.133307,
+      "started_at_utc": "2026-10-03T19:54:51Z",
+      "ended_at_utc": "2026-10-03T19:54:59Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "29010349b2979950616873524a13b543a902640f5a35daedf173002a809f4e2b",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 2.975756,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "mcp__serena__fixture_serena",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "B",
+      "fixture": "cannot_start",
+      "run": 1,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 0.847022,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 0.882074,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 5.978234,
+      "started_at_utc": "2026-10-03T19:55:00Z",
+      "ended_at_utc": "2026-10-03T19:55:06Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "29010349b2979950616873524a13b543a902640f5a35daedf173002a809f4e2b",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 0.847022,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "B",
+      "fixture": "cannot_start",
+      "run": 2,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 0.946971,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 0.975472,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 6.080438,
+      "started_at_utc": "2026-10-03T19:55:06Z",
+      "ended_at_utc": "2026-10-03T19:55:12Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "29010349b2979950616873524a13b543a902640f5a35daedf173002a809f4e2b",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 0.946971,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    },
+    {
+      "arm": "B",
+      "fixture": "cannot_start",
+      "run": 3,
+      "exit": 0,
+      "stderr": "",
+      "requests": [
+        {
+          "path": "/v1/responses",
+          "t": 0.638382,
+          "deferred_tool_guidance": false,
+          "listed_tools": null
+        },
+        {
+          "path": "/v1/responses",
+          "t": 0.671881,
+          "deferred_tool_guidance": false,
+          "listed_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "elapsed_sec": 5.778326,
+      "started_at_utc": "2026-10-03T19:55:13Z",
+      "ended_at_utc": "2026-10-03T19:55:18Z",
+      "command": [
+        "codex",
+        "exec",
+        "-p",
+        "stack-worker",
+        "-c",
+        "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "web_search=\"live\"",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "reply ok"
+      ],
+      "working_directory": "<SCRATCH>/cwd",
+      "profile_sha256": "29010349b2979950616873524a13b543a902640f5a35daedf173002a809f4e2b",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "first_request_sec": 0.638382,
+      "first_turn_tools": [
+        "apply_patch",
+        "clock__curr_time",
+        "create_goal",
+        "exec_command",
+        "get_goal",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read_mcp_resource",
+        "update_goal",
+        "view_image",
+        "write_stdin"
+      ]
+    }
+  ],
+  "selection": "A",
+  "selection_reason": "A and B expose Serena in 3/3 delayed starts. A uses the existing codex/*/mcp_servers.serena.* map route and fails explicitly before a request on 3/3 failed starts; B introduces a root piece and silently continues on failure.",
+  "upstream_sources": [
+    "openai/codex@rust-v0.160.0:codex-rs/core/config.schema.json:7394-7398",
+    "openai/codex@rust-v0.160.0:codex-rs/core/src/config/mod.rs:1836,4343-4346",
+    "openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs:270-334",
+    "openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/connection_manager/required.rs:17-63",
+    "openai/codex@rust-v0.160.0:codex-rs/core/src/session/session.rs:1890-1897",
+    "openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/rmcp_client.rs:356,954-956,1019-1025",
+    "openai/codex@rust-v0.160.0:codex-rs/config/src/mcp_types.rs:219-225,248-256",
+    "openai/codex@rust-v0.160.0:codex-rs/core/tests/suite/code_mode.rs:271-300,7874",
+    "openai/codex@rust-v0.160.0:codex-rs/core/tests/common/responses.rs:753,773,784,821,1011"
+  ],
+  "upstream_tests": {
+    "status": "not_run",
+    "reason": "Rust 1.95 toolchain, cargo, rustc, rustup and just not found on PATH",
+    "commands": [
+      "just test -p codex-core optional_mcp_startup_grace_controls_initial_turn_tool_catalog",
+      "just test -p codex-core dropping_startup_cleans_up_while_required_mcp_is_stalled",
+      "just test -p codex-mcp capture_binding_skips_pending_optional_servers_after_configured_shared_startup_grace",
+      "just test -p codex-mcp capture_binding_waits_for_optional_startup_when_shared_grace_is_disabled",
+      "just test -p codex-mcp capture_binding_shares_optional_startup_grace_across_connection_sets",
+      "just test -p codex-exec exits_non_zero_when_required_mcp_server_fails_to_initialize"
+    ],
+    "network_skips": "The two codex-core tests skip without network; any later upstream run must retain skips."
+  },
+  "failing_first": [
+    {
+      "class": "structural and synthetic",
+      "command": "python3 -m unittest -v tests.test_codex_worker_lane.TemplateTests.test_worker_startup_timeouts_layer_over_user_servers tests.test_codex_worker_lane.RequiredStartTests",
+      "exit_code": 1,
+      "result": "Required key and helpers absent; fake required-start failure silently succeeds. Complete returned output and environment-corrected rerun retained in private custody.",
+      "returned_output": "Ran 4 tests in 1.111s\nFAILED (failures=2, errors=2)"
+    },
+    {
+      "class": "local native integration on synthetic inputs",
+      "command": "NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests.test_required_serena_starts_before_the_first_turn_on_a_custom_provider",
+      "exit_code": 1,
+      "result": "Serena missing from first-turn tools, no tool-set difference, failed startup exits 0.",
+      "runs": [
+        {
+          "case": "profile",
+          "exit": 0,
+          "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<CODEX_HOME>\"))",
+          "requests": [
+            {
+              "path": "/v1/responses",
+              "t": 1.600176,
+              "deferred_tool_guidance": false,
+              "listed_tools": null
+            },
+            {
+              "path": "/v1/responses",
+              "t": 1.632378,
+              "deferred_tool_guidance": false,
+              "listed_tools": [
+                "apply_patch",
+                "clock__curr_time",
+                "create_goal",
+                "exec_command",
+                "get_goal",
+                "list_mcp_resource_templates",
+                "list_mcp_resources",
+                "read_mcp_resource",
+                "update_goal",
+                "view_image",
+                "write_stdin"
+              ]
+            }
+          ],
+          "elapsed_sec": 6.731298,
+          "command": [
+            "codex",
+            "exec",
+            "-p",
+            "stack-worker",
+            "-c",
+            "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+            "-m",
+            "gpt-6.1-sol",
+            "-c",
+            "model_reasoning_effort=\"max\"",
+            "-c",
+            "web_search=\"live\"",
+            "-s",
+            "read-only",
+            "--skip-git-repo-check",
+            "reply ok"
+          ],
+          "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+          "first_request_sec": 1.600176,
+          "first_turn_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        },
+        {
+          "case": "control",
+          "exit": 0,
+          "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<CODEX_HOME>\"))",
+          "requests": [
+            {
+              "path": "/v1/responses",
+              "t": 1.688025,
+              "deferred_tool_guidance": false,
+              "listed_tools": null
+            },
+            {
+              "path": "/v1/responses",
+              "t": 1.718963,
+              "deferred_tool_guidance": false,
+              "listed_tools": [
+                "apply_patch",
+                "clock__curr_time",
+                "create_goal",
+                "exec_command",
+                "get_goal",
+                "list_mcp_resource_templates",
+                "list_mcp_resources",
+                "read_mcp_resource",
+                "update_goal",
+                "view_image",
+                "write_stdin"
+              ]
+            }
+          ],
+          "elapsed_sec": 6.831089,
+          "command": [
+            "codex",
+            "exec",
+            "-p",
+            "stack-worker",
+            "-c",
+            "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+            "-c",
+            "mcp_servers.serena.required=false",
+            "-m",
+            "gpt-6.1-sol",
+            "-c",
+            "model_reasoning_effort=\"max\"",
+            "-c",
+            "web_search=\"live\"",
+            "-s",
+            "read-only",
+            "--skip-git-repo-check",
+            "reply ok"
+          ],
+          "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+          "first_request_sec": 1.688025,
+          "first_turn_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        },
+        {
+          "case": "cannot start",
+          "exit": 0,
+          "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<CODEX_HOME>\"))",
+          "requests": [
+            {
+              "path": "/v1/responses",
+              "t": 0.797666,
+              "deferred_tool_guidance": false,
+              "listed_tools": null
+            },
+            {
+              "path": "/v1/responses",
+              "t": 0.830169,
+              "deferred_tool_guidance": false,
+              "listed_tools": [
+                "apply_patch",
+                "clock__curr_time",
+                "create_goal",
+                "exec_command",
+                "get_goal",
+                "list_mcp_resource_templates",
+                "list_mcp_resources",
+                "read_mcp_resource",
+                "update_goal",
+                "view_image",
+                "write_stdin"
+              ]
+            }
+          ],
+          "elapsed_sec": 5.928176,
+          "command": [
+            "codex",
+            "exec",
+            "-p",
+            "stack-worker",
+            "-c",
+            "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+            "-m",
+            "gpt-6.1-sol",
+            "-c",
+            "model_reasoning_effort=\"max\"",
+            "-c",
+            "web_search=\"live\"",
+            "-s",
+            "read-only",
+            "--skip-git-repo-check",
+            "reply ok"
+          ],
+          "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+          "first_request_sec": 0.797666,
+          "first_turn_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "returned_output": "Ran 1 test in 21.009s\nFAILED (failures=3)"
+    },
+    {
+      "class": "local native integration on synthetic inputs; corrected TMPDIR namespace",
+      "exit_code": 1,
+      "runs": [
+        {
+          "case": "profile",
+          "exit": 0,
+          "stderr": "",
+          "requests": [
+            {
+              "path": "/v1/responses",
+              "t": 1.641783,
+              "deferred_tool_guidance": false,
+              "listed_tools": null
+            },
+            {
+              "path": "/v1/responses",
+              "t": 1.679889,
+              "deferred_tool_guidance": false,
+              "listed_tools": [
+                "apply_patch",
+                "clock__curr_time",
+                "create_goal",
+                "exec_command",
+                "get_goal",
+                "list_mcp_resource_templates",
+                "list_mcp_resources",
+                "read_mcp_resource",
+                "update_goal",
+                "view_image",
+                "write_stdin"
+              ]
+            }
+          ],
+          "elapsed_sec": 6.781451,
+          "command": [
+            "codex",
+            "exec",
+            "-p",
+            "stack-worker",
+            "-c",
+            "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+            "-m",
+            "gpt-6.1-sol",
+            "-c",
+            "model_reasoning_effort=\"max\"",
+            "-c",
+            "web_search=\"live\"",
+            "-s",
+            "read-only",
+            "--skip-git-repo-check",
+            "reply ok"
+          ],
+          "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+          "first_request_sec": 1.641783,
+          "first_turn_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        },
+        {
+          "case": "control",
+          "exit": 0,
+          "stderr": "",
+          "requests": [
+            {
+              "path": "/v1/responses",
+              "t": 1.466898,
+              "deferred_tool_guidance": false,
+              "listed_tools": null
+            },
+            {
+              "path": "/v1/responses",
+              "t": 1.494854,
+              "deferred_tool_guidance": false,
+              "listed_tools": [
+                "apply_patch",
+                "clock__curr_time",
+                "create_goal",
+                "exec_command",
+                "get_goal",
+                "list_mcp_resource_templates",
+                "list_mcp_resources",
+                "read_mcp_resource",
+                "update_goal",
+                "view_image",
+                "write_stdin"
+              ]
+            }
+          ],
+          "elapsed_sec": 6.580279,
+          "command": [
+            "codex",
+            "exec",
+            "-p",
+            "stack-worker",
+            "-c",
+            "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+            "-c",
+            "mcp_servers.serena.required=false",
+            "-m",
+            "gpt-6.1-sol",
+            "-c",
+            "model_reasoning_effort=\"max\"",
+            "-c",
+            "web_search=\"live\"",
+            "-s",
+            "read-only",
+            "--skip-git-repo-check",
+            "reply ok"
+          ],
+          "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+          "first_request_sec": 1.466898,
+          "first_turn_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        },
+        {
+          "case": "cannot start",
+          "exit": 0,
+          "stderr": "",
+          "requests": [
+            {
+              "path": "/v1/responses",
+              "t": 0.709978,
+              "deferred_tool_guidance": false,
+              "listed_tools": null
+            },
+            {
+              "path": "/v1/responses",
+              "t": 0.738187,
+              "deferred_tool_guidance": false,
+              "listed_tools": [
+                "apply_patch",
+                "clock__curr_time",
+                "create_goal",
+                "exec_command",
+                "get_goal",
+                "list_mcp_resource_templates",
+                "list_mcp_resources",
+                "read_mcp_resource",
+                "update_goal",
+                "view_image",
+                "write_stdin"
+              ]
+            }
+          ],
+          "elapsed_sec": 5.827844,
+          "command": [
+            "codex",
+            "exec",
+            "-p",
+            "stack-worker",
+            "-c",
+            "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+            "-m",
+            "gpt-6.1-sol",
+            "-c",
+            "model_reasoning_effort=\"max\"",
+            "-c",
+            "web_search=\"live\"",
+            "-s",
+            "read-only",
+            "--skip-git-repo-check",
+            "reply ok"
+          ],
+          "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+          "first_request_sec": 0.709978,
+          "first_turn_tools": [
+            "apply_patch",
+            "clock__curr_time",
+            "create_goal",
+            "exec_command",
+            "get_goal",
+            "list_mcp_resource_templates",
+            "list_mcp_resources",
+            "read_mcp_resource",
+            "update_goal",
+            "view_image",
+            "write_stdin"
+          ]
+        }
+      ],
+      "command": "NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests.test_required_serena_starts_before_the_first_turn_on_a_custom_provider",
+      "returned_output": "Ran 1 test in 20.753s\nFAILED (failures=3)"
+    }
+  ],
+  "residuals": [
+    "Coordinator rebase and native rerun after #626 at 0.160.0; the measured binary here is 0.159.3.",
+    "Live route confirmation skipped outside the runtime lane 06:30-09:00Z window.",
+    "No real Serena startup, host apply, model run, token measurement, upstream Rust execution, or other-host acceptance is established.",
+    "Independent Opus and cross-family Sol reviews, Gate A and configuration-owner ACKs, required CI, publication, merge and #436 close are coordinator-only.",
+    "Destination configuration suite has two stale assertions in owner-controlled files; both must be repaired by that owner before final acceptance.",
+    "Initial trial has relative timings only; the retained metadata-refinement repeat includes per-run UTC timestamps. All 36 runs remain retained.",
+    "Concurrent origin/main advanced to 463a57b983eec540ae90eb45c2b1a7c6fc469aed while builder HEAD remained cac8700ba914950266272347468bff7ad630a4bf. Sandbox forbids rebase; latest-main manifest registration must be repeated after coordinator rebase."
+  ],
+  "integration_checks": [
+    {
+      "command": "python3 -m unittest tests.test_codex_worker_lane tests.test_landscape_sweep_harness tests.test_codex_lane",
+      "exit_code": 0,
+      "returned_output": "Ran 381 tests in 93.240s\nOK (skipped=15)",
+      "scope": "before correcting the three existing native fixture registrations"
+    },
+    {
+      "command": "NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests",
+      "exit_code": 1,
+      "returned_output": "Ran 12 tests in 106.490s\nFAILED (failures=3, skipped=1)",
+      "failures": [
+        "existing /bin/false or missing Serena stubs in strict-config, project-precedence and app-server apply tests"
+      ],
+      "scope": "first native suite after required flag"
+    },
+    {
+      "command": "NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests",
+      "exit_code": 0,
+      "returned_output": "Ran 12 tests in 122.185s\nOK (skipped=1)",
+      "scope": "after correcting the three native fixture registrations; separate trial-only test skipped"
+    },
+    {
+      "command": "python3 tools/adoption/new_wsl_client_config.py --check",
+      "exit_code": 0,
+      "returned_output": "check passed"
+    },
+    {
+      "command": "python3 -m unittest tests.test_new_wsl_client_config",
+      "exit_code": 1,
+      "returned_output": "Ran 146 tests in 34.207s\nFAILED (failures=2)",
+      "owner_handoff": {
+        "record_counts": {
+          "expected": [
+            366,
+            246,
+            192,
+            54,
+            112,
+            65,
+            47,
+            8
+          ],
+          "observed": [
+            367,
+            247,
+            192,
+            55,
+            112,
+            65,
+            47,
+            8
+          ]
+        },
+        "rendered_serena": {
+          "expected": {
+            "startup_timeout_sec": 60
+          },
+          "observed": {
+            "startup_timeout_sec": 60,
+            "required": true
+          }
+        }
+      }
+    },
+    {
+      "command": "python3 tools/token-e2e/freeze_snapshot.py list-frozen --repo . --json",
+      "exit_code": 0,
+      "observed": "Repository template paths are not frozen items; installed stack-worker profile presence and SHA256 are frozen, with role tables and effective MCP set. No omniroute profile item is listed."
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py blueprints/convergence-practice/wsl-retrieval/experiment.json",
+      "exit_code": 0,
+      "returned_output": "record[0]: valid",
+      "scope": "an unpinned recipe reference only; no changed-file pin or record rebinding"
+    },
+    {
+      "command": "git diff --check origin/main...HEAD",
+      "exit_code": 0,
+      "returned_output": "",
+      "scope": "HEAD still equals base because builder cannot commit; coordinator repeats at final head"
+    },
+    {
+      "command": "git diff --check origin/main",
+      "exit_code": 0,
+      "returned_output": "",
+      "scope": "checks actual uncommitted builder changes"
+    },
+    {
+      "command": "python3 -m unittest tests.test_codex_worker_lane tests.test_landscape_sweep_harness tests.test_codex_lane",
+      "exit_code": 0,
+      "returned_output": "Ran 381 tests in 95.252s\nOK (skipped=15)",
+      "scope": "unit_acceptance_final"
+    },
+    {
+      "command": "python3 -m unittest tests.test_codex_worker_lane tests.test_landscape_sweep_harness tests.test_codex_lane",
+      "exit_code": 0,
+      "returned_output": "Ran 381 tests in 93.585s\nOK (skipped=15)",
+      "scope": "unit_final_capture"
+    },
+    {
+      "command": "NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests",
+      "exit_code": 0,
+      "returned_output": "Ran 12 tests in 121.994s\nOK (skipped=1)",
+      "scope": "native_final_capture"
+    },
+    {
+      "command": "python3 -m unittest tests.test_codex_worker_lane tests.test_landscape_sweep_harness tests.test_codex_lane",
+      "exit_code": 0,
+      "returned_output": "Ran 381 tests in 92.623s\nOK (skipped=15)",
+      "scope": "final content after canonicalizing FakeHost temporary root for R1"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_output": "Publication validation failed: latest-main entries refer to absent or stale unrebased artifacts; the initial receipt also contained possible local session identifiers and a masked path matching the personal-home pattern.",
+      "scope": "initial registry validation; original output retained privately; receipt privacy repaired before final validation"
+    },
+    {
+      "command": "python3 scripts/validate.py --scan-file evidence/receipts/codex-serena-startup-port-20261003.json",
+      "exit_code": 0,
+      "returned_output": "{\"scanned_files\": 1, \"status\": \"passed\"}",
+      "scope": "after removing fixture session metadata and synthetic transcript from public stderr"
+    },
+    {
+      "command": "NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests.test_required_serena_starts_before_the_first_turn_on_a_custom_provider",
+      "exit_code": 0,
+      "returned_output": "Ran 1 test in 21.584s\nOK",
+      "scope": "affected native regression after capture sanitization"
+    },
+    {
+      "command": "python3 -m unittest tests.test_codex_worker_lane tests.test_landscape_sweep_harness tests.test_codex_lane",
+      "exit_code": 0,
+      "returned_output": "Ran 381 tests in 90.516s\nOK (skipped=15)",
+      "scope": "final source after canonical paths and diagnostic-only public capture"
+    }
+  ],
+  "destination_propagation": {
+    "map": "adoption/new-wsl/client-config-map.json:409-412",
+    "match": "codex/*/mcp_servers.serena.*",
+    "wiring": "slot:serena",
+    "result": "Next destination client-config apply renders required=true in stack-worker.config.toml",
+    "map_entry_added": false
+  },
+  "rehearsal_relaxation": {
+    "ported": false,
+    "reason": "Working Serena fixture passes native scratch-HOME rehearsal, apply and rollback without relaxation; no HOME-bound Serena failure demonstrated.",
+    "canonical_paths": "R1: FakeHost resolves its temp root once, printed rollback paths resolve, and the assertion compares run.resolve(); rollback still executes."
+  },
+  "source_comparison": {
+    "installed_tag": "rust-v0.159.3",
+    "target_and_latest_stable_tag": "rust-v0.160.0",
+    "retrieved_with": "gh api GitHub contents at each tag",
+    "files": [
+      {
+        "path": "codex-rs/codex-mcp/src/connection_manager/required.rs",
+        "installed_sha256": "21af5592c5bbb35e2b296c23b02f331bc3a50a7ed21378a59b18eb3cb8d9c1b2",
+        "target_sha256": "21af5592c5bbb35e2b296c23b02f331bc3a50a7ed21378a59b18eb3cb8d9c1b2",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs",
+        "installed_sha256": "749ba9975ba5c3821d003df1c20d17042f386cdfbd2c66a72c9de15e6652dd9c",
+        "target_sha256": "749ba9975ba5c3821d003df1c20d17042f386cdfbd2c66a72c9de15e6652dd9c",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/codex-mcp/src/connection_manager.rs",
+        "installed_sha256": "88ffc14d95837a4f905b6e47721121a3d47246f4ca95fecb9142035687c40dfe",
+        "target_sha256": "88ffc14d95837a4f905b6e47721121a3d47246f4ca95fecb9142035687c40dfe",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/codex-mcp/src/connection_manager_tests.rs",
+        "installed_sha256": "4485762239f848febc67e9e52b0107ed1cda68be2e53e2f0041a1563474e8d7b",
+        "target_sha256": "4485762239f848febc67e9e52b0107ed1cda68be2e53e2f0041a1563474e8d7b",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/codex-mcp/src/mcp/mod.rs",
+        "installed_sha256": "3ad76e5dff1a60e597ea5a35270c2301d68654ec9d28ce07bcceb4fbd118ad1b",
+        "target_sha256": "3ad76e5dff1a60e597ea5a35270c2301d68654ec9d28ce07bcceb4fbd118ad1b",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/codex-mcp/src/rmcp_client.rs",
+        "installed_sha256": "b8562b3a6def953aab82fc8e728785010da932d5dce4526b0e8df861a7e3e685",
+        "target_sha256": "b8562b3a6def953aab82fc8e728785010da932d5dce4526b0e8df861a7e3e685",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/codex-mcp/src/tool_catalog_cache.rs",
+        "installed_sha256": "d34d400a86630e6c447014feec5315f3ab012e0b95a7158ee93cfc12f0467c94",
+        "target_sha256": "d34d400a86630e6c447014feec5315f3ab012e0b95a7158ee93cfc12f0467c94",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/config/src/config_toml.rs",
+        "installed_sha256": "05b6d259c8882322d33a997d69c0898f7ca3693552bf9ec5f4a8f1c60457bb1e",
+        "target_sha256": "453b5ed4d49cf3768ce47e1f2fe1987c92d694bba9b52373dcf10f15901ab9d1",
+        "byte_identical": false
+      },
+      {
+        "path": "codex-rs/config/src/mcp_types.rs",
+        "installed_sha256": "08bdfe6bcc0ca607b1ead8b373029f895528604290f94bf1ba18c2dc83db8fd8",
+        "target_sha256": "08bdfe6bcc0ca607b1ead8b373029f895528604290f94bf1ba18c2dc83db8fd8",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/core/config.schema.json",
+        "installed_sha256": "eda7251b7e46e0b9d0f3d8eef5dab451e11a55d723e2b802e152b7208045836a",
+        "target_sha256": "7ce31bde1ed6ef15c53a96ba460bb1d0fb7b99fd9ab719b567c94c474f62b023",
+        "byte_identical": false
+      },
+      {
+        "path": "codex-rs/core/src/config/mod.rs",
+        "installed_sha256": "df6d6871a35a9e365e36beb3d388c2c39cae59d95bd84834321c8501390ec397",
+        "target_sha256": "854f5a6b184714740500b8d3eae2bb04cb88172efccf11d38a74f2f6189c0341",
+        "byte_identical": false
+      },
+      {
+        "path": "codex-rs/core/src/session/mcp_runtime.rs",
+        "installed_sha256": "ff6c351e3af4f662c265a2f0c16e84da7815771913a493694eba0d99ec08d8eb",
+        "target_sha256": "ff6c351e3af4f662c265a2f0c16e84da7815771913a493694eba0d99ec08d8eb",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/core/src/session/session.rs",
+        "installed_sha256": "de7eca05b55865c0ef03465a29bfb51e54d1eb78d253533d8b76e88712172f2d",
+        "target_sha256": "2da4c0288596269fbb6df6d9a04a389e8ce0184be77ee2bcce765521e63702a5",
+        "byte_identical": false
+      },
+      {
+        "path": "codex-rs/core/tests/suite/managed_threads_tests.rs",
+        "installed_sha256": "82c3c1dc0cba6f62465fd75233cfbd55435f6220277fc4e91b035e94c53deb34",
+        "target_sha256": "82c3c1dc0cba6f62465fd75233cfbd55435f6220277fc4e91b035e94c53deb34",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/core/tests/suite/mcp_optional_startup_grace.rs",
+        "installed_sha256": "26598acc9194c435096e97e1066921e34527aefe43152064a14455424f863c16",
+        "target_sha256": "26598acc9194c435096e97e1066921e34527aefe43152064a14455424f863c16",
+        "byte_identical": true
+      },
+      {
+        "path": "codex-rs/exec/tests/suite/mcp_required_exit.rs",
+        "installed_sha256": "5c38ffe2aaef3e858d1eae8fa9250a70d837732ed494bdddd2f8dd3a057edc75",
+        "target_sha256": "5c38ffe2aaef3e858d1eae8fa9250a70d837732ed494bdddd2f8dd3a057edc75",
+        "byte_identical": true
+      }
+    ]
+  },
+  "initial_trial": {
+    "reason_retained": "Initial preregistered trial lacked per-run absolute UTC timestamps. Preserve every run; refinement changes capture metadata only.",
+    "exit_code": 0,
+    "returned_output": "Ran 1 test in 128.612s\n\nOK",
+    "runs": [
+      {
+        "arm": "control",
+        "fixture": "delayed_initialize",
+        "run": 1,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 1.56068,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 1.591447,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 6.680262,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+        "first_request_sec": 1.56068,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "control",
+        "fixture": "delayed_initialize",
+        "run": 2,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 1.497042,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 1.527572,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 6.630732,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+        "first_request_sec": 1.497042,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "control",
+        "fixture": "delayed_initialize",
+        "run": 3,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 1.568459,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 1.597755,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 6.680413,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+        "first_request_sec": 1.568459,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "control",
+        "fixture": "cannot_start",
+        "run": 1,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 0.509943,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 0.542588,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 5.628248,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+        "first_request_sec": 0.509943,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "control",
+        "fixture": "cannot_start",
+        "run": 2,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 0.699199,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 0.728789,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 5.828195,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+        "first_request_sec": 0.699199,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "control",
+        "fixture": "cannot_start",
+        "run": 3,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 0.726416,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 0.755845,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 5.877896,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+        "first_request_sec": 0.726416,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "A",
+        "fixture": "delayed_initialize",
+        "run": 1,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 3.038018,
+            "deferred_tool_guidance": true,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 3.070871,
+            "deferred_tool_guidance": true,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "mcp__serena__fixture_serena",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 8.1841,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "58f4af22c1e6ad4283a0ed2d3719adc27ec1b6f2edcb3369a0332647431743d3",
+        "first_request_sec": 3.038018,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "mcp__serena__fixture_serena",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "A",
+        "fixture": "delayed_initialize",
+        "run": 2,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 3.051511,
+            "deferred_tool_guidance": true,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 3.085337,
+            "deferred_tool_guidance": true,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "mcp__serena__fixture_serena",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 8.183568,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "58f4af22c1e6ad4283a0ed2d3719adc27ec1b6f2edcb3369a0332647431743d3",
+        "first_request_sec": 3.051511,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "mcp__serena__fixture_serena",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "A",
+        "fixture": "delayed_initialize",
+        "run": 3,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 3.164788,
+            "deferred_tool_guidance": true,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 3.196469,
+            "deferred_tool_guidance": true,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "mcp__serena__fixture_serena",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 8.283801,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "58f4af22c1e6ad4283a0ed2d3719adc27ec1b6f2edcb3369a0332647431743d3",
+        "first_request_sec": 3.164788,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "mcp__serena__fixture_serena",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "A",
+        "fixture": "cannot_start",
+        "run": 1,
+        "exit": 1,
+        "stderr": "2026-10-03T19:27:50.513420Z ERROR codex_core::session: Failed to create session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request\nError: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request (code -32603)",
+        "requests": [],
+        "elapsed_sec": 5.578561,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "58f4af22c1e6ad4283a0ed2d3719adc27ec1b6f2edcb3369a0332647431743d3",
+        "first_request_sec": null,
+        "first_turn_tools": [],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "A",
+        "fixture": "cannot_start",
+        "run": 2,
+        "exit": 1,
+        "stderr": "2026-10-03T19:27:56.544511Z ERROR codex_core::session: Failed to create session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request\nError: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request (code -32603)",
+        "requests": [],
+        "elapsed_sec": 5.477765,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "58f4af22c1e6ad4283a0ed2d3719adc27ec1b6f2edcb3369a0332647431743d3",
+        "first_request_sec": null,
+        "first_turn_tools": [],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "A",
+        "fixture": "cannot_start",
+        "run": 3,
+        "exit": 1,
+        "stderr": "2026-10-03T19:28:02.228081Z ERROR codex_core::session: Failed to create session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request\nError: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request (code -32603)",
+        "requests": [],
+        "elapsed_sec": 5.577368,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "58f4af22c1e6ad4283a0ed2d3719adc27ec1b6f2edcb3369a0332647431743d3",
+        "first_request_sec": null,
+        "first_turn_tools": [],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "B",
+        "fixture": "delayed_initialize",
+        "run": 1,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 2.926075,
+            "deferred_tool_guidance": true,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 2.95654,
+            "deferred_tool_guidance": true,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "mcp__serena__fixture_serena",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 8.08352,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "50cfb5a9b414614472fbc1cd620ad6d6f1d91d7f777ea239a3c566d47eceb0a2",
+        "first_request_sec": 2.926075,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "mcp__serena__fixture_serena",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "B",
+        "fixture": "delayed_initialize",
+        "run": 2,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 2.992365,
+            "deferred_tool_guidance": true,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 3.022673,
+            "deferred_tool_guidance": true,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "mcp__serena__fixture_serena",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 8.134015,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "50cfb5a9b414614472fbc1cd620ad6d6f1d91d7f777ea239a3c566d47eceb0a2",
+        "first_request_sec": 2.992365,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "mcp__serena__fixture_serena",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "B",
+        "fixture": "delayed_initialize",
+        "run": 3,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 2.987239,
+            "deferred_tool_guidance": true,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 3.021019,
+            "deferred_tool_guidance": true,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "mcp__serena__fixture_serena",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 8.134014,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "50cfb5a9b414614472fbc1cd620ad6d6f1d91d7f777ea239a3c566d47eceb0a2",
+        "first_request_sec": 2.987239,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "mcp__serena__fixture_serena",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "B",
+        "fixture": "cannot_start",
+        "run": 1,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 0.538059,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 0.572367,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 5.67799,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "50cfb5a9b414614472fbc1cd620ad6d6f1d91d7f777ea239a3c566d47eceb0a2",
+        "first_request_sec": 0.538059,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "B",
+        "fixture": "cannot_start",
+        "run": 2,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 0.546088,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 0.576004,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 5.678289,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "50cfb5a9b414614472fbc1cd620ad6d6f1d91d7f777ea239a3c566d47eceb0a2",
+        "first_request_sec": 0.546088,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      },
+      {
+        "arm": "B",
+        "fixture": "cannot_start",
+        "run": 3,
+        "exit": 0,
+        "stderr": "",
+        "requests": [
+          {
+            "path": "/v1/responses",
+            "t": 0.467973,
+            "deferred_tool_guidance": false,
+            "listed_tools": null
+          },
+          {
+            "path": "/v1/responses",
+            "t": 0.497963,
+            "deferred_tool_guidance": false,
+            "listed_tools": [
+              "apply_patch",
+              "clock__curr_time",
+              "create_goal",
+              "exec_command",
+              "get_goal",
+              "list_mcp_resource_templates",
+              "list_mcp_resources",
+              "read_mcp_resource",
+              "update_goal",
+              "view_image",
+              "write_stdin"
+            ]
+          }
+        ],
+        "elapsed_sec": 5.62751,
+        "command": [
+          "codex",
+          "exec",
+          "-p",
+          "stack-worker",
+          "-c",
+          "model_providers.nasfake.base_url=\"{BASE_URL}\"",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "model_reasoning_effort=\"max\"",
+          "-c",
+          "web_search=\"live\"",
+          "-s",
+          "read-only",
+          "--skip-git-repo-check",
+          "reply ok"
+        ],
+        "profile_sha256": "50cfb5a9b414614472fbc1cd620ad6d6f1d91d7f777ea239a3c566d47eceb0a2",
+        "first_request_sec": 0.467973,
+        "first_turn_tools": [
+          "apply_patch",
+          "clock__curr_time",
+          "create_goal",
+          "exec_command",
+          "get_goal",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read_mcp_resource",
+          "update_goal",
+          "view_image",
+          "write_stdin"
+        ],
+        "driver_sha256": "be63e44a755c4db0fc1df48f6007a0f854b7e3da4c331efc6757e0ced07a3151",
+        "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+        "working_directory": "<SCRATCH>/cwd"
+      }
+    ]
+  },
+  "capture_refinement": "Added per-run UTC process start/end timestamps, scratch working directory and driver/MCP fixture SHA256; inputs, arms, selection and ALL_TOOLS oracle unchanged.",
+  "total_trial_runs_retained": 36,
+  "bubblewrap_version": "0.9.0",
+  "registry_checks": [
+    {
+      "command": "git show origin/main:manifests/evidence.json > manifests/evidence.json",
+      "source_revision": "463a57b983eec540ae90eb45c2b1a7c6fc469aed",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/host_receipts.py register_file one-liner from docs/lanes.md:105-107 for seven already-registered changed files and the new receipt",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/component_matrix.py --write",
+      "exit_code": 0,
+      "returned_output": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}"
+    },
+    {
+      "command": "python3 scripts/new_host_grand_list.py --write",
+      "exit_code": 0,
+      "returned_output": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_output": "Publication validation failed: latest-main evidence entries refer to 21 absent files and five stale unrebased files.",
+      "scope": "expected unrebased-base limitation; privacy findings repaired; final validator output retained in custody"
+    }
+  ]
+}

@@ -188,6 +188,8 @@ This lane changed after `v2026.09.26.2`: a host checked out at that tag has none
 
 The 2026-09-27 custom-agent and worker-profile update adds `CHUB_TELEMETRY = "0"` and `CHUB_FEEDBACK = "0"` under the worker profile's `[shell_environment_policy.set]`. A worker with another `HOME` or `CHUB_DIR` can miss the user's Context Hub configuration; the explicit worker profile opts out for its shell commands, including when the home is shared. Codex `rust-v0.157.1` loads the separate profile file as a full second user layer ([loader](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs)), and Context Hub `v0.1.4` checks these variables before home-scoped settings ([telemetry](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js), [config](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/config.js)). The [decision addendum](../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-custom-agents-and-context-hub) verifies profile environment loading with source and a native sandbox test, and covers the [F4 RTK guidance](../docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26) refresh in the [three custom-agent templates](../examples/codex-native/README.md#2026-09-27-custom-agent-instruction-refresh).
 
+The stack-worker profile waits for required Serena before its first turn and fails when Serena cannot start; the [2026-10-03 addendum](../docs/decisions/2026-09-26-codex-worker-lane.md#addendum-2026-10-03-serena-at-the-first-turn-port-of-436) retains the synthetic native trial and the codebase-memory retirement.
+
 Start every worker with the profile **and** the model, effort and web search on its command line, with stdin closed:
 
 ```sh

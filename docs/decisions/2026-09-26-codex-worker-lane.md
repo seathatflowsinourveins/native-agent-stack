@@ -845,3 +845,203 @@ these restrictions be enforced instead of instructed. A run in which a spawned r
 developer text exactly once, or does not run at the pinned model and effort, would reopen the carriers.
 A later change to either file's bytes needs a new dated section and new digest rows in `SHA256SUMS`, the
 test and the examples README.
+## Addendum 2026-10-03: serena at the first turn (port of #436)
+
+**Status: Arm A selected by the preregistered trial; repository port, no host apply.** North-star action: make the native
+Codex worker's exact-symbol lane available on its first turn while building the foundation for research and
+historical simulation. This addendum answers the unmeasured startup knobs at L364-365 without rewriting that
+dated passage. The port source is #436's pinned head `b18d9f031fdf854e74f59586529df1022e805975`; its historical
+observations remain historical.
+
+**Preregistered criteria (written before the trials).** Control is the current main stack-worker profile,
+unchanged. Arm A adds `required = true` only to `[mcp_servers.serena]`. Arm B sets
+`mcp_optional_startup_grace_ms = 0` at the profile root. Arm C would use `startup_readiness = "catalog"`, but
+is excluded: the process-scoped in-memory catalog starts empty in a fresh `codex exec`
+(`openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/tool_catalog_cache.rs:36-49`). `connection` and `catalog`
+are the supported values (`codex-rs/config/src/mcp_types.rs:219-225`), and execution still needs a live connection.
+
+Each included arm receives three fresh-process runs with a stdio Serena fixture delaying `initialize` by
+2.5 seconds, and three separate runs with Serena unable to start. Keep every run's first-turn tool names,
+time from Codex launch to first Responses request, process exit code, failure text and elapsed time. The oracle
+is `mcp__serena__fixture_serena` in the first turn's `ALL_TOOLS`, returned in the second request's
+`custom_tool_call_output`; first-request guidance alone is insufficient. The instrument follows #436's native
+race test and upstream code-mode tests, using `bwrap --unshare-net`, scratch homes and a loopback fake Responses
+endpoint. Its evidence class is local native integration on synthetic inputs, with no provider execution.
+
+An arm passes only if Serena's tool is on the first turn whenever startup succeeds within its configured
+timeout. Among passing arms, prefer no new configuration-owner map entry, then lower added latency, then explicit
+failure over silent degradation. Keep the existing startup allowances. Do not require codebase-memory. If B
+wins, run the configuration-map check and stop if its new root key is unmapped. Port rehearsal relaxation only
+if a failing-first native test proves that scratch HOME prevents Serena from starting.
+
+**Source verification before code.** The installed client and current base pin are `codex-cli 0.159.3`;
+#626 remains open and the coordinator owns the subsequent 0.160.0 rebase and rerun. GitHub release reads on
+2026-10-03 identify `rust-v0.160.0` as both that target and the latest stable tag. Read both the installed
+`rust-v0.159.3` source and the target tag. The required-server implementation, connection manager, catalog builder,
+cache, MCP types, per-step timeout implementation and selected MCP tests are byte-identical between those tags.
+The schema/config and session files differ elsewhere; the facts below were re-read at the target tag:
+
+- Shared grace: `openai/codex@rust-v0.160.0:codex-rs/core/config.schema.json:7394-7398` defines 1000 ms and zero
+  as waiting for each server's configured startup timeout. `codex-rs/core/src/config/mod.rs:4343-4347` consumes
+  the setting and `:1836` passes it into MCP configuration. `codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs:270-334`
+  consumes it; `:309-311` starts the shared deadline at the first catalog build, after the required-server wait.
+- Required semantics: `openai/codex@rust-v0.160.0:codex-rs/config/src/mcp_types.rs:248-256` and
+  `codex-rs/codex-mcp/src/connection_manager/required.rs:17-63`; the required wait awaits the initialized client
+  at `:35`, and the aggregate failure text is at `:61`. `codex-rs/core/src/session/mcp_runtime.rs:147` validates
+  required servers, and `codex-rs/core/src/session/session.rs:1890-1897` awaits initial installation with `?`.
+- Per-step timeouts: `openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/rmcp_client.rs:356`, `:954-956` and
+  `:1019-1025` apply the startup timeout to client start, initialize and initial tools/list separately; 60 s
+  is not one overall deadline. The source default is 30 s at `:105`. The unversioned official MCP page's
+  10 s default differs from this pin; this port follows the tagged implementation
+  ([official MCP documentation](https://developers.openai.com/codex/mcp)).
+- Instrument references: `openai/codex@rust-v0.160.0:codex-rs/core/tests/suite/code_mode.rs:271-300` and
+  `:7874` (`code_mode_exports_all_tools_metadata_for_namespaced_mcp_tools`), plus
+  `codex-rs/core/tests/common/responses.rs:753`, `:773`, `:784`, `:821` and `:1011` for SSE events.
+
+**Unchanged upstream tests: not run.** Rust 1.95, cargo, rustc, rustup and just were not found on PATH; no
+toolchain is installed for this port. The target pins Rust 1.95.0 (`codex-rs/rust-toolchain.toml:2`). Retain
+the native upstream invocation `just test -p <crate> <filter>` (`justfile:87-88`) for these re-located tests:
+
+- `codex-core`: `core/tests/suite/mcp_optional_startup_grace.rs:40`
+  `optional_mcp_startup_grace_controls_initial_turn_tool_catalog` (network-dependent, skip at `:43`), and
+  `core/tests/suite/managed_threads_tests.rs:30` `dropping_startup_cleans_up_while_required_mcp_is_stalled`
+  (network-dependent, skip at `:31`).
+- `codex-mcp`: `codex-mcp/src/connection_manager_tests.rs:2872`
+  `capture_binding_skips_pending_optional_servers_after_configured_shared_startup_grace`, `:3029`
+  `capture_binding_waits_for_optional_startup_when_shared_grace_is_disabled`, and `:3122`
+  `capture_binding_shares_optional_startup_grace_across_connection_sets`.
+- `codex-exec`: `exec/tests/suite/mcp_required_exit.rs:9`
+  `exits_non_zero_when_required_mcp_server_fails_to_initialize`.
+
+**Trial, 2026-10-03, codex-cli 0.159.3.** The complete sanitized receipt is
+[`codex-serena-startup-port-20261003.json`](../../evidence/receipts/codex-serena-startup-port-20261003.json).
+The first table retains the initial trial; the second retains its capture refinement, adding per-run UTC
+start/end timestamps and instrument hashes. The fixture, criteria and selection are unchanged, and all 36
+runs remain in the receipt. Each cell retains all three runs in order. Times are seconds from Codex process launch; the failure
+elapsed time is the whole Codex process lifetime, including shutdown, rather than an MCP-only timer.
+
+| Arm | Serena on first turn, successful startup | First request times | Unable-to-start exit codes | Unable-to-start elapsed times | First request on failed start |
+| --- | --- | --- | --- | --- | --- |
+| Control, unchanged main | no, no, no | 1.560680, 1.497042, 1.568459 | 0, 0, 0 | 5.628248, 5.828195, 5.877896 | 0.509943, 0.699199, 0.726416 |
+| A, Serena required | yes, yes, yes | 3.038018, 3.051511, 3.164788 | 1, 1, 1 | 5.578561, 5.477765, 5.577368 | none, none, none |
+| B, zero shared grace | yes, yes, yes | 2.926075, 2.992365, 2.987239 | 0, 0, 0 | 5.677990, 5.678289, 5.627510 | 0.538059, 0.546088, 0.467973 |
+| C, cached readiness | excluded by source review | not run | not run | not run | not run |
+
+The complete-capture rerun returned `Ran 1 test in 129.972s`, `OK`, exit 0, from
+2026-10-03T19:53:09Z through 19:55:18Z:
+
+| Arm | Serena on first turn, successful startup | First request times | Unable-to-start exit codes | Unable-to-start elapsed times | First request on failed start |
+| --- | --- | --- | --- | --- | --- |
+| Control | no, no, no | 1.568545, 1.477847, 1.762726 | 0, 0, 0 | 5.778881, 5.678131, 5.777845 | 0.637889, 0.519297, 0.632459 |
+| A | yes, yes, yes | 3.174493, 3.308461, 3.160008 | 1, 1, 1 | 5.477237, 5.526917, 5.526881 | none, none, none |
+| B | yes, yes, yes | 2.986330, 3.001203, 2.975756 | 0, 0, 0 | 5.978234, 6.080438, 5.778326 | 0.847022, 0.946971, 0.638382 |
+
+**Decision and alternatives.** A and B pass the successful-start criterion, 3/3 each. Choose **A**, because
+`codex/*/mcp_servers.serena.*` already maps to `slot:serena`
+(`adoption/new-wsl/client-config-map.json:409-412`). B's root piece has no matching map entry. A's median
+first-request latency is 3.051511 s, adding 1.490831 s to the control's 1.560680 s; B's median is 2.987239 s.
+The preference for an existing map entry precedes the initial measured 0.064272 s latency difference.
+The complete-capture medians were 1.568545 s for control, 3.174493 s for A and 2.986330 s for B; the same
+owner-map preference selects A, and the first-request added latency in that repeat is 1.605948 s.
+A also fails
+explicitly before a request when Serena cannot start, while B silently continues; B would wait for every
+enabled optional server, including the existing longer allowances. Do not increase the shared grace.
+Cached readiness does not solve fresh-process startup. A per-prompt `mcp://` mention remains an unmeasured
+alternative that would require every brief to name Serena.
+
+**Destination propagation and ownership.** The destination's rendered `stack-worker.config.toml` gains
+`required = true` for Serena at its next client-config apply through the existing `slot:serena` route. No
+configuration-owner map entry is added. The map check passes, but its unchanged tests still expect the old
+piece counts and old rendered Serena table: two failures are handed to the configuration owner, and their
+files are not edited here. This requires that owner's ACK on #608 before merge. The coordinator rebases after
+#626 and repeats native acceptance with the resulting `lane.CODEX_VERSION` (0.160.0); the 0.159.3 trial is
+retained, not relabelled as a 0.160.0 execution.
+
+**Codebase-memory retirement from the required proposal.** Keep main's codebase-memory startup allowance
+but add no `required` key. `catalogs/foundation/new-wsl-architecture-20261001.json:363` names codebase-memory
+as an optional task-appended lane and `:376` reserves its installation for tasks that need it. The client map
+at `:330-335` marks `codex/*/mcp_servers.codebase-memory.*` as `not_wired` because the code-navigation slot
+belongs to Serena. #436's account-daemon residual below also makes requiring it outside the account HOME
+inappropriate. The three older native tests now use a working Serena fixture. The native app-server
+dry-run/apply/rollback test passes without rehearsal relaxation, so neither `relaxed_required_flags()` nor
+the dry-run override is ported.
+
+**Failing-first evidence and current checks.** These are our returned outputs, with the main profile and
+installer unchanged for the first two rows. The parser's absent helpers are synthetic evidence, not a native
+startup failure. Preserve the first attempted runs too: the sandbox's read-only var/tmp caused Python tempfile
+to fall back to /tmp despite the requested TMPDIR. Re-run under an upstream bubblewrap bind mount exposing
+authorized scratch storage at the required var/tmp path; its preflight printed the requested TMPDIR. All
+subsequent checks run under `nice -n 19` in that namespace.
+
+| Check | Class | Before | After |
+| --- | --- | --- | --- |
+| Profile startup assertions and `RequiredStartTests` | structural and synthetic | exit 1; `Ran 4 tests in 1.111s`; `FAILED (failures=2, errors=2)` | included in the unit suite, exit 0 |
+| `test_required_serena_starts_before_the_first_turn_on_a_custom_provider` | local native integration, synthetic inputs | exit 1; `Ran 1 test in 20.753s`; `FAILED (failures=3)`; no Serena tool, no tool-set difference, failed startup exits 0 | included in native suite, exit 0; Serena-only tool-set difference, failed startup before any request |
+| `test_serena_startup_trial` | local native integration, synthetic inputs | control arm retains all six runs | exit 0; `Ran 1 test in 128.612s`; `OK`; all 18 trial runs retained |
+| Existing native tests after required key | local native integration, synthetic inputs | exit 1; `Ran 12 tests in 106.490s`; `FAILED (failures=3, skipped=1)`; existing missing or /bin/false Serena stubs | exit 0; `Ran 12 tests in 122.185s`; `OK (skipped=1)`; trial-only test skipped because its separate trial already ran |
+| `new_wsl_client_config.py --check` | structural | current base map | exit 0; `check passed` |
+| `tests.test_new_wsl_client_config` | structural and synthetic | owner's unchanged expectations | exit 1; `Ran 146 tests in 34.207s`; `FAILED (failures=2)`; stale count tuple and rendered Serena table handed off |
+
+Final content checks after the capture refinement and R1 canonical-root repair: the required three-module
+unit suite returned `Ran 381 tests in 92.623s`, `OK (skipped=15)`, exit 0; the native class returned
+`Ran 12 tests in 121.994s`, `OK (skipped=1)`, exit 0. The trial's separate repeat retained above returned exit 0.
+The final publication scan found generated session metadata and the synthetic prompt transcript in the
+fixture stderr. The public receipt now retains diagnostics only, with separate Codex-home masking; original
+captures remain private. The scanner returned `{"scanned_files": 1, "status": "passed"}`, exit 0. The affected
+native first-turn regression then returned `Ran 1 test in 21.584s`, `OK`, exit 0, and the three-module unit suite
+returned `Ran 381 tests in 90.516s`, `OK (skipped=15)`, exit 0.
+
+R1 canonicalizes the synthetic harness's temporary root once; its rollback assertion compares `run.resolve()`
+with the printed canonical path and still calls rollback;
+all ported printed-path assertions were audited. The installer preserves a required failure's multiline text,
+bounded at 2,000 characters, alongside `names_best_effort`. Existing worker keys and allowances remain intact.
+The omniroute comment now cites the current `build_args.py:356-357` key exclusion, while the keyed filters
+table remains byte-identical to main.
+
+**Historical facts preserved from #436 (2026-09-27, codex-cli 0.157.1).** A peer relayed that Serena and
+codebase-memory were absent from GPT-6's first-turn tools through OmniRoute and appeared after a 75 s sleep;
+the peer artifact was not retained. Workstation stdio probes measured Serena initialize at 1.53-2.24 s and
+codebase-memory at 1.20-1.25 s, each timed from its own launch. The historical unchanged-profile first requests
+left at 1.63-1.69 s. Those probe times are not measurements of added latency, and the codebase-memory timing
+alone does not corroborate its relayed omission. The shared grace starts after the required wait, and each
+startup step receives the configured timeout independently. A partial profile MCP table without a base
+registration causes the `invalid transport` hazard under whole-file strict validation.
+
+At codebase-memory-mcp 0.11.0, the historical scratch-HOME probe returned no answer in 30 s because the active
+account daemon used a different cache directory; the account-HOME probe answered in 1.2 s. Workers under a
+different HOME could therefore fail or hang if codebase-memory were required. The source #436 also retained
+Serena probes from cwd `/` at 1.47-1.53 s and codebase-memory at 1.20-1.25 s; no host apply had run. These are
+historical claims from the pinned PR, not measurements repeated by this port. Preserve #436's commits
+`2da1144d` through `2ba0e799` as port credit and its `claude/w5-codex-mcp-required-20260927` branch.
+
+**Overturn conditions and residuals.** Re-measure if a maintained Codex release provides a persistent catalog
+that covers fresh processes, a per-server optional wait with an equivalent first-turn guarantee, or a changed
+grace policy. Compare A and any such supported alternative on the same first-turn oracle and startup-failure
+fixture, retaining all runs and owner-map effects. Reopen the decision if real Serena starts fail within the
+60 s per-step allowance or a retained gateway probe still lacks its tool after the profile is applied.
+
+The optional live route was skipped outside the runtime lane's 06:30-09:00Z window; no provider, model, gateway,
+real Serena, token or other-host acceptance is claimed. No Rust upstream tests were run. The initial trial
+lacked absolute per-run timestamps; its preserved capture refinement includes them and instrument hashes.
+Gate A owns the final-head
+review: the repository templates are not themselves items in `list-frozen`, but the installed stack-worker
+profile's presence and SHA256 are frozen (`codex.stack_worker_profile.present` and `.sha256`), alongside role
+tables and the effective MCP server set. No omniroute profile item is listed. No host apply occurred.
+
+**Completeness critic.** Covered the installed pin and target/latest source, required and optional starts,
+fresh-process cache limits, per-step timeouts, first-turn tool names, failed-start controls, owner-map propagation,
+codebase-memory retirement, historical evidence classes, canonical rollback paths and the frozen installed profile.
+The next lifecycle sweep must retain the target-pin rerun, configuration-owner fixes/ACK, Gate A review and quiet-window
+capability/host follow-up as open gates. Independent Opus and cross-family Sol review, all required CI, rebase,
+publication, merge and #436 closure are coordinator actions under the sandbox addendum.
+
+Concurrent main advancement was observed before final registration: this builder's HEAD remained the contract
+base `cac8700ba914950266272347468bff7ad630a4bf`, while origin/main moved to
+`463a57b983eec540ae90eb45c2b1a7c6fc469aed`. Its newer evidence manifest names unrelated files absent from this
+older worktree. No assigned content path changed in that interval. The prescribed registry commands are run,
+but rebase and final registration/validation remain with the coordinator; the builder cannot edit git state or
+fill other owners' artifacts.
+Both required report generators returned exit 0 (`status: written`). Publication validation after copying
+the latest main manifest returned exit 1 for those unrelated missing/stale files; its initial own-receipt
+privacy findings were repaired as recorded above. This is not a passed final publication gate. The coordinator
+must rebase, register the actual final content, regenerate reports and obtain `status: passed` before committing.
