@@ -31,13 +31,15 @@ by the pinned PR head, using its merge base with main.
   [04:46 review][review-parked] and [05:15 follow-up][review-followup] remain the
   disposition evidence; the custody window produced no new owner.
 - **The roadmap assignment did not resolve it.** The September 28 roadmap put
-  #392 in the near-term landing work at line 178, assigned row F-2W-6 to a Mac
-  coordinator and a Mac session at line 206, and kept it in “Rebase, then land” at
-  line 235. The later parked review and the blockers below leave that work
-  outstanding. See the [roadmap at the verification base][roadmap].
+  #392 in the near-term landing work at line 178, assigned row F-2W-6 to the Mac
+  coordinator, depending on a Mac session, at line 206, and kept it in “Rebase,
+  then land” at line 235. The later parked review and the blockers below leave
+  that work outstanding. See the [roadmap at the verification base][roadmap].
 - **The pinned head still has two material recording blockers.** A script loaded
   only the PR's 17 added receipt blobs and printed counts, never receipt bodies
-  or output excerpts. The re-derived counts match the custody notice:
+  or output excerpts. The two blocker counts (10 of 17 and 31 of 48) match the
+  [custody notice][notice]; the distinct-revision count (6) matches the six
+  `receipt-revision/*` tags in the [September 29 review][review-parked]:
 
   | Property checked against the verification base | Result |
   | --- | --- |
@@ -66,7 +68,10 @@ by the pinned PR head, using its merge base with main.
   [install-plan rows][install-plan] select no context-supply layer and do not
   install ccusage; native client usage and OpenTelemetry own metering. The exact
   current rows are `owners[26]` (ccusage) and `owners[27]` (context-supply), each
-  with no installation commands. The [token-skills-orchestration entry][open-work]
+  with no installation commands. That file's older context-supply prose at
+  [line 292][new-target-prose] still keeps ccusage as the usage meter: `git blame`
+  at the verification base attributes it to #591, which precedes the decided rows
+  (#602) and the install plan (#606). The [token-skills-orchestration entry][open-work]
   treats legacy-host token observations as a separate scope. This concerns the
   new target. The Mac's own profile is not changed here.
 
@@ -138,14 +143,16 @@ codebase-memory-mcp entry and still pins mcporter at 0.13.13; the [stack
 manifest][stack] still records mcporter 0.14.1. No pin is reconciled here.
 
 The bounded readiness-audit child/worker run used copies of issue bodies as its
-inputs. Its retained verifier tally was **88 verdicts: 83 confirmed, 4 corrected,
-1 unverifiable and 0 refuted**, as reported in [the September 27 Round 3
-review][review-round3] and the PR body's Round 3 section. Its returned workflow
-status was not kept. The [workflow at the verification base][workflow-status]
-still assigns `unverified` or `incomplete` when an unverifiable verdict is
-present; that tally cannot establish `complete`, and the actual unsaved status
-cannot be reconstructed as a retained result. The issue-body inputs are copies
-of source material, not synthetic fixtures.
+inputs, not synthetic fixtures: #392's Round 3 section calls them synthetic, and
+a nit in the [September 29 review][review-parked] flagged that word against
+copies of issue bodies. The run's retained verifier tally was **88 verdicts: 83
+confirmed, 4 corrected, 1 unverifiable and 0 refuted**, as reported in [the
+September 27 Round 3 review][review-round3] and the PR body's Round 3 section.
+The run's returned workflow status was not kept. The [workflow at the
+verification base][workflow-status] still assigns `unverified` or `incomplete`
+when an unverifiable verdict is present; that tally cannot establish
+`complete`, and the actual unsaved status cannot be reconstructed as a retained
+result.
 
 ### Lessons on receipt practice
 
@@ -214,7 +221,8 @@ claim is found before completing the disposition.
 [digest-source]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/scripts/host_receipts.py#L1012-L1019
 [append-only]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/contributing-evidence.md#L243-L259
 [landscape]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/catalogs/landscape/foundation.json
-[new-target]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-new-wsl-definitive-defaults.md#L78
+[new-target]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-new-wsl-definitive-defaults.md#L78-L79
+[new-target-prose]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-new-wsl-definitive-defaults.md#L292
 [install-plan]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json#L1060-L1105
 [open-work]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/blueprints/convergence-practice/clean-resolution-20261002/open-work.json#L38-L42
 [mac-clients]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-02-two-host-north-star-architecture.md#L109-L111
