@@ -113,18 +113,20 @@ DIFFER_RE = re.compile(r"^[0-9]+ ids differ from the S baseline: ")
 # the decision record and both trial workflows' header comments state it (test_compare.py checks each). compare.py
 # does not judge it; result.json repeats it under decision_rule.protocol.
 PROTOCOL = (
-    "A run decides an OS when its result.json, or, only if that file's upload failed, the outcome line compare.py "
-    "printed, gives adopt, reject or no verdict for that OS; a run in which neither exists is incomplete.",
+    "A run decides an OS when its result.json, or, only if result.json is absent from the compare artifact, the "
+    "outcome line compare.py printed, gives adopt, reject or no verdict for that OS; a run in which neither exists is "
+    "incomplete.",
     "A result.json lists the OS that its run did not measure as not measured, which decides nothing.",
-    "Per OS, the deciding run is the first run of that OS's own trial workflow that decides it.",
+    "Per OS, the deciding run is the first run of that OS's own trial workflow that decides it before that OS's trial "
+    "ended.",
     "Until an OS's trial ends, a repeat is allowed for it only by closing and reopening the draft pull request when no "
     "run of either trial workflow is in progress.",
     "Once an OS's trial has ended, at its deciding run or without a verdict, nothing changes it: its later runs are "
     "reported only, and cancelling or reopening during such a run is not a deviation for that OS.",
     "Any coordinator action other than the close-and-reopen repeat that changes the head, or that makes a run "
-    "incomplete after its first serial, shards or controls job started, is a protocol deviation that ends the trial of "
-    "each OS it affects without a verdict: pushing a commit, or cancelling that run by hand, reopening during it or "
-    "deleting its artifacts or the run itself.",
+    "incomplete after its first serial, shards or controls job started, is a protocol deviation: pushing a commit, or "
+    "cancelling that run by hand, reopening during it or deleting its artifacts or the run itself; it ends the trial "
+    "of each OS it affects without a verdict at the moment it occurs.",
     "No run starts while the pull request conflicts with main, because GitHub runs no pull_request workflow on a pull "
     "request with a merge conflict: the trial of an OS that then still needs a run ends without a verdict (not "
     "measured), and no push may resolve the conflict.",
@@ -292,6 +294,7 @@ class Run:
     missing_ids: list = dataclasses.field(default_factory=list)
     extra_ids: list = dataclasses.field(default_factory=list)
     repeated_ids: list = dataclasses.field(default_factory=list)
+    lost: bool = False  # S only: none of its step's three files (read_run)
 
     @property
     def attempt(self):
@@ -462,6 +465,9 @@ def read_run(path: Path, os_name: str, arm: str, repeat: int, inventory: Invento
         return run
     if arm == SERIAL_ARM:
         run.logs = [read_log(path, "S", None, [])]
+        # The S step writes command.txt first and log.txt and exit-code.txt even when its command fails, so none of
+        # the three means its script never ran (a step lost to a runner fault: partial_reasons, README.md "Limits").
+        run.lost = not any((path / name).exists() for name in ("command.txt", "log.txt", "exit-code.txt"))
     else:
         wanted = inventory.lists.get(arm)
         if wanted is None:
@@ -753,6 +759,20 @@ def unrecorded_attempt(attempt) -> bool:
     return attempt is None or attempt == ""
 
 
+def recorded(runs: list, read) -> dict:
+    """{value: [run names]} of the value read(run) over the runs that record one (a non-empty string)."""
+    seen = collections.defaultdict(list)
+    for run in runs:
+        value = read(run)
+        if isinstance(value, str) and value:
+            seen[value].append(run.name)
+    return dict(sorted(seen.items()))
+
+
+def described(seen: dict) -> str:
+    return "; ".join(f"{value}: {_cap(names)}" for value, names in seen.items())
+
+
 def rerun_reasons(runs: list, controls: dict, compare_attempt) -> list:
     """Every sign of a re-run (README.md, "Trigger, repetition and re-runs"): the compare job's own run attempt other
     than "1", or a recorded run_attempt of any run or control directory other than "1". Checked first, before the
@@ -803,6 +823,16 @@ def partial_reasons(os_name: str, runs: list, needs, controls: dict, min_repeats
     for run in runs:
         if run.unstarted:
             reasons.append(f"{run.name}: {'; '.join(run.unstarted)}")
+        elif run.lost:
+            reasons.append(f"{run.name}: the test phase started, but the S step left no command.txt, log.txt or "
+                           "exit-code.txt (a step lost to a runner fault)")
+    # The runtime changed during the run (README.md, "Limits"): an environment fault, never an arm's own result. The
+    # implementation is not recorded: every job's interpreter check asserts CPython before the clock starts.
+    for label, seen in (("python versions", recorded(runs, lambda run: run.python_version)),
+                        ("machines", recorded(runs, lambda run: (run.runtime or {}).get("machine")))):
+        if len(seen) > 1:
+            reasons.append(f"the arm runs recorded {len(seen)} {label} ({described(seen)}): the runtime changed "
+                           "during the run (an environment fault)")
     if not controls.get("present"):
         reasons.append("no control run directory")
     elif not controls.get("started"):
@@ -828,12 +858,8 @@ def incomplete_reasons(reruns: list, partial: list) -> list:
 def compare_with_baseline(os_name: str, by_arm: dict, baseline: dict) -> None:
     """Flaky ids from the eligible S runs; every sharded run's records against the first eligible S run."""
     serial = [run for run in by_arm[SERIAL_ARM] if not run.problems]
-    versions = sorted({run.python_version for run in serial})
-    baseline.update(s_runs=len(by_arm[SERIAL_ARM]), s_eligible=len(serial), python_versions=versions)
-    if len(versions) > 1:
-        for run in serial:
-            run.problems.append(f"the eligible S runs used different python versions {versions}")
-        serial = []
+    baseline.update(s_runs=len(by_arm[SERIAL_ARM]), s_eligible=len(serial),
+                    python_versions=sorted({run.python_version for run in serial}))
     reference, flaky = None, set()
     if serial:
         grouped = [groups(run.logs) for run in serial]
@@ -846,8 +872,6 @@ def compare_with_baseline(os_name: str, by_arm: dict, baseline: dict) -> None:
             if reference is None:
                 run.problems.append("no eligible S baseline on this OS")
                 continue
-            if run.python_version not in versions:
-                run.problems.append(f"python {run.python_version!r} differs from S {versions}")
             mine = groups(run.logs)
             diffs = [{"id": key, "S": [list(r) for r in reference.get(key, ())], "arm": [list(r) for r in mine.get(key, ())]}
                      for key in sorted((set(reference) | set(mine)) - flaky) if reference.get(key) != mine.get(key)]
@@ -901,6 +925,11 @@ def verdict_for_os(os_name: str, runs: list, inventory: Inventory, controls: dic
     ineligible S baseline or unmeasurable controls (no verdict); then the rule (reject or adopt)."""
     report = {"outcome": None, "selected_arm": None, "reasons": [], "arms": {}, "flags": [],
               "baseline": {"flaky_ids": [], "flaky_total": 0}}
+    images = recorded(runs, lambda run: (run.meta or {}).get("runner_image"))
+    if len(images) > 1:
+        # Reported, never judged, whatever the outcome (README.md, "Limits"): an image rollout takes days.
+        report["flags"].append(f"the arm runs ran on {len(images)} runner images ({described(images)}): the outcome "
+                               "record must address it")
     reruns = rerun_reasons(runs, controls, compare_attempt)
     if job_result(needs, "inventory") == "failure":
         gate = inventory.report if isinstance(inventory.report, dict) else {}
@@ -1126,14 +1155,14 @@ def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, o
             "serial_baseline": "S needs three runs, each with a complete summary, an exit status that agrees with its "
                                "status line, executed ids equal to the inventory with each id once, the exact command "
                                "python3 -m unittest -v, a clean checkout, run_attempt 1, the pull request head and a "
-                               "valid step time; the eligible S runs share one python version",
+                               "valid step time",
             "sharded_arm": "every run eligible: every shard log (and the tail) complete, its exit status consistent with "
                            "its status line, the exact command python3 -m unittest -v <its list>, its list equal to the "
                            "inventory's, its executed ids equal to its modules' ids, the union over all logs equal to "
                            "the inventory with each id once, its (kind, key, outcome) records equal to the first "
-                           "eligible S run outside the flaky ids, the same python version as S in every step, a clean "
-                           "checkout, run_attempt 1, the pull request head and a valid step time; at least three runs; "
-                           "the controls of the OS passed",
+                           "eligible S run outside the flaky ids, every step on the python version its job recorded, a "
+                           "clean checkout, run_attempt 1, the pull request head and a valid step time; at least three "
+                           "runs; the controls of the OS passed",
             "speed": "take the eligible sharded arm with the smallest median step time (a tie goes to the arm without "
                      "a tail); adopt it only if its median <= 3/5 of the S median and its slowest run <= 3/4 of the "
                      "fastest S run, compared as exact fractions; otherwise reject, with no fall-through; no eligible "
@@ -1145,8 +1174,11 @@ def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, o
                           "run or control directory other than 1), a cancelled or skipped job, a missing run "
                           "directory, a job status cancelled (of an arm run or of the control run), an unrecorded run "
                           "attempt (runtime.json missing or without run_attempt), a run whose test phase never started "
-                          "(its clock-start step did not succeed or timing.json records no start), a missing control "
-                          "run or one whose parallel group never started, control steps that left no probe, log or "
+                          "(its clock-start step did not succeed or timing.json records no start), an S run whose test "
+                          "phase started but which left no command.txt, log.txt or exit-code.txt (a step lost to a "
+                          "runner fault), arm runs that recorded more than one python version or machine (the runtime "
+                          "changed during the run), a missing control run or one whose parallel group never started, "
+                          "control steps that left no probe, log or "
                           "exit status although the group started while no other control evidence failed (a runner "
                           "fault inside the control group), a controls-check job that failed although this job's own "
                           "check of the same control artifact passed, an inventory job that failed without a "
@@ -1159,7 +1191,8 @@ def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, o
                           "unrecorded, no recorded one is wrong, and every other control expectation holds)",
             "not_measured": "the OS that this run did not measure is listed as not measured, which decides nothing",
             "flags": "a sharded arm that was ineligible only because steps never wrote an exit status is flagged when "
-                     "the rule rejects or adopts; the outcome record must address it; reported, never judged",
+                     "the rule rejects or adopts, and arm runs on more than one runner image whatever the outcome; the "
+                     "outcome record must address every flag; reported, never judged",
             "protocol": " ".join(PROTOCOL) + " compare.py does not see a protocol deviation; the outcome record names it.",
         },
         "inputs": {"expected_sha": expected_sha, "os": os_name, "min_repeats": min_repeats,

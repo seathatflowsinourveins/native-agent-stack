@@ -21,27 +21,26 @@ name: Suite shards trial, ubuntu-24.04 (draft pull request only)
 # record can never land on this branch by accident.
 #
 # Protocol (preregistered; README.md and experiment.json's quality_rule state it word for word): A run decides an OS
-# when its result.json, or, only if that file's upload failed, the outcome line compare.py printed, gives adopt,
-# reject or no verdict for that OS; a run in which neither exists is incomplete. A result.json lists the OS that its
-# run did not measure as not measured, which decides nothing. Per OS, the deciding run is the first run of that OS's
-# own trial workflow that decides it. Until an OS's trial ends, a repeat is allowed for it only by closing and
-# reopening the draft pull request when no run of either trial workflow is in progress. Once an OS's trial has
-# ended, at its deciding run or without a verdict, nothing changes it: its later runs are reported only, and
-# cancelling or reopening during such a run is not a deviation for that OS. Any coordinator action other than the
-# close-and-reopen repeat that changes the head, or that makes a run incomplete after its first serial, shards or
-# controls job started, is a protocol deviation that ends the trial of each OS it affects without a verdict:
-# pushing a commit, or cancelling that run by hand, reopening during it or deleting its artifacts or the run itself.
-# No run starts while the pull request conflicts with main, because GitHub runs no pull_request workflow on a pull
-# request with a merge conflict: the trial of an OS that then still needs a run ends without a verdict (not
-# measured), and no push may resolve the conflict.
+# when its result.json, or, only if result.json is absent from the compare artifact, the outcome line compare.py
+# printed, gives adopt, reject or no verdict for that OS; a run in which neither exists is incomplete. A result.json
+# lists the OS that its run did not measure as not measured, which decides nothing. Per OS, the deciding run is the
+# first run of that OS's own trial workflow that decides it before that OS's trial ended. Until an OS's trial ends, a
+# repeat is allowed for it only by closing and reopening the draft pull request when no run of either trial workflow
+# is in progress. Once an OS's trial has ended, at its deciding run or without a verdict, nothing changes it: its
+# later runs are reported only, and cancelling or reopening during such a run is not a deviation for that OS. Any
+# coordinator action other than the close-and-reopen repeat that changes the head, or that makes a run incomplete
+# after its first serial, shards or controls job started, is a protocol deviation: pushing a commit, or cancelling
+# that run by hand, reopening during it or deleting its artifacts or the run itself; it ends the trial of each OS it
+# affects without a verdict at the moment it occurs. No run starts while the pull request conflicts with main,
+# because GitHub runs no pull_request workflow on a pull request with a merge conflict: the trial of an OS that then
+# still needs a run ends without a verdict (not measured), and no push may resolve the conflict.
 #
 # Re-runs: never re-run any job, the compare job included: compare.py makes the OS incomplete when its own
 # GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control directory, is not 1. Whether a re-run job's upload
 # (overwrite: false) would fail on the first attempt's artifact name, and whether its data would reach a compare job,
-# is unverified; the outcome is incomplete either way. cancel-in-progress is true: a reopen during a run, a protocol
-# deviation, cancels that run instead of queueing an unattended second run behind it. Its cost: one reopen starts
-# both trial workflows, so a repeat for one OS waits until the other OS's run has ended, or has been cancelled once
-# that OS's trial ended.
+# is unverified; the outcome is incomplete either way. cancel-in-progress is true: a reopen during a run cancels that
+# run instead of queueing an unattended second run behind it. Its cost: one reopen starts both trial workflows, so a
+# repeat for one OS waits until the other OS's run has ended, or has been cancelled once that OS's trial ended.
 #
 # Jobs: inventory (the fail-closed parity and coverage gate, shard lists built at run time from the head);
 # serial (arm S x 3) and shards (arms G4 and G4T x 3; at most 2 + 2 timed jobs at once); controls (a passing, a

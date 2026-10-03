@@ -682,6 +682,7 @@ class VerdictTests(TreeCase):
             "no status": lambda d: (d / "git-status.txt").unlink(),
             "status failed": lambda d: (d / "git-status.txt").write_text("git status failed\n"),
             "other head": lambda d: rewrite_json(d / "meta.json", checkout_sha="f" * 40),
+            # The job recorded another python than its steps' probes show: the within-job check.
             "other python": lambda d: rewrite_json(d / "meta.json", python_version="3.12.3"),
             "clocks disagree": lambda d: (d / "timing.json").write_text(json.dumps(
                 {"step_ns": nanoseconds(40), "wall_ns": nanoseconds(60), "problems": []})),
@@ -716,10 +717,70 @@ class VerdictTests(TreeCase):
         self.assertFalse(self.run_entry(result, f"{OS}-S-r2")["eligible"])
         self.assertEqual(self.verdict(result)["outcome"], "no verdict")
 
-    def test_serial_runs_on_two_python_versions_give_no_verdict(self):
+    def test_serial_runs_on_two_python_versions_are_incomplete_not_no_verdict(self):
+        # R4-1: an image rollout during a run changed the interpreter between two S jobs, an environment fault.
+        # Previous head: every S run ineligible, so no verdict, final under the deciding-run rule.
         self.tree.full()
         rewrite_json(self.tree.run_dir(f"{OS}-S-r3") / "meta.json", python_version="3.12.3")
-        self.assertEqual(self.verdict()["outcome"], "no verdict")
+        result = self.tree.result()
+        self.assertIncomplete(self.verdict(result), f"the arm runs recorded 2 python versions (3.12.3: [{OS}-S-r3] (1); ")
+        self.assertIncomplete(self.verdict(result), "the runtime changed during the run (an environment fault)")
+        self.assertTrue(self.run_entry(result, f"{OS}-S-r3")["eligible"])
+
+    def test_a_sharded_run_on_another_python_version_than_s_is_incomplete_not_a_handover(self):
+        # R4-1: G4 r1's job and all its steps ran another release than every other run (its probes agree with its job,
+        # so the within-job check holds). Previous head: G4 r1 ineligible, so G4T decided: adopt G4T.
+        self.tree.full()
+        run = self.tree.run_dir(f"{OS}-G4-r1")
+        rewrite_json(run / "meta.json", python_version="3.12.3")
+        for probe in run.glob("*.probe.json"):
+            rewrite_json(probe, python_version="3.12.3")
+        result = self.tree.result()
+        self.assertIncomplete(self.verdict(result), f"the arm runs recorded 2 python versions (3.12.3: [{OS}-G4-r1] (1)")
+        self.assertTrue(self.run_entry(result, f"{OS}-G4-r1")["eligible"], "no longer an ineligibility")
+
+    def test_arm_runs_on_two_machines_are_incomplete(self):
+        # R4-1: runtime.json's machine differs between two runs of one OS. Previous head: not compared, adopt.
+        for machines, outcome in ((("x86_64", "arm64"), "incomplete"), (("x86_64", "x86_64"), "adopt")):
+            with self.subTest(machines), tempfile.TemporaryDirectory() as tmp:
+                tree = Tree(Path(tmp)).full()
+                rewrite_json(tree.run_dir(f"{OS}-S-r1") / "runtime.json", machine=machines[0])
+                rewrite_json(tree.run_dir(f"{OS}-G4T-r2") / "runtime.json", machine=machines[1])
+                verdict = tree.result()["verdicts"][OS]
+                self.assertEqual(verdict["outcome"], outcome, verdict["reasons"])
+                if outcome == "incomplete":
+                    self.assertIncomplete(verdict, "the arm runs recorded 2 machines (arm64: [ubuntu-24.04-G4T-r2] (1); "
+                                                   "x86_64: [ubuntu-24.04-S-r1] (1))")
+
+    def test_another_runner_image_with_the_same_python_version_is_only_a_flag(self):
+        # R4-1: an image rollout that left the interpreter and the machine unchanged is reported, never judged.
+        # Previous head: no flag.
+        self.tree.full()
+        rewrite_json(self.tree.run_dir(f"{OS}-G4T-r3") / "meta.json", runner_image="20260907.0337.1")
+        result = self.tree.result()
+        verdict = self.verdict(result)
+        self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("adopt", "G4"), verdict["reasons"])
+        self.assertTrue(all(run["eligible"] for run in result["runs"]))
+        self.assertEqual(verdict["flags"], [f"the arm runs ran on 2 runner images (20260907.0337.1: [{OS}-G4T-r3] (1); "
+                                            f"fixture: [{OS}-G4-r1, {OS}-G4-r2, {OS}-G4-r3, {OS}-G4T-r1, {OS}-G4T-r2, "
+                                            "...] (8)): the outcome record must address it"])
+        self.assertIn("- FLAG ubuntu-24.04: the arm runs ran on 2 runner images", compare.summary_markdown(result))
+
+    def test_a_serial_step_lost_to_a_runner_fault_is_incomplete_not_no_verdict(self):
+        # R4-2: the clock step succeeded, but the S step left none of its files: its script never ran (a runner
+        # fault), as a lost control step. Previous head: S r2 ineligible, so no verdict, final. Kept: an S step that
+        # wrote its command and log but no exit status (stopped before its end) leaves evidence, which is judged.
+        self.tree.full()
+        for name in ("command.txt", "log.txt", "exit-code.txt"):
+            (self.tree.run_dir(f"{OS}-S-r2") / name).unlink()
+        result = self.tree.result()
+        self.assertIncomplete(self.verdict(result), f"{OS}-S-r2: the test phase started, but the S step left no "
+                                                    "command.txt, log.txt or exit-code.txt (a step lost to a runner fault)")
+        self.assertTrue(self.run_entry(result, f"{OS}-S-r2")["test_phase_started"])
+        with tempfile.TemporaryDirectory() as tmp:
+            tree = Tree(Path(tmp)).full()
+            (tree.run_dir(f"{OS}-S-r2") / "exit-code.txt").unlink()
+            self.assertEqual(tree.result()["verdicts"][OS]["outcome"], "no verdict")
 
     def test_failed_controls_reject(self):
         self.tree.full()
@@ -1574,6 +1635,17 @@ class WorkflowTests(unittest.TestCase):
                 with self.subTest(os_name=os_name, job=name):
                     self.assertIn(f"max-parallel: {expected[os_name]}\n", jobs(text)[name])
                     self.assertIn("fail-fast: false\n", jobs(text)[name])
+
+    def test_every_macos_python_setup_pins_one_release_that_its_interpreter_check_asserts(self):
+        # R4-1: an image rollout during a run can change the cached 3.13 patch release between jobs. An exact version
+        # takes the same release in every job (from the tool cache, else a download), and each job's interpreter
+        # check asserts it before the clock starts, so another release gives an unstarted run (incomplete). Linux
+        # runs the image's system python3, compared across runs by compare.py.
+        text = self.texts["macos-15"]
+        self.assertEqual(re.findall(r"(?m)^ +python-version: '([^']*)'$", text), ["3.13.15"] * 4)
+        self.assertEqual(re.findall(r"(?m)^ +check-latest: (\S+)$", text), ["false"] * 4)
+        self.assertEqual(re.findall(r"sys\.version_info\[:[23]\] == \(([0-9, ]+)\)", text), ["3, 13, 15"] * 4)
+        self.assertNotIn("python-version:", self.texts["ubuntu-24.04"])
 
     def test_the_control_job_matches_the_oracle(self):
         for os_name, text in self.texts.items():

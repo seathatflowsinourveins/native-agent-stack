@@ -22,29 +22,29 @@ name: Suite shards trial, macos-15 (draft pull request only)
 # record can never land on this branch by accident.
 #
 # Protocol (preregistered; README.md and experiment.json's quality_rule state it word for word): A run decides an OS
-# when its result.json, or, only if that file's upload failed, the outcome line compare.py printed, gives adopt,
-# reject or no verdict for that OS; a run in which neither exists is incomplete. A result.json lists the OS that its
-# run did not measure as not measured, which decides nothing. Per OS, the deciding run is the first run of that OS's
-# own trial workflow that decides it. Until an OS's trial ends, a repeat is allowed for it only by closing and
-# reopening the draft pull request when no run of either trial workflow is in progress. Once an OS's trial has
-# ended, at its deciding run or without a verdict, nothing changes it: its later runs are reported only, and
-# cancelling or reopening during such a run is not a deviation for that OS. Any coordinator action other than the
-# close-and-reopen repeat that changes the head, or that makes a run incomplete after its first serial, shards or
-# controls job started, is a protocol deviation that ends the trial of each OS it affects without a verdict:
-# pushing a commit, or cancelling that run by hand, reopening during it or deleting its artifacts or the run itself.
-# No run starts while the pull request conflicts with main, because GitHub runs no pull_request workflow on a pull
-# request with a merge conflict: the trial of an OS that then still needs a run ends without a verdict (not
-# measured), and no push may resolve the conflict.
+# when its result.json, or, only if result.json is absent from the compare artifact, the outcome line compare.py
+# printed, gives adopt, reject or no verdict for that OS; a run in which neither exists is incomplete. A result.json
+# lists the OS that its run did not measure as not measured, which decides nothing. Per OS, the deciding run is the
+# first run of that OS's own trial workflow that decides it before that OS's trial ended. Until an OS's trial ends, a
+# repeat is allowed for it only by closing and reopening the draft pull request when no run of either trial workflow
+# is in progress. Once an OS's trial has ended, at its deciding run or without a verdict, nothing changes it: its
+# later runs are reported only, and cancelling or reopening during such a run is not a deviation for that OS. Any
+# coordinator action other than the close-and-reopen repeat that changes the head, or that makes a run incomplete
+# after its first serial, shards or controls job started, is a protocol deviation: pushing a commit, or cancelling
+# that run by hand, reopening during it or deleting its artifacts or the run itself; it ends the trial of each OS it
+# affects without a verdict at the moment it occurs. No run starts while the pull request conflicts with main,
+# because GitHub runs no pull_request workflow on a pull request with a merge conflict: the trial of an OS that then
+# still needs a run ends without a verdict (not measured), and no push may resolve the conflict.
 #
 # Re-runs: never re-run any job, the compare job included: compare.py makes the OS incomplete when its own
 # GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control directory, is not 1. Whether a re-run job's upload
 # (overwrite: false) would fail on the first attempt's artifact name, and whether its data would reach a compare job,
-# is unverified; the outcome is incomplete either way. cancel-in-progress is true: a reopen during a run, a protocol
-# deviation, cancels that run instead of queueing an unattended second run behind it, which would hold up to three
-# macOS slots. Its cost: one reopen starts both trial workflows, so a Linux repeat waits until this macOS run has
-# ended, or has been cancelled once the macOS trial ended.
+# is unverified; the outcome is incomplete either way. cancel-in-progress is true: a reopen during a run cancels that
+# run instead of queueing an unattended second run behind it, which would hold up to three macOS slots. Its cost:
+# one reopen starts both trial workflows, so a Linux repeat waits until this macOS run has ended, or has been
+# cancelled once the macOS trial ended.
 #
-# Jobs: inventory (ubuntu-24.04 with the arms' Python line from actions/setup-python: the fail-closed parity and
+# Jobs: inventory (ubuntu-24.04 with the arms' Python release from actions/setup-python: the fail-closed parity and
 # coverage gate, shard lists built at run time from the head); serial (arm S x 3) and shards (arms G3 and G3T x 3),
 # one of each at a time, so with the control job this workflow holds at most three of the plan's five macOS slots;
 # controls (a passing, a failing, a crashing and a hanging shard in one parallel group on macos-15; expected to fail)
@@ -55,10 +55,12 @@ name: Suite shards trial, macos-15 (draft pull request only)
 # and again at every reopen: up to six macOS jobs against five slots (README.md, "Limits"; the coordinator opens and
 # reopens the pull request only when the macOS queue is not saturated).
 #
-# Suite environment: as validate-macos, actions/setup-python 3.13, plus the two npm pins that validate.yml installs,
-# because their tripwires (tests/test_shell_parser_ci.py, tests/test_landscape_sweep_skills.py) fail any Actions job
-# that is not a recorded gap; validate-macos is one, this workflow's jobs are not. The step scripts use only bash 3.2
-# features (no mapfile): the image's bash is 3.2.57 (actions/runner-images at f95c0c79,
+# Suite environment: as validate-macos, except that every job takes the exact release 3.13.15 from
+# actions/setup-python (validate-macos takes the line 3.13) and asserts it in its interpreter check, so that an image
+# rollout during a run cannot change the interpreter between jobs (README.md, "Limits"); plus the two npm pins that
+# validate.yml installs, because their tripwires (tests/test_shell_parser_ci.py, tests/test_landscape_sweep_skills.py)
+# fail any Actions job that is not a recorded gap; validate-macos is one, this workflow's jobs are not. The step
+# scripts use only bash 3.2 features (no mapfile): the image's bash is 3.2.57 (actions/runner-images at f95c0c79,
 # images/macos/macos-15-arm64-Readme.md, image 20260907.0337.1).
 
 on:
@@ -113,14 +115,14 @@ jobs:
       - name: Set up the manifest-supported Python line (the arms' line, from the same pin)
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.13'
+          python-version: '3.13.15'
           check-latest: false
-      - name: Check the interpreter (CPython 3.13)
+      - name: Check the interpreter (CPython 3.13.15, the pinned release)
         run: |
           set -euo pipefail
           command -v python3
           python3 --version
-          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:2] == (3, 13)))'
+          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:3] == (3, 13, 15)))'
       - name: Build the inventory and the shard lists (fail-closed parity and coverage gate)
         run: >-
           python3 "$TRIAL_DIR/inventory.py" --os "$OS_LABEL" --root .
@@ -176,14 +178,14 @@ jobs:
       - name: Set up the manifest-supported Python line
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.13'
+          python-version: '3.13.15'
           check-latest: false
-      - name: Check the interpreter (CPython 3.13)
+      - name: Check the interpreter (CPython 3.13.15, the pinned release)
         run: |
           set -euo pipefail
           command -v python3
           python3 --version
-          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:2] == (3, 13)))'
+          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:3] == (3, 13, 15)))'
       # The two npm pin steps validate.yml runs before its suite (validate.yml at 9b0b8d6d, lines 157-217), run bodies
       # unchanged.
       - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
@@ -314,14 +316,14 @@ jobs:
       - name: Set up the manifest-supported Python line
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.13'
+          python-version: '3.13.15'
           check-latest: false
-      - name: Check the interpreter (CPython 3.13)
+      - name: Check the interpreter (CPython 3.13.15, the pinned release)
         run: |
           set -euo pipefail
           command -v python3
           python3 --version
-          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:2] == (3, 13)))'
+          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:3] == (3, 13, 15)))'
       # The same two npm pin steps as the serial job, from validate.yml, run bodies unchanged.
       - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
         run: |
@@ -513,14 +515,14 @@ jobs:
       - name: Set up the manifest-supported Python line
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.13'
+          python-version: '3.13.15'
           check-latest: false
-      - name: Check the interpreter (CPython 3.13)
+      - name: Check the interpreter (CPython 3.13.15, the pinned release)
         run: |
           set -euo pipefail
           command -v python3
           python3 --version
-          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:2] == (3, 13)))'
+          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:3] == (3, 13, 15)))'
       - name: Copy the four control modules alone into an empty directory and export a probe variable
         run: |
           set -euo pipefail
