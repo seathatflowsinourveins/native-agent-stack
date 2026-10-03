@@ -42,6 +42,12 @@ class VerdictTest(unittest.TestCase):
         self.assertEqual(self.check(r, definitive("NONE", None))["verdict"], "agree")
         self.assertEqual(self.check(r, definitive("F01", "owner/a"))["verdict"], "contest")
 
+    def test_a_named_repository_is_the_pick_even_when_it_installs_nothing_on_the_host(self):
+        # Amendment 4: actions/attest and Dependabot run on GitHub; their rows name the repository and are picks.
+        r = row("s", "definitive", "https://github.com/owner/a", installs_nothing_extra=True)
+        self.assertEqual(self.check(r, definitive("F01", "owner/a"))["verdict"], "agree")
+        self.assertEqual(self.check(r, definitive("NONE", None))["verdict"], "contest")
+
     def test_split_row_is_a_nomination(self):
         got = self.check(row("s", "split", measurement="ten fixed questions"), definitive("F02", "owner/b"))
         self.assertEqual((got["verdict"], got["manifest_measurement"]), ("nominates", "ten fixed questions"))

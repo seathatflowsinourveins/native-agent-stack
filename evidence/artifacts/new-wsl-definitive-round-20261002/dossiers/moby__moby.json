@@ -1,0 +1,348 @@
+{
+  "contender": "moby/moby",
+  "revision": {
+    "contender": "moby/moby",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "moby/moby",
+        "tag": "docker-v29.8.2",
+        "commit": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "docker-v29.8.2",
+    "commit": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+    "read_at": "2026-10-02T03:02:31+00:00"
+  },
+  "dossier": {
+    "contender": "moby/moby",
+    "revision": {
+      "tag": "docker-v29.8.2",
+      "commit": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Source repository of the Moby project, from which Docker Engine is built: the container daemon `dockerd` and the Linux `docker-proxy` userland port proxy (root Go module `github.com/moby/moby/v2`), the Engine HTTP API definition (`api/swagger.yaml`, API v1.56) with its Go types module (`api/`), and the Go client module (`client/`). The `docker` CLI, Docker Compose and Buildx are separate projects that this repo only pins for dev/test images (Dockerfile:12-23). The README has no install or usage section; build/install steps are in docs/, the Makefile and contrib/.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Moby is an open-source project created by Docker to enable and accelerate software containerization.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "It provides a 'Lego set' of toolkit components; 'Components include container build tools, a container registry, orchestration tools, a runtime and more', usable as building blocks with other tools.",
+          "citation": "README.md:14-15"
+        },
+        {
+          "claim": "Principles: modular; 'Batteries included but swappable' (most components can be swapped by different implementations).",
+          "citation": "README.md:19-23"
+        },
+        {
+          "claim": "'Usable security: Moby provides secure defaults without compromising usability.'",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "'Developer focused': the APIs are functional building blocks 'not necessarily intended as end user tools'; documentation and UX are aimed at developers, not end users.",
+          "citation": "README.md:25-27"
+        },
+        {
+          "claim": "Audience is engineers/integrators who want to modify, hack and build container-based systems; 'It is not for people looking for a commercially supported system'.",
+          "citation": "README.md:29-32"
+        },
+        {
+          "claim": "Releases are 'supported by the maintainers, community and users, on a best efforts basis only'; commercial support is via Docker Desktop or Mirantis Container Runtime; the repo is not a place for Docker product support requests.",
+          "citation": "README.md:40-41"
+        },
+        {
+          "claim": "Starting with Docker v29 (released November 2025) the Go module github.com/docker/docker is deprecated and won't be updated.",
+          "citation": "README.md:45-46"
+        },
+        {
+          "claim": "Supported public Go modules are github.com/moby/moby/client (Go client for the Docker Engine API) and github.com/moby/moby/api (API types shared between client and server).",
+          "citation": "README.md:48-53"
+        },
+        {
+          "claim": "The root module github.com/moby/moby/v2 is the codebase for building container engines such as Docker Engine; it produces binaries only, is not intended to be imported as a Go library and has no API stability guarantees.",
+          "citation": "README.md:55-56"
+        },
+        {
+          "claim": "Docker Engine releases are tagged with a `docker-` prefix (e.g. docker-v29.0.0); these tags only build the engine binary and must not be consumed via go get; client and api modules have their own tags.",
+          "citation": "README.md:58-64"
+        },
+        {
+          "claim": "v29 includes many breaking API changes (option structs, renamed methods, moved types); see the v29.0.0 release notes for the Go SDK list.",
+          "citation": "README.md:78-79"
+        },
+        {
+          "claim": "Use and transfer of Moby may be subject to restrictions by the United States and other governments (export-control notice).",
+          "citation": "README.md:89-95"
+        },
+        {
+          "claim": "Moby is licensed under the Apache License, Version 2.0.",
+          "citation": "README.md:99-101"
+        }
+      ],
+      "install": [
+        {
+          "method": "Build static dockerd + docker-proxy from source with Docker Buildx bake (needs docker + buildx on the build host). Output goes to ./bundles/binary (./bundles/dynbinary when DOCKER_STATIC=0; override with DESTDIR). docs/contributing/ctn-build.md:12,22 still say ./bundles/binary-daemon and ./bundles/dynbinary-daemon, which is out of date versus docker-bake.hcl (code preferred). The ./bundles/binary-daemon folder is produced by `hack/make.sh binary` (hack/make/binary:7) run inside the dev container, not by the host-side bake export (the Dockerfile build stage moves its /tmp/bundles/${target}-daemon/* into /build, which bake exports), and it is the folder `make install` copies from (hack/make/install-binary:9).",
+          "command": "docker buildx bake binary   (or: make binary)",
+          "citation": "docker-bake.hcl:4-6,56-59,77-79,98-110; Dockerfile:578-584,596-597,606-607; Makefile:165-167,177-178; docs/contributing/ctn-build.md:10-15,19,22-25 (stale output paths at :12 and :22); hack/make/binary:5-11; hack/make/install-binary:9"
+        },
+        {
+          "method": "Build 'complete' binaries that also include containerd, runc, tini (docker-init) and rootlesskit (same output folder rule as above: ./bundles/binary, ./bundles/dynbinary when DOCKER_STATIC=0, or DESTDIR)",
+          "command": "docker buildx bake all",
+          "citation": "docs/contributing/ctn-build.md:33-34; docker-bake.hcl:56-59,134-138; Dockerfile:611-617"
+        },
+        {
+          "method": "Install the built binaries into /usr/local/bin (Linux only; documented for the dev container). install-binary copies dockerd, runc, containerd, ctr, containerd-shim-runc-v2, docker-proxy, docker-init, rootlesskit and the two rootless scripts from ./bundles/binary-daemon (hack/make/install-binary:9-19), the folder `hack/make.sh binary` writes inside the dev container (hack/make/binary:7); it is not the ./bundles/binary that host-side `docker buildx bake` exports. hack/make/binary-daemon:7-20 copies the nested executables into that bundle only when /usr/local/bin/runc exists and the build is native (as in the dev container). The target dir is ${DOCKER_MAKE_INSTALL_PREFIX:=/usr/local}/bin and the helper refuses when `go env GOOS` is not linux (hack/make/.install:5-12).",
+          "command": "make install   (runs KEEPBUNDLE=1 hack/make.sh install-binary)",
+          "citation": "Makefile:191-193; docs/contributing/set-up-dev-env.md:151-169; hack/make/install-binary:8-20; hack/make/.install:3-14; hack/make/binary:5-11; hack/make/binary-daemon:4-30"
+        },
+        {
+          "method": "Development container: build the docker-dev image and open a shell in a privileged container, then build/install/run dockerd inside it",
+          "command": "make shell   then: hack/make.sh binary install-binary run",
+          "citation": "docs/contributing/set-up-dev-env.md:119-123,187-192; Makefile:119,208-210"
+        },
+        {
+          "method": "Rootless setup of an already installed dockerd (Linux only, must be run as a non-root user; needs newuidmap/newgidmap and /etc/subuid,/etc/subgid)",
+          "command": "dockerd-rootless-setuptool.sh install --force   (script header 'typical usage'; --force skips the abort when a rootful docker.sock is writable)",
+          "citation": "contrib/dockerd-rootless-setuptool.sh:4-7,45-59,91-95; contrib/dockerd-rootless.sh:6-8"
+        },
+        {
+          "method": "Pre-built packages are NOT provided by this repo: it ships source releases only; binary distributions come from third parties and the docs point to the external docs.docker.com installation page (not fetched). No macOS install of the daemon is documented.",
+          "command": "none in repo",
+          "citation": "project/BRANCHES-AND-TAGS.md:54; project/PACKAGERS.md:3-11; docs/contributing/software-required.md:48-68"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - primary target. Static/dynamic dockerd + docker-proxy are built for linux/amd64 (also arm64, arm/v5-v7, ppc64le, s390x: docker-bake.hcl:81-92); CI builds and tests on ubuntu-26.04 amd64 and arm64 runners (.github/workflows/ci.yml:41-48; .github/workflows/test.yml:90-105) plus an Oracle Linux 8 Lima VM job (.github/workflows/vm.yml:34-50). Needs root (daemon/command/daemon.go:148-150) or rootless mode with 'feature limitations' (daemon/command/daemon.go:183-186), specific kernel features (project/PACKAGERS.md:135-139; contrib/check-config.sh) and runtime deps containerd/runc plus iptables or nftables (project/PACKAGERS.md:116-128; daemon/command/config_unix.go:56).",
+        "wsl2": "unknown - no README/doc statement and no WSL2 CI job (searches of .github/, docs/, project/ found no WSL mention). The Linux daemon does carry a WSL2 mirrored-networking workaround that triggers when /usr/bin/wslinfo and a loopback0 device exist (daemon/libnetwork/drivers/bridge/wsl2_linux.go:13-37; daemon/libnetwork/drivers/bridge/internal/iptabler/wsl2.go:41-52; daemon/libnetwork/drivers/bridge/bridge_linux.go:201), so WSL2 guests are anticipated in code but support is not documented.",
+        "macos_arm64": "no - dockerd is not supported natively on macOS: daemon/daemon_unsupported.go is built for !linux && !freebsd && !windows (which includes darwin) and its checkSystem returns 'the Docker daemon is not supported on this platform' (daemon/daemon_unsupported.go:1,11-13); daemon startup calls CheckSystem first and aborts with 'system requirements not met' (daemon/command/daemon.go:122-123; daemon/daemon.go:849-858); no darwin target in docker-bake.hcl:81-92; no macOS CI runner (workflow runners are ubuntu and windows; no macos/darwin/osx string anywhere under .github/). The only darwin-only non-vendored source file is a kernel-version helper (pkg/parsers/kernel/kernel_darwin.go:1-24, plus its test pkg/parsers/kernel/kernel_darwin_test.go); shared unix files such as pkg/parsers/operatingsystem/operatingsystem_unix.go:1 and daemon/volume/mounts/volume_unix.go:1 also build on darwin, but daemon startup fails in checkSystem (daemon/daemon_unsupported.go:11-13; daemon/command/daemon.go:122-123). project/PACKAGERS.md:141-142 says the client will even run on Mac OS X / Darwin, and docs/contributing/software-required.md:62-63 assumes 'Docker for Mac' is installed on macOS; no in-repo macOS daemon path was found, so running the daemon there means a Linux environment supplied by other software (inference).",
+        "gpu": "yes (Linux only, conditional on host tooling) - GPU device requests are served via NVIDIA CDI hook (nvidia-cdi-hook) or nvidia-container-runtime-hook if found on PATH, else AMD when a CDI spec or helper binary is present (daemon/devices_linux.go:5-22; daemon/devices_nvidia_linux.go:23-78; daemon/devices.go:43-51); CDI spec dirs are read at startup (daemon/command/daemon.go:288-293). No-op on non-Linux (daemon/devices_nonlinux.go:7-8). No GPU CI job found in .github/; the CDI integration test uses fixture specs (integration/container/cdi_test.go:25-45)."
+      },
+      "integrations": {
+        "cli": "The daemon CLI is in this repo: cobra root command 'dockerd [OPTIONS]' with --version, --config-file, --validate and platform flags (daemon/command/docker.go:26-69; daemon/command/options.go:105; daemon/command/config_unix.go:14-61). The user-facing `docker` CLI (docker/cli, pinned v29.8.0), Buildx (0.37.0) and Docker Compose (v5.5.1, image docker/compose-bin) are NOT in this repo: they are only fetched/pinned into the dev and dind images (Dockerfile:12-13,19-23,219-230,416-417,441,658). The repo's own sample multi-service stack is run with `docker compose up -d` (contrib/otel/README.md:17; contrib/otel/compose.yaml:3-31). The Engine API has no stack/project object; Swarm services are the only built-in multi-service primitive (daemon/server/router/swarm/cluster.go:35-40).",
+        "mcp": "none found (searched the non-vendored tree for MCP / model context protocol).",
+        "sdk_or_api": "yes - HTTP Engine API v1.56 (Swagger 2.0 in api/swagger.yaml:12-25; docs per version in api/docs/) served on a unix socket by default /var/run/docker.sock (daemon/pkg/opts/hosts.go:21; daemon/command/daemon.go:709-715) or TCP with optional TLS client-cert verification (daemon/command/daemon.go:925-950); gRPC is multiplexed on the same socket (daemon/command/httphandler.go:38-48). Routers: containers, images, networks, volumes, build, system, swarm (services/nodes/tasks/secrets/configs), plugin, distribution, checkpoint, session, debug (daemon/command/daemon.go:838-856). Min API version defaults to 1.40 (daemon/config/config.go:64-71). No built-in user auth beyond socket permissions/TLS and optional authorization plugins (daemon/command/config.go:25; daemon/command/daemon.go:885-887). Go SDK modules: github.com/moby/moby/api and github.com/moby/moby/client (README.md:48-53; client/README.md:8-56).",
+        "claude_code_or_codex": "none found. The repo contains AGENTS.md (PR conventions for coding agents, e.g. add a 'Created with: <AGENT NAME>' note: AGENTS.md:1-6), Copilot review instructions (.github/copilot-instructions.md:1-2, .github/instructions/) and a CI workflow that forwards review requests to Docker's agentic platform (.github/workflows/pr-review.yml:64-74); none is a Claude Code/Codex integration for users of the engine."
+      },
+      "telemetry_and_network": "No product telemetry, analytics or update-check code found in daemon/, client/, api/, pkg/, cmd/ (searched for telemetry/analytics/phone-home/update-check; hits are OpenTelemetry plumbing and tests). Tracing: dockerd initialises an OTel tracer (daemon/command/daemon.go:264-277) but uses a no-op provider unless an exporter is configured via OTEL_TRACES_EXPORTER=otlp, OTEL_EXPORTER_OTLP_ENDPOINT or OTEL_EXPORTER_OTLP_TRACES_ENDPOINT (daemon/internal/otelutil/provider.go:27-30; vendor/github.com/moby/buildkit/util/tracing/detect/otlp.go:27-30). A Prometheus /metrics endpoint exists only when --metrics-addr is set (daemon/command/metrics.go:14-17; daemon/command/config.go:71). The build image turns Go telemetry off (Dockerfile:58-62). Network: the API listens only on the configured hosts, default unix socket; TCP without --tlsverify logs insecure-exposure warnings and a deprecation notice that it will become a hard failure (daemon/command/daemon.go:995-1033). Outbound: default registry is Docker Hub (registry-1.docker.io, auth/search via index.docker.io; mirrors and insecure registries configurable) (daemon/pkg/registry/config.go:39-55); registry credentials are supplied client-side per request via X-Registry-Auth, so the engine itself requires no account (api/swagger.yaml:72-77). Default log driver is json-file (daemon/config/config.go:47-48); AWS/GCP SDKs are vendored for the awslogs/gcplogs drivers (go.mod:14-15,22-27). State defaults: /var/lib/docker, /var/run/docker, config /etc/docker/daemon.json for rootful; XDG dirs for rootless (daemon/config/config_linux.go:177-196; daemon/command/daemon_unix.go:25-45). CI-only network use: bin-image.yml pushes moby/moby-bin to Docker Hub (.github/workflows/bin-image.yml:45,72-75) and pr-review.yml POSTs a PR number to https://agentic-platform.docker.com (.github/workflows/pr-review.yml:64-74); neither is in the shipped binary."
+    },
+    "code": {
+      "languages": [
+        "Go (primary; go 1.26.8 per go.mod:3)",
+        "Shell/Bash (hack/, contrib/)",
+        "Dockerfile + HCL (Dockerfile, docker-bake.hcl)",
+        "YAML/OpenAPI (api/swagger.yaml)",
+        "Protocol Buffers (extpoints/**/*.proto)",
+        "C (contrib/syscall-test, contrib/nnp-test)",
+        "PowerShell (hack/make.ps1)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/dockerd/main.go",
+          "what": "dockerd daemon binary: reexec init, ignores SIGPIPE, calls daemon/command.NewDaemonRunner (cmd/dockerd/main.go:16-38)"
+        },
+        {
+          "path": "daemon/command/docker.go",
+          "what": "cobra root command 'dockerd [OPTIONS]' with --version/--config-file/--validate and platform flags (docker.go:26-69)"
+        },
+        {
+          "path": "daemon/command/daemon.go",
+          "what": "daemonCLI.start(): system check, root check, listeners/TLS, containerd, OTel, daemon.NewDaemon, metrics, Swarm cluster, BuildKit, routers, serve (daemon.go:121-435)"
+        },
+        {
+          "path": "cmd/docker-proxy/main_linux.go",
+          "what": "Linux-only userland TCP/UDP/SCTP port-forward proxy binary (main_linux.go:30-60; hack/make/binary-proxy:5-13)"
+        },
+        {
+          "path": "api/swagger.yaml",
+          "what": "Engine API v1.56 Swagger 2.0 definition (swagger.yaml:12-25)"
+        },
+        {
+          "path": "client/",
+          "what": "Go client module github.com/moby/moby/client, e.g. client.New(client.FromEnv) (client/README.md:31-34)"
+        },
+        {
+          "path": "docker-bake.hcl",
+          "what": "Buildx bake targets binary, dynbinary, all, *-cross, bin-image, dind, dev, govulncheck (docker-bake.hcl:77-228), driven by Makefile and hack/make.sh; host output folder is ./bundles/binary or ./bundles/dynbinary, or DESTDIR (docker-bake.hcl:56-59,98-110)"
+        },
+        {
+          "path": "contrib/dockerd-rootless-setuptool.sh",
+          "what": "Rootless install/check/uninstall helper (Linux only) plus contrib/dockerd-rootless.sh launcher (setuptool:4-7,45-53)"
+        }
+      ],
+      "architecture": "One Go daemon. cmd/dockerd -> daemon/command (cobra CLI, config, listeners/TLS, middleware, OTel, metrics, containerd/BuildKit startup) -> daemon/ (container lifecycle, OCI spec generation in daemon/oci_linux.go, seccomp daemon/seccomp_linux.go, AppArmor daemon/apparmor_*.go, GPU/CDI daemon/devices*.go, default OCI spec/caps/masked paths in daemon/pkg/oci). The HTTP API is served by daemon/server with routers in daemon/server/router/{container,image,network,volume,build,system,swarm,plugin,distribution,checkpoint,session,grpc,debug}; gRPC shares the socket. Execution is delegated to containerd (external via --containerd, a managed binary via daemon/internal/containerd/server/supervisor, or an experimental in-process embedded mode) and runc (daemon/command/daemon_unix.go:121-138). Images use graph drivers or the containerd snapshotter (daemon/containerd); builds use BuildKit (daemon/internal/builder-next, vendor/github.com/moby/buildkit) or the classic builder (daemon/builder). Networking is daemon/libnetwork (bridge, overlay, macvlan, ipvlan, windows, remote drivers; iptables and nftables backends in drivers/bridge/internal/{iptabler,nftabler}). Swarm mode is daemon/cluster on vendored swarmkit; volumes daemon/volume; log drivers daemon/logger; registry client daemon/pkg/registry; plugins daemon/pkg/plugin. A new out-of-process extension host lives in daemon/extensions.go with extension points in extpoints/. Container isolation is built from the generated OCI spec: mount/net/time/uts/pid/ipc namespaces (daemon/pkg/oci/defaults.go:117-124), cgroups, default seccomp, AppArmor 'docker-default', 14 default capabilities, masked and read-only /proc,/sys paths (daemon/pkg/oci/defaults.go:108-116,194-208; daemon/pkg/oci/caps/defaults.go:4-21). Separate Go modules: api/ (types + swagger), client/ (Go client), man/. Other dirs: pkg/ (utility packages), internal/ (testutil, namesgenerator), integration/ and integration-cli/ (tests), hack/ (build/test/validate scripts; hack/make.sh drives the bundle scripts in hack/make/), contrib/ (init scripts, rootless, apparmor/selinux, check-config.sh), project/ and docs/. Not in the repo: docker CLI, Compose, Buildx, and the sources of containerd/runc/tini/rootlesskit (fetched at pinned tags in Dockerfile:145,251,294,327).",
+      "packaging_and_release": "Source-only releases by git tag `docker-vX.Y.Z` (this revision: docker-v29.8.2, annotated tag peeling to 8af9fe3a, .git/packed-refs:2-3); release branches docker-MAJOR.x; binary distributions come from third parties (project/BRANCHES-AND-TAGS.md:29-54,79-84; project/PACKAGERS.md:3-11). In-repo build via `docker buildx bake` produces static or dynamic dockerd + docker-proxy (and with target `all` also containerd, runc, docker-init, rootlesskit) for linux/amd64, arm/v5-v7, arm64, ppc64le, s390x and windows/amd64 (docker-bake.hcl:81-92,134-142); the host-side output folder is ./bundles/binary (./bundles/dynbinary when DOCKER_STATIC=0) or DESTDIR, not ./bundles/binary-daemon (docker-bake.hcl:56-59,98-110,134-138; Dockerfile:596-597,606-607). The only publishing workflow is .github/workflows/bin-image.yml: it builds `bin-image-cross` through docker/github-builder (SHA-pinned, v1.17.0) and pushes multi-arch `moby/moby-bin` images to Docker Hub on master/release-branch/tag pushes (bin-image.yml:12-23,31-75), with `id-token: write # for signing attestation(s) and authenticating to Docker Hub with GitHub OIDC` (bin-image.yml:38); the attestation details live in that external reusable workflow, which was not opened. No checksum files, GPG/cosign signing steps or GitHub-release upload steps were found in .github/ or hack/ (searched cosign|sigstore|attest|provenance|sbom|checksum|gpg). Version string is derived from the git ref at build time, defaulting to 'dev' (hack/make.sh:41-48); releases/versions.yaml:2-4 lists last 29.8.1 / next 29.8.2. Go dependencies are vendored (vendor/modules.txt; hack/README.md:52-54). Packaging helpers: contrib/init/systemd/docker.service, openrc and sysvinit scripts, contrib/apparmor, contrib/selinux.",
+      "tests_and_ci": "Go `testing` with gotest.tools/v3 assertions (TESTING.md:6-22; go.mod:123), run with gotestsum and -cover (hack/test/unit:45,105). Suites: unit tests beside packages; API integration tests in integration/<component> (build, config, container, daemon, extension, image, network, networking, secret, service, session, system, volume); deprecated legacy integration-cli (TESTING.md:20-22); docker-py suite (Makefile:220-222); BuildKit's own integration tests against this dockerd (.github/workflows/buildkit.yml:61-84). Approx. 834 *_test.go files repo-wide (daemon 396, integration 157, client 128, integration-cli 96, api 15, remainder in pkg/internal/cmd/extpoints). CI: 21 workflow files plus 4 composite actions in .github/. ci.yml: binary/dynbinary builds on ubuntu-26.04 amd64+arm64, cross-compile matrix, govulncheck with SARIF upload, dind image build. test.yml (+ reusable .test.yml/.test-unit.yml): dev-image build, unit tests with coverage on amd64/arm64 (also firewalld mode), integration on snapshotter and graphdriver storage with modes rootless, systemd, userns, iptables+firewalld, nftables, nftables+firewalld and embedded containerd (full matrix on amd64 only), flaky-test re-runs, docker-py, validate scripts (golangci-lint, shfmt, vendor, pkg-imports, module-replace, deprecate-integration-cli, generate-files; hack/validate/*), swagger validation, per-arch smoke tests under QEMU. vm.yml/.vm.yml: Lima VM on Oracle Linux 8 (cgroup v1) with container/build/system integration incl. rootless. windows-2022/2025.yml (+ .windows.yml, windows-integration-flaky.yml), codeql.yml (Go, weekly), zizmor.yml (workflow static analysis), bin-image.yml, DCO/PR-label/milestone validators, labeler, PR-review trigger, sync-release-branch. Actions are pinned to commit SHAs. Test jobs use continue-on-error on non-PR events (.github/workflows/.test.yml:47,103,177; .test-unit.yml:35; .vm.yml:30), so only pull-request runs gate. No WSL2, macOS or GPU CI job found.",
+      "dependencies": "Root go.mod (module github.com/moby/moby/v2): 113 direct + 182 indirect requirements plus 5 `tool` directives (gogo/protobuf plugins, moby/extensions mobyextgen, protoc-gen-go) (go.mod:5-11,14-126,130-311), all vendored under vendor/ (vendor/modules.txt; project/PACKAGERS.md:40-48). api/go.mod: 5 direct, 0 indirect (go 1.24). client/go.mod: 15 direct + 10 indirect (go 1.24). man/go.mod: 1 direct + 1 indirect (go 1.19, module path still github.com/docker/docker/man). 12 of the 113 direct root requirements are pseudo-versions or release candidates (go.mod:17-21,38,62,69,76,80,102,120), e.g. hcsshim v0.15.0-rc.4, moby/extensions, moby/swarmkit/v2. Key direct deps: containerd/v2 v2.3.6 (:31), moby/buildkit v0.33.1 (:67), swarmkit (:80), rootlesskit/v3 (:98), moby/profiles seccomp+apparmor (:77-78), OpenTelemetry (:108-114), grpc (:121), AWS SDK v2/GCP logging/fluent/gelf/srslog for log drivers. Non-Go runtime deps: containerd, runc, iptables or nftables, procps, e2fsprogs, xfsprogs, XZ, optional pigz (project/PACKAGERS.md:116-128, partly stale).",
+      "security_policy": "SECURITY.md: report privately to security@docker.com (no public issues); acknowledgement within 72 hours; triage then a draft GitHub security advisory for coordinated disclosure; no paid bounty; supported versions are those marked Maintained in project/BRANCHES-AND-TAGS.md (SECURITY.md:3-42; project/BRANCHES-AND-TAGS.md:56-62). CONTRIBUTING.md:22-33 repeats the process."
+    },
+    "claim_checks": [
+      {
+        "claim": "Components include container build tools, a container registry, orchestration tools, a runtime and more (README.md:14-15).",
+        "verified": "partial",
+        "evidence": "Code differs from the README's umbrella wording. In-tree: BuildKit integration (daemon/internal/builder-next; go.mod:67), Swarm orchestration (daemon/cluster; daemon/server/router/swarm/cluster.go:27-61), a registry client (daemon/pkg/registry). Not in this repo: a registry server (distribution/distribution is only a test fixture image, Dockerfile:77-79), containerd and runc (built from separate upstream tags, Dockerfile:145,251), and any multi-service application tool - Compose is only a pinned CLI plugin in dev/dind images (Dockerfile:22-23,417,441,658) and the API has no stack/project object."
+      },
+      {
+        "claim": "Usable security: Moby provides secure defaults without compromising usability (README.md:24).",
+        "verified": "partial",
+        "evidence": "Secure defaults exist: builtin seccomp profile (daemon/seccomp_linux.go:46-57), AppArmor 'docker-default' when supported (daemon/apparmor_default.go:22-31), 14-capability default set (daemon/pkg/oci/caps/defaults.go:4-21), masked/read-only /proc and /sys paths (daemon/pkg/oci/defaults.go:108-116,194-208; daemon/create_unix.go:27-31), TLS warnings for TCP listeners (daemon/command/daemon.go:995-1033). Code also shows limits: no-new-privileges, userns-remap and SELinux are off by default (daemon/command/config_unix.go:22,44,53), the default bridge has outbound masquerade and inter-container communication on (config_unix.go:28,37; daemon/network/network_mode_unix.go:10), and the daemon runs as root (daemon/command/daemon.go:148-150). Networking is not deny-by-default; only `none` mode or Internal networks cut egress (daemon/libnetwork/drivers/bridge/internal/nftabler/network.go:115-126; api/swagger.yaml:2708-2716)."
+      },
+      {
+        "claim": "Batteries included but swappable: most components can be swapped by different implementations (README.md:23).",
+        "verified": "yes",
+        "evidence": "External containerd via --containerd (daemon/command/config.go:31; daemon/command/daemon_unix.go:127-129), extra OCI runtimes (--add-runtime, daemon/command/config_unix.go:19), storage driver (:21), init binary path (:47), authorization plugins (daemon/command/config.go:25), firewall backend iptables or nftables (config_unix.go:56). In-process embedded containerd is flagged experimental (daemon/command/daemon_embedded_containerd.go:23)."
+      },
+      {
+        "claim": "Developer focused: APIs are functional building blocks aimed at developers (README.md:25-27).",
+        "verified": "yes",
+        "evidence": "Versioned Swagger 2.0 Engine API with documented versioning and client-side registry auth (api/swagger.yaml:12-25,49-98), per-version docs (api/docs/), and a Go client module with a working example (client/README.md:8-56)."
+      },
+      {
+        "claim": "Docker Engine releases are tagged with a `docker-` prefix (README.md:60).",
+        "verified": "yes",
+        "evidence": "This checkout is tag docker-v29.8.2 peeled to 8af9fe3a (.git/packed-refs:2-3); tag formats in project/BRANCHES-AND-TAGS.md:79-84; bin-image.yml triggers on docker-v* (bin-image.yml:19-21); hack/make.sh strips the prefix to form the version (hack/make.sh:42-45)."
+      },
+      {
+        "claim": "Releases are supported on a best-efforts basis only (README.md:41).",
+        "verified": "yes",
+        "evidence": "Only docker-29.x (and 25.0 until 2026-12-04) are 'Maintained'; 28.x and older are 'Unmaintained' and out of scope for security advisories (project/BRANCHES-AND-TAGS.md:33-45,56-62; SECURITY.md:38-42)."
+      },
+      {
+        "claim": "Go module github.com/docker/docker is deprecated; supported modules are moby/moby/client and moby/moby/api (README.md:45-53).",
+        "verified": "yes",
+        "evidence": "Module paths are github.com/moby/moby/v2 (go.mod:1), github.com/moby/moby/api (api/go.mod:1) and github.com/moby/moby/client (client/go.mod:1), with the root requiring both (go.mod:73-74). Minor leftover: man/go.mod:1 still uses github.com/docker/docker/man."
+      },
+      {
+        "claim": "Moby is licensed under the Apache License, Version 2.0 (README.md:99-100).",
+        "verified": "yes",
+        "evidence": "LICENSE:2-3 (Apache License Version 2.0), api/LICENSE:2-3, client/LICENSE:2-3. NOTICE:6-16 lists MIT/BSD-3 derived components and NOTICE:21-28 repeats the export-control text; licenses of vendored dependencies were not audited."
+      },
+      {
+        "claim": "OpenSSF Scorecard and OpenSSF Best Practices badges (README.md:6-7).",
+        "verified": "not_checkable",
+        "evidence": "The badges link to external services (scorecard.dev, bestpractices.dev); scores are not in the repo. Related in-repo practices: SHA-pinned actions (e.g. .github/workflows/ci.yml:52,59), zizmor workflow audit (.github/workflows/zizmor.yml:26-36), CodeQL (.github/workflows/codeql.yml:40-71), govulncheck (.github/workflows/ci.yml:132-159), SECURITY.md."
+      },
+      {
+        "claim": "v29 includes many breaking API changes: option structs, renamed methods, moved types (README.md:78).",
+        "verified": "partial",
+        "evidence": "The module split and option/result-struct style are visible (client/go.mod:1; api/go.mod:1; client/README.md:31-46: client.New, client.ContainerListOptions, result.Items), but the full list lives in external release notes that were not opened."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Rootless-mode network and port driver comparison (project-authored guide in a script header)",
+        "metric": "Qualitative 'Net throughput' and 'Port throughput' ratings; no numeric measurements",
+        "value": "Net throughput rated 'Slow' for gvisor-tap-vsock, slirp4netns, vpnkit and pasta, 'Fast' for lxc-user-nic; port throughput 'Fast' for builtin/implicit port drivers, 'Slow' for slirp4netns/gvisor-tap-vsock port drivers",
+        "source": "contrib/dockerd-rootless.sh:37-51",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: this repo is only the engine (dockerd, docker-proxy) plus API/client modules. The docker CLI, Docker Compose and Buildx are separate projects pinned only for dev/test images (Dockerfile:12-13,19-23,416-417,441,658). No multi-service definition tool exists in-tree and the Engine API has no stack/project object, only Swarm services (daemon/server/router/swarm/cluster.go:35-40), so 'define and run an app with supporting services, volumes and networks' is provided outside this repo.",
+      "Platform: dockerd is not supported natively on macOS: checkSystem returns 'the Docker daemon is not supported on this platform' and startup aborts with 'system requirements not met' (daemon/daemon_unsupported.go:11-13; daemon/command/daemon.go:122-123); no darwin target in docker-bake.hcl:81-92; no macOS CI. A Linux environment supplied by other software is therefore needed (README.md:41 names Docker Desktop as a separate product). WSL2 has only a code-level mirrored-networking workaround (daemon/libnetwork/drivers/bridge/wsl2_linux.go:25-37) and no docs or CI job. GPU support depends on host-installed NVIDIA/AMD CDI tooling and is Linux-only (daemon/devices_nvidia_linux.go:38-78; daemon/devices_nonlinux.go:7-8).",
+      "Isolation is container-based and not deny-by-default: default network mode is bridge with outbound masquerade and inter-container communication on (daemon/network/network_mode_unix.go:10; daemon/command/config_unix.go:28,37); no-new-privileges, userns-remap and SELinux are off by default (config_unix.go:22,44,53). Egress can be cut only with the `none` network or Internal networks (daemon/libnetwork/drivers/bridge/internal/nftabler/network.go:115-126; api/swagger.yaml:2708-2716, Internal defaults false); no per-destination allow-list/policy engine was found. Filesystem limits come from explicit mounts and read-only flags (api/types/mount/mount.go:11-34; api/types/container/hostconfig.go:448), not per-path OS rules; restricting API callers needs optional authorization plugins (daemon/command/config.go:25).",
+      "Privilege and exposure: dockerd must run as root, and rootless mode 'has feature limitations' (daemon/command/daemon.go:148-150,183-186); the socket group defaults to `docker` (daemon/command/config_unix.go:20) and contributor docs tell users to join it (docs/contributing/software-required.md:70-88). Listening on TCP without --tlsverify logs 'gives root access on this machine to everyone who has access to your network' plus a notice it will become a hard failure (daemon/command/daemon.go:995-1033). The repo's own dev helper hack/make/run binds tcp://0.0.0.0:2375 with --tls=false (hack/make/run:57,62) and dev workflows use `docker run --privileged` (Makefile:119).",
+      "New extension host: dockerd scans /usr/libexec/docker/moby-extensions (or --extension-dir) and executes every executable it finds as the daemon user (daemon/extensions.go:52-82; vendor/github.com/moby/extensions/internal/launcher/launcher.go:104); the provider policy is allow-all (daemon/extensions.go:27-29); the only guard is skipping world-writable or non-root/non-daemon-owned directories (vendor/github.com/moby/extensions/internal/launcher/discovery.go:75-82). The feature is new and its dependency is a pseudo-version (go.mod:69).",
+      "Maintenance and compatibility: only docker-29.x (and 25.0 until 2026-12-04) are Maintained; 28.x and older are Unmaintained (project/BRANCHES-AND-TAGS.md:33-45); support is best-effort (README.md:41). v29 changed Go module paths and has 'many breaking API changes' (README.md:45-46,78); the default minimum API version is 1.40 and older versions are deprecated (daemon/config/config.go:64-71; daemon/command/daemon.go:637-643).",
+      "Build and dependency surface: needs Go 1.26.8 (go.mod:3; Dockerfile:3); 113 direct and 182 indirect Go modules, 12 direct requirements on pseudo-versions or RCs (go.mod:17-21,38,62,69,76,80,102,120); containerd, runc, tini and rootlesskit are built from separately pinned upstream tags (Dockerfile:145,251,294,327); in-process embedded containerd is experimental (daemon/command/daemon_embedded_containerd.go:23). Non-PR CI test jobs use continue-on-error (.github/workflows/.test.yml:47,103,177).",
+      "Documentation drift and legal: docs/contributing/ctn-build.md:12,22 name ./bundles/binary-daemon and ./bundles/dynbinary-daemon as bake output while docker-bake.hcl:56-59,98-110 writes ./bundles/binary and ./bundles/dynbinary, and `make install` reads ./bundles/binary-daemon (hack/make/install-binary:9), a folder the host-side bake does not create; project/PACKAGERS.md:121-123 lists containerd >=1.6.22 and iptables >=1.4 while Dockerfile:145 pins containerd v2.3.6 and an nftables backend exists (daemon/command/config_unix.go:56); hack/make.sh:11-12 and docs/contributing/set-up-dev-env.md:249-251 refer to a VERSION file that does not exist (version defaults to 'dev', hack/make.sh:41); project/BRANCHES-AND-TAGS.md:10 calls Moby a 'core library, versioned as v2.x (currently in beta)' while README.md:55-56 says the root module is not a library. License is Apache-2.0 (LICENSE:2-3) with an export-control notice (README.md:89-95; NOTICE:21-28) and third-party notices (NOTICE:6-16); vendored dependency licenses were not audited."
+    ]
+  },
+  "repaired": true,
+  "verification": [
+    {
+      "contender": "moby/moby",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Build static dockerd + docker-proxy from source with Docker Buildx bake (needs docker + buildx on the build host; output in ./bundles/binary-daemon); command: docker buildx bake binary (or: make binary)",
+          "citation": "docs/contributing/ctn-build.md:10-15; Makefile:165-167; docker-bake.hcl:98-102",
+          "holds": false,
+          "note": "Command and description are right. ctn-build.md:13-15 gives `docker buildx bake [binary]`. Makefile:165-167 has `binary: ## build statically linked linux binaries` -> `$(BAKE_CMD) binary`, with BUILDX = `docker buildx` (Makefile:1-2,157). DOCKER_STATIC defaults to 1 (docker-bake.hcl:4-6), and the build stage builds dockerd and docker-proxy (Dockerfile:591-597). The output path is wrong. docker-bake.hcl:101 exports to bindir(\"binary\"), which returns \"./bundles/binary\" when DESTDIR is empty (docker-bake.hcl:56-59). The `binary` stage copies the contents of /tmp/bundles/binary-daemon/ into the image root (Dockerfile:566,596-597,606-607), so the files land at ./bundles/binary/dockerd and ./bundles/binary/docker-proxy. ctn-build.md:12 ('output to ./bundles/binary-daemon by default') is stale; the dossier repeated it although its own docker-bake.hcl citation contradicts it. bundles/binary-daemon is produced only by `hack/make.sh binary` inside the dev container (hack/make/binary:7), and that is the folder `make install` copies from (hack/make/install-binary:9)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE; README: 'Moby is licensed under the Apache License, Version 2.0.'",
+          "citation": "LICENSE:2-3; README.md:99-101",
+          "holds": true,
+          "note": "LICENSE:2-3 reads 'Apache License Version 2.0, January 2004', followed by the standard terms through 'END OF TERMS AND CONDITIONS' (LICENSE:177) and the usual appendix notice 'Copyright 2013-2018 Docker, Inc. Licensed under the Apache License, Version 2.0' (LICENSE:179-191). No added terms. README.md:99-101 matches. Vendored dependency licenses were not audited, as the dossier says."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "no - dockerd is not supported natively on macOS (unsupported-platform build returns 'the Docker daemon is not supported on this platform'; no darwin bake target; no macOS CI; only darwin-tagged non-vendored file is a kernel-version helper; PACKAGERS says only the client runs on Darwin), so a Linux VM supplied by other software is required",
+          "citation": "daemon/daemon_unsupported.go:1,11-13; docker-bake.hcl:81-92; .github/workflows; pkg/parsers/kernel/kernel_darwin.go:1-24; project/PACKAGERS.md:141-142; docs/contributing/software-required.md:62-63",
+          "holds": true,
+          "note": "daemon_unsupported.go:1 builds for `!linux && !freebsd && !windows`, which includes darwin; daemon_unix.go:1 is `linux || freebsd`. checkSystem (:11-13) returns the quoted error, and daemon/command/daemon.go:122-123 calls daemon.CheckSystem() first in start(), so dockerd cannot start on macOS. docker-bake.hcl:81-92 lists only linux/* and windows/amd64. Every runs-on in .github/workflows is ubuntu-* or windows-2022/2025 (windows-2022.yml:37, windows-2025.yml:42); there is no macOS runner. software-required.md:62-63 matches. Two imprecisions don't change the conclusion. (1) kernel_darwin.go is the only darwin-only non-test source file, but other non-vendored files also build on darwin: kernel_darwin_test.go, and files with `linux || freebsd || darwin` constraints such as pkg/parsers/operatingsystem/operatingsystem_unix.go:1, daemon/volume/mounts/volume_unix.go:1 and daemon/internal/layer/layer_unix.go:1. (2) PACKAGERS.md:141-142 says the client 'will even run on ... Mac OS X / Darwin'; it does not literally say 'only the client'."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "yes - HTTP Engine API v1.56 (Swagger 2.0) served on unix socket /var/run/docker.sock by default or TCP with optional TLS client-cert verification; gRPC multiplexed on the same socket; routers containers/images/networks/volumes/build/system/swarm/plugin/distribution/checkpoint/session/debug; min API version defaults to 1.40; no built-in user auth beyond socket permissions/TLS and optional authz plugins; Go SDK modules moby/moby/api and moby/moby/client",
+          "citation": "api/swagger.yaml:12-25; daemon/pkg/opts/hosts.go:21; daemon/command/daemon.go:709-715,838-856,885-887,925-950; daemon/command/httphandler.go:38-48; daemon/config/config.go:64-71; daemon/command/config.go:25; README.md:48-53; client/README.md:8-56",
+          "holds": true,
+          "note": "swagger.yaml:12,22,25 has swagger '2.0', basePath /v1.56 and version '1.56'. hosts.go:21 sets DefaultUnixSocket = /var/run/docker.sock, and daemon.go:709-715 falls back to the default socket (named pipe on Windows) when no host is set. daemon.go:932-934 requires and verifies client certs unless --tlsverify=false. httphandler.go:39-46 sends HTTP/2 application/grpc requests to the gRPC server and everything else to the API. daemon.go:839-855 registers checkpoint, container, image, system, volume, build, session, swarm, plugin, distribution, network and debug routers; Swarm services/nodes/tasks/secrets/configs routes are at daemon/server/router/swarm/cluster.go:35-61. config.go:69 sets defaultMinAPIVersion '1.40' (MaxAPIVersion 1.56 at :64). config.go:25 defines --authorization-plugin. Only the experimental, version and authz middlewares are registered (daemon.go:876-886). client/README.md:31-51 shows a working client.New(client.FromEnv) example."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "'Usable security: Moby provides secure defaults without compromising usability' (README.md:24) - verified: partial (secure defaults exist; no-new-privileges/userns-remap/SELinux off, masquerade+ICC on, daemon runs as root, egress cut only by none/Internal networks)",
+          "citation": "daemon/seccomp_linux.go:46-57; daemon/apparmor_default.go:22-31; daemon/pkg/oci/caps/defaults.go:4-21; daemon/pkg/oci/defaults.go:108-116,194-208; daemon/create_unix.go:27-31; daemon/command/daemon.go:148-150,995-1033; daemon/command/config_unix.go:22,28,37,44,53; daemon/network/network_mode_unix.go:10; daemon/libnetwork/drivers/bridge/internal/nftabler/network.go:115-126; api/swagger.yaml:2708-2716",
+          "holds": true,
+          "note": "Every citation matches. The builtin seccomp profile is the default branch (seccomp_linux.go:47-48,55-56). AppArmor 'docker-default' is used when supported (apparmor_default.go:22,26-31). There are exactly 14 default capabilities (caps/defaults.go:6-19). Masked paths and read-only /proc paths (oci/defaults.go:109-116,195-208) are applied to non-privileged containers (create_unix.go:27-31). TCP without --tlsverify logs warnings plus a deprecation notice (daemon.go:995-1033). The limits are also confirmed: --selinux-enabled=false (:22), --ip-masq=true (:28), --icc=true (:37), --userns-remap='' (:44), --no-new-privileges=false (:53); the default network is bridge (network_mode_unix.go:10); dockerd requires euid 0 (daemon.go:148-150); Internal networks drop egress leaving the bridge (nftabler/network.go:122-126), and Internal defaults to false (swagger.yaml:2715). 'partial' is a fair rating."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "readme.install[0]: replace 'output in ./bundles/binary-daemon' with 'output in ./bundles/binary (./bundles/dynbinary when DOCKER_STATIC=0; override with DESTDIR)' and cite docker-bake.hcl:56-59,98-110 and Dockerfile:596-597,606-607. Add that docs/contributing/ctn-build.md:12,22 still say ./bundles/binary-daemon and ./bundles/dynbinary-daemon, which is out of date. Also note that bundles/binary-daemon is produced only by `hack/make.sh binary` inside the dev container (hack/make/binary:7), which is the folder `make install` copies from (hack/make/install-binary:9).",
+        "Optional wording fix (does not affect the verdict), readme.platforms.macos_arm64: change 'the only non-vendored darwin-tagged file is a kernel-version helper' to 'the only darwin-only non-vendored source file is a kernel-version helper (plus its test); shared unix files such as pkg/parsers/operatingsystem/operatingsystem_unix.go:1 and daemon/volume/mounts/volume_unix.go:1 also build on darwin, but daemon startup fails in checkSystem (daemon/daemon_unsupported.go:11-13; daemon/command/daemon.go:122-123)'. Change 'project/PACKAGERS.md:141-142 says only the client runs on Darwin' to 'project/PACKAGERS.md:141-142 says the client will even run on Mac OS X / Darwin'."
+      ]
+    },
+    {
+      "contender": "moby/moby",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "`docker buildx bake binary` (or `make binary`) builds static dockerd + docker-proxy; output goes to ./bundles/binary (./bundles/dynbinary when DOCKER_STATIC=0; override with DESTDIR); docs/contributing/ctn-build.md:12,22 still name ./bundles/binary-daemon and ./bundles/dynbinary-daemon; ./bundles/binary-daemon is produced by `hack/make.sh binary` in the dev container and is what `make install` reads.",
+          "citation": "docker-bake.hcl:4-6,56-59,77-79,98-110; Dockerfile:578-584,596-597,606-607; Makefile:165-167,177-178; docs/contributing/ctn-build.md:10-15,19,22-25; hack/make/binary:5-11; hack/make/install-binary:9",
+          "holds": true,
+          "note": "docker-bake.hcl:5 DOCKER_STATIC default \"1\"; :56-59 bindir() = DESTDIR or ./bundles/<dir>; :77-79 default group = binary; :101 output bindir(DOCKER_STATIC==\"1\" ? \"binary\" : \"dynbinary\"); :104-110 dynbinary. Dockerfile:578-584 picks target binary/dynbinary; :596-597 moves /tmp/bundles/${target}-daemon/* into /build; :606-607 `FROM scratch AS binary` exports /build. The build stage (Dockerfile:532-533) only adds gowinres to /usr/local/bin, so hack/make/binary-daemon:13-15 copies no nested runc/containerd and the export holds only dockerd + docker-proxy (binary-proxy:5-13 Linux only). Makefile:1-2 BUILDX ?= docker buildx; :165-167 `$(BAKE_CMD) binary`; :177-178 mkdir bundles. ctn-build.md:12 and :22 do say binary-daemon / dynbinary-daemon (stale). hack/make.sh:130 DEST=bundles/binary and hack/make/binary:7 appends -daemon; PREFIX=/tmp is set only in the build stage (Dockerfile:566), so the dev container writes ./bundles/binary-daemon. install-binary:9 reads $(dirname $DEST)/binary-daemon."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:2-3 'Apache License / Version 2.0, January 2004'; standard terms end at :177 'END OF TERMS AND CONDITIONS', followed by the appendix notice 'Copyright 2013-2018 Docker, Inc. Licensed under the Apache License, Version 2.0' (:179-191). README.md:99-101 agrees. api/LICENSE and client/LICENSE also exist (sub-module files not opened)."
+        },
+        {
+          "field": "platforms.macos_arm64",
+          "statement": "no - dockerd is not supported natively on macOS: daemon_unsupported.go (!linux && !freebsd && !windows) checkSystem returns 'the Docker daemon is not supported on this platform'; startup calls CheckSystem first and aborts with 'system requirements not met'; no darwin bake target; no macOS CI; only darwin-only non-vendored source is the kernel-version helper; PACKAGERS.md says only the client runs on Darwin.",
+          "citation": "daemon/daemon_unsupported.go:1,11-13; daemon/command/daemon.go:122-123; daemon/daemon.go:849-858; docker-bake.hcl:81-92; pkg/parsers/kernel/kernel_darwin.go:1-24; project/PACKAGERS.md:141-142; docs/contributing/software-required.md:62-63",
+          "holds": true,
+          "note": "daemon_unsupported.go:1 `//go:build !linux && !freebsd && !windows`, :11-13 returns the quoted error; the other checkSystem definitions are daemon_unix.go (`//go:build linux || freebsd`) and daemon_windows.go, so darwin gets the unsupported one. daemon/command/daemon.go:122-123 calls daemon.CheckSystem() first and wraps the error as 'system requirements not met'; daemon/daemon.go:849-858 CheckSystem -> checkSystemOnce. docker-bake.hcl:81-92 lists linux/* and windows/amd64 only. Grep of .github/ for macos|darwin|osx finds nothing; runners are ubuntu-26.04(-arm), ubuntu-latest, windows-2022/2025. Non-vendored *_darwin*.go files are only pkg/parsers/kernel/kernel_darwin.go and its test; operatingsystem_unix.go:1 (freebsd || darwin) and volume/mounts/volume_unix.go:1 (linux || freebsd || darwin) are shared. PACKAGERS.md:141-142 and software-required.md:62-63 say what is claimed."
+        },
+        {
+          "field": "integrations.sdk_or_api",
+          "statement": "HTTP Engine API v1.56 (Swagger 2.0) on unix socket /var/run/docker.sock by default or TCP with optional TLS client-cert verification; gRPC multiplexed on the same socket; routers incl. swarm services/nodes/tasks/secrets/configs; min API version defaults to 1.40; no built-in user auth beyond socket perms/TLS and optional authz plugins; Go SDK modules moby/moby/api and moby/moby/client.",
+          "citation": "api/swagger.yaml:12-25; daemon/pkg/opts/hosts.go:21; daemon/command/daemon.go:709-715,838-856,885-887,925-950; daemon/command/httphandler.go:38-48; daemon/config/config.go:64-71; daemon/command/config.go:25; README.md:48-53; client/README.md:8-56",
+          "holds": true,
+          "note": "swagger.yaml:12 swagger \"2.0\", :22 basePath /v1.56, :25 version 1.56; api/docs/ holds v1.0 to v1.56 files. hosts.go:21 DefaultUnixSocket=/var/run/docker.sock; daemon.go:709-715 -> defaultAPISocketPath (:804-815) returns DefaultHost (XDG runtime dir only when honorXDG, e.g. rootless). daemon.go:932-934 RequireAndVerifyClientCert unless --tlsverify=false. httphandler.go:38-48 sends HTTP/2 application/grpc to the grpc server/proxy, all else to the API. buildRouters :838-856 = checkpoint, container, image, system, volume, build, session, swarm, plugin, distribution, network, debug; swarm/cluster.go:35-61 has services/nodes/tasks/secrets/configs. config.go:69 defaultMinAPIVersion \"1.40\" (applied at :386; DOCKER_MIN_API_VERSION override down to MinAPIVersion 1.24). config.go:25 --authorization-plugin; daemon.go:885-887 authz middleware. The only API middlewares are experimental, version and authz (daemon.go:877,883,886), and extpoints/ has no auth hooks. README.md:48-53 and client/README.md:8-56 (client.New(client.FromEnv...)) match."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "'Usable security: Moby provides secure defaults without compromising usability' (README.md:24) verified 'partial': builtin seccomp, AppArmor docker-default when supported, 14 default caps, masked/read-only /proc,/sys, TCP TLS warnings; but no-new-privileges, userns-remap and SELinux off by default, default bridge with masquerade and ICC on, daemon runs as root, egress only cut by none/Internal networks.",
+          "citation": "daemon/seccomp_linux.go:46-57; daemon/apparmor_default.go:22-31; daemon/pkg/oci/caps/defaults.go:4-21; daemon/pkg/oci/defaults.go:108-116,194-208; daemon/create_unix.go:27-31; daemon/command/daemon.go:148-150,995-1033; daemon/command/config_unix.go:22,28,37,44,53; daemon/network/network_mode_unix.go:10; daemon/libnetwork/drivers/bridge/internal/nftabler/network.go:115-126; api/swagger.yaml:2708-2716",
+          "holds": true,
+          "note": "README.md:24 quote matches. seccomp_linux.go:46-57 applies GetDefaultProfile for default/unset (falls back to unconfined with a warning only if the kernel lacks seccomp, :35-41). apparmor_default.go:22 docker-default, :26-31 only if appArmorSupported(). caps/defaults.go:5-20 lists exactly 14 capabilities. oci/defaults.go:110-116 read-only /proc paths, :194-208 masked /proc and /sys paths; create_unix.go:27-31 applies them to non-privileged containers. daemon.go:995-1033 TCP-without-tlsverify warnings and deprecation notice. config_unix.go:22 selinux-enabled=false, :44 userns-remap=\"\", :53 no-new-privileges=false, :28 ip-masq=true, :37 icc=true. network_mode_unix.go:10 defaultNetwork=bridge. daemon.go:148-150 requires euid 0 on Linux. nftabler/network.go:115-126 Internal networks drop non-local ingress/egress; swagger.yaml:2708-2716 Internal default false. The evidence supports 'partial'."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,343 @@
+{
+  "contender": "tobi/qmd",
+  "revision": {
+    "contender": "tobi/qmd",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "tobi/qmd",
+        "tag": "v2.8.3",
+        "commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.8.3",
+    "commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+    "read_at": "2026-10-02T03:02:51+00:00"
+  },
+  "dossier": {
+    "contender": "tobi/qmd",
+    "revision": {
+      "tag": "v2.8.3",
+      "commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "QMD ('Query Markup Documents', npm package @tobilu/qmd) is a local search engine for collections of Markdown/plain-text files. `qmd collection add` registers a directory plus glob mask; `qmd update` copies each matching file's UTF-8 text into one SQLite index (content-addressed by SHA-256, FTS5 for BM25); `qmd embed` adds chunk embeddings (sqlite-vec). Retrieval modes are lexical (`qmd search`, no models), vector (`qmd vsearch`) and hybrid expansion + RRF + LLM rerank (`qmd query`), using three local GGUF models run through node-llama-cpp. Results carry docid, collection-relative path, title, score, line and snippet; the stored body is read back with `qmd get`/`multi-get` (CLI) or MCP `get`/`multi_get`. The same engine is exposed as a CLI, an MCP server (stdio or localhost HTTP, read-only tools) and a Node/Bun SDK. There is no converter for PDF, scans, Office, EPUB or HTML: only text files matched by the collection mask are ingested.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "An on-device search engine for everything you need to remember. Index your markdown notes, meeting transcripts, documentation, and knowledge bases. Search with keywords or natural language. Ideal for your agentic flows.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "QMD combines BM25 full-text search, vector semantic search, and LLM re-ranking, all running locally via node-llama-cpp with GGUF models.",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "Typed expansions are routed exclusively: lex goes to BM25/FTS, vec and hyde go to vector search. The original query is sent to both backends, then fused with RRF and reranked.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "Three retrieval modes: `qmd search` (fast keyword, BM25 only), `qmd vsearch` (semantic), `qmd query` (hybrid + reranking, 'best quality').",
+          "citation": "README.md:53-56, 828-847"
+        },
+        {
+          "claim": "Original-document read-back: `qmd get <path|#docid>` (also `--full`) and `qmd multi-get <glob|comma-list>`; get/multi-get are line-numbered by default and accept a `path:from:count` suffix.",
+          "citation": "README.md:58-65, 86, 877-880, 1035-1052"
+        },
+        {
+          "claim": "Context descriptions attached to collections/paths are returned with matching documents; described as 'the key feature' of QMD.",
+          "citation": "README.md:45"
+        },
+        {
+          "claim": "MCP server exposes query, get, multi_get and status; stdio by default, optional HTTP transport (`qmd mcp --http [--daemon]`, localhost:8181).",
+          "citation": "README.md:89-97, 132-146"
+        },
+        {
+          "claim": "Claude Code: install the plugin (`claude plugin marketplace add tobi/qmd`, `claude plugin install qmd@qmd`) or configure MCP manually; Claude Desktop JSON config is provided.",
+          "citation": "README.md:99-130"
+        },
+        {
+          "claim": "HTTP endpoints POST /mcp, POST /query (alias /search) and GET /health; Origin/Host validation guards against DNS rebinding; endpoints are unauthenticated.",
+          "citation": "README.md:152-178"
+        },
+        {
+          "claim": "SDK: createStore({dbPath, config|configPath}), search, searchLex, searchVector, get, getDocumentBody, multiGet, update, embed; the SDK requires an explicit dbPath.",
+          "citation": "README.md:208-443"
+        },
+        {
+          "claim": "Requirements: Node >= 22 or Bun >= 1.0.0, Homebrew SQLite on macOS; three GGUF models auto-downloaded from HuggingFace to ~/.cache/qmd/models/ (~300 MB, ~640 MB, ~1.1 GB).",
+          "citation": "README.md:545-564"
+        },
+        {
+          "claim": "Collections are defined in ~/.config/qmd/index.yml: path, pattern (default **/*.md), ignore, update hook, includeByDefault, hierarchical context; built-in exclusions node_modules, .git, .cache, vendor, dist, build.",
+          "citation": "README.md:700-758"
+        },
+        {
+          "claim": "A checked-in project-local .qmd config is not trusted by default (update commands, out-of-project paths, custom models); with no terminal (agents, CI, MCP) the gated fields are skipped and in-project indexing continues.",
+          "citation": "README.md:795-824"
+        },
+        {
+          "claim": "Index is a single SQLite file at ~/.cache/qmd/index.sqlite (FTS5 + sqlite-vec); documents are chunked into ~900 tokens with 15% overlap.",
+          "citation": "README.md:1127-1141, 1171-1183"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global (Node >= 22)",
+          "command": "npm install -g @tobilu/qmd",
+          "citation": "README.md:31-32, 590-591"
+        },
+        {
+          "method": "bun global",
+          "command": "bun install -g @tobilu/qmd",
+          "citation": "README.md:33-34, 593"
+        },
+        {
+          "method": "run without installing",
+          "command": "npx @tobilu/qmd ...   |   bunx @tobilu/qmd ...",
+          "citation": "README.md:36-38"
+        },
+        {
+          "method": "from source (development)",
+          "command": "git clone https://github.com/tobi/qmd; cd qmd; npm install; npm link",
+          "citation": "README.md:599-602"
+        },
+        {
+          "method": "Claude Code plugin (the qmd binary must already be on PATH)",
+          "command": "claude plugin marketplace add tobi/qmd && claude plugin install qmd@qmd",
+          "citation": "README.md:115-116"
+        },
+        {
+          "method": "macOS prerequisite (Homebrew SQLite)",
+          "command": "brew install sqlite",
+          "citation": "README.md:549-552"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs on ubuntu-latest for Node 22/23 and Bun (.github/workflows/ci.yml:10-17, 41-47); optional native package sqlite-vec-linux-x64 (package.json:73-79); Nix flake pins an x86_64-linux node_modules hash (flake.nix:46-48) and .github/workflows/nix.yml builds on ubuntu-latest (nix.yml:16).",
+        "wsl2": "unknown - README and CI never mention WSL2; the code only has WSL path heuristics (src/store.ts:490-496, src/cli/qmd.ts:3817-3818) and a changelog line (CHANGELOG.md:735).",
+        "macos_arm64": "yes - CI runs on macos-latest (.github/workflows/ci.yml:16, 47; nix.yml:16); package.json lists sqlite-vec-darwin-arm64 (package.json:74); flake.nix pins an aarch64-darwin hash (flake.nix:48); README requires Homebrew SQLite on macOS (README.md:549-552), which src/db.ts:25-42, 153-157 shows is needed under Bun; Metal workaround in bin/qmd:33-52. The repo does not state the architecture of the macos-latest runner.",
+        "gpu": "yes (optional) - QMD_LLAMA_GPU auto|metal|vulkan|cuda|false and QMD_FORCE_CPU/--no-gpu (README.md:1150-1151; src/llm.ts:726-742); falls back to CPU with a warning when GPU init fails (src/llm.ts:1059-1076); `qmd doctor` probes devices (README.md:1020-1021). No GPU job exists in CI and model-backed tests are skipped when CI is set (test/llm.test.ts:832)."
+      },
+      "integrations": {
+        "cli": "`qmd` CLI (npm bin -> bin/qmd -> dist/cli/qmd.js). Search: `qmd search` (BM25, no models), `qmd vsearch`, `qmd query` (plain text, or multi-line lex:/vec:/hyde:/intent: query documents). Read-back: `qmd get <path|#docid>[:from[:count]]`, `qmd multi-get <glob|comma-list>` (line-numbered by default; --full-path, --max-bytes default 65536, -l). Ingestion/admin: collection add|list|remove|rename|show|update-cmd|include|exclude, context add|list|rm, update, embed, pull, status, doctor, cleanup, init, trust, bench, skill/skills. Output formats cli|json|csv|md|xml|files. (README.md:28-87, 606-1056; src/cli/qmd.ts:3567-3675, 4333-4954)",
+        "mcp": "Yes. `qmd mcp` (stdio) and `qmd mcp --http [--port N] [--host H] [--daemon]` / `qmd mcp stop` (README.md:89-182; src/cli/qmd.ts:4739-4845). Tools, all annotated readOnly: `query` {query (plain text, auto-expanded) OR searches[<=10 of {type: lex|vec|hyde, query}], collections[], intent, limit=10, minScore=0, candidateLimit, rerank=true} returning per hit {docid, file, title, score, context, line, snippet}; `get` {file (path | #docid | path:from:count), fromLine, maxLines, lineNumbers=true}; `multi_get` {pattern (glob | comma list | docids), maxLines, maxBytes=65536, lineNumbers=true}; `status`. Also a resource template qmd://{+path}. No tool adds collections, updates or embeds (src/mcp/server.ts:196-582). Protocol revision 2026-07-28 via @modelcontextprotocol/server 2.0.0, dual-speaking 2025-era stdio clients (skills/qmd/references/mcp-setup.md:42-54; CHANGELOG.md:52-61).",
+        "sdk_or_api": "Yes. Node/Bun TypeScript SDK `@tobilu/qmd`: createStore, search, searchLex, searchVector, expandQuery, get, getDocumentBody, multiGet, collection/context CRUD, update, embed, getStatus, close (README.md:208-443; src/index.ts:228-560; package.json:6-13). HTTP: POST /query (alias /search; requires `searches`), POST /mcp, GET /health (README.md:152-155; src/mcp/server.ts:973-1069).",
+        "claude_code_or_codex": "Claude Code: yes. .claude-plugin/marketplace.json (skills ./qmd and ./release, mcpServers.qmd = `qmd mcp`), skills/qmd/SKILL.md (allowed-tools Bash(qmd:*), mcp__qmd__*; instructs search, then get/multi-get, then cite docids and answer from retrieved text, SKILL.md:20-27), manual MCP JSON for ~/.claude/settings.json (README.md:112-130), and `qmd skill install [--global] [--yes]` which writes a bootstrap stub to .agents/skills/qmd with an optional .claude/skills/qmd symlink (src/cli/qmd.ts:3339-3365, 3549-3565). Codex: none found - no Codex doc, config snippet or code in the repo ('codex' appears only as a sample collection name, example-index.yml:90); the stdio MCP server and CLI are client-agnostic but undocumented for Codex."
+      },
+      "telemetry_and_network": "No telemetry, analytics or update-check code found in src/ (grep for telemetry/analytics/sentry/posthog/update-notifier; third-party dependencies were not audited). Network use found: (1) Model weights: the three default GGUF models are `hf:` URIs resolved by node-llama-cpp resolveModelFile into ~/.cache/qmd/models on first use of embed/vsearch/query or MCP vec/hyde/rerank (src/llm.ts:279-285, 1098-1105; README.md:556-564); `qmd pull` additionally sends HEAD requests to https://huggingface.co/<repo>/resolve/main/<file> to compare ETags (src/llm.ts:351-361, 516-549); HF_ENDPOINT mirrors are honoured (src/llm.ts:469; src/cli/qmd.ts:3815). (2) node-llama-cpp may compile llama.cpp locally and download its source when no packaged prebuilt binding fits (build 'auto', skipDownload false: src/llm.ts:993-1005). (3) `qmd search`, `get`, `multi-get`, `ls` and `status` read only the local SQLite index and need no models or network (src/cli/qmd.ts:2798-2828, 514-573). (4) MCP stdio opens no socket; MCP HTTP listens on localhost:8181 by default with Origin/Host checks and no authentication (src/mcp/server.ts:939-971, 1108-1112). (5) Per-collection `update:` hooks run `bash -c <command>` (for example git pull) before `qmd update` (src/cli/qmd.ts:935-967). No account, API key or hosted service is required."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (src/, test/)",
+        "JavaScript ESM (bin/qmd launcher, scripts/*.mjs)",
+        "Python (finetune/ training and eval scripts; not published to npm)",
+        "Nix (flake.nix)",
+        "Shell (scripts/release.sh, scripts/pre-push, test/*.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "bin/qmd",
+          "what": "npm bin launcher (package.json:14-16): runs dist/cli/qmd.js when installed, or src/cli/qmd.ts via tsx/bun in a git checkout; picks node vs bun from lockfiles; quiets llama logs for `mcp`; disables Metal residency sets on darwin (bin/qmd:23-52, 87-192)"
+        },
+        {
+          "path": "src/cli/qmd.ts",
+          "what": "CLI main and command switch (context, get, multi-get, ls, collection, init, status, doctor, update, trust, embed, pull, search, vsearch, query, bench, mcp, skill/skills, cleanup): lines 4333-4954"
+        },
+        {
+          "path": "src/mcp/server.ts",
+          "what": "MCP server: startMcpServer (stdio, :800-828) and startMcpHttpServer (sessionless Streamable HTTP plus REST /query and /health, :853-1114)"
+        },
+        {
+          "path": "src/index.ts",
+          "what": "SDK entry (package main dist/index.js, package.json:6-13): createStore() facade over store.ts, llm.ts and collections.ts (:352-560)"
+        },
+        {
+          "path": "skills/qmd/SKILL.md",
+          "what": "Agent skill for the search-then-retrieve workflow; bundled in the npm package and in the Claude Code plugin (.claude-plugin/marketplace.json)"
+        },
+        {
+          "path": "src/bench/bench.ts",
+          "what": "`qmd bench <fixture.json>` search-quality harness (precision@k, recall, MRR, F1 per backend)"
+        },
+        {
+          "path": "src/bench-rerank.ts",
+          "what": "standalone reranker throughput benchmark (bun), excluded from the build (tsconfig.build.json:10)"
+        },
+        {
+          "path": "finetune/",
+          "what": "Python SFT/GRPO/eval/GGUF-conversion scripts for the query-expansion model (not part of the npm package)"
+        }
+      ],
+      "architecture": "Single ESM TypeScript package (~18.5k lines in src/). src/store.ts (~6.1k lines) is the core: schema (content table keyed by SHA-256, documents mapping collection/path to hash, documents_fts FTS5, content_vectors + sqlite-vec vectors_vec, llm_cache, store_collections; :1181-1283), reindexCollection (fast-glob + UTF-8 read, :1605-1725), markdown break-point chunking (900 tokens, 15% overlap), searchFTS (BM25), searchVec, reciprocalRankFusion, hybridQuery (BM25 probe, LLM expansion, RRF, chunk rerank, position-aware blend), structuredSearch (caller-typed lex/vec/hyde), and findDocument/getDocumentBody/findDocuments (all read the stored copy). src/llm.ts (~2.2k lines) wraps node-llama-cpp: lazy model load, GPU/CPU selection, embeddings, rerank via ranking context rankAll, grammar-constrained query expansion, idle unload. src/db.ts abstracts bun:sqlite vs better-sqlite3 and loads sqlite-vec. src/collections.ts handles YAML config and project-local .qmd discovery; src/trust.ts is the approval gate for project-local config; src/index.ts is the SDK facade; src/mcp/server.ts and src/mcp/origin-guard.ts are the MCP server and DNS-rebinding guard; src/cli/ holds formatter, version, MCP PID and embed-lock helpers; src/ast.ts does tree-sitter chunking for code files; src/maintenance.ts does cleanup. Index selection: --index <name>, else the nearest .qmd/index.yml|yaml found walking up from cwd (project-local .qmd/index.sqlite), else global ~/.cache/qmd/index.sqlite with ~/.config/qmd/index.yml (src/cli/qmd.ts:3090-3106; src/collections.ts:112-154; src/store.ts:636-654). Default models: embeddinggemma-300M (embed), Qwen3-Reranker-0.6B (rerank), fine-tuned Qwen3-1.7B qmd-query-expansion (generate) (src/llm.ts:282-285).",
+      "packaging_and_release": "Artifact: npm package @tobilu/qmd; package.json `files` ships bin/, dist/, skills/, four scripts, LICENSE and CHANGELOG.md (package.json:17-27); dist/ is built by scripts/build.mjs (tsc -p tsconfig.build.json, stamps dist/cli/build-info.json with the commit). Release flow: scripts/release.sh renames CHANGELOG [Unreleased], bumps package.json and .claude-plugin/marketplace.json, commits 'release: vX' and tags vX (scripts/release.sh:96-124); scripts/pre-push validates tag/version/changelog/CI (scripts/pre-push:13-90). .github/workflows/publish.yml runs on tags v*: bun install --frozen-lockfile, bun test, npm run build, `npm publish --provenance --access public` (permissions id-token: write, so an npm provenance attestation), then `gh release create` with notes from CHANGELOG (publish.yml:3-56). No prebuilt binaries, checksums or detached signatures are produced; npm provenance is the only attestation. The release workflow uses bun-version: latest (publish.yml:18-20). Nix: flake.nix builds from source with fixed-output node_modules hashes for x86_64-linux and aarch64-darwin; aarch64-linux and x86_64-darwin are fakeHash placeholders (flake.nix:46-53). The v2.8.3 tag is annotated and peels to facd35e (.git/packed-refs:2-3); CHANGELOG dates 2.8.3 as 2026-08-16 (CHANGELOG.md:5).",
+      "tests_and_ci": "Frameworks: vitest 3.2.7 under Node and `bun test`, running the same files (package.json:33-35; scripts/test-all.mjs:35-38 runs tsc typecheck, vitest, bun test and package smoke). test/ holds 43 *.test.ts files (about 1.2k describe/test/it declarations by line-start grep, approximate) plus test/launcher-detection.test.sh, test/smoke-install.sh, helpers, 6 eval-docs fixtures and test/Containerfile; largest are store.test.ts, cli.test.ts, sdk.test.ts, mcp.test.ts, llm.test.ts. CI: .github/workflows/ci.yml (Node 22 and 23 x ubuntu/macos running `npx vitest run ... test/` with CI=true; Bun latest x ubuntu/macos with `bun install --frozen-lockfile` then `bun test`), nix.yml (`nix build .` on ubuntu/macos), publish.yml (bun test on ubuntu before publishing). Coverage gap: when CI is set, model-backed suites (vector and hybrid eval, LlamaCpp integration, MCP HTTP transport, origin-guard HTTP e2e) are skipped (test/mcp.test.ts:326, 352, 937; test/mcp-origin-guard.test.ts:162; test/llm.test.ts:832, 1235; test/eval.test.ts:159, 271; test/store.test.ts:656, 3751; test/sdk.test.ts:632), and src/llm.ts itself refuses LLM calls under CI (src/llm.ts:804). No Windows, WSL or GPU jobs.",
+      "dependencies": "package.json: 13 runtime dependencies (@modelcontextprotocol/server 2.0.0, better-sqlite3 ^13.0.3, fast-glob 3.3.3, node-llama-cpp 3.20.0, picomatch 4.0.5, sqlite-vec 0.1.9, tree-sitter-go/python/rust/typescript, web-tree-sitter 0.26.12, yaml 2.9.0, zod 4.2.1), 5 optional (sqlite-vec platform binaries for darwin-arm64/x64, linux-arm64/x64, windows-x64), 3 dev (@types/better-sqlite3, tsx, vitest), 1 peer (typescript ^5.9.3) = 22 direct; versions are exact-pinned except better-sqlite3 and the typescript peer. bun.lock is the committed lockfile (package-lock.json is gitignored, .gitignore:3). finetune/pyproject.toml: 13 Python dependencies (torch, trl, peft, transformers, accelerate, huggingface_hub, trackio, datasets, pyyaml, gguf, sentencepiece, nvidia-ml-py, pydantic), not shipped in the npm package. flake.nix: 2 flake inputs (nixpkgs unstable, flake-utils; flake.nix:4-7) with flake.lock.",
+      "security_policy": "none - no SECURITY.md or other security-policy file, and no dependabot/renovate config; .github/ contains only ci.yml, nix.yml and publish.yml. Security behaviour is documented in README.md:148-178 and 795-824 and in CHANGELOG.md:7-45 (2.8.3 'Security' section)."
+    },
+    "claim_checks": [
+      {
+        "claim": "MCP server exposes tools query, get, multi_get and status (README.md:93-97).",
+        "verified": "yes",
+        "evidence": "src/mcp/server.ts:251 (query), 404 (get), 481 (multi_get), 554 (status); all annotated readOnlyHint:true (:315, 409, 486, 559); plus a qmd://{+path} document resource (:196-234). No tool can add collections, update or embed, so the MCP surface is read-only. No prompts are registered despite the docstring at :166-169."
+      },
+      {
+        "claim": "MCP `query` takes `searches` (typed lex/vec/hyde, 1-10) and it is Required (README.md:188); docs/SYNTAX.md:154-155 says there is no plain query string parameter and `searches` is required.",
+        "verified": "partial",
+        "evidence": "Code accepts either a plain `query` string (auto-expanded by the local LLM) or `searches` (max 10), mutually exclusive, neither individually required (src/mcp/server.ts:317-324, 340-352). Only the REST endpoints /query and /search require `searches` (src/mcp/server.ts:988-992). README and SYNTAX.md are stale for MCP; code wins."
+      },
+      {
+        "claim": "`multi_get` maxBytes default is 10240 (README.md:200).",
+        "verified": "no",
+        "evidence": "DEFAULT_MULTI_GET_MAX_BYTES = 64*1024 (src/store.ts:94) is the MCP default (src/mcp/server.ts:490) and the CLI default (src/cli/qmd.ts:4431; --help says 65536 at :3671). README.md:431 and :884 say 64KB; README.md:200 and CLAUDE.md:129 say 10KB."
+      },
+      {
+        "claim": "get/multi-get retrieve the document (full content) by path or 6-char docid; documents table holds 'Markdown content with metadata and docid (6-char hash)' (README.md:58-65, 195-202, 1131-1141).",
+        "verified": "partial",
+        "evidence": "Bodies come from the SQLite `content` table (SHA-256 keyed) captured at the last `qmd update`/`collection add`, not from the live file (src/store.ts:1661-1706, 4884-4928, 5056-5154); the MCP server and SDK never re-index on their own. Lookups only resolve rows in `documents`, so no tool reads arbitrary files (src/store.ts:4809-4851). docid = first 6 hex chars of the hash (src/store.ts:2341-2343, 2860-2864), so byte-identical files share one and docid lookup returns the first match (src/store.ts:3363-3384); path-suffix lookups use LIKE '%...' LIMIT 1 (src/store.ts:4817-4825). README's schema list (README.md:1133-1141) names `collections`/`path_contexts`, which init drops (src/store.ts:1196-1197), and omits the `content` and `store_collections` tables (src/store.ts:1200-1266)."
+      },
+      {
+        "claim": "Claude Code: install the plugin via `claude plugin marketplace add tobi/qmd` and `claude plugin install qmd@qmd` (README.md:112-117).",
+        "verified": "partial",
+        "evidence": ".claude-plugin/marketplace.json:2-27 defines marketplace 'qmd' with plugin 'qmd' (source ./skills, skills ./qmd and ./release, mcpServers.qmd = `qmd mcp`, version 2.8.3 kept in lockstep with package.json by scripts/release.sh:111-122). The plugin does not install the CLI (skills/qmd/SKILL.md:5: 'Requires qmd CLI or MCP server'). The `claude plugin` commands belong to Claude Code and were not run."
+      },
+      {
+        "claim": "On-device search over Markdown collections with default mask **/*.md; the README makes no claim of PDF/Office/EPUB/HTML conversion (README.md:3, 614, 737).",
+        "verified": "yes",
+        "evidence": "DEFAULT_GLOB = '**/*.md' (src/store.ts:48). reindexCollection globs with fast-glob, skips hidden paths, node_modules/.git/.cache/vendor/dist/build, symlinks and out-of-collection files, then reads each file as UTF-8 text and skips empty ones (src/store.ts:1617-1677). No PDF/Office/EPUB/HTML/OCR conversion code or dependency exists (grep of src/ for pdf, docx, epub, ocr, pandoc, html-to-text found none; the only 'html' hits are GGUF download sanity checks, src/llm.ts:417-425; package.json lists no converter). Answer to 'which tool converts difficult-layout documents': none in this project. Custom masks can match other text types (example-index.yml:69 uses **/*.{md,mdx,txt})."
+      },
+      {
+        "claim": "Score table: BM25 conversion is Math.abs(score), vector is 1/(1+distance), reranker is an 'LLM 0-10 rating' (score/10, 'Yes/No + logprobs'), and the top 30 candidates are reranked (README.md:495-496, 511-515, 525).",
+        "verified": "no",
+        "evidence": "FTS score = |bm25|/(1+|bm25|) (src/store.ts:4107); vector score = 1 - cosine distance (src/store.ts:4300); reranker uses node-llama-cpp's ranking context `rankAll` (src/llm.ts:1778); candidate limit default is 40 (src/store.ts:421; README.md:193 and --help at src/cli/qmd.ts:3653 also say 40). README.md:1293 (createRankingContext) is the accurate description."
+      },
+      {
+        "claim": "RRF k=60, original query x2, top-rank bonus +0.05/+0.02, position-aware blend 75/60/40, lex to FTS and vec/hyde to vector (README.md:24, 519-532).",
+        "verified": "yes",
+        "evidence": "src/store.ts:4578-4620 (k=60; bonus 0.05 for rank 1, 0.02 for ranks 2-3), :5426-5428 (original-query lists weighted 2x), :5682-5689 (blend weights 0.75/0.60/0.40 applied to 1/rank, not the fused RRF score), :5504-5560 (routing). Nuances not in README: a strong BM25 hit (top >= 0.85, gap >= 0.15, no intent) skips LLM expansion (src/store.ts:417-418, 5472-5483); for caller-typed `searches` the 2x weight goes to the first non-empty ranked list and lex lists are built before vec/hyde lists, so it is not strictly the first sub-query (src/store.ts:5901-5966)."
+      },
+      {
+        "claim": "A project-local .qmd config is untrusted by default; with no terminal (agents, CI, MCP) its update commands, out-of-project paths and custom model URIs are skipped (README.md:795-824).",
+        "verified": "partial",
+        "evidence": "Gate logic is in src/trust.ts:313-333 and is applied only by CLI commands update/embed/pull/vsearch/query (src/cli/qmd.ts:895-967, 4637, 4661, 4701, 4711) and CLI model resolution (:161, 2156). The MCP/SDK path (src/mcp/server.ts:800-865; src/index.ts:352-391) never calls trust.ts: `qmd mcp` adopts the local config (src/cli/qmd.ts:3097-3104) and createStore passes config.models.* to LlamaCpp unchecked. MCP has no update/ingest tool, so hooks do not run there."
+      },
+      {
+        "claim": "The HTTP MCP server binds to localhost by default, rejects non-loopback Origin/Host with 403, and endpoints are unauthenticated (README.md:148-178).",
+        "verified": "yes",
+        "evidence": "src/mcp/server.ts:939-971 (host defaults to localhost or QMD_HOST; guard runs before routing, including REST), src/mcp/origin-guard.ts:91-167 (loopback-only Origin; Host enforced unless wildcard bind without QMD_ALLOWED_HOSTS; QMD_ALLOWED_ORIGINS=* disables), startup warnings at src/mcp/server.ts:1108-1112; no auth code exists. README.md:152 says 'two endpoints' but lists three (/mcp, /query alias /search, /health), which matches src/mcp/server.ts:973-1038."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "`qmd bench` on the repo's example fixture (10 queries over 6 synthetic docs, src/bench/fixtures/example.json), per backend",
+        "metric": "fixture score (precision@k-based, 0.00-1.00)",
+        "value": "bm25 ~0.50, vector ~0.70, hybrid/full ~1.00 ('typically')",
+        "source": "README.md:1095-1098",
+        "independent": false
+      },
+      {
+        "what": "Regression thresholds asserted by the eval tests (24 synthetic queries over 6 docs; minimum accepted values, not measured results)",
+        "metric": "Hit@3 / Hit@5 minimums",
+        "value": "BM25 overall >= 0.40 Hit@3; vector overall >= 0.50 Hit@3; hybrid (with vectors) non-fusion overall >= 0.60 Hit@3 and fusion queries >= 0.50 and >= best single backend; vector and hybrid suites are skipped when CI is set",
+        "source": "test/eval.test.ts:46-79, 131-151, 218-264, 328-404 (skipIf at :159, :271)",
+        "independent": false
+      },
+      {
+        "what": "Query-expansion model (Qwen3-1.7B SFT) scored by the rule-based reward in finetune/reward.py (format/diversity/entity rubric, not retrieval quality)",
+        "metric": "average reward score; count rated Excellent",
+        "value": "92.0% average; 30/30 Excellent. The README says 31 queries/8 categories (finetune/README.md:100) while finetune/evals/queries.txt now has 51 queries in 12 groups, so the figure refers to an earlier query set",
+        "source": "finetune/README.md:257-261; finetune/SCORING.md:132-147",
+        "independent": false
+      },
+      {
+        "what": "SFT training of the expansion model (Qwen3-1.7B, v2, A10G)",
+        "metric": "loss and token accuracy",
+        "value": "final train loss 0.472; eval loss 0.304; token accuracy 97.4% train / 93.8% eval; 5 epochs",
+        "source": "finetune/README.md:244-255",
+        "independent": false
+      },
+      {
+        "what": "Default GGUF model download sizes",
+        "metric": "size on disk",
+        "value": "embeddinggemma-300M-Q8_0 ~300 MB; qwen3-reranker-0.6b-q8_0 ~640 MB; qmd-query-expansion-1.7B-q4_k_m ~1.1 GB (~2 GB total); skills reference says first search loads '~3GB'",
+        "source": "README.md:558-562; skills/qmd/references/mcp-setup.md:119",
+        "independent": false
+      },
+      {
+        "what": "Embedding-context memory cost per 2048-token context",
+        "metric": "VRAM per context",
+        "value": "~150 MB baseline (embeddinggemma/nomic) vs ~1190 MB for Qwen3-Embedding-0.6B; 8 of the latter exhausted an 8 GB card (fixed by sizing the pool from the weight file)",
+        "source": "src/llm.ts:670-671; CHANGELOG.md:149-156",
+        "independent": false
+      },
+      {
+        "what": "Claude Code plugin install footprint after scoping the plugin source to ./skills",
+        "metric": "installed size",
+        "value": "~50 KB, versus ~230 MB / 9,000+ items before the fix",
+        "source": "CHANGELOG.md:358-363",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap for document conversion: ingestion is fast-glob plus readFileSync(utf-8) on any file matching the mask (default **/*.md) with no binary-file or size guard (src/store.ts:1623-1677); nothing in src/ or package.json handles PDF, scans/OCR, Office, EPUB or HTML. A mask that matches binary files would index mangled text, and title extraction exists only for .md and .org (src/store.ts:2866-2896). Any conversion to Markdown must happen outside QMD; CHANGELOG.md:896-898 mentions 'PDF ingestion' only as a source of long chunks.",
+      "Read-back returns an indexed snapshot, not the live file: get/multi_get read the SQLite content table written at the last `qmd update` (src/store.ts:1661-1706, 4884-4928, 5056-5154); the MCP server never re-indexes (no update call in src/mcp/server.ts), so edits stay invisible until `qmd update` (and vectors until `qmd embed`). docid is only the first 6 hex chars of the SHA-256 body hash, identical files share it, and docid or path-suffix lookups return the first match (src/store.ts:3363-3384, 4817-4825); `multi_get` compares maxBytes against SQLite LENGTH of text (src/store.ts:5127).",
+      "Vector and hybrid search depend on three GGUF models (~2 GB) fetched from Hugging Face on first use via mutable resolve/main refs, checked only by GGUF magic bytes and ETag, with no pinned digest (src/llm.ts:279-285, 351-361, 453-482); `qmd vsearch` also runs the 1.7B expansion model (src/store.ts:5783); the MCP `query` tool defaults to rerank=true (src/mcp/server.ts:334). Any truthy CI environment variable (even 'false') makes embedBatch, generate, expandQuery and rerank throw (src/llm.ts:804, 1475, 1542, 1603, 1710). `qmd pull` deletes cached model files when the remote ETag cannot be fetched, before attempting a re-download (src/llm.ts:516-531). The native stack (node-llama-cpp 3.20.0, better-sqlite3, sqlite-vec 0.1.9) is ABI-sensitive (bin/qmd:124-172) and node-llama-cpp may try to compile llama.cpp (src/llm.ts:993-1005).",
+      "Trust and exposure: the project-local .qmd/index.yml approval gate is enforced only in CLI commands (src/cli/qmd.ts:895-967, 4637, 4661, 4701, 4711); the MCP/SDK path (src/mcp/server.ts:800-865, src/index.ts:352-391) never calls src/trust.ts and passes models.* from an adopted local config straight to LlamaCpp, contrary to README.md:821-824. The HTTP transport is unauthenticated; only Origin/Host checks exist and --host 0.0.0.0 disables the Host check (src/mcp/server.ts:1108-1112; README.md:175-178). Which index an MCP server uses depends on the launching client's cwd (local .qmd found upward from cwd, src/cli/qmd.ts:3090-3106). The MCP instructions string puts collection names and global context into the client's system prompt (src/mcp/server.ts:107-163).",
+      "Client coverage: only Claude clients are documented (Claude Desktop JSON, Claude Code plugin/skill; README.md:99-130; .claude-plugin/marketplace.json). No Codex-specific documentation, config snippet or code exists ('codex' appears only as a sample collection name, example-index.yml:90); OpenClaw appears in skills/qmd/references/mcp-setup.md:31-40 and a .pi/settings.json skills pointer exists. `qmd skill install` writes to ./.agents/skills/qmd (src/cli/qmd.ts:3158-3168). The Claude plugin does not install the qmd binary (skills/qmd/SKILL.md:5).",
+      "Documentation drift that can mislead agents: README says MCP `searches` is required and multi_get maxBytes defaults to 10240 (README.md:188, 200) but code accepts plain `query` or `searches` and defaults to 65536 (src/mcp/server.ts:317-324, 490; src/store.ts:94); skills/qmd/references/mcp-setup.md documents get params `path`/`full` and a singular `collection` that the code lacks (mcp-setup.md:73-109 vs src/mcp/server.ts:330, 410-415); multi_get's skip message names a nonexistent tool 'qmd_get' (src/mcp/server.ts:514); `qmd update [--pull]` in --help has no implementation (src/cli/qmd.ts:3593; option parsed at :3058, never read); README says tree-sitter grammars are optional but they are required dependencies (README.md:673-675 vs package.json:65-68, test/package.test.ts:35-40). Unknown MCP parameters are silently ignored (README.md:204).",
+      "Maintenance and supply chain: no security policy file and no dependabot/renovate; the release workflow installs bun-version: latest on one ubuntu job (publish.yml:18-20) and npm provenance is the only attestation (no checksums or signatures); CI skips all model-backed and live-HTTP suites (see tests_and_ci); sqlite-vec is pre-1.0 (0.1.9) and the LLM/native stack is exact-pinned, needing manual bumps (skills/release/SKILL.md:32-36); the Nix flake has fakeHash placeholders for aarch64-linux and x86_64-darwin (flake.nix:50-53) and CHANGELOG.md:49 notes flake hashes were not updated with a dependency bump; CHANGELOG has no 2.7.x or 2.8.0-2.8.2 headers, and the 2.8.3 entry spans ~390 lines (CHANGELOG.md:5-392).",
+      "Licensing: the code is MIT (LICENSE:1-21; package.json:120), but the three downloaded model weights carry their own licences, which this repo does not state (README.md:556-564); the default embedder is a Google EmbeddingGemma GGUF whose terms are outside this repo. finetune/README.md:1-12 declares MIT for the fine-tuned expansion model (base Qwen/Qwen3-1.7B)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "tobi/qmd",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npm global (Node >= 22): npm install -g @tobilu/qmd",
+          "citation": "README.md:31-32, 590-591",
+          "holds": true,
+          "note": "README.md:32 and :591 both show `npm install -g @tobilu/qmd`. The package name matches package.json:2, and the bin maps qmd -> bin/qmd (package.json:14-16). The Node >= 22 qualifier matches README.md:547 and engines.node '>=22.0.0' (package.json:99-101)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT text ('Copyright (c) 2024-2026 Tobi Lutke'). package.json:120 declares \"license\": \"MIT\" and flake.nix:149 sets licenses.mit."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - CI runs on macos-latest; package.json lists sqlite-vec-darwin-arm64; flake.nix pins an aarch64-darwin hash; Homebrew SQLite is required on macOS and src/db.ts shows it is needed under Bun; Metal workaround in bin/qmd; the repo does not state the macos-latest runner's architecture.",
+          "citation": ".github/workflows/ci.yml:16, 47; nix.yml:16; package.json:74; flake.nix:48; README.md:549-552; src/db.ts:25-42, 153-157; bin/qmd:33-52",
+          "holds": true,
+          "note": "Every citation matches. ci.yml:16/47 and nix.yml:16 list macos-latest. package.json:74 is sqlite-vec-darwin-arm64 0.1.9. flake.nix:48 is a real aarch64-darwin hash (aarch64-linux and x86_64-darwin are fakeHash, :51-52). db.ts:25-42 swaps in Homebrew SQLite only on the Bun+darwin path, and db.ts:153-157 is the matching hint; the Node path (db.ts:58-62) uses better-sqlite3. bin/qmd:50-52 sets GGML_METAL_NO_RESIDENCY on darwin. It is accurate that no workflow declares the runner arch. The only indirect hint is ci.yml:71, which points the Bun job at /opt/homebrew/opt/sqlite/lib; db.ts:33 labels that path Apple Silicon."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "`qmd mcp` (stdio) and `qmd mcp --http [--port N] [--host H] [--daemon]` / `qmd mcp stop`. Read-only tools: query (query OR searches<=10, collections, intent, limit=10, minScore=0, candidateLimit, rerank=true; hits carry docid/file/title/score/context/line/snippet), get (file, fromLine, maxLines, lineNumbers=true), multi_get (pattern, maxLines, maxBytes=65536, lineNumbers=true) and status. Resource template qmd://{+path}. No ingest/update/embed tool. Protocol 2026-07-28 via @modelcontextprotocol/server 2.0.0, dual-speaking 2025-era stdio clients.",
+          "citation": "README.md:89-182; src/cli/qmd.ts:4739-4845; src/mcp/server.ts:196-582; skills/qmd/references/mcp-setup.md:42-54; CHANGELOG.md:52-61",
+          "holds": true,
+          "note": "In qmd.ts, `stop` is :4747-4767, --http is :4769-4838 (port default 8181, --host, --daemon) and stdio is :4839-4843. server.ts registers one resource (qmd://{+path}, :196-198) and exactly four tools (:251, 404, 481, 554), each with readOnlyHint:true (:315, 409, 486, 559); a grep of src/ finds no other registerTool/registerPrompt. The query schema (:316-337) has query/searches (max 10, mutually exclusive per :340-352), limit 10, minScore 0, candidateLimit, collections, intent and rerank true. The hit shape is :380-391. get is :410-415. multi_get maxBytes defaults to DEFAULT_MULTI_GET_MAX_BYTES = 64*1024 (store.ts:94; server.ts:490). The protocol wording matches mcp-setup.md:44, CHANGELOG.md:52-61 and package.json:59."
+        },
+        {
+          "field": "claim_checks[5]",
+          "statement": "On-device search over Markdown collections with default mask **/*.md; no PDF/Office/EPUB/HTML/OCR conversion code or dependency exists; ingestion reads matched files as UTF-8 text (verified: yes).",
+          "citation": "README.md:3, 614, 737; src/store.ts:48, 1617-1677; src/llm.ts:417-425; example-index.yml:69",
+          "holds": true,
+          "note": "store.ts:48 is DEFAULT_GLOB = \"**/*.md\". store.ts:1617-1677 runs fast-glob with the six built-in excludes, then the hidden-path filter, the out-of-collection check, readFileSync(utf-8) and the empty-content skip. Re-running the grep of src/ for pdf|docx|epub|ocr|pandoc|html-to-text|mammoth|tesseract|xlsx|pptx gives zero hits. Every 'html' hit is GGUF-download validation (llm.ts:368, 417-425, 449, 462-464, 1095). README.md has no pdf/docx/epub/ocr/pandoc/office/html mention. The only lockfile hit is jsdom as an optional peer of vitest (bun.lock:520), which is not a converter. example-index.yml:69 uses **/*.{md,mdx,txt}. Not exercised at runtime: whether fast-glob drops file symlinks that point inside the collection (followSymbolicLinks:false at store.ts:1626)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

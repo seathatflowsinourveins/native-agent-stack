@@ -1,0 +1,299 @@
+{
+  "contender": "e2b-dev/e2b",
+  "revision": {
+    "contender": "e2b-dev/e2b",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "e2b-dev/E2B",
+        "tag": "e2b@2.52.0",
+        "commit": "970b34dc24d628f8061e539925468c123e345d5f",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "e2b@2.52.0",
+    "commit": "970b34dc24d628f8061e539925468c123e345d5f",
+    "read_at": "2026-10-02T03:02:05+00:00"
+  },
+  "dossier": {
+    "contender": "e2b-dev/e2b",
+    "revision": {
+      "tag": "e2b@2.52.0",
+      "commit": "970b34dc24d628f8061e539925468c123e345d5f",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Client-side monorepo for E2B (FoundryLabs, Inc.): JavaScript/TypeScript SDK `e2b`, Python SDK `e2b` (sync and async), CLI `@e2b/cli`, thin wrappers `@e2b/code-interpreter`/`e2b-code-interpreter` and `@e2b/desktop`/`e2b-desktop`, and the OpenAPI/protobuf specs the clients are generated from. The SDKs create and drive Linux sandboxes that run remotely on E2B Cloud, or on a self-hosted/BYOC deployment of the separate e2b-dev/runtime project. `Sandbox.create()` POSTs /v2/sandboxes at https://api.<domain> with an API key (packages/js-sdk/src/sandbox/sandboxApi.ts:1747-1750). Commands, files and PTYs then run inside the sandbox through its `envd` daemon over Connect-RPC (packages/js-sdk/src/sandbox/index.ts:167-226). Per-task separation is done with separate sandboxes, `fork` (up to 20 copies of a checkpointed sandbox: sandboxApi.ts:535-554, index.ts:425-445), snapshots, and pause/resume. Enforced restrictions are API options on the remote sandbox: egress allow/deny lists (CIDR, IP, hostname), an internet on/off switch, per-host header transforms, an optional SOCKS5 egress proxy, public-URL traffic tokens, and always-on secured envd access. The repo contains no local OS-level filesystem or network rule engine and no WSL2/macOS-specific sandboxing code. Whole-repo greps for seccomp, landlock, bubblewrap, seatbelt, sandbox-exec, firejail, nsjail, gVisor, firecracker, microVM and WSL found nothing. The sandbox runtime that actually isolates workloads is not in this repo; only its API specs are synced here (spec/README.md:8-12).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "E2B is an open-source infrastructure that allows you to run AI-generated code in secure isolated sandboxes in the cloud.",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "To start and control sandboxes, use the JavaScript SDK (npm `e2b`) or Python SDK (PyPI `e2b`).",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "Usage requires signing up to E2B, getting an API key, and setting the E2B_API_KEY environment variable (e2b_***).",
+          "citation": "README.md:36-42"
+        },
+        {
+          "claim": "`Sandbox.create()` followed by `sandbox.commands.run('echo \"Hello from E2B!\"')` returns the command's stdout (JS, and Python as a context manager).",
+          "citation": "README.md:44-62"
+        },
+        {
+          "claim": "`runCode()`/`run_code()` needs the separate Code Interpreter SDK (`@e2b/code-interpreter` / `e2b-code-interpreter`).",
+          "citation": "README.md:64-79"
+        },
+        {
+          "claim": "The Desktop SDK (`@e2b/desktop` / `e2b-desktop`) provides mouse, keyboard, screenshot, application and desktop-streaming APIs for computer use.",
+          "citation": "README.md:81-96"
+        },
+        {
+          "claim": "Self-hosting: follow the embed deployment guide to set up the E2B runtime (github.com/e2b-dev/runtime) on your own; the infrastructure is deployed using Terraform.",
+          "citation": "README.md:104-106"
+        },
+        {
+          "claim": "Supported self-host targets: AWS, Google Cloud (GCP), Azure, and a general Linux machine (via Embed).",
+          "citation": "README.md:108-112"
+        },
+        {
+          "claim": "CLI install: `brew install e2b` on macOS, or `npm install -g @e2b/cli`.",
+          "citation": "packages/cli/README.md:15-25"
+        },
+        {
+          "claim": "CLI auth: `e2b auth login`, or provide E2B_API_KEY as an environment variable where a browser cannot be opened (CI/CD).",
+          "citation": "packages/cli/README.md:27-37"
+        },
+        {
+          "claim": "Each Desktop sandbox is isolated from the others and can be customized with any dependencies.",
+          "citation": "packages/desktop-js/README.md:5"
+        },
+        {
+          "claim": "Python SDK shares one set of HTTP/2 connections across all sandboxes in a process; a new connection is dialed only when every existing one carries E2B_STREAMS_PER_CONNECTION streams (default 100), up to E2B_MAX_CONNECTIONS (default 200); both are read at import.",
+          "citation": "packages/python-sdk/README.md:69-77"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm (JS/TS SDK)",
+          "command": "npm i e2b",
+          "citation": "README.md:28"
+        },
+        {
+          "method": "pip (Python SDK)",
+          "command": "pip install e2b",
+          "citation": "README.md:33"
+        },
+        {
+          "method": "npm global (CLI)",
+          "command": "npm install -g @e2b/cli",
+          "citation": "packages/cli/README.md:24"
+        },
+        {
+          "method": "Homebrew (CLI, macOS)",
+          "command": "brew install e2b",
+          "citation": "packages/cli/README.md:18"
+        },
+        {
+          "method": "npm / pip (Code Interpreter SDK)",
+          "command": "npm i @e2b/code-interpreter  # JavaScript/TypeScript ; pip install e2b-code-interpreter  # Python",
+          "citation": "README.md:69-70"
+        },
+        {
+          "method": "npm / pip (Desktop SDK)",
+          "command": "npm i @e2b/desktop  # JavaScript/TypeScript ; pip install e2b-desktop  # Python",
+          "citation": "README.md:86-87"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes: CI runs the JS, Python and CLI suites on ubuntu-22.04 (.github/workflows/js_sdk_tests.yml:48, python_sdk_tests.yml:30, cli_tests.yml:29). The SDKs are pure TypeScript/Python with no native code built in this repo (Python deps include native wheels such as pyqwest, packages/python-sdk/pyproject.toml:23). CPU architecture is not stated in the workflows.",
+        "wsl2": "unknown: no mention of WSL/WSL2 anywhere in the repo (whole-repo grep, lockfiles excluded). A WSL2 shell would take the generic Linux code path: the CLI's browser opener uses xdg-open on non-darwin/non-win32 (packages/cli/src/utils/openBrowser.ts:11-19) and prints a manual login URL if the opener fails (packages/cli/src/commands/auth/login.ts:156-167). Native Windows is CI-tested (windows-latest) but that is not WSL2.",
+        "macos_arm64": "yes: Homebrew install documented for macOS (packages/cli/README.md:15-19) and the CLI has a darwin branch (packages/cli/src/utils/openBrowser.ts:11-13). It is not exercised in CI (only ubuntu-22.04 and windows-latest runners) and arm64 is not mentioned.",
+        "gpu": "no: nothing in the repo mentions or requires a GPU (grep for GPU/CUDA/nvidia outside lockfiles: 0 hits). SandboxOpts has no GPU option (packages/js-sdk/src/sandbox/sandboxApi.ts:588-683)."
+      },
+      "integrations": {
+        "cli": "yes: `e2b` binary from npm `@e2b/cli` (packages/cli/package.json:71-73) with command groups auth, template, sandbox (packages/cli/src/commands/index.ts:23-25). Sandbox subcommands are connect, info, list, kill, pause, resume, create, logs, metrics, exec, snapshot, fork (packages/cli/src/commands/sandbox/index.ts:20-32). `sandbox create` exposes only lifecycle, timeout, user, cwd and env flags, with no network/egress flags (packages/cli/src/commands/sandbox/create.ts:32-51).",
+        "mcp": "No standalone MCP server for MCP clients found in this repo. The SDK has an `mcp` option on Sandbox.create that starts an in-sandbox `mcp-gateway` (as root) and exposes getMcpUrl()/getMcpToken() (packages/js-sdk/src/sandbox/index.ts:325-344, 721-738; Python packages/python-sdk/e2b/sandbox_sync/main.py:236-257). spec/mcp-server.json is the catalog schema of MCP servers for that option and is owned by this repo (spec/README.md:34-35).",
+        "sdk_or_api": "SDKs: JS/TS `e2b` (packages/js-sdk), Python `e2b` with sync Sandbox and async AsyncSandbox (packages/python-sdk/e2b/__init__.py:113,125), an `E2B` bound-client class (packages/js-sdk/README.md:48-67), plus @e2b/code-interpreter, e2b-code-interpreter, @e2b/desktop and e2b-desktop. HTTP API: REST OpenAPI spec for https://api.e2b.app authenticated by the X-API-Key header (spec/openapi.yml:1-14). In-sandbox envd HTTP and Connect-RPC (process, filesystem) specs are in spec/envd/envd.yaml, spec/envd/process/process.proto and spec/envd/filesystem/filesystem.proto.",
+        "claude_code_or_codex": "none found as an integration: no Claude Code or Codex plugin, skill, hook, .mcp.json, .claude/ directory or AGENTS.md (globs found none). Only mentions: CLAUDE.md holds contributor instructions for coding agents working on this repo (pnpm/uv, changesets, Linear MCP for PRs) (CLAUDE.md:1-10). The CLI `sandbox exec` help text and tests use `codex exec` as an example remote pass-through command run inside a sandbox (packages/cli/src/commands/sandbox/exec.ts:23-28; packages/cli/tests/commands/sandbox/exec_passthrough.test.ts:107-113)."
+      },
+      "telemetry_and_network": "No analytics or crash-reporting SDK found (greps for telemetry/analytics/sentry/posthog/segment/mixpanel/amplitude in source hit only the CLI's simple-update-notifier dependency). (1) Account: an E2B account and API key are required; both SDKs throw without one (packages/js-sdk/src/api/index.ts:99-105; packages/python-sdk/e2b/api/__init__.py:334-339). Plan tiers cap sandbox lifetime at 1 h (Hobby) / 24 h (Pro) (packages/js-sdk/src/sandbox/sandboxApi.ts:613-617). (2) Network: control-plane calls go to https://api.<domain>, default domain e2b.app, overridable via E2B_DOMAIN, E2B_API_URL, E2B_SANDBOX_URL (packages/js-sdk/src/connectionConfig.ts:500-505, 545-555; packages/python-sdk/e2b/connection_config.py:214-232, 314-323; spec/openapi.yml:6-7). Sandbox traffic goes to https://sandbox.<domain> for e2b.app/e2b.dev/e2b.pro/e2b-staging.dev, else https://<port>-<sandboxId>.<domain> (connectionConfig.ts:8, 569-613). (3) Client metadata is sent on every API request with no opt-out found: headers browser, lang, lang_version, package_version, publisher, sdk_runtime, system (packages/js-sdk/src/api/metadata.ts:8-16 and api/index.ts:116-120; packages/python-sdk/e2b/api/metadata.py:7-14 and api/__init__.py:348-351), and a User-Agent e2b-js-sdk|e2b-python-sdk/<version> plus an integration tag such as e2b-cli/<version> and optional source/<E2B_USER_AGENT_SOURCE> (connectionConfig.ts:393-414; packages/cli/src/api.ts:10). (4) CLI: update check via simple-update-notifier every 8 h, disabled by NO_UPDATE_NOTIFIER (packages/cli/src/index.ts:11-22). `e2b auth login` opens a browser at ${E2B_DOCS_BASE or https://e2b.dev/docs}/api/cli with a loopback callback server on 127.0.0.1 (packages/cli/src/commands/auth/login.ts:107-112; packages/cli/src/user.ts:45-47). The API key and OAuth tokens are stored as plaintext JSON in ~/.e2b/config.json (dir 0700, file 0600, 'TODO: Keep in Keychain') (user.ts:37, 148-154). Token refresh POSTs to the OAuth token endpoint (packages/cli/src/utils/token-refresh.ts:42-55). E2B_API_KEY is the non-interactive alternative (packages/cli/README.md:33-37). (5) Debug mode E2B_DEBUG=true targets http://localhost:3000 and localhost:<port> and needs a locally running API/envd built from the separate runtime repo (connectionConfig.ts:75-80, 500-503, 577-579). (6) An optional SOCKS5 egressProxy must be reachable from E2B's infrastructure (sandboxApi.ts:175-201). (7) Secret values are write-only on the server and resolved by the platform via ${e2b.secrets.<name>} placeholders; workload-identity tokens are minted by the egress proxy (packages/js-sdk/src/secret.ts:15-27; packages/js-sdk/src/sandbox/iam.ts:70-79). (8) Development only: `make codegen` and scripts/fetch-spec.sh pull specs from GitHub (e2b-dev/runtime, private e2b-dev/belt) through Docker and Copybara (scripts/fetch-spec.sh:43-59)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript",
+        "Python",
+        "Protocol Buffers",
+        "OpenAPI YAML",
+        "Shell",
+        "Dockerfile",
+        "Handlebars",
+        "Starlark (Copybara)"
+      ],
+      "entry_points": [
+        {
+          "path": "packages/cli/src/index.ts",
+          "what": "CLI `e2b` (bin -> dist/index.js, packages/cli/package.json:71-73); commander program built in packages/cli/src/commands/index.ts"
+        },
+        {
+          "path": "packages/js-sdk/src/index.ts",
+          "what": "JS/TS SDK exports: Sandbox (default export), Template, Volume, Secret, E2B bound client, error classes, network types"
+        },
+        {
+          "path": "packages/js-sdk/src/sandbox/index.ts",
+          "what": "JS Sandbox class: create/connect/fork/pause/kill/updateNetwork plus commands, files, pty, git (deprecated), MCP URL/token"
+        },
+        {
+          "path": "packages/python-sdk/e2b/__init__.py",
+          "what": "Python SDK exports: Sandbox (sync), AsyncSandbox, Template/AsyncTemplate, Volume, Secret, E2B client, exceptions"
+        },
+        {
+          "path": "packages/python-sdk/e2b/sandbox_sync/main.py",
+          "what": "Python sync Sandbox (async twin: packages/python-sdk/e2b/sandbox_async/main.py)"
+        },
+        {
+          "path": "packages/code-interpreter-js/src/index.ts",
+          "what": "@e2b/code-interpreter: Sandbox.runCode against the sandbox's Jupyter server on port 49999, default template code-interpreter-v1 (Python twin: packages/code-interpreter-python/e2b_code_interpreter/__init__.py)"
+        },
+        {
+          "path": "packages/desktop-js/src/index.ts",
+          "what": "@e2b/desktop: desktop Sandbox (default template `desktop`, Xfce, VNC streaming, mouse/keyboard/screenshot) (Python twin: packages/desktop-python/e2b_desktop/__init__.py)"
+        },
+        {
+          "path": "spec/openapi.yml",
+          "what": "REST API spec for https://api.e2b.app (synced from e2b-dev/runtime, pinned by spec/runtime-ref); in-sandbox envd specs in spec/envd/"
+        }
+      ],
+      "architecture": "Client-only monorepo: pnpm workspace `packages/*` (pnpm-workspace.yaml:1-2) plus uv-managed Python packages. JS SDK packages/js-sdk/src: `api/` (openapi-fetch REST client with generated schema.gen.ts, HTTP/2 transport http2.ts), retry.ts, `envd/` (Connect-RPC clients generated from spec/envd/{process,filesystem}/*.proto for the in-sandbox daemon, plus its HTTP API), `sandbox/` (index.ts Sandbox class; sandboxApi.ts create/list/pause/fork/snapshot and the network/egress/lifecycle option types; commands/, commands/pty.ts, filesystem/, deprecated git/, network.ts, iam.ts, signature.ts), `template/` (template builder DSL, Dockerfile parsing, build API), `volume/`, secret.ts, connectionConfig.ts, client.ts. Python SDK packages/python-sdk/e2b mirrors this with separate sync/async trees (sandbox_sync/, sandbox_async/, template_sync/, template_async/, volume/, secret/), a shared sandbox/ package, generated clients (api/client/, volume/client/, envd/*_pb.py, sandbox/mcp.py), and an HTTP/2 connection balancer (api/__init__.py:116-186). CLI packages/cli/src is a commander program (commands/{auth,sandbox,template}) built on the JS SDK. The code-interpreter-* and desktop-* packages subclass the base Sandbox and default to hosted templates `code-interpreter-v1` and `desktop`. spec/ holds OpenAPI/proto files synced by Copybara from e2b-dev/runtime (spec/runtime-ref) and the private e2b-dev/belt (spec/belt-ref) (copy.bara.sky:14-79); `make codegen` regenerates the clients in Docker (Makefile:15-30). templates/ has two Dockerfiles used by tests (base, httpbin). The control plane, orchestrator, sandbox proxy and the in-sandbox envd daemon are NOT in this repo; only their API specs are.",
+      "packaging_and_release": "Artifacts: npm packages `e2b` (packages/js-sdk), `@e2b/cli`, `@e2b/code-interpreter`, `@e2b/desktop`, and PyPI packages `e2b`, `e2b-code-interpreter`, `e2b-desktop` (build backend uv_build: packages/python-sdk/pyproject.toml:56-58). There are no standalone binaries or SDK/CLI container images; the only image push is the `base` sandbox template to DockerHub (.github/workflows/templates.yml:20-48). Flow: Changesets (.changeset/config.json) -> manual `Release` workflow, main branch only (release.yml:3-4, 27-36) -> per-package test jobs -> publish_packages.yml (environment `deployment`, line 22), which runs `pnpm run version`, commits '[skip ci] Release new versions' (lines 85-101), publishes via changesets/action with createGithubReleases: true (lines 103-110) and pushes the commit and tags (112-125). JS publishes with `pnpm changeset publish` (package.json:6). Python publishes with `uv publish --trusted-publishing always --check-url https://pypi.org/simple/` (packages/python-sdk/package.json:9, same in code-interpreter-python and desktop-python), tagged by .github/scripts/publish_python_sdk.sh:5-11 when only python-sdk changes (.github/scripts/publish_command.cjs:8-12). Workflows request `id-token: write` (release.yml:8-10, publish_packages.yml:11-13). No npm token secret is referenced and npm@^11.6 is installed (publish_packages.yml:65-68), consistent with OIDC trusted publishing. No explicit `--provenance`, attestation, checksum, signature or SBOM step exists in the repo (greps found only a Copybara jar SHA256 in copybara.Dockerfile:20-23 and PyPI trusted publishing). PR builds upload .tgz/.whl artifacts with prerelease/local-version tags (pkg_artifacts.yml:76-166). Hygiene: third-party Actions are pinned by commit SHA; pnpm `minimumReleaseAge: 4320` (3 days) delays new dependency versions (pnpm-workspace.yaml:51-53); CI installs with --frozen-lockfile / `uv sync --locked`. The Homebrew formula named in the CLI README is not in this repo.",
+      "tests_and_ci": "Frameworks: Vitest 4 for TypeScript (js-sdk projects unit/template/connectionConfig: packages/js-sdk/vitest.config.mts:8-66; extra configs for Bun, Deno, Cloudflare workerd and a Chromium browser) with msw HTTP mocks; pytest with xdist/asyncio/timeout for Python (packages/python-sdk/pyproject.toml:31-41). Lint/type tools: oxlint, prettier, tsc, ruff, ty, knip. Test files, approx.: packages/js-sdk/tests 113 *.test.ts; packages/python-sdk/tests 174 test_*.py; packages/cli/tests 19; packages/code-interpreter-js/tests 34; packages/code-interpreter-python/tests 59; packages/desktop-js/tests 5; packages/desktop-python/tests 3; about 407 in total. The suites mix mocked and live tests: many create real sandboxes and need E2B_API_KEY (packages/js-sdk/tests/setup.ts:70-107; packages/python-sdk/tests/conftest.py:71-88). Egress rules are verified only by live tests that curl from inside a sandbox (packages/js-sdk/tests/sandbox/network.test.ts, internetAccess.test.ts), while request-shape tests use msw (tests/sandbox/egressProxy.test.ts:1-45). CI has 16 workflow files in .github/workflows. sdk_tests.yml (PR to main plus manual, path-filtered, against production and staging domains, with an aggregate status job) fans out to: js_sdk_tests.yml (node on ubuntu-22.04 and windows-latest; bun, deno, cloudflare, cloudflare-deploy and browser on ubuntu-22.04); python_sdk_tests.yml and cli_tests.yml (ubuntu-22.04 and windows-latest); code_interpreter_js/python_tests.yml; desktop_js/python_tests.yml. Other workflows: lint.yml (oxlint, prettier, ruff, fails on uncommitted changes), typecheck.yml, generated_files.yml (re-runs Docker codegen and diffs), pkg_artifacts.yml, release.yml, publish_packages.yml, templates.yml (manual template builds), codegen_image_cache.yml. No macOS runners.",
+      "dependencies": "Manifests and direct dependency counts (runtime / dev). package.json (root, private workspace): 1 / 9. packages/js-sdk/package.json: 11 + 1 optional (undici8) / 19. packages/cli/package.json: 15 (incl. workspace `e2b`) / 13. packages/code-interpreter-js/package.json: 1 (workspace `e2b`) / 7. packages/desktop-js/package.json: 1 (workspace `e2b`) / 7. packages/python-sdk/pyproject.toml: 12 / 8 dev + 5 codegen group. packages/code-interpreter-python/pyproject.toml: 3 / 8. packages/desktop-python/pyproject.toml: 3 / 6. Lockfiles: pnpm-lock.yaml, packages/python-sdk/uv.lock, packages/code-interpreter-python/uv.lock, packages/desktop-python/uv.lock. Engines: Node >=20.18.1 <21 || >=22 (CLI >=22.9.0), Python >=3.10 (.tool-versions pins node 22.18.0, pnpm 10.34.5, python 3.10, uv 0.10.0, bun 1.3.14, deno 2.8.1).",
+      "security_policy": "none: no SECURITY.md or other security policy/disclosure file anywhere in the repo (case-insensitive glob **/*security* found no files; grep for vulnerability/responsible disclosure/security@ found nothing). .github/ISSUE_TEMPLATE/config.yml:1-8 links only to docs and Discord."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:20: E2B is open-source infrastructure that runs AI-generated code in secure isolated sandboxes in the cloud.",
+        "verified": "partial",
+        "evidence": "Only the client side is here. The repo has SDKs, CLI and specs, while openapi.yml and the envd specs are synced from e2b-dev/runtime (spec/README.md:8-12; copy.bara.sky:14-61). There is no isolation, VM or OS-sandbox code or terminology anywhere (zero hits for seccomp, landlock, bubblewrap, seatbelt, WSL, gVisor, nsjail, firecracker, microVM). The backend lives in the separate runtime repo (README.md:104-106), so the isolation itself cannot be checked here."
+      },
+      {
+        "claim": "README.md:20: use the JavaScript SDK or Python SDK to start and control sandboxes.",
+        "verified": "yes",
+        "evidence": "JS Sandbox.create POSTs /v2/sandboxes (packages/js-sdk/src/sandbox/sandboxApi.ts:1747-1750), then commands/files/pty use Connect-RPC to the sandbox's envd (packages/js-sdk/src/sandbox/index.ts:167-226). Python: packages/python-sdk/e2b/sandbox_sync/main.py:167-257 and the async twin sandbox_async/main.py."
+      },
+      {
+        "claim": "README.md:36-42: an E2B account and API key (E2B_API_KEY) are required.",
+        "verified": "yes",
+        "evidence": "The JS ApiClient throws AuthenticationError without a key and sends it as X-API-KEY (packages/js-sdk/src/api/index.ts:99-105, 116-120). Python raises AuthenticationException (packages/python-sdk/e2b/api/__init__.py:334-342). OpenAPI declares ApiKeyAuth in header X-API-Key (spec/openapi.yml:11-14)."
+      },
+      {
+        "claim": "README.md:44-62: sandbox.commands.run('echo ...') runs the command in the sandbox and returns stdout.",
+        "verified": "yes",
+        "evidence": "`Commands` is a Connect-RPC client of the in-sandbox process.Process service (packages/js-sdk/src/sandbox/commands/index.ts:138-150; spec/envd/process/process.proto:5-21); results expose stdout and exitCode (packages/js-sdk/src/sandbox/commands/commandHandle.ts:25-33). The command executes remotely, not on the caller's host. The Python context manager kills the sandbox on exit (packages/python-sdk/e2b/sandbox_sync/main.py:506-510)."
+      },
+      {
+        "claim": "Need-derived reading of README.md:20 ('secure isolated sandboxes'): network egress is deny-by-default. The README never states this.",
+        "verified": "no",
+        "evidence": "Documented default is allow-all: 'If allowOut is not specified, all outbound traffic is allowed' (packages/js-sdk/src/sandbox/sandboxApi.ts:215-219; packages/python-sdk/e2b/sandbox/sandbox_api.py:315-318). The default-create live test expects working internet (packages/js-sdk/tests/sandbox/internetAccess.test.ts:52-63), and the SDK stopped presetting allow_internet_access in 2.51.0 (packages/js-sdk/CHANGELOG.md:34). Restriction is opt-in per sandbox: allowInternetAccess: false or network.denyOut: [ALL_TRAFFIC] (sandboxApi.ts:382-386, 624-627; packages/js-sdk/src/sandbox/network.ts:1-4), with allowOut entries winning over denyOut (spec/openapi.yml:474; tests/sandbox/network.test.ts:100-128). Enforcement is server-side and is verified only by live tests."
+      },
+      {
+        "claim": "Need-derived reading of README.md:20: OS-level filesystem read/write rules can be applied to agent commands. The README never states this.",
+        "verified": "no",
+        "evidence": "No such option exists. SandboxOpts has no path or permission rules (packages/js-sdk/src/sandbox/sandboxApi.ts:588-683). Volume mounts carry only name and path (spec/openapi.yml:742-753). Filesystem calls take only a `user` (spec/envd/envd.yaml:357-364). The only boundary offered is the remote sandbox plus user accounts (default `user`, packages/js-sdk/src/connectionConfig.ts:657; commands may run as root, packages/cli/src/commands/sandbox/exec.ts:34)."
+      },
+      {
+        "claim": "README.md:104-112: self-hosting the E2B runtime via the embed guide and Terraform on AWS/GCP/Azure/Linux.",
+        "verified": "not_checkable",
+        "evidence": "Deployment code is in e2b-dev/runtime, which is not in this repo (spec/README.md:8-12). SDK code documents feature gaps on open-source deployments: egressProxy is 'rejected as unsupported' on a deployment built from the open-source runtime (packages/js-sdk/src/sandbox/sandboxApi.ts:287-289). `onResume` needs a runtime built at or after 2026-08-20 (packages/python-sdk/e2b/sandbox_sync/main.py:280-283). The volume-content API spec comes from the private belt repo (spec/README.md:11-12)."
+      },
+      {
+        "claim": "packages/cli/README.md:15-25: install the CLI with `brew install e2b` (macOS) or `npm install -g @e2b/cli`.",
+        "verified": "partial",
+        "evidence": "npm: package @e2b/cli with bin `e2b` (packages/cli/package.json:2, 71-73). Homebrew: no formula is in this repo; the only trace is a comment that distro packagers set NO_UPDATE_NOTIFIER (packages/cli/src/index.ts:11-12), so it is not checkable here."
+      },
+      {
+        "claim": "packages/cli/README.md:33-37: the CLI authenticates in CI/CD via the E2B_API_KEY environment variable.",
+        "verified": "yes",
+        "evidence": "ensureAPIKey reads E2B_API_KEY first, falls back to projectApiKey in ~/.e2b/config.json, else prints an error box and exits 1 (packages/cli/src/api.ts:15, 37-50). Login prints a manual URL and the E2B_API_KEY hint when no browser opens (packages/cli/src/commands/auth/login.ts:156-167)."
+      },
+      {
+        "claim": "packages/desktop-js/README.md:5: each sandbox is isolated from the others.",
+        "verified": "not_checkable",
+        "evidence": "Inter-sandbox isolation is a backend property not implemented in this repo. SDK-side facts: each sandbox has its own ID and envd access token sent per request (packages/js-sdk/src/sandbox/index.ts:160-163, 187-189). Create v2 always secures system communication (spec/openapi.yml:967-970; packages/js-sdk/CHANGELOG.md:36). Public sandbox URLs default to open (allowPublicTraffic default true, spec/openapi.yml:468-471) and require a traffic token only when set to false (packages/js-sdk/tests/sandbox/network.test.ts:130-168)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Python SDK envd HTTP/2 connection-pool sharding: streams opened before a 750 ms deadline against a local peer advertising 100 concurrent streams per connection (three-run median; sync and async gave the same capacity). It measures client connection handling, not isolation or security. The measured fixed-pool mechanism (E2B_ENVD_POOL_SHARDS, four pools by default) was replaced in 2.52.0 by an on-demand balancer (packages/python-sdk/CHANGELOG.md:26, 90-102), and the SVG is not referenced from any README.",
+        "metric": "streams opened out of 400 requested concurrent long-lived streams",
+        "value": "1 pool: 100/400; 4 pools (default at the time): 398/400; 8 pools: 400/400 (chart labels 96 ms near the 8-pool, 400-stream point)",
+        "source": ".github/assets/envd-pool-sharding-benchmark.svg:3,50,87-89,124,127",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: this repo holds clients and specs only. Sandbox isolation and network enforcement live in the separate e2b-dev/runtime project and E2B Cloud (spec/README.md:8-12; README.md:104-106). Nothing here enforces filesystem or network rules on the caller's own OS, and the repo has no WSL2/macOS-local boundary (zero hits for seccomp, landlock, bubblewrap, seatbelt, sandbox-exec, WSL anywhere).",
+      "Hard dependency on an account and network: every sandbox operation needs an E2B API key and reachability of https://api.<domain> and the sandbox host (packages/js-sdk/src/api/index.ts:99-105; packages/js-sdk/src/connectionConfig.ts:500-505, 569-613). Sandbox lifetime is capped at 1 h (Hobby) / 24 h (Pro) (packages/js-sdk/src/sandbox/sandboxApi.ts:613-617). The only local mode, E2B_DEBUG, needs an API/envd built from the runtime repo (connectionConfig.ts:75-80).",
+      "Network restrictions are opt-in and server-owned. Egress is allow-all unless set (packages/js-sdk/src/sandbox/sandboxApi.ts:215-219; tests/sandbox/internetAccess.test.ts:52-63). Since 2.51.0 the SDK presets no defaults, so defaults can change server-side without an SDK release (packages/js-sdk/CHANGELOG.md:34-36). denyOut accepts only CIDR/IP, not domains, and allowOut always wins over denyOut (spec/openapi.yml:474-479). updateNetwork replaces the whole egress config and clears omitted fields, including the egress proxy (sandboxApi.ts:354-380; sandbox/index.ts:600-618). UDP traffic (DNS, QUIC) is not tunneled through the egress proxy (sandboxApi.ts:153-157). `e2b sandbox create` has no network flags (packages/cli/src/commands/sandbox/create.ts:32-51).",
+      "No filesystem read/write rule feature: sandbox options expose env vars, metadata, timeout, network, iam, lifecycle and volume mounts (name and path only, no read-only flag) (packages/js-sdk/src/sandbox/sandboxApi.ts:588-683; spec/openapi.yml:742-753). Commands and files take a `user` and can run as root (packages/js-sdk/src/sandbox/commands/index.ts:66; packages/cli/src/commands/sandbox/exec.ts:34).",
+      "Self-host / open-source parity gaps documented in SDK code: egressProxy is unsupported on deployments built from the open-source runtime (packages/js-sdk/src/sandbox/sandboxApi.ts:287-289); `onResume` needs a runtime built after 2026-08-20 (packages/python-sdk/e2b/sandbox_sync/main.py:280-283); the volume-content API spec is synced from a private repository (spec/README.md:11-12; copy.bara.sky:63-79).",
+      "Licensing inconsistency: the root LICENSE is Apache-2.0 (LICENSE:1-4, 189-201), but all seven packages declare and ship MIT (packages/js-sdk/package.json:6; packages/js-sdk/LICENSE:1-3; packages/python-sdk/pyproject.toml:6; likewise cli, code-interpreter-*, desktop-*).",
+      "Security/supply chain: no security policy or disclosure file; no signature, checksum, SBOM or explicit provenance flag in the release workflows (.github/workflows/publish_packages.yml). The CLI stores the API key and OAuth tokens as plaintext JSON in ~/.e2b/config.json with a 'TODO: Keep in Keychain' (packages/cli/src/user.ts:37, 148-154). The SDK sends client-metadata headers on every request with no opt-out (packages/js-sdk/src/api/metadata.ts:8-16). The CLI update check is on by default (packages/cli/src/index.ts:11-22).",
+      "CI/maintenance: behavior is tested mainly through live runs against E2B production and staging with repo secrets (.github/workflows/sdk_tests.yml:87-221), so it is not reproducible offline. CI covers only ubuntu-22.04 and windows-latest (no macOS or WSL2). The default code owner is a single GitHub user (CODEOWNERS:3). Minor releases carry visible removals and endpoint moves (2.50.0 removed the V1 template APIs; 2.51.0 moved create/connect to v2 endpoints) (packages/js-sdk/CHANGELOG.md:30-50)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "e2b-dev/e2b",
+      "checks": [
+        {
+          "field": "readme.install[0] (npm, JS/TS SDK)",
+          "statement": "Install the JS/TS SDK with `npm i e2b`.",
+          "citation": "README.md:28",
+          "holds": true,
+          "note": "README.md:26-29 shows `npm i e2b` under 'JavaScript / TypeScript'. The package in packages/js-sdk/package.json:2-3 is named `e2b`, version 2.52.0, with publishConfig access public (lines 18-20). The checkout matches the named revision: tag e2b@2.52.0 peels to 970b34dc24d6…, which is HEAD (.git/packed-refs:2-3)."
+        },
+        {
+          "field": "license",
+          "statement": "License is SPDX Apache-2.0, file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is Apache License 2.0, with the boilerplate notice 'Copyright 2023 FoundryLabs, Inc.' at 189-201. This is only the repo-level license. All seven published packages declare MIT (packages/js-sdk/package.json:6, packages/python-sdk/pyproject.toml:6, and the cli, code-interpreter-js/python and desktop-js/python manifests) and each ships an MIT LICENSE (e.g. packages/js-sdk/LICENSE:1-3). So `npm i e2b` and `pip install e2b` deliver MIT code. The dossier states this in risks, so the field is accurate as written."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes: Homebrew install documented for macOS and the CLI has a darwin branch; not exercised in CI (only ubuntu-22.04 and windows-latest runners) and arm64 is not mentioned.",
+          "citation": "packages/cli/README.md:15-19; packages/cli/src/utils/openBrowser.ts:11-13",
+          "holds": true,
+          "note": "Both citations hold: 'Using Homebrew (on macOS)' plus `brew install e2b` at README.md:15-19, and `process.platform === 'darwin'` -> `open` at openBrowser.ts:11-13. No workflow uses a macOS runner; test suites run on ubuntu-22.04/windows-latest and other jobs on ubuntu-latest. The Python SDK's native dependency pyqwest 0.10.0 ships macosx_11_0_arm64 wheels (packages/python-sdk/uv.lock:819), which supports the 'yes'. One sub-clause is too broad: 'arm64 is not mentioned' is literally false. arm64 appears in codegen.Dockerfile:31, copybara.Dockerfile:12, templates/base/e2b.Dockerfile:19, templates/httpbin/e2b.Dockerfile:22 and .github/workflows/templates.yml:46 (`--platform linux/amd64,linux/arm64`). All of these are Linux container builds, not macOS client support, so the decision-relevant 'yes' stands."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "None found as an integration: no Claude Code or Codex plugin, skill, hook, .mcp.json, .claude/ directory or AGENTS.md (globs found none); only mentions are CLAUDE.md contributor instructions and `codex exec` as an example pass-through command.",
+          "citation": "CLAUDE.md:1-10; packages/cli/src/commands/sandbox/exec.ts:23-28; packages/cli/tests/commands/sandbox/exec_passthrough.test.ts:107-113",
+          "holds": false,
+          "note": "The three citations hold. CLAUDE.md:1-10 is contributor instructions (pnpm/uv, changesets, Linear MCP at line 8). exec.ts:23-28 has help text `e2b sandbox exec -u root <sandboxID> codex exec \"prompt\" --help`. exec_passthrough.test.ts:104-114 asserts the pass-through command `codex exec prompt --help`. But 'no … skill … (globs found none)' is false. The repo tracks skills/stripe-projects/SKILL.md, an Agent Skills-format skill: frontmatter `name: stripe-projects` and a `description:` at lines 1-4. It is the format Claude Code and Codex load, and it tells a coding agent how to use the E2B CLI (`npm install -g @e2b/cli`, `e2b sandbox create --detach`, `e2b sandbox exec … -- bash -lc`; lines 60-102) and the JS/Python SDKs (lines 104-163) after provisioning through Stripe Projects. No .mcp.json, .claude/, .codex/, AGENTS.md or plugin manifest exists, and nothing else references skills/."
+        },
+        {
+          "field": "claim_checks[4] (need-derived: egress deny-by-default, verified: no)",
+          "statement": "Network egress is not deny-by-default: the documented default is allow-all; restriction is opt-in per sandbox via allowInternetAccess: false or denyOut: [ALL_TRAFFIC]; allowOut entries win over denyOut.",
+          "citation": "packages/js-sdk/src/sandbox/sandboxApi.ts:215-219; packages/python-sdk/e2b/sandbox/sandbox_api.py:315-318; packages/js-sdk/tests/sandbox/internetAccess.test.ts:52-63; packages/js-sdk/CHANGELOG.md:34; sandboxApi.ts:382-386, 624-627; packages/js-sdk/src/sandbox/network.ts:1-4; spec/openapi.yml:474; packages/js-sdk/tests/sandbox/network.test.ts:100-128",
+          "holds": true,
+          "note": "Every cited line matches. sandboxApi.ts:218 and sandbox_api.py:318 both say that if allowOut/allow_out is not specified, all outbound traffic is allowed. internetAccess.test.ts:52-63 creates a sandbox with no options and expects curl to an external host to return 204. CHANGELOG.md:34 (2.51.0) says create no longer presets allow_internet_access. sandboxApi.ts:382-386 and 624-627 make allowInternetAccess:false equivalent to denyOut 0.0.0.0/0, and network.ts:4 defines ALL_TRAFFIC = '0.0.0.0/0'. openapi.yml:474 says allowed entries always take precedence over denied ones, and network.test.ts:100-128 tests that live. The spec sets no false default for allow_internet_access (openapi.yml:544, 828-831, 947, 1000)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Required: readme.integrations.claude_code_or_codex. Replace 'no Claude Code or Codex plugin, skill, hook, .mcp.json, .claude/ directory or AGENTS.md (globs found none)' with: 'no Claude Code or Codex plugin, hook, .mcp.json, .claude/ directory or AGENTS.md. One agent skill exists: skills/stripe-projects/SKILL.md (Agent Skills format, `name: stripe-projects`, lines 1-4), which tells a coding agent how to use the E2B CLI and JS/Python SDKs with an E2B API key provisioned through Stripe Projects (lines 60-163). It is not specific to Claude Code or Codex, and nothing else in the repo references it.' Add this file to the 'Only mentions' list.",
+        "Wording fix (does not affect the verdict): readme.platforms.macos_arm64. Change 'arm64 is not mentioned' to 'arm64 is not mentioned for macOS clients; it appears only in Linux Docker/template builds (codegen.Dockerfile:31, copybara.Dockerfile:12, .github/workflows/templates.yml:46)'. Optionally add that pyqwest 0.10.0 ships macosx_11_0_arm64 wheels (packages/python-sdk/uv.lock:819)."
+      ]
+    }
+  ]
+}

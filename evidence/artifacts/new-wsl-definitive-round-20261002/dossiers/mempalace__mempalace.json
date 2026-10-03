@@ -1,0 +1,350 @@
+{
+  "contender": "mempalace/mempalace",
+  "revision": {
+    "contender": "mempalace/mempalace",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "MemPalace/mempalace",
+        "tag": "v3.10.0",
+        "commit": "22fd87f09c19d5ffb2d6966486483353937931c0",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.10.0",
+    "commit": "22fd87f09c19d5ffb2d6966486483353937931c0",
+    "read_at": "2026-10-02T03:02:24+00:00"
+  },
+  "dossier": {
+    "contender": "mempalace/mempalace",
+    "revision": {
+      "tag": "v3.10.0",
+      "commit": "22fd87f09c19d5ffb2d6966486483353937931c0",
+      "read_at": "2026-10-02T03:02:24+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Local-first AI memory system. It mines project files and chat transcripts (Claude Code and Codex JSONL among others) into a 'palace' of wings > rooms > drawers stored verbatim in a vector store (ChromaDB by default; sqlite_exact, rust_exact, qdrant, milvus, pgvector are opt-in), searched with vector + BM25 hybrid ranking, plus a temporal SQLite knowledge graph, per-agent diaries and an append-only agent-coordination 'logstream' (README.md:26-37,286-306; mempalace/README.md:5-41). It is exposed as a CLI (`mempalace`), an MCP server (`mempalace-mcp`: 45 tools over stdio, optional HTTP hub; `mempalace-light-mcp`: 3 tools) and plugins/hooks for Claude Code, Codex CLI, Cursor, Antigravity, DeepSeek Harness and others (pyproject.toml:57-60; .claude-plugin/; .codex-plugin/). Ownership model on one host with several agents: one host-global palace by default (<config_dir>/palace; config_dir is ~/.mempalace for existing installs, otherwise ~/.config/mempalace: mempalace/config.py:255-275,918-935), scoped only by wing/room naming; each palace has one writer at a time (per-palace non-blocking flock; a long-lived MCP stdio server holds the lease after its first mutating call and peer servers become read-only for writes, unless a `mempalace serve` hub owns the palace and stdio servers/CLI/hooks proxy to it: mempalace/mcp_server/_guards.py:177-189,485-599; website/guide/shared-brain.md:19-20,43-63).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'Local-first AI memory. Verbatim storage, pluggable backend, 96.6% R@5 raw on LongMemEval — zero API calls.'",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Stores conversation history as verbatim text and retrieves it with semantic search; 'does not summarize, extract, or paraphrase'; people/projects become wings, topics rooms, original content lives in drawers so searches can be scoped.",
+          "citation": "README.md:26-32"
+        },
+        {
+          "claim": "Retrieval layer is pluggable; default is ChromaDB; interface defined in mempalace/backends/base.py and alternative backends can be dropped in without touching the rest of the system.",
+          "citation": "README.md:34-37"
+        },
+        {
+          "claim": "'Nothing leaves your machine unless you opt in.'",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "Agent-guided setup: `npx skills add MemPalace/mempalace` installs three skills (mempalace, mempalace-recall, mempalace-task); installing a skill does not by itself install the CLI or MCP server, the setup skill guides those system changes and verifies the live connection.",
+          "citation": "README.md:46-63"
+        },
+        {
+          "claim": "Weekly stable-release checks are disabled by default, contact only PyPI when enabled, and never install updates automatically.",
+          "citation": "README.md:65-71"
+        },
+        {
+          "claim": "Direct CLI setup should use an isolated environment: `uv tool install mempalace` (recommended), `pipx install mempalace`, or pip inside an activated venv; then `mempalace init ~/projects/myapp`.",
+          "citation": "README.md:73-97"
+        },
+        {
+          "claim": "Docker image ghcr.io/mempalace/mempalace is multi-arch (amd64 + arm64); everything persists under /data; the first command needing embeddings downloads the model (~80 MB minilm, ~300 MB embeddinggemma) and needs network; the GPU image is not published (x86_64 only, build it yourself).",
+          "citation": "README.md:108-136,170-183"
+        },
+        {
+          "claim": "ChromaDB is the default backend and needs no configuration; every non-default backend is opt-in (sqlite_exact, rust_exact, milvus, qdrant, pgvector); select with --backend, MEMPALACE_BACKEND or config.json.",
+          "citation": "README.md:189-206"
+        },
+        {
+          "claim": "Quickstart: `mempalace mine ~/.claude/projects/ --mode convos` (scope with --wing per project), `mempalace search \"...\"`, `mempalace wake-up`.",
+          "citation": "README.md:212-224"
+        },
+        {
+          "claim": "45 MCP tools cover palace reads/writes, knowledge-graph operations, cross-wing navigation, drawer management, agent diaries, and agent coordination (logstream events + artifact handoffs).",
+          "citation": "README.md:293-299"
+        },
+        {
+          "claim": "Auto-save hooks for Claude Code, Codex CLI and Cursor IDE save periodically and before context compression; `mempalace sweep <transcript-dir>` stores one verbatim drawer per user/assistant message, idempotent and resume-safe.",
+          "citation": "README.md:308-326"
+        },
+        {
+          "claim": "'Claude Code sessions expire in 30 days without auto-save hooks wired' (links to a GitHub discussion and a retention checklist).",
+          "citation": "README.md:19-22"
+        },
+        {
+          "claim": "Requirements: Python 3.9+, a vector-store backend (ChromaDB default), ~300 MB for the embedding model; optional OpenAI-compatible remote embedding endpoint; no API key required for the core benchmark path.",
+          "citation": "README.md:330-337"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv tool (recommended by README)",
+          "command": "uv tool install mempalace",
+          "citation": "README.md:80-86"
+        },
+        {
+          "method": "pipx",
+          "command": "pipx install mempalace",
+          "citation": "README.md:88-89"
+        },
+        {
+          "method": "pip inside an activated virtualenv",
+          "command": "python -m venv .venv && source .venv/bin/activate\npip install mempalace",
+          "citation": "README.md:94-97"
+        },
+        {
+          "method": "Agent-guided setup (installs skills only; the agent then installs the CLI/MCP)",
+          "command": "npx skills add MemPalace/mempalace",
+          "citation": "README.md:55-63"
+        },
+        {
+          "method": "Docker (GHCR image; MCP over stdio, palace under /data)",
+          "command": "docker pull ghcr.io/mempalace/mempalace:latest\ndocker run -i --rm -v mempalace-data:/data ghcr.io/mempalace/mempalace",
+          "citation": "README.md:114-123"
+        },
+        {
+          "method": "Claude Code and Codex CLI plugin marketplaces (plugin READMEs; both expect `mempalace-mcp` on PATH, i.e. the Python package from the methods above)",
+          "command": "claude plugin marketplace add MemPalace/mempalace\nclaude plugin install --scope user mempalace\n\ncodex plugin marketplace add MemPalace/mempalace\ncodex plugin add mempalace@mempalace",
+          "citation": ".claude-plugin/README.md:13-16,24-30; .codex-plugin/README.md:5-23"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI test-linux on ubuntu-latest with Python 3.9/3.11/3.13 (.github/workflows/ci.yml:10-22); amd64 Docker image smoke-tested and published (.github/workflows/docker-publish.yml:25-56,104-107); native wheel x86_64-unknown-linux-gnu (.github/workflows/release-native.yml:24-26).",
+        "wsl2": "unknown - no WSL2-specific install docs, CI job or test; the only WSL mention is incidental (CHANGELOG.md:125: a 4.99M-vector palace pushed WSL into swap).",
+        "macos_arm64": "yes - CI test-macos on macos-latest, Python 3.13 (.github/workflows/ci.yml:46-55; the runner architecture is not pinned in the workflow); native wheel aarch64-apple-darwin (.github/workflows/release-native.yml:33-34); README says the Docker image 'runs natively on Apple Silicon' (README.md:110-112); Apple Silicon embeddinggemma/CoreML fix (CHANGELOG.md:154).",
+        "gpu": "yes (optional, off by default) - extras `mempalace[gpu]` (onnxruntime-gpu/CUDA), `[dml]`, `[coreml]` (pyproject.toml:117-124); CPU is the default (website/guide/remote-server.md:115-118); Dockerfile.gpu is x86_64-only and not published (README.md:173-183); CI only build-checks it, no GPU runner (.github/workflows/docker-publish.yml:118-138)."
+      },
+      "integrations": {
+        "cli": "Yes - `mempalace` console script (pyproject.toml:58; `python -m mempalace`: mempalace/__main__.py:3-5) with subcommands init, mine, sweep, sync, search, compress, wake-up, split, hook, instructions, rules, repair, repair-status, daemon, mcp, serve, migrate, migrate-wings, hallways, status, update, logstream, task, artifact, palace (mempalace/cli/parser.py:67-910; reference website/reference/cli.md). There is no CLI subcommand to delete a drawer (only `sync --apply` prunes drawers whose source files are gone: parser.py:265-294), none for export, backup or restore.",
+        "mcp": "Yes - `mempalace-mcp` (pyproject.toml:59; mempalace/mcp_proxy.py:309-329): stdio by default, auto-proxies to a live local hub, exposes 45 tools (mempalace/mcp_server/schemas.py:9-980); `--transport http` and the turnkey `mempalace serve` give an HTTP hub with bearer token, TLS 1.2+, Host/Origin checks and `--read-only` (mempalace/mcp_server/_guards.py:21-70; mempalace/mcp_server/http.py:123-210; mempalace/cli/parser.py:550-579; website/guide/remote-server.md:120-160). `mempalace-light-mcp` is a 3-tool server (pyproject.toml:60; CHANGELOG.md:56). MCP protocol versions 2025-11-25 down to 2024-11-05 (mempalace/mcp_server/schemas.py:1016-1021); hand-rolled JSON-RPC, no `mcp` SDK dependency (pyproject.toml:29-50).",
+        "sdk_or_api": "Python library only, no separate SDK package: documented imports mempalace.searcher.search_memories, mempalace.layers.MemoryStack, mempalace.knowledge_graph.KnowledgeGraph, mempalace.palace_graph, mempalace.dialect.Dialect (website/reference/python-api.md:5-120); a Hermes MemoryProvider adapter (mempalace/integrations/hermes/__init__.py:1-5). The only HTTP API is the MCP JSON-RPC endpoint /mcp plus /healthz, /statusz, /logstream/stream and /sync/peers on a hub (website/guide/shared-brain.md:495-518,556-558; website/guide/remote-server.md:205-211); no REST CRUD API and no non-Python SDK found.",
+        "claude_code_or_codex": "Claude Code: marketplace plugin .claude-plugin/ - plugin.json declares MCP server `mempalace-mcp` (.claude-plugin/plugin.json:10-14), hooks Stop/SessionEnd/PreCompact with 30/10/90 s timeouts calling `mempalace hook run --harness claude-code` (.claude-plugin/hooks/hooks.json:3-37; .claude-plugin/hooks/mempal-stop-hook.sh:24), 5 slash commands and 3 skills (.claude-plugin/README.md:32-54). Codex CLI: .codex-plugin/plugin.json + .agents/plugins/marketplace.json + root .mcp.json + root skills/ (manifest has mcpServers './.mcp.json' and NO hooks key, pinned by tests/test_codex_plugin_manifest.py:31-35; docs/RELEASING.md:36-42); .codex-plugin/hooks.json defines SessionStart/Stop/PreCompact calling `mempalace hook run --harness codex` (.codex-plugin/hooks.json:2-36; .codex-plugin/hooks/mempal-hook.sh:6) but is not referenced by the manifest; manual Codex hook wiring is documented in hooks/README.md:88-105 and website/guide/hooks.md:45-62. Manual MCP registration: `claude mcp add mempalace -- mempalace-mcp` / `codex mcp add mempalace -- mempalace-mcp` (mempalace/cli/cmd_serve.py:47-52; mempalace/instructions/init.md:64-68). Transcript readers: Claude Code JSONL (mempalace/normalize.py:301-360) and Codex rollout JSONL, event_msg user/agent messages only (mempalace/normalize.py:363-408; backfill `mempalace mine ~/.codex/sessions/ --mode convos`: hooks/README.md:242-245). Neither harness gets automatic session-start recall injection (hook_session_start returns {}: mempalace/hooks_cli.py:1504-1526; hooks/cursor/README.md:123). `mempalace task launch --runner codex|claude` can spawn `codex exec`/`claude --print` from a stored task (mempalace/cli/cmd_coord.py:497-508)."
+      },
+      "telemetry_and_network": "Docs state no telemetry/phone-home (CLAUDE.md:27,34; website/guide/remote-server.md:15-19; README.md:39). Code: no analytics/telemetry client in mempalace/ (grep for telemetry/posthog/analytics/sentry hits only comments: mempalace/__init__.py:59-63, mempalace/mcp_server/__init__.py:37-45). The repo never sets ChromaDB's anonymized_telemetry (no Settings(...)/ANONYMIZED_TELEMETRY anywhere; clients are plain chromadb.PersistentClient(path=...): mempalace/backends/chroma.py:3088,3198); mempalace/__init__.py:59-63 only lowers a chromadb posthog logger's level and asserts chromadb 1.x's posthog client is a no-op stub, which cannot be confirmed from this repo (uv.lock pins chromadb 1.5.7 at uv.lock:531-533 and lists no posthog package). Network calls found in code: (a) PyPI release check to https://pypi.org/pypi/mempalace/json - opt-in, default off, `mempalace update check` forces one (mempalace/update_awareness.py:85-96,143-147; website/reference/cli.md:7-19); (b) Wikipedia REST lookup only with allow_network=True, default False (mempalace/entity_registry.py:177-193,556-590); (c) LLM-assisted `mempalace init` is on by default but targets local Ollama (http://localhost:11434) with fallback to heuristics; external providers need explicit selection and a consent prompt when the key comes from the environment (mempalace/cli/cmd_init.py:31-108; mempalace/llm_client.py:1-22); (d) optional OpenAI-compatible embedding endpoint (mempalace/embedding.py:24-33; README.md:335) and optional networked backends qdrant/milvus/pgvector that receive verbatim text when pointed at remote services (website/guide/configuration.md:44-49); (e) hub/peer HTTP between MemPalace processes on loopback or user-configured peers with bearer tokens (mempalace/mcp_proxy.py:101-116; mempalace/transport.py:96-100; website/guide/shared-brain.md:82-97,527-558). Required downloads on first use: default minilm model from ChromaDB's S3 (~80 MB) and, if selected, onnx-community/embeddinggemma-300m-ONNX from Hugging Face (~300 MB) (README.md:133-136; Dockerfile:75-80; mempalace/embedding.py:267,427-438). No account or API key is required for the core path (README.md:337). Separate from the package, the docs site build can embed Google Analytics when MEMPALACE_DOCS_GA_ID is set (website/.vitepress/config.mts:14,33-34; .github/workflows/deploy-docs.yml:47)."
+    },
+    "code": {
+      "languages": [
+        "Python (primary; 126 modules under mempalace/)",
+        "Rust (crates/: mempalace-core, mempalace-py PyO3 bindings, mempalace-cli)",
+        "Shell/bash (hook wrappers and installers under .claude-plugin/hooks, .codex-plugin/hooks, hooks/)",
+        "JavaScript (Node ESM DeepSeek-Harness plugin, .dsh-plugin/; docs site website/ is VitePress/Vue)",
+        "Markdown (skills, slash commands, docs)"
+      ],
+      "entry_points": [
+        {
+          "path": "mempalace/cli/parser.py:22",
+          "what": "`mempalace` console script (pyproject.toml:58 -> mempalace.cli:main; also `python -m mempalace`); subcommand handlers in mempalace/cli/cmd_*.py"
+        },
+        {
+          "path": "mempalace/mcp_proxy.py:309",
+          "what": "`mempalace-mcp` console script (pyproject.toml:59): thin stdio front end that proxies to a live hub, otherwise imports the full server"
+        },
+        {
+          "path": "mempalace/mcp_server/runtime.py:432",
+          "what": "Full MCP server main() (stdio loop :156, HTTP loop :348); also `python -m mempalace.mcp_server`"
+        },
+        {
+          "path": "mempalace/mcp_light_server.py",
+          "what": "`mempalace-light-mcp` (pyproject.toml:60): 3-tool PQL server (palace_query / palace_exec / palace_coordinate)"
+        },
+        {
+          "path": "mempalace/hooks_cli.py:1683",
+          "what": "`mempalace hook run --hook {session-start|stop|session-end|precompact} --harness {claude-code|codex|dsh}` (parser.py:363-380); target of the Claude/Codex hook wrappers"
+        },
+        {
+          "path": "mempalace/cli/cmd_serve.py:107",
+          "what": "`mempalace serve`: turnkey HTTP MCP hub (token auto-generated for non-loopback binds, TLS, read-only mode)"
+        },
+        {
+          "path": "crates/mempalace-cli/src/main.rs",
+          "what": "`mempalace-native` Rust binary (vector search/stats/bench over a sqlite_exact DB; crates/mempalace-cli/Cargo.toml:8-10); crates/mempalace-py/src/lib.rs is the PyO3 module `mempalace_core_rs`"
+        },
+        {
+          "path": ".claude-plugin/hooks/hooks.json",
+          "what": "Claude Code plugin hook registrations -> bash wrappers .claude-plugin/hooks/mempal-{stop,session-end,precompact}-hook.sh; Codex wrapper .codex-plugin/hooks/mempal-hook.sh; legacy manual scripts hooks/mempal_*_hook.sh"
+        }
+      ],
+      "architecture": "Python package mempalace/: cli/ (argparse parser + cmd_* handlers), mcp_server/ (hand-written JSON-RPC server, stdio + HTTP; tools_read/tools_write/tools_kg/tools_diary/tools_coord, schemas.py, protocol.py, _guards.py gates), mcp_proxy.py (stdio->hub proxy), hooks_cli.py (session hooks), miner.py (project files) and convo_miner.py + normalize.py (transcripts: Claude Code, Codex, Gemini, ChatGPT, Slack...), sweeper.py (per-message miner, Claude Code JSONL only), searcher/ (vector + BM25 hybrid ranking, closet boost), palace/ (collection access, closets, per-palace flock mine_lock/palace_lock), backends/ (base.py contract + chroma, sqlite_exact, rust_exact, qdrant, milvus, pgvector), knowledge_graph.py (SQLite temporal triples; default DB ~/.mempalace/knowledge_graph.sqlite3 unless --palace is given: knowledge_graph.py:49, mcp_server/_guards.py:937-940), logstream.py/logsync.py/replica.py (append-only agent events and artifacts in logstream.sqlite3, multi-master peer sync), wal.py (JSONL write audit log), repair.py/migrate.py/backups.py (index rebuild and backups), daemon.py/service.py (opt-in write queue), embedding.py (minilm default, embeddinggemma, openai-compat; ONNX providers), config.py (env > config.json > defaults), dialect.py (lossy AAAK summaries), update_awareness.py. The big packages mcp_server, cli, palace and searcher are 'fragment' packages whose files are exec()'d into one shared namespace (mempalace/mcp_server/__init__.py:145-169; mempalace/cli/__init__.py:83-106; mempalace/palace/__init__.py:95-113). Data at rest: <config_dir>/palace/ (chroma.sqlite3 + HNSW segments, drawers and closets collections), logstream.sqlite3 in the palace dir, <config_dir>/wal/write_log.jsonl (mempalace/wal.py:24), ~/.mempalace/hook_state/ (hook.log, per-session markers: hooks_cli.py:39-40), ~/.mempalace/locks/ (palace/palace_lock.py:240-245), ~/.mempalace/server/ (hub token/serverinfo). Rust crates are an optional exact-vector accelerator sharing sqlite_exact.sqlite3 (crates/README.md:1-15).",
+      "packaging_and_release": "Python: hatchling sdist + wheel of package `mempalace` only (pyproject.toml:159-164; hooks/*.sh and plugin directories are not in the wheel). Release flow (docs/RELEASING.md:64-113): publishing a GitHub Release triggers .github/workflows/publish.yml, which validates the tag shape, requires the tagged commit to be an ancestor of main, requires tag == mempalace/version.py, builds with `python -m build` and uploads with pypa/gh-action-pypi-publish via PyPI Trusted Publishing (OIDC, no stored token) behind a manual-approval `pypi` environment (publish.yml:3-25,46-51,84-124). No checksum, signature or attestation step is configured in that workflow (whether PEP 740 attestations are produced would be the pinned action's default; not verified here). Docker: .github/workflows/docker-publish.yml smoke-tests the amd64 image (CLI mine+search, MCP stdio handshake, compose config), then pushes multi-arch amd64+arm64 images to ghcr.io/mempalace/mempalace on main and v* tags with `provenance: mode=max` and `sbom: true` (docker-publish.yml:19-24,58-116); the GPU image is build-checked only. Native: .github/workflows/release-native.yml builds PyO3 wheels (linux x86_64/aarch64, windows x86_64, macOS x86_64/aarch64) and `mempalace-native` executables (linux/windows/macOS) and attaches them to the GitHub release with `gh release upload`; no checksums/signatures, and wheels are distributed outside PyPI (release-native.yml:18-106; crates/README.md:17-23). .github/workflows/version-guard.yml enforces that 7 version sources agree (version-guard.yml:23-85). Claude/Codex plugins are distributed straight from the git repo through marketplace manifests (.claude-plugin/marketplace.json; .agents/plugins/marketplace.json), not as artifacts. Active workflows pin third-party actions by commit SHA.",
+      "tests_and_ci": "pytest (+pytest-cov, hypothesis, pytest-rerunfailures; pyproject.toml:77-103,210-238). tests/ has ~190 Python test modules (171 top-level, 8 in tests/mcp/, 11 in tests/benchmarks/ which CI excludes) with ~4,950 `def test_` functions in total, plus helpers/conftest; Rust tests in crates (10 #[test]/cfg(test) hits: crates/mempalace-core/src/lib.rs, crates/mempalace-cli/tests/search.rs); 4 Node test files for the DSH plugin (.dsh-plugin/test/*.test.mjs, driven by tests/test_dsh_plugin.py). Project self-checks include manifest/hook tests (tests/test_codex_plugin_manifest.py, tests/test_claude_plugin_hook_config.py, tests/test_hooks_cli.py) and README-vs-code claim tests (tests/test_readme_claims.py). CI .github/workflows/ci.yml (push/PR to main and develop): test-linux (Python 3.9/3.11/3.13), test-windows (3.13, with reruns for known ChromaDB HNSW flakes), test-macos (3.13), lint (ruff check + ruff format --check, ruff==0.16.6), test-rust (cargo fmt/check/test on linux/windows/macOS, builds the native wheel and runs backend suites with MEMPALACE_REQUIRE_NATIVE=1); pytest runs with --ignore=tests/benchmarks and --cov-fail-under=80 (pyproject.toml:233 says 85). Other workflows: version-guard.yml, docker-publish.yml, release-native.yml, publish.yml, deploy-docs.yml (VitePress -> GitHub Pages); bump-plugin-version.yml.disabled is inactive. No CodeQL/dependency-audit workflow; dependabot covers pip and github-actions only (.github/dependabot.yml:1-12); mypy is a dev dependency but not gated (pyproject.toml:97-102). I did not run any tests or benchmarks.",
+      "dependencies": "pyproject.toml core runtime: 7 direct (chromadb>=1.5.4,<2; pyyaml>=6,<7; tomli>=2 only for py<3.11; huggingface_hub>=0.20; tokenizers>=0.15; numpy>=1.24; python-dateutil>=2.8) (pyproject.toml:29-50). Optional extras: dev 8 (pytest, pytest-cov, pytest-rerunfailures, ruff==0.16.6, psutil, hypothesis, pre-commit, mypy), spellcheck 1, milvus 2, pgvector 1, gpu 1, dml 1, coreml 1, extract 2 (striprtf, markitdown[docx,pdf,pptx,xlsx] on py>=3.10), multilingual 0 (empty alias) (pyproject.toml:76-142); [dependency-groups].dev 8 (pyproject.toml:144-157). uv.lock (committed; used by the Dockerfile) locks 182 packages including chromadb 1.5.7, whose declared dependencies include grpcio, kubernetes, onnxruntime, opentelemetry-*, httpx, uvicorn, pydantic (uv.lock:531-574). Rust workspace (Cargo.toml; Cargo.lock has 79 packages): mempalace-core 5 deps (rusqlite[bundled], rayon, serde, serde_json, thiserror) + 1 dev; mempalace-cli 4 (mempalace-core, clap, serde, serde_json) + 2 dev; mempalace-py 2 (mempalace-core, pyo3 abi3-py39); native wheel `mempalace-native-core` has its own maturin pyproject (crates/mempalace-py/pyproject.toml). npm: .dsh-plugin/package.json 0 dependencies (Node >=20.3); website/package.json 5 devDependencies (docs only).",
+      "security_policy": "SECURITY.md: report privately through GitHub Private Vulnerability Reporting (Security tab > Advisories), not public issues; aims to acknowledge within 48 hours; 3.x is supported, 2.x and earlier are not (SECURITY.md:3-33)."
+    },
+    "claim_checks": [
+      {
+        "claim": "'Nothing leaves your machine unless you opt in.' (README.md:39)",
+        "verified": "partial",
+        "evidence": "Content-carrying egress paths found in code are opt-in: PyPI check off by default (mempalace/update_awareness.py:143-147), Wikipedia lookup needs allow_network=True (mempalace/entity_registry.py:556-590), external LLM providers need explicit selection plus a consent prompt for environment keys (mempalace/cli/cmd_init.py:31-108), remote embeddings/backends are explicit config (mempalace/embedding.py:24-33; website/guide/configuration.md:44-49). Not fully verifiable here: first embedding use downloads model files from the network (README.md:133-136; mempalace/embedding.py:427-438), and the repo never sets ChromaDB's anonymized_telemetry (no Settings/ANONYMIZED_TELEMETRY anywhere); mempalace/__init__.py:59-63 only silences a chromadb posthog logger and claims chromadb 1.x's client is a no-op stub, which this repo cannot confirm (uv.lock:531-533; no posthog package in uv.lock)."
+      },
+      {
+        "claim": "45 MCP tools (README.md:295)",
+        "verified": "yes",
+        "evidence": "mempalace/mcp_server/schemas.py defines 45 `\"mempalace_*\": {` tool entries (lines 9-980); tests/test_readme_claims.py:78-95 asserts README tool counts equal the TOOLS dict. Stale copies exist: .codex-plugin/plugin.json:4,25 and .codex-plugin/README.md:3 still say 44."
+      },
+      {
+        "claim": "Auto-save hooks for Claude Code, Codex CLI and Cursor IDE save periodically and before context compression (README.md:310-322)",
+        "verified": "partial",
+        "evidence": "Claude Code: plugin registers Stop/SessionEnd/PreCompact (.claude-plugin/hooks/hooks.json:3-37). Codex: .codex-plugin/hooks.json exists (SessionStart/Stop/PreCompact, :2-36) but .codex-plugin/plugin.json has no hooks key and a test pins that (tests/test_codex_plugin_manifest.py:31-35), so Codex hooks need manual wiring (hooks/README.md:88-105); that documented snippet points at the legacy script hooks/mempal_save_hook.sh, which mines the transcript's parent directory (hooks/mempal_save_hook.sh:268-269) rather than calling `mempalace hook run --harness codex`; SessionEnd is wired only for Claude (hooks/README.md:107-112). Defaults differ from website/guide/hooks.md:9-12: code default is silent direct save (mempalace/config.py:1612-1615; mempalace/hooks_cli.py:1455-1486), every 15 human messages (hooks_cli.py:38,1435). PreCompact starts a detached background mine for the transcript and does not wait for it (hooks_cli.py:508-545,1672-1673); only MEMPAL_DIR is mined synchronously (hooks_cli.py:825-892)."
+      },
+      {
+        "claim": "Stores conversation history verbatim; 'does not summarize, extract, or paraphrase' (README.md:28-30)",
+        "verified": "partial",
+        "evidence": "Drawers are stored as given, chunked at 800 chars by default (mempalace/mcp_server/tools_write.py:365-500; mempalace/config.py:385), with NUL/lone surrogates replaced by U+FFFD (config.py:52-70,225-233) and harness noise stripped from Claude Code transcripts (mempalace/palace/__init__.py:75-83). But the hook checkpoint diary entry is a derived digest of the last user messages truncated to 80 chars each (mempalace/hooks_cli.py:952-993,1062-1068); AAAK is documented as lossy, not lossless (mempalace/dialect.py:12-15; docs/HISTORY.md:94-99); closets extract topics/entities/quotes by regex for project files (docs/CLOSETS.md:18-22); `--extract general` classifies content (website/guide/getting-started.md:75)."
+      },
+      {
+        "claim": "96.6% R@5 raw on LongMemEval, zero API calls (README.md:7,238-244)",
+        "verified": "partial",
+        "evidence": "The committed per-question file benchmarks/results_mempal_raw_session_20260414_1629.jsonl has 500 lines, 483 with recall_any@5 = 1.0 (96.6%); held-out hybrid file has 443/450 (98.4%) and the 1659 rerank file 496/500 (99.2%). I did not re-run the benchmark or fetch the dataset. Benchmark scripts and tests/benchmarks are not run in CI (.github/workflows/ci.yml:22)."
+      },
+      {
+        "claim": "Retrieval layer is pluggable; backends can be dropped in without touching the rest (README.md:34-37)",
+        "verified": "yes",
+        "evidence": "BaseBackend/BaseCollection contract in mempalace/backends/base.py:420,798; six backends registered via the `mempalace.backends` entry-point group (pyproject.toml:62-68) with a conformance suite (tests/test_backend_conformance.py). Caveat: integrity gating and repair tooling are ChromaDB-specific (mempalace/mcp_server/_guards.py:687-692; mempalace/repair.py)."
+      },
+      {
+        "claim": "Release checks are disabled by default, contact only PyPI, never auto-install (README.md:65-71)",
+        "verified": "yes",
+        "evidence": "mempalace/update_awareness.py: returns early unless policy enabled or forced (:143-147), fixed https://pypi.org/pypi/mempalace/json URL with 2 s timeout (:85-96), prepare_upgrade only describes actions (:180-223); `mempalace update check` forces a check regardless of the setting (website/reference/cli.md:12-13)."
+      },
+      {
+        "claim": "Docker image is multi-arch (amd64 + arm64); GPU image not published (README.md:108-114,173-183)",
+        "verified": "yes",
+        "evidence": ".github/workflows/docker-publish.yml:104-107 builds linux/amd64,linux/arm64 on non-PR events and pushes to GHCR; build-gpu job only validates Dockerfile.gpu without publishing (:118-138); Dockerfile.gpu is x86_64-only per README.md:181-183."
+      },
+      {
+        "claim": "`mempalace sweep <transcript-dir>` stores one verbatim drawer per user/assistant message, idempotent and resume-safe (README.md:324-326)",
+        "verified": "partial",
+        "evidence": "Idempotency/resume come from deterministic ids and a timestamp cursor (mempalace/sweeper.py:3-37), but the parser accepts only Claude Code-shaped records (record type user/assistant with message.role, uuid, sessionId: sweeper.py:89-151); no Codex event_msg handling, so it does not cover Codex rollouts. Sweep writes are not WAL-logged (no _wal_log call: grep of mempalace/)."
+      },
+      {
+        "claim": "'Claude Code sessions expire in 30 days without auto-save hooks wired' (README.md:20)",
+        "verified": "not_checkable",
+        "evidence": "Depends on Claude Code's own retention behavior and a linked GitHub discussion that was not opened; the project's retention guide says only 'Do not assume those transcripts are permanent' (website/guide/claude-code-retention.md:14)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LongMemEval, 500 questions, raw mode (semantic search over verbatim sessions, no LLM). Project docs also say it was independently reproduced (Linux x86_64 on v3.3.0; M2 Ultra by a community member in issue #39) - relayed by the project, third-party reports not opened. Committed result file shows 483/500 hits.",
+        "metric": "R@5 (recall_any@5); R@10 0.982 and NDCG@10 0.889 in the expected-output block",
+        "value": "96.6%",
+        "source": "README.md:238-244; benchmarks/BENCHMARKS.md:24-34; benchmarks/README.md:39-45; docs/HISTORY.md:24-26,116-118; benchmarks/results_mempal_raw_session_20260414_1629.jsonl",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval hybrid v4 (keyword/temporal/preference boosts, no LLM) on the held-out 450 questions never used in development; committed file shows 443/450",
+        "metric": "R@5 (also R@10, NDCG@10)",
+        "value": "98.4% (R@10 99.8%, NDCG@10 0.938); full-500 hybrid v4 98.6%",
+        "source": "README.md:238-249; website/reference/benchmarks.md:26-43; benchmarks/results_mempal_hybrid_v4_held_out_session_20260414_1634.jsonl",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval hybrid v4 + LLM rerank of top-20, full 500 (README: any capable model; 99.2% with minimax-m2.7 via Ollama Cloud; committed file shows 496/500). Project states an earlier 100% result was tuned on 3 wrong answers and does not headline it.",
+        "metric": "R@5",
+        "value": ">=99% (README); 99.2% (website/reference/benchmarks.md)",
+        "source": "README.md:244-257; website/reference/benchmarks.md:26-30; benchmarks/BENCHMARKS.md:87-94; docs/HISTORY.md:28-34; benchmarks/results_mempal_hybrid_v4_llmrerank_session_20260414_1659.jsonl",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval with the project's lossy AAAK index format and with room-based boosting, compared with raw mode",
+        "metric": "R@5",
+        "value": "AAAK 84.2% (vs 96.6% raw); rooms 89.4%",
+        "source": "benchmarks/README.md:26-30; docs/HISTORY.md:94-99",
+        "independent": false
+      },
+      {
+        "what": "LoCoMo, 1,986 questions, retrieval recall at top-10, no rerank (session granularity; hybrid v5)",
+        "metric": "R@10",
+        "value": "60.3% session; 88.9% hybrid v5",
+        "source": "README.md:261-264; website/reference/benchmarks.md:56-71",
+        "independent": false
+      },
+      {
+        "what": "ConvoMem (Salesforce), 250 items (50 per category), raw retrieval",
+        "metric": "average recall",
+        "value": "92.9%",
+        "source": "README.md:265; website/reference/benchmarks.md:75-80",
+        "independent": false
+      },
+      {
+        "what": "MemBench (ACL 2025), 8,500 items, hybrid top-5, all categories",
+        "metric": "R@5",
+        "value": "80.3%",
+        "source": "README.md:266; website/reference/benchmarks.md:82-85",
+        "independent": false
+      },
+      {
+        "what": "Release-note performance/memory measurements on large palaces and proxied MCP sessions (167k-drawer sqlite_exact palace; stdio session behind a hub). No figures are published for the native rust_exact engine.",
+        "metric": "latency; resident memory",
+        "value": "mempalace_status 6997 ms -> 1045 ms; warm mempalace_search 6364 ms -> 210-1600 ms (3.8.0); proxied stdio session ~17 MB vs ~80 MB import weight; native engine: none published",
+        "source": "CHANGELOG.md:150-151,155; README.md:210; crates/README.md:57-61",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "One host, several agents, single writer: the palace is guarded by a non-blocking per-palace flock; an MCP stdio server takes the writer lease for its lifetime on its first mutating call, a second harness's `mempalace-mcp` then gets -32001 'Peer MCP writer active' for writes, and CLI/hook mines get MineAlreadyRunning unless a `mempalace serve` hub owns the palace and everything proxies to it (mempalace/mcp_server/_guards.py:177-189,485-599; mempalace/palace/palace_lock.py:207-296; website/guide/shared-brain.md:43-63; website/guide/remote-server.md:194-204). Per-session stdio servers also exit after 8 h idle by default (_guards.py:113-115).",
+      "Deletion and recovery are thin: mempalace_delete_drawer and delete_by_source are described as irreversible (mempalace/mcp_server/schemas.py:437-438,503-504); the write-ahead log redacts content keys, so deleted text cannot be replayed from it (mempalace/wal.py:28-30,84-96; tools_write.py:516-524) and bulk `mine` writes are not WAL-logged at all (_wal_log is called only from tools_write/tools_diary/tools_kg/sync.py); there is no soft-delete/restore, no backup/restore/export/delete CLI (mempalace/cli/parser.py:67-910; mempalace/exporter.py:68 is not wired to CLI or MCP), no wing/room-level or KG-fact deletion (KG facts can only be invalidated: mempalace/knowledge_graph.py:343-375; logstream is append-only: website/guide/shared-brain.md:458-460). Backups exist only as side effects of repair/migrate: legacy `repair` keeps one rolling <palace>.backup that it deletes and rewrites each run (mempalace/cli/cmd_repair.py:287-298), `migrate` keeps at most max_backups=10 (mempalace/config.py:1546-1573). The project's own recovery guidance is rebuild-from-SQLite and warns that re-mining drops MCP-added and diary-only drawers (integrations/shared/recall-protocol.md:86-107).",
+      "Durability rests on ChromaDB HNSW + SQLite/FTS5, with a visible history of index damage: release notes record index divergence, FTS5 corruption, stale-index handling and a 'silent write-loss path' closed in 3.10.0 (CHANGELOG.md:15,85,89-90). The server refuses all non-allowlisted tools with -32002 when the SQLite quick_check fails (mempalace/mcp_server/_guards.py:884-922), refuses writes with -32005 after an in-place package upgrade until the server is restarted (mempalace/mcp_server/protocol.py:567-617), and falls back to BM25-only search when the vector index diverges (_guards.py:1166-1218); repair is a manual CLI step (website/reference/cli.md:143-164).",
+      "Codex integration is thinner than Claude Code's: the Codex plugin manifest registers MCP + skills but no hooks (tests/test_codex_plugin_manifest.py:31-35), no SessionEnd for Codex (hooks/README.md:107-112), `mempalace sweep` parses only Claude Code JSONL (mempalace/sweeper.py:89-151), the Codex transcript parser keeps only event_msg user/agent text, not tool output (mempalace/normalize.py:363-408), and neither harness gets automatic session-start recall injection (mempalace/hooks_cli.py:1504-1526). Project-wing derivation reads a top-level `cwd` (hooks_cli.py:1273-1315) while the repo's Codex fixtures put identifiers under `payload` (tests/test_codex_fallback.py:16-19), so Codex behavior there is unverified in the repo. The Codex manifest still advertises 44 tools (.codex-plugin/plugin.json:4).",
+      "Scoping is convention-based and differs by capture path: one host-global palace by default (mempalace/config.py:918-935); hook-driven transcript mines always use wing `sessions` (mempalace/hooks_cli.py:1185-1197) while checkpoint diary entries go to wing_<project> under agent `claude` or `codex` (hooks_cli.py:1211-1222,1453-1465) and the legacy shell hook mines the transcript's parent directory with no wing, which resolves to wing_api (hooks/mempal_save_hook.sh:268-269; mempalace/convo_miner.py:850-872). Search/list filters are wing, room, exact source_file and dates, with no agent filter (mempalace/mcp_server/schemas.py:286-348,550-579). State is split between the config dir and legacy ~/.mempalace even on XDG installs: hook state, locks and the default KG database (hooks_cli.py:39-40; mempalace/palace/mine_lock.py:31; mempalace/knowledge_graph.py:49).",
+      "Capture is unredacted and unencrypted: hooks mine whole transcripts including tool output verbatim; grep of miner.py, convo_miner.py, normalize.py and hooks_cli.py finds no secret/credential scrubbing and no at-rest encryption code exists in mempalace/ (only advice not to file secrets: website/guide/shared-brain.md:154-155). A loopback hub is tokenless unless a token is set (website/guide/shared-brain.md:82-90).",
+      "Network/footprint unknowns: the repo does not set ChromaDB's own telemetry flag (see telemetry notes); first embedding use needs network to fetch a ~80 MB (ChromaDB S3) or ~300 MB (Hugging Face) model (README.md:133-136; mempalace/embedding.py:267,427-438) and the repo does not state the license of those downloaded model weights; the dependency graph is heavy (chromadb pulls grpcio, kubernetes, onnxruntime, opentelemetry; 182 locked packages: uv.lock:535-574) and an unproxied stdio session imports ~77 MB per agent process (mempalace/mcp_proxy.py:1-20).",
+      "Maintenance and scope: 18 changelog releases between 3.0.0 (2026-04-06) and 3.10.0 (2026-09-15), with behavior changes inside minors (CHANGELOG.md:13-22,852); .github/CODEOWNERS names two owners (:5-6). Docs lag code: ROADMAP.md still describes v3.1.1/v4.0.0-alpha (ROADMAP.md:3,25); website/guide/hooks.md describes a blocking-hook flow (:9-12) while the default is silent save; website/guide/getting-started.md:25 says chromadb>=0.5.0 vs chromadb>=1.5.4,<2 (pyproject.toml:30); mempalace/README.md:16 still says AAAK is '30x lossless' though dialect.py:12-15 and docs/HISTORY.md:94-99 say it is lossy; docs still point at ~/.mempalace although new installs use ~/.config/mempalace (CHANGELOG.md:22; website/guide/configuration.md:5-18). Scope reaches well beyond memory: agent task coordination and headless launch of codex/claude (mempalace/cli/cmd_coord.py:497-508), peer replication, six storage backends and a Rust engine."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "mempalace/mempalace",
+      "checks": [
+        {
+          "field": "readme.install[0] (uv tool, recommended)",
+          "statement": "uv tool (recommended by README): `uv tool install mempalace`",
+          "citation": "README.md:80-86",
+          "holds": true,
+          "note": "README.md:80-81 recommends uv. Line 84 is `uv tool install mempalace` and line 85 is `mempalace init ~/projects/myapp`. The package name `mempalace` (pyproject.toml:2) and the `mempalace` console script (pyproject.toml:58) match. The checked-out HEAD is 22fd87f09c19…, which is what the annotated tag v3.10.0 peels to (.git/packed-refs:2-3), and pyproject.toml:3 says version 3.10.0."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT text ('Copyright (c) 2026 MemPalace Contributors'). It is the only license file in the tree, and every manifest agrees: pyproject.toml:7, Cargo.toml:12, crates/mempalace-py/pyproject.toml:10 and .dsh-plugin/package.json:6 all declare MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI test-linux on ubuntu-latest with Python 3.9/3.11/3.13; amd64 Docker image smoke-tested and published; native wheel x86_64-unknown-linux-gnu",
+          "citation": ".github/workflows/ci.yml:10-22; .github/workflows/docker-publish.yml:25-56,104-107; .github/workflows/release-native.yml:24-26",
+          "holds": true,
+          "note": "ci.yml:10-22: the test-linux job runs on ubuntu-latest with a Python 3.9/3.11/3.13 matrix and runs pytest. docker-publish.yml:25-56: the smoke job builds linux/amd64, loads it and runs scripts/docker-smoke.sh. The build job needs smoke (:61), and :104-108 pushes linux/amd64 and linux/arm64 on non-PR events, which are pushes to main and v* tags (:3-9). release-native.yml:25-26 builds on ubuntu-latest for target x86_64-unknown-linux-gnu."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code plugin declares MCP `mempalace-mcp` and Stop/SessionEnd/PreCompact hooks (30/10/90 s) calling `mempalace hook run --harness claude-code`, with 5 slash commands and 3 skills. The Codex plugin has mcpServers './.mcp.json' and no hooks key (pinned by a test); .codex-plugin/hooks.json exists but is unreferenced, so hooks need manual wiring. Manual `claude/codex mcp add mempalace -- mempalace-mcp`. Claude Code and Codex (event_msg only) JSONL parsers. No session-start recall injection. `task launch --runner codex|claude`.",
+          "citation": ".claude-plugin/plugin.json:10-14; .claude-plugin/hooks/hooks.json:3-37; .claude-plugin/hooks/mempal-stop-hook.sh:24; .claude-plugin/README.md:32-54; tests/test_codex_plugin_manifest.py:31-35; docs/RELEASING.md:36-42; .codex-plugin/hooks.json:2-36; .codex-plugin/hooks/mempal-hook.sh:6; hooks/README.md:88-105,242-245; website/guide/hooks.md:45-62; mempalace/cli/cmd_serve.py:47-52; mempalace/instructions/init.md:64-68; mempalace/normalize.py:301-360,363-408; mempalace/hooks_cli.py:1504-1526; hooks/cursor/README.md:123; mempalace/cli/cmd_coord.py:497-508",
+          "holds": true,
+          "note": "Every citation matches. Claude plugin: plugin.json:10-14 maps mempalace to mempalace-mcp. hooks.json registers Stop 30 s, SessionEnd 10 s and PreCompact 90 s. The Stop and PreCompact wrappers call `--harness claude-code` (line 24 of each); SessionEnd backgrounds the same call with claude-code as the default (session-end-hook.sh:38). README.md:32-40 lists 5 commands. Codex: plugin.json:20-21 has skills ./skills/ and mcpServers ./.mcp.json and no hooks key (test :34-35). The marketplace source path is ./ (.agents/plugins/marketplace.json:9-12). Root .mcp.json and root skills/ (3 SKILL.md) exist. hooks.json maps SessionStart/Stop/PreCompact to mempal-hook.sh, whose line 6 calls `mempalace hook run --harness codex`. cmd_serve.py:29-30 defaults server_cmd to mempalace-mcp. normalize.py:386-404 keeps only event_msg user_message/agent_message. run_hook sends session-start to hook_session_start for every harness (hooks_cli.py:1691-1703), which outputs {} or a daemon-blocked notice, and nothing in mempalace/ emits additionalContext. parser.py:869-873 defines --runner with choices from _TASK_RUNNER_ADAPTERS. Non-blocking nit: '3 skills' is not stated in .claude-plugin/README.md:32-54. The count is true (.claude-plugin/skills/{mempalace,mempalace-recall,mempalace-task}), but the citation should point there."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "'Nothing leaves your machine unless you opt in.' (README.md:39), rated partial: content-carrying egress is opt-in, but first-use model downloads happen and ChromaDB telemetry is never explicitly disabled",
+          "citation": "README.md:39; mempalace/update_awareness.py:143-147; mempalace/entity_registry.py:556-590; mempalace/cli/cmd_init.py:31-108; mempalace/embedding.py:24-33,427-438; website/guide/configuration.md:44-49; README.md:133-136; mempalace/__init__.py:59-63; uv.lock:531-533",
+          "holds": true,
+          "note": "README.md:39 is quoted verbatim. update_awareness.py:143-147 returns early unless the check is enabled or forced; :85-96 uses a fixed PyPI URL with a 2 s timeout. entity_registry.py:556-590 defaults to allow_network=False. cmd_init.py: LLM init is on by default against Ollama at localhost:11434 (llm_client.py:6,207). An external openai-compat provider with an env-sourced key is skipped (:47-54); other external providers with an env key get a y/N prompt (:73-99). embedding.py:24-33 covers the openai-compat endpoint config, and configuration.md:44-49 warns about server backends. README.md:133-136 and embedding.py:427-438 (hf_hub_download) cover the first-use downloads. Case-insensitive grep finds no anonymized_telemetry or ANONYMIZED_TELEMETRY in the repo, and there is no Settings( in any .py file. __init__.py:59-63 only lowers the posthog logger level. uv.lock:531-533 pins chromadb 1.5.7, and posthog appears 0 times in uv.lock. The 'partial' rating is supported."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

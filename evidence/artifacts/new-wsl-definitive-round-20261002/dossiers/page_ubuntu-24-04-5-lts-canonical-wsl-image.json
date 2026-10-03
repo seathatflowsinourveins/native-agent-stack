@@ -1,0 +1,252 @@
+{
+  "contender": "page:ubuntu-24-04-5-lts-canonical-wsl-image",
+  "revision": {
+    "contender": "page:ubuntu-24-04-5-lts-canonical-wsl-image",
+    "kind": "pages",
+    "pages": [
+      "https://releases.ubuntu.com/24.04.5/",
+      "https://documentation.ubuntu.com/wsl/latest/",
+      "https://ubuntu.com/about/release-cycle"
+    ],
+    "tag": null,
+    "commit": null,
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "page:ubuntu-24-04-5-lts-canonical-wsl-image",
+    "revision": {
+      "tag": null,
+      "commit": null,
+      "read_at": "2026-10-02T03:02:33+00:00"
+    },
+    "license": {
+      "spdx": null,
+      "file": null
+    },
+    "purpose": "Ubuntu 24.04.5 LTS (Noble Numbat) root-filesystem image for the Windows Subsystem for Linux, published on releases.ubuntu.com under a Canonical Ltd. copyright footer as ubuntu-24.04.5-wsl-amd64.wsl (371M, last modified 2026-09-08 00:19), next to SHA256SUMS and SHA256SUMS.gpg. The release page describes it as 'the root filesystem to be installed and launched by the Windows Subsystem for Linux'. Support dates for 24.04 LTS come from Canonical's release-cycle page: standard security maintenance to May 2029, ESM to May 2034, Legacy add-on to May 2039, with Ubuntu Pro-gated items flagged. The 'Ubuntu on WSL' docs hub links to the install, GPU/CUDA and Ubuntu Pro for WSL how-tos. Evidence basis: this is not a code repository. The working directory holds only .round-meta.json (read_at taken from .round-meta.json:11). Every fact therefore comes from the three listed pages, read through a fetch tool that returns processed text, not raw HTML. Citations are URLs with section or row labels, not line numbers. The listed docs URL answered 301 and redirected to https://ubuntu.com/wsl/docs/latest/, which I read as that page's content. No page outside the three listed ones was opened.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "WSL image description: 'The WSL image is the root filesystem to be installed and launched by the Windows Subsystem for Linux.'",
+          "citation": "https://releases.ubuntu.com/24.04.5/ (WSL Image section)"
+        },
+        {
+          "claim": "File index row: ubuntu-24.04.5-wsl-amd64.wsl, 371M, last modified 2026-09-08 00:19; companion ubuntu-24.04.5-wsl-amd64.manifest, 16K, 2026-09-08 00:19. Every file name in the index is an -amd64 build; no arm64 WSL file is listed.",
+          "citation": "https://releases.ubuntu.com/24.04.5/ (file index; columns Name, Last modified, Size, Description)"
+        },
+        {
+          "claim": "SHA256SUMS (893 B) and SHA256SUMS.gpg (833 B), both last modified 2026-09-15 19:11, are published in the same index. The page presents no instructions or notes on checking downloads against them.",
+          "citation": "https://releases.ubuntu.com/24.04.5/ (file index)"
+        },
+        {
+          "claim": "The page heading is 'Ubuntu 24.04.5.1 (Noble Numbat)' under the /24.04.5/ path. Only the desktop ISO is named 24.04.5.1 (5.8G, 2026-09-14 23:20). The server ISO (3.8G), netboot tarball (98M) and WSL image are named 24.04.5. The page does not explain 24.04.5 versus 24.04.5.1.",
+          "citation": "https://releases.ubuntu.com/24.04.5/ (page heading and file index)"
+        },
+        {
+          "claim": "The same index still lists older WSL images: ubuntu-24.04.3-wsl-amd64.wsl (361M, 2025-08-05 17:00) and ubuntu-24.04.4-wsl-amd64.wsl (373M, 2026-02-10 01:01), each with a .manifest.",
+          "citation": "https://releases.ubuntu.com/24.04.5/ (file index)"
+        },
+        {
+          "claim": "'LTS are released every two years and receive 5 years of standard security maintenance.'",
+          "citation": "https://ubuntu.com/about/release-cycle (LTS description)"
+        },
+        {
+          "claim": "Ubuntu 24.04 LTS 'Noble Numbat' row: 'Released: Apr 2024'; standard security maintenance May 2029; expanded security maintenance May 2034; break/bug support May 2034; legacy add-on May 2039; architectures amd64, armhf, arm64, s390x, riscv64, ppc64el-p9; upgrade path 24.10, 26.04 LTS.",
+          "citation": "https://ubuntu.com/about/release-cycle (24.04 LTS row)"
+        },
+        {
+          "claim": "'ESM extends the life of LTS releases by providing 10 years of security updates for the 'Main' repository and also adds 10 years of security coverage for the 'Universe' repository.' ESM is available through Ubuntu Pro. 'At the end of the 10 year ESM period, the Legacy add-on can be purchased to cover additional 5 years.'",
+          "citation": "https://ubuntu.com/about/release-cycle (ESM and Legacy add-on text)"
+        },
+        {
+          "claim": "Chart legend labels (as returned by the fetch tool): 'Standard Security Maintenance for packages in Main' carries no Pro tag. 'Expanded Security Maintenance for packages in Universe', 'Break fix and bug support' and 'Legacy add-on for security coverage and support' are each tagged Ubuntu Pro. The page does not state what Universe packages receive without Ubuntu Pro after year 5.",
+          "citation": "https://ubuntu.com/about/release-cycle (support chart legend)"
+        },
+        {
+          "claim": "'Ubuntu Pro is Canonical's enhanced security and support subscription for Ubuntu systems.' 'Ubuntu Pro subscriptions are free for personal use on up to five machines.' It 'includes up to 15 years of security coverage (ESM and Legacy add-on), Kernel Livepatch, Landscape, FIPS 140-3 certified packages, and CIS hardening.'",
+          "citation": "https://ubuntu.com/about/release-cycle (Ubuntu Pro text)"
+        },
+        {
+          "claim": "Packages are grouped into 'Main' and 'Restricted' (the base system) and 'Universe' and 'Multiverse' (community and extra packages); 'Main' and 'Universe' are open source. Footers carry Canonical Ltd. copyright and trademark notices ('© 2025' on the release index, '© 2026' on the release-cycle page). No SPDX identifier or licence file appears.",
+          "citation": "https://ubuntu.com/about/release-cycle (package categories, footer); https://releases.ubuntu.com/24.04.5/ (footer)"
+        },
+        {
+          "claim": "Ubuntu on WSL 'enables developers to run a GNU/Linux environment on Windows'. Ubuntu Pro for WSL is 'a tool for managing Ubuntu on WSL' enabling 'automatic attachment of your Pro subscription to Ubuntu instances, and remote deployment with Landscape.'",
+          "citation": "https://documentation.ubuntu.com/wsl/latest/ (301 to https://ubuntu.com/wsl/docs/latest/; intro text)"
+        },
+        {
+          "claim": "The hub links the how-tos 'Install Ubuntu on WSL' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/howto/install-ubuntu-wsl2/), 'Enabling GPU acceleration with CUDA' (.../howto/gpu-cuda/) and 'Security overview for Ubuntu on WSL' (.../explanation/security-overview/). The hub itself has no text on supported Windows versions, the WSL 2 requirement, install methods, systemd, GPU/CUDA, Ubuntu releases offered, lifecycle, licence or telemetry. A keyword search of its links found none for NVIDIA, systemd, Windows 10/11, import, .wsl, release or versions.",
+          "citation": "https://documentation.ubuntu.com/wsl/latest/ (301 to https://ubuntu.com/wsl/docs/latest/; In this documentation section and links)"
+        },
+        {
+          "claim": "Project and community section: 'It's an open-source project that warmly welcomes community contributions, suggestions, fixes and constructive feedback.' It links a code of conduct (https://ubuntu.com/community/ethos/code-of-conduct) and contribution guidelines (.../howto/contributing/). Docs follow the Diataxis structure and are labelled 'latest' in their URLs.",
+          "citation": "https://documentation.ubuntu.com/wsl/latest/ (301 to https://ubuntu.com/wsl/docs/latest/; Project and community section)"
+        }
+      ],
+      "install": [
+        {
+          "method": "Download the WSL root-filesystem image (acquisition step only). The listed pages document no wsl.exe, import or other install command; the docs hub links an 'Install Ubuntu on WSL' how-to that was not opened because it is not a listed page.",
+          "command": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl (resolved from the relative index link ubuntu-24.04.5-wsl-amd64.wsl); checksum files SHA256SUMS and SHA256SUMS.gpg sit in the same directory",
+          "citation": "https://releases.ubuntu.com/24.04.5/ (WSL Image section and file index)"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - the image is an amd64 build (ubuntu-24.04.5-wsl-amd64.wsl, https://releases.ubuntu.com/24.04.5/), and amd64 is among the architectures listed for 24.04 LTS (https://ubuntu.com/about/release-cycle). The pages describe the image as a WSL root filesystem, not as a bare-metal Linux install.",
+        "wsl2": "unknown - the release page says the image is the root filesystem for 'the Windows Subsystem for Linux' without naming WSL 1 or WSL 2 or a minimum WSL version, and the docs hub has no WSL 2 requirement text (https://ubuntu.com/wsl/docs/latest/). The hub links a how-to whose URL slug is install-ubuntu-wsl2; it was not opened. Nothing is stated about WSL 2.7.13 or kernel 6.18.",
+        "macos_arm64": "no - the docs hub describes running Ubuntu 'on Windows' (https://ubuntu.com/wsl/docs/latest/), the release index lists only -amd64 files, and macOS is mentioned on none of the listed pages.",
+        "gpu": "unknown - no listed page states GPU, NVIDIA or RTX 4090 support. The docs hub links a how-to titled 'Enabling GPU acceleration with CUDA' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/howto/gpu-cuda/), which was not opened."
+      },
+      "integrations": {
+        "cli": "none found - no command-line tool or command is documented on the listed pages; the install how-to linked from the docs hub was not opened.",
+        "mcp": "none found",
+        "sdk_or_api": "none found",
+        "claude_code_or_codex": "none found"
+      },
+      "telemetry_and_network": "No listed page states anything about telemetry or phoning home; the docs hub covers no telemetry or network policy (https://ubuntu.com/wsl/docs/latest/). Network services and accounts mentioned: (1) the image is fetched from releases.ubuntu.com through plain relative links, and no account requirement is mentioned in the returned page text (https://releases.ubuntu.com/24.04.5/); (2) Ubuntu Pro is a subscription, free for personal use on up to five machines, needed for the legend items tagged Ubuntu Pro (https://ubuntu.com/about/release-cycle; links /pro, /pro/free-trial and /pricing/pro not opened); (3) Ubuntu Pro for WSL auto-attaches a Pro subscription and supports remote deployment via Landscape (https://ubuntu.com/wsl/docs/latest/). A 'Security overview for Ubuntu on WSL' page is linked from the hub and was not opened."
+    },
+    "code": {
+      "languages": [],
+      "entry_points": [
+        {
+          "path": "https://releases.ubuntu.com/24.04.5/ (row ubuntu-24.04.5-wsl-amd64.wsl)",
+          "what": "The WSL root-filesystem image artifact, 371M, last modified 2026-09-08 00:19. The index link is relative."
+        },
+        {
+          "path": "https://releases.ubuntu.com/24.04.5/ (row ubuntu-24.04.5-wsl-amd64.manifest)",
+          "what": "A 16K manifest published with the image on the same timestamp. The page does not describe its contents and I did not open it."
+        },
+        {
+          "path": "https://releases.ubuntu.com/24.04.5/ (rows SHA256SUMS, SHA256SUMS.gpg)",
+          "what": "Checksum list (893 B) and companion .gpg (833 B), 2026-09-15 19:11. The page gives no verification instructions and the files were not opened."
+        },
+        {
+          "path": "https://documentation.ubuntu.com/wsl/latest/ (301 to https://ubuntu.com/wsl/docs/latest/)",
+          "what": "Ubuntu on WSL documentation hub: tutorials, how-to guides including the install and GPU/CUDA links, references and explanations."
+        },
+        {
+          "path": "https://ubuntu.com/about/release-cycle",
+          "what": "Release and support lifecycle page with the 24.04 LTS dates and the Ubuntu Pro, ESM and Legacy add-on terms."
+        }
+      ],
+      "architecture": "No source tree exists: the working directory holds only .round-meta.json and the listed pages are web pages, so there are no module paths to cite. What the pages show: the WSL image is a single root-filesystem file (.wsl, 371M), published per point release in the releases.ubuntu.com index with a manifest and checksum and signature files. Windows-side fleet management is a separate tool, Ubuntu Pro for WSL (docs hub). The docs follow the Diataxis structure (tutorials, how-to guides, references, explanations). The image build pipeline, package set and WSL-specific configuration (for example systemd or GPU libraries) are not described on the listed pages.",
+      "packaging_and_release": "Artifacts in https://releases.ubuntu.com/24.04.5/: ubuntu-24.04.5-wsl-amd64.wsl (371M, 2026-09-08 00:19) and its .manifest (16K); SHA256SUMS (893 B) and SHA256SUMS.gpg (833 B), both 2026-09-15 19:11. That is about a week after the WSL image and at the same time as the 24.04.5.1 desktop torrent and zsync files (2026-09-15 19:10-19:11). WSL images in the index are dated 2025-08-05 (24.04.3), 2026-02-10 (24.04.4) and 2026-09-08 (24.04.5), one per point release; no 24.04.5.1 WSL file is listed. The page shows no verification instructions or key information, and no attestation or SBOM statement appears in the returned text. No release workflow is documented on the listed pages. The page footer links bug reports to the Launchpad project ubuntu-cdimage (https://bugs.launchpad.net/ubuntu-cdimage/+filebug). The contents of SHA256SUMS, SHA256SUMS.gpg and the .manifest were not opened because they are not listed pages.",
+      "tests_and_ci": "None found. There is no repository, test directory (test-file count 0) or CI workflow in the working directory, and the listed pages do not describe image testing or CI.",
+      "dependencies": "No manifest files exist in the working directory (only .round-meta.json), so direct dependency counts are not available. The index offers ubuntu-24.04.5-wsl-amd64.manifest (16K, https://releases.ubuntu.com/24.04.5/), which was not opened, so the package count of the image is unknown. The release-cycle page names the package repositories Main, Restricted, Universe and Multiverse but does not say which packages the image installs.",
+      "security_policy": "None found as a file or page among the listed pages. The release-cycle page defines the maintenance policy (5 years standard security maintenance for Main; ESM; Legacy add-on; Pro-tagged items) at https://ubuntu.com/about/release-cycle. Its footer links /security, https://canonical.com/legal and https://canonical.com/legal/data-privacy, none of which were opened. The docs hub links a 'Security overview for Ubuntu on WSL' page that was not opened."
+    },
+    "claim_checks": [
+      {
+        "claim": "The WSL image is the root filesystem to be installed and launched by the Windows Subsystem for Linux (published for amd64).",
+        "verified": "partial",
+        "evidence": "No code exists, so the check is against the page's own index. https://releases.ubuntu.com/24.04.5/ lists ubuntu-24.04.5-wsl-amd64.wsl (371M, 2026-09-08 00:19) and a 16K .manifest, and every listed name is -amd64. Whether it installs and launches under WSL 2.7.13 / kernel 6.18 is not stated: the page names 'the Windows Subsystem for Linux' without a version, and the docs hub has no WSL 2 requirement text (https://ubuntu.com/wsl/docs/latest/)."
+      },
+      {
+        "claim": "SHA256SUMS and SHA256SUMS.gpg are published with the images, so the vendor checksum can be verified.",
+        "verified": "partial",
+        "evidence": "Both rows exist in the index (893 B and 833 B, 2026-09-15 19:11; https://releases.ubuntu.com/24.04.5/). The page gives no verification instructions or key information, and I did not open either file (not listed pages). I therefore cannot confirm that SHA256SUMS has a line for ubuntu-24.04.5-wsl-amd64.wsl or that the .gpg signs it. Both files are dated about a week after the WSL image (2026-09-08 00:19)."
+      },
+      {
+        "claim": "Page heading 'Ubuntu 24.04.5.1 (Noble Numbat)' on the /24.04.5/ page.",
+        "verified": "partial",
+        "evidence": "Only the desktop ISO carries 24.04.5.1 (ubuntu-24.04.5.1-desktop-amd64.iso, 5.8G, 2026-09-14 23:20). The server ISO, netboot tarball and WSL image are named 24.04.5, and no 24.04.5.1 WSL file is listed. The page says nothing about why they differ. The index also lists 24.04.3 and 24.04.4 WSL images (361M and 373M). Source: https://releases.ubuntu.com/24.04.5/."
+      },
+      {
+        "claim": "'LTS are released every two years and receive 5 years of standard security maintenance.'",
+        "verified": "yes",
+        "evidence": "Consistent with the 24.04 LTS row on the same page: 'Released: Apr 2024' and standard security maintenance ending May 2029 (https://ubuntu.com/about/release-cycle). This is a consistency check within the page only; no independent source was opened."
+      },
+      {
+        "claim": "ESM gives 10 years of security updates for Main and 10 years of security coverage for Universe; 24.04 ESM ends May 2034.",
+        "verified": "partial",
+        "evidence": "The sentence and the 24.04 row (ESM May 2034, break/bug support May 2034, Legacy add-on May 2039) agree on https://ubuntu.com/about/release-cycle. Repeated fetches did not return the chart legend for years 6-10 consistently (one extraction listed Universe-only ESM). The page does not state what Universe packages receive without Ubuntu Pro. Pro terms were not opened."
+      },
+      {
+        "claim": "'Ubuntu Pro subscriptions are free for personal use on up to five machines.'",
+        "verified": "not_checkable",
+        "evidence": "Only the page's own sentence exists (https://ubuntu.com/about/release-cycle). The linked /pro, /pro/free-trial and /pricing/pro pages are not listed pages and were not opened, so eligibility terms such as what counts as personal use are unverified."
+      },
+      {
+        "claim": "Ubuntu on WSL documents GPU acceleration with CUDA (need: NVIDIA RTX 4090 access through WSL).",
+        "verified": "partial",
+        "evidence": "The docs hub has a link titled 'Enabling GPU acceleration with CUDA' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/howto/gpu-cuda/) but I did not open it. The hub text itself has no GPU/CUDA details, a keyword search found no link for NVIDIA, and no listed page mentions the RTX 4090 (https://ubuntu.com/wsl/docs/latest/)."
+      },
+      {
+        "claim": "Need, not a page claim: systemd user services work in the image under WSL.",
+        "verified": "not_checkable",
+        "evidence": "No listed page makes or supports this statement. The docs hub has no systemd text or link (keyword search: none for systemd, https://ubuntu.com/wsl/docs/latest/), and neither the release index nor the release-cycle page mentions it."
+      },
+      {
+        "claim": "Need, not a page claim: current Python 3.13, Node 24 and Rust toolchains are available.",
+        "verified": "not_checkable",
+        "evidence": "No listed page states package versions. The index has ubuntu-24.04.5-wsl-amd64.manifest (16K), which was not opened (https://releases.ubuntu.com/24.04.5/). The release-cycle page shows 24.04 LTS as 'Released: Apr 2024' and lists 26.04 LTS in its upgrade path."
+      },
+      {
+        "claim": "Need, not a page claim: the image works with WSL 2.7.13 / kernel 6.18 on this Windows host.",
+        "verified": "not_checkable",
+        "evidence": "No listed page names a minimum WSL version, kernel, Windows version or the .wsl import mechanism. The docs hub keyword search found none for Windows 10/11, import, .wsl or versions (https://ubuntu.com/wsl/docs/latest/). The 'Install Ubuntu on WSL' how-to (slug install-ubuntu-wsl2) was not opened."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Version-label ambiguity: https://releases.ubuntu.com/24.04.5/ is headed 'Ubuntu 24.04.5.1 (Noble Numbat)' and its index mixes 24.04.3, 24.04.4, 24.04.5 and 24.04.5.1 files, including three .wsl images (24.04.3 at 361M, 24.04.4 at 373M, 24.04.5 at 371M). The page does not explain 24.04.5 versus 24.04.5.1, and no 24.04.5.1 WSL image is listed, so the image must be selected by exact file name.",
+      "Checksum and signature chain not confirmed from the listed pages: SHA256SUMS and SHA256SUMS.gpg are listed (893 B and 833 B, 2026-09-15 19:11, about a week after the WSL image's 2026-09-08 00:19). The page has no verification instructions or key information, and the files were not opened. It is therefore unconfirmed that SHA256SUMS has a line for ubuntu-24.04.5-wsl-amd64.wsl or which key signed it.",
+      "Needs the listed pages do not cover: systemd user services, Python 3.13 / Node 24 / Rust versions, NVIDIA RTX 4090 access through WSL, compatibility with WSL 2.7.13 and kernel 6.18, and the install procedure. The docs hub says none of these appear on it and links install and GPU/CUDA how-tos that were not opened. Docs are spread across three hosts: documentation.ubuntu.com returns 301 to ubuntu.com/wsl/docs/latest/, whose links point to canonical-ubuntu-on-wsl.readthedocs-hosted.com, and the docs are labelled 'latest' (https://ubuntu.com/wsl/docs/latest/).",
+      "Toolchain currency is unknown: the release-cycle page lists 24.04 LTS as 'Released: Apr 2024' and names 26.04 LTS in its upgrade path (https://ubuntu.com/about/release-cycle). Neither the release page nor the docs hub publishes package versions, and the 16K manifest was not opened.",
+      "Security coverage is split by repository and by Ubuntu Pro. Standard maintenance covers 'Main' (to May 2029). The chart legend tags Universe ESM, break-fix/bug support and the Legacy add-on as Ubuntu Pro items. ESM runs to May 2034 and the Legacy add-on 'can be purchased' to May 2039. Pro is 'free for personal use on up to five machines' (terms page not opened). The page does not state what Universe packages receive without Pro, and no listed page says which repository the needed toolchain packages come from (https://ubuntu.com/about/release-cycle).",
+      "Image refresh cadence: the index shows WSL images dated 2025-08-05, 2026-02-10 and 2026-09-08, one per point release about 6-7 months apart, and no intermediate WSL image is listed (https://releases.ubuntu.com/24.04.5/). The pages do not describe how or when updates reach an installed image.",
+      "Licensing is undocumented on the listed pages: no SPDX identifier or licence file appears, only Canonical Ltd. copyright and trademark notices ('© 2025' on the release index, '© 2026' on the release-cycle page) and legal links that were not opened. The release-cycle page says 'Main' and 'Universe' are open source and says nothing of the kind for 'Restricted' and 'Multiverse'.",
+      "Evidence limits: there is no repository or source, so no code, tests, CI, SBOM or release-workflow evidence exists (working directory holds only .round-meta.json). Pages were read through a fetch tool that returns processed text; one request for a literal reproduction of the release index was declined, and the chart-legend wording for years 6-10 could not be reproduced consistently. The input 'repository' URL (https://ubuntu.com/download/server) is the server download page, not in pages_to_read, and was not opened."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "page:ubuntu-24-04-5-lts-canonical-wsl-image",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Download the WSL root-filesystem image (acquisition step only): https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl (resolved from the relative index link ubuntu-24.04.5-wsl-amd64.wsl); checksum files SHA256SUMS and SHA256SUMS.gpg sit in the same directory. The listed pages document no wsl.exe, import or other install command; the docs hub links an 'Install Ubuntu on WSL' how-to that was not opened.",
+          "citation": "https://releases.ubuntu.com/24.04.5/ (WSL Image section and file index)",
+          "holds": true,
+          "note": "The WSL Image section reads 'The WSL image is the root filesystem to be installed and launched by the Windows Subsystem for Linux.' and links the relative href ubuntu-24.04.5-wsl-amd64.wsl. The index row is 2026-09-08 00:19, 371M, 'WSL image for 64-bit PC (AMD64) computers (standard download)'. SHA256SUMS (893) and SHA256SUMS.gpg (833), both dated 2026-09-15 19:11, are in the same index. The page has no install command and no SHA256SUMS or GPG instructions. The docs hub (https://ubuntu.com/wsl/docs/latest/) shows no commands and links 'Install Ubuntu on WSL' -> .../howto/install-ubuntu-wsl2/."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: null, file: null. Supporting claim: 'Main' and 'Universe' are open source; footers carry Canonical Ltd. copyright and trademark notices ('© 2025' on the release index, '© 2026' on the release-cycle page); no SPDX identifier or licence file appears.",
+          "citation": "https://ubuntu.com/about/release-cycle (package categories, footer); https://releases.ubuntu.com/24.04.5/ (footer)",
+          "holds": true,
+          "note": "Neither page has any 'licence', 'license' or 'SPDX' text, the docs hub has none either, and the working directory holds only .round-meta.json, so null is correct. The footers match: '© 2025 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.' on the release index (plus a 'Legal information' link to https://www.ubuntu.com/legal) and '© 2026 Canonical Ltd. …' on the release-cycle page. The open-source quote is accurate but cut short. The page sentence continues: '…while 'Restricted' and 'Multiverse' contain some non-open source software.'"
+        },
+        {
+          "field": "readme.platforms.wsl2",
+          "statement": "unknown - the release page says the image is the root filesystem for 'the Windows Subsystem for Linux' without naming WSL 1 or WSL 2 or a minimum WSL version, and the docs hub has no WSL 2 requirement text. The hub links a how-to whose URL slug is install-ubuntu-wsl2; it was not opened. Nothing is stated about WSL 2.7.13 or kernel 6.18.",
+          "citation": "https://releases.ubuntu.com/24.04.5/; https://ubuntu.com/wsl/docs/latest/",
+          "holds": true,
+          "note": "Release page: no WSL 1, WSL 2 or minimum-version text. Hub: 'WSL 2'/'WSL2' is absent from the body text, the 'Install Ubuntu on WSL' link goes to .../howto/install-ubuntu-wsl2/, and nothing mentions 2.7.13 or kernel 6.18. 'unknown' is supported. Omission: the hub also links 'Comparing WSL versions for Ubuntu on WSL' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/explanation/compare-wsl-versions/), not opened, which the dossier does not mention."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "none found - no command-line tool or command is documented on the listed pages; the install how-to linked from the docs hub was not opened.",
+          "citation": "No citation given in the dossier; checked against https://ubuntu.com/wsl/docs/latest/ (Reference links) and https://releases.ubuntu.com/24.04.5/",
+          "holds": false,
+          "note": "The docs hub's Reference section links two command-line references: 'Windows Agent CLI' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/reference/07-windows-agent-command-line-reference/) and 'WSL Pro Service CLI' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/reference/08-wsl-pro-service-command-line-reference/), both Ubuntu Pro for WSL components. No shell commands appear on the listed pages, so that half holds. 'none found' / 'no command-line tool' does not hold, because a listed page names two CLIs."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Claim 'The WSL image is the root filesystem to be installed and launched by the Windows Subsystem for Linux (published for amd64).' verified: partial. Evidence: the index lists ubuntu-24.04.5-wsl-amd64.wsl (371M, 2026-09-08 00:19) and a 16K .manifest, and every listed name is -amd64. Install/launch under WSL 2.7.13 / kernel 6.18 is not stated; the page names WSL without a version and the docs hub has no WSL 2 requirement text.",
+          "citation": "https://releases.ubuntu.com/24.04.5/; https://ubuntu.com/wsl/docs/latest/",
+          "holds": true,
+          "note": "The quote is exact. The .wsl row (2026-09-08 00:19, 371M) and .manifest row (2026-09-08 00:19, 16K, 'contents of live filesystem') match. No row contains arm64. Neither page names a WSL version or kernel, so 'partial' is the right grade. Wording nit: 'every listed name is -amd64' is literally false for SHA256SUMS, SHA256SUMS.gpg and netboot/. It should say every architecture-specific file is -amd64."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.cli: replace \"none found - no command-line tool or command is documented on the listed pages\" with: \"Two CLIs named, not opened: the docs hub (https://ubuntu.com/wsl/docs/latest/, Reference section) links 'Windows Agent CLI' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/reference/07-windows-agent-command-line-reference/) and 'WSL Pro Service CLI' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/reference/08-wsl-pro-service-command-line-reference/), both Ubuntu Pro for WSL components. No shell commands appear on the listed pages themselves.\"",
+        "readme.claims[12] and claim_checks[9].evidence: remove 'versions' from the 'keyword search found none for …' lists. The hub links 'Comparing WSL versions for Ubuntu on WSL' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/explanation/compare-wsl-versions/), not opened. Add the same link to readme.platforms.wsl2 as the unopened source for WSL 1 vs 2.",
+        "risks[6] and readme.claims[10]: replace \"says nothing of the kind for 'Restricted' and 'Multiverse'\" (and complete the truncated quote) with the page's own sentence: \"'Main' and 'Universe' are open source, while 'Restricted' and 'Multiverse' contain some non-open source software\" (https://ubuntu.com/about/release-cycle).",
+        "readme.telemetry_and_network and code.security_policy: change 'the docs hub covers no telemetry or network policy' to say the hub's own text has none but it links 'Data collection and Ubuntu on WSL' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/explanation/data-collection/) and 'Firewall requirements for Ubuntu on WSL' (https://canonical-ubuntu-on-wsl.readthedocs-hosted.com/latest/reference/firewall_requirements/), neither opened.",
+        "claim_checks[0].evidence and readme.claims[1]: change 'every listed name is -amd64' / 'Every file name in the index is an -amd64 build' to 'every architecture-specific file in the index is -amd64 (SHA256SUMS, SHA256SUMS.gpg and netboot/ carry no architecture); no arm64 file is listed'."
+      ]
+    }
+  ]
+}

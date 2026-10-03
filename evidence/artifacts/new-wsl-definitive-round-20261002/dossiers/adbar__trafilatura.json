@@ -1,0 +1,332 @@
+{
+  "contender": "adbar/trafilatura",
+  "revision": {
+    "contender": "adbar/trafilatura",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "adbar/trafilatura",
+        "tag": "v2.2.0",
+        "commit": "c1bc9531a2a978326112ca9987e1382745116136",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.2.0",
+    "commit": "c1bc9531a2a978326112ca9987e1382745116136",
+    "read_at": "2026-10-02T03:01:55+00:00"
+  },
+  "dossier": {
+    "contender": "adbar/trafilatura",
+    "revision": {
+      "tag": "v2.2.0",
+      "commit": "c1bc9531a2a978326112ca9987e1382745116136",
+      "read_at": "2026-10-02T03:01:55+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Python library and `trafilatura` command-line tool that fetches web pages over plain HTTP(S) (urllib3, optional pycurl) or reads local HTML/stdin, extracts main text, comments and metadata (title, author, date, site name, URL, tags, categories, license) with a rule-based extractor backed by readability/jusText fallbacks, and emits TXT, Markdown, CSV, JSON, HTML, XML or XML-TEI. It also discovers URLs through feeds, sitemaps and a small focused crawler. It does not run JavaScript or drive a browser. Every statement in this dossier comes from static reading of the files at the pinned commit (commit confirmed via .git/HEAD:1 and .git/packed-refs:2); nothing was executed, installed or benchmarked.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Trafilatura is a Python package and command-line tool designed to gather text on the Web and simplify the process of turning raw HTML into structured, meaningful data.",
+          "citation": "README.md:25-27"
+        },
+        {
+          "claim": "It includes all necessary discovery and text processing components to perform web crawling, downloads, scraping, and extraction of main texts, metadata and comments.",
+          "citation": "README.md:27-30"
+        },
+        {
+          "claim": "It aims at staying handy and modular: no database is required, the output can be converted to commonly used formats.",
+          "citation": "README.md:30-31"
+        },
+        {
+          "claim": "Support for sitemaps (TXT, XML) and feeds (ATOM, JSON, RSS); smart crawling and URL management (filtering and deduplication).",
+          "citation": "README.md:49-51"
+        },
+        {
+          "claim": "Parallel processing of online and offline input: live URLs, efficient and polite processing of download queues; previously downloaded HTML files and parsed HTML trees.",
+          "citation": "README.md:53-55"
+        },
+        {
+          "claim": "Main text (common patterns and generic algorithms like jusText and readability); metadata (title, author, date, site name, categories and tags); optional comments, links, images, tables.",
+          "citation": "README.md:57-61"
+        },
+        {
+          "claim": "Output formats: TXT and Markdown, CSV, JSON, HTML, XML and XML-TEI.",
+          "citation": "README.md:63-67"
+        },
+        {
+          "claim": "Optional add-ons: language detection on extracted content; speed optimizations.",
+          "citation": "README.md:69-71"
+        },
+        {
+          "claim": "Actively maintained with support from the open-source community; 'this package continues to be maintained but its future depends on community support'.",
+          "citation": "README.md:73-75, 143-144"
+        },
+        {
+          "claim": "'Trafilatura consistently outperforms other open-source libraries in text extraction benchmarks'; benchmark section and evaluation readme are linked.",
+          "citation": "README.md:80-86"
+        },
+        {
+          "claim": "Other evaluations: 'Most efficient open-source library' in ScrapingHub's article extraction benchmark; 'Best overall tool' (Lejeune & Barbaresi 2020); 'Best single tool by ROUGE-LSum Mean F1 Page Scores' (Bevendorff et al. 2023).",
+          "citation": "README.md:92-96"
+        },
+        {
+          "claim": "Usage documentation is provided for the command line, Python and R (install command is not in the README itself, it links to the docs).",
+          "citation": "README.md:101-112"
+        },
+        {
+          "claim": "Distributed under the Apache 2.0 license; versions prior to v1.8.0 are under GPLv3+.",
+          "citation": "README.md:121-123"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip from PyPI",
+          "command": "pip install trafilatura",
+          "citation": "docs/installation.rst:51 (also docs/quickstart.rst:8, docs/index.rst:86)"
+        },
+        {
+          "method": "pip upgrade",
+          "command": "pip install --upgrade trafilatura",
+          "citation": "docs/installation.rst:58-59"
+        },
+        {
+          "method": "pip from GitHub (latest code base)",
+          "command": "pip install --force-reinstall -U git+https://github.com/adbar/trafilatura",
+          "citation": "docs/installation.rst:60-61"
+        },
+        {
+          "method": "pip with all optional extras (language detection, pycurl, compression, faster encoding/date detection, SOCKS)",
+          "command": "pip install trafilatura[all]",
+          "citation": "docs/installation.rst:103-106; extras defined at pyproject.toml:101-110"
+        },
+        {
+          "method": "Homebrew on macOS (hint only; the docs print no command)",
+          "command": "(none printed) docs hint: 'Installation on MacOS is generally easier with brew', linking https://formulae.brew.sh/formula/trafilatura",
+          "citation": "docs/installation.rst:64-65"
+        },
+        {
+          "method": "pip with dev extra (tests, ruff, mypy; for contributors)",
+          "command": "pip install trafilatura[dev]",
+          "citation": "docs/tests.rst:17; CONTRIBUTING.md:29"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - docs say 'It is tested on Linux, macOS and Windows systems and on all recent versions of Python' (docs/installation.rst:17); CI runs ubuntu-latest on Python 3.10/3.12/3.13/3.14 (.github/workflows/tests.yml:19-34); pure-Python package needing Python >=3.10 (pyproject.toml:12, 67-68). The CPU architecture is not named anywhere in the repo.",
+        "wsl2": "unknown - no mention of WSL/WSL2 in README, docs, code or CI (searched); Windows is tested natively on windows-latest/Python 3.11 (.github/workflows/tests.yml:29-30).",
+        "macos_arm64": "unknown - macOS is documented as tested (docs/installation.rst:17; brew hint :65) and CI runs macos-latest on Python 3.11 (.github/workflows/tests.yml:27-28), but no file names arm64/Apple Silicon. That job skips the [all] extras because those steps are gated on matrix.env.MINIMAL == 'false', which is undefined for it (tests.yml:27-28, 66, 73), so pycurl/py3langid etc. are not exercised on macOS CI.",
+        "gpu": "no - CPU only; no GPU/CUDA/torch code or dependency (pyproject.toml:56-64, 101-110; searched trafilatura/*.py). Language detection uses the lightweight py3langid package (trafilatura/utils.py:44-50)."
+      },
+      "integrations": {
+        "cli": "yes - console script `trafilatura` (pyproject.toml:81-82 -> trafilatura/cli.py:187-233). Inputs: -u/--URL, -i file of URLs, --input-dir, or HTML on stdin (cli.py:61-63, 218-229). Output to stdout or -o dir (cli_utils.py:193-210); formats --json/--csv/--xml/--xmltei/--markdown/--html (cli.py:131-138); --with-metadata (cli.py:123); discovery --feed/--sitemap/--crawl/--explore/--probe/--list (cli.py:78-103); --config-file (cli.py:126); logs to stderr (cli.py:197-198); exit codes 0/1/126 from download failures only (cli_utils.py:382-391). A single-URL JSON-with-metadata call is composed from documented flags: `trafilatura -u URL --json --with-metadata` (docs/usage-cli.rst:26-37, 359). Docs: docs/usage-cli.rst.",
+        "mcp": "none found - no MCP server, config or mention in README, docs, package or tests (searched for 'mcp' / 'model context protocol').",
+        "sdk_or_api": "Python API: extract, bare_extraction, extract_with_metadata, fetch_url, fetch_response, extract_metadata, baseline, html2txt, load_html (trafilatura/__init__.py:15-33; docs/usage-python.rst; docs/corefunctions.rst); feeds/sitemaps/spider modules documented in docs/usage-python.rst:403-476; R via reticulate (docs/usage-r.rst:89-96). Hosted HTTP API: docs say it is 'currently unavailable' and that the underlying code is 'not currently open-sourced' (docs/usage-api.rst:20-21, 105); the repo contains no HTTP server.",
+        "claude_code_or_codex": "none found - no Claude Code, Codex or other agent-tool integration, plugin, skill or instruction file in the repo (searched README, docs, package, tests for claude/codex/anthropic/mcp)."
+      },
+      "telemetry_and_network": "No telemetry, usage reporting or phone-home code in the package (searched trafilatura/*.py and settings.cfg for telemetry/analytics/sentry/tracking: none) and the README says nothing about it. No account, API key or hosted service is needed for the CLI/library (searched for key/token/credential: none). Network use is driven by user inputs: plain HTTP(S) GET via urllib3, or pycurl when installed (trafilatura/downloads.py:203-238, 312), sent with User-Agent 'trafilatura/<version> (+https://github.com/adbar/trafilatura)' (downloads.py:81-82). Extra automatic requests: robots.txt in the crawler (spider.py:164-168) and in sitemap discovery (sitemaps.py:252-256) plus guessed sitemap paths (sitemaps.py:40-46, 211); HEAD liveness probes (sitemaps.py:193; downloads.py:322-363, the pycurl probe has TLS verification off at :330-332); Google News RSS lookups for feed discovery when a target language is set (feeds.py:202-211); web.archive.org when --archived is used (cli_utils.py:408-411); an optional SOCKS proxy read from the http_proxy env var, active only if urllib3[socks] imports (downloads.py:34-39, 64-69). TEI validation uses the bundled DTD, no download (xml.py:34, 288-290). The Sphinx docs-site config embeds a Google Analytics ID with IP anonymization (docs/conf.py:99-102): website only, not the package. Network behaviour inside dependencies (courlan, htmldate, justext) is outside this repo; only courlan's redirection_test HEAD helper is visibly called (downloads.py:23, 349-356)."
+    },
+    "code": {
+      "languages": [
+        "Python"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:81-82",
+          "what": "console_scripts entry `trafilatura = trafilatura.cli:main`"
+        },
+        {
+          "path": "trafilatura/cli.py:187-233",
+          "what": "main() -> parse_args -> process_args: routes to discovery (--feed/--sitemap/--explore), crawler, --probe, --input-dir, URL/-i list, or stdin; `python -m trafilatura.cli` also works (cli.py:236-237); there is no __main__.py and no server/daemon entry point"
+        },
+        {
+          "path": "trafilatura/cli_utils.py:250-268, 394-465",
+          "what": "download-queue consumer, URL and file pipelines, `examine` safeguard around extract(), exit-code logic"
+        },
+        {
+          "path": "trafilatura/__init__.py:15-33",
+          "what": "Python API exports: extract, bare_extraction, extract_with_metadata, fetch_url, fetch_response, extract_metadata, baseline, html2txt, load_html"
+        },
+        {
+          "path": "trafilatura/core.py:290-674",
+          "what": "bare_extraction (returns Document), extract (returns str), extract_with_metadata (returns Document with serialized text)"
+        },
+        {
+          "path": "trafilatura/downloads.py:263-319",
+          "what": "fetch_url (decoded text or None) and fetch_response (Response with data, status, final url, optional headers)"
+        },
+        {
+          "path": "trafilatura/spider.py:296; trafilatura/feeds.py:214; trafilatura/sitemaps.py:165",
+          "what": "focused_crawler, find_feed_urls, sitemap_search (not re-exported at package top level; documented in docs/usage-python.rst:403-476)"
+        },
+        {
+          "path": "trafilatura/settings.py:70-213, 226-324",
+          "what": "Extractor options class, args_to_extractor (CLI args -> options), Document class (21 fields, checked by tests/unit_tests.py:305)"
+        }
+      ],
+      "architecture": "One pure-Python package `trafilatura/` (21 modules, ~8.9k lines) plus settings.cfg and a bundled TEI DTD (trafilatura/data/tei_corpus.dtd). Flow: cli.py (argparse) -> cli_utils.py (input loading, courlan UrlStore throttled download queue, file/stdin pipelines, output writing) -> downloads.py (urllib3 pool, or pycurl when installed; Response class) -> core.py (extract / bare_extraction / extract_with_metadata). The cascade in core.trafilatura_sequence (core.py:179-287): main_extractor.py rule-based extraction using xpaths.py -> external.py comparison with readability (in-tree fork readability_lxml.py) and jusText -> baseline.py rescue -> recall-mode retry. Supporting modules: utils.py (decompression, encoding detection, load_html), htmlprocessing.py (tree cleaning/conversion), metadata.py + json_metadata.py (OpenGraph/meta/JSON-LD; dates via htmldate), deduplication.py (LRU cache, Simhash fingerprint), xml.py (TXT/Markdown/CSV/JSON/XML/TEI serialization and TEI validation), settings.py (Extractor/Document, constants), feeds.py / sitemaps.py / spider.py (URL discovery, spider.py holds the robots.txt logic), meta.py (cache reset). No browser engine, no server, no database, no persistent state except files written with -o/--backup-dir.",
+      "packaging_and_release": "setuptools build backend (pyproject.toml:2-4); single package `trafilatura` (pyproject.toml:67-68); version read from trafilatura/__init__.py:10 (pyproject.toml:71-72); package data = settings.cfg + TEI DTD (pyproject.toml:75-79); ships py.typed (MANIFEST.in:4). Pure Python: no compiled extensions in this repo. MANIFEST.in controls the sdist (excludes tests/realworld_tests.py and tests/cache, lines 9-10; line 1 still names README.rst although the README is Markdown, pyproject.toml:9). Distribution channel is PyPI (docs/installation.rst:35) plus a Homebrew formula mentioned in the docs (docs/installation.rst:65); CITATION.cff:6-9 points to a Zenodo concept DOI for archived releases. The repo has NO release/publish workflow (.github/workflows contains only tests.yml and codeql.yml) and no checksums, signatures or provenance attestations are configured or documented, so how PyPI artifacts are built and uploaded cannot be determined from the repo. Changelog: HISTORY.md (no release dates).",
+      "tests_and_ci": "pytest (pytest>=9.1.1, pytest-cov; pyproject.toml:92-100, 162-163, testpaths `tests/*test*.py`). 13 test modules in tests/ (baseline, cli, deduplication, downloads, feeds, filters, json_metadata, metadata, realworld, sitemaps, spider, unit, xml_tei) with ~235 `def test_` functions, plus tests/conftest.py (mock_network fixture, conftest.py:1-83) and docs/docs_tests.py (Sphinx build with -W). Fixtures: tests/cache (110 pages), tests/eval (926 pages), tests/resources (21 files). Some tests call live hosts (httpbun.com: tests/downloads_tests.py:124-188, tests/cli_tests.py:295-304). CI: .github/workflows/tests.yml on push/PR to master: ubuntu-latest x Python 3.10/3.12/3.14 x MINIMAL true/false, ubuntu 3.13 full, macos-latest 3.11, windows-latest 3.11 (lines 15-34); steps: `uv pip install -e .[dev]`, `ruff check` + `ruff format --check`, libcurl dev + `.[all]` on full jobs, `mypy -p trafilatura` (3.13 full), `pytest --cov`, docs build test, Codecov upload with CODECOV_TOKEN (lines 53-101). .github/workflows/codeql.yml: CodeQL for Python on push/PR to master plus weekly cron. Docs build on Read the Docs (.readthedocs.yaml). No release workflow.",
+      "dependencies": "pyproject.toml:56-64: 7 runtime dependencies (certifi, charset_normalizer>=3.4.9, courlan>=1.4.0, htmldate>=1.10.0, justext>=3.0.2, lxml>=6.1.1, urllib3>=1.26,<3). Extras (pyproject.toml:91-135): dev 7 (ruff, mypy, pytest, pytest-cov, types-lxml, types-pycurl, types-urllib3); all 7 (brotli, faust-cchardet, htmldate[speed], py3langid, pycurl, urllib3[socks], zstandard); eval 13 (pandas, tabulate, tqdm, beautifulsoup4, boilerpy3, goose3, html2text, html-text, inscriptis, newspaper3k, news-please, readability-lxml, resiliparse; magic_html is git-only, pyproject.toml:111-112); docs 4 (sphinx, pydata-sphinx-theme, docutils, sphinx-sitemap). No lockfile or requirements files in the repo. pycurl needs system libcurl dev headers (tests.yml:64-70). courlan, htmldate and py3langid are the same author's projects (docs/tutorial0.rst:129, docs/usage-python.rst:276, docs/usage-cli.rst:112). Requires Python >=3.10 (pyproject.toml:12).",
+      "security_policy": "none - no SECURITY.md or equivalent anywhere in the repo; .github contains only FUNDING.yml, tests.yml and codeql.yml. CONTRIBUTING.md directs bug reports to public GitHub issues (CONTRIBUTING.md:11, 19, 39). CodeQL scanning is enabled (.github/workflows/codeql.yml)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Python package and command-line tool to gather text on the Web and turn raw HTML into structured data; 'no database is required' (README.md:25-31)",
+        "verified": "yes",
+        "evidence": "Console script `trafilatura` declared at pyproject.toml:81-82 and implemented in trafilatura/cli.py:187-233; library exports extract/bare_extraction/extract_with_metadata/fetch_url/fetch_response/extract_metadata/baseline/html2txt/load_html (trafilatura/__init__.py:15-33). No database code or dependency (pyproject.toml:56-64); files are written only when -o/--backup-dir are given (cli_utils.py:181-210)."
+      },
+      {
+        "claim": "'It includes all necessary discovery and text processing components to perform web crawling, downloads, scraping, and extraction' (README.md:27-30)",
+        "verified": "partial",
+        "evidence": "Holds for server-rendered HTML fetched with a plain HTTP GET (downloads.py:209-215, 437-512). The package has no browser/JS engine, no POST/form/sign-in/session/tab/screenshot code and no PDF handling (searched trafilatura/*.py); no Content-Type check, only status 200 + size (downloads.py:241-250). Only a static Cookie/User-Agent header can be set via settings.cfg (settings.cfg:13-19; downloads.py:143-163). docs/troubleshooting.rst:35-39 itself says JavaScript-heavy pages need an external browser-automation library such as Playwright."
+      },
+      {
+        "claim": "'Metadata (title, author, date, site name, categories and tags)' (README.md:58-60)",
+        "verified": "yes",
+        "evidence": "extract_metadata (metadata.py:459-563) fills title, author, url, hostname, description, sitename, date (via htmldate, :523-525), categories, tags, license, image, pagetype. Code caveats: metadata is extracted/emitted only with --with-metadata, --only-with-metadata or xmltei (settings.py:168-170; xml.py:159-180); the output URL is the page-declared og:url/canonical when present, the requested URL being only a fallback (metadata.py:190-197, 372-396, 515-517; requested URL set at cli_utils.py:263); JSON also carries fingerprint, id, filedate and language (language only set when a target language is given, core.py:470-474; xml.py:159-180)."
+      },
+      {
+        "claim": "'Output formats: TXT and Markdown, CSV, JSON, HTML, XML and XML-TEI' (README.md:63-67)",
+        "verified": "yes",
+        "evidence": "settings.py:26-27 (SUPPORTED_FMT_CLI = csv, json, html, markdown, txt, xml, xmltei); cli.py:131-138; serializers in core.py:78-132 and xml.py:159-296, 626-655. Results go to stdout unless -o is set (cli_utils.py:203-210); logs go to stderr (cli.py:197-198)."
+      },
+      {
+        "claim": "'Live URLs, efficient and polite processing of download queues' (README.md:53-55)",
+        "verified": "partial",
+        "evidence": "Throttling and bounds exist: per-domain wait via courlan UrlStore (downloads.py:390-397; SLEEP_TIME=5.0, settings.cfg:11), thread pool (downloads.py:400-422), MAX_FILE_SIZE 20,000,000 bytes (settings.cfg:7; downloads.py:217-222, 456), DOWNLOAD_TIMEOUT 30 s (settings.cfg:6; downloads.py:189-193, 454-455), MAX_REDIRECTS 2 (settings.cfg:22; downloads.py:171-176, 453), CLI crawl stops at 30 pages (cli_utils.py:329, 363-364). But robots.txt is consulted only by the crawler's link filter (spider.py:86-88, 150-168); -u/-i/--feed/--sitemap downloads never check it (no robots logic in downloads.py or cli_utils.py) although docs say it should be respected (docs/downloads.rst:161-167). There is no output-length cap and no extraction timeout in URL mode (cli_utils.py:443-465). Code, not README/docs, is authoritative here."
+      },
+      {
+        "claim": "'Support for sitemaps (TXT, XML) and feeds (ATOM, JSON, RSS)'; 'Smart crawling and URL management (filtering and deduplication)' (README.md:49-51)",
+        "verified": "yes",
+        "evidence": "Sitemaps: XML and plain-text URL lists (sitemaps.py:147-162), robots.txt 'Sitemap:' lines and guessed paths (sitemaps.py:40-46, 209-211, 252-286). Feeds: Atom, RSS and JSON Feed (feeds.py:118-147), feed autodiscovery (feeds.py:168-199). Crawler: focused_crawler (spider.py:296-338; default max_seen_urls=10 at :38). URL de-duplication, blacklist and filter (downloads.py:366-387; cli.py:71, 105-109). docs/usage-cli.rst:185-186 calls crawling 'more experimental'."
+      },
+      {
+        "claim": "'Optional add-ons: language detection on extracted content; speed optimizations' (README.md:69-71)",
+        "verified": "yes",
+        "evidence": "`all` extra = brotli, faust-cchardet, htmldate[speed], py3langid, pycurl, urllib3[socks], zstandard (pyproject.toml:101-110); each is import-guarded (utils.py:17-56; downloads.py:34-53). Without py3langid, --target-language falls back to a check of HTML meta-language tags only (core.py:398-402; utils.py:416-447), a nuance docs/usage-python.rst:203 does not mention."
+      },
+      {
+        "claim": "'Trafilatura consistently outperforms other open-source libraries in text extraction benchmarks' (README.md:80-83)",
+        "verified": "partial",
+        "evidence": "The repo has the harness (tests/evaluate.py; eval extra pyproject.toml:113-128; tests/README.rst:44-53) and the project's own table (docs/evaluation.rst:74-97) in which trafilatura 1.2.2 has the highest F-score (0.909). That table is self-run, dated 2022-05-18, Python 3.8, v1.2.2 (not 2.2.0), and goose3 has higher precision (0.934 vs 0.932). Calibration against internal suites own-bench/WMB/WCXB/AEB is mentioned (core.py:42-52) without published results. Third-party evaluations are only linked (README.md:92-96); not opened or re-run."
+      },
+      {
+        "claim": "'Actively maintained with support from the open-source community' (README.md:73-75); 'continues to be maintained but its future depends on community support' (README.md:143-144)",
+        "verified": "partial",
+        "evidence": "HISTORY.md:4-32 lists v2.2.0 with ~20 items from several contributors; 2.1.0 and 2.0.0 precede it (HISTORY.md:35-120). The README itself hedges the future (README.md:143-144); pyproject.toml:13-15 lists one author; no release automation or security policy exists in the repo (.github has only FUNDING.yml, tests.yml, codeql.yml). Release dates are not in the repo, so cadence cannot be assessed."
+      },
+      {
+        "claim": "'distributed under the Apache 2.0 license. Versions prior to v1.8.0 are under GPLv3+' (README.md:121-123)",
+        "verified": "yes",
+        "evidence": "LICENSE is the Apache License 2.0 text (LICENSE:1-2); pyproject.toml:10 `license = 'Apache-2.0'`; trafilatura/__init__.py:8. The in-tree readability-lxml fork declares Apache-2.0 (readability_lxml.py:2-17); the bundled TEI DTD header allows free redistribution (data/tei_corpus.dtd:3). The pre-1.8.0 GPLv3+ history cannot be verified in this shallow clone (not checked) and does not apply to v2.2.0."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Project's own main-text extraction benchmark: trafilatura 1.2.2 standard mode (750 documents; 2,236 text + 2,250 boilerplate segments; Python 3.8; run 2022-05-18; self-run, predates 2.x)",
+        "metric": "precision / recall / accuracy / F-score; run time relative to the baseline function",
+        "value": "0.914 / 0.904 / 0.910 / 0.909; 7.1x",
+        "source": "docs/evaluation.rst:74-97",
+        "independent": false
+      },
+      {
+        "what": "Same table: trafilatura 1.2.2 fast and precision modes",
+        "metric": "precision / recall / accuracy / F-score; time relative to baseline",
+        "value": "fast: 0.914 / 0.886 / 0.902 / 0.900, 4.8x; precision: 0.932 / 0.874 / 0.905 / 0.902, 9.4x",
+        "source": "docs/evaluation.rst:94-95",
+        "independent": false
+      },
+      {
+        "what": "Same table: other extractors as run by the project (not by their authors)",
+        "metric": "F-score (time relative to baseline)",
+        "value": "readabilipy 0.2.0 0.874 (248x); news-please 1.5.22 0.808 (61x); readability-lxml 0.8.1 0.801 (5.8x); goose3 3.1.9 0.793 (22x; highest precision 0.934); baseline 0.790 (1x); boilerpy3 1.0.6 0.777 (4.1x); justext 3.0.0 custom 0.742 (5.2x); newspaper3k 0.2.8 0.713 (12x); raw HTML 0.658",
+        "source": "docs/evaluation.rst:80-93",
+        "independent": false
+      },
+      {
+        "what": "ScrapingHub article-extraction-benchmark (third-party benchmark; linked by the README, not opened; only the ranking claim is relayed)",
+        "metric": "ranking claim",
+        "value": "'Most efficient open-source library'; no numbers in the repo",
+        "source": "README.md:92; docs/evaluation.rst:24",
+        "independent": true
+      },
+      {
+        "what": "Lejeune & Barbaresi 2020, 'Bien choisir son outil d'extraction de contenu a partir du Web' (HAL paper; linked, not opened; co-authored by the project's author, README.md:162)",
+        "metric": "ranking claim",
+        "value": "'Best overall tool'; no numbers in the repo",
+        "source": "README.md:93-94; docs/evaluation.rst:25",
+        "independent": false
+      },
+      {
+        "what": "Bevendorff et al. 2023, 'An Empirical Comparison of Web Content Extraction Algorithms' (Webis paper; linked, not opened; only the ranking claim is relayed)",
+        "metric": "ROUGE-LSum mean F1 page score (ranking claim)",
+        "value": "'Best single tool'; no numbers in the repo",
+        "source": "README.md:95-96; docs/evaluation.rst:27",
+        "independent": true
+      }
+    ],
+    "risks": [
+      "Scope: no JavaScript rendering, browser automation, form/POST, sign-in, tab, screenshot or PDF handling exists in the package. Downloads are plain HTTP GET via urllib3 or pycurl (trafilatura/downloads.py:209-215, 437-512) with no Content-Type handling (downloads.py:241-250); only a static Cookie/User-Agent can come from settings.cfg (settings.cfg:13-19). The docs send JS-heavy pages to external browser-automation libraries such as Playwright (docs/troubleshooting.rst:35-39). Extraction can take HTML from stdin or --input-dir (cli.py:218-229), so it can only sit downstream of such a tool.",
+      "Attribution output is thin and partly implicit: JSON `source` is the page-declared og:url/canonical when present, with the requested URL only a fallback (metadata.py:190-197, 372-396, 515-517; cli_utils.py:263). The CLI discards the final redirect URL, HTTP status and headers (fetch_url returns text only, downloads.py:263-288; the full Response is available only through Python fetch_response, :291-319) and emits no fetch timestamp: `filedate` is a date-only value, present in JSON only (metadata.py:560; settings.py:216-222; xml.py:159-180). HTML piped on stdin or read with --input-dir cannot be given an origin URL on the CLI (cli.py:222-229). Metadata appears only with --with-metadata (settings.py:168-170). JSON/CSV field sets are defined only in code (xml.py:159-180, 637-653), not documented, and lightly tested (tests/unit_tests.py:293-296).",
+      "TLS verification is silently downgraded: on an SSL error both HTTP paths retry with certificate verification disabled (downloads.py:232-234 urllib3; 459-463 and 485-487 pycurl), urllib3's InsecureRequestWarning is globally silenced (downloads.py:58), and the HEAD liveness probe never verifies (downloads.py:330-332). Tests assert the fallback (tests/downloads_tests.py:202-228). Only a log line marks it; there is no option to disable the fallback (a --no-ssl flag exists only as commented-out code, cli.py:110-112). Relevant where attribution depends on an authenticated origin.",
+      "robots.txt compliance is limited to the crawler's link filter, which uses the generic '*' agent (spider.py:86-88, 150-168). Direct downloads (-u, -i, --feed, --sitemap) do not check it (no robots logic in downloads.py or cli_utils.py). The default User-Agent identifies the tool (downloads.py:81-82); docs warn it may be blocked and that downloads do not bypass blocks (docs/troubleshooting.rst:56, 67-68).",
+      "Failure semantics for shell callers (static reading, not executed): exit status reflects only download failures, 0/1/126 (cli_utils.py:260-267, 382-391). An extraction that returns None (empty, too short, language-filtered) prints nothing to stdout and still exits 0 (cli_utils.py:443-465; stdin path cli.py:226-229). There is no output-length cap option (cli.py:49-152; settings.cfg). URL-mode extraction has no time limit (cli_utils.py:443-465); EXTRACTION_TIMEOUT is used only by the --input-dir pipeline via executor.map(..., timeout=...) whose result iterator is never consumed (cli_utils.py:428-437), so by code reading it cannot fire; docs describe it as dropping extraction after 30 s and mention the `signal` module, which the code does not use (docs/settings.rst:39).",
+      "Python-API state and resource caveats: the urllib3 pool and retry strategy are process-global singletons built from the first config seen (downloads.py:59-61, 166-200), so later per-call DOWNLOAD_TIMEOUT/MAX_REDIRECTS changes are ignored on the urllib3 path (tests reset them by hand, tests/downloads_tests.py:71-85, 164-167). Decompression of fetched payloads has no output-size cap (utils.py:116-138, with a `max_output_size=???` note at :124), so MAX_FILE_SIZE bounds only the compressed size where trafilatura itself decompresses (e.g. the pycurl path sets Accept-Encoding by hand and fetches the raw body, downloads.py:78-80, 442-450, 473).",
+      "Docs drift from code (code should be trusted): docs/downloads.rst:175, 208, 218-220, 244 import `get_crawl_delay` from trafilatura (not present; only courlan's UrlStore method is used, spider.py:327) and unpack 4 values from load_download_buffer (it returns 2, downloads.py:390-397); docs/index.rst:198 cites a docs/requirements.txt that is not in the repo; docs/usage-r.rst:102 shows XML metadata attributes (`source=`) that the code does not emit by default (xml.py:66-80, 224-229; settings.py:168-170); docs/downloads.rst:134 states exit code 1 on failures while the code also returns 126 (cli_utils.py:382-391). The hosted HTTP API is documented as unavailable and closed-source (docs/usage-api.rst:20-21, 105).",
+      "Maintenance and supply chain: one listed author (pyproject.toml:13-15); the README says the future depends on community support (README.md:143-144; CONTRIBUTING.md:4-6). No release/publish workflow, checksums, signatures, attestations, lockfile or security policy in the repo (.github/workflows has only tests.yml and codeql.yml). CI actions are pinned by tag, not commit SHA (tests.yml:38, 42, 47, 95; codeql.yml:28, 32, 46, 59) and tests.yml has no permissions block. Some tests hit live third-party hosts (tests/downloads_tests.py:124-188; tests/cli_tests.py:295-304). The published benchmark table predates 2.x (docs/evaluation.rst:74-78). Three dependencies (courlan, htmldate, py3langid) are the same author's projects."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "adbar/trafilatura",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip from PyPI)",
+          "statement": "pip install trafilatura",
+          "citation": "docs/installation.rst:51 (also docs/quickstart.rst:8, docs/index.rst:86)",
+          "holds": true,
+          "note": "installation.rst:51 reads 'Type the following command: ``pip install trafilatura`` (``pip3`` where applicable)'. quickstart.rst:8 and index.rst:86 ('Primary installation method is with a Python package manager') give the same command. PyPI is named as the channel at installation.rst:35 and the distribution name is 'trafilatura' (pyproject.toml:7). Nothing was installed."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-2, 176; pyproject.toml:10; trafilatura/__init__.py:8; README.md:121-123",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License 2.0 terms: header at :1-3, sections 1-9, 'END OF TERMS AND CONDITIONS' at :176 (the optional appendix is omitted). pyproject.toml:10 and trafilatura/__init__.py:8 both declare 'Apache-2.0', and README.md:121 agrees. In-tree third-party material: readability_lxml.py:17 says 'License of forked code: Apache-2.0', and data/tei_corpus.dtd:3 allows free redistribution. The only GPL mentions in the repo are the pre-v1.8.0 notes (README.md:123, docs/index.rst:118)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - docs say tested on Linux, macOS and Windows; CI runs ubuntu-latest on Python 3.10/3.12/3.13/3.14; pure-Python package needing Python >=3.10; CPU architecture not named anywhere in the repo",
+          "citation": "docs/installation.rst:17; .github/workflows/tests.yml:19-34; pyproject.toml:12, 67-68",
+          "holds": true,
+          "note": "installation.rst:17 matches the quote word for word. tests.yml:19-24 sets ubuntu-latest x 3.10/3.12/3.14 x MINIMAL true/false, and :31-34 adds ubuntu-latest 3.13 with MINIMAL false. pyproject.toml:12 gives requires-python '>=3.10' and :67-68 a single package 'trafilatura'. trafilatura/ holds 21 .py modules plus settings.cfg, py.typed and data/tei_corpus.dtd; there are no .c/.h/.pyx/.so/.pyd/.rs/.cpp files anywhere. No project file names an architecture; the only x86_64/amd64/arm64 strings are inside saved third-party pages under tests/eval/*.html. The 'x86_64' part is an inference from Linux testing plus pure Python, which the dossier itself flags."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - console script `trafilatura`; inputs -u/-i/--input-dir/stdin; stdout or -o; --json/--csv/--xml/--xmltei/--markdown/--html; --with-metadata; --feed/--sitemap/--crawl/--explore/--probe/--list; --config-file; logs to stderr; exit codes 0/1/126 from download failures only; `trafilatura -u URL --json --with-metadata` composed from documented flags",
+          "citation": "pyproject.toml:81-82; trafilatura/cli.py:61-63, 78-103, 123, 126, 131-138, 187-233; trafilatura/cli_utils.py:193-210, 382-391; docs/usage-cli.rst:26-37, 359",
+          "holds": true,
+          "note": "All sub-claims match the code. pyproject.toml:81-82 maps `trafilatura` to `trafilatura.cli:main`. main/process_args are at cli.py:187-233, with routing at :206-229. -i/--input-dir/-u are at :61-63. write_result (cli_utils.py:193-210) writes to stdout unless -o is given. Format flags are at cli.py:131-137. --with-metadata is at :123 and is wired to Extractor.with_metadata (settings.py:168-170, 210). --config-file is at :126, and logging.basicConfig(stream=sys.stderr) is at :198. _define_exit_code returns 0/1/126 (cli_utils.py:382-391) from download errors collected at :260-267. Citation slips: --list is defined at cli.py:73 (Output group), outside the cited :78-103, and --json is documented at usage-cli.rst:86/380, not in the cited :26-37/359. Exit-code nuance: only -u/-i/--feed/--sitemap/--explore runs set a code (cli.py:206-224); --crawl, --probe, --input-dir and stdin always exit 0 (cli.py:195, 210-229). Separately, argparse usage errors exit 2 (e.g. cli.py:160) and an undecodable -i file exits 1 (cli_utils.py:82)."
+        },
+        {
+          "field": "claim_checks[4] ('Live URLs, efficient and polite processing of download queues', verified: partial)",
+          "statement": "Per-domain wait (SLEEP_TIME 5.0), thread pool, MAX_FILE_SIZE 20,000,000, DOWNLOAD_TIMEOUT 30 s, MAX_REDIRECTS 2, CLI crawl stops at 30 pages; robots.txt consulted only by the crawler's link filter, -u/-i/--feed/--sitemap never check it though docs say it should be respected; no output-length cap and no extraction timeout in URL mode",
+          "citation": "README.md:53-55; trafilatura/downloads.py:171-176, 189-193, 217-222, 390-422, 453-456; trafilatura/settings.cfg:6, 7, 11, 22; trafilatura/cli_utils.py:329, 363-364, 443-465; trafilatura/spider.py:86-88, 150-168; docs/downloads.rst:161-167",
+          "holds": true,
+          "note": "README.md:54 matches the quote. Every bound matches the code: SLEEP_TIME = 5.0 (settings.cfg:11) is passed as time_limit to UrlStore.get_download_urls (downloads.py:390-397); a ThreadPoolExecutor runs at downloads.py:400-422; MAX_FILE_SIZE = 20000000 (settings.cfg:7) is enforced while streaming (downloads.py:217-222) and via pycurl MAXFILESIZE (:456); DOWNLOAD_TIMEOUT = 30 (settings.cfg:6) is applied at downloads.py:189-193 and 454-455; MAX_REDIRECTS = 2 (settings.cfg:22) is applied at downloads.py:171-176 and 453; the CLI crawl uses n=30 (cli_utils.py:329, 363-364). The only robots disallow check is can_fetch('*', link) in CrawlParameters.is_valid_link (spider.py:86-88), with fetch and parse at :150-168. There is no robots code in downloads.py, cli_utils.py or feeds.py, and sitemaps.py:252-286 reads robots.txt only for 'Sitemap:' lines. docs/downloads.rst:167 says the rules 'should be respected'. examine() calls extract() with no timeout (cli_utils.py:443-465), and is_acceptable_length (utils.py:405-413) checks input size, not output. The 'partial' rating is right. Minor nuance: the crawler also stores the rules in its UrlStore (spider.py:253), and focused_crawler takes its delay from courlan's get_crawl_delay (spider.py:327). That is still crawler-only."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking - integrations.cli: cite --list at trafilatura/cli.py:73 (Output group) instead of cli.py:78-103.",
+        "Non-blocking - integrations.cli: add docs/usage-cli.rst:86 (or :380) as the citation documenting --json in the composed `trafilatura -u URL --json --with-metadata` command.",
+        "Non-blocking - integrations.cli: replace 'exit codes 0/1/126 from download failures only' with 'exit codes 0/1/126 from download failures on -u/-i/--feed/--sitemap/--explore runs (cli.py:206-224; cli_utils.py:260-267, 382-391); --crawl, --probe, --input-dir and stdin always exit 0 (cli.py:195, 210-229); argparse usage errors exit 2 and an undecodable -i file exits 1 (cli_utils.py:82)'."
+      ]
+    }
+  ]
+}

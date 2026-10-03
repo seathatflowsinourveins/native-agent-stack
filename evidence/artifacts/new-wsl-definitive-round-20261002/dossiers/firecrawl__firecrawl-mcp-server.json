@@ -1,0 +1,293 @@
+{
+  "contender": "firecrawl/firecrawl-mcp-server",
+  "revision": {
+    "contender": "firecrawl/firecrawl-mcp-server",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "firecrawl/firecrawl-mcp-server",
+        "tag": "v3.2.1",
+        "commit": "d22f144eee0754fd819b5b976b32294d8d234ea5",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.2.1",
+    "commit": "d22f144eee0754fd819b5b976b32294d8d234ea5",
+    "read_at": "2026-10-02T03:02:06+00:00"
+  },
+  "dossier": {
+    "contender": "firecrawl/firecrawl-mcp-server",
+    "revision": {
+      "tag": "v3.2.1",
+      "commit": "d22f144eee0754fd819b5b976b32294d8d234ea5",
+      "read_at": "2026-10-02T03:02:06+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "MCP server (TypeScript on Node) that exposes Firecrawl web operations as six MCP tools - firecrawl_scrape (one URL -> markdown/html/json/screenshot etc., optional onlyMainContent), firecrawl_map, firecrawl_search, firecrawl_crawl, firecrawl_check_crawl_status, firecrawl_extract - by wrapping the @mendable/firecrawl-js client (src/index.ts:234-565). Facts bearing on the stated needs: (1) fetching a chosen URL exists only as the MCP tool firecrawl_scrape; the package ships no shell CLI for it (the firecrawl-mcp bin only starts the server, package.json:6-8) and the tool returns the SDK response as JSON text (src/index.ts:156-158, 268-269), so metadata fields come from the Firecrawl API rather than from this repo; (2) page interaction exists only as the `actions` array on firecrawl_scrape (and inside scrapeOptions of search/crawl): wait, screenshot, scroll, scrape, click, write, press, executeJavascript, generatePDF (src/index.ts:164-166, 205-220). It is absent when CLOUD_SERVICE=true, is not mentioned in the README, is sent in a single client.scrape call (src/index.ts:268), has no tab, navigation or session-persistence action types, and has no shell-callable form. A Firecrawl API key (cloud) or a self-hosted Firecrawl API URL is required (README.md:182-190).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'A Model Context Protocol (MCP) server implementation that integrates with Firecrawl for web scraping capabilities.'",
+          "citation": "README.md:11"
+        },
+        {
+          "claim": "Features: web scraping, crawling and discovery; search and content extraction; deep research and batch scraping; automatic retries and rate limiting; cloud and self-hosted support; SSE support.",
+          "citation": "README.md:16-23"
+        },
+        {
+          "claim": "Run with env FIRECRAWL_API_KEY=fc-YOUR_API_KEY npx -y firecrawl-mcp; stdio is the default transport and SSE is opt-in with SSE_LOCAL=true at http://localhost:3000/sse.",
+          "citation": "README.md:31-33; README.md:104-112"
+        },
+        {
+          "claim": "FIRECRAWL_API_KEY is 'Required when using cloud API (default)' and optional for a self-hosted instance reached through FIRECRAWL_API_URL; keys come from a firecrawl.dev account.",
+          "citation": "README.md:82; README.md:182-190"
+        },
+        {
+          "claim": "firecrawl_scrape: 'Scrape content from a single URL with advanced options', best when you know exactly which page has the information; returns 'Markdown, HTML, or other formats as specified'; example options: formats, onlyMainContent, waitFor, timeout, mobile, includeTags, excludeTags, skipTlsVerification.",
+          "citation": "README.md:336-373"
+        },
+        {
+          "claim": "For many known URLs use firecrawl_batch_scrape ('built-in rate limiting and parallel processing') and poll with firecrawl_check_batch_status.",
+          "citation": "README.md:315-317; README.md:375-432"
+        },
+        {
+          "claim": "firecrawl_crawl starts an asynchronous crawl; 'Crawl responses can be very large and may exceed token limits. Limit the crawl depth and number of pages'.",
+          "citation": "README.md:503-515"
+        },
+        {
+          "claim": "firecrawl_map discovers URLs on a site; firecrawl_search searches the web and can optionally scrape the results.",
+          "citation": "README.md:434-441; README.md:465-467"
+        },
+        {
+          "claim": "firecrawl_extract: 'Extract structured information from web pages using LLM capabilities. Supports both cloud AI and self-hosted LLM extraction.'",
+          "citation": "README.md:569-571; README.md:589"
+        },
+        {
+          "claim": "Retries: FIRECRAWL_RETRY_MAX_ATTEMPTS / INITIAL_DELAY / MAX_DELAY / BACKOFF_FACTOR (defaults 3, 1000, 10000, 2); 'Automatically retries failed requests due to rate limits' with exponential backoff; rate limiting is attributed to 'Firecrawl's built-in' capabilities.",
+          "citation": "README.md:193-198; README.md:285-292; README.md:304"
+        },
+        {
+          "claim": "Credit monitoring: FIRECRAWL_CREDIT_WARNING_THRESHOLD (1000) and FIRECRAWL_CREDIT_CRITICAL_THRESHOLD (100); 'Tracks API credit consumption for cloud API usage'.",
+          "citation": "README.md:200-203; README.md:294-300"
+        },
+        {
+          "claim": "'The server includes comprehensive logging': operation status and progress, performance metrics, credit usage monitoring, rate limit tracking, error conditions.",
+          "citation": "README.md:636-654"
+        },
+        {
+          "claim": "Client setup examples for Cursor, Windsurf, VS Code and Claude Desktop, all launching npx -y firecrawl-mcp with FIRECRAWL_API_KEY in env.",
+          "citation": "README.md:41-102; README.md:122-176; README.md:238-262"
+        },
+        {
+          "claim": "Development flow is npm install, npm run build, npm test; license stated as 'MIT License - see LICENSE file for details'.",
+          "citation": "README.md:680-698; README.md:706-708"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx (no install step; POSIX env syntax, a Windows cmd variant is given separately at README.md:80)",
+          "command": "env FIRECRAWL_API_KEY=fc-YOUR_API_KEY npx -y firecrawl-mcp",
+          "citation": "README.md:31-33"
+        },
+        {
+          "method": "npm global install",
+          "command": "npm install -g firecrawl-mcp",
+          "citation": "README.md:37-39"
+        },
+        {
+          "method": "npx in local SSE / HTTP mode (instead of stdio)",
+          "command": "env SSE_LOCAL=true FIRECRAWL_API_KEY=fc-YOUR_API_KEY npx -y firecrawl-mcp",
+          "citation": "README.md:108-112"
+        },
+        {
+          "method": "Smithery CLI for Claude Desktop (README labels this Legacy)",
+          "command": "npx -y @smithery/cli install @mendableai/mcp-server-firecrawl --client claude",
+          "citation": "README.md:114-120"
+        },
+        {
+          "method": "From source (Development section; two separate commands in the README)",
+          "command": "npm install   # then: npm run build",
+          "citation": "README.md:680-691"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Linux is the CI and publish platform (.github/workflows/ci.yml:11, .github/workflows/publish.yml:10) and both Dockerfiles are Linux images (Dockerfile:3,21; Dockerfile.service:4,17). The README names no OS for Linux, and CI only builds (ci.yml:22-26); it never starts the server. image.yml sets no `platforms`, so the published image is a single default-platform build (.github/workflows/image.yml:29-37). In practice Node >=22 is needed (package-lock.json:58-60) although package.json:36-38 says >=18 and CI uses Node 20 (ci.yml:19).",
+        "wsl2": "unknown - no mention of WSL anywhere in the repo; the README's only Windows note is a native-Windows `cmd /c` workaround (README.md:80). No install-script or OS/CPU-restricted packages appear in package-lock.json (grep for hasInstallScript, os, cpu found none).",
+        "macos_arm64": "unknown - no macOS or arm64 statement; the only Mac mention is the Cursor keyboard shortcut (README.md:84) and there is no macOS CI job (ci.yml:11 is ubuntu-latest only). No native or platform-restricted packages in package-lock.json (grep) and no local browser dependency (package.json:29-35).",
+        "gpu": "no - no GPU code or requirement; the server is a thin client that forwards calls to the Firecrawl API through @mendable/firecrawl-js (src/index.ts:119-132, 268); page rendering happens in the Firecrawl service and no browser or ML dependency is declared (package.json:29-35)."
+      },
+      "integrations": {
+        "cli": "none found - the only bin, firecrawl-mcp (package.json:6-8), starts the MCP server; src/index.ts never reads process.argv (no flags, no --help, no fetch/scrape subcommand) and the other package.json scripts are build/start/lint tasks (package.json:15-27).",
+        "mcp": "yes - FastMCP-based server (src/index.ts:3, 88-117) exposing six tools: firecrawl_scrape, firecrawl_map, firecrawl_search, firecrawl_crawl, firecrawl_check_crawl_status, firecrawl_extract (src/index.ts:234, 273, 314, 402, 470, 497). Transports: stdio by default (src/index.ts:587-592); stateless HTTP stream (the README calls it SSE) when SSE_LOCAL, HTTP_STREAMABLE_SERVER or CLOUD_SERVICE is 'true' (src/index.ts:574-586). README setup for Cursor (README.md:41-84), Windsurf (README.md:86-102), VS Code (README.md:122-176), Claude Desktop (README.md:238-262), Smithery (README.md:114-120; smithery.yaml:3-22).",
+        "sdk_or_api": "No SDK or API of its own: package.json has no main or exports (package.json:6-11). It consumes @mendable/firecrawl-js ^4.3.4 (package.json:30; src/index.ts:5, 119-132), which calls the Firecrawl HTTP API (cloud by default, or a self-hosted instance via FIRECRAWL_API_URL, README.md:187-190). The only HTTP surface this server itself provides is MCP over HTTP plus an unauthenticated /health (src/index.ts:110-116, 574-586).",
+        "claude_code_or_codex": "none found - no mention of Claude Code, 'claude mcp add', Codex, .mcp.json, AGENTS.md or skill files anywhere in the repo (grep, lockfiles excluded). Only Claude Desktop JSON (README.md:238-262) and the Smithery command with --client claude (README.md:119) are documented."
+      },
+      "telemetry_and_network": "No telemetry, analytics, crash-reporting or update-check code in this repo (grep of README, source, configs and workflows found none; the only hit is the 'changeTracking' format name, src/index.ts:183). Network use: every tool call goes through @mendable/firecrawl-js (src/index.ts:5, 268, 309, 394, 462, 492, 562) to the Firecrawl API - Firecrawl cloud by default, which needs a Firecrawl account and API key (README.md:82, 184-190) - or to a self-hosted Firecrawl at FIRECRAWL_API_URL (src/index.ts:119-132; README.md:187-190). The repo holds no base-URL constant, so the default cloud endpoint is defined inside the SDK (not in this checkout). Every call except check_crawl_status adds origin: 'mcp-fastmcp' (src/index.ts:134, 268, 309, 396, 464, 560). Target URLs, search queries, options, extraction prompts and any text typed by write actions are therefore sent to the Firecrawl service. dotenv loads a .env file from the working directory (src/index.ts:8). Logging is silent in stdio mode and goes to the console only in the HTTP modes (src/index.ts:54-86). HTTP modes listen on PORT (default 3000) and serve MCP plus /health (src/index.ts:110-116, 566-586)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript",
+        "JavaScript (jest.config.js only)",
+        "Shell (docker/entrypoint.sh)",
+        "Dockerfile",
+        "nginx config (docker/nginx.conf)",
+        "YAML (workflows, smithery.yaml)"
+      ],
+      "entry_points": [
+        {
+          "path": "package.json:6-8",
+          "what": "bin 'firecrawl-mcp' -> dist/index.js, compiled from src/index.ts (shebang at src/index.ts:1; tsconfig.json:6-7); starts the MCP server, stdio by default."
+        },
+        {
+          "path": "src/index.ts:566-594",
+          "what": "Server main: picks stdio, or stateless httpStream on PORT (default 3000) and HOST (default localhost; 0.0.0.0 when CLOUD_SERVICE=true), then awaits server.start()."
+        },
+        {
+          "path": "src/index.ts:234-565",
+          "what": "The six MCP tool registrations (scrape, map, search, crawl, check_crawl_status, extract), each wrapping one @mendable/firecrawl-js call."
+        },
+        {
+          "path": "package.json:19-20",
+          "what": "npm start -> node dist/index.js; npm run start:cloud -> CLOUD_SERVICE=true node dist/index.js (header-authenticated HTTP mode with Safe Mode)."
+        },
+        {
+          "path": "Dockerfile:38",
+          "what": "Smithery-generated image (Dockerfile:1): ENTRYPOINT node dist/index.js on node:22-slim; no workflow builds this file."
+        },
+        {
+          "path": "Dockerfile.service:35",
+          "what": "Service image: CMD /entrypoint.sh (docker/entrypoint.sh:1-11) runs node dist/index.js in the background and nginx in the foreground on :8080 (docker/nginx.conf); no transport env var is set in the image, so CLOUD_SERVICE / SSE_LOCAL / HTTP_STREAMABLE_SERVER must be supplied at run time (src/index.ts:574-586)."
+        },
+        {
+          "path": "smithery.yaml:3-22",
+          "what": "Smithery stdio start command: node dist/index.js with FIRECRAWL_API_KEY / FIRECRAWL_API_URL taken from the Smithery config."
+        }
+      ],
+      "architecture": "Single-file server. src/index.ts (about 595 lines) builds a FastMCP server from the forked firecrawl-fastmcp package (src/index.ts:3, 88-117), defines zod parameter schemas, and registers six tools that each call one @mendable/firecrawl-js method: scrape -> client.scrape (:268), map -> client.map (:309), search -> client.search (:394), crawl -> client.crawl (:462), check_crawl_status -> client.getCrawlStatus (:492), extract -> client.extract (:562); results are returned as JSON.stringify(response, null, 2) (:156-158). The scrape schema covers formats (markdown, html, rawHtml, screenshot, links, summary, changeTracking, json with prompt/schema), onlyMainContent, includeTags/excludeTags, waitFor, mobile, skipTlsVerification, location, storeInCache, maxAge and `actions` (:171-232). The per-session API key comes from `authenticate` (:93-109): from Authorization Bearer / x-firecrawl-api-key / x-api-key headers when CLOUD_SERVICE=true (:15-32, 94-100), otherwise from env FIRECRAWL_API_KEY (:101-108). SAFE_MODE (= CLOUD_SERVICE) strips `actions` and crawl `webhook` (:136-137, 205-220, 442-452). Transport is stdio by default, or stateless httpStream for CLOUD_SERVICE / SSE_LOCAL / HTTP_STREAMABLE_SERVER (:566-594), with a /health endpoint (:110-116). Other modules: src/types/fastmcp.d.ts (ambient types for firecrawl-fastmcp); docker/nginx.conf + docker/entrypoint.sh (Dockerfile.service image: nginx on :8080 in front of node on :3000, rewriting /{apiKey}/... path keys into the X-Firecrawl-API-Key header); src/legacy/index.md (the pre-FastMCP implementation kept as a Markdown file, not compiled). The server itself implements no retries, credit tracking, output-size caps, retrieval timestamps or content hashing, and sets no default for maxAge or onlyMainContent; those are left to the SDK/API.",
+      "packaging_and_release": "npm package firecrawl-mcp (package.json:2) ships only dist/ (package.json:9-11), built with tsc (package.json:16); the prepare script builds on install (package.json:24) and the Dockerfiles skip it with --ignore-scripts (Dockerfile:11-12; Dockerfile.service:8-10). .github/workflows/publish.yml runs on GitHub release creation or manual dispatch: ubuntu-latest, Node 20.x, npm ci, npm run build, then npm publish with the NPM_TOKEN secret (publish.yml:3-30). No provenance flag, id-token permission, attestation, checksum, signature or SBOM step exists in any workflow (grep of .github found none). Docker: image.yml pushes ghcr.io/firecrawl/firecrawl-mcp-server:latest from Dockerfile.service on every push to main (image.yml:6-37); image-staging.yml pushes ghcr.io/firecrawl/firecrawl-mcp-server-alpha:latest from the staging and fastmcp branches (image-staging.yml:6-40). Only mutable `latest` tags, no `platforms` key, no `permissions:` blocks, actions referenced by tag or branch (actions/checkout@main at image.yml:17). Neither Dockerfile sets USER. Git tag v3.2.1 points to commit d22f144eee0754fd819b5b976b32294d8d234ea5 (.git/packed-refs:2); CHANGELOG.md stops at 1.7.0 (CHANGELOG.md:3).",
+      "tests_and_ci": "Jest with the ts-jest ESM preset is configured (jest.config.js:1-18; npm test at package.json:17) but there are 0 test files (no *.test.* or *.spec.* files, no tests/ directory), and jest, ts-jest, eslint and prettier are neither declared in package.json nor present in package-lock.json. jest.setup.ts mocks old SDK methods asyncBatchScrapeUrls / checkBatchScrapeStatus that the current code never calls (jest.setup.ts:52-66). `npm run test:endpoints` points to test-endpoints.js, which does not exist (package.json:18; VERSIONING.md:93-101). ESLint and Prettier configs exist (.eslintrc.json, .prettierrc) but are not run in CI. CI: .github/workflows/ci.yml on push and pull request to main - ubuntu-latest, Node 20.x, npm ci, npm run build (ci.yml:3-26); no test, lint or audit step. Other workflows: publish.yml (npm publish), image.yml and image-staging.yml (GHCR images).",
+      "dependencies": "package.json: 5 runtime dependencies (@mendable/firecrawl-js ^4.3.4, dotenv ^17.2.2, firecrawl-fastmcp ^1.0.2, typescript ^5.9.2, zod ^4.1.5; package.json:29-35) plus 1 dev dependency (@types/node ^24.3.1; package.json:55-57) = 6 direct. package-lock.json (lockfileVersion 3) resolves 159 packages including nested copies but records version 3.1.9, not 3.2.1 (package-lock.json:3). pnpm-lock.yaml (lockfileVersion 9.0) lists the same 5+1 direct deps and resolves @mendable/firecrawl-js 4.3.5 where the npm lock has 4.3.4 (pnpm-lock.yaml:9-29; package-lock.json:48). firecrawl-fastmcp 1.0.2 (a FastMCP fork whose source is not in this repo) pulls @modelcontextprotocol/sdk ^1.18.0, mcp-proxy, execa, yargs ^18, undici ^5.6.0 and others (package-lock.json:722-745). No browser or driver packages, and no install-script or OS/CPU-restricted packages in the lock (grep). Lock licenses: 136 MIT, 22 ISC/BSD/Apache-2.0, 1 URL-form declaration (uri-templates 0.2.0, package-lock.json:1829-1833). Test and lint tools (jest, ts-jest, eslint, prettier) are not declared anywhere.",
+      "security_policy": "none - no SECURITY.md in the repo root or .github/ (.github holds only workflows/), and the README has no vulnerability-reporting section."
+    },
+    "claim_checks": [
+      {
+        "claim": "firecrawl_scrape fetches a single URL and returns main-content Markdown/HTML or other formats, with options such as onlyMainContent and timeout (README.md:336-373).",
+        "verified": "partial",
+        "evidence": "Tool exists and forwards to client.scrape (src/index.ts:234-271); formats (src/index.ts:173-200) and onlyMainContent (src/index.ts:201) are in the schema. The README example field timeout (README.md:363) is not in scrapeParamsSchema (src/index.ts:171-232). Output is the SDK response passed through JSON.stringify (src/index.ts:156-158, 268-269); the server adds no retrieval timestamp, hash or citation field, and which metadata keys (title, source URL, status code) come back is defined by @mendable/firecrawl-js / the API, which is not in this checkout (README.md:372-373 lists none). The server sets no default for onlyMainContent or maxAge (src/index.ts:201, 231); VERSIONING.md:87-88 says the defaults are 48 h and true - not checkable here."
+      },
+      {
+        "claim": "Deep research and batch scraping; tools firecrawl_batch_scrape and firecrawl_check_batch_status (README.md:20, 375-432).",
+        "verified": "no",
+        "evidence": "Only six server.addTool calls exist: firecrawl_scrape, firecrawl_map, firecrawl_search, firecrawl_crawl, firecrawl_check_crawl_status, firecrawl_extract (src/index.ts:234, 273, 314, 402, 470, 497). No batch_scrape, check_batch_status or deep-research tool is registered (grep of src/). VERSIONING.md:53-59 lists the same six as current and VERSIONING.md:82 says to stop using firecrawl_deep_research; src/legacy/index.md also defines only those six (lines 28, 219, 276, 465, 493, 632). Tool descriptions still say 'use batch_scrape' (src/index.ts:241-242, 279, 408-409). Code wins; the README is stale."
+      },
+      {
+        "claim": "Automatic retries/rate limiting and credit monitoring configured through FIRECRAWL_RETRY_* and FIRECRAWL_CREDIT_* (README.md:21, 193-203, 285-300).",
+        "verified": "no",
+        "evidence": "src/index.ts reads only CLOUD_SERVICE, SSE_LOCAL, HTTP_STREAMABLE_SERVER, FIRECRAWL_API_KEY, FIRECRAWL_API_URL, PORT and HOST (src/index.ts:56-58, 94, 103, 121, 137, 566-577); none of the FIRECRAWL_RETRY_* or FIRECRAWL_CREDIT_* variables is read. withRetry and the credit CONFIG exist only in src/legacy/index.md:916-963, a Markdown file that tsc does not compile (tsconfig.json:13). README.md:304 attributes rate limiting to Firecrawl's built-in capabilities, so any retry would come from the SDK/API - not checkable in this checkout."
+      },
+      {
+        "claim": "'The server includes comprehensive logging' including performance metrics, credit usage and rate-limit tracking (README.md:636-654).",
+        "verified": "partial",
+        "evidence": "ConsoleLogger writes only when CLOUD_SERVICE, SSE_LOCAL or HTTP_STREAMABLE_SERVER is 'true' (src/index.ts:54-59), so default stdio mode is silent. The only log calls are one info line per tool (src/index.ts:267, 308, 393, 461, 550-552). No performance-metric, credit or rate-limit logging exists in src/index.ts; the README's sample lines ('initialized successfully', 'Starting scrape for URL') appear only in src/legacy/index.md:1026, 1392."
+      },
+      {
+        "claim": "Cloud and self-hosted support; API key optional when FIRECRAWL_API_URL is set (README.md:22, 184-190).",
+        "verified": "yes",
+        "evidence": "createClient passes apiUrl from FIRECRAWL_API_URL when set (src/index.ts:119-132); authenticate exits only when both key and URL are missing (src/index.ts:102-107); getClient permits a missing key when FIRECRAWL_API_URL is set (src/index.ts:148-151). The cloud default endpoint is not defined in this repo (no URL constant), so it comes from the SDK."
+      },
+      {
+        "claim": "SSE support: SSE_LOCAL=true serves http://localhost:3000/sse (README.md:23, 104-112).",
+        "verified": "partial",
+        "evidence": "SSE_LOCAL=true switches to the httpStream transport with PORT (default 3000), host localhost unless HOST is set, and stateless: true (src/index.ts:566-586). The /sse route itself is implemented in the firecrawl-fastmcp dependency (this repo only declares transport args in src/types/fastmcp.d.ts:12-17), so the path cannot be verified here; docker/nginx.conf:97-110 proxies /sse to the app. The README does not document the HTTP_STREAMABLE_SERVER or CLOUD_SERVICE modes that the code also implements (src/index.ts:574-578)."
+      },
+      {
+        "claim": "firecrawl_crawl is asynchronous and can be bounded by depth and page limits, e.g. maxDepth and limit (README.md:503-551).",
+        "verified": "partial",
+        "evidence": "limit (src/index.ts:436) and a depth control exist, but the depth field is maxDiscoveryDepth (src/index.ts:434), not the README example's maxDepth (README.md:530); this repo enforces no default or ceiling for limit. README.md:538-551 and src/index.ts:426 say the response is an operation ID, but the code calls client.crawl(...) (src/index.ts:462-465); whether that SDK method waits for completion is defined in @mendable/firecrawl-js (not in this checkout). VERSIONING.md:39,56 notes V1 used asyncCrawlUrl and V2 uses crawl."
+      },
+      {
+        "claim": "Tool text in the code (not the README): 'Safe Mode: Read-only content extraction. Interactive actions (click, write, executeJavascript) are disabled for security' (src/index.ts:257); the README itself never mentions interactive actions.",
+        "verified": "yes",
+        "evidence": "SAFE_MODE = (CLOUD_SERVICE === 'true') (src/index.ts:136-137). When true, `actions` is omitted from the scrape schema (src/index.ts:205-220) and `webhook` from the crawl schema (src/index.ts:442-452), matching the tool text (src/index.ts:257, 427). In stdio / SSE_LOCAL / HTTP_STREAMABLE_SERVER modes `actions` accepts wait, screenshot, scroll, scrape, click, write, press, executeJavascript, generatePDF (src/index.ts:164-169, 205-220). README.md contains no mention of actions, screenshots-as-actions or PDF (grep), so these capabilities are undocumented there; the legacy file describes actions as 'List of actions to perform before scraping' (src/legacy/index.md:172)."
+      },
+      {
+        "claim": "Development and contributing flow: run tests with npm test (README.md:688-690, 697).",
+        "verified": "no",
+        "evidence": "No *.test.* / *.spec.* files and no tests/ directory exist (glob); jest.config.js:16 matches only **/*.test.ts. jest, ts-jest, eslint and prettier are not in package.json devDependencies (package.json:55-57) nor anywhere in package-lock.json (grep). jest.setup.ts:52-66 mocks the old asyncBatchScrapeUrls / checkBatchScrapeStatus methods. CI runs npm ci and npm run build only (.github/workflows/ci.yml:22-26)."
+      },
+      {
+        "claim": "env FIRECRAWL_API_KEY=fc-YOUR_API_KEY npx -y firecrawl-mcp starts the server (README.md:31-33).",
+        "verified": "partial",
+        "evidence": "Package name firecrawl-mcp (package.json:2) with bin firecrawl-mcp -> dist/index.js (package.json:6-8), files: ['dist'] (package.json:9-11) built by tsc (package.json:16); dist/ is gitignored (.gitignore:5). Presence of the package on the npm registry is not checkable from this checkout. engines.node >=18 (package.json:36-38) conflicts with @mendable/firecrawl-js 4.3.4's >=22 (package-lock.json:58-60). In stdio mode the API key reaches the tools only through `authenticate` being invoked by firecrawl-fastmcp without an HTTP request (src/index.ts:101-108, 148-154); that dependency behaviour is not checkable here."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Speed-up from passing the maxAge parameter so scrapes are served from cached data",
+        "metric": "relative scrape speed (claimed)",
+        "value": "'500% faster' - stated in a tool description with no baseline, dataset or method",
+        "source": "src/index.ts:255",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Documentation does not match the v3.2.1 code: the README documents firecrawl_batch_scrape, firecrawl_check_batch_status, 'deep research', FIRECRAWL_RETRY_*/FIRECRAWL_CREDIT_* settings and arguments timeout, maxDepth, systemPrompt, lang/country (README.md:20, 193-203, 363, 375-432, 486-487, 530, 583), but src/index.ts registers six tools (src/index.ts:234, 273, 314, 402, 470, 497), reads none of those env vars and defines none of those fields (src/index.ts:171-232, 375-385, 429-456, 536-543). It does not document the CLOUD_SERVICE, HTTP_STREAMABLE_SERVER, PORT or HOST settings the code reads (src/index.ts:56-58, 566-577). Tool descriptions still tell the model to 'use batch_scrape' (src/index.ts:241-242, 279, 408-409), and the search example passes sources as strings (src/index.ts:346-348) while the schema requires {type} objects (src/index.ts:381-383). VERSIONING.md describes /:apiKey/v2 endpoints that exist only as an nginx rewrite in the Dockerfile.service image (docker/nginx.conf:10-46; VERSIONING.md:16-24) and a test-endpoints.js script that is missing (VERSIONING.md:93-101; package.json:18).",
+      "Scope: the fetch and interaction capabilities named in the needs are reachable only as MCP tools backed by a remote Firecrawl service - no CLI and no library export (package.json:6-11; no process.argv in src/index.ts). A Firecrawl account and API key are required for the default cloud API (README.md:82, 182-190), or a separately run self-hosted Firecrawl that is not part of this repo. Every URL, option and typed text goes through @mendable/firecrawl-js (src/index.ts:268, 309, 394, 462, 562), including the `text` of write actions (src/index.ts:211), which would carry any credentials typed in a scripted sign-in. Tool descriptions also instruct the model to default to these tools ('you should always default to using this tool', src/index.ts:238, 317).",
+      "Page interaction is limited and undocumented: it exists only as the `actions` array (wait, screenshot, scroll, scrape, click, write, press, executeJavascript, generatePDF; fields selector, milliseconds, text, key, direction, script, fullPage) (src/index.ts:164-166, 205-220); the README never mentions actions, screenshots or PDF (grep). It is removed when CLOUD_SERVICE=true (src/index.ts:137, 205), has no tab, navigation, cookie/session or file-transfer action types, and each tool call is a separate client.scrape request (src/index.ts:268), so this repo keeps no browser state between calls. Its limits and timeouts are defined in the SDK/API, not in this checkout. In default stdio mode the model can also set executeJavascript scripts (src/index.ts:215), skipTlsVerification (src/index.ts:222) and crawl webhooks with custom headers (src/index.ts:442-452).",
+      "No automated tests: zero test files, and jest/ts-jest/eslint/prettier are undeclared (package.json:55-57; package-lock.json); jest.setup.ts mocks removed SDK methods (jest.setup.ts:52-66); `npm run test:endpoints` targets a missing file (package.json:18); CI only runs npm ci and npm run build (.github/workflows/ci.yml:22-26).",
+      "Runtime and lockfile inconsistencies: package.json engines.node >=18 (package.json:36-38) while @mendable/firecrawl-js 4.3.4 requires >=22 (package-lock.json:58-60) and yargs 18 requires ^20.19.0 || ^22.12.0 || >=23 (package-lock.json:1904-1906); CI and publish use Node 20.x (.github/workflows/ci.yml:19; publish.yml:18) while the Dockerfiles use Node 22. package-lock.json says version 3.1.9 (package-lock.json:3) against package.json 3.2.1, and the two lockfiles resolve different @mendable/firecrawl-js versions (4.3.4 vs 4.3.5).",
+      "Release hygiene: npm publish runs from CI with a long-lived NPM_TOKEN and no provenance, attestation, checksum, signature or SBOM step (.github/workflows/publish.yml:27-30; grep of .github); GHCR images are tagged only `latest` and rebuilt on every push to main (image.yml:6-10, 35); workflows use actions/checkout@main and old v1/v2 action majors with no `permissions:` blocks (image.yml:17-30; image-staging.yml:20-33); neither Dockerfile sets USER; typescript is a runtime dependency (package.json:33); the main server dependency firecrawl-fastmcp is a separately published fork whose source is not in this repo (package.json:32).",
+      "Inbound auth in HTTP modes: with SSE_LOCAL or HTTP_STREAMABLE_SERVER, authenticate checks no inbound credential and returns the server's own FIRECRAWL_API_KEY (src/index.ts:101-108); the bind host is localhost by default but overridable with HOST (src/index.ts:567-570), CLOUD_SERVICE binds 0.0.0.0 (src/index.ts:568-569), and /health is unauthenticated (src/index.ts:110-116). The service image's nginx accepts API keys embedded in the URL path and rewrites them into X-Firecrawl-API-Key (docker/nginx.conf:10-46); the file sets no access_log directive (docker/nginx.conf:1-122).",
+      "Maintenance and licensing signals in the tree: CHANGELOG.md stops at 1.7.0 (2025-03-18) while the package is 3.2.1 (CHANGELOG.md:3; package.json:3); the server advertises name 'firecrawl-fastmcp' and version '3.0.0' (src/index.ts:89-90); the pre-FastMCP implementation is kept as src/legacy/index.md; LICENSE names 'vrknetha' as copyright holder while package.json author is 'firecrawl' (LICENSE:3; package.json:50); one transitive dependency (uri-templates 0.2.0) declares its license as a URL rather than an SPDX id (package-lock.json:1833). The checkout is shallow (one commit, .git/shallow), so commit history and release cadence could not be assessed."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "firecrawl/firecrawl-mcp-server",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npx (no install step; POSIX env syntax, a Windows cmd variant is given separately at README.md:80): env FIRECRAWL_API_KEY=fc-YOUR_API_KEY npx -y firecrawl-mcp",
+          "citation": "README.md:31-33; README.md:80; package.json:2, 6-8",
+          "holds": true,
+          "note": "README.md:32 contains the exact command inside a bash fence (31/33). README.md:80 gives the Windows variant `cmd /c \"set FIRECRAWL_API_KEY=your-api-key && npx -y firecrawl-mcp\"`. package.json:2 names the package firecrawl-mcp, and package.json:6-8 maps bin firecrawl-mcp -> dist/index.js, so `npx -y firecrawl-mcp` resolves to the server entry. Whether the package is on the npm registry can't be checked from the checkout."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, license file LICENSE",
+          "citation": "LICENSE:1-21; package.json:28; README.md:706-708",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text: 'MIT License' at :1, with the permission, notice and warranty clauses at :5-21. package.json:28 declares \"license\": \"MIT\" and README.md:708 says 'MIT License - see LICENSE file for details'. The copyright line names vrknetha (LICENSE:3); the dossier's risks already record this."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - Linux is the CI and publish platform; both Dockerfiles are Linux images; the README names no OS for Linux; CI only builds and never starts the server; image.yml sets no platforms (single default-platform image); in practice Node >=22 is needed although package.json says >=18 and CI uses Node 20.",
+          "citation": ".github/workflows/ci.yml:11, 19, 22-26; .github/workflows/publish.yml:10; Dockerfile:3, 21; Dockerfile.service:4, 17; .github/workflows/image.yml:29-37; package-lock.json:58-60; package.json:36-38",
+          "holds": true,
+          "note": "ci.yml:11 and publish.yml:10 are `runs-on: ubuntu-latest`. Dockerfile:3/21 are node:22-alpine/node:22-slim and Dockerfile.service:4/17 are node:22-alpine, all Linux images. ci.yml:22-26 runs only npm ci + npm run build. A grep of .github finds no `platforms` key. A case-insensitive grep of README.md finds only Windows (:80) and Mac (:84), never Linux. package-lock.json:58-60 shows @mendable/firecrawl-js 4.3.4 with engines node >=22.0.0, against package.json:36-38 >=18.0.0 and ci.yml:19 '20.x'. Wording caveat, not an error: 'in practice Node >=22 is needed' rests on a declared engines field, which npm treats as advisory unless engine-strict is set. The checkout shows no actual failure on Node 20. The lock also has no hasInstallScript, os or cpu entries (grep), consistent with a pure-JS install."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes - FastMCP-based server exposing six tools (firecrawl_scrape, firecrawl_map, firecrawl_search, firecrawl_crawl, firecrawl_check_crawl_status, firecrawl_extract); stdio by default; stateless HTTP stream (README calls it SSE) when SSE_LOCAL, HTTP_STREAMABLE_SERVER or CLOUD_SERVICE is 'true'; README setup for Cursor, Windsurf, VS Code, Claude Desktop, Smithery.",
+          "citation": "src/index.ts:3, 88-117, 234, 273, 314, 402, 470, 497, 574-592; README.md:41-84, 86-102, 104-112, 114-120, 122-176, 238-262; smithery.yaml:3-22",
+          "holds": true,
+          "note": "src/index.ts:3 imports FastMCP from firecrawl-fastmcp, and :88-117 constructs the server. A grep of src/ finds exactly six server.addTool calls in src/index.ts (:234 scrape, :273 map, :314 search, :402 crawl, :470 check_crawl_status, :497 extract); the other name matches are in the uncompiled src/legacy/index.md. :574-586 picks transportType 'httpStream' with stateless: true when any of the three env vars is 'true', and :587-592 falls back to stdio. README.md:104-112 calls this mode SSE. The Cursor, Windsurf, Smithery, VS Code and Claude Desktop sections are at the cited lines. smithery.yaml:3-22 is a stdio startCommand running node dist/index.js with FIRECRAWL_API_KEY/FIRECRAWL_API_URL."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "firecrawl_scrape fetches a single URL and returns main-content Markdown/HTML or other formats, with options such as onlyMainContent and timeout (README.md:336-373) - verified: partial",
+          "citation": "src/index.ts:156-158, 171-232, 234-271; README.md:336-373; VERSIONING.md:87-88",
+          "holds": true,
+          "note": "'partial' is the correct rating. The tool forwards to client.scrape (src/index.ts:268) and returns JSON.stringify(res, null, 2) (:156-158, :269). formats (:173-200) and onlyMainContent (:201) are in scrapeParamsSchema. The README example's timeout (README.md:363) appears nowhere in :171-232, so the 'timeout' part of the claim fails. onlyMainContent (:201) and maxAge (:231) are bare .optional() with no default. README.md:372-373 lists no metadata fields. VERSIONING.md:87-88 does claim defaults of 172800000 ms (48 h) for maxAge and true for onlyMainContent; this repo does not enforce them, as the dossier says."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

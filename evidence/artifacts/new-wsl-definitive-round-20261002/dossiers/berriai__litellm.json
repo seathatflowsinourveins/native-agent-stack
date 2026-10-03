@@ -1,0 +1,303 @@
+{
+  "contender": "berriai/litellm",
+  "revision": {
+    "contender": "berriai/litellm",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "BerriAI/litellm",
+        "tag": "v1.103.2",
+        "commit": "f69b2103dfc0f7a41f65555fd66df05274584e5a",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.103.2",
+    "commit": "f69b2103dfc0f7a41f65555fd66df05274584e5a",
+    "read_at": "2026-10-02T03:02:04+00:00"
+  },
+  "dossier": {
+    "contender": "berriai/litellm",
+    "revision": {
+      "tag": "v1.103.2",
+      "commit": "f69b2103dfc0f7a41f65555fd66df05274584e5a",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "LiteLLM is a Python SDK plus a FastAPI proxy ('AI Gateway', the `litellm` command) that fronts about 158 provider ids behind OpenAI-format endpoints (/v1/chat/completions, /v1/responses over HTTP and WebSocket, /v1/messages, /v1/models and more). It adds a Router for multi-deployment load balancing, cooldown and fallback, optional Postgres-backed virtual keys, budgets and spend logs, guardrails, an admin dashboard, and a `lite` client CLI that launches Codex, Claude Code, OpenCode or pi through the proxy (`lite codex`, `lite configure codex`). In this revision the GPT-6 family appears in the model catalog as `gpt-6-astra` (provider openai: 922,000 input / 128,000 output tokens; also azure, azure_ai, bedrock, bedrock_mantle and openrouter ids including `openrouter/openai/gpt-6-astra-pro`; model_prices_and_context_window.json:32470-32538, 66336-66361). It is a general multi-provider gateway, not Codex-specific: Codex support is a wrapper CLI plus Codex-aware handling inside the proxy. The root README does not mention Codex, GPT-6, ChatGPT accounts or request compression; those facts come from code (see architecture, claim_checks, risks). Core is MIT; enterprise/ is under a proprietary license.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Open Source AI Gateway for 100+ LLMs. Self-hosted. Enterprise-ready. Call any LLM in OpenAI format.",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Single unified interface to 100+ LLM providers in the OpenAI format; use as a Python SDK or deploy the AI Gateway (Proxy Server) as a central service.",
+          "citation": "README.md:46-48"
+        },
+        {
+          "claim": "Production-ready gateway: virtual keys, spend tracking, guardrails, load balancing, and an admin dashboard out of the box.",
+          "citation": "README.md:61"
+        },
+        {
+          "claim": "8ms P95 latency at 1k RPS (links to docs.litellm.ai/docs/benchmarks).",
+          "citation": "README.md:62"
+        },
+        {
+          "claim": "Supported endpoints include /chat/completions, /responses, /embeddings, /images, /audio, /batches, /rerank, /a2a, /messages; the provider table marks OpenAI as supporting chat, messages, responses, embeddings, images, audio, moderations and batches.",
+          "citation": "README.md:85, README.md:351"
+        },
+        {
+          "claim": "Gateway quick start: `uv tool install 'litellm[proxy]'`, `litellm --model gpt-4o`, then the OpenAI SDK with base_url http://0.0.0.0:4000.",
+          "citation": "README.md:111-124"
+        },
+        {
+          "claim": "Gateway key features: central API gateway with authn/z, multi-tenant cost tracking and spend management per project/user, per-project logging/guardrails/caching, virtual keys, admin dashboard UI.",
+          "citation": "README.md:410"
+        },
+        {
+          "claim": "SDK Router offers retry/fallback logic across multiple deployments (e.g. Azure/OpenAI), application-level load balancing and cost tracking.",
+          "citation": "README.md:411"
+        },
+        {
+          "claim": "Stable release: use docker images with the -stable tag; they have undergone 12 hour load tests.",
+          "citation": "README.md:416"
+        },
+        {
+          "claim": "All Docker images published to GHCR are signed with cosign using one key introduced in commit 0112e53; verify with `cosign verify --key <cosign.pub URL> ghcr.io/berriai/litellm:<release-tag>`.",
+          "citation": "README.md:567-591"
+        },
+        {
+          "claim": "Enterprise tier: features under the LiteLLM Commercial License, SSO, custom SLAs and professional support.",
+          "citation": "README.md:595-607"
+        },
+        {
+          "claim": "Docs have moved to the separate BerriAI/litellm-docs repository (docs.litellm.ai); this repo contains no docs/ directory.",
+          "citation": "README.md:629"
+        },
+        {
+          "claim": "CLI README: `lite codex` launches Codex with all LLM traffic routed via the proxy: exports OPENAI_BASE_URL (proxy + /v1) and OPENAI_API_KEY, points Codex at a custom provider through -c overrides on the HTTP/SSE Responses transport ('the proxy does not speak the Responses WebSocket protocol'), and writes a model catalog $CODEX_HOME/litellm-models.json so /model lists the proxy's chat models.",
+          "citation": "litellm/proxy/client/cli/README.md:473-501"
+        },
+        {
+          "claim": "CLI README: `lite configure codex` persistently edits ~/.codex/config.toml (selected model + a LiteLLM Responses provider with the gateway key in a static Authorization header, owner-only file), requires stable Codex 0.129.0 or newer, and `lite unconfigure codex` restores only values still holding what configure wrote.",
+          "citation": "litellm/proxy/client/cli/README.md:539-562"
+        }
+      ],
+      "install": [
+        {
+          "method": "Python SDK via uv",
+          "command": "uv add litellm",
+          "citation": "README.md:90"
+        },
+        {
+          "method": "Gateway/proxy via uv tool (then start with a model)",
+          "command": "uv tool install 'litellm[proxy]' && litellm --model gpt-4o",
+          "citation": "README.md:111-113"
+        },
+        {
+          "method": "Installer script for the proxy (litellm[proxy]) on Linux/macOS; bootstraps uv 0.10.9 from astral.sh, then offers `litellm --setup`",
+          "command": "curl -fsSL https://raw.githubusercontent.com/BerriAI/litellm/main/scripts/install.sh | sh",
+          "citation": "scripts/install.sh:3, scripts/install.sh:55-63, scripts/install.sh:84-108, litellm/proxy/client/cli/README.md:603"
+        },
+        {
+          "method": "Installer script for only the thin `lite` client (litellm[cli]) on Linux/macOS",
+          "command": "curl -fsSL https://raw.githubusercontent.com/BerriAI/litellm/main/scripts/install-cli.sh | sh",
+          "citation": "scripts/install-cli.sh:3, scripts/install-cli.sh:58-66, scripts/install-cli.sh:110"
+        },
+        {
+          "method": "Docker Compose from a source checkout (requires LITELLM_MASTER_KEY in .env; builds docker/Dockerfile.non_root)",
+          "command": "docker compose up -d --build",
+          "citation": "docker/README.md:12-32"
+        },
+        {
+          "method": "Homebrew tap for `lite` only; documented as 'once published' and the in-repo formula still has REPLACE_AT_RELEASE placeholders",
+          "command": "brew install BerriAI/litellm/lite",
+          "citation": "packaging/homebrew/README.md:5-9, packaging/homebrew/lite.rb:18-19"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - scripts accept Linux (scripts/install.sh:59-63); CI builds and verifies the native wheel as tag linux_x86_64 on ubuntu-latest (.github/scripts/verify_linux_native_wheel.py:15-17, .github/workflows/test-rust.yml:123-161); Dockerfile is Wolfi + Python 3.13 (Dockerfile:3-8, 56-66); requires Python >=3.10,<3.15 (pyproject.toml:6).",
+        "wsl2": "unknown - no WSL2 mention in docs/scripts/workflows; installers gate only on `uname -s` being Linux or Darwin (scripts/install.sh:55-63), which WSL2 reports as Linux, but that is neither documented nor CI-tested.",
+        "macos_arm64": "unknown - install scripts accept Darwin for any `uname -m` (scripts/install.sh:59-61, scripts/install-cli.sh:62-64) and a Homebrew formula template exists (packaging/homebrew/lite.rb:13-33, python@3.13), but no macOS runner exists in .github/workflows or .circleci/config.yml and native-wheel verification covers only linux_x86_64. The Rust extension is optional at runtime (litellm/rust_bridge/loader.py:12-24), yet the build backend is maturin (pyproject.toml:290-292), so a source build needs a Rust toolchain.",
+        "gpu": "no - not needed: gateway/SDK forward HTTP calls to providers; the only GPU-adjacent item is an optional NVIDIA Riva client extra (pyproject.toml:142-149)."
+      },
+      "integrations": {
+        "cli": "Yes. `litellm` = proxy server (pyproject.toml:186 -> litellm/proxy/proxy_cli.py:960; defaults --host 0.0.0.0 --port 4000 at :673-674; --config at :748; --setup wizard at :771-776). `lite` = client CLI (pyproject.toml:187; litellm/proxy/client/cli/main.py:85-168: login/logout/whoami, models, credentials, keys, teams, users, chat, http, claude/codex/opencode/pi, up/down, configure/unconfigure, autoroute). `litellm-proxy` alias (pyproject.toml:188).",
+        "mcp": "Yes, as an MCP gateway: the proxy mounts /mcp (litellm/proxy/_lazy_features.py:182-183), registered MCP servers can be called through /chat/completions with tools of type mcp and server_url litellm_proxy/mcp/<server> (README.md:228-248), Cursor config example at README.md:250-263; SDK-side bridge litellm.experimental_mcp_client.load_mcp_tools (README.md:203-226).",
+        "sdk_or_api": "Yes. Python SDK (`from litellm import completion`, README.md:93-105; Router in litellm/router.py; Responses SDK in litellm/responses/main.py). OpenAI-compatible HTTP API on :4000, including POST /v1/responses (also /responses and /openai/v1/responses), GET/DELETE /v1/responses/{id}, input_items, /compact, /input_tokens, /cancel, and a Responses WebSocket route (litellm/proxy/response_api_endpoints/endpoints.py:184-198, 954-968, 1109-1120, 1182-1193, 1455-1457); /v1/models is used by the CLI (litellm/proxy/client/cli/commands/agents.py:296-313).",
+        "claude_code_or_codex": "Codex CLI: yes. `lite codex` wrapper (litellm/proxy/client/cli/commands/agents.py:52-57, 129-163, 223-239, 770-823), persistent `lite configure codex` / `lite unconfigure codex` (commands/configure.py:364-385; commands/codex_settings.py:33, 152-272), model-catalog sync via `codex debug models` (agents.py:526-623). Codex-aware proxy behavior: session-id grouping (litellm/proxy/litellm_pre_call_utils.py:695-721), drop_params default on for Codex user agents (:854-868, 2417-2418), prewarm ack on managed WebSocket (litellm/responses/streaming_iterator.py:2607-2628), encrypted_content affinity (litellm/responses/utils.py:466-520). Tests: tests/test_litellm/proxy/client/cli/test_codex_settings.py, tests/test_litellm/responses/test_metadata_codex_callback.py. Codex SDK: none found (grep for codex-sdk / @openai/codex finds nothing); SDK workers would use the generic OpenAI-compatible API. Claude Code: yes (`lite claude`, `lite up`, `lite login --config-claude`, `lite configure claude`: CLI README.md:473-592; /v1/messages; optional /claude_code_gateway, off by default: litellm/proxy/_types.py:2622)."
+      },
+      "telemetry_and_network": "No default-on usage telemetry found: the `--telemetry` flag (default True, litellm/proxy/proxy_cli.py:759-764) and litellm.telemetry=True (litellm/__init__.py:243) are never read (user_telemetry is only assigned: litellm/proxy/proxy_server.py:2377, 8666, 8773); security.md:63-65 says no telemetry when self-hosting. Outbound calls that do happen by default: (a) on import, GET of model_prices_and_context_window.json from raw.githubusercontent.com/BerriAI/litellm/main (5s timeout, background retries, falls back to the bundled copy); skipped when LITELLM_LOCAL_MODEL_COST_MAP=True and in `lite`/`litellm-proxy` processes (litellm/__init__.py:420-423; litellm/litellm_core_utils/get_model_cost_map.py:1-10, 601-662); (b) Anthropic beta-headers config from the same host unless LITELLM_LOCAL_ANTHROPIC_BETA_HEADERS=true (litellm/anthropic_beta_headers_manager.py:126-138, 178-180); (c) autorouter presets from GitHub, resolved once per process, unless LITELLM_LOCAL_AUTOROUTER_PRESETS=true (litellm/proxy/public_endpoints/public_endpoints.py:506, 551-556); (d) docs.litellm.ai blog RSS only when the dashboard calls /public/litellm_blog_posts (public_endpoints.py:457-476). Conditional egress: license check GET https://license.litellm.ai/verify_license/<key> only when LITELLM_LICENSE is set (litellm/proxy/auth/litellm_license.py:30, 58-98, 112-129); enterprise billable-request counters pushed over OTLP/HTTP mTLS to LiteLLM's collector only for licensed deployments with LITELLM_BILLING_METRICS_* env set (litellm/proxy/enterprise_billing/billing_metrics.py:1-14, 35-42, 284-296; helm/litellm-helm/README.md:103-116); legacy BudgetManager(client_type='hosted') uses https://api.litellm.ai (litellm/budget_manager.py:36, 61-63); Pyroscope (LITELLM_ENABLE_PYROSCOPE) and ddtrace (USE_DDTRACE) are off by default (proxy_server.py:10822-10860); Sentry, Langfuse, OTEL and others only as user-selected callbacks (litellm/__init__.py:120-173). Provider egress relevant here: https://api.openai.com/v1 for provider openai (litellm/llms/openai/responses/transformation.py:604-623); for provider chatgpt: auth.openai.com OAuth/device-code and https://chatgpt.com/backend-api/codex (litellm/llms/chatgpt/common_utils.py:15-21). Required accounts/services: no LiteLLM account; provider API keys (or a ChatGPT login); Postgres via DATABASE_URL is needed for virtual keys, budgets and spend logs (proxy_server.py:1218-1225, 9654-9664), Redis is optional; installers fetch uv from astral.sh (scripts/install.sh:84-92). Request/response bodies are not stored in spend logs unless store_prompts_in_spend_logs is enabled (default off: litellm/proxy/_types.py:2870-2873, litellm/proxy/spend_tracking/spend_tracking_utils.py:1659-1675)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "Rust",
+        "TypeScript/TSX",
+        "Go",
+        "HCL",
+        "Shell",
+        "Prisma schema"
+      ],
+      "entry_points": [
+        {
+          "path": "litellm/proxy/proxy_cli.py:960",
+          "what": "`litellm` console script (pyproject.toml:186) -> run_server: starts the FastAPI proxy (uvicorn/gunicorn/granian); defaults host 0.0.0.0, port 4000, optional --config YAML, --setup wizard"
+        },
+        {
+          "path": "litellm/proxy/proxy_server.py",
+          "what": "FastAPI app: auth, routing, spend tracking, admin API/UI, lazy-mounted /mcp"
+        },
+        {
+          "path": "litellm/proxy/client/cli/main.py",
+          "what": "`lite` / `litellm-proxy` client CLI (pyproject.toml:187-188): login, admin commands, lite claude|codex|opencode|pi, configure/unconfigure, up/down, autoroute"
+        },
+        {
+          "path": "litellm/proxy/response_api_endpoints/endpoints.py",
+          "what": "OpenAI Responses API routes: POST /v1/responses, /compact, /input_tokens, /cancel and WebSocket /v1/responses"
+        },
+        {
+          "path": "litellm/main.py",
+          "what": "SDK entry points completion()/acompletion(); Responses SDK in litellm/responses/main.py; Router class in litellm/router.py"
+        },
+        {
+          "path": "scripts/install.sh",
+          "what": "curl|sh installer for litellm[proxy] via uv; scripts/install-cli.sh installs only litellm[cli]"
+        },
+        {
+          "path": "Dockerfile",
+          "what": "Wolfi image (Python 3.13, Rust toolchain for the native extension, Prisma, prebuilt UI); also docker/Dockerfile.non_root, docker-compose.yml, docker/entrypoint.sh, docker/prod_entrypoint.sh"
+        },
+        {
+          "path": "helm/litellm",
+          "what": "Helm charts (helm/litellm componentized gateway/backend/UI; helm/litellm-helm) and Terraform modules terraform/litellm/{aws,gcp}"
+        }
+      ],
+      "architecture": "Structure: (1) SDK core: litellm/main.py and litellm/utils.py resolve the provider (litellm_core_utils/get_llm_provider_logic.py) and dispatch to per-provider transformation configs under litellm/llms/<provider>/ (llms/openai/{chat,responses}/, llms/chatgpt/, llms/azure/, llms/bedrock*/ ...) through litellm/llms/custom_httpx/llm_http_handler.py; Responses-API code is in litellm/responses/ (main.py, streaming_iterator.py with a managed WebSocket handler, utils.py for id/encrypted-content encoding). litellm/router.py with router_strategy/ and router_utils/ (pre_call_checks/, cooldown, fallbacks) pools several deployments per model_name. (2) Proxy: litellm/proxy/ (proxy_server.py, proxy_cli.py, auth/ for virtual keys/JWT/SSO, common_request_processing.py + litellm_pre_call_utils.py for request shaping, route_llm_request.py, response_api_endpoints/, management_endpoints/, guardrails/guardrail_hooks/, hooks/, spend_tracking/, db/, schema.prisma on Postgres via Prisma, pass_through_endpoints/, _experimental/mcp_server/, a prebuilt dashboard in _experimental/out built from ui/litellm-dashboard) plus litellm/integrations/ (observability callbacks, compression_interception) and litellm/proxy/client/cli/ (the lite CLI). (3) Optional Rust: litellm-rust/ (18 crates, PyO3 bridge litellm.rust_bridge._native); litellm/rust_bridge/catalog.py:60-65 sends only OCR (aws_textract required) and Bedrock transcription to Rust, chat completions and responses stay Python. Sibling packages enterprise/ (proprietary) and litellm-proxy-extras/ (migrations); capability/pricing catalog model_prices_and_context_window.json. Need-relevant mechanics: [Model resolution] common_request_processing.py:1991-1996 sets data.model = general_settings.completion_model OR CLI --model OR path model OR the client's model, then model_alias_map and key aliases (:2011-2015); route_llm_request.py:640-720 then tries exact model_name, wildcard patterns (router_utils/pattern_match_deployments.py), deployment names, pass_through_all_models (default False, types/router.py:865-867), else ProxyModelNotFoundError. [GPT-6] catalog entry gpt-6-astra (openai) has supports_max/xhigh reasoning true and none/minimal false (model_prices_and_context_window.json:32470-32538); llms/openai/chat/gpt_5_transformation.py:64,115-128 treats any gpt-6 name as a gpt-5.4+ reasoning model. [Reasoning effort] OpenAI chat path passes reasoning_effort (dict -> string), raises 400 for unsupported xhigh/minimal/low, or drops the param when drop_params is on (gpt_5_transformation.py:278-302); the Responses path passes the reasoning object through and checks supports_reasoning plus temperature/top_p rules (llms/openai/responses/transformation.py:207-281); the efforts a model group advertises are the intersection across its deployments (router_utils/reasoning_effort_capability.py:201-212). [Codex lane] see integrations; the proxy forces drop_params on for Codex user agents, re-encodes response ids as resp_<base64 litellm:custom_llm_provider;model_id;response_id> (responses/utils.py:330-382, 602-612) and, with affinity enabled, wraps encrypted_content (utils.py:466-520); previous_response_id is decoded back before the upstream call (utils.py:683-700). [Account pooling] several model_list entries sharing a model_name with different api_key/org are load-balanced (default simple-shuffle; least-busy, latency, usage-based v1/v2, cost, budget limiting: types/router.py:86-91, 938-944); defaults cooldown 5s, 2 retries, 5 fallbacks (constants.py:11,66,78); affinity pinning for Responses/encrypted reasoning is opt-in via optional_pre_call_checks (router.py:2236-2300). The chatgpt/ provider (ChatGPT-subscription OAuth device-code login, tokens in ~/.config/litellm/chatgpt/auth.json) holds one account per process (llms/chatgpt/authenticator.py:43-50, 153-173). [Usage] one LiteLLM_SpendLogs row per request with tokens, spend, model, model_group, api_base, session_id, team and key (litellm/proxy/schema.prisma:642-684), written only with a database; Prometheus/OTEL/Langfuse etc. are opt-in callbacks. [Compression] nothing is applied by default; see claim_checks item 10.",
+      "packaging_and_release": "PyPI dist `litellm` built with maturin (pyproject.toml:290-317; module litellm.rust_bridge._native, abi3-py310 per litellm-rust/crates/python-bridge/Cargo.toml:12-14); sibling packages litellm-proxy-extras 0.4.100 (MIT) and litellm-enterprise 0.1.69.post1 (LicenseRef-Proprietary), both pinned by the `proxy` extra (pyproject.toml:74-75) and built with uv_build. Container images ghcr.io/berriai/litellm; Dockerfile pins base/uv/node images by digest (Dockerfile:3-13). .github/workflows/create-release.yml (manual dispatch) only creates the git tag, a GitHub Release whose notes embed a cosign verify snippet pointing at the root cosign.pub (lines 71-106, 144-172), and a release branch via create-release-branch.yml. No workflow in .github/workflows or .circleci/config.yml builds or pushes images, signs with cosign, uploads to PyPI, or emits checksums/SBOM/attestations, so the README signing claim (README.md:567-591) is verifiable here only as a published key plus text. Supply-chain controls present in CI: uv.lock and `exclude-newer = 3 days` (pyproject.toml:335), sha256-verified tool downloads (.circleci/config.yml:66-136; .github/workflows/image-scan.yml:55-61), SHA-pinned GitHub Actions, zizmor, OpenSSF Scorecard, OSV, Grype image scan, CodeQL. Terraform modules are mirrored to the registry on each release (README.md:552); Homebrew formula is an unreleased template (packaging/homebrew/lite.rb:18-19).",
+      "tests_and_ci": "Frameworks: pytest (asyncio auto mode, xdist, mock, respx, vcrpy/pytest-recording, hypothesis, rerunfailures, timeout; pyproject.toml:191-233, 350-366), cargo nextest + clippy for Rust, vitest for the dashboard and VS Code extension, Playwright e2e, CodSpeed micro-benchmarks (tests/benchmarks/), manual mutmut. Approx. test files: 2,795 tests/**/test_*.py plus 30 *_test.py (1,854 of them in tests/test_litellm/), 813 dashboard *.test.ts(x), plus tests/test_litellm_rust/ and cargo tests. 50 GitHub Actions workflows (.github/workflows): test-unit.yml / _test-unit-base.yml / test-unit-proxy-db.yml, test-linting.yml (ruff, basedpyright), test-code-quality.yml (~30 repo-specific checks and a Python 3.10 import smoke), test-rust.yml (fmt, clippy -D warnings, nextest, wheel build + linux_x86_64 verification), codspeed.yml, test-semgrep.yml, codeql.yml, osv-scan.yml, image-scan.yml (Grype, fail on high), zizmor.yml, scorecard.yml, test-e2e-changed.yml, weekly_load_anomaly.yml, helm/terraform/UI/VS Code workflows. CircleCI (.circleci/config.yml:3011-3140) runs a `build_and_test` workflow of about 38 jobs (provider translation, router, responses API, proxy e2e with Postgres/Redis, a Windows job) and an `integration` matrix of 8 suites on main and litellm_* branches. No macOS runner.",
+      "dependencies": "Python (pyproject.toml): 16 core requirement lines = 14 distinct packages (fastuuid, httpx[http2], openai, python-dotenv, tiktoken x2 markers, importlib-metadata, tokenizers, click, jinja2, aiohttp, pydantic x2 markers, pydantic-settings, jsonschema, boto3; lines 12-33). 15 optional extras with 86 entries (proxy 34 incl. litellm-proxy-extras==0.4.100 and litellm-enterprise==0.1.69.post1; proxy-runtime 19; extra_proxy 10; cli 6; 11 small extras with 17 entries; lines 46-183); dependency groups dev 38, ci 27, proxy-dev 9, e2e-dev 5, healthcheck 2 (lines 190-288); uv.lock. enterprise/pyproject.toml and litellm-proxy-extras/pyproject.toml declare 0 runtime deps. Rust: litellm-rust/Cargo.toml workspace of 18 crates with 30 external + 16 internal workspace dependency entries (+ Cargo.lock). JS: ui/litellm-dashboard/package.json 36 deps + 31 devDeps (+ package-lock.json); root package.json 3 + 4 dev; vscode-extension/package.json 1 dep (openai) + 6 dev. Go: terraform/provider/go.mod 2 direct requires. Helm: helm/litellm/Chart.yaml and helm/litellm-helm/Chart.yaml (Bitnami postgresql/redis subcharts, helm/litellm-helm/README.md:130-138).",
+      "security_policy": "security.md (repo root, lowercase; no SECURITY.md under .github/): reports go through private GitHub vulnerability advisories and must include a reproduction video; categories P0 supply chain, P1 unauthenticated proxy access, P2 authenticated abuse; bounties only for P0/P1 ($500-$3,000); contact support@berri.ai; states no telemetry is stored on LiteLLM servers when self-hosting and that missing master_key setups are out of scope (security.md:4-77)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Call 100+ LLM providers in the OpenAI format, including /chat/completions and /responses (README.md:46, 85).",
+        "verified": "yes",
+        "evidence": "LlmProviders enum has 158 members (litellm/types/utils.py:4023-4181; includes non-LLM categories such as vector stores). POST /v1/responses is implemented (litellm/proxy/response_api_endpoints/endpoints.py:184-198) and the gpt-6-astra catalog entry lists /v1/chat/completions, /v1/batch and /v1/responses (model_prices_and_context_window.json:32510-32514)."
+      },
+      {
+        "claim": "Production-ready gateway with virtual keys, spend tracking, guardrails, load balancing and an admin dashboard (README.md:61, 410).",
+        "verified": "partial",
+        "evidence": "Present: LiteLLM_SpendLogs model (litellm/proxy/schema.prisma:642-684), guardrail hooks (litellm/proxy/guardrails/guardrail_hooks/), Router strategies (litellm/types/router.py:86-91, 938-944), dashboard (ui/litellm-dashboard, prebuilt in litellm/proxy/_experimental/out). Caveats not in the README: spend logs, virtual keys and budgets need a Postgres DATABASE_URL (proxy_server.py:1218-1225) and a proxy-wide budget without a DB is not enforced (proxy_server.py:9654-9664); prompts/responses are stored in spend logs only if store_prompts_in_spend_logs is on (default off; litellm/proxy/_types.py:2870-2873)."
+      },
+      {
+        "claim": "SDK Router gives retry/fallback and load balancing across multiple deployments (README.md:411).",
+        "verified": "yes",
+        "evidence": "litellm/router.py with strategies simple-shuffle (default), least-busy, latency-based, usage-based v1/v2, cost-based, budget limiting (litellm/types/router.py:86-91, 938-944; litellm/router_strategy/); defaults cooldown 5s, 2 retries, 5 fallbacks (litellm/constants.py:11, 66, 78). Affinity pinning for Responses/encrypted reasoning is opt-in (router.py:2236-2300). Code wins over the Router docstring that says cooldown defaults to 1s (router.py:823)."
+      },
+      {
+        "claim": "8ms P95 latency at 1k RPS (README.md:62).",
+        "verified": "not_checkable",
+        "evidence": "The benchmarks page lives in the separate litellm-docs repo (README.md:629). The clone has only CodSpeed micro-benchmarks (tests/benchmarks/, .github/workflows/codspeed.yml:41-95) and load-test scripts (tests/load_tests/) with no published figures."
+      },
+      {
+        "claim": "Use docker images with the -stable tag; they underwent 12 hour load tests (README.md:416).",
+        "verified": "partial",
+        "evidence": ".github/workflows/create-release.yml:7 calls v...-stable tags 'legacy' and accepts plain X.Y.Z tags; this checkout is tag v1.103.2. No in-repo workflow defines a 12-hour load test (only weekly_load_anomaly.yml with a 45-minute timeout)."
+      },
+      {
+        "claim": "All GHCR images are cosign-signed with the key introduced in commit 0112e53 (README.md:567-591).",
+        "verified": "partial",
+        "evidence": "cosign.pub exists at the repo root and create-release.yml:71-106 embeds the verify snippet in release notes, but no workflow here builds, pushes or signs images (grep for cosign/ghcr/twine/pypi under .github and .circleci finds nothing else); commit 0112e53 is not in this shallow clone."
+      },
+      {
+        "claim": "`lite codex` routes Codex through the proxy with -c provider overrides on HTTP/SSE because 'the proxy does not speak the Responses WebSocket protocol'; `lite configure codex` needs Codex 0.129.0+ (CLI README.md:493, 558).",
+        "verified": "partial",
+        "evidence": "Overrides verified: model_provider=litellm, wire_api=responses, supports_websockets=false, requires_openai_auth=false, env_key OPENAI_API_KEY (litellm/proxy/client/cli/commands/agents.py:129-163). The 0.129.0 floor is enforced only by `lite configure codex` (commands/codex_settings.py:33, 152-165, 196; commands/configure.py:96), not by the `lite codex` launcher (agents.py:770-823). The WebSocket sentence is stale versus code: the proxy exposes @router.websocket('/v1/responses') and ('/responses') (endpoints.py:1455-1457), proxying natively for OpenAI (litellm/llms/openai/responses/transformation.py:754-756) and emulating over HTTP streaming for providers without native WS, including chatgpt (litellm/llms/custom_httpx/llm_http_handler.py:6640-6666; litellm/llms/chatgpt/responses/transformation.py:244-246). Code wins."
+      },
+      {
+        "claim": "Codex model catalog: a proxy model the installed Codex knows keeps Codex's own entry and reasoning levels; an unknown model gets the plain entry (CLI README.md:493).",
+        "verified": "yes",
+        "evidence": "Known models reuse the stock entry and only priority/visibility/upgrade change (agents.py:462-507); for unknown slugs _CodexModel hard-codes supported_reasoning_levels=(), supports_reasoning_summaries=False, support_verbosity=False (agents.py:400-428), so no reasoning-level metadata is supplied for a GPT-6 slug the installed Codex does not know. The file is only written when `codex debug models` exists (Codex 0.130+), otherwise Codex's built-in catalog is used (agents.py:526-623)."
+      },
+      {
+        "claim": "No telemetry when self-hosting (security.md:63-65).",
+        "verified": "partial",
+        "evidence": "No default-on usage telemetry found: --telemetry (default True, proxy_cli.py:759-764) and litellm.telemetry=True (litellm/__init__.py:243) are never read (proxy_server.py:2377, 8666, 8773). But default startup fetches JSON from raw.githubusercontent.com (litellm/__init__.py:420-435; litellm_core_utils/get_model_cost_map.py:601-662), LITELLM_LICENSE triggers calls to license.litellm.ai (litellm/proxy/auth/litellm_license.py:30, 58-98), and licensed deployments with env config push billable-request counters to LiteLLM's collector (litellm/proxy/enterprise_billing/billing_metrics.py:1-14, 284-296)."
+      },
+      {
+        "claim": "Prompt compression is something an operator adds (dashboard copy: 'Headroom is a native LiteLLM guardrail ... No prompt compression guardrails configured yet. Add one below'; PromptCompressionTab.tsx:109, 123).",
+        "verified": "yes",
+        "evidence": "Nothing is on the default call path: litellm.compression.compress() is a library function (litellm/compression/compress.py:354-395) used only by CompressionInterceptionLogger, which exists only if 'compression_interception' is listed in litellm_settings.callbacks (litellm/proxy/common_utils/callback_utils.py:152-162) and acts only on /v1/messages (anthropic_messages) calls (litellm/integrations/compression_interception/handler.py:137-146). The Headroom guardrail needs api_base / HEADROOM_API_BASE of an external service, defaults default_on=False, and covers completion and responses call types (litellm/proxy/guardrails/guardrail_hooks/headroom/headroom.py:56-59, 487-521); the Compresr guardrail defaults to https://api.compresr.ai with default_on=False (compresr/compresr.py:73, 496-523, 582); CustomGuardrail default_on=False (litellm/integrations/custom_guardrail.py:163). No shipped YAML enables any; no GZip/Brotli/Zstd middleware is registered (grep of litellm/ finds none; proxy_server.py:2232-2273). Caveat: the dashboard add-guardrail form defaults defaultOn=true (ui/litellm-dashboard/src/app/(dashboard)/cost-optimization/_components/PromptCompressionTab.tsx:37-41). /v1/responses/compact is a client-invoked pass-through of OpenAI's compact endpoint (endpoints.py:954-990)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Proxy (AI Gateway) latency overhead",
+        "metric": "P95 latency at 1,000 requests per second",
+        "value": "8 ms",
+        "source": "README.md:62 (links https://docs.litellm.ai/docs/benchmarks; that page is not in this clone and was not fetched)",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "ChatGPT-subscription ('native account') path is single-account and heavily rewritten: litellm/llms/chatgpt/authenticator.py:43-50 keeps one auth.json under CHATGPT_TOKEN_DIR/CHATGPT_AUTH_FILE (process-wide env, default ~/.config/litellm/chatgpt) with no per-deployment credential, so pooling several ChatGPT accounts would need separate processes; the Responses transform forces store=false and stream=true, prepends a built-in 'You are Codex, based on GPT-5' instruction block and keeps only 10 request keys (litellm/llms/chatgpt/responses/transformation.py:79-107; common_utils.py:25), and it calls the undocumented chatgpt.com/backend-api/codex endpoint using Codex's client id and originator header (common_utils.py:14-23). Pooling API keys (several model_list entries per model_name) is the supported pooling path.",
+      "Codex-lane mutations: for Codex user agents drop_params is forced on unless the caller or litellm_settings sets it, so unsupported params (a rejected reasoning level, sampling params) are silently dropped instead of returning 400 (litellm/proxy/litellm_pre_call_utils.py:854-868, 2417-2418; llms/openai/chat/gpt_5_transformation.py:278-302; llms/openai/responses/transformation.py:225-240). Response ids are always re-encoded as resp_<base64> and, with the affinity check, encrypted_content is wrapped (litellm/responses/utils.py:330-382, 466-520, 602-612); when the originating deployment is outside the routed group the encrypted reasoning is stripped (router_utils/pre_call_checks/encrypted_content_affinity_check.py:296-306). The client-requested model is overridden by general_settings.completion_model or by `litellm --model X`, which is the README quick start (litellm/proxy/common_request_processing.py:1991-1996).",
+      "Capability gating depends on a remotely fetched catalog: supports_*_reasoning_effort and temperature/top_p rules (including the gpt-6-astra entry: low..max accepted, none/minimal not) are read from model_prices_and_context_window.json, fetched from GitHub main on import and falling back to the bundled copy (litellm/__init__.py:420-423; litellm_core_utils/get_model_cost_map.py:601-662; gpt_5_transformation.py:15-28 notes the fetched map can lag the code; tests/test_litellm/router_utils/test_reasoning_effort_capability.py:377-407). Set LITELLM_LOCAL_MODEL_COST_MAP=True to pin the bundled copy.",
+      "Auth and bind defaults: with no master key every caller is treated as an authenticated internal user (litellm/proxy/auth/user_api_key_auth.py:1838-1849, 2656-2660), the default bind is 0.0.0.0:4000 (litellm/proxy/proxy_cli.py:673-674), and security.md:53 declares a missing master_key out of scope; a local gateway holding provider keys needs LITELLM_MASTER_KEY set (docker/README.md:14-24).",
+      "Licensing/scope: core is MIT but enterprise/ is proprietary (LICENSE:3; enterprise/LICENSE.md:7-14) and the `proxy` extra installs litellm-enterprise, license LicenseRef-Proprietary (pyproject.toml:75; enterprise/pyproject.toml:7). LITELLM_LICENSE-gated items include a limit of one auto-router per gated capability without a license (litellm/proxy/auth/litellm_license.py:164-173) and the enterprise billing exporter (litellm/proxy/enterprise_billing/billing_metrics.py:284-296).",
+      "Docs/README drift and missing docs: documentation is not in this repo (README.md:629), so documented behavior cannot be checked here; observed drift: the CLI wrapper says the proxy lacks Responses WebSocket (litellm/proxy/client/cli/commands/agents.py:142-149) though it ships a WS route (endpoints.py:1455-1457); README promotes -stable image tags (README.md:416) while create-release.yml:7 calls them legacy; router.py:823 docstring says 1s cooldown versus 5s in litellm/constants.py:78.",
+      "Release provenance and platform coverage are not reproducible from the repo: no workflow builds/pushes images, signs with cosign or publishes to PyPI (create-release.yml only tags and writes notes); CI verifies the native wheel only for linux_x86_64 (.github/scripts/verify_linux_native_wheel.py:15-17) with no macOS runner; the build backend is maturin/Rust (pyproject.toml:290-292), so git/sdist installs such as LITELLM_CLI_REF (scripts/install.sh:21-23) need a Rust toolchain; WSL2 is undocumented.",
+      "Operational weight: usage observation and budgets require Postgres (schema.prisma:642-684; proxy_server.py:1218-1225, 9654-9664) and multi-worker CLI sessions need Redis (litellm/proxy/client/cli/README.md:507); the surface is large (158 provider ids, ~2.8k Python test files, 50 workflows, three languages) with a fast release cadence, and the Codex wrapper injects a Stop hook running ~/.litellm/statusline.py unless the user's Codex config already declares hooks (agents.py:204-239)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "berriai/litellm",
+      "checks": [
+        {
+          "field": "readme.install[1]",
+          "statement": "Gateway/proxy via uv tool (then start with a model): `uv tool install 'litellm[proxy]' && litellm --model gpt-4o`",
+          "citation": "README.md:111-113; pyproject.toml:47-84, 186; litellm/__init__.py:1401; litellm/proxy/proxy_cli.py:673-674, 701, 960",
+          "holds": true,
+          "note": "README.md:112 is `uv tool install 'litellm[proxy]'` and :113 is `litellm --model gpt-4o`. The README puts them on separate lines; the dossier joins them with &&, which is a fair paraphrase. The `proxy` extra exists (pyproject.toml:47). The `litellm` script maps to litellm:run_server (pyproject.toml:186), which is re-exported at litellm/__init__.py:1401 from proxy_cli.py:960. `--model/-m` is defined at proxy_cli.py:701, and the host/port defaults are 0.0.0.0 and 4000 (:673-674), which matches the README's OpenAI-SDK base_url example."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE; core is MIT, enterprise/ is under a proprietary license",
+          "citation": "LICENSE:1-8; pyproject.toml:7-8; enterprise/LICENSE.md:2-25; enterprise/pyproject.toml:7-8",
+          "holds": true,
+          "note": "LICENSE:3 puts enterprise/ under its own license, and :4-8 put everything else under the MIT License (Copyright (c) 2023 Berri AI). pyproject.toml has license = \"MIT\" and license-files = [\"LICENSE\"]. enterprise/LICENSE.md is the BerriAI Enterprise license: production use needs a subscription, and copying or distributing is forbidden. enterprise/pyproject.toml:7 says LicenseRef-Proprietary. Upstream slip, not a dossier error: LICENSE:3 points to \"enterprise/LICENSE\" but the file is enterprise/LICENSE.md."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - scripts accept Linux; CI builds and verifies the native wheel as tag linux_x86_64 on ubuntu-latest; Dockerfile is Wolfi + Python 3.13; requires Python >=3.10,<3.15",
+          "citation": "scripts/install.sh:59-63; .github/scripts/verify_linux_native_wheel.py:15-17; .github/workflows/test-rust.yml:123-161; Dockerfile:3-8, 56-66; pyproject.toml:6",
+          "holds": true,
+          "note": "install.sh:61 accepts Linux; other OSes exit at :62. The verifier sets EXPECTED_PLATFORM_TAG = \"linux_x86_64\" (with cp310/abi3) at :15-17. The rust-wheel job (:123-161) runs on ubuntu-latest: `uv build --wheel`, then verify_linux_native_wheel.py, a native-route test and `make test-rust-extension`. Both the build and runtime images are Wolfi base images pinned by digest (Dockerfile:4, 7), with python-3.13 installed at :59 and in the runtime stage at :129. requires-python is \">=3.10, <3.15\". Caveat the claim doesn't contradict: test-rust.yml only runs on pushes/PRs that touch certain paths (:3-58)."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Codex CLI: yes (`lite codex` wrapper, persistent `lite configure/unconfigure codex`, catalog sync via `codex debug models`, Codex-aware proxy behaviour: session-id grouping, drop_params default, WS prewarm ack, encrypted_content affinity); no Codex SDK; Claude Code yes, /claude_code_gateway off by default",
+          "citation": "litellm/proxy/client/cli/commands/agents.py:52-57, 129-163, 223-239, 526-623, 770-823; commands/configure.py:364-385; commands/codex_settings.py:33, 152-272; litellm/proxy/litellm_pre_call_utils.py:695-721, 854-868, 2417-2418; litellm/responses/streaming_iterator.py:2607-2628; litellm/responses/utils.py:466-520; litellm/proxy/_types.py:2620-2623; litellm/proxy/client/cli/README.md:473-592",
+          "holds": true,
+          "note": "Every cited range matches. _KNOWN_AGENTS includes codex. codex_proxy_provider/_codex_proxy_args build the -c overrides, and prepare_codex adds the Stop hook. _codex_debug_models/codex_model_sync_args write $CODEX_HOME/litellm-models.json. run_agent is the launcher. configure.py:364-385 defines the `configure codex` / `unconfigure codex` commands. codex_settings.py has _MIN_CODEX_VERSION=(0,129,0), require_safe_codex, and configure_codex_settings, which writes a static `Authorization: Bearer` header. In the proxy: Codex session-id extraction is gated on the Codex user agent; drop_params defaults on for Claude Code/Codex unless the caller or litellm_settings sets it, and is applied at :2417-2418. Also present: _send_warmup_ack and the encrypted_content wrapping. Both cited test files exist. A repo-wide grep for codex-sdk, @openai/codex and codex_sdk finds nothing. enable_claude_code_gateway defaults to None and is described as 'Off by default'."
+        },
+        {
+          "field": "claim_checks[6]",
+          "statement": "`lite codex` -c provider overrides verified; the 0.129.0 floor is enforced only by `lite configure codex`, not the `lite codex` launcher; the README sentence 'the proxy does not speak the Responses WebSocket protocol' is stale versus code (verified: partial)",
+          "citation": "agents.py:129-163, 770-823; codex_settings.py:33, 152-165, 196; configure.py:96; litellm/proxy/response_api_endpoints/endpoints.py:1455-1457; litellm/llms/openai/responses/transformation.py:754-756; litellm/llms/custom_httpx/llm_http_handler.py:6640-6666; litellm/llms/chatgpt/responses/transformation.py:244-246",
+          "holds": true,
+          "note": "The overrides are model_provider=litellm, wire_api=responses, supports_websockets=False, requires_openai_auth=False, env_key=OPENAI_API_KEY and empty http_headers. run_agent (:770-823) does no version check. require_safe_codex is called by preflight_codex_settings (:165, called from configure.py:96 _preflight) and by configure_codex_settings (:196). The proxy registers @router.websocket on both /v1/responses and /responses. OpenAI's supports_native_websocket() returns True and ChatGPT's returns False; providers without native support go through ManagedResponsesWebSocketHandler (HTTP streaming), as the dossier says. The 'partial' rating holds: the out-of-date sentence appears in CLI README.md:493 and in the agents.py:146-147 docstring."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

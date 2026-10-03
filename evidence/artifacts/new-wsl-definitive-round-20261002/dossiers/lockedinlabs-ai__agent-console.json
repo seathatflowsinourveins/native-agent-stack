@@ -1,0 +1,343 @@
+{
+  "contender": "lockedinlabs-ai/agent-console",
+  "revision": {
+    "contender": "lockedinlabs-ai/agent-console",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "lockedinlabs-ai/agent-console",
+        "tag": "v0.4.1",
+        "commit": "8e33889a4e1097f64e91fdb6fc9871d7301108f9",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.4.1",
+    "commit": "8e33889a4e1097f64e91fdb6fc9871d7301108f9",
+    "read_at": "2026-10-02T03:02:21+00:00"
+  },
+  "dossier": {
+    "contender": "lockedinlabs-ai/agent-console",
+    "revision": {
+      "tag": "v0.4.1",
+      "commit": "8e33889a4e1097f64e91fdb6fc9871d7301108f9",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Agent Console (LockedIn Labs, MIT, v0.4.1) is a zero-dependency Node.js (>=22) local web console with an optional multi-machine hub. It reads the JSONL transcripts that Claude Code and Codex already write on disk and turns them into per-response token events in four disjoint classes (uncached input, output, cache write with a 5m/1h split when Claude Code reports it, cache read). It de-duplicates streamed lines, forked-subagent copies and copied transcripts, and adds context/cache-health signals, live alerts and offline list-price cost estimates. Fact for the need's question (which single tool measures provider usage from the local Claude Code and Codex logs): this one program does that for both tools from local transcripts (lib/collector/parsers.js:133-170, 262-269; docs/accounting.md:108-127), not from provider APIs or invoices (docs/accounting.md:388-390). It is read-only observability: a repo-wide search found no feature that supplies task context to agents, keeps recoverable originals of artifacts, or measures artifact/context reductions ('compaction' appears only as an accounting rule, docs/accounting.md:142,145), and it ships no MCP server (docs/ARCHITECTURE.md:354-360). Facts were read from the v0.4.1 checkout with read/search tools only; no code or tests were executed.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Local and team observability for Claude Code and Codex: every session's tokens, cache reads and writes, models and list-price cost, on this computer and on every connected computer, in one local console.",
+          "citation": "README.md:20-23"
+        },
+        {
+          "claim": "No account to create, no package install and no build step: `node bin/agent-console.mjs --open` reads the Claude Code and Codex history already on the computer and opens the console, signed in, normally at http://127.0.0.1:6787.",
+          "citation": "README.md:46-57"
+        },
+        {
+          "claim": "Nothing leaves a machine but counts (model ids, minute timestamps, token counts, salted hashes), never a prompt, reply, file path or file contents; a test pushes planted canaries through the real reporter and hub and checks every byte on the wire. The console itself sends no telemetry, no update check, no account; three opt-ins (--share-project-names, --share-alerts, --share-tool-activity) are off unless passed.",
+          "citation": "README.md:66-73"
+        },
+        {
+          "claim": "Tokens are split into cache read, cache write (by cache lifetime), output and uncached input; totals, estimate, message count and per-class shares follow one period (1 h, 24 h, 7 d, 30 d); usage lines that could not be counted are counted by reason and shown beside the figures, never silently dropped.",
+          "citation": "README.md:273-282"
+        },
+        {
+          "claim": "Unknown is not zero: a record that did not report a token class makes the total a floor, and a model with no verified list price is left out of the dollar figure rather than priced at $0.",
+          "citation": "README.md:418-422"
+        },
+        {
+          "claim": "Copied transcripts count once: record ids come from the transcript itself, not from file location, so the same session read on two machines is one set of events.",
+          "citation": "README.md:423-425"
+        },
+        {
+          "claim": "Dollars are estimates at standard API list prices from a dated, offline table (lib/collector/prices.json); not an invoice or subscription charge; tokens measure usage, not productivity.",
+          "citation": "README.md:426-428"
+        },
+        {
+          "claim": "Context and cache health: a session is flagged when an input reading reaches 160,000 tokens, or reaches 80,000 and doubles from the first retained reading; the last 16 readings are shown and the hub keeps at most 128 per session; idle-gap and possible-prefix-rewrite signals carry an estimated extra cost; the logs do not prove the cause.",
+          "citation": "README.md:311-324"
+        },
+        {
+          "claim": "Optional --interop enables a local Prometheus /metrics endpoint and local ingest of Claude Code OpenTelemetry and Kong/LiteLLM token metrics, shown in a Telemetry panel kept separate from transcript totals so one request is never added twice; read and ingest use separate credentials.",
+          "citation": "README.md:326-337"
+        },
+        {
+          "claim": "A dependency-free shared analysis core is exported as @lockedinlabs/agent-console/analysis (ANALYSIS_VERSION 1, contextHealth and others); the package is not on the npm registry.",
+          "citation": "README.md:339-360"
+        },
+        {
+          "claim": "The hub keeps 8 days of usage by default (--retention-days) in ~/.agent-console/hub/; 30-day views come from daily totals kept for 400 days.",
+          "citation": "README.md:277-279, 498-500"
+        },
+        {
+          "claim": "Works on macOS, Linux and Windows (console, joining/reporting, Projects view with git); CI runs the whole suite including the multi-process privacy test and the package smoke test on all three with Node 22 and 24.",
+          "citation": "README.md:257-266"
+        },
+        {
+          "claim": "Distribution status as stated: the GitHub v0.4.1 release has a Node.js package and standalone files for macOS, Linux and Windows; @lockedinlabs/agent-console is not published to npm; the Homebrew tap and a container image are not verified as available.",
+          "citation": "README.md:85-91"
+        },
+        {
+          "claim": "Claude Code or Codex can install it from the repository URL by following INSTALL.md; an optional `policy` command compiles agent-policy.yaml into Claude Code project agents, settings and hooks (nothing is installed by starting the dashboard; hard token/dollar budget enforcement is not available from the native launch hook).",
+          "citation": "README.md:37-40, 436-457"
+        }
+      ],
+      "install": [
+        {
+          "method": "Run from source with git and Node.js 22+ (Linux, macOS, Windows; no build step)",
+          "command": "git clone https://github.com/LockedinLabs-AI/agent-console.git\ncd agent-console\nnode bin/agent-console.mjs --open",
+          "citation": "README.md:46-50; INSTALL.md:31-36"
+        },
+        {
+          "method": "npm global install of the v0.4.1 GitHub release archive (the registry package is not published)",
+          "command": "npm install --global --ignore-scripts https://github.com/LockedinLabs-AI/agent-console/releases/download/v0.4.1/lockedinlabs-agent-console-0.4.1.tgz\nagent-console --open",
+          "citation": "README.md:96-99; INSTALL.md:56-60; availability note README.md:89"
+        },
+        {
+          "method": "npx of the v0.4.1 GitHub release archive",
+          "command": "npx --yes https://github.com/LockedinLabs-AI/agent-console/releases/download/v0.4.1/lockedinlabs-agent-console-0.4.1.tgz --open",
+          "citation": "README.md:112-114"
+        },
+        {
+          "method": "Standalone executable (Node.js inside) via install.sh into ~/.local/bin (Linux x64/arm64, macOS arm64/x64; Linux needs glibc 2.28+)",
+          "command": "curl -fsSLO https://raw.githubusercontent.com/LockedinLabs-AI/agent-console/main/install.sh && sh ./install.sh",
+          "citation": "docs/standalone-install.md:21-23, 49-52; INSTALL.md:76-94; README.md:170-173"
+        },
+        {
+          "method": "Docker team-hub image (Linux amd64/arm64; hub only, --no-local; README says a v0.4.1 image has not been verified)",
+          "command": "docker volume create agent-console-state\ndocker run --name agent-console-hub --network host \\\n  -v agent-console-state:<private> \\\n  ghcr.io/lockedinlabs-ai/agent-console:v0.4.1",
+          "citation": "docs/docker-hub.md:17-22; README.md:91"
+        },
+        {
+          "method": "Homebrew tap (documented in the formula README, but stated as not published or verified)",
+          "command": "brew install LockedinLabs-AI/tap/agent-console",
+          "citation": "packaging/homebrew-tap/README.md:3-14; README.md:90"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:257-266 lists Linux as working and says CI runs the whole suite on Linux (ubuntu-latest, .github/workflows/ci.yml:13); the release carries agent-console-linux-x64 (docs/executables.md:13), built and smoke-tested on ubuntu-24.04 (.github/workflows/binaries.yml:66) and installed with install.sh on that runner at release (.github/workflows/release.yml:275, 287-295); the standalone build needs glibc 2.28+ (install.sh:48-65).",
+        "wsl2": "unknown - WSL is not in the README support table (README.md:257-266) and no CI job runs under WSL (.github/workflows/ci.yml:13). The code is WSL-aware: it detects WSL (lib/hub/routes.js:129-132) and prints that the WSL address is usually reachable from this computer only, advising --advertise plus a port forward or mirrored networking (server.js:396-399; README.md:661). Transcripts inside WSL would be read as on Linux, but that is not stated or tested.",
+        "macos_arm64": "yes - README.md:257-266; the release carries agent-console-darwin-arm64 (docs/executables.md:11), built on macos-15 (.github/workflows/binaries.yml:64) and installed on that runner at release (.github/workflows/release.yml:273, 287-295); signed with an Apple Developer ID and notarized from v0.4.1 (docs/executables.md:50-55); CI also runs macos-latest (.github/workflows/ci.yml:13).",
+        "gpu": "no - not applicable: a log-reading Node.js dashboard with no GPU, CUDA or Metal code (a search of README, INSTALL, docs, lib, server.js, package.json and Dockerfile found only a roadmap note about a future NVIDIA Dynamo Prometheus adapter, docs/policy.md:168-174)."
+      },
+      "integrations": {
+        "cli": "yes. Binary `agent-console` (package.json:29-31). No command or only options starts the console (--open, --demo, --json prints launch details as JSON, --listen, --retention-days, --claude-root/--codex-root, --poll-ms, ...); join|report|stop|leave run the reporter; `policy diff|apply|remove|status`; `metrics-token --scope read|ingest`; --version/help (bin/agent-console.mjs:23-56; lib/config.js:180-239; lib/reporter.js:63-105; docs/policy.md:73-96). Headless inspection without the web console: `node lib/collector/collector.js --summary` prints today's (local calendar day) per-class totals as JSON and, for a machine that never enrolled, creates no state and sends nothing (lib/collector/README.md:18-22; lib/collector/collector.js:615-668, 685, 869-895). Not run in this review.",
+        "mcp": "none found. The docs state the package has no MCP server, registry, proxy or gateway and that response redaction does not cover MCP traffic (docs/ARCHITECTURE.md:354-360). No .mcp.json, plugin, skill or slash-command files exist in the tree (searches for SKILL.md, plugin.json, .mcp.json, .claude* and 'plugin' in README/docs found none). MCP tool calls are only counted as kind 'mcp' in the opt-in tool-activity counts (docs/COLLECTOR-CONTRACT.md:156-163).",
+        "sdk_or_api": "Library: `@lockedinlabs/agent-console/analysis` (pure, dependency-free: contextHealth, alert reducer, agentTree, costPerOutcome, policy parsing, interop summaries; package.json:24-28; lib/analysis/index.js:1-8; docs/ANALYSIS.md) and `@lockedinlabs/agent-console/conformance` (synthetic Claude Code/Codex logs plus expected totals; test/conformance/index.js:1-32); the package is not on the npm registry (README.md:349-352). HTTP, loopback 127.0.0.1 only, needs the sign-in cookie and an `X-Agent-Console: 1` header: GET /api/console (per period `tokens` {total, fresh, output, cacheWrite, cacheRead, cacheWrite5m, cacheWrite1h, cacheWriteUnknownTtl}, per-class `unknown` counts, cost, lanes, context; lib/hub/aggregate.js:312-343; lib/hub/routes.js:576-642) and GET /api/projects?period=; schemas docs/console-v0.4.schema.json and docs/projects-v0.4.schema.json (the console schema documents the v0.4 additions, docs/console-v0.4.schema.json:5). Programmatic reads need the sign-in flow shown in test/hub-e2e.test.js:68-86 (start with --json, follow the printed sign-in link). With --interop and a bearer token from `metrics-token`: GET /metrics (Prometheus gauge agent_console_transcript_tokens_last_24h{kind=input|output|cache_read|cache_write}; lib/analysis/interop.js:42-48), POST /v1/metrics (OTLP/HTTP JSON) and POST /ingest/gateway/kong|litellm (lib/hub/routes.js:516-556). Reporters use POST /api/ingest over pinned TLS with a device token (docs/COLLECTOR-CONTRACT.md:297-304). The exact per-window accounting report (lib/hub/accounting.js) is imported only by tests, not by server code, the CLI or package exports.",
+        "claude_code_or_codex": "Reads both tools' local transcripts read-only: Claude Code from $CLAUDE_CONFIG_DIR/projects, ~/.claude/projects and ~/.config/claude/projects; Codex from $CODEX_HOME/sessions plus archived_sessions, or ~/.codex/sessions plus ~/.codex/archived_sessions (lib/collector/collector.js:65-93; docs/accounting.md:17-35). No other tool is parsed (lib/collector/parsers.js:425-428). README and INSTALL.md are written so Claude Code or Codex can install it from the repo URL (README.md:37-40; INSTALL.md:1-6, 111-115). Claude Code only: `agent-console policy apply` writes repo-scoped .claude/agents, .claude/settings.json and a local hook (PreToolUse, PreModelSwitch) with private backups and `policy remove` (docs/policy.md:83-134; docs/ARCHITECTURE.md:121-168); there is no Codex enforcement adapter (docs/ARCHITECTURE.md:25-26). Claude Code's own OpenTelemetry metrics can be pointed at /v1/metrics when --interop is on (docs/INTEROP.md:47-83). No plugin, skill, slash command or mechanism for supplying context to either agent was found."
+      },
+      "telemetry_and_network": "No telemetry, update check, crash reporting, analytics, licence check or account, per docs (docs/security/DATA-FLOWS.md:42-51; README.md:66-73; docs/PRINCIPLES.md:42-47; CONTRIBUTING.md:77-78) and per code. The shipped code's outbound call sites are: loopback fetches to find or sign in to an already-running console (lib/hub/port.js:33-44; lib/hub/admin.js:271-293; server.js:147); certificate-pinned HTTPS to the hub named in a join link (lib/collector/pinned.js:38-113; lib/reporter.js:342,575,797); a loopback-only probe (lib/reporter.js:305-326); and lib/collector/transport.js:314-323, which posts only to the hub or the URL the operator gives (plain HTTP only to private hosts unless allowHttp, transport.js:59-80). The UI's CSP limits connect-src to 'self' (lib/hub/http.js:27-30) and the service worker handles same-origin requests only (public/sw.js:19-34). No model API is called (docs/security/DATA-FLOWS.md:53-57). Accounts: none; no model API key or cloud account needed (INSTALL.md:3-6). The network is used only on request: --listen opens the reporting port (default 127.0.0.1:6788) to private-range callers (public ranges need --allow-public, 100.64.0.0/10 needs --allow-cgnat; lib/hub/routes.js:189-196); join, report and leave are TLS-only (lib/hub/routes.js:212-218); the join page is plain HTTP (SECURITY.md:172-197). Downloads from github.com over HTTPS happen only when a person runs install.sh/install.ps1 or a printed join command (docs/security/DATA-FLOWS.md:38-39; lib/invocation.js:54); whether npx contacts the npm registry depends on npm, not this code (docs/security/DATA-FLOWS.md:59-65). What leaves a reporting machine: allowlisted usage metadata and salted hashes, plus opt-in project folder names, alert kinds and tool-call counts (README.md:555-583; lib/collector/collector.js:305-337). Local state lives under ~/.agent-console (modes 600/700, no at-rest encryption, docs/security/THREAT-MODEL.md:203-205); the hub's own machine also keeps project folder names, full paths and branches in names.json for its own screen (docs/security/DATA-FLOWS.md:97-101,114). The website sources contain no analytics (docs/website.md:3-6; no analytics or fetch calls found under site/). Repo CI, not the product, publishes OpenSSF Scorecard results to the public Scorecard API (.github/workflows/scorecard.yml:3-8,35)."
+    },
+    "code": {
+      "languages": [
+        "JavaScript (Node.js >=22; ESM .js/.mjs, plus CommonJS .cjs for the executable launcher)",
+        "HTML/CSS/vanilla JavaScript (browser UI in public/, static site in site/)",
+        "POSIX shell (install.sh, scripts/update-homebrew-tap.sh)",
+        "PowerShell (install.ps1)",
+        "Ruby (Homebrew formula template packaging/homebrew-tap/Formula/agent-console.rb.in)"
+      ],
+      "entry_points": [
+        {
+          "path": "bin/agent-console.mjs",
+          "what": "The `agent-console` binary (package.json bin): checks Node >=22, then dispatches version, join|report|leave|stop (lib/reporter.js), metrics-token, policy, or no command/options (server.js); unknown words are refused (bin/agent-console.mjs:14-56)."
+        },
+        {
+          "path": "server.js",
+          "what": "Console + hub server main: loopback console listener, reporting listener (plain-HTTP join page and TLS ingestion), local collection, --demo (server.js:1-16, 314-350)."
+        },
+        {
+          "path": "lib/reporter.js",
+          "what": "Reporter for another machine: join, report, stop, leave (lib/reporter.js:1-33, 63-105)."
+        },
+        {
+          "path": "lib/collector/collector.js",
+          "what": "Standalone collector CLI: --summary, --once, --sync-now, --watch, --out, --post (lib/collector/collector.js:853-895)."
+        },
+        {
+          "path": "lib/policy/cli.js",
+          "what": "`policy diff|apply|remove|status` for Claude Code project files, with the hook it installs in lib/policy/hook.mjs and classify.mjs (bin/agent-console.mjs:35-41; docs/policy.md:83-134)."
+        },
+        {
+          "path": "lib/analysis/index.js",
+          "what": "Library entry exported as @lockedinlabs/agent-console/analysis (package.json:24-28)."
+        },
+        {
+          "path": "test/conformance/index.js",
+          "what": "Library entry exported as @lockedinlabs/agent-console/conformance (package.json:24-28; test/conformance/index.js:1-32)."
+        },
+        {
+          "path": "packaging/sea/main.cjs",
+          "what": "First script of the standalone executables: unpacks the embedded package into the user cache, verifies every file's SHA-256, then starts it (packaging/sea/main.cjs:1-15)."
+        }
+      ],
+      "architecture": "Local-first pipeline, Node.js standard library only. (1) Collector, lib/collector/: scanner.js picks transcript files; collector.js keeps a per-file byte cursor and a write-ahead spool and lets only the projectRecord allowlist out (collector.js:305-337); parsers.js turns one JSONL line into usage records (Claude Code: per-message running maximum shared across files so streamed lines and forked-subagent copies count once; Codex: cumulative counters to per-event deltas, per-response token_usage_record lines, fork-boundary and counter-reset rules) and counts lines it cannot count as coverage debt by reason; pricing.js + prices.json give offline list-price estimates; transport.js and pinned.js deliver batches over certificate-pinned HTTPS. (2) Hub, server.js and lib/hub/: two listeners, the console on 127.0.0.1 (cookie sign-in in admin.js; routes.js; http.js with CSP and secret redaction) and a reporting port that serves the join page over plain HTTP and ingestion over TLS by sniffing the first byte (server.js:314-334; self-signed ECDSA certificate in tls.js); registry.js (devices, single-use invitations, token verifiers), store.js (records-<day>.ndjson, minute buckets for the retention window, 400-day daily rollup, up to 128 context samples per session), aggregate.js (the /api/console payload), local.js (the hub reads its own machine in-process every --poll-ms, default 2 s), alerts.js, fleet.js, projects.js, state-lock.js. (3) lib/reporter.js (+ reporter-outbox.js, reporter-search.js) runs on other machines: join, report, stop, leave. (4) lib/analysis/: pure count-based functions (contextHealth, alerts, agentTree, costPerOutcome, policy parsing, interop summaries); lib/interop/ingest.js: opt-in OTLP/Kong/LiteLLM adapters; lib/policy/: Claude Code policy compiler and hook; lib/gitstats.js: local git evidence. (5) public/: vanilla-JS UI (console.js, join.js, network-only service worker sw.js); site/: static download page. (6) Build and release: packaging/sea (Node single-executable via postject), Dockerfile (hub image), packaging/homebrew-tap (formula template), .github/workflows, scripts/, bench/.",
+      "packaging_and_release": "Per release (docs/ARCHITECTURE.md:296-352; scripts/release-assets-check.mjs:16-23): the npm tarball lockedinlabs-agent-console-<version>.tgz (npm pack), five standalone Node-embedded executables (darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64.exe) plus four .tar.gz archives (ten assets), six CycloneDX 1.5 SBOMs (*.cdx.json; .github/scripts/release-sbom.mjs:117,193-194) and SHA256SUMS (.github/workflows/release.yml:122-139); a GHCR hub image for linux/amd64 and arm64 with provenance, SBOM and an attestation (.github/workflows/ghcr.yml:95-124). Attestations: actions/attest-build-provenance over dist/* and the SBOMs, plus a per-file SBOM attestation (release.yml:140-177); verify with `gh attestation verify` (SECURITY.md:55-81); SLSA Build Level 2 self-assessed, not Level 3 (docs/security/SSDF.md:53-63). macOS executables are Developer-ID signed and notarized from v0.4.1 and the release fails without the five Apple secrets (release.yml:44-67; scripts/release-assets-check.mjs:42-44); the Windows executable is not code-signed (docs/executables.md:75-84). v0.1.0-v0.3.0 were attested under SamSnead85/agent-console (README.md:757-761). Pipeline: triggered by `release: published` (release.yml:11-13); the authorize job requires the tag to be a main commit whose main-push ci.yml, public-safety and perf runs succeeded (release.yml:18-39; scripts/release-source-check.mjs:7-32); native builds (binaries.yml), npm test, smoke:pack and upload without --clobber (release.yml:115-193); then published-install acceptance on Linux, macOS and Windows (release.yml:221-321); the npm job needs NPM_TOKEN and README states the registry package is not published (.github/workflows/npm-publish.yml:35-65; README.md:89). Actions are pinned to commit SHAs; Dependabot updates actions, npm and docker weekly (.github/dependabot.yml). Not verified here: that the v0.4.1 release assets exist (no network access in this review).",
+      "tests_and_ci": "Node's built-in test runner (`node --test`, concurrency 4 by default) enumerated by scripts/test.mjs:11-35; 69 test files in test/*.test.js, every one importing node:test; plus test/conformance/ (23 synthetic Claude Code/Codex transcript files, manifest.json, expected.json, collector-records.json), test/fixtures/ and test/helpers/. Notable: test/hub-e2e.test.js (real hub and reporter processes plus a recording TLS relay as the privacy canary), test/conformance.test.js (collector to hub store to accounting to console, compared to expected totals), test/security.test.js, test/collector-parsers.test.js. `npm run lint` is `node --check` on all JS plus JSON validity, not a linter or type check (scripts/lint.mjs:1-8); `npm run smoke:pack` packs, installs into a scratch prefix and starts demo mode (scripts/pack-smoke.mjs:1-9). CI has 13 workflow files in .github/workflows/: ci.yml (3 OS x Node 22/24: npm test, smoke:pack, git diff check; lint and an npm audit of the packaging/sea lockfile on Linux/Node 24; ci.yml:9-32), perf.yml (counted-operation budgets via bench/check.mjs), public-safety.yml (gitleaks + public-content check), pr-checks.yml (changelog and screenshot rules), ui-probes.yml (Playwright + axe in a real browser, installed ad hoc in CI), binaries.yml (builds and starts every native target on its own runner), ghcr.yml (image build/start for amd64 and arm64), installers.yml and readme-install.yml (weekly and on change: run install.sh/install.ps1 and the README install line against the latest release), pages.yml (download page), scorecard.yml (OpenSSF Scorecard), release.yml and npm-publish.yml (release). CodeQL is cited in docs as running on every change (docs/security/SSDF.md:41; docs/security/THREAT-MODEL.md:140-143) but there is no CodeQL workflow file in the tree, so it is configured outside it and not verifiable here. Required-check branch protection is repository configuration and not visible in the checkout (docs/ARCHITECTURE.md:328-331). Tests were not executed in this review.",
+      "dependencies": "package.json (root): 0 dependencies, 0 devDependencies (package.json:58-60); runtime is Node >=22 standard library only (server.js:18-24; lib/collector/collector.js:15-25 import only node: and relative modules; a search of lib/, server.js and bin/ for other import specifiers found only strings inside code). packaging/sea/package.json: 0 dependencies, 1 devDependency (postject 1.0.0-alpha.6, build-time only, packaging/sea/package.json:6-8) with a committed lockfile (packaging/sea/package-lock.json, transitive commander 9.5.0) installed with --ignore-scripts (.github/workflows/binaries.yml:88-89). No other manifests (a search for package.json, lockfiles, requirements, go.mod, Cargo.toml etc. found only these three). The Dockerfile base is node:22-bookworm-slim pinned by digest (Dockerfile:1). Playwright and axe-core are installed ad hoc in the UI-probes CI job only (.github/workflows/ui-probes.yml:24-30). The standalone executables embed Node.js 24 (docs/executables.md:3-8; binaries.yml:84-87).",
+      "security_policy": "SECURITY.md at the repo root: private reporting through GitHub Security Advisories; targets (not commitments) of acknowledgement in 2 business days, reproduce/CVSS in 5, fixed release for critical/high in 30 days and others in 90; only 0.4.x receives security fixes; scope and download-verification steps listed (SECURITY.md:3-81). Supporting documents: docs/security/DATA-FLOWS.md, THREAT-MODEL.md, SSDF.md (maintainer self-assessment, not an audit, SSDF.md:11) and ENTERPRISE-FAQ.md."
+    },
+    "claim_checks": [
+      {
+        "claim": "Measures provider usage (input, output, cache-creation and cache-read tokens) from the local logs Claude Code and Codex write.",
+        "verified": "partial",
+        "evidence": "Claude Code: yes - assistant message.usage input_tokens, output_tokens, cache_creation_input_tokens and cache_read_input_tokens, plus the 5m/1h split, are read (lib/collector/parsers.js:159-170). Codex: input_tokens, output_tokens, cached_input_tokens and cache_write_input_tokens are read from token_count totals or per-response token_usage_record lines (parsers.js:262-269, 271-411); uncached input is derived as input minus cached minus cache_write and is null (unknown) when cache_write_input_tokens is absent (parsers.js:357-359, 403-404), so the Codex cache-creation class depends on a field the repo can only show in synthetic fixtures (test/collector-parsers.test.js:18-19); whether real Codex logs always carry it cannot be checked from this checkout. Only these two tools are parsed (parsers.js:425-428). Classes are disjoint and total = input + output + cache read + cache write (docs/accounting.md:108-127). The source is local transcripts, not provider APIs (docs/accounting.md:388-390). Code path read, not executed."
+      },
+      {
+        "claim": "Nothing leaves a machine but counts; a canary test checks every byte on the wire.",
+        "verified": "yes",
+        "evidence": "One allowlist, projectRecord, builds every record (lib/collector/collector.js:305-337). test/hub-e2e.test.js starts real hub and reporter processes over canary-laden transcripts through a recording TLS relay that holds the hub's certificate (test/hub-e2e.test.js:1-11, 94-123, 125-145); README.md:578-583 adds the hub's files, the reporter's files and the console payload. The README's headline sentence lists only model ids, minutes, counts and hashes; records also carry the tool, subagent flag, price tier, cache TTL kind, device id, an execution-origin hash and the machine label, which README.md:555-569 and docs/COLLECTOR-CONTRACT.md:50-67 disclose."
+      },
+      {
+        "claim": "The console itself sends no telemetry, no update check and no account.",
+        "verified": "yes",
+        "evidence": "Outbound call sites in the shipped code: loopback fetches (lib/hub/port.js:33-44; lib/hub/admin.js:271-293; server.js:147), certificate-pinned HTTPS to the hub in a join link (lib/collector/pinned.js:38-113; lib/reporter.js:342,575,797), a loopback-only probe (lib/reporter.js:305-326), and lib/collector/transport.js:314-323 which posts only to the hub or operator-given URL (plain HTTP only to private hosts unless allowHttp, transport.js:59-80). CSP connect-src 'self' (lib/hub/http.js:27-30); the service worker is same-origin only (public/sw.js:19-34). Matches docs/security/DATA-FLOWS.md:21-51. Greps for fetch, http.request, tls.connect, net.connect, WebSocket and sendBeacon in lib/, server.js and public/ found nothing else. What npx/npm contact is outside this code (docs/security/DATA-FLOWS.md:59-65)."
+      },
+      {
+        "claim": "No account, no package install, no build step and no dependencies; Node.js 22 or newer.",
+        "verified": "yes",
+        "evidence": "package.json:58-60 (empty dependencies and devDependencies), package.json:32-34 (engines >=22), bin/agent-console.mjs:14-21 (refuses Node <22), server.js:18-24 and lib/collector/collector.js:15-25 (only node: and relative imports); a search of lib/, server.js and bin/ for other import specifiers found only strings inside code. The only dev dependency is the build-time postject (packaging/sea/package.json:6-8)."
+      },
+      {
+        "claim": "Context and cache health: flagged at 160,000 input tokens, or 80,000 and doubling; last 16 readings; at most 128 per session; idle-gap and possible-prefix-rewrite signals with an estimated extra cost.",
+        "verified": "yes",
+        "evidence": "lib/analysis/context.js:32-59 (bloated = latest >= 160_000 or latest >= 80_000 with growth >= 2; samples.slice(-16); break kinds idle-gap, lifetime-unknown, possible-prefix-rewrite; extra cost = write cost minus a hypothetical cache read at table rates, lines 15-25); lib/hub/store.js:311-324 (continuation rows excluded, samples.length > 128 drops the oldest); lib/hub/aggregate.js:730 calls contextHealth per lane."
+      },
+      {
+        "claim": "Dollar figures are offline list-price estimates and unknown is never priced at zero.",
+        "verified": "yes",
+        "evidence": "lib/collector/pricing.js:71-114 returns status 'unpriced' with usd null for an unlisted model, unverified rate, unknown tier or any unreported token class. lib/collector/prices.json:1-13 (USD, basis standard-global-api-equivalent, inventoryCheckedOn 2026-09-20) holds 22 model rows (19 verified, 3 unpriced: codex-auto-review, gpt-5.3-codex-spark, gpt-reserve) and 1 alias (prices.json:435-443). Models released later are unpriced until the table is updated."
+      },
+      {
+        "claim": "Copied transcripts count once and totals reconcile to the token.",
+        "verified": "partial",
+        "evidence": "Record ids are HMACs of tool, session id and message id under the shared salt, not paths (lib/collector/collector.js:165; docs/COLLECTOR-CONTRACT.md:52); Claude messages use a per-message running maximum shared across files so forked copies add only growth (lib/collector/parsers.js:172-224, 244-254); test/conformance.test.js:1-7, 44-53 replays synthetic logs through collector, store, accounting and console and compares to expected.json to the token and 1e-9 USD (docs/accounting.md:349-353). But the expected totals are summed from project-authored synthetic ground truth (docs/accounting.md:346-347), transcripts are not reconciled with the provider's usage API or invoice (docs/accounting.md:388-390), and drops are counted per machine for a transcript copied to two machines (docs/accounting.md:393-394)."
+      },
+      {
+        "claim": "Defaults: 8 days of minute data (1-90 configurable), 30-day views from a 400-day daily rollup, transcripts polled every 2 seconds.",
+        "verified": "yes",
+        "evidence": "lib/config.js:19-20, 130-132 (default 8, clamp 1-90; poll default 2000 ms); lib/hub/store.js:72 (ROLLUP_DAYS = 400); lib/hub/local.js:143 and lib/collector/collector.js:463-470 (files older than the retention window are not read); docs/MEASUREMENTS.md:7-9; docs/accounting.md:241-255 (30-day periods are marked partial where daily totals are missing). Where docs and code differ the code was preferred: lib/collector/README.md:12 says the local collector runs every five seconds, but server.js:268 passes config.pollMs (default 2000), matching README.md:671."
+      },
+      {
+        "claim": "CI runs the whole suite and the package smoke test on macOS, Linux and Windows with Node 22 and 24.",
+        "verified": "yes",
+        "evidence": ".github/workflows/ci.yml:9-32 (3 OS x Node 22/24: npm test, npm run smoke:pack, git diff --exit-code; lint and npm audit on Linux/Node 24); 69 test/*.test.js files all importing node:test (scripts/test.mjs:11-35). Whether these jobs are required merge checks is repository configuration and not visible in the checkout (docs/ARCHITECTURE.md:328-331). Not run here."
+      },
+      {
+        "claim": "Releases carry SHA256SUMS and a signed build-provenance attestation, macOS executables are signed and notarized from v0.4.1, and v0.4.1 packages are published.",
+        "verified": "partial",
+        "evidence": "The workflows implement the checks: checksums, provenance and SBOM attestations (.github/workflows/release.yml:122-177), a complete-asset check requiring macOS 'signed and notarized' labels (scripts/release-assets-check.mjs:30-47) and a missing-secret stop (release.yml:44-67). Not checkable offline: whether the published v0.4.1 release exists with those assets. The README is internally inconsistent: README.md:88 says v0.4.1 packages are published, while README.md:224-229 and 504-506 still say 'Until v0.4.1 packages are published'; README.md:89-91 says the npm package is not published and the Homebrew tap and container image are unverified."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Hub first read of a 1,000,268-line / 1.87 GB synthetic heavy month (240 sessions, 254 subagent transcripts)",
+        "metric": "time until first read complete; peak memory",
+        "value": "17.9 s and 512 MB after the optimisation (39.2 s and 1,463 MB before)",
+        "source": "docs/PERFORMANCE.md:26, 99-110 (figures as published; not reproduced here)",
+        "independent": false
+      },
+      {
+        "what": "Hub idle CPU and restart with one heavy synthetic month loaded",
+        "metric": "CPU as share of one core; restart to ready",
+        "value": "1.7% of a core after (24.1% before); restart first paint / ready 2.6 s / 3.2 s (4.2 s / 6.5 s before)",
+        "source": "docs/PERFORMANCE.md:99-110",
+        "independent": false
+      },
+      {
+        "what": "Collector pass on a 100,000-line synthetic history (CI-enforced operation counts, not times)",
+        "metric": "idle-pass bytes read / written / files opened; first-read bytes read per source byte",
+        "value": "84 KB / 16 B / 9 files (budgets <=128 KB / <=1 KB / <=20); 1.27 per source byte (budget <=1.35)",
+        "source": "docs/PERFORMANCE.md:41-60, 112-120; bench/budgets.json:8-21 (budget values match the doc)",
+        "independent": false
+      },
+      {
+        "what": "Team of ten reporters joined to one hub (10 machines x 80,000 lines, 1.44 GB, 8 days)",
+        "metric": "catch-up time for all machines; steady hub CPU; console answer",
+        "value": "21.2 s catch-up; 0.6% of a core steady; 48 ms and 107 KB console answer (20.8 s, 0.6%, 59 ms before)",
+        "source": "docs/PERFORMANCE.md:24-28, 126-135",
+        "independent": false
+      },
+      {
+        "what": "Alert latency for a synthetic five-call append through the local collector",
+        "metric": "time until the alert appeared",
+        "value": "2,043 ms in one observation; the README says it is not a latency guarantee and the UI can add up to 2 s of polling",
+        "source": "README.md:362-378",
+        "independent": false
+      },
+      {
+        "what": "Transcript structure on one heavily used machine, read-only, 24 September 2026 (basis for the accounting rules)",
+        "metric": "log-shape counts",
+        "value": "Claude, one UTC day: 32,676 usage lines for 21,546 distinct messages, 14,621 with usage changing between lines; Codex, 45 days: 53 counters went down, all explained by last_token_usage; counting replayed Codex history would have added 57,112,458 tokens over 14 days",
+        "source": "docs/accounting.md:355-377",
+        "independent": false
+      },
+      {
+        "what": "Output equivalence before and after the performance work",
+        "metric": "records compared",
+        "value": "byte-identical for 546,687 records (heavy month), 107,685 records (second history) and every conformance machine",
+        "source": "docs/PERFORMANCE.md:172-176",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: read-only observability of provider usage. The tool 'observes; it does not route or authorize model or tool calls' (docs/ARCHITECTURE.md:8-12, 21-26). A repo-wide search found no feature that supplies task context to agents, stores recoverable originals of artifacts, or measures artifact/context reductions; 'compaction' appears only as an accounting rule (docs/accounting.md:142,145), and the only separation it keeps is between transcript totals and optional OTel/gateway readings (docs/INTEROP.md:82-83, 102-105). The only originals it preserves are the project .claude files that `policy apply` overwrites (private backup, `policy remove`; docs/policy.md:90-96). No MCP server (docs/ARCHITECTURE.md:354-360). The exact per-window accounting report (lib/hub/accounting.js) is imported only by tests; supported programmatic reads are the signed-in /api/console, /metrics (24 h gauges, --interop only) and `collector.js --summary` (local-day totals).",
+      "Measurement basis: counts come from transcripts the tools wrote and are not reconciled with the provider's usage API or invoice; requests a tool never logged are invisible (docs/accounting.md:388-390). Parsing depends on unofficial log formats and observed behaviour such as copied-history ids staying stable (docs/accounting.md:381-384); the conformance suite and fixtures are project-authored synthetic logs (test/conformance.test.js:1-7). Codex uncached input and cache write need cache_write_input_tokens; if absent they are unknown and totals become floors (lib/collector/parsers.js:357-359). Cost uses a static table of 22 model rows dated 2026-09-20 (lib/collector/prices.json:5; lib/collector/pricing.js:71-114). Default retention is 8 days of minute data, at most 90 (lib/config.js:19, 130-132).",
+      "Maintenance and maturity: one maintainer owns every path (.github/CODEOWNERS:1-5; docs/security/THREAT-MODEL.md:188-193); main requires no reviews or signed commits and administrators can bypass required checks (THREAT-MODEL.md:188-193; docs/security/SSDF.md:21, 28). Pre-1.0 with seven versions dated 2026-09-20 to 2026-09-27 (CHANGELOG.md:3, 66, 119, 449, 537, 597, 655), a security advisory fixed in 0.2.2 (CHANGELOG.md:449-474), and upgrade rules (stop old hubs, upgrade the console before reporters; README.md:725-731; CHANGELOG.md:115-117). The repository moved from SamSnead85/agent-console and v0.1.0-v0.3.0 attestations keep the old identity (README.md:757-761). Security fixes cover 0.4.x only (SECURITY.md:32-37). The SSDF document is the maintainer's own assessment, not an audit (docs/security/SSDF.md:11).",
+      "Distribution and documentation drift: README says the npm package is not published and the Homebrew tap and container image are unverified (README.md:85-91), and it both states that v0.4.1 packages are published (README.md:88) and still says 'Until v0.4.1 packages are published' (README.md:224-229, 504-506). lib/collector/README.md:12 says the local collector runs every five seconds but the default is 2 s (lib/config.js:20; server.js:268). THIRD_PARTY_NOTICES.md:49 names lib/prices.js, which does not exist in the tree.",
+      "Install and supply chain: the Linux/macOS installer is fetched with curl from the mutable main branch (docs/standalone-install.md:19-31). install.sh checks only the executable's SHA-256 against a SHA256SUMS from the same release, which proves integrity, not origin; attestation checks are a manual `gh attestation verify` (SECURITY.md:55-81; docs/security/THREAT-MODEL.md:166-169). Printed join commands run `node -e '<check>'` and then `npx` on the downloaded package (lib/invocation.js:54). The Windows executable is not code-signed (docs/executables.md:75-84).",
+      "Platform limits: the Linux standalone executable needs glibc 2.28+ (not Alpine/musl or CentOS 7; install.sh:48-65); the source and npm routes need Node 22+ (bin/agent-console.mjs:14-21); WSL2 is not in the support table or CI, and joining from WSL needs --advertise plus port forwarding (README.md:257-266; server.js:396-399); the Projects view runs /usr/bin/git on non-Windows (lib/gitstats.js:29-40), so a git installed elsewhere would not be found by that path (not tested here).",
+      "Network and security posture when shared: --listen exposes the reporting port to private networks; the join page is plain HTTP and alterable on-path (SECURITY.md:172-197); the sign-in cookie is HttpOnly/SameSite=Strict but 127.0.0.1 cookies are sent to every local port (SECURITY.md:131-135; lib/hub/admin.js:212); no at-rest encryption, SSO/roles or persistent audit log (docs/security/THREAT-MODEL.md:203-210; docs/security/ENTERPRISE-FAQ.md:80-81); the hub's machine keeps project names, full paths and branches in names.json (docs/security/DATA-FLOWS.md:97-101, 114); some CodeQL alerts are dismissed rather than fixed (THREAT-MODEL.md:194-199) and open alerts are described as being triaged (ENTERPRISE-FAQ.md:154-156); a reporter can report false numbers for itself (THREAT-MODEL.md:127-128).",
+      "Licensing: the code is MIT (LICENSE:1-21; package.json:58), but the MIT grant does not cover the LockedIn Labs name or marks and a modified version must not be presented as a LockedIn Labs product (README.md:832-838); the brand assets (public/brand, app icons, docs/brand lockups, screenshots) are the company's own (THIRD_PARTY_NOTICES.md:54-66); IBM Plex fonts are OFL 1.1 and the standalone executables embed Node.js with its bundled components' licences (THIRD_PARTY_NOTICES.md:8-20, 34-45); the Anthropic and OpenAI marks belong to their owners (THIRD_PARTY_NOTICES.md:22-32)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "lockedinlabs-ai/agent-console",
+      "checks": [
+        {
+          "field": "readme.install[0] (Run from source with git and Node.js 22+)",
+          "statement": "Run from source with git and Node.js 22+ (Linux, macOS, Windows; no build step): git clone https://github.com/LockedinLabs-AI/agent-console.git; cd agent-console; node bin/agent-console.mjs --open",
+          "citation": "README.md:46-50; INSTALL.md:31-36",
+          "holds": true,
+          "note": "README.md:46-50 and INSTALL.md:31-36 show the same commands (INSTALL adds a --version step). README.md:52-54: Git and Node.js 22+, no package install, no build step. INSTALL.md:38: the commands also work in Windows PowerShell, with no dependencies and no build step. Supporting code: bin/agent-console.mjs:14-21 refuses Node <22, and :42-43 starts server.js for option-only calls such as --open. package.json:32-34 has engines >=22.0.0 and :59-60 has empty dependencies and devDependencies. Checkout HEAD 8e33889a… = tag v0.4.1. Not executed."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT License text, 'Copyright (c) 2026 LockedIn Labs'. package.json:58 also says \"license\": \"MIT\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - README lists Linux as working and says CI runs the whole suite on Linux (ubuntu-latest); the release carries agent-console-linux-x64, built and smoke-tested on ubuntu-24.04 and installed with install.sh on that runner at release; the standalone build needs glibc 2.28+.",
+          "citation": "README.md:257-266; .github/workflows/ci.yml:13; docs/executables.md:13; .github/workflows/binaries.yml:66; .github/workflows/release.yml:275, 287-295; install.sh:48-65",
+          "holds": true,
+          "note": "README.md:259-263 marks Linux 'Yes' for the console, joining/reporting and Projects (with git); 265-266 is the CI sentence. ci.yml:13-14 has a matrix of [ubuntu-latest, macos-latest, windows-latest] x Node [22, 24] running npm test and smoke:pack (30-31). docs/executables.md:13 lists agent-console-linux-x64(.tar.gz). binaries.yml:66 builds linux-x64 on ubuntu-24.04, and smoke.mjs starts it with no Node on PATH (148-150). release.yml:275 runs linux-x64 on ubuntu-24.04 in executable-acceptance; 287-295 runs sh ./install.sh and checks the printed version. install.sh:48-65 refuses glibc <2.28 and musl. Whether the v0.4.1 assets exist on GitHub was not checked (outside the working directory)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Reads both tools' local transcripts read-only (Claude Code: $CLAUDE_CONFIG_DIR/projects, ~/.claude/projects, ~/.config/claude/projects; Codex: $CODEX_HOME/sessions plus archived_sessions, or ~/.codex/sessions plus ~/.codex/archived_sessions). No other tool is parsed. README and INSTALL.md are written so Claude Code or Codex can install it. Claude Code only: policy apply writes repo-scoped .claude/agents, .claude/settings.json and a hook (PreToolUse, PreModelSwitch), with private backups and policy remove. There is no Codex enforcement adapter. Claude Code OTel metrics can go to /v1/metrics with --interop. No plugin, skill, slash command or context-supply mechanism.",
+          "citation": "lib/collector/collector.js:65-93; docs/accounting.md:17-35; lib/collector/parsers.js:425-428; README.md:37-40; INSTALL.md:1-6, 111-115; docs/policy.md:83-134; docs/ARCHITECTURE.md:121-168, 25-26; docs/INTEROP.md:47-83",
+          "holds": true,
+          "note": "collector.js:74-89 builds exactly these roots. accounting.md:19-24 lists them, and :34 says 'read locally and read-only'. parsers.js:427 returns no records for any tool other than claude-code/codex. README.md:37-40 and INSTALL.md:3-6, 111-115 address coding assistants. policy.md:88-97 covers .claude/agents/*.md, .claude/settings.json, a hook under .claude/hooks/, a backup under ~/.agent-console/policy/ and remove restoring originals; :107-109 covers PreToolUse/PreModelSwitch. ARCHITECTURE.md:147-153 agrees, and :25-26 says 'no Codex enforcement adapter'. INTEROP.md:47-83 gives the OTEL_* setup pointed at 127.0.0.1:6787/v1/metrics under --interop. Globs for SKILL.md, plugin.json, .mcp.json and .claude*/, and a grep for MCP server code, found nothing. Minor wording: with CODEX_HOME set, the code also reads ~/.codex/sessions and ~/.codex/archived_sessions if present (collector.js:84-89, optional roots), so 'or' is narrower than the code. The substance is unaffected."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Measures provider usage (input, output, cache-creation and cache-read tokens) from the local logs Claude Code and Codex write; verified: partial (Codex cache-write/uncached input depend on cache_write_input_tokens, shown only in synthetic fixtures).",
+          "citation": "lib/collector/parsers.js:159-170, 262-269, 271-411, 357-359, 403-404, 425-428; test/collector-parsers.test.js:18-19; docs/accounting.md:108-127, 388-390",
+          "holds": true,
+          "note": "parsers.js:159-170 reads input_tokens, output_tokens, cache_creation_input_tokens (or 5m+1h), cache_read_input_tokens and the ephemeral 5m/1h split. parsers.js:262-269 maps the Codex input/output/cache_write_input_tokens/cached_input_tokens fields, used for token_count totals (302-304) and token_usage_record lines (383-411). Uncached input is null unless cacheWrite is present (357-359, 403-404). test/collector-parsers.test.js:18-19 is a synthetic counters fixture. A grep finds cache_write_input_tokens only in the parser, docs/accounting.md, bench/generate.mjs and test files, which supports the caveat. accounting.md:110 says 'Four disjoint classes. Total = input + output + cache read + cache write'; :388-390 says counts are not reconciled with the provider API or invoice. The 'partial' rating is fair."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

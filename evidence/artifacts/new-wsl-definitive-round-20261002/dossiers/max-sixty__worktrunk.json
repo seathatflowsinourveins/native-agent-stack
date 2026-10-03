@@ -1,0 +1,330 @@
+{
+  "contender": "max-sixty/worktrunk",
+  "revision": {
+    "contender": "max-sixty/worktrunk",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "max-sixty/worktrunk",
+        "tag": "v0.80.0",
+        "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.80.0",
+    "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+    "read_at": "2026-10-02T03:02:22+00:00"
+  },
+  "dossier": {
+    "contender": "max-sixty/worktrunk",
+    "revision": {
+      "tag": "v0.80.0",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT OR Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Worktrunk (`wt`, optionally also `git-wt`) is a Rust CLI that wraps Git's native `git worktree` to create, switch, list, merge and remove one worktree per branch, aimed at running AI agents in parallel (Cargo.toml:65; README.md:18). It drives the `git` CLI (minimum Git 2.43, src/git/version.rs:31) and optionally `gh`/`glab`/`tea`/`az` for forge status. Facts mapped to the stated needs: (1) Version-control base: Git only; other VCS directories (.hg, .jj, .svn ...) are merely excluded from `wt step copy-ignored` (docs/src/content/docs/step.md:475). (2) Parallel-agent worktree management (create, list with CI status, merge, clean up): provided - `wt switch -c [-x <agent>]`, `wt list [--full]`, `wt merge`, `wt remove`, `wt step prune`, hooks, and per-agent activity markers shown in `wt list`. (3) GitHub automation from the host (pull requests, checks, reviews, API): not provided - it only reads PR/CI/review state through the user's authenticated `gh` (read-only calls) and leaves PR creation/review/merge to `gh`/`glab` (README.md:176-184); no MCP server, HTTP API or reusable GitHub Action ships in the repo. (4) Structural/syntax-aware or entity-level diffs: not provided - diffs are line-based `git diff` output, optionally piped through an external pager such as delta (src/commands/picker/pager.rs:44-47). (5) GitHub-side agent PR review and mention-triggered tasks: not part of the Worktrunk product; this repo's own CI uses the separate `max-sixty/tend` project pinned at 0.3.4 (.github/workflows/tend-review.yaml:57; .github/workflows/tend-mention.yaml:354). (6) Enforced OS-level filesystem/network boundary for agent commands: not provided - worktrees separate working directories only, commands run with the caller's privileges, and project-defined hooks are gated by an approval prompt (AGENTS.md:83). The README itself makes no claims about items 3-6.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Worktrunk is a CLI for git worktree management, designed for running AI agents in parallel.",
+          "citation": "README.md:18"
+        },
+        {
+          "claim": "Three core commands make worktrees as easy as branches; also hooks to automate local workflows and copy-on-write build caches.",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "Git's native worktree feature gives each agent its own working directory, so they don't step on each other's changes.",
+          "citation": "README.md:32-35"
+        },
+        {
+          "claim": "Core commands: `wt switch feat`; `wt switch -c -x claude feat` (create + start Claude); `wt remove` (clean up); `wt list` (list with status, versus `git worktree list` which shows paths only).",
+          "citation": "README.md:47-82"
+        },
+        {
+          "claim": "Hooks - run commands on create, pre-merge, post-merge, etc.",
+          "citation": "README.md:89"
+        },
+        {
+          "claim": "Merge workflow - squash, rebase, merge, clean up in one command.",
+          "citation": "README.md:91"
+        },
+        {
+          "claim": "Interactive picker - browse worktrees with streaming CI status and diff, log, PR and comment previews.",
+          "citation": "README.md:92"
+        },
+        {
+          "claim": "Share build caches - ten worktrees get target/, node_modules/ etc without building or copying them (on APFS, btrfs, and XFS).",
+          "citation": "README.md:93"
+        },
+        {
+          "claim": "`wt list --full` - CI status and AI-generated summaries per branch.",
+          "citation": "README.md:94"
+        },
+        {
+          "claim": "PR checkout - `wt switch pr:123` to jump straight to a PR's branch.",
+          "citation": "README.md:95"
+        },
+        {
+          "claim": "PR workflow - commit, push, open a PR, merge via GitHub/GitLab, then clean up: `wt step commit` (commit staged changes), `gh pr create` (or `glab mr create`), `wt remove`.",
+          "citation": "README.md:176-184"
+        },
+        {
+          "claim": "Local merge - squash, rebase onto main, fast-forward merge, clean up (`wt merge main`).",
+          "citation": "README.md:186-201"
+        },
+        {
+          "claim": "For parallel agents, create multiple worktrees and launch an agent in each, e.g. `wt switch -x claude -c feature-a -- 'Add user authentication'`; `-x` runs a command after switching.",
+          "citation": "README.md:203-211"
+        },
+        {
+          "claim": "Next steps point to LLM commit messages, the interactive picker, Claude Code integration and CI status and PR links.",
+          "citation": "README.md:215-221"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (macOS and Linux)",
+          "command": "brew install worktrunk && wt config shell install",
+          "citation": "README.md:112-114"
+        },
+        {
+          "method": "Cargo (from crates.io; builds from source)",
+          "command": "cargo install worktrunk && wt config shell install",
+          "citation": "README.md:120-122"
+        },
+        {
+          "method": "Arch Linux",
+          "command": "sudo pacman -S worktrunk && wt config shell install",
+          "citation": "README.md:140-142"
+        },
+        {
+          "method": "Conda (community-maintained conda-forge feedstock)",
+          "command": "conda install -c conda-forge worktrunk && wt config shell install",
+          "citation": "README.md:146-148"
+        },
+        {
+          "method": "Pixi (global install)",
+          "command": "pixi global install worktrunk && wt config shell install",
+          "citation": "README.md:150"
+        },
+        {
+          "method": "Cargo without tree-sitter bash syntax highlighting (avoids needing a C99 compiler)",
+          "command": "cargo install worktrunk --no-default-features --features cli",
+          "citation": "docs/src/content/docs/faq.md:293-297"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - `x86_64-unknown-linux-musl` release archive (dist-workspace.toml:25; `aarch64-unknown-linux-musl` is also released); the full CI test suite runs on ubuntu-24.04 (.github/workflows/ci.yaml:77-79) and the musl target is built and tested in the nightly workflow (.github/workflows/nightly.yaml:229-278); AUR package for x86_64 and aarch64 (.github/aur/PKGBUILD:7,13-14).",
+        "wsl2": "unknown - no statement that WSL2 is supported or tested: CI runs on ubuntu-24.04, macos-26 and windows-2025 only (.github/workflows/ci.yaml:77-83) and the docs never name WSL2 as a platform. WSL appears only as a Windows-side caveat (WSL's bash.exe launcher shadowing Git Bash, src/shell_exec.rs:486-487) and as a /mnt/wsl symlink-path example (src/output/global.rs:83-88). Linux release archives exist but nothing ties them to WSL2.",
+        "macos_arm64": "yes - `aarch64-apple-darwin` release target (dist-workspace.toml:25); the full PR test suite runs on the macos-26 runner, which nightly.yaml describes as the arm64 macOS leg (.github/workflows/ci.yaml:80-81; .github/workflows/nightly.yaml:230-234); Intel macOS (`x86_64-apple-darwin`) is also released and tested nightly (nightly.yaml:255-256).",
+        "gpu": "no - not applicable: no GPU code or dependency (Cargo.toml:160-322; no cuda/gpu/wgpu/opencl/vulkan/metal references in src/)."
+      },
+      "integrations": {
+        "cli": "yes - `wt` binary (src/main.rs; Cargo.toml:123-126) and optional `git-wt` (Cargo.toml:132-141; included in release builds via dist-workspace.toml:31). Subcommands: switch, list (+ statusline), remove, merge, step (commit, squash, rebase, push, diff, copy-ignored, eval, for-each, promote, prune, relocate, tether), hook, config, plus git-style external `wt-<name>` PATH subcommands and user aliases (src/cli/mod.rs:776,1282,1409,1513,1589,1943,2645,2655; src/commands/custom.rs:1-28). Machine-readable `--format=json` on switch/list/merge/remove/step (docs/src/content/docs/switch.md:264-270; list.md:228-231; merge.md:160-166; remove.md:177-181) and a published JSON Schema for `wt list` (docs/src/content/docs/list.md:470-471; docs/public/schema/list-v2.json). Shell integration for bash, zsh, fish, nushell (experimental) and PowerShell (docs/src/content/docs/shell-integration.md:18).",
+        "mcp": "none found - no MCP server or client code/config in the repo (case-insensitive search for MCP); the only match is docs/src/content/docs/llm-commits.md:29 (and its generated skill mirrors), where Claude Code's `--safe-mode` flag is described as disabling MCP for the commit-message command.",
+        "sdk_or_api": "No HTTP API, SDK or reusable GitHub Action found (only internal composite actions under .github/actions/). The `worktrunk` Rust library crate is published (Cargo.toml:119-121) but its own docs say 'The library API is not stable' (src/lib.rs:6-8). Machine interfaces are the JSON outputs listed above, plus a JSON context object piped to for-each/hook commands on stdin (docs/src/content/docs/step.md:678).",
+        "claude_code_or_codex": "yes. Claude Code plugin: marketplace manifest .claude-plugin/marketplace.json:1-17 pointing at plugins/worktrunk; `wt config plugins claude install` runs `claude plugin marketplace add max-sixty/worktrunk` and `claude plugin install worktrunk@worktrunk` (src/commands/config/plugins.rs:16-62). Plugin hooks (plugins/worktrunk/hooks/hooks.json:3-86) set/clear agent-activity markers shown in `wt list` (UserPromptSubmit, Notification, Stop, SessionEnd), route Claude's `isolation: worktree` through `wt switch --create` / `wt remove` (WorktreeCreate/WorktreeRemove, lines 67-86), and answer Claude's EnterWorktree PermissionRequest with 'allow' for worktrees at the configured worktree-path location (src/commands/config/plugins.rs:119-155; docs/src/content/docs/claude-code.md:147). Also a `/worktrunk` configuration skill and a `/wt-switch-create` skill (skills/) and `wt list statusline --format=claude-code` for the Claude Code statusline (docs/src/content/docs/claude-code.md:149-174). Codex: `wt config plugins codex install` runs `codex plugin marketplace add max-sixty/worktrunk` and `codex plugin add worktrunk@worktrunk` (src/commands/config/codex.rs:10-41; .agents/plugins/marketplace.json:1-19) - activity tracking and config skill only, no worktree isolation (docs/src/content/docs/claude-code.md:9-18). Claude Code and Codex are also documented as commit-message generators (docs/src/content/docs/llm-commits.md:21-41). Other hosts: Gemini CLI extension (gemini-extension.json; claude-code.md:76-82), OpenCode, Pi and oh-my-pi activity plugins embedded from dev/*.ts (src/commands/config/opencode.rs:16; pi.rs:17; omp.rs:13). The shipped skill tells agents to stop and escalate for hook approvals rather than use --yes (skills/worktrunk/SKILL.md:118-136)."
+      },
+      "telemetry_and_network": "Telemetry: the docs state the CLI performs no telemetry, collects no analytics and transmits no user data (docs/src/content/docs/code-signing.md:52); consistent with the code - no HTTP-client or TLS crates in Cargo.toml:160-322 or in Cargo.lock (tokio with mio/socket2 is present for the picker's event loop, Cargo.toml:309-314). The docs website, not the CLI, loads a Google Analytics tag when served from worktrunk.dev (docs/src/components/Head.astro:46-56). Network policy: the CLI touches the network only when the user asks (AGENTS.md:75). Actual egress paths, all via subprocesses: `git fetch` for `wt switch pr:N`/`mr:N` (src/commands/worktree/switch.rs:419,539-545,1228); `gh`/`glab`/`tea`/`az` for CI status, PR/MR lookup and picker previews, only with `wt list --full`, a `ci` column, the picker or the statusline (src/commands/list/columns.rs:240-250; src/commands/list/ci_status/mod.rs:1-6; docs/src/content/docs/list.md:575); the first `default_branch()` per repo may run `git ls-remote` with a 10 s bound and caches the result (src/git/repository/config.rs:25,396-416); `curl` GET of https://api.github.com/repos/max-sixty/worktrunk/releases/latest for `wt config show --full` (src/commands/config/show.rs:1715-1727); the user-configured `[commit.generation]` shell command receives the prompt (including the diff) on stdin and is the only route by which code leaves the machine to an LLM provider - no model client is bundled (src/llm.rs:503-530; docs/src/content/docs/llm-commits.md:7,19-56); `wt config plugins claude|codex install` shells out to `claude`/`codex`, which fetch the plugin from GitHub (src/commands/config/plugins.rs:16-62). Accounts/services: none required for local worktree operations; `gh`/`glab`/`tea`/`az` installed and authenticated for CI/PR features (docs/src/content/docs/switch.md:153); an LLM CLI/account only if commit generation or summaries are configured. State is local: git config `worktrunk.*` and `.git/wt/{cache,logs,trash}` (docs/src/content/docs/faq.md:135-155) plus a local command log of hooks and LLM commands (faq.md:253-255). The docs say there are no daemons (faq.md:183), though post-* hooks and background removal run as detached processes (src/commands/process.rs:174-253)."
+    },
+    "code": {
+      "languages": [
+        "Rust (edition 2024; 207 files in src/, 72 in tests/, 7 in benches/)",
+        "TypeScript/JavaScript (Astro Starlight docs site in docs/; agent plugin sources dev/*.ts)",
+        "Python (docs demo tooling in docs/demos/; .github/verify-windows-signature.py)",
+        "Shell and batch (plugins/worktrunk/hooks/wt.sh, wt.cmd)",
+        "Nix (flake.nix, nix/home-manager-module.nix)",
+        "YAML (GitHub workflows, composite actions)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/main.rs",
+          "what": "`wt` CLI binary (Cargo.toml:123-126; default-run = wt at Cargo.toml:67); clap parse then dispatch to src/commands/*."
+        },
+        {
+          "path": "src/git_wt.rs",
+          "what": "`git-wt` binary: `include!(\"main.rs\")`, built only with feature `git-wt` (Cargo.toml:132-141); shipped in release archives (dist-workspace.toml:31)."
+        },
+        {
+          "path": "src/lib.rs",
+          "what": "`worktrunk` library crate (git/, config/, shell_exec, styling, trace, ...); docs state the library API is not stable (src/lib.rs:6-8)."
+        },
+        {
+          "path": "src/cli/mod.rs",
+          "what": "clap command tree: switch (:776), list (:1282), remove (:1409), merge (:1513), step (:1589), hook (:1943), config (:2645), external wt-<name> (:2655-2656); hidden deprecated `select` (:1518)."
+        },
+        {
+          "path": "src/commands/config/plugins.rs",
+          "what": "`wt config plugins claude ...` handlers and the Claude Code PermissionRequest hook handler (`approve-enter-worktree`); sibling files codex.rs, opencode.rs, pi.rs, omp.rs install the other agent plugins."
+        },
+        {
+          "path": "plugins/worktrunk/hooks/hooks.json",
+          "what": "Claude Code plugin hook definitions; call `wt` through plugins/worktrunk/hooks/wt.sh (WORKTRUNK_BIN override, Windows-aware wrapper)."
+        },
+        {
+          "path": "tests/helpers/wt-perf/src/main.rs",
+          "what": "`wt-perf` perf/trace helper binary (publish = false); workspace member (Cargo.toml:1-5)."
+        },
+        {
+          "path": ".github/workflows/release.yaml",
+          "what": "Tag-triggered cargo-dist release pipeline (build, sign Windows, packslip, GitHub Release, crates.io/Homebrew/winget/AUR publish)."
+        }
+      ],
+      "architecture": "One Rust crate `worktrunk` (library + `wt` binary) in a Cargo workspace with one helper crate (tests/helpers/wt-perf). All VCS work is done by spawning the `git` CLI (no libgit2/gitoxide dependency): src/git/ holds Repository/WorkingTree wrappers (src/git/repository/{worktrees,branch,branches,diff,working_tree,integration,...}.rs), remote_ref/{github,gitlab,gitea,azure}.rs that resolve PR/MR refs through gh/glab/tea/az, version.rs (Git >= 2.43 check), reap.rs and fsmonitor.rs (process cleanup). src/shell_exec.rs is the single process-spawn chokepoint (Cmd: logging, timeouts, signal forwarding, process groups; `sh -c` on Unix, Git Bash on Windows), enforced by a pre-commit rule (.pre-commit-config.yaml:77-89). src/main.rs parses args with clap (src/cli/{mod,config,hook,list,step}.rs) and dispatches to src/commands/: worktree/{switch,push,resolve,finish,hooks,types}.rs; list/ (collect/ background tasks, columns/render/layout, json_v2, ci_status/{github,gitlab,gitea,azure,cache,platform}.rs); picker/ (skim + ratatui interactive picker with 8 preview tabs and PR/comment panes); merge.rs; remove.rs; step/{commit,squash,rebase,diff,copy_ignored,promote,prune,relocate,tether}.rs; hooks.rs + hook_plan.rs + command_approval.rs (hook execution behind a frozen, user-approved plan); statusline.rs; alias.rs and custom.rs; config/ (show, state, approvals and the agent installers). src/config/ holds user and project TOML, approvals, deprecation migrations and minijinja template expansion; src/shell/ and src/commands/configure_shell.rs implement shell integration; src/llm.rs and src/summary.rs pipe prompts to a user-configured shell command for commit messages and branch summaries; src/copy.rs does reflink copies; src/trace/, logging.rs and diagnostic.rs provide tracing. No server or daemon: state lives in git config `worktrunk.*` and .git/wt/{cache,logs,trash} (docs/src/content/docs/faq.md:135-155). Outside src/: plugins/worktrunk/ (Claude Code/Codex plugin: hooks.json, wt.sh wrapper, generated skills mirror), skills/ (authored agent skills), gemini-extension.json, dev/*.ts (OpenCode/Pi/oh-my-pi plugin sources embedded with include_str!), docs/ (Astro Starlight site), tests/, benches/.",
+      "packaging_and_release": "Version 0.80.0 (Cargo.toml:59); toolchain pinned to 1.97.0 (rust-toolchain.toml:2), MSRV 1.97 (Cargo.toml:61). Releases are built by cargo-dist 0.30.2 (dist-workspace.toml:7; .github/workflows/release.yaml:78) when a version tag is pushed (release.yaml:48-52; the plan step also runs on PRs): targets aarch64/x86_64-apple-darwin, aarch64/x86_64-unknown-linux-musl and x86_64-pc-windows-msvc (dist-workspace.toml:25); installers: shell, powershell, homebrew (dist-workspace.toml:17); both `wt` and `git-wt` are built (dist-workspace.toml:31); thin-LTO dist profile (Cargo.toml:379-382). Integrity: per-archive `.sha256` checksums (release.yaml:221-228); the Windows zip goes through SignPath with the `test-signing` policy on a self-signed test certificate, failures non-blocking (release.yaml:164-216; .github/verify-windows-signature.py:3-9); a Sigstore-signed 'packslip' manifest of archive digests is produced by jdx/packslip pinned by commit SHA, best-effort via continue-on-error (release.yaml:365-394; CHANGELOG.md:13); no GitHub build-provenance attestation step found (only `attestations: write` for packslip, release.yaml:316-320); the code-signing policy covers only the Windows binaries (docs/src/content/docs/code-signing.md:13,21-25); most other third-party actions are pinned by version tag, not SHA (e.g. release.yaml:70,184,437,457,513) and dist is installed with curl|sh (release.yaml:78); releases are described as immutable (release.yaml:367-368). Publishing: crates.io via OIDC Trusted Publishing (release.yaml:418-441), Homebrew tap max-sixty/homebrew-worktrunk with formula `wt` (dist-workspace.toml:19-21; release.yaml:465-495), winget (release.yaml:443-463), AUR `worktrunk-bin` from .github/aur/PKGBUILD (release.yaml:497-521; PKGBUILD uses SKIP checksums filled by updpkgsums, PKGBUILD:15-16). Environments `signing` and `release` scope the signing, AUR and bot secrets (release.yaml:128; .github/AGENTS.md:11-16). The cargo-dist shell/PowerShell installers edit shell profiles to add the install dir to PATH unless WORKTRUNK_NO_MODIFY_PATH=1 (dist-workspace.toml:10-16). Nix flake for x86_64-linux, aarch64-linux and aarch64-darwin (flake.nix:26) with `nix flake check` in nightly (nightly.yaml:418-445); the crates.io archive is test-built without .git (nightly.yaml:358-385).",
+      "tests_and_ci": "Frameworks: cargo nextest with insta/insta-cmd snapshot tests (1,132 .snap files under tests/), rstest, PTY tests via portable-pty + vt100 behind feature `shell-integration-tests` (needs bash, zsh, fish, nushell, pwsh, jq; Cargo.toml:107-109), inline unit tests and doctests, criterion benches (7 in benches/, Cargo.toml:348-374). Roughly 4,800 `#[test]`/`#[rstest]` attributes (2,368 across 66 files under tests/ including the wt-perf helper; 2,476 across 152 files under src/; rstest case expansion not counted). 72 .rs files under tests/: 61 in tests/integration_tests/, 6 in tests/common/, tests/integration.rs, tests/cancel_background.rs, and 3 in tests/helpers/wt-perf. Integration tests run the built `wt` against temp git repos with mocked gh/glab/tea/az (src/testing/mock_commands.rs; tests/integration_tests/ci_status.rs) and hermetic git/config/network isolation (tests/AGENTS.md:32-44); includes shell-injection tests (tests/integration_tests/security.rs), read-only-object-database 'managed sandbox' tests (tests/integration_tests/list.rs:4460-4467) and readme_sync.rs, which asserts README/docs/help/skills/example configs stay in sync with src/cli/mod.rs (tests/integration_tests/readme_sync.rs:2716). Docs-site tests: docs/tests/*.mjs (3 files) and docs/demos/tests/test_recording.py. CI workflows (.github/workflows): ci.yaml (pre-commit lint = rustfmt, clippy -D warnings, typos, Cargo.lock check, custom pygrep rules; feature-check; test matrix ubuntu-24.04/macos-26/windows-2025 running the project's own `wt hook pre-merge --yes insta` using crates.io wt 0.79.0; fast-checks = lockfile, doctest, rustdoc; msrv via cargo-msrv; docs build); nightly.yaml (feature powerset, full tests incl. a Git 2.43.0 leg, musl and Intel-macOS release targets, cargo-udeps, minimal-versions, crates.io archive without .git, lychee link check, `nix flake check`; opens a failure issue); coverage.yaml (cargo-llvm-cov nextest to Codecov); affected.yaml (cargo-affected, advisory); benchmarks.yaml (daily criterion run, time series appended to a gist owned by worktrunk-bot - not read here); publish-docs.yaml (GitHub Pages); release.yaml; tend-*.yaml (agent automation). Dependabot covers cargo, github-actions and npm (.github/dependabot.yaml).",
+      "dependencies": "Cargo.toml: 65 direct [dependencies] (15 optional - clap, clap_complete, crossterm, humantime, skim, ratatui, ansi-to-tui, tokio, arboard, open, termimad, tracing-log, tracing-subscriber behind feature `cli`; tree-sitter-bash and tree-sitter-highlight behind `syntax-highlighting`; both features are on by default, Cargo.toml:86-106), 2 unix-only (nix, signal-hook; :324-329), 1 build-dependency (vergen-gitcl; :331-332), 12 dev-dependencies (:334-346). Cargo.lock resolves 494 packages. Notable: clap 4.6, minijinja (templates), skim exact-pinned 5.7.0 with ratatui 0.30 (picker TUI), reflink-copy (CoW), rayon, tokio (picker event loop), petname exact-pinned =3.2.0 (stable codename filter). No libgit2/gitoxide and no HTTP client. `unsafe_code = forbid` (Cargo.toml:376-377). Workspace member tests/helpers/wt-perf (publish = false) has 7 deps (tests/helpers/wt-perf/Cargo.toml:14-35). Docs site docs/package.json: 6 dependencies + 3 devDependencies (Astro/Starlight, Playwright, TypeScript). Runtime external tools: git >= 2.43 (required), optional gh/glab/tea/az, curl (version check), sh on Unix or Git Bash on Windows for hooks (src/shell_exec.rs:1-9); source builds with default features need a C99 compiler (docs/src/content/docs/faq.md:293). Dependabot only (cargo weekly, github-actions daily, npm weekly: .github/dependabot.yaml); no cargo-audit/cargo-deny/CodeQL/dependency-review config found.",
+      "security_policy": "none - no SECURITY.md or equivalent vulnerability-reporting file in the repo (glob for SECURITY* returned nothing). Related documents: .github/AGENTS.md (CI token/environment model; points to the external tend security model), docs/src/content/docs/code-signing.md (Windows signing policy; tampering reports go to a public issue, lines 54-56), AGENTS.md:83 (project commands run only after approval), tests/integration_tests/security.rs (shell-injection tests)."
+    },
+    "claim_checks": [
+      {
+        "claim": "`wt list --full` shows CI status per branch (README.md:94) and `wt switch pr:123` jumps to a PR's branch (README.md:95).",
+        "verified": "yes",
+        "evidence": "The CI column renders only with `--full`/`[list] full` or when `ci` is listed in `[list] columns` (src/commands/list/columns.rs:240-250; src/commands/list/collect/mod.rs:1022). GitHub status comes from `gh pr list --head <branch> --json ...statusCheckRollup,reviewDecision,isDraft...` and `gh api repos/{owner}/{repo}/commits/{sha}/check-runs` (src/commands/list/ci_status/github.rs:66-86,212-217); GitLab/Gitea/Azure use glab/tea/az (src/commands/list/ci_status/mod.rs:1-6). `pr:N` resolves via `gh api repos/{owner}/{repo}/pulls/{N}` (src/git/remote_ref/github.rs:107-123) then `git fetch` of the branch or of refs/pull/N/head for forks (src/commands/worktree/switch.rs:407-422,537-545,1226-1229). All forge calls are read-only and need an authenticated gh/glab (docs/src/content/docs/switch.md:153)."
+      },
+      {
+        "claim": "PR workflow: `wt step commit`, then `gh pr create` (or `glab mr create`), then `wt remove` after the PR is merged (README.md:176-184).",
+        "verified": "yes",
+        "evidence": "PR creation and merge are done by external gh/glab, not Worktrunk. A search of all of src/ for gh/glab write-style calls (pr create/merge/review/comment, --method, -X, POST, -f/-F, --field, --input) found none; the only forge invocations are `gh repo set-default --view`, `gh api <GET path>`, `gh auth token/status`, `gh pr list/view --json`, and glab/tea/az equivalents (src/git/remote_ref/github.rs:69-80,112,228-233; src/commands/list/ci_status/github.rs:66-86,213-217; src/commands/picker/prs.rs:965-966,1126-1127). `wt step push` and `wt merge` never push to a remote (docs/src/content/docs/step.md:344; merge.md:91)."
+      },
+      {
+        "claim": "`wt step commit  # commit staged changes` (README.md:181).",
+        "verified": "partial",
+        "evidence": "Code prevails over the README comment: the default stage mode is All, i.e. untracked files plus unstaged tracked changes are staged before committing (src/config/user/sections.rs:22-25; docs/src/content/docs/step.md:126-132,167-168); `wt merge` and `wt step squash` do the same (docs/src/content/docs/merge.md:145-151). Auto-staging untracked files prints a warning (CHANGELOG.md:71). `--stage=tracked|none` or `[commit] stage` changes the behavior (step.md:134-144)."
+      },
+      {
+        "claim": "Merge workflow - squash, rebase, merge, clean up in one command; hooks at pre-merge/post-merge (README.md:89,91,186-201).",
+        "verified": "yes",
+        "evidence": "src/commands/merge.rs runs commit (361-375), squash (380-394), rebase (397-420), pre-merge hooks (424-439), a fast-forward or --no-ff merge into the LOCAL target branch (447-453), then worktree/branch cleanup (455-469). Ten hook types exist (src/git/mod.rs:501-522). Local only: never fetches or pushes (docs/src/content/docs/merge.md:91; step.md:344). Project hooks run only through the approval gate (src/commands/hook_plan.rs:1-43; src/commands/command_approval.rs:1-103)."
+      },
+      {
+        "claim": "Interactive picker - browse worktrees with streaming CI status and diff, log, PR and comment previews (README.md:92).",
+        "verified": "yes",
+        "evidence": "Eight preview tabs: diff, working, committed, log, upstream, summary, pr, comments (src/commands/picker/preview.rs:36-45). PR/MR commits and comments are fetched off-thread with read-only `gh pr view --json` / `glab api` (src/commands/picker/prs.rs:902-925,960-967,1121-1128). Diffs are plain git diffs, optionally through a pager such as delta (src/commands/picker/pager.rs:44-47) - line-based, not structural."
+      },
+      {
+        "claim": "Share build caches - ten worktrees get target/, node_modules/ etc without building or copying them (on APFS, btrfs, and XFS) (README.md:93).",
+        "verified": "partial",
+        "evidence": "Mechanism confirmed: `wt step copy-ignored` uses per-file `reflink_copy::reflink_or_copy` (src/copy.rs:170), so data blocks are shared on copy-on-write filesystems. It is still a per-file clone whose time scales with file count, and ext4/NTFS fall back to full copies (docs/src/content/docs/step.md:511-522), so 'without copying' holds only in the copy-on-write sense."
+      },
+      {
+        "claim": "Git's native worktree feature gives each agent its own working directory, so they don't step on each other's changes (README.md:32-35).",
+        "verified": "partial",
+        "evidence": "Separate working directories and indexes: yes, via `git worktree` (worktrees share one .git, docs/src/content/docs/faq.md:60). Not an enforced boundary: hooks, `--execute` programs, aliases and LLM commands run with the caller's privileges through sh -c or direct exec (src/shell_exec.rs:1-9; src/llm.rs:511-530); src/ contains no sandbox, filesystem-rule or network-deny mechanism (searches for bubblewrap, landlock, seatbelt/sandbox-exec, seccomp, firejail, nsjail, unshare, chroot, cgroup, pledge found none). The only gate is the approval prompt for project commands, bypassable with --yes (AGENTS.md:83; docs/src/content/docs/config.md:880-882). The code does cope with running inside another tool's sandbox (src/shell_exec.rs:58-67; src/git/repository/mod.rs:892; tests/integration_tests/list.rs:4460-4467)."
+      },
+      {
+        "claim": "(Docs) The CLI performs no telemetry, collects no analytics and transmits no user data; network access happens only when a command the user ran needs it (docs/src/content/docs/code-signing.md:52; AGENTS.md:75).",
+        "verified": "yes",
+        "evidence": "No HTTP-client or TLS crates in Cargo.toml dependencies or Cargo.lock; egress is subprocess-based (git, gh/glab/tea/az, curl, user-configured LLM command): src/commands/config/show.rs:1715-1727, src/commands/worktree/switch.rs:419,1228, src/llm.rs:511-530. Sanctioned exception: the first default-branch detection may run `git ls-remote`, bounded to 10 s (src/git/repository/config.rs:25,396-416). Caveat: the docs website, not the CLI, loads Google Analytics on worktrunk.dev (docs/src/components/Head.astro:46-56)."
+      },
+      {
+        "claim": "Install: `brew install worktrunk` and `sudo pacman -S worktrunk` (README.md:110-114,138-142).",
+        "verified": "partial",
+        "evidence": "Not confirmable from this repo, and the repo's own publishing targets differ: the release pipeline publishes a Homebrew formula named `wt` to the tap max-sixty/homebrew-worktrunk (dist-workspace.toml:19-21; release.yaml:465-495) and the AUR package `worktrunk-bin` (release.yaml:497-521; .github/aur/PKGBUILD:3,11-12), and the generated release notes tell AUR users `paru worktrunk-bin` (release.yaml:414). Whether homebrew-core `worktrunk` or an official Arch `worktrunk` package exists is outside the repo. `cargo install worktrunk` is backed by crates.io Trusted Publishing (release.yaml:418-441)."
+      },
+      {
+        "claim": "Windows: free code signing provided by SignPath.io, certificate by SignPath Foundation (README.md:136; docs/src/content/docs/code-signing.md:15-19).",
+        "verified": "no",
+        "evidence": "Code prevails over the README: the release workflow submits to SignPath with `signing-policy-slug: 'test-signing'` and says the project is on a self-signed test certificate while its OSS application is under review, so signing failures are tolerated (release.yaml:164-166,186-191). .github/verify-windows-signature.py:3-9 confirms the self-signed test certificate, that it only checks a certificate is present, and that v0.69.0 and v0.69.1 shipped unsigned. Windows-only; not relevant to Linux/macOS artifacts."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "wt list / switch picker per-row work on a 50-worktree repo (project-reported, v0.80.0 changelog)",
+        "metric": "time before per-row work starts",
+        "value": "47 ms (previously 120 ms)",
+        "source": "CHANGELOG.md:7",
+        "independent": false
+      },
+      {
+        "what": "Forge calls made for CI status in a repo with 239 local branches after skipping never-pushed branches (project-reported)",
+        "metric": "number of `gh` calls",
+        "value": "25 (previously 249)",
+        "source": "CHANGELOG.md:9",
+        "independent": false
+      },
+      {
+        "what": "Disk use of 56 worktrees of a Rust repo with a 40GB target/ shared via `wt step copy-ignored` reflinks (one machine, project-reported)",
+        "metric": "size by du vs actual disk",
+        "value": "2.6TB by du, 0.7TB on disk",
+        "source": "docs/src/content/docs/faq.md:62",
+        "independent": false
+      },
+      {
+        "what": "Copying a 14GB target/ directory: `cp -R` vs `cp -Rc` / `wt step copy-ignored` (project-reported)",
+        "metric": "time and extra disk",
+        "value": "cp -R: 2m, 14GB; cp -Rc / wt step copy-ignored: 20s, ~0",
+        "source": "docs/src/content/docs/step.md:515-518",
+        "independent": false
+      },
+      {
+        "what": "Rust first build with a reflink-copied target/ versus a full rebuild (project-reported)",
+        "metric": "first build time",
+        "value": "~3s vs ~68s",
+        "source": "docs/src/content/docs/step.md:530 (also .config/wt.toml:2)",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No enforced isolation: Worktrunk separates agents only by git worktree directories, which share one .git (docs/src/content/docs/faq.md:60). Hooks, `-x/--execute` programs, aliases and LLM commands run via sh -c or direct exec with the caller's full filesystem and network rights (src/shell_exec.rs:1-9; src/llm.rs:511-530); no sandbox, filesystem-rule or network-deny code exists (searches of src/ for bubblewrap, landlock, seatbelt, sandbox-exec, seccomp, firejail, nsjail, unshare, chroot, cgroup, pledge found none). The only gate is the per-command approval prompt for project hooks/aliases, which `--yes` or `wt config approvals add --yes` bypasses (AGENTS.md:83; docs/src/content/docs/config.md:880-882). The code tolerates running inside another tool's sandbox (src/shell_exec.rs:58-67; src/git/repository/mod.rs:892) but supplies none.",
+      "No structural or entity-level diffs: user-facing diffs are line-based `git diff` (src/git/repository/diff.rs:221-225); internal captures use git plumbing that deliberately ignores `diff.external` (src/git/repository/diff.rs:29-39); output may be paged through an external tool such as delta/bat (src/commands/picker/pager.rs:44-47; docs/src/content/docs/step.md:416-420). tree-sitter is used only to syntax-highlight bash commands in terminal output (Cargo.toml:84-86,219-224; src/styling/highlighting.rs:3). No difftastic, semantic-diff or structural-merge integration was found anywhere in the repo.",
+      "No GitHub write automation; forge features depend on external CLIs: the code runs only read-only `gh` calls and never creates, reviews, comments on or merges PRs (src/commands/list/ci_status/github.rs:66-86,212-217; src/git/remote_ref/github.rs:69-123; README.md:176-184). CI status, `pr:N` checkout and PR previews need `gh`/`glab` (or `tea`/`az`) installed and authenticated, otherwise cells are blank or show a warning (docs/src/content/docs/switch.md:153; docs/src/content/docs/list.md:122). The forge is inferred from the remote hostname unless `[forge]` is set, and Gitea and Azure DevOps are marked experimental (docs/src/content/docs/config.md:387,568-578). `wt merge` and `wt step push` are local-only (docs/src/content/docs/merge.md:91; step.md:344).",
+      "The GitHub-side agent review/mention automation is external to the product: .github/workflows/tend-*.yaml are generated by the separate max-sixty/tend project (pinned `max-sixty/tend/claude@0.3.4`), run Claude (`model: opus`) with contents/pull-requests/issues write permissions, a bot PAT and Claude/Anthropic secrets (tend-review.yaml:1-8,30-34,57-66; .github/AGENTS.md:5-18). It is configured for this repo (bot worktrunk-bot, @-mention gate, owner-only merge); tend's own behavior and the agent sandbox it provides live in tend, and appear here only as comments (.github/actions/tend-setup/action.yaml:118-150; .github/AGENTS.md:24).",
+      "Release integrity is thin outside Windows: the signing policy covers only the Windows binaries (docs/src/content/docs/code-signing.md:21-25); checksums are per-archive `.sha256` (release.yaml:221-228); the Sigstore packslip is optional and continue-on-error (release.yaml:365-394); no build-provenance attestation step; Windows signing uses a self-signed SignPath test certificate and v0.69.0/v0.69.1 shipped unsigned (.github/verify-windows-signature.py:3-9; release.yaml:164-166,189); most third-party actions are version-tag pinned and dist is installed via curl|sh (release.yaml:70,78); the AUR PKGBUILD ships SKIP checksums resolved at publish time (.github/aur/PKGBUILD:15-16; release.yaml:521).",
+      "Maintenance and stability: one named person holds the author, reviewer and approver roles (docs/src/content/docs/code-signing.md:38-42) and is the only one who can merge to main (.github/AGENTS.md:7); pre-1.0 (0.80.0) with behavior changes marked Breaking in minor releases (CHANGELOG.md:17,29,53,103); the Rust library API is explicitly unstable (src/lib.rs:6-8; CHANGELOG.md:45); MSRV tracks latest stable minus one, currently Rust 1.97 (AGENTS.md:9; Cargo.toml:61); several features are labelled experimental (step promote/relocate/tether, `remove --reap`, nushell, Gitea, Azure DevOps: docs/src/content/docs/step.md:41-44; remove.md:85; shell-integration.md:18; config.md:387).",
+      "Platform coverage gaps: WSL2 is neither documented nor tested - CI covers ubuntu-24.04, macos-26 and windows-2025 (.github/workflows/ci.yaml:77-83); the Linux musl and Intel-macOS release targets are only built/tested in the nightly workflow (.github/workflows/nightly.yaml:229-278) while PR CI exercises the glibc build; copy-on-write cache sharing needs APFS/btrfs/XFS/ReFS and falls back to full copies on ext4/NTFS (docs/src/content/docs/step.md:511-522); `wt remove --reap` is Unix-only (docs/src/content/docs/remove.md:103).",
+      "Security posture: no SECURITY.md or vulnerability-reporting channel and no cargo-audit/cargo-deny/CodeQL/dependency-review config (only Dependabot, clippy -D warnings and `unsafe_code = forbid`: .github/dependabot.yaml; .pre-commit-config.yaml:25-29; Cargo.toml:376-377). Project hooks are arbitrary shell shipped in a repo's .config/wt.toml, and post-* hooks run detached, possibly indefinitely, after wt exits (AGENTS.md:83-87; src/commands/process.rs:174-253). `wt step commit`, `squash` and `merge` auto-stage untracked files by default (src/config/user/sections.rs:22-25; CHANGELOG.md:71), unlike the README's 'commit staged changes' comment (README.md:181)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "max-sixty/worktrunk",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Homebrew (macOS and Linux): `brew install worktrunk && wt config shell install`",
+          "citation": "README.md:112-114 (heading at README.md:110)",
+          "holds": true,
+          "note": "README.md:110 reads 'Homebrew (macOS & Linux):' and lines 112-114 contain exactly `brew install worktrunk && wt config shell install` (also docs/src/content/docs/worktrunk.md:126). The repo's own tap publishes the formula as `wt` (dist-workspace.toml:19-21), but the repo points this command at homebrew-core: CHANGELOG.md:3110 says 'Homebrew install uses core tap: Install command updated from `max-sixty/worktrunk/wt` to `worktrunk`', and release.yaml:404-408 rewrites release notes to `brew install worktrunk && wt config shell install`. Whether the core formula is live can't be checked from the repo. Not one of the five picks: the dossier's install claim check (claim_checks[8], 'partial') omits this in-repo evidence and could cite it."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: MIT OR Apache-2.0; file: LICENSE",
+          "citation": "LICENSE:1-2,5-26,29-221; Cargo.toml:66",
+          "holds": true,
+          "note": "LICENSE is the only license file. Lines 1-2: 'This project is dual-licensed under MIT and Apache-2.0. You may choose either license at your option.' It contains the full MIT text (5-26) and Apache-2.0 text (29-221). Cargo.toml:66 has `license = \"MIT OR Apache-2.0\"`; README.md:10 badge and .github/aur/PKGBUILD:9 agree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - x86_64-unknown-linux-musl release archive (aarch64 musl also released); full CI test suite on ubuntu-24.04; musl target built and tested in nightly; AUR package for x86_64 and aarch64",
+          "citation": "dist-workspace.toml:25; .github/workflows/ci.yaml:77-79 (step at 114-115); .github/workflows/nightly.yaml:229-278; .github/aur/PKGBUILD:7,13-14",
+          "holds": true,
+          "note": "dist-workspace.toml:25 targets include x86_64-unknown-linux-musl and aarch64-unknown-linux-musl. In ci.yaml the test matrix's ubuntu-24.04 leg (77-79) runs the step '🧪 Full test suite' = `wt hook pre-merge --yes insta` (114-115). nightly.yaml's release-target job runs `cargo nextest run --target x86_64-unknown-linux-musl` on ubuntu-24.04 with musl-tools (249-251, 277-278); the job is gated on needs.gate (243-244). PKGBUILD:7 arch=('x86_64' 'aarch64'); lines 13-14 point at the two musl release tarballs."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "yes - Claude Code plugin (marketplace manifest; `wt config plugins claude install`; activity-marker hooks; WorktreeCreate/WorktreeRemove routed through `wt switch --create`/`wt remove`; EnterWorktree PermissionRequest answered 'allow' at the worktree-path location; /worktrunk and /wt-switch-create skills; statusline). Codex plugin: activity + config skill, no isolation. Claude Code/Codex as commit generators; Gemini/OpenCode/Pi/omp plugins; skill says escalate rather than --yes",
+          "citation": ".claude-plugin/marketplace.json:1-17; src/commands/config/plugins.rs:16-62,119-155; plugins/worktrunk/hooks/hooks.json:3-86; docs/src/content/docs/claude-code.md:9-18,76-82,141,147,149-174; src/commands/config/codex.rs:10-41; .agents/plugins/marketplace.json:1-19; docs/src/content/docs/llm-commits.md:21-41; src/commands/config/opencode.rs:16; pi.rs:17; omp.rs:13; skills/worktrunk/SKILL.md:118-136",
+          "holds": true,
+          "note": "All sub-claims match: marketplace.json:14 source ./plugins/worktrunk. plugins.rs:53,57 run `claude plugin marketplace add max-sixty/worktrunk` and `claude plugin install worktrunk@worktrunk`. hooks.json sets 🤖/💬 on UserPromptSubmit/Notification/Stop and clears on SessionEnd; WorktreeCreate/WorktreeRemove (67-86) call `wt switch --create ... --format=json` and `wt remove --foreground`; claude-code.md:141 ties this to isolation: \"worktree\". plugins.rs:135-150 prints behavior 'allow' only for EnterWorktree into a worktree at its expected path (claude-code.md:147). Statusline at claude-code.md:149-174. codex.rs:37,41 run `codex plugin marketplace add max-sixty/worktrunk` / `codex plugin add worktrunk@worktrunk`; claude-code.md:9-18 shows Codex with config skill and activity only, no isolation. llm-commits.md:21-41 gives the Claude Code and Codex commit commands. gemini-extension.json exists (claude-code.md:76-82). opencode.rs:16, pi.rs:17, omp.rs:13 include_str! dev/*.ts. skills/worktrunk and skills/wt-switch-create exist; SKILL.md:136 says 'stop and escalate', not --yes. Minor omission only: the PreToolUse(AskUserQuestion) and PermissionRequest-fallback marker hooks aren't listed."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "`wt list --full` shows CI status per branch (README.md:94) and `wt switch pr:123` jumps to a PR's branch (README.md:95) - verified: yes; forge calls read-only and need authenticated gh/glab",
+          "citation": "README.md:94-95; src/commands/list/columns.rs:240-250; src/commands/list/collect/mod.rs:1022; src/commands/list/ci_status/github.rs:66-86,212-217; src/commands/list/ci_status/mod.rs:1-6; src/git/remote_ref/github.rs:107-123; src/commands/worktree/switch.rs:407-422,537-545,1226-1229; docs/src/content/docs/switch.md:153",
+          "holds": true,
+          "note": "columns.rs:243 `ColumnKind::CiStatus => listed || gates.show_full`; collect/mod.rs:1022 `show_full = cli_full || config.list.full()`. github.rs:66-86 runs `gh pr list --head <branch> --state open --json ...statusCheckRollup,...reviewDecision,isDraft,...`; github.rs:212-217 builds `gh api repos/{owner}/{repo}/commits/{sha}/check-runs`; ci_status/mod.rs:1-6 names gh/glab/tea/az. remote_ref/github.rs:107-123 resolves pr:N via `gh api repos/{o}/{r}/pulls/{N}`. switch.rs fetches the same-repo branch with an explicit refspec (417-419), the tracking ref (539-545) or the fork ref (1228). switch.md:137 names refs/pull/N/head; :153 requires gh/glab 'installed and authenticated'. Read-only is consistent with code: a grep of src/ for --method/-X/POST/PATCH/PUT/DELETE and pr/mr create|merge|review|comment found nothing; every gh/glab/tea/az invocation is list/view/api GET."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

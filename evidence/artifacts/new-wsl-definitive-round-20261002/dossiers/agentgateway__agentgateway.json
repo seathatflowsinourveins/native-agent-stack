@@ -1,0 +1,272 @@
+{
+  "contender": "agentgateway/agentgateway",
+  "revision": {
+    "contender": "agentgateway/agentgateway",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "agentgateway/agentgateway",
+        "tag": "v1.5.0",
+        "commit": "fe6732474a96a0363dfb9822859af4e9bab360fa",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.5.0",
+    "commit": "fe6732474a96a0363dfb9822859af4e9bab360fa",
+    "read_at": "2026-10-02T03:01:54+00:00"
+  },
+  "dossier": {
+    "contender": "agentgateway/agentgateway",
+    "revision": {
+      "tag": "v1.5.0",
+      "commit": "fe6732474a96a0363dfb9822859af4e9bab360fa",
+      "read_at": "2026-10-02T03:01:54+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Open-source (Linux Foundation project, README.md:131) proxy for agent traffic: LLM, MCP and A2A. Rust data plane (crates/), Go Kubernetes controller + agctl CLI (controller/), React UI embedded in the binary (ui/). Standalone mode is one binary driven by a hot-reloaded YAML/JSON file; it exposes an OpenAI-compatible LLM listener (default port 4000), a UI/admin server (localhost:15000), Prometheus metrics, optional OTLP tracing/logs and an optional SQLite/Postgres request-log store. Facts bearing on the GPT-6 harness-gateway need: (1) it serves OpenAI Responses calls (/v1/responses, which the repo says Codex uses) and passes them straight through to an OpenAI provider (crates/agentgateway/src/llm/mod.rs:324); the UI ships a Codex CLI client-setup recipe. (2) 'Account pooling' exists only as operator-configured static credentials per provider entry, combined through provider groups / virtual models with load balancing, priority failover, health eviction and CEL-keyed session affinity; no ChatGPT/Codex subscription-login account handling was found. (3) Usage (input/output/cached/reasoning tokens, cost when a model catalog is loaded) is recorded in Prometheus metrics, OTel spans and an optional DB log store, but reasoning effort is not a recorded attribute. (4) There is no request/prompt-compression feature, only inbound Content-Encoding decoding. (5) The string 'gpt-6' does not occur anywhere in the repo, so model names are opaque pass-through strings.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Agentgateway is an open source proxy built on AI-native protocols (MCP & A2A) that provides drop-in security, observability, and governance for agent-to-LLM, agent-to-tool, and agent-to-agent communication across any framework and environment.",
+          "citation": "README.md:32"
+        },
+        {
+          "claim": "LLM Gateway: route traffic to major LLM providers (OpenAI, Anthropic, Gemini, Bedrock, and more) through a unified OpenAI-compatible API with budget and spend controls, prompt enrichment, load balancing, and failover.",
+          "citation": "README.md:52-53"
+        },
+        {
+          "claim": "MCP Gateway: connect LLMs to tools and external data sources via MCP with tool federation, stdio/HTTP/SSE/Streamable HTTP transports, OpenAPI integration, and OAuth authentication.",
+          "citation": "README.md:55-56"
+        },
+        {
+          "claim": "A2A Gateway: secure agent-to-agent communication using A2A, with capability discovery, modality negotiation, and task collaboration.",
+          "citation": "README.md:58-59"
+        },
+        {
+          "claim": "Inference Routing: intelligent routing to self-hosted models using Kubernetes Inference Gateway extensions, with decisions based on GPU utilization, KV cache, LoRA adapters, and queue depth.",
+          "citation": "README.md:61-62"
+        },
+        {
+          "claim": "Guardrails: multi-layered content filtering with regex, OpenAI moderation, AWS Bedrock Guardrails, Google Model Armor, and custom webhooks.",
+          "citation": "README.md:64-65"
+        },
+        {
+          "claim": "Security & Observability: auth (JWT, API keys, OAuth), fine-grained RBAC with CEL policy engine, rate limiting, TLS, and OpenTelemetry metrics/logs/tracing.",
+          "citation": "README.md:67-68"
+        },
+        {
+          "claim": "Standalone docs cover deployments without the full Kubernetes controller, driven by flat yaml config; Kubernetes docs cover the built-in Kubernetes controller and Gateway API support.",
+          "citation": "README.md:80-81"
+        },
+        {
+          "claim": "Agentgateway has a built-in UI.",
+          "citation": "README.md:83"
+        },
+        {
+          "claim": "agentgateway is currently in active development.",
+          "citation": "README.md:117"
+        },
+        {
+          "claim": "Agentgateway is a Linux Foundation project.",
+          "citation": "README.md:131"
+        },
+        {
+          "claim": "License badge: Apache 2.0.",
+          "citation": "README.md:8-10"
+        }
+      ],
+      "install": [
+        {
+          "method": "Install script shipped in the repo (downloads the release binary and its .sha256 from GitHub Releases, verifies SHA-256 with openssl, copies to /usr/local/bin via sudo). README.md:73-74 only links to external quickstart pages (agentgateway.dev), which were not opened, so the website's own curl-pipe form is unknown.",
+          "command": "bash common/scripts/get-agentgateway --version v1.5.0   # omit --version for the latest release; --no-sudo skips sudo; env AGENTGATEWAY_INSTALL_DIR overrides /usr/local/bin; VERIFY_CHECKSUM=false disables the openssl check",
+          "citation": "common/scripts/get-agentgateway:20-24,150-152,169-193,223-229"
+        },
+        {
+          "method": "Direct download of a GitHub release asset plus its checksum (URL pattern taken from the install script; asset names from the release workflow: agentgateway-linux-amd64, agentgateway-linux-arm64, agentgateway-darwin-arm64)",
+          "command": "curl -SsL -o agentgateway https://github.com/agentgateway/agentgateway/releases/download/v1.5.0/agentgateway-linux-amd64 && curl -SsL -o agentgateway.sha256 https://github.com/agentgateway/agentgateway/releases/download/v1.5.0/agentgateway-linux-amd64.sha256 && chmod +x agentgateway",
+          "citation": "common/scripts/get-agentgateway:150-159; .github/workflows/release.yml:516-526"
+        },
+        {
+          "method": "Container image (multi-arch linux/amd64 + linux/arm64; entrypoint /app/agentgateway; sets AGENTGATEWAY_ENV=container, so a writable /config mount or --file/--config is required)",
+          "command": "docker pull cr.agentgateway.dev/agentgateway:v1.5.0",
+          "citation": ".github/workflows/release.yml:549-552,84-87; Dockerfile:103,112; crates/agentgateway-app/src/lib.rs:205-221"
+        },
+        {
+          "method": "Build from source (Linux/macOS): Rust toolchain pinned to 1.98 plus Node 24.17.0/pnpm for the embedded UI; UI=0 skips the Node/UI build",
+          "command": "cd ui && corepack enable && pnpm install --frozen-lockfile && pnpm build && cd .. && export CARGO_NET_GIT_FETCH_WITH_CLI=true && make build   # binary: ./target/release/agentgateway",
+          "citation": "DEVELOPMENT.md:18-57; Makefile:44-72; rust-toolchain.toml:2"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release.yml:409-411 builds x86_64-unknown-linux-musl, published as agentgateway-linux-amd64 (release.yml:520); multi-arch image includes linux/amd64 (release.yml:84-85); CI runs make test on Ubuntu (pull_request.yml:39-40,63-64).",
+        "wsl2": "unknown - no WSL mention anywhere in the repo (searched); a Linux musl binary is published, but WSL2 is neither documented nor CI-tested.",
+        "macos_arm64": "yes - release.yml:417-419 builds aarch64-apple-darwin on macos-26, published as agentgateway-darwin-arm64 (release.yml:518); CI runs make test on macos-15 (pull_request.yml:43-44). Caveats: the oneshot subcommand is compiled only on Linux (crates/agentgateway-app/src/lib.rs:114-116) and no darwin-amd64 asset is published (release.yml:516-526).",
+        "gpu": "no - not applicable: a CPU-only proxy with no CUDA/GPU code under crates/ (searched). README.md:61-62 mentions GPU utilization only as a routing input for self-hosted model servers via Kubernetes Inference Gateway extensions."
+      },
+      "integrations": {
+        "cli": "Yes. The agentgateway binary takes -f/--file, -c/--config, --validate-only, -V and --version; subcommands: oneshot [-f|-c] [--output FILE] <command...> (Linux only: starts the gateway as a subprocess, waits for readiness, then execs the command), import --from <source> -f <file> [-o <file>] (LiteLLM config importer) and migrate -f <file> (crates/agentgateway-app/src/lib.rs:44-132; commands/oneshot.rs:16-24; crates/agentgateway/src/import.rs:1-6,106-111). A separate Go agctl CLI is built per release (.github/workflows/release.yml:457-492; controller/cmd/agctl/main.go).",
+        "mcp": "Yes, as an MCP gateway (README.md:55-56): the top-level mcp: config federates upstream MCP targets (stdio, SSE, streamable HTTP, OpenAPI) and serves them at /mcp and /sse (crates/agentgateway/src/types/local.rs:397-401,563-578; crates/agentgateway/src/mcp/; examples/mcp-*/). No MCP server exposing the gateway's own usage/management data was found.",
+        "sdk_or_api": "HTTP APIs, no client SDK for the gateway itself. Data plane: OpenAI-compatible /v1/chat/completions, /v1/responses, /v1/embeddings, /v1/models, /v1/images/*, /v1/rerank; Anthropic /v1/messages (+count_tokens); Gemini generateContent/streamGenerateContent/countTokens; Vertex rawPredict (crates/agentgateway/src/llm/model_router.rs:55-95). Admin/UI REST: /api/runtime, /api/config, /api/cel, /api/logs, /api/costs, /api/budgets (types/local.rs:2060-2070) on localhost:15000 by default (config.rs:327). Control plane: xDS gRPC with purpose-built protobuf types (architecture/configuration.md:21-27; crates/protos/proto/resource.proto). The Go api/ module only holds generated protobuf types (api/go.mod).",
+        "claude_code_or_codex": "Codex: the UI Client Setup page has a Codex CLI recipe - export OPENAI_API_KEY, optionally a separate CODEX_HOME, codex login --with-api-key, then codex --model <m> -c model_provider=gateway -c model_providers.gateway.base_url=<gateway>/v1; it warns that an existing Codex login 'can impact functionality' (ui/src/pages/ClientSetup.tsx:420-437). The Intune example expects wire_api = responses, a managed base_url ending in /v1 and an env_key holding the gateway client key (not the OpenAI key), and a successful POST /v1/responses (examples/microsoft-intune/verification/verify-agentgateway-clients-macos.sh:139-152; examples/microsoft-intune/README.md:309-323). A semantic-routing example states Codex uses the OpenAI Responses API and links an external Codex doc page (examples/llm-semantic-routing/k8s/cost-based/README.md:168-198; page not opened). A unit test pins requests carrying the same codex-session-id header to one provider in a group via sessionAffinity (crates/agentgateway/src/proxy/httpproxy.rs:3956-4032). No Codex-SDK-specific docs found; OpenAI JS/Python SDK recipes use base_url=<gateway>/v1 with chat.completions (ClientSetup.tsx:566-607). Claude Code: recipe sets ANTHROPIC_BASE_URL/ANTHROPIC_AUTH_TOKEN (ClientSetup.tsx:384-395); code decodes Claude Code's gzip request bodies and answers /v1/messages/count_tokens locally when the provider lacks it (llm/mod.rs:1753-1775,2803-2808); UI warns about Claude subscription keys (ui/src/claudeSubscription.ts:38-64)."
+      },
+      "telemetry_and_network": "No product telemetry, analytics, phone-home or update check found in code or docs (searched crates/, controller/, ui/, scripts). Outbound traffic is limited to what is configured: LLM providers (OpenAI default host api.openai.com, crates/llm/src/openai.rs:62-65), optional OTLP trace/log export (schema/config.md:71-80; crates/agentgateway/src/types/frontend.rs:297-299), optional JWKS/OIDC/ext-authz/guardrail-webhook endpoints, and one hard-coded fetch of https://models.dev/api.json that runs only when the admin/UI refresh-costs API is called (crates/agentgateway/src/llm/catalog/refresh.rs:52-63; ui.rs:672-750). Install-time only: get-agentgateway queries api.github.com for the latest tag and downloads from github.com (common/scripts/get-agentgateway:103,150-152). No account with the project is required; upstream provider credentials come from config/env (apiKey: $OPENAI_API_KEY, examples/llm-basic/config.yaml:12-18; env expansion at types/local.rs:85-86). Local state: running with no flags creates ~/.config/agentgateway/config.yaml (or /config) and a SQLite data.db (crates/agentgateway-app/src/lib.rs:183-257), and request logs go to that DB by default (config.rs:387) with tokens, cost, model, user and status (telemetry/log_store.rs:381-404); prompt/completion bodies are stored only with database.llm=full (types/frontend.rs:308-333). Ports: LLM listener 4000 on the wildcard address (types/local.rs:50,4736-4740), admin/UI localhost:15000 (config.rs:327), Prometheus stats 15020 and readiness 15021 on the wildcard address (config.rs:334,341). Postgres is optional; no other required network service."
+    },
+    "code": {
+      "languages": [
+        "Rust (data plane, crates/)",
+        "Go (controller/, api/, tools/)",
+        "TypeScript/React (ui/)",
+        "Protocol Buffers (crates/protos/proto)",
+        "Shell/PowerShell (installer, Intune examples)"
+      ],
+      "entry_points": [
+        {
+          "path": "crates/agentgateway-app/src/main.rs",
+          "what": "agentgateway binary main; delegates to agentgateway_app::run()"
+        },
+        {
+          "path": "crates/agentgateway-app/src/lib.rs",
+          "what": "clap CLI (run, oneshot, import, migrate), default-config creation, allocator selection"
+        },
+        {
+          "path": "crates/agentgateway-app/src/commands/run.rs",
+          "what": "server startup: parse config, open DB, request-log store, budget init, then agentgateway::app::run"
+        },
+        {
+          "path": "crates/agentgateway/src/app.rs",
+          "what": "wires data-plane gateway, admin/UI server and metrics server"
+        },
+        {
+          "path": "crates/agentgateway/src/llm/mod.rs",
+          "what": "LLM provider enum, chat-format translation table, request/response/stream processing"
+        },
+        {
+          "path": "crates/agentgateway/src/llm/model_router.rs",
+          "what": "model-name router for the llm: config, default /v1/* route table, virtual models"
+        },
+        {
+          "path": "controller/cmd/agentgateway/main.go",
+          "what": "Kubernetes controller (Gateway API/CRDs to xDS); controller/cmd/agctl/main.go is the agctl CLI"
+        },
+        {
+          "path": "common/scripts/get-agentgateway",
+          "what": "binary installer script (GitHub release download + sha256 check)"
+        }
+      ],
+      "architecture": "Cargo workspace of 14 crates (Cargo.toml:9-24). crates/agentgateway-app = binary + clap CLI. crates/agentgateway = main library: app.rs; proxy/{gateway,httpproxy,tcpproxy}.rs (listeners, routing, retries, provider selection, session affinity); types/local.rs (YAML/JSON config to internal IR, llm:/mcp:/ui: shorthands, virtual models, default standalone config) and types/agent_xds.rs (xDS to the same IR); llm/ (mod.rs provider + format translation, model_router.rs, policy/ guardrails: regex, PII, webhook, OpenAI moderation, Bedrock, Model Armor, Azure Content Safety; catalog/ cost catalog); http/ (auth incl. backend auth kinds, apikey.rs, jwt, budget/, localratelimit, remoteratelimit, health.rs, retry, sessionaffinity, compression/, ext_authz, ext_proc, transformation_cel); mcp/ and a2a/; telemetry/ (log.rs, metrics.rs, trc.rs, log_store with sqlite/postgres); management/ + ui.rs (admin server, /api/*, embedded UI); store/. crates/llm (agent-llm) = wire types and conversions (types/{completions,responses,messages,gemini,...}, conversion/*, SSE parsing in parse/). Support crates: cel-fork + celx (CEL engine), core, pool, hbone, xds, protos, htpasswd-verify-fork. LLM request path: model_router resolves the requested model to a backend (virtual models: weighted / failover / conditional) -> AIProvider::process_*_request decodes the body (Content-Encoding aware), applies aliases/defaults/overrides/guardrails -> select_provider (affinity hash, else best-of-two by health/latency score) -> backend auth (static key etc.) -> upstream; JSON and SSE responses are parsed pass-through to extract usage. Go controller (controller/, root go.mod) turns Gateway API + agentgateway.dev CRDs into xDS; ui/ is React/Vite embedded via the ui cargo feature. architecture/configuration.md describes three config forms: static, local file (watched), xDS.",
+      "packaging_and_release": "release.yml runs on v*.*.* tags (also workflow_dispatch/workflow_call; release.yml:3-36). Binaries built by make build (UI embedded): linux-amd64 (x86_64 musl), linux-arm64 (aarch64 musl, mimalloc, aws-lc), darwin-arm64 (macos-26), windows-amd64.exe (release.yml:397-425); each uploaded with a .sha256 file (release.yml:516-526) plus agctl binaries with checksums (release.yml:457-492,533-536); GitHub release created by softprops/action-gh-release (release.yml:537-566). No GPG/cosign signature, SBOM or provenance attestation for the binaries was found; the install script verifies SHA-256 only (common/scripts/get-agentgateway:166-193). Container images: multi-arch (amd64/arm64) pushed to ghcr.io/<owner>/agentgateway and controller (release.yml:44-45,73-201,203-370); image tags are signed with cosign (release.yml:188-197,353-358); an OpenVEX attestation (.github/vex/openvex.json) is attached only to the controller image (release.yml:360-366). Helm charts agentgateway, agentgateway-crds, agentgateway-standalone are published (release.yml:372-395,554-557). Nightly: nightly.yml (cron 02:00 UTC) calls release.yml to publish 0.0.0-alpha.<sha> images/charts tagged latest-dev (nightly.yml:3-6,74-79,145-156). Rust crates are publish = false (Cargo.toml:46); version is tag-only (Cargo.toml:42). Runner image: cgr.dev/chainguard/glibc-dynamic (Dockerfile:99).",
+      "tests_and_ci": "Rust: cargo test via make test (cargo test --tests --benches --examples; Makefile:99-104) using tokio::test, rstest, insta snapshots and wiremock mocks. About 180 .rs files under crates/ contain tests (~2,470 #[test]/#[tokio::test]/#[rstest] attributes) and 276 insta .snap files (golden request/response conversions in crates/llm/src/tests/); integration tests in crates/agentgateway/tests/ (integration.rs, validate_examples.rs, tests/*.rs: 17 modules + mod.rs); live-provider tests are opt-in via AGENTGATEWAY_E2E=true plus provider keys (crates/agentgateway/tests/tests/llm_providers.rs:9-35). Go: 129 *_test.go files under controller/ (unit, e2e on kind, Gateway API conformance). UI: Playwright e2e (ui/tests/e2e/ui.spec.ts, 1 spec). Fuzzing: 3 cargo-fuzz targets (fuzz/fuzz_targets/{cel_expression,llm_request_conversions,proxy_protocol}.rs), not referenced by any workflow. CI (.github/workflows/pull_request.yml, name Branch; push/PR to main): proxy-test = make test on Ubuntu, windows-2025 and macos-15 (lines 27-77); proxy-lint = make generate-schema check-clean-repo check-default-members + make lint (cargo fmt --check, cargo clippy --all-targets) (79-98); ui-lint = pnpm lint + Playwright e2e (101-126); controller-test = go test -race ./... (129-143); controller-lint (145-167); controller-e2e on kind (169-205); controller-conformance and GIE conformance (207-309). Other workflows: release.yml, nightly.yml, debug_cache.yml (manual cache debugging); .github/workflows/cache-e2e is a one-line note, not a workflow. dependabot.yml groups weekly cargo updates and leaves other ecosystems at security-update-only (limit 0).",
+      "dependencies": "Root Cargo.toml [workspace.dependencies]: 181 entries (11 are in-workspace path crates), lines 48-286; [patch.crates-io] redirects schemars, http-serde, wiremock and async-openai to git forks pinned by commit (Cargo.toml:1-5). Per crate [dependencies]: crates/agentgateway 136 (6 optional) + 6 target-specific (pprof, which, tokio, tikv-jemallocator, jemalloc_pprof, pprof-alloc) + 12 dev entries; crates/agentgateway-app 10 (+1 optional target-specific); crates/llm 38 (1 optional) + 2 dev; crates/core 37 (1 optional) + 1 build; crates/http 4; crates/celx 18 (1 optional) + 2 dev; crates/hbone 16; crates/pool 12 + 7 dev; crates/protos 5 + 5 build; crates/xds 18; crates/xtask 9; crates/cel-fork/cel 18 + 5 dev; crates/cel-fork/cel-derive 3 + 1 dev; crates/htpasswd-verify-fork 6. Go: root go.mod (module github.com/agentgateway/agentgateway, go 1.27.0) 237 require lines of which 179 are indirect (about 58 direct); api/go.mod 2; tools/go.mod about 400 require lines (dev tooling). UI: ui/package.json 13 dependencies + 10 devDependencies, all exact-pinned, pnpm 11.20.0, Node 24.17.0. Cargo.lock, go.sum and pnpm-lock.yaml are committed.",
+      "security_policy": "SECURITY.md: report vulnerabilities privately through GitHub security advisories (github.com/agentgateway/agentgateway/security/advisories/new), not public issues; it defines what counts as a vulnerability (defeating a promised security boundary) and treats admin interfaces, user-written CEL/config and trusted ext-auth/ext-proc services as privileged or the user's responsibility (SECURITY.md:11-51). Also .github/vex/openvex.json (OpenVEX statements)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:52-53 - unified OpenAI-compatible API to route traffic to major LLM providers",
+        "verified": "yes",
+        "evidence": "Default route table serves /v1/chat/completions, /v1/responses, /v1/embeddings, /v1/models, /v1/messages etc. (crates/agentgateway/src/llm/model_router.rs:55-95). OpenAI Responses to an OpenAI provider is a direct passthrough (llm/mod.rs:324) and reasoning/tools stay in an untyped rest map (crates/llm/src/types/responses.rs:264-266). Conversions exist for other providers (llm/mod.rs:318-347) but Responses to Chat Completions is lossy: non-function tools and several tool_choice forms are dropped (crates/llm/src/conversion/openai_compat.rs:335-383) and reasoning.effort maps only to minimal/low/medium/high/xhigh/max with 'none' omitted (openai_compat.rs:387-397). /v1/responses/compact is Detect, i.e. observe-only passthrough (model_router.rs:85; crates/llm/src/lib.rs:161-163)."
+      },
+      {
+        "claim": "README.md:52-53 - load balancing and failover (the closest README claim to account pooling)",
+        "verified": "yes",
+        "evidence": "AIBackend::select_provider uses a session-affinity hash if present, else best-of-two random by health/latency score (llm/mod.rs:72-101). Config supports ordered provider groups (ai.groups[].providers[], 'load balanced together'; types/local.rs:1538-1608) and weighted/failover/conditional virtual models (types/local.rs:494-561,4601-4640); a health policy evicts unhealthy endpoints (http/health.rs:1-56) and a test shows 429 on the primary being evicted and the fallback serving (proxy/httpproxy.rs:4034-4129). Caveats: in the simple llm.models[] list same-name entries are first-match, not balanced (llm/model_router.rs:332-335; types/local.rs:4207-4214); credentials are static per entry (http/auth/mod.rs:74-111); session affinity is best-effort and may remap (types/local.rs:2676-2679)."
+      },
+      {
+        "claim": "README.md:52-53 - budget and spend controls",
+        "verified": "partial",
+        "evidence": "Budgets (USD or Tokens; Audit or Block; epoch-aligned windows) attach to gateway API keys, not to upstream provider accounts (http/budget/mod.rs:123-143,199-243; http/apikey.rs:454-486). They are charged after the response and cannot be applied when the provider does not report usage/cost (budget/mod.rs:123-127). USD needs a model catalog, which is empty unless config.modelCatalog is set or refreshed from models.dev via the admin API (llm/catalog/mod.rs:43-60; config.rs:372; llm/catalog/refresh.rs:52-63; ui.rs:672-750). LLM-aware rate limits are adjusted by actual token usage (llm/mod.rs:3033-3054; types/local.rs:2461-2466)."
+      },
+      {
+        "claim": "README.md:67-68 - OpenTelemetry metrics/logs/tracing (usage observation)",
+        "verified": "yes",
+        "evidence": "Prometheus gen_ai_client_token_usage, gen_ai_client_cost (USD), gen_ai_server_request_duration and time-to-first-token (crates/agentgateway/src/telemetry/metrics.rs:272-276,380-415; schema/metrics.md:40-50); OTel GenAI span attributes incl. input/output/cache-read/cache-creation/reasoning tokens (telemetry/log.rs:1612-1666); Responses streams are observed pass-through for usage incl. reasoning_tokens (crates/llm/src/conversion/responses.rs:22-122); OTLP tracing/logs are optional (schema/config.md:71-80; types/frontend.rs:297-299); DB request log stores tokens, cost, models, user (telemetry/log_store.rs:381-404). Gap: reasoning effort is not among recorded request params (crates/llm/src/lib.rs:301-318; schema/cel.md:80-88) and the raw llmRequest CEL variable is not available to log expressions (schema/cel.md:106)."
+      },
+      {
+        "claim": "README.md:32 - drop-in ... across any framework and environment",
+        "verified": "partial",
+        "evidence": "Codex needs client-side changes: set an API key, run codex login --with-api-key, pass model_provider/base_url overrides, and avoid an existing Codex login (ui/src/pages/ClientSetup.tsx:420-437); the Intune example requires wire_api = responses and an env_key holding the gateway key, not the OpenAI key (examples/microsoft-intune/verification/verify-agentgateway-clients-macos.sh:139-152; examples/microsoft-intune/README.md:321-323). The gateway holds the real provider key (types/local.rs:904-914). No handling of ChatGPT-login/subscription tokens for OpenAI was found (no chatgpt.com, backend-api or auth.json references repo-wide), whereas Anthropic sk-ant-oat tokens and GitHub Copilot tokens are handled (llm/mod.rs:1436-1445; http/auth/copilot.rs:7-73)."
+      },
+      {
+        "claim": "README.md:80 - standalone deployments driven by flat yaml config",
+        "verified": "yes",
+        "evidence": "Local config is a YAML/JSON file watched for changes (architecture/configuration.md:12-19); -f/--file or -c/--config select it (crates/agentgateway-app/src/lib.rs:44-53); with no flags a default config is auto-created (lib.rs:183-197,235-257; types/local.rs:54-70). Config is env-expanded via shellexpand (types/local.rs:85-86)."
+      },
+      {
+        "claim": "README.md:83 - built-in UI",
+        "verified": "yes",
+        "evidence": "The ui cargo feature embeds ui/dist (Makefile:44-59; crates/agentgateway/src/ui.rs:77), served at http://<admin-addr>/ui (app.rs:202-203; DEVELOPMENT.md:58); admin default is localhost:15000 (config.rs:327). Note that the default first-run config also attaches the UI and /api/* routes to the LLM gateway port (types/local.rs:54-70,2060-2070)."
+      },
+      {
+        "claim": "README.md:8-10 - License Apache 2.0",
+        "verified": "partial",
+        "evidence": "LICENSE is the Apache-2.0 text and the workspace declares license = Apache-2.0 (Cargo.toml:45). Vendored crates/cel-fork/cel and cel-derive declare MIT (crates/cel-fork/cel/Cargo.toml:9; cel-derive/Cargo.toml:6) and crates/pool/LICENSE is an MIT license (Sean McArthur)."
+      },
+      {
+        "claim": "README.md:73-74,80-81 - quickstarts and docs at agentgateway.dev",
+        "verified": "not_checkable",
+        "evidence": "External pages (agentgateway.dev quickstarts/docs, and the Codex integration page linked from examples/llm-semantic-routing/k8s/cost-based/README.md:175-176) were not opened. In-repo documentation is architecture/*.md, generated schema/*.md reference, design/*.md and examples/*/README.md."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Native-account pooling is not a built-in feature. Credentials are static per provider entry (BackendAuthKind::Key; the Passthrough kind only re-attaches an already-validated incoming JWT) (crates/agentgateway/src/http/auth/mod.rs:74-111,227-253). No ChatGPT/Codex subscription handling (OAuth login, token refresh, account rotation) exists: a repo-wide search finds no chatgpt.com/backend-api/auth.json code, and the UI tells users to log Codex out (ui/src/pages/ClientSetup.tsx:428). Pooling must be hand-built from provider groups or virtual models; duplicate llm.models names are first-match, not balanced (llm/model_router.rs:332-335); session affinity is best-effort and may remap (types/local.rs:2676-2679). Reuse of an existing machine login exists only for GitHub Copilot (http/auth/copilot.rs:43-73).",
+      "Requested model and reasoning effort are preserved only on the plain path. Responses to OpenAI Responses passthrough leaves reasoning untouched (llm/mod.rs:324; crates/llm/src/types/responses.rs:264-266) and the incoming model is used when params.model is unset (types/local.rs:906-910). Virtual models, model aliases, defaults/overrides/transformation and failover targets rewrite or pin the model (llm/model_router.rs:296,535-565; llm/mod.rs:1957-1967,2849-2872; types/local.rs:4601-4640). On Responses to Chat Completions conversion, effort is limited to a fixed enum ('none' dropped) and non-function tools are dropped (crates/llm/src/conversion/openai_compat.rs:335-397). 'gpt-6' appears nowhere in the repo; GPT-6 names would be opaque strings with no cost-catalog entry unless a catalog is loaded.",
+      "Scope: there is no request or prompt compression feature. The only compression code decodes inbound Content-Encoding (gzip/deflate/br/zstd; a single encoding only, otherwise HTTP 415) and re-encodes buffered responses with the upstream's encoding (crates/agentgateway/src/http/compression/mod.rs:44-109; llm/mod.rs:848-871,2803-2821; proxy/mod.rs:304-307). 'Request compression off unless chosen' is therefore trivially true but nothing can be chosen; the README is silent on Codex, the Responses API, account pooling and compression, so those facts come only from code, UI and examples.",
+      "Security default: with no -f/-c the first-run config serves the LLM listener on port 4000 bound to the wildcard address with the UI and /api/{config,logs,costs,budgets,runtime,cel} routes attached and no auth policy (crates/agentgateway/src/types/local.rs:54-70,2060-2070,4736-4740); config writes are blocked only in readOnly mode (ui.rs:52-56). local.rs:402-405 says authentication is strongly recommended when the UI is exposed and SECURITY.md:28 treats admin interfaces as privileged. Provider keys live in the config file or environment (types/local.rs:85-86,904-914).",
+      "Request-size limit: default maxBufferSize is 2 MiB (crates/agentgateway/src/lib.rs:339-341); larger LLM request bodies get HTTP 413 (proxy/mod.rs:300-303; llm/model_router.rs:374-380), and an SSE event larger than the buffer aborts the stream (crates/llm/src/parse/passthrough.rs:70-72,84). The repo's own LLM example raises the limit to 20 MiB (examples/llm-basic/config.yaml:6-8), which matters for long agent transcripts.",
+      "Usage-recording caveats: cost and USD budgets depend on a model catalog that is empty by default (llm/catalog/mod.rs:43-60; config.rs:372) unless fetched on demand from models.dev (llm/catalog/refresh.rs:52-63; ui.rs:672-750); llm.cost is unset for unpriced models (schema/cel.md:89). With the default config, request logs (tokens, cost, models, status, user) persist to a local SQLite file (config.rs:387; crates/agentgateway-app/src/lib.rs:249-257); bodies are stored only with database.llm=full, but when llm is omitted 'legacy' behavior also stores content captured by CEL expressions (types/frontend.rs:308-333). Reasoning effort is not recorded (crates/llm/src/lib.rs:301-318).",
+      "Platform/packaging: published binaries are limited to linux-amd64, linux-arm64, darwin-arm64 and windows-amd64.exe, each with only a .sha256 (.github/workflows/release.yml:516-526); get-agentgateway advertises more platforms (darwin-amd64, linux-386/arm/ppc64le/s390x/riscv64, windows-arm64) with no matching release asset (common/scripts/get-agentgateway:71) and checks SHA-256 only (lines 166-193). Images are cosign-signed but the OpenVEX attestation covers only the controller image (release.yml:188-197,360-366). oneshot is Linux-only (crates/agentgateway-app/src/lib.rs:114-116); WSL2 is undocumented.",
+      "Maintenance/licensing: large polyglot monorepo (14 Rust crates + Go controller + React UI) on very recent pinned toolchains - Rust 1.98 (rust-toolchain.toml:2), Go 1.27.0 (go.mod:3), Node 24.17.0 (Dockerfile:4) - while DEVELOPMENT.md still says Rust 1.86+ (line 21) against workspace rust-version 1.90 (Cargo.toml:44). Four crates are git-patched to commit-pinned forks (schemars, http-serde, wiremock, async-openai; Cargo.toml:1-5) and builds need CARGO_NET_GIT_FETCH_WITH_CLI (DEVELOPMENT.md:49). MIT-licensed vendored cel-fork and pool crates sit inside the Apache-2.0 tree (crates/cel-fork/cel/Cargo.toml:9; crates/pool/LICENSE). CODEOWNERS is a single team (CODEOWNERS:1); governance is an LF Projects charter (CHARTER.md:1-8)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "agentgateway/agentgateway",
+      "checks": [
+        {
+          "field": "readme.install[0] (install script)",
+          "statement": "`bash common/scripts/get-agentgateway --version v1.5.0` downloads the release binary and its .sha256 from GitHub Releases, verifies SHA-256 with openssl and copies it to /usr/local/bin via sudo; --no-sudo skips sudo, AGENTGATEWAY_INSTALL_DIR overrides the target and VERIFY_CHECKSUM=false disables the check.",
+          "citation": "common/scripts/get-agentgateway:20-24,150-152,169-193,223-229",
+          "holds": true,
+          "note": "Lines 20-24 set the defaults (USE_SUDO=true, VERIFY_CHECKSUM=true, AGENTGATEWAY_INSTALL_DIR=/usr/local/bin). Lines 150-152 build releases/download/$TAG/agentgateway-$OS-$ARCH plus .sha256. Lines 184-193 compare `openssl sha1 -sha256` with the first field of the .sha256 file, which matches the sha256sum output written by release.yml:519-523. installFile (176-181) runs chmod and cp via runAsRoot, which uses sudo unless root or --no-sudo (60-66, 267-268). Lines 223-229 document --version and --no-sudo. Asset names linux-amd64, linux-arm64 and darwin-arm64 match release.yml:518-523. Caveats the dossier doesn't state: omitting --version needs jq (line 110), which verifySupported never checks; tar is mandatory (93-96) even though nothing is extracted; and on Windows the script would request agentgateway-windows-amd64 without the published .exe suffix."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0, file LICENSE.",
+          "citation": "LICENSE:1-3,176-178; README.md:8-10; Cargo.toml:45",
+          "holds": true,
+          "note": "LICENSE is the standard Apache License 2.0 text (END OF TERMS at 176, APPENDIX at 178). The README badge reads 'License: Apache 2.0' and the workspace declares license = \"Apache-2.0\". The vendored exceptions noted elsewhere in the dossier are real: crates/cel-fork/cel/Cargo.toml:9 and cel-derive/Cargo.toml:6 declare MIT, and crates/pool/LICENSE is MIT (Sean McArthur), although crates/pool/Cargo.toml:4 inherits the workspace Apache-2.0 value."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - release.yml builds aarch64-apple-darwin on macos-26, published as agentgateway-darwin-arm64; CI runs make test on macos-15; the oneshot subcommand is compiled only on Linux; no darwin-amd64 asset is published.",
+          "citation": ".github/workflows/release.yml:417-419,516-526; .github/workflows/pull_request.yml:43-44; crates/agentgateway-app/src/lib.rs:114-116",
+          "holds": true,
+          "note": "release.yml:417-419 is the matrix entry os: macos-26 / target: aarch64-apple-darwin. Line 518 renames the build to agentgateway-darwin-arm64 and 519 writes its .sha256. pull_request.yml:43-44 adds macos-15 to the proxy-test matrix, whose step runs `make test` (63-64). lib.rs:115-116 gates Oneshot with #[cfg(target_os = \"linux\")], and dispatch at 151-152 does the same. Release outputs (516-526) are only darwin-arm64, linux-amd64, linux-arm64 and windows-amd64.exe. I chose this platform because the reviewing machine is macOS. The linux_x86_64 citations (release.yml:84-85,409-411,520; pull_request.yml:39-40,63-64) also match."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "The UI ships a Codex CLI recipe (OPENAI_API_KEY, optional CODEX_HOME, codex login --with-api-key, model_provider=gateway with base_url <gateway>/v1, a warning about an existing login). The Intune example requires wire_api=responses, a /v1 base_url, a gateway-key env_key and POST /v1/responses. The semantic-routing README says Codex uses the Responses API. A unit test pins codex-session-id to one provider. Claude Code gets a recipe, gzip request-body decoding, a local count_tokens fallback and a subscription-key warning.",
+          "citation": "ui/src/pages/ClientSetup.tsx:384-395,420-437,566-607; examples/microsoft-intune/verification/verify-agentgateway-clients-macos.sh:139-152; examples/microsoft-intune/README.md:309-323; examples/llm-semantic-routing/k8s/cost-based/README.md:168-198; crates/agentgateway/src/proxy/httpproxy.rs:3956-4032; crates/agentgateway/src/llm/mod.rs:1753-1775,2803-2808; ui/src/claudeSubscription.ts:38-64",
+          "holds": true,
+          "note": "Every sub-citation matches. v1 = `${base}/v1` (ClientSetup.tsx:352), and line 428 is the 'existing login it can impact functionality' warning. The verify script defaults to EXPECTED_CODEX_BASE_URL=https://llm.example.com/v1 and env key AGENTGATEWAY_API_KEY (lines 8-9) and greps wire_api = \"responses\" (146). Intune README:314 requires a successful POST /v1/responses, and 321-323 says to use the gateway client key, not the OpenAI key. Semantic-routing README:171-176 states Codex uses the Responses API and links an external page. The affinity test keys on request.headers['codex-session-id'] and asserts an 8/0 or 0/8 split, but it sends /v1/chat/completions, not /v1/responses. mod.rs comments explicitly name Claude Code for both the count_tokens fallback and gzip decoding. claudeSubscription.ts:59-63 warns on sk-ant-oat keys. The OpenAI JS/Python recipes use chat.completions."
+        },
+        {
+          "field": "claim_checks[0] (README.md:52-53 unified OpenAI-compatible API)",
+          "statement": "verified yes: the default route table serves /v1/chat/completions, /v1/responses, /v1/embeddings, /v1/models, /v1/messages etc.; Responses to an OpenAI provider is a direct passthrough with reasoning/tools in an untyped rest map; Responses to Chat Completions drops non-function tools, several tool_choice forms and effort 'none'; /v1/responses/compact is Detect.",
+          "citation": "crates/agentgateway/src/llm/model_router.rs:55-95; crates/agentgateway/src/llm/mod.rs:318-347; crates/llm/src/types/responses.rs:264-266; crates/llm/src/conversion/openai_compat.rs:335-397; crates/llm/src/lib.rs:161-163",
+          "holds": true,
+          "note": "Confirmed: mod.rs:323-324 '// Direct passthrough' chat(InputFormat::Responses, ChatFormat::OpenAIResponses), and the table at 318-347 lists the other provider conversions. responses.rs:264-266 is a flattened rest field commented 'tools, reasoning, etc. - passthrough'. openai_compat.rs:335-352 keeps only Function tools; 371-383 drops Hosted/AllowedTools/Mcp/Custom/ProgrammaticToolCalling/ApplyPatch/Shell tool_choice with a warning; 387-397 maps effort minimal..max with None->None. model_router.rs:85 routes /v1/responses/compact to Detect, which lib.rs:161-163 defines as as-is forwarding plus rate limit and telemetry, so 'observe-only' slightly understates it. One imprecision that doesn't change the verdict: /v1/models is not an entry in the cited table. There it hits the '*' Passthrough catch-all (line 89; store/binds.rs:4333 asserts resolve_route(\"/v1/models\") == Passthrough). The gateway's own model list comes from ModelRouter::resolve via is_model_list_request (model_router.rs:173-176,452-462)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "claim_checks[0].evidence and readme.integrations.sdk_or_api: stop attributing /v1/models to the default route table at crates/agentgateway/src/llm/model_router.rs:55-95. That table has no /v1/models entry; it falls to the '*' Passthrough catch-all at line 89. State instead that /v1/models (and /models) is answered locally by the llm: model router (model_router.rs:173-176,452-462) and otherwise passed through to the provider."
+      ]
+    }
+  ]
+}

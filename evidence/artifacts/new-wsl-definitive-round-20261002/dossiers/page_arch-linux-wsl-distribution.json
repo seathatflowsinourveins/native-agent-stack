@@ -1,0 +1,207 @@
+{
+  "contender": "page:arch-linux-wsl-distribution",
+  "revision": {
+    "contender": "page:arch-linux-wsl-distribution",
+    "kind": "pages",
+    "pages": [
+      "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+      "https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL"
+    ],
+    "tag": null,
+    "commit": null,
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "page:arch-linux-wsl-distribution",
+    "revision": {
+      "tag": null,
+      "commit": null,
+      "read_at": "2026-10-02T03:02:33+00:00"
+    },
+    "license": {
+      "spdx": null,
+      "file": null
+    },
+    "purpose": "Fact record for the Arch Linux image offered in Microsoft's WSL distribution manifest (microsoft/WSL, distributions/DistributionInfo.json). Entry ModernDistributions.archlinux[0] (Name 'archlinux', FriendlyName 'Arch Linux') names one x86-64-only image: https://fastly.mirror.pkgbuild.com/wsl/2026.10.01.179549/archlinux-2026.10.01.179549.wsl with SHA-256 d2ef183f58cd65bfce52d5a122fe4936f7f2ac0af6b1b427681afd28d1f64b17. The manifest's own top-level Default is 'Ubuntu', not Arch. Pages-only study: the working directory held only .round-meta.json, the manifest was read via WebFetch, and the second listed page (Arch wiki 'Install Arch Linux on WSL') returned an Anubis 'Access Denied' page on all three attempts, so none of its content (install steps, systemd, GPU, keyring) is covered.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Arch Linux is a ModernDistributions record under family key 'archlinux' (a one-element array): Name 'archlinux', FriendlyName 'Arch Linux', Default true. What 'Default' means is not documented on the opened pages; in every multi-entry family (Ubuntu, openSUSE, RLCPlus, SUSE, AlmaLinux, Fedora) exactly one entry has Default true and the others have false.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0])"
+        },
+        {
+          "claim": "Image location: Amd64Url.Url is https://fastly.mirror.pkgbuild.com/wsl/2026.10.01.179549/archlinux-2026.10.01.179549.wsl, a .wsl file whose path and file name carry the build string 2026.10.01.179549.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0].Amd64Url.Url)"
+        },
+        {
+          "claim": "Published checksum: Amd64Url.Sha256 is d2ef183f58cd65bfce52d5a122fe4936f7f2ac0af6b1b427681afd28d1f64b17 (64 hex characters).",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0].Amd64Url.Sha256)"
+        },
+        {
+          "claim": "Only an Amd64Url exists for Arch; the entry has no Arm64Url key.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0])"
+        },
+        {
+          "claim": "The only keys used by ModernDistributions entries are Name, FriendlyName, Default, Amd64Url, Arm64Url, Url and Sha256: there is no signature, GPG, version, support-window or minimum-WSL-version key.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (all ModernDistributions entries)"
+        },
+        {
+          "claim": "Top-level keys are ModernDistributions, Default and Distributions; the top-level Default is the string 'Ubuntu'.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (top-level 'Default': 'Ubuntu')"
+        },
+        {
+          "claim": "The legacy top-level Distributions array (Ubuntu, Debian, kali-linux, OracleLinux_7_9, OracleLinux_8_10, OracleLinux_9_5, SUSE-Linux-Enterprise-15-SP6, openSUSE-Tumbleweed; Store-style fields such as StoreAppId and PackageFamilyName) has no Arch entry; Arch appears only under ModernDistributions.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (top-level Distributions array)"
+        },
+        {
+          "claim": "Gap, not a project statement: the listed install page returned an Anubis page headed 'Oh noes!' with 'Access Denied: error code 9e4edb5b6b850c41' (Anubis v1.27.0), so no statement from the Arch wiki was read.",
+          "citation": "https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL (error page returned instead of the article)"
+        }
+      ],
+      "install": [
+        {
+          "method": "Manifest-listed image file (Windows/WSL guest image). The opened pages document no Linux or macOS install and show no install command; the catalog Name is 'archlinux'.",
+          "command": "(no command on any readable page) image URL https://fastly.mirror.pkgbuild.com/wsl/2026.10.01.179549/archlinux-2026.10.01.179549.wsl ; expected SHA-256 d2ef183f58cd65bfce52d5a122fe4936f7f2ac0af6b1b427681afd28d1f64b17",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0].Amd64Url)"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes, as an x86-64 guest image only: the Arch entry has an Amd64Url and nothing else. It is consumed by WSL on Windows; no install for a native Linux host is documented on the opened pages. https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0])",
+        "wsl2": "unknown: the entry is in the WSL project's own manifest, but it has no WSL1/WSL2 or minimum-WSL-version key (keys are Name, FriendlyName, Default, Amd64Url, Arm64Url, Url, Sha256) and the Arch wiki page was unreadable (Access Denied). https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+        "macos_arm64": "no: the Arch entry has no Arm64Url and no macOS install is documented on the opened pages. https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0])",
+        "gpu": "unknown: no GPU, NVIDIA or CUDA key or text appears in the manifest entry, and https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL returned Access Denied, so nothing about an RTX 4090 was read."
+      },
+      "integrations": {
+        "cli": "none found: the manifest holds data only and no command line; the wiki page that might show wsl commands was unreadable (https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL).",
+        "mcp": "none found in the manifest (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json).",
+        "sdk_or_api": "none found: only a static, machine-readable JSON file at https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json; no API is documented on the opened pages.",
+        "claude_code_or_codex": "none found in the manifest (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json); wiki page unreadable."
+      },
+      "telemetry_and_network": "Network is required to fetch the image: Amd64Url.Url points at https://fastly.mirror.pkgbuild.com/wsl/2026.10.01.179549/archlinux-2026.10.01.179549.wsl (HTTPS; host name begins 'fastly.'), and the manifest itself is a file in the microsoft/WSL GitHub repository (branch master). The Arch entry has no account, login or token field, and no telemetry-related text appears in it. Anything the Arch wiki says about network use (for example pacman mirrors after install) was not read because the page returned Access Denied. Citations: https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0].Amd64Url.Url); https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL (error page)."
+    },
+    "code": {
+      "languages": [
+        "JSON"
+      ],
+      "entry_points": [
+        {
+          "path": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+          "what": "WSL distribution manifest (data file, not executable). ModernDistributions.archlinux[0] is the Arch record: Name, FriendlyName, Default, Amd64Url.Url, Amd64Url.Sha256."
+        }
+      ],
+      "architecture": "No source tree: the working directory contains only .round-meta.json (kind 'pages', .round-meta.json:3), so there are no code modules to name. The manifest (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json) has three top-level keys: ModernDistributions (object mapping family key to an array of entries with Name, FriendlyName, Default, Amd64Url{Url,Sha256} and an optional Arm64Url{Url,Sha256}), Default (the string 'Ubuntu'), and Distributions (legacy array of Store-style entries with StoreAppId, PackageFamilyName and appx package URLs; no Arch). The family key 'archlinux' holds a single entry. Line numbers are not available because WebFetch returns processed text, so citations use JSON paths. The image build and publication pipeline was not described on any readable page.",
+      "packaging_and_release": "Artifact: one .wsl file for the Arch entry (x86-64 only) at https://fastly.mirror.pkgbuild.com/wsl/2026.10.01.179549/archlinux-2026.10.01.179549.wsl. Checksum: SHA-256 d2ef183f58cd65bfce52d5a122fe4936f7f2ac0af6b1b427681afd28d1f64b17 in the manifest (Amd64Url.Sha256). Signatures or attestations: none stated in the entry (no such keys exist in any ModernDistributions entry). Release workflows: none visible, since no repository checkout or workflow file was opened. The image was not downloaded or hashed in this study. Citation: https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+      "tests_and_ci": "None found: 0 test files and 0 CI workflow files in the working directory (a glob of every file returned only .round-meta.json). CI and tests of microsoft/WSL, and the Arch image build, were not opened.",
+      "dependencies": "Not applicable: no dependency manifests (package.json, Cargo.toml, pyproject.toml or similar) exist in the working directory, so there is no direct-dependency count.",
+      "security_policy": "none found: no SECURITY.md or similar file in the working directory (only .round-meta.json); policy files of the upstream repositories were not opened."
+    },
+    "claim_checks": [
+      {
+        "claim": "Need: installed from a vendor image whose checksum can be verified.",
+        "verified": "partial",
+        "evidence": "The Arch entry carries Amd64Url.Sha256 = d2ef183f58cd65bfce52d5a122fe4936f7f2ac0af6b1b427681afd28d1f64b17, identical in three separate WebFetch passes (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json, ModernDistributions.archlinux[0]), so a checksum exists to compare against. Not confirmed: the .wsl file was not downloaded or hashed; WebFetch returns processed text rather than raw bytes; the checksum is published in Microsoft's manifest, not on an Arch page I could read; and the entry has no signature or attestation key."
+      },
+      {
+        "claim": "Need: the image comes from the Arch vendor.",
+        "verified": "partial",
+        "evidence": "Amd64Url.Url has host fastly.mirror.pkgbuild.com and path /wsl/2026.10.01.179549/ (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). Neither opened page states that this host is the Arch project's official release location; the wiki page that might say so returned Access Denied (https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL)."
+      },
+      {
+        "claim": "Need: a single base distribution image is identified for Arch.",
+        "verified": "yes",
+        "evidence": "The 'archlinux' family key holds exactly one entry (Name 'archlinux', one Amd64Url) and the legacy Distributions array has no Arch entry (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). Only the build string 2026.10.01.179549 in the URL identifies the version."
+      },
+      {
+        "claim": "Need: an image usable on an x86-64 Windows host (RTX 4090 machine).",
+        "verified": "yes",
+        "evidence": "The Arch entry has an Amd64Url and no Arm64Url (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). That the host is x86-64 comes from the requester, not from the pages."
+      },
+      {
+        "claim": "Possible reading of 'Default: true' on the Arch entry: Arch is the WSL default distribution.",
+        "verified": "no",
+        "evidence": "The top-level key is 'Default': 'Ubuntu'. 'Default': true appears once per family, including on the single-entry Arch family, and its semantics are not documented on the opened pages (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json)."
+      },
+      {
+        "claim": "Need: systemd user services work in the image.",
+        "verified": "not_checkable",
+        "evidence": "No systemd text exists in the manifest entry, and the Arch wiki page returned Access Denied (https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL). The image contents were not inspected."
+      },
+      {
+        "claim": "Need: current Python 3.13, Node 24 and Rust toolchains.",
+        "verified": "not_checkable",
+        "evidence": "The manifest lists no package versions (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json); the wiki page was unreadable and the image was not opened."
+      },
+      {
+        "claim": "Need: NVIDIA GPU access through WSL for an RTX 4090.",
+        "verified": "not_checkable",
+        "evidence": "No GPU, NVIDIA or CUDA key or text exists in the manifest entry; the wiki page returned Access Denied (https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL)."
+      },
+      {
+        "claim": "Need: long-term security support.",
+        "verified": "not_checkable",
+        "evidence": "The Arch entry has no version, LTS, support-window or end-of-support key and its FriendlyName is plain 'Arch Linux' (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). The wiki page that might state a support policy was unreadable."
+      },
+      {
+        "claim": "Need: the .wsl image works with WSL 2.7.13 and kernel 6.18.",
+        "verified": "not_checkable",
+        "evidence": "The entry has no minimum-WSL-version or kernel key; the only format hint is the .wsl extension in Amd64Url.Url (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). The wiki page was unreadable."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Coverage gap: https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL returned an Anubis 'Oh noes!' / 'Access Denied' page (error code 9e4edb5b6b850c41, Anubis v1.27.0) on all three attempts (later attempts may have been fetch-cache hits). Its install steps, pacman keyring, systemd, GPU and warning text were not read, so every need beyond checksum presence and architecture is unverified. No alternate URL was used, because only the listed pages were allowed.",
+      "Snapshot only: the manifest is read from branch master with no pinned tag or commit (.round-meta.json:8-9), and the Arch entry pins one dated build (2026.10.01.179549, read 2026-10-02). The URL and SHA-256 recorded here will differ whenever the entry is updated (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json).",
+      "Thin integrity evidence: the entry gives only a SHA-256 held in Microsoft's manifest; no signature, GPG or attestation key exists in any ModernDistributions entry. All manifest values were read through WebFetch (processed text, not raw bytes); the hash matched across three passes but the image was never downloaded or hashed here (same manifest URL).",
+      "x86-64 only: the Arch entry has no Arm64Url (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json, ModernDistributions.archlinux[0]).",
+      "No lifecycle data: the entry carries no version-support, LTS or minimum-WSL-version key and its FriendlyName is plain 'Arch Linux', so 'long-term security support' and WSL 2.7.13 compatibility cannot be evidenced from the manifest (same manifest URL).",
+      "Download provenance: the image is served from fastly.mirror.pkgbuild.com; the opened pages do not say who operates that host or that it is the Arch project's official release channel, and the wiki that might was unreadable (manifest URL above; wiki URL returned Access Denied).",
+      "Possible misreading of selection: the manifest's top-level Default is 'Ubuntu'; Arch's 'Default': true only marks its own single-entry family, and the flag's semantics are undocumented on the opened pages (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json).",
+      "Licensing unexamined: the working directory contains only .round-meta.json and no license file, so license.spdx is null; neither the manifest repository's license nor the image's package licences were opened."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "page:arch-linux-wsl-distribution",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Manifest-listed image file (Windows/WSL guest image). The opened pages document no Linux or macOS install and show no install command; the catalog Name is 'archlinux'. Command: (no command on any readable page) image URL https://fastly.mirror.pkgbuild.com/wsl/2026.10.01.179549/archlinux-2026.10.01.179549.wsl ; expected SHA-256 d2ef183f58cd65bfce52d5a122fe4936f7f2ac0af6b1b427681afd28d1f64b17",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0].Amd64Url)",
+          "holds": true,
+          "note": "Two separate fetches of the manifest return Name \"archlinux\", Amd64Url.Url \"https://fastly.mirror.pkgbuild.com/wsl/2026.10.01.179549/archlinux-2026.10.01.179549.wsl\" and Sha256 \"d2ef183f58cd65bfce52d5a122fe4936f7f2ac0af6b1b427681afd28d1f64b17\". Both match the dossier character for character. The file has no command-line text (no 'wsl --install', 'wsl.exe' or shell command), and the wiki page still returns Access Denied, so 'no command on any readable page' is accurate."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: null, file: null. Explained in risks as 'Licensing unexamined: the working directory contains only .round-meta.json and no license file ... neither the manifest repository's license nor the image's package licences were opened.'",
+          "citation": "Working directory (every file, including hidden ones: only .round-meta.json); https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+          "holds": true,
+          "note": "A listing of every file in the working directory returns only .round-meta.json, so no license file exists. The manifest has no license key or text anywhere, and the wiki page is unreadable. The null values claim no licence and are labelled 'unexamined', which matches the evidence in scope."
+        },
+        {
+          "field": "readme.platforms.wsl2",
+          "statement": "unknown: the entry is in the WSL project's own manifest, but it has no WSL1/WSL2 or minimum-WSL-version key (keys are Name, FriendlyName, Default, Amd64Url, Arm64Url, Url, Sha256) and the Arch wiki page was unreadable (Access Denied).",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json; https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL",
+          "holds": true,
+          "note": "The manifest is in the microsoft/WSL repository. I listed every ModernDistributions entry, family by family. Their only keys are Name, FriendlyName, Default, Amd64Url, Arm64Url, Url and Sha256, and the archlinux entry has Name, FriendlyName, Default and Amd64Url{Url, Sha256}. Nothing in the file mentions WSL1, WSL2, a minimum version or a kernel. The wiki URL returns Anubis 'Oh noes!' with 'Access Denied: error code 9e4edb5b6b850c41' and 'v1.27.0'. So 'unknown' is the right reading of the cited pages."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "none found: the manifest holds data only and no command line; the wiki page that might show wsl commands was unreadable (https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL).",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json; https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL",
+          "holds": true,
+          "note": "The manifest is a JSON data file with top-level keys ModernDistributions, Default ('Ubuntu') and Distributions. It contains no 'wsl --install', 'wsl.exe' or other command text. The wiki URL returns the Anubis Access Denied page instead of the article, so no wsl commands could be read there."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Need: installed from a vendor image whose checksum can be verified. Verified: partial. Amd64Url.Sha256 = d2ef183f58cd65bfce52d5a122fe4936f7f2ac0af6b1b427681afd28d1f64b17 exists to compare against; the .wsl file was not downloaded or hashed; the checksum is published in Microsoft's manifest, not a readable Arch page; the entry has no signature or attestation key.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.archlinux[0])",
+          "holds": true,
+          "note": "The Sha256 is the same in both of my fetches and matches the dossier. The entry and the whole file have no signature, GPG or attestation key or text. The checksum sits in Microsoft's repository, and the only Arch page is unreadable. 'partial' fits: a checksum to compare against exists, but nothing was hashed and the image's vendor origin is not shown. The dossier writer's 'three passes' is their own process and can't be checked, but the value it reports is correct."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

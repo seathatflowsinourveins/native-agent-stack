@@ -59,9 +59,12 @@ def manifest_rows(ref: str) -> tuple[dict, str]:
 
 
 def row_picks(row: dict, field: list) -> set:
-    """The row's install pick as round contender ids, or {"NONE"} for a row that installs nothing."""
+    """The row's pick as round contender ids, or {"NONE"} for a row that names no repository.
+
+    Amendment 4: a row's pick is the repository it names. ``installs_nothing_extra`` is not a NONE pick: it also marks
+    picks that run on GitHub rather than on the host (actions/attest, Dependabot)."""
     repos = [norm(p) for p in (row.get("repository") or "").split(" ; ") if p.strip()]
-    if not repos or row.get("installs_nothing_extra"):
+    if not repos:
         return {"NONE"}
     by_repo = {norm(f["repository"]): f["contender"] for f in field}
     return {ALIASES.get(p) or by_repo.get(p) or f"unlisted:{p}" for p in repos}

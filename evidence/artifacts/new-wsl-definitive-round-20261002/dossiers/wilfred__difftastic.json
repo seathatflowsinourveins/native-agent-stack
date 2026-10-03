@@ -1,0 +1,336 @@
+{
+  "contender": "wilfred/difftastic",
+  "revision": {
+    "contender": "wilfred/difftastic",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "Wilfred/difftastic",
+        "tag": "0.71.0",
+        "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "0.71.0",
+    "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+    "read_at": "2026-10-02T03:03:06+00:00"
+  },
+  "dossier": {
+    "contender": "wilfred/difftastic",
+    "revision": {
+      "tag": "0.71.0",
+      "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Difftastic (binary `difft`, written in Rust) is a command-line structural diff tool for human review. It detects each file's language, parses both versions with tree-sitter, diffs the simplified syntax trees (Dijkstra shortest path over a graph of syntax positions) and prints syntax-aware changes (side-by-side or inline; an unstable JSON mode also exists). It falls back to a line-oriented diff with word highlighting for unsupported languages, oversized inputs, graph-limit overruns and, by default, any parse error. It is wired in as an external diff command for git, Mercurial, Fossil and Jujutsu. Non-goals stated by the README: generating patches and merging (README.md:10-11, 59-73; src/main.rs:605-858).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Difftastic is a structural diff tool that compares files based on their syntax.",
+          "citation": "README.md:10-11"
+        },
+        {
+          "claim": "The README has no install commands; it defers to the manual's Installation page.",
+          "citation": "README.md:13-15"
+        },
+        {
+          "claim": "Not line-oriented: 'If you reformat your code and it's now split over multiple lines, difftastic will show you what's actually changed.'",
+          "citation": "README.md:31-33"
+        },
+        {
+          "claim": "Compatible with git (configuration instructions in the manual) 'as well as many other version control systems'; also usable with mercurial.",
+          "citation": "README.md:37-39, 77-81"
+        },
+        {
+          "claim": "Supports 'over 30 programming languages'; a file with an unrecognised extension gets a line-oriented diff with word highlighting.",
+          "citation": "README.md:43-47"
+        },
+        {
+          "claim": "Known issues: scales 'relatively poorly on files with a large number of changes' and 'can use a lot of memory'; side-by-side display 'can be confusing'; 'regularly has releases that fix crashes'.",
+          "citation": "README.md:49-57"
+        },
+        {
+          "claim": "Non-goal, patching: output is 'intended for human consumption' and does not generate patches that can be applied later.",
+          "citation": "README.md:59-68"
+        },
+        {
+          "claim": "Non-goal, merging: AST merging is not addressed (the README points elsewhere for merges); AST diffing is lossy with respect to whitespace.",
+          "citation": "README.md:70-73, 128-137"
+        },
+        {
+          "claim": "By default falls back to a line-oriented diff on parse errors so it 'never claims that two syntactically different files are the same'; DFT_PARSE_ERROR_LIMIT allows a small number of errors.",
+          "citation": "README.md:93-113"
+        },
+        {
+          "claim": "Since 0.50 a single file containing conflict markers can be passed and difftastic diffs the two conflicting sides.",
+          "citation": "README.md:115-126"
+        },
+        {
+          "claim": "'Difftastic always considers order to be important'; unordered data such as JSON keys must be sorted beforehand.",
+          "citation": "README.md:139-149"
+        },
+        {
+          "claim": "`difft --check-only --exit-code before.js after.js` checks whether two files have the same AST without computing a diff ('much faster'); exit code 0 means no syntactic changes, 1 means changes.",
+          "citation": "README.md:155-168"
+        },
+        {
+          "claim": "Integration with other tools: 'Probably not. Difftastic is young.'; Emacs users can use magit or difftastic.el.",
+          "citation": "README.md:83-91"
+        },
+        {
+          "claim": "License: MIT; the vendored tree-sitter parsers in vendored_parsers/ are 'a mix of the MIT license and the Apache license' (see vendored_parsers/*/LICENSE); sample_files/ are MIT unless stated.",
+          "citation": "README.md:193-204"
+        }
+      ],
+      "install": [
+        {
+          "method": "Pre-built binary from GitHub releases",
+          "command": "Download the archive for your OS/CPU from https://github.com/Wilfred/difftastic/releases/latest and extract the `difft` executable (release assets are named difft-<version>-<target>.tar.gz on Unix; no shell command is documented)",
+          "citation": "manual/src/installation.md:5-12; .github/workflows/release.yml:50-60"
+        },
+        {
+          "method": "Homebrew (macOS)",
+          "command": "brew install difftastic",
+          "citation": "manual/src/installation.md:16-23"
+        },
+        {
+          "method": "Cargo from source (crates.io); needs Rust >= 1.85 and a C++14 compiler",
+          "command": "cargo install --locked difftastic",
+          "citation": "manual/src/from_source.md:3-20"
+        },
+        {
+          "method": "Arch Linux (pacman)",
+          "command": "sudo pacman -S difftastic",
+          "citation": "manual/src/installation.md:27-33"
+        },
+        {
+          "method": "Nix",
+          "command": "nix-env --install difftastic",
+          "citation": "manual/src/installation.md:35-41"
+        },
+        {
+          "method": "Fedora (dnf)",
+          "command": "sudo dnf install difftastic",
+          "citation": "manual/src/installation.md:43-49"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release builds exist for x86_64-unknown-linux-gnu and x86_64-unknown-linux-musl (.github/workflows/release.yml:29-30, 38-39) and both are in the CI test matrix (.github/workflows/test.yml:14, 24). The gnu binaries are built on ubuntu-22.04, so they need a correspondingly recent glibc (CHANGELOG.md:199-203).",
+        "wsl2": "unknown - README, manual and CI never mention WSL. A Linux x86_64 binary is published (release.yml:29-30), but WSL2 itself is neither documented nor tested.",
+        "macos_arm64": "yes - aarch64-apple-darwin is built natively in the release workflow (release.yml:33-34) and tested natively on macos-14, an M1 runner (test.yml:20-21); `brew install difftastic` is documented (manual/src/installation.md:16-23).",
+        "gpu": "no - not used or required; CPU-only Rust CLI with no GPU dependency (Cargo.toml:39-139). The only 'CUDA' hit is a file-extension comment (src/parse/guess_language.rs:259)."
+      },
+      "integrations": {
+        "cli": "yes - the `difft` binary (Cargo.toml:161-163). Usage `difft [OPTIONS] OLD-PATH NEW-PATH` (src/options.rs:26); also two directories, `-` for stdin, a single file with conflict markers, and the 7/9-argument GIT_EXTERNAL_DIFF form (src/options.rs:909-1011; manual/src/usage.md:8-58). Flags: --display {side-by-side, side-by-side-show-both, inline, json}, --exit-code, --check-only, --ignore-comments, --skip-unchanged, --sort-paths, --override, --override-binary, --list-languages, --byte-limit, --graph-limit, --parse-error-limit, --dump-ts/--dump-syntax/--dump-syntax-dot (src/options.rs:152-381); most have DFT_* env vars (manual/src/usage.md:60-69). Exit codes 0/1/2 (src/exit_codes.rs:1-12; manual/src/usage.md:84-94). VCS wiring documented for git (diff.external, GIT_EXTERNAL_DIFF, difftool; other git commands need --ext-diff), Mercurial extdiff, Fossil diff-command and Jujutsu ui.diff-formatter (manual/src/git.md:14-139, mercurial.md:3-28, fossil.md:3-13, jj.md:3-13).",
+        "mcp": "none found - no MCP server, config or mention in the README, manual, src/ or workflows (searched the checkout excluding fixtures).",
+        "sdk_or_api": "none found - binary-only crate (Cargo.toml:161-163, no [lib]), no HTTP API; internal rustdoc is published but not on docs.rs (manual/src/contributing.md:47-53). The only machine-readable interface is the CLI's `--display=json`, which is refused unless DFT_UNSTABLE is set (src/options.rs:812-819; src/display/json.rs:296-314).",
+        "claude_code_or_codex": "none found - no Claude Code or Codex plugin, skill, hook or documentation. AGENTS.md:1-3 only tells AI contributors to follow AI_POLICY.md and not to edit CHANGELOG.md unless asked; AI_POLICY.md:4-12 requires understanding the code, disclosing AI use, and human-written issue/PR comments."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home found. src/ has no network code: the only URLs are comments and the --help footer text (src/options.rs:123-139), and Cargo.lock contains no HTTP/TLS/async-runtime crates (reqwest, hyper, ureq, tokio, openssl, rustls, native-tls all absent). No account or network service is required at run time. The only subprocess is `git check-attr diff binary -z -- <path>`, run for each diffed file and ignored if git is unavailable (src/gitattributes.rs:26-74; src/main.rs:420-424); build.rs also runs `git log -1` when .git exists (build.rs:88-109). Binary detection reads the local system MIME database when present (manual/src/from_source.md:30-43). Logging is local, via DFT_LOG/pretty_env_logger (src/main.rs:144). CI-only network use: Codecov upload (.github/workflows/coverage.yml:19-23), curl download of the typos binary (test.yml:122-123), GitHub Pages deploy (deploy_docs.yml:56-62)."
+    },
+    "code": {
+      "languages": [
+        "Rust",
+        "C (vendored tree-sitter parsers compiled by build.rs via the cc crate)",
+        "JavaScript (tree-sitter grammar.js files inside vendored_parsers/)",
+        "Markdown (mdBook manual under manual/ and translation/zh-CN/)",
+        "Shell (sample_files/compare_all.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/main.rs:143",
+          "what": "fn main(): initialises the DFT_LOG logger, calls options::parse_args() and dispatches Mode::{Diff, DiffFromConflicts, ListLanguages, DumpTreeSitter, DumpSyntax, DumpSyntaxDot, GitHasUnmergedFile}; binary name `difft` (Cargo.toml:161-163)"
+        },
+        {
+          "path": "src/options.rs:89",
+          "what": "clap CLI definition app(); parse_args() at :725 maps 2/7/9-argument forms (git external-diff protocol, :909-958) and DFT_* environment variables"
+        },
+        {
+          "path": "src/main.rs:405",
+          "what": "diff_file() (read, text/binary/encoding detection, .gitattributes check) and diff_file_content() at :605 (language guess, tree-sitter parse, unchanged pre-pass, Dijkstra, fallbacks, hunks)"
+        },
+        {
+          "path": "src/main.rs:866",
+          "what": "diff_directories(): rayon-parallel directory diff; results printed serially, sorted (--sort-paths) or collected for JSON"
+        },
+        {
+          "path": "src/display/json.rs:296",
+          "what": "print_directory() / print(): the unstable JSON output (directory mode prints an array, two-file mode prints one object)"
+        },
+        {
+          "path": "build.rs:43",
+          "what": "build script: compiles 4 vendored C parsers (janet-simple, kotlin, latex, smali), embeds git commit date/hash and rustc version, sets JEMALLOC_SYS_WITH_LG_PAGE=16"
+        },
+        {
+          "path": "tests/cli.rs",
+          "what": "23 assert_cmd integration tests that drive the built `difft` binary"
+        },
+        {
+          "path": "sample_files/compare_all.sh",
+          "what": "output-regression runner: builds release, diffs every sample_files/*_1.* pair, md5s the output into compare.result and compares it with compare.expected"
+        }
+      ],
+      "architecture": "Single Rust binary crate (no [lib]). Pipeline driven from src/main.rs: src/options.rs (clap + DFT_* env) -> src/files.rs (file/stdin//dev/null reading; text-vs-binary and encoding heuristics: valid UTF-8, UTF-16 with BOM, near-UTF-8, Windows-1252, MIME type via tree_magic_mini; directory walk with the `ignore` crate, hidden files included, .git excluded, lines 277-284) and src/gitattributes.rs (`git check-attr diff binary`; the 0.69 changelog says it honours '-text' and 'binary' but the code reads the `diff` and `binary` attributes) -> src/parse/guess_language.rs (language from --override globs, Emacs mode header, shebang, Hack/Objective-C heuristics, filename globs, `<?xml`; 65 Language variants) -> src/parse/tree_sitter_parser.rs (per-language TreeSitterConfig: atom nodes, delimiter tokens, ignorable trailing tokens, highlight queries, embedded sub-languages such as JS in HTML; converts the tree-sitter tree to the simplified atom/list Syntax of src/parse/syntax.rs and counts parse errors against the limit) -> src/diff/ (unchanged.rs pre-pass that shrinks the problem; graph.rs + shortest_path.rs Dijkstra over lazily built vertices bounded by DFT_GRAPH_LIMIT; sliders.rs post-processing; changes.rs ChangeMap; lcs_diff.rs Histogram diff via imara-diff for lines and words) -> src/display/ (hunks.rs, context.rs, side_by_side.rs, inline.rs, json.rs, style.rs). The plain-text fallback is src/line_parser.rs + src/words.rs. src/conflicts.rs rebuilds the two sides of a conflict-marker file; src/summary.rs holds DiffResult/FileFormat; src/exit_codes.rs holds the 0/1/2 codes. Grammars: 58 crates.io parser crates (Cargo.toml:82-139) plus 4 vendored C grammars under vendored_parsers/ (symlinked *-src dirs built by build.rs; manual/src/parser_vendoring.md:19-41). jemalloc is the global allocator except on Windows, illumos and FreeBSD (src/main.rs:102-107).",
+      "packaging_and_release": "Source: crate `difftastic` on crates.io, published by the release workflow with katyo/publish-crates and the CARGO_REGISTRY_TOKEN secret (.github/workflows/release.yml:67-74). Binaries: pushing a tag matching [0-9]+.* creates a draft GitHub release (taiki-e/create-gh-release-action, release.yml:3-21) and uploads difft-<tag>-<target> archives (.tar.gz on Unix, .zip on Windows, built with --locked) for x86_64/aarch64 Linux gnu, x86_64 Linux musl, x86_64/aarch64 macOS and x86_64/aarch64 Windows MSVC via taiki-e/upload-rust-binary-action (release.yml:23-65). The version in the filename is new in 0.71 (CHANGELOG.md:29-32); 0.70 fixed binaries that ignored Cargo.lock (CHANGELOG.md:60-64). No checksum, signature, SBOM or provenance/attestation step is configured in any workflow (a search of .github/ for attest, cosign, sigstore, sha256, checksum, provenance, slsa, gpg and sign finds nothing); whether the third-party upload action emits checksum files by default cannot be determined from this checkout. No workflow declares `permissions:`. Other upstream artefacts: man page difft.1 generated from difft.1.md (manual/src/packaging_difftastic.md:53-59), cargo-deb metadata (Cargo.toml:165-173), cargo-binstall metadata pointing at the release archives (Cargo.toml:33-37; not mentioned in the docs), mdBook manual + rustdoc + homepage deployed to GitHub Pages on pushes to master (deploy_docs.yml:1-62). Distro packages (Homebrew, Arch, Nix, Fedora, FreeBSD, winget, Scoop, Chocolatey) are third-party (manual/src/packaging_difftastic.md:6-8; manual/src/installation.md). Docs reference ./scripts/release.sh (manual/src/contributing.md:84-94) but no such file exists in this checkout. CHANGELOG.md:1 still reads '0.71 (unreleased)' at the 0.71.0 tag, so the tag date is not determinable here.",
+      "tests_and_ci": "Rust built-in harness: 124 #[test] functions in 19 src files with #[cfg(test)] modules (e.g. src/parse/guess_language.rs, src/diff/unchanged.rs, src/display/context.rs) plus 23 integration tests in tests/cli.rs (assert_cmd + predicates; exit codes, binary override, --check-only, --ignore-comments, directory and git-style arguments, parse-error fallback) = about 20 test-bearing Rust files and 147 tests. One test is #[ignore]d because it needs the system MIME database (src/files.rs:374-378); CI runs it with `cargo test -- --ignored` (test.yml:53-61). No test covers --display json (no 'json' in tests/; no #[test] in src/display/json.rs). Output-regression fixtures: about 109 before/after pairs (sample_files/*_1.* vs *_2.*) whose md5-hashed output is compared with sample_files/compare.expected (sample_files/compare_all.sh:28-43). CI workflows in .github/workflows: test.yml (on push and pull_request) runs `cargo test` on 7 targets (Linux x86_64 gnu/musl, aarch64 gnu via cross, macOS arm64 native and x86_64 via cross, Windows x86_64 and arm64) with Rust 1.85.0, the MIME-DB tests, a latest-stable test, the output-regression diff, `cargo package --allow-dirty`, rustfmt, actionlint and typos (test.yml:5-125); coverage.yml uploads cargo-llvm-cov results to Codecov with fail_ci_if_error false and informational project status (coverage.yml:17-23; .codecov.yml:5-11); deploy_docs.yml and release.yml as described above. No clippy step (clippy.toml exists), cargo-audit/cargo-deny, or Dependabot/Renovate configuration in the checkout.",
+      "dependencies": "Single Cargo.toml (no workspace). [dependencies]: 88 direct crates, of which 30 are general (clap, regex, rayon, serde/serde_json, tree-sitter, tree-sitter-language, tree_magic_mini, ignore, imara-diff, strsim, encoding_rs, ...; Cargo.toml:40-79) and 58 are tree-sitter language-parser crates (Cargo.toml:82-139). Plus 1 target-specific (tikv-jemallocator, :143), 3 dev-dependencies (assert_cmd, predicates, pretty_assertions; :145-149) and 3 build-dependencies (cc, rayon, version_check; :151-156). Cargo.lock has 175 [[package]] entries including the root crate (root entry at Cargo.lock:202) and no HTTP/TLS/async-runtime crates. The 4 vendored grammars carry their own Cargo.toml/package.json, but only their src/*.c files are compiled (build.rs:44-65). Toolchain: Rust >= 1.85 (Cargo.toml:21; rust-toolchain.toml:2) plus a C/C++ compiler (manual/src/from_source.md:3-10); optional system MIME database (manual/src/from_source.md:30-43).",
+      "security_policy": "none - no SECURITY.md or equivalent anywhere in the checkout; .github/ holds only ISSUE_TEMPLATE/bug_report.md and four workflows. Unrelated to vulnerability reporting, AI_POLICY.md:1-12 sets rules for AI-assisted contributions (understand and disclose AI use; issue and PR comments must be human-written) and AGENTS.md:1-3 points AI contributors to it."
+    },
+    "claim_checks": [
+      {
+        "claim": "Structural diff: difftastic 'compares files based on their syntax' and shows what actually changed even after reformatting (README.md:10-11, 31-33).",
+        "verified": "yes",
+        "evidence": "diff_file_content() guesses the language (src/main.rs:621), parses both inputs with tree-sitter (src/main.rs:658-668; src/parse/tree_sitter_parser.rs:1296-1320), converts them to a simplified atom/list tree that stores no whitespace (src/parse/tree_sitter_parser.rs:1594-1639; manual/src/parsing.md:28-34, 93-97), pre-marks unchanged subtrees (src/diff/unchanged.rs:19-34) and runs Dijkstra over ordered syntax positions (src/main.rs:693-718; src/diff/shortest_path.rs:59-130; src/diff/graph.rs:19-46). Files that differ only in non-significant whitespace print 'No syntactic changes.' (src/main.rs:928-930). Caveat: blank-line and whitespace changes are invisible by design (manual/src/tricky_cases.md:437-457)."
+      },
+      {
+        "claim": "'Over 30 programming languages' are supported (README.md:43-44).",
+        "verified": "yes",
+        "evidence": "Understated; the code wins. The Language enum has 65 variants (src/parse/guess_language.rs:21-87) and the manual table lists 62 rows: 52 programming-language and 10 structured-text (manual/src/languages_supported.md:11-62, 68-77). 58 crates.io parser crates plus 4 vendored C parsers back them (Cargo.toml:82-139; build.rs:44-65). Markdown has no entry in the language globs (src/parse/guess_language.rs:196-427), so .md files take the line-diff fallback. Detection order: --override globs, Emacs mode header, shebang, Hack/Objective-C heuristics, filename globs, `<?xml` header (src/parse/guess_language.rs:469-516)."
+      },
+      {
+        "claim": "Unrecognised extensions and parse errors fall back to a line-oriented diff (README.md:46-47, 95-99).",
+        "verified": "yes",
+        "evidence": "No guessed language -> line_parser::change_positions (src/main.rs:646-655), a Histogram line diff with word-level matching inside novel lines (src/line_parser.rs:108-126; src/diff/lcs_diff.rs:1-8, 34). The parse-error limit defaults to 0 (src/options.rs:22, 357-368) and to_syntax_with_limit() rejects any tree with more errors (src/parse/tree_sitter_parser.rs:1575-1589), triggering the fallback labelled 'Text (N <lang> parse errors, exceeded DFT_PARSE_ERROR_LIMIT...)' (src/main.rs:754-796; src/summary.rs:23-32). Files over --byte-limit (1,000,000) or graphs over --graph-limit (3,000,000) fall back the same way (src/options.rs:17-21; src/parse/tree_sitter_parser.rs:1314-1317; src/main.rs:720-729, 799-821). Nuance: detection is not extension-only; shebang, Emacs header and `<?xml` also select a language."
+      },
+      {
+        "claim": "`--check-only --exit-code` sets exit code 0 for no syntactic changes and 1 for changes, and is 'much faster' (README.md:155-168).",
+        "verified": "partial",
+        "evidence": "Exit codes 0/1/2 and the --exit-code gate are as described (src/exit_codes.rs:1-12; src/main.rs:391-396). Check-only returns before the graph diff (src/main.rs:670-691) and compares syntax trees by content id, ignoring positions (src/parse/syntax.rs:614-621); trailing-comma lists compare equal (src/parse/syntax.rs:652-663). But for unsupported-language files and every fallback (parse errors, byte limit) check-only compares raw text, so any byte difference counts as a change (src/main.rs:578-603, 649-651, 783-791, 808-816); binary files report byte changes (src/summary.rs:55-65). 'Much faster' is never quantified (CHANGELOG.md:899-901) and cannot be checked from the repo."
+      },
+      {
+        "claim": "Not in the README: the CLI help and man page say `--display json` outputs 'a machine-readable JSON array with an element per file' (src/options.rs:218-226; difft.1.md:64).",
+        "verified": "partial",
+        "evidence": "Code differs from the help text. JSON requires DFT_UNSTABLE and is called 'an unstable feature' whose 'format may change' (src/options.rs:812-819; the man page omits this). Two-file mode prints a single object, not an array (src/main.rs:386; src/display/json.rs:308-314); only directory mode prints an array (src/main.rs:319-324; src/display/json.rs:296-306). The schema is per-file {aligned_lines, chunks[lines{lhs/rhs{line_number, changes[{start, end, content, highlight}]}}], language, path, status} (src/display/json.rs:186-266), i.e. token spans within lines with highlight kinds delimiter/normal/string/type/comment/keyword/tree_sitter_error, not function- or class-level entities. By code reading (not executed): --check-only leaves positions and hunks empty (src/main.rs:679-690) so json status would be 'unchanged' (src/display/json.rs:64-83), and json with a conflict-marker file reaches `unreachable!()` (src/main.rs:266, 990). No test covers JSON."
+      },
+      {
+        "claim": "Compatible with git 'as well as many other version control systems' (README.md:37-39).",
+        "verified": "yes",
+        "evidence": "Git external-diff protocol with 2, 7 and 9 arguments including renames and mode changes (src/options.rs:909-958), /dev/null for added/removed files (src/options.rs:488-506), unmerged-path handling (src/options.rs:885-899), git temp-file naming (src/options.rs:606-621). The manual documents git, Mercurial, Fossil and Jujutsu (manual/src/git.md, mercurial.md, fossil.md, jj.md; manual/src/usage.md:3-6). Caveat: git <= 2.43.1 can crash with an external diff when file permissions change (manual/src/git.md:6-10). Other git commands need --ext-diff (manual/src/git.md:26-40)."
+      },
+      {
+        "claim": "Output is 'intended for human consumption' and difftastic 'does not generate patches' (README.md:61-63).",
+        "verified": "yes",
+        "evidence": "The only display modes are side-by-side, side-by-side-show-both, inline and json (src/options.rs:211-227); no unified/patch output exists and the diff result is positions and hunks for rendering (src/summary.rs:35-53)."
+      },
+      {
+        "claim": "Performance 'scales relatively poorly on files with a large number of changes, and can use a lot of memory' (README.md:51-52).",
+        "verified": "yes",
+        "evidence": "Consistent with the code, which bounds the cost with defaults of 1,000,000 bytes per file, 3,000,000 graph vertices and 0 parse errors (src/options.rs:17-22), falling back to a line diff when exceeded (src/main.rs:720-729, 799-821). The graph-limit comment says it was chosen so a pathological sample terminates in about 5 seconds (src/options.rs:18-21); the manual notes graph-traversal bugs can cause huge memory use (manual/src/profiling.md:11-12). No benchmark numbers are published."
+      },
+      {
+        "claim": "Difftastic 'regularly has releases that fix crashes' (README.md:57).",
+        "verified": "partial",
+        "evidence": "CHANGELOG.md has 33 lines mentioning crash or panic across its history, but the most recent explicit 'crash' wording is in 0.62 (CHANGELOG.md:244-246); sections 0.63 to 0.71 (CHANGELOG.md:1-240) contain none, although 0.68 fixed 'fatal: external diff died' for unmerged paths (CHANGELOG.md:98-101)."
+      },
+      {
+        "claim": "License is MIT, and vendored parsers are 'a mix of the MIT license and the Apache license' (see vendored_parsers/*/LICENSE) (README.md:195-200).",
+        "verified": "partial",
+        "evidence": "Root license is MIT (LICENSE:1; Cargo.toml:6). Vendored kotlin, latex and smali have MIT LICENSE files (vendored_parsers/tree-sitter-kotlin/LICENSE:1, tree-sitter-latex/LICENSE:1, tree-sitter-smali/LICENSE:1). vendored_parsers/tree-sitter-janet-simple has no LICENSE file and an empty license field (package.json:12; its Cargo.toml has no license key). No Apache-licensed parser directory exists; Apache appears only in highlight-query headers derived from nvim-treesitter (vendored_parsers/highlights/latex.scm:1, hcl.scm:1, cmake.scm:1; vendored_parsers/tree-sitter-kotlin/queries/highlights.scm:1)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Allocator switch from MiMalloc to Jemalloc (project's own testing)",
+        "metric": "runtime regression",
+        "value": "up to 20% longer runtime",
+        "source": "CHANGELOG.md:207-210 (0.64 notes)",
+        "independent": false
+      },
+      {
+        "what": "Jemalloc vs MiMalloc on the repository's sample files (code comment)",
+        "metric": "time and instructions",
+        "value": "Jemalloc uses 10-20% more time (up to 33% more instructions)",
+        "source": "src/main.rs:100-101",
+        "independent": false
+      },
+      {
+        "what": "Calibration of the default graph limit",
+        "metric": "graph nodes / wall time",
+        "value": "largest sample (slow_1.rs/slow_2.rs) is 1.3M nodes; DEFAULT_GRAPH_LIMIT is 3,000,000, chosen so the test file in issue #306 terminates in ~5 seconds",
+        "source": "src/options.rs:18-21",
+        "independent": false
+      },
+      {
+        "what": "Historical (0.40, Dec 2022): graph construction change contributed by a third party to the project",
+        "metric": "graph vertices",
+        "value": "~20% fewer vertices",
+        "source": "CHANGELOG.md:847-856",
+        "independent": false
+      },
+      {
+        "what": "Historical (0.29, Jun 2022): performance release",
+        "metric": "runtime on larger files",
+        "value": "typically a 30% reduction in runtime",
+        "source": "CHANGELOG.md:1135-1138",
+        "independent": false
+      },
+      {
+        "what": "Performance stress-test fixture size (no timing published)",
+        "metric": "input size",
+        "value": "huge_cpp_1.cpp / huge_cpp_2.cpp: 22 MiB and 590,000 lines",
+        "source": "src/diff/lcs_diff.rs:6-8",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Machine-readable output is unstable and thin: --display=json is refused unless DFT_UNSTABLE is set and 'its format may change in future' (src/options.rs:812-819); it is absent from the README and manual (only --help, the man page and CHANGELOG.md:557-558 mention it) and no test covers it (tests/cli.rs; src/display/json.rs). Two-file mode emits an object while the help says array (src/main.rs:386 vs src/options.rs:226). By code reading (not executed), --check-only with json reports status 'unchanged' (src/main.rs:679-690; src/display/json.rs:64-83) and json with conflict-marker input reaches unreachable!() (src/main.rs:266, 990).",
+      "Scope and granularity: output is per-line token spans with highlight kinds (src/display/json.rs:214-266), not entities such as functions or classes, and it is explicitly not patch-applicable or mergeable (README.md:59-73). The tool compares two inputs only; it has no GitHub/PR/API, worktree, MCP, agent or evaluation features and no network code (searched README, manual, src/ and workflows).",
+      "Silent degradation to a line diff: any tree-sitter parse error (default limit 0), more than 1,000,000 bytes per file, or more than 3,000,000 graph vertices switches to a line diff (src/options.rs:17-22; src/main.rs:720-821); the downgrade is visible only in the file header or the JSON `language` value, 'Text (...)' (src/summary.rs:23-32). The README itself lists poor scaling, high memory use and crash-fix releases as known issues (README.md:49-57).",
+      "Syntactic equality hides some changes: whitespace and blank lines are not stored (manual/src/parsing.md:93-97; manual/src/tricky_cases.md:437-457 says this 'can hide accidental code reformatting'); trailing commas are ignored for Go, Java, JavaScript, Python, Rust, Swift and TypeScript (CHANGELOG.md:68-73; src/parse/syntax.rs:652-663); CR characters are stripped by default (src/options.rs:261-269); --ignore-comments exists. With --exit-code such differences return 0 in supported languages.",
+      "Release and supply-chain hygiene: no checksums, signatures, SBOM or attestations are configured; no workflow declares `permissions:`; dtolnay/rust-toolchain is referenced by tag or branch rather than SHA (.github/workflows/test.yml:34, 59, 69, 78, 90, 99; deploy_docs.yml:31); CI downloads the typos binary with curl and no checksum (test.yml:122-123); there is no SECURITY.md, Dependabot/Renovate config, cargo-audit/deny or clippy step; 175 locked packages including 58 third-party parser crates built with a C toolchain (Cargo.toml:82-139; Cargo.lock).",
+      "Maintenance and documentation drift: single listed author (Cargo.toml:8); parsers abandoned upstream have been dropped (Hare, Elvish, SCSS, Hack: CHANGELOG.md:23, 50-51, 84-85); tree-sitter is capped below 0.26.11 because of solidity and `ignore` below 0.4.30 for MSRV (Cargo.toml:51-54, 74-78); 0.66 was skipped over a release-process issue and 0.70 fixed binaries that ignored Cargo.lock (CHANGELOG.md:60-64, 157-160); manual/src/contributing.md:89-91 references a scripts/release.sh that does not exist; CHANGELOG.md:1 still says 0.71 is 'unreleased' at the 0.71.0 tag; the README says 'over 30' languages while the code has 65 (src/parse/guess_language.rs:21-87).",
+      "Licensing: the root license is MIT (LICENSE:1), but vendored_parsers/tree-sitter-janet-simple has no LICENSE file and an empty license field (package.json:12), unlike kotlin, latex and smali (MIT LICENSE files). The README's 'MIT and Apache' description of vendored parsers (README.md:198-200) does not match the tree, where Apache is cited only in highlight-query headers (e.g. vendored_parsers/highlights/latex.scm:1).",
+      "Platform and runtime dependencies: binary-vs-text detection uses the system MIME database when present (manual/src/from_source.md:30-43; src/files.rs:174-213); a `git check-attr` subprocess runs per diffed file and is silently skipped if git is missing (src/main.rs:420-424; src/gitattributes.rs:26-74); git <= 2.43.1 can crash with an external diff when permissions change (manual/src/git.md:6-10); Linux gnu binaries are built on Ubuntu 22.04, which sets a glibc floor (CHANGELOG.md:199-203); source builds need Rust >= 1.85 and a C/C++14 compiler (manual/src/from_source.md:3-10); WSL2 is neither documented nor tested."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "wilfred/difftastic",
+      "checks": [
+        {
+          "field": "readme.install[2]",
+          "statement": "Cargo from source (crates.io); needs Rust >= 1.85 and a C++14 compiler. Command: `cargo install --locked difftastic`",
+          "citation": "manual/src/from_source.md:3-20",
+          "holds": true,
+          "note": "from_source.md:5-7 says 'Difftastic requires Rust version 1.85 or later' (consistent with Cargo.toml:21 rust-version = \"1.85.0\"); :9-10 requires 'a C++ compiler that supports C++14' (GCC >= 8); :14-19 points to the crates.io crate and gives exactly `$ cargo install --locked difftastic`."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT permission text (Copyright (c) 2021-2025 Wilfred Hughes, LICENSE:3). Cargo.toml:6 also declares license = \"MIT\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - release builds exist for x86_64-unknown-linux-gnu and x86_64-unknown-linux-musl and both are in the CI test matrix; the gnu binaries are built on ubuntu-22.04, so they need a correspondingly recent glibc.",
+          "citation": ".github/workflows/release.yml:29-30, 38-39; .github/workflows/test.yml:14, 24; CHANGELOG.md:199-203",
+          "holds": true,
+          "note": "release.yml:29-30 builds x86_64-unknown-linux-gnu on ubuntu-22.04 and :38-39 builds x86_64-unknown-linux-musl on ubuntu-22.04 (cross). test.yml:14 tests the gnu target and :24 tests the musl target (use-cross: true). The 0.64 Build note at CHANGELOG.md:199-203 says CI moved to Ubuntu 22.04, so prebuilt binaries 'will require a newer glibc version to run'."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `difft` binary; usage `difft [OPTIONS] OLD-PATH NEW-PATH`; also two directories, `-` for stdin, a single conflict-marker file and the 7/9-argument GIT_EXTERNAL_DIFF form; flags --display {side-by-side, side-by-side-show-both, inline, json}, --exit-code, --check-only, --ignore-comments, --skip-unchanged, --sort-paths, --override, --override-binary, --list-languages, --byte-limit, --graph-limit, --parse-error-limit, --dump-ts/--dump-syntax/--dump-syntax-dot; most have DFT_* env vars; exit codes 0/1/2; VCS setup documented for git (diff.external, GIT_EXTERNAL_DIFF, difftool, --ext-diff), Mercurial extdiff, Fossil diff-command and Jujutsu ui.diff-formatter.",
+          "citation": "Cargo.toml:161-163; src/options.rs:26, 152-381, 909-1011; manual/src/usage.md:8-58, 60-69, 84-94; src/exit_codes.rs:1-12; manual/src/git.md:14-139, mercurial.md:3-28, fossil.md:3-13, jj.md:3-13",
+          "holds": true,
+          "note": "Cargo.toml:161-163 defines [[bin]] name = \"difft\". options.rs:26 defines the USAGE string. Every listed flag is defined in options.rs:152-381, and --display accepts exactly the four listed values (:213). options.rs:912-983 handles 2, 7, 9 and 1 (conflict-file) arguments; any other count exits with 2. usage.md:19-58 documents directories, `-` for stdin and conflict files. The 0/1/2 constants in exit_codes.rs match usage.md:84-94. git.md covers diff.external, GIT_EXTERNAL_DIFF, --ext-diff and difftool. mercurial.md documents extdiff, fossil.md `settings diff-command` and jj.md `[ui] diff-formatter`. 'Most' env vars is accurate: usage.md:62 says 'every', but --list-languages and the --dump-* options have no .env()."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Structural diff: difftastic 'compares files based on their syntax' and shows what actually changed even after reformatting (README.md:10-11, 31-33) - verified: yes",
+          "citation": "README.md:10-11, 31-33; src/main.rs:621, 658-668, 693-718, 928-930; src/parse/tree_sitter_parser.rs:1296-1320, 1594-1639; manual/src/parsing.md:28-34, 93-97; src/diff/unchanged.rs:19-34; src/diff/shortest_path.rs:59-130; src/diff/graph.rs:19-46; manual/src/tricky_cases.md:437-457",
+          "holds": true,
+          "note": "The README quotes are verbatim. main.rs:621 calls guess(). main.rs:658-668 calls to_tree_with_limit, which runs a tree-sitter Parser on both sides (tree_sitter_parser.rs:1296-1320), then to_syntax_with_limit, which converts the trees to Syntax (:1594-1639). parsing.md:28-34 describes the atom/list tree, and :93-97 says it stores no whitespace and ignores position. unchanged.rs:19-34 is mark_unchanged. main.rs:693-718 loops mark_syntax, which calls the Dijkstra shortest_vertex_path (shortest_path.rs:1-2, 59-130, 163). graph.rs:19-46 documents vertices as LHS/RHS syntax pointers. main.rs:928-929 prints 'No syntactic changes.'. tricky_cases.md:437-457 confirms the blank-line caveat."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,342 @@
+{
+  "contender": "praetorian-inc/noseyparker",
+  "revision": {
+    "contender": "praetorian-inc/noseyparker",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "praetorian-inc/noseyparker",
+        "tag": "v0.24.0",
+        "commit": "61fa4ca67e4ded1b47b3b9ecce618ae91f1ff2fe",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.24.0",
+    "commit": "61fa4ca67e4ded1b47b3b9ecce618ae91f1ff2fe",
+    "read_at": "2026-10-02T03:02:37+00:00"
+  },
+  "dossier": {
+    "contender": "praetorian-inc/noseyparker",
+    "revision": {
+      "tag": "v0.24.0",
+      "commit": "61fa4ca67e4ded1b47b3b9ecce618ae91f1ff2fe",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Nosey Parker (`noseyparker`) is a Rust command-line secret scanner from Praetorian. `scan` walks files, directories, local Git repositories (all blobs in the object database), HTTPS Git URLs, GitHub users/orgs, and JSONL-streamed content. It matches them against 183 YAML-defined regex rules (Vectorscan prefilter plus Rust regex captures), groups matches into deduplicated findings stored in a local SQLite 'datastore', and `report`/`summarize` emit human, JSON, JSONL or (experimental) SARIF output. Per the code: it does not verify whether found credentials are live, it has no staged-changes/pre-commit mode, and it exits 0 whether or not findings exist.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Nosey Parker is a CLI tool that finds secrets and sensitive information in textual data; essentially a special-purpose grep-like tool for detection of secrets.",
+          "citation": "README.md:5-6"
+        },
+        {
+          "claim": "Designed for offensive security (e.g., red-team lateral movement) but can also be useful for defensive security testing; has found secrets in hundreds of offensive security engagements at Praetorian.",
+          "citation": "README.md:8-9"
+        },
+        {
+          "claim": "Natively scans files, directories, GitHub, and Git history, and has an extensible input enumeration mechanism.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "Uses regular expressions with 183 patterns chosen for high precision based on feedback from security engineers.",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Deduplicates matches that share the same secret, reducing review burden by 10-1000x or more.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "Can scan at GB/s on a multicore system and has scanned inputs as large as 20TB during security engagements.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Typical workflow is three phases: scan inputs, report details, review and triage findings; interactive review/annotation is via the separate companion project Nosey Parker Explorer.",
+          "citation": "README.md:17-21, 198-200"
+        },
+        {
+          "claim": "Install options: Homebrew formula, prebuilt x86_64/aarch64 Linux and macOS binaries on the latest release page, Docker images (Debian and Alpine base, x86_64/aarch64) on ghcr.io, Arch Linux AUR package, or build from source.",
+          "citation": "README.md:25-89"
+        },
+        {
+          "claim": "Does not build natively on Windows (#121); it is possible to run on Windows using WSL1 and the native Linux release.",
+          "citation": "README.md:61-62"
+        },
+        {
+          "claim": "Source builds tested on several Ubuntu versions and macOS on x86_64 and aarch64; build needs cargo, cmake, boost >=1.57, git, patch, pkg-config, sha256sum, zsh.",
+          "citation": "README.md:70-80"
+        },
+        {
+          "claim": "Can scan a Git repo from an HTTPS URL and the repos of a GitHub user or organization; an optional GitHub token in NP_GITHUB_TOKEN gives a higher API rate limit and may make additional repositories accessible.",
+          "citation": "README.md:176-195"
+        },
+        {
+          "claim": "Reports findings in human-readable and JSON formats; additional output formats including JSON and JSON lines are available via --format.",
+          "citation": "README.md:202-208, 226"
+        },
+        {
+          "claim": "Third-party integrations: Homebrew and Arch packages, a GitHub Action (bpsizemore/noseyparker-action), a DefectDojo parser for Nosey Parker v0.16 JSON, and Nemesis support.",
+          "citation": "README.md:258-264"
+        },
+        {
+          "claim": "The project has pre-commit hooks that contributors are encouraged to install via `pre-commit install`.",
+          "citation": "README.md:278-283"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew formula (third-party packaged)",
+          "command": "brew install noseyparker",
+          "citation": "README.md:25-29"
+        },
+        {
+          "method": "Prebuilt binaries from GitHub Releases (x86_64/aarch64 Linux and macOS)",
+          "command": "No command documented; download the tarball for your platform from https://github.com/praetorian-inc/noseyparker/releases/latest",
+          "citation": "README.md:32-34"
+        },
+        {
+          "method": "Docker image, Debian base (x86_64/aarch64)",
+          "command": "docker pull ghcr.io/praetorian-inc/noseyparker:latest   (run: docker run -v \"$PWD\":/scan ghcr.io/praetorian-inc/noseyparker:latest <ARGS>)",
+          "citation": "README.md:37-43, 139-147"
+        },
+        {
+          "method": "Docker image, Alpine base (x86_64/aarch64)",
+          "command": "docker pull ghcr.io/praetorian-inc/noseyparker-alpine:latest",
+          "citation": "README.md:45-51"
+        },
+        {
+          "method": "Arch Linux AUR package (third-party packaged)",
+          "command": "No command documented; package page: https://aur.archlinux.org/packages/noseyparker",
+          "citation": "README.md:54-56"
+        },
+        {
+          "method": "Build from source (Linux/macOS; needs cargo, cmake, boost, git, patch, pkg-config, sha256sum, zsh)",
+          "command": "rm -rf release && ./scripts/create-release.zsh   (binary lands at release/bin/noseyparker)",
+          "citation": "README.md:65-89"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:34 lists prebuilt x86_64 Linux binaries and README.md:70 says source builds were tested on Ubuntu x86_64; CI runs ubuntu-22.04/24.04 x86_64 (.github/workflows/ci.yml:59-93) and the release workflow builds glibc and Alpine/musl amd64 artifacts (.github/workflows/release-artifacts.yml:22-26, 91-103).",
+        "wsl2": "unknown - README.md:61-62 documents only WSL1 with the native Linux release; WSL2 is not mentioned and no CI job covers WSL or Windows (ci.yml:56-141).",
+        "macos_arm64": "yes - README.md:34 lists prebuilt aarch64 macOS binaries; CI has a macos-14 arm64 test job (ci.yml:131-141) and the release workflow builds a macos-13.arm64 artifact (release-artifacts.yml:40-44). Signing/notarization of macOS binaries is only a manual script (scripts/codesign-macos-release.zsh).",
+        "gpu": "no - matching is CPU-only via Vectorscan (crates/noseyparker/src/matcher.rs:78, 143-155); grep for gpu/cuda/opencl/metal/vulkan across the repo (excluding lockfile and snapshots) returns nothing."
+      },
+      "integrations": {
+        "cli": "yes - single `noseyparker` binary with subcommands scan, summarize, report, github (cargo feature), datastore, rules, annotations, generate (crates/noseyparker-cli/src/args.rs:194-304); help via `noseyparker help` / `-h` (README.md:92-99). Environment variables read: NP_DATASTORE, NP_GITHUB_TOKEN, NP_LOG, NO_COLOR (args.rs:181, 594-646; main.rs:45-50).",
+        "mcp": "none found - grep for mcp / model context protocol across the repo returns nothing.",
+        "sdk_or_api": "No SDK or HTTP API. Workspace crates are `publish = false` (Cargo.toml:17) and the changelog calls the Rust crate APIs an implementation detail (CHANGELOG.md:7). Machine-readable interfaces: `report`/`summarize` JSON and JSONL, experimental SARIF (args.rs:1287-1327), a JSON Schema of the report JSON via `generate json-schema` (args.rs:1210-1211), and JSONL input via `scan --enumerator` (args.rs:894-912). README lists third-party integrations (GitHub Action bpsizemore/noseyparker-action, DefectDojo parser for v0.16 JSON, Nemesis) at README.md:262-264; those external projects were not inspected.",
+        "claude_code_or_codex": "none found - grep for claude/codex/copilot/cursor/agent skill across the repo returns nothing. The only AI-vendor material is detection rules for AI-provider API keys (e.g., crates/noseyparker/data/default/builtin/rules/anthropic.yml:3-12, matching sk-ant-api keys), which are scanning rules, not an integration."
+      },
+      "telemetry_and_network": "No telemetry, analytics, crash-reporting, update-check or phone-home code found: grep over crates/, docs/, scripts/ and workflows for telemetry/analytics/sentry/usage-stats/update-check terms finds nothing relevant, Cargo.lock lists no telemetry/analytics crates (only the reqwest/hyper/openssl HTTP stack, Cargo.lock:3745), and the README is silent on telemetry. No account or registration is required; a GitHub token is optional. Network use is limited to: (1) `git clone --bare|--mirror` and `git remote update --prune` run through the system `git` binary for --git-url and --github-* inputs, with global/system git config disabled (crates/noseyparker-cli/src/cmd_scan.rs:1174-1263; crates/noseyparker/src/git_binary.rs:48-109); only https URLs without embedded credentials, query or fragment are accepted (crates/noseyparker/src/git_url.rs:41-92). (2) Read-only GET requests to the GitHub REST API (default https://api.github.com/, or a GitHub Enterprise URL via --github-api-url) to list repos: rate_limit, users/{u}, users/{u}/repos, orgs/{o}/repos, orgs/{o}/members, organizations (crates/noseyparker/src/github/client.rs:35-68, 254-267; github.rs:47-62), User-Agent `noseyparker` (client_builder.rs:17). NP_GITHUB_TOKEN is read only from the environment, held as a secrecy::SecretString and sent as a bearer token (client_builder.rs:46-68; auth.rs:12; client.rs:261-264); the same variable is handed to git through an always-configured inline credential helper that echoes $NP_GITHUB_TOKEN (git_binary.rs:30-36), and GitUrl allows any HTTPS host (git_url.rs:59-61), so the token may be offered to non-GitHub hosts that request credentials (code-reading inference, not tested). (3) Scanning local files, directories, local repos and --enumerator files uses no network. (4) --ignore-certs disables TLS verification for both git (GIT_SSL_NO_VERIFY) and the API client (args.rs:339-341; git_binary.rs:53-55; client_builder.rs:72-75). Findings are never transmitted; they are written to a local SQLite datastore (datastore.rs:1034-1051). The binary embeds build-host metadata (OS, CPU, rustc, git SHA) shown by --version (crates/noseyparker-cli/build.rs:8-15; args.rs:38-71); this is local only. The test suite and CI call the live GitHub API and clone GitHub repos (crates/noseyparker-cli/tests/github/mod.rs; tests/scan/appmaker/mod.rs:18-34; ci.yml:173-180)."
+    },
+    "code": {
+      "languages": [
+        "Rust",
+        "YAML (detection rules and rulesets)",
+        "Zsh (build and release scripts)",
+        "SQL (datastore schema)"
+      ],
+      "entry_points": [
+        {
+          "path": "crates/noseyparker-cli/src/main.rs",
+          "what": "Binary main(): parses args, sets up logging/rlimits, dispatches to subcommands, exits 2 only on error (main.rs:100-136). Cargo's bin name is `noseyparker-cli`; scripts/create-release.zsh:119 renames it to `noseyparker`."
+        },
+        {
+          "path": "crates/noseyparker-cli/src/args.rs",
+          "what": "clap definition of every command and option, including input specifiers, rule selection, report filters/formats, env-var bindings."
+        },
+        {
+          "path": "crates/noseyparker-cli/src/cmd_scan.rs",
+          "what": "`scan` pipeline: load rules, clone/update Git URLs, enumerate inputs, parallel scan, batched SQLite writes, summary print."
+        },
+        {
+          "path": "crates/noseyparker-cli/src/cmd_report.rs",
+          "what": "`report` command (human/json/jsonl in this file; cmd_report/human_format.rs and cmd_report/sarif_format.rs for the other formats)."
+        },
+        {
+          "path": "crates/noseyparker-cli/src/cmd_summarize.rs",
+          "what": "`summarize` command: per-rule counts as human table, JSON or JSONL."
+        },
+        {
+          "path": "crates/noseyparker-cli/src/cmd_rules/cmd_rules_check.rs",
+          "what": "`rules check` linter: unique/well-formed IDs, ruleset resolution, every rule in some ruleset, examples/negative_examples assertions; nonzero exit on errors."
+        },
+        {
+          "path": "crates/noseyparker/data/default/builtin/rulesets/default.yml",
+          "what": "Default ruleset (162 rule IDs, lines 15-176); rule definitions live in ../rules/*.yml (84 files, 183 rules); sibling rulesets np.assets.yml (15) and np.hashes.yml (6)."
+        },
+        {
+          "path": "scripts/create-release.zsh",
+          "what": "Release build script used by CI and both Dockerfiles: cargo build --locked --features release, then assembles bin/, completions, man pages, JSON schema."
+        }
+      ],
+      "architecture": "Cargo workspace of 8 crates (Cargo.toml:1-2). crates/noseyparker-cli is the binary: clap command definitions (src/args.rs), one module per command (cmd_scan.rs, cmd_report.rs + cmd_report/{human_format,sarif_format}.rs, cmd_summarize.rs, cmd_rules/, cmd_github.rs, cmd_datastore.rs, cmd_annotations.rs, cmd_generate/), and rule loading (rule_loader.rs). crates/noseyparker is the core library: SQLite datastore (src/datastore.rs + datastore/schema_70.sql, rusqlite bundled), a Vectorscan multi-pattern prefilter followed by anchored Rust-regex capture extraction (src/rules_database.rs, src/matcher.rs), blob/provenance/snippet types, git_binary.rs (shells out to the system git for clone/update with global/system config disabled), an optional github/ REST client (feature `github`, reqwest+tokio), and embedded default rules and ignore file via include_dir (src/defaults.rs, data/default/). crates/noseyparker-rules parses YAML rules/rulesets (rule fields: name, id, pattern, description, examples, negative_examples, references, categories; no validation/verification field, src/rule.rs:10-40). crates/input-enumerator walks the filesystem with the `ignore` crate but with standard filters disabled, so .gitignore and hidden files are not honored (src/lib.rs:224), and enumerates Git repos in-process via gix, iterating every object in the object database and computing first-seen commit/path provenance (src/git_repo_enumerator.rs, src/git_metadata_graph.rs). Smaller crates: noseyparker-digest (git-style SHA-1 blob ids), content-guesser (MIME guess, optional libmagic), bstring-serde, progress. Scan flow: rules compiled once -> enumerator thread feeds a bounded channel -> Rayon parallel scanner threads -> one datastore-writer thread committing batched SQLite transactions (cmd_scan.rs:403-447, 506-542). A datastore is a directory with datastore.db, scratch/, clones/, blobs/ and an auto-written .gitignore containing `*` (datastore.rs:107-133); concurrent multi-process use of one datastore is documented as untested (datastore.rs:48-49). Default ignore patterns (lockfiles, vendored test dirs, /proc /sys /dev) live in crates/noseyparker/data/default/ignore.conf.",
+      "packaging_and_release": "Version 0.24.0 (Cargo.toml:15); every crate has `publish = false`, so nothing is published to crates.io. Release profile: opt-level 3, thin LTO, debuginfo stripped into packed split debuginfo (Cargo.toml:20-28); the `release` feature enables mimalloc and compiles out trace logging (crates/noseyparker-cli/Cargo.toml:59). scripts/create-release.zsh runs `cargo build --locked --profile release --features release` (line 112), copies target/release/noseyparker-cli to release/bin/noseyparker (119), adds CHANGELOG/LICENSE/README, .dwp/.dSYM debug symbols, completions for 5 shells, man pages and the report JSON schema (122-152), and prints per-file sha256 digests to the build log only (157-158). .github/workflows/release-artifacts.yml (push to main, tags v*.*.*, manual) builds ubuntu-22.04 x86_64/arm64 and macos-13 x86_64/arm64 natively plus Alpine/musl amd64/arm64 via Dockerfile.alpine, runs the integration tests against the built binary, and uploads noseyparker-v<ver>-<target-triple>.tar.gz as GitHub Actions artifacts (release-artifacts.yml:15-157); no step creates a GitHub Release or emits checksum, signature or attestation files. .github/workflows/docker-image.yml builds Debian- and Alpine-based images per arch on native runners, pushes by digest to ghcr.io/<repo>[-alpine] and merges multi-arch manifests (docker-image.yml:32-174); no signing/attestation step. macOS codesign + notarization (Developer ID identity, notarytool) exists only as a manual script (scripts/codesign-macos-release.zsh:38-39, 66, 77) not invoked by any workflow. Homebrew and AUR packages are third-party (README.md:260-261). Vectorscan can optionally be built CPU-native, which breaks binary portability (crates/noseyparker-cli/Cargo.toml:34-43).",
+      "tests_and_ci": "Rust `cargo test`: unit tests in several crates plus CLI integration tests in crates/noseyparker-cli/tests/ (16 .rs files, 195 insta .snap snapshot files) using assert_cmd, assert_fs, insta, predicates; about 131 matching test-attribute lines in 25 files (about 90 in the integration tests, about 41 in crate sources). NP_TEST_PROGRAM lets the suite run against a built release binary or Docker image (tests/common/mod.rs:90-108). In-repo gaps: TODO list at tests/test_noseyparker.rs:20-36 (SARIF, --github-user/--github-org scans, datastore version mismatch, etc.); SARIF snapshot test is disabled (tests/scan/appmaker/mod.rs:54-57); Git-history scanning is exercised only by an empty-repo test and a network clone of an archived third-party repo (tests/scan/basic/mod.rs:117-127; tests/scan/appmaker/mod.rs:18-34), with no local multi-commit repo fixture; no tests in the progress or content-guesser crates and one in input-enumerator. CI workflows: ci.yml (PR, push to main, daily 05:00 UTC cron) runs a 7-job matrix (ubuntu-22.04 x86_64 release+test, ubuntu-24.04 x86_64 --no-default-features, ubuntu-22.04 arm64 release, ubuntu-24.04 arm64 test, macos-13 x86_64, macos-14 arm64) with `cargo test --locked` (NP_GITHUB_TOKEN from secrets so GitHub tests hit the live API), `--version`, and `cargo doc` under -D warnings (ci.yml:50-186); rust-checks.yml (PR/push/tags + weekly cron) runs clippy -> SARIF -> GitHub code scanning with continue-on-error (non-blocking) and `cargo fmt --all --check` (rust-checks.yml:13-93); release-artifacts.yml and docker-image.yml as described above (the Docker job smoke-tests `--version`, docker-image.yml:107-108). No MSRV job: CI uses stable (Cargo.toml:7 declares rust-version 1.82; Dockerfile:12 builds with rust:1.82-bullseye).",
+      "dependencies": "Cargo workspace; Cargo.lock is committed and CI/release build with --locked (ci.yml:168-180; scripts/create-release.zsh:112). MSRV 1.82 (Cargo.toml:7). Direct dependency entries per manifest (workspace path crates included): crates/noseyparker-cli/Cargo.toml 45 runtime (6 optional; 6 are workspace crates) + 6 dev + 2 build (vergen, vergen-gitcl); crates/noseyparker/Cargo.toml 28 runtime (4 optional: chrono, reqwest, secrecy, tokio; 5 workspace crates) + 2 dev; crates/input-enumerator/Cargo.toml 14 + 1 dev; crates/noseyparker-rules/Cargo.toml 9 + 2 dev; crates/bstring-serde/Cargo.toml 4 + 2 dev; crates/content-guesser/Cargo.toml 4 (magic/libmagic optional); crates/noseyparker-digest/Cargo.toml 2 + 1 dev; crates/progress/Cargo.toml 1; the root Cargo.toml is a virtual workspace manifest with no dependencies. Notable: vectorscan-rs 0.0.5 (pre-1.0 C++ Vectorscan binding; needs cmake and Boost to build; Cargo.lock:4949-4963), rusqlite 0.35 with bundled SQLite, reqwest 0.12 with native-tls-vendored (vendored OpenSSL, Cargo.lock:3270-3271), gix 0.72.1 (Cargo.lock:1148-1149), parquet/arrow 55 (optional), serde_yaml 0.9.34+deprecated (Cargo.lock:4135-4136).",
+      "security_policy": "SECURITY.md exists: only the latest release receives security updates (SECURITY.md:5); vulnerabilities are reported by email to security@praetorian.com (SECURITY.md:9). The file has no private-vulnerability-reporting link, PGP key or response-time commitment."
+    },
+    "claim_checks": [
+      {
+        "claim": "Natively scans files, directories, GitHub, and Git history (README.md:12).",
+        "verified": "yes",
+        "evidence": "`scan` accepts file/directory/local-repo inputs, --git-url, --github-user/--github-organization and --enumerator (crates/noseyparker-cli/src/args.rs:855-931); directories that are Git repos get their entire history scanned via object-database enumeration (crates/input-enumerator/src/git_repo_enumerator.rs:262-274; cmd_scan.rs:245-279). Code adds limits the README does not state: no staged-changes/diff mode, and --git-history only accepts full|none, with a code comment noting bounded history is unimplemented (args.rs:776-783)."
+      },
+      {
+        "claim": "Uses regular expressions with 183 patterns chosen for high precision (README.md:13).",
+        "verified": "partial",
+        "evidence": "The count is right: 183 rule definitions in 84 YAML files (crates/noseyparker/data/default/builtin/rules/; 183 top-level `- name:` entries and 183 `  id:` lines), matching 162 (rulesets/default.yml:15-176) + 15 (np.assets.yml:14-29, one commented out at :22) + 6 (np.hashes.yml:13-18). But a default scan enables only the `default` ruleset (args.rs:724), i.e., 162 rules; the other 21 are asset/identifier and password-hash rules. 'High precision' is not checkable; the default set includes 14 generic rules (default.yml:56-69) and fuzzy-category rules need surrounding context (docs/RULES.md:90)."
+      },
+      {
+        "claim": "Deduplicates matches that share the same secret, reducing review burden by 10-1000x or more (README.md:14).",
+        "verified": "partial",
+        "evidence": "Mechanism verified: a finding is the group of matches sharing a rule and capture groups (crates/noseyparker/src/datastore/schema_70.sql:159-186; README.md:131-134) and redundant-match suppression is on by default in `report` (args.rs:1105-1110). The 10-1000x magnitude is self-reported with no method or dataset."
+      },
+      {
+        "claim": "Can scan at GB/s on a multicore system and has scanned inputs as large as 20TB (README.md:15; example at README.md:158-160).",
+        "verified": "not_checkable",
+        "evidence": "No benchmark harness in the repo (criterion commented out at crates/noseyparker-cli/Cargo.toml:120; FIXME 'add benchmarks' at crates/noseyparker/src/location.rs:114) and the README example gives no hardware. The design is consistent with a throughput focus (Vectorscan multi-pattern prefilter, matcher.rs:132-153; Rayon parallel scanners, cmd_scan.rs:327-331, 506-542)."
+      },
+      {
+        "claim": "Prebuilt binaries for x86_64/aarch64 Linux and macOS are on the latest release page (README.md:34).",
+        "verified": "partial",
+        "evidence": ".github/workflows/release-artifacts.yml builds tarballs for ubuntu-22.04 x86_64/arm64 and macos-13 x86_64/arm64 (lines 22-44) and Alpine/musl amd64/arm64 (91-103), but only uploads them as Actions workflow artifacts (80-86, 151-157). No workflow publishes GitHub Release assets, checksums, signatures or attestations, so the Releases-page contents cannot be verified from this repo."
+      },
+      {
+        "claim": "Docker images for x86_64/aarch64 at ghcr.io/praetorian-inc/noseyparker and -alpine, with :latest and :main tags (README.md:37-51).",
+        "verified": "yes",
+        "evidence": ".github/workflows/docker-image.yml:36-62 builds Debian and Alpine images for linux/amd64 and linux/arm64 on native runners and :125-174 merges them into multi-arch manifests (triggers: push to main and v*.*.* tags, :15-20). Entrypoint `noseyparker` with /scan workdir matches the README usage (Dockerfile:66-68; Dockerfile.alpine:40-42). No image signing or attestation step."
+      },
+      {
+        "claim": "Additional output formats are supported, including JSON and JSON lines (README.md:226).",
+        "verified": "partial",
+        "evidence": "Code differs from the README: `report` supports human, json, jsonl and sarif (args.rs:1287-1309). SARIF is not mentioned in the README, is labelled experimental (args.rs:1301-1307; CHANGELOG.md:323), has its tests disabled/TODO (crates/noseyparker-cli/tests/scan/appmaker/mod.rs:54-57; tests/test_noseyparker.rs:27), lists only built-in rules (cmd_report/sarif_format.rs:154-156), and embeds the matching text in snippet.text (sarif_format.rs:88-92)."
+      },
+      {
+        "claim": "Man pages converted to Markdown are included in the repository at docs/v0.17.0/man/man1 (README.md:98-99).",
+        "verified": "partial",
+        "evidence": "The files exist but are for v0.17.0 while the workspace version is 0.24.0 (Cargo.toml:15). The v0.17.0 `report` page predates --min-score, --max-provenance and --suppress-redundant (args.rs:1070-1110) and the `scan` page predates --enumerator (args.rs:894-912); grep of docs/v0.17.0 finds none of these. The release tarball generates fresh man pages (scripts/create-release.zsh:146)."
+      },
+      {
+        "claim": "Nosey Parker also includes vendored copies of several other packages under the Apache License and other permissive licenses; see LICENSE for details (README.md:292).",
+        "verified": "no",
+        "evidence": "LICENSE (lines 1-202) is only the stock Apache-2.0 text with no list of vendored packages, there is no NOTICE or third-party license file, and the tree has no vendored-package directories. CHANGELOG.md:317-321 and 330 say the vendored Boost/Vectorscan copies were removed from this repo and moved into the separate vectorscan-rs crates."
+      },
+      {
+        "claim": "The project has pre-commit hooks that readers are encouraged to use (README.md:278-283).",
+        "verified": "partial",
+        "evidence": ".pre-commit-config.yaml:3-23 configures contributor hygiene hooks (check-added-large-files, check-yaml/json/toml, check-symlinks, trailing-whitespace, rustfmt `fmt`, `cargo-check`). None runs Nosey Parker or any secret scanner, and no .pre-commit-hooks.yaml is published for downstream use (glob finds none), so the README line concerns repo contributors, not scanning staged changes."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Scan of a local CPython Git clone, invoked without --ruleset (README example)",
+        "metric": "data scanned / blobs / wall time / throughput / new matches",
+        "value": "19.19 GiB from 335,849 blobs in 17 s (1.11 GiB/s); 2,178 new matches; hardware not stated",
+        "source": "README.md:158-160",
+        "independent": false
+      },
+      {
+        "what": "Claimed scan speed and largest scanned input",
+        "metric": "throughput; maximum input size",
+        "value": "'GB/s on a multicore system'; 'as large as 20TB' during security engagements (no method given)",
+        "source": "README.md:15",
+        "independent": false
+      },
+      {
+        "what": "Claimed review-burden reduction from deduplicating findings",
+        "metric": "review-burden reduction factor",
+        "value": "10-1000x or more (no method or dataset given)",
+        "source": "README.md:14",
+        "independent": false
+      },
+      {
+        "what": "v0.20.0 release: incremental input enumeration plus memory/speed work",
+        "metric": "wall-clock and memory reduction versus the prior release",
+        "value": "typical 10-30% less wall time and 10-50% less memory; 10-20x less in some unusual cases",
+        "source": "CHANGELOG.md:164-165",
+        "independent": false
+      },
+      {
+        "what": "v0.20.0: rework of first-commit provenance computation for Git history (PR #222)",
+        "metric": "peak memory and wall-clock reduction",
+        "value": "20-50% typical; up to 20x less peak memory and 5x less wall time on Homebrew/nixpkgs-sized repos",
+        "source": "CHANGELOG.md:208-210",
+        "independent": false
+      },
+      {
+        "what": "v0.14.0: recording matches to the datastore in larger batches",
+        "metric": "scan speedup on heavy multithreaded, many-match workloads",
+        "value": "up to 2x",
+        "source": "CHANGELOG.md:662 (v0.14.0 section starts at CHANGELOG.md:592)",
+        "independent": false
+      },
+      {
+        "what": "Snippet deduplication in the datastore schema",
+        "metric": "datastore size reduction on large datastores",
+        "value": "20-100x or more (schema comment, no method given)",
+        "source": "crates/noseyparker/src/datastore/schema_70.sql:145-146",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No staged-changes/pre-commit mode: inputs are paths, local repos, HTTPS URLs, GitHub users/orgs or JSONL enumerator files (crates/noseyparker-cli/src/args.rs:855-931); local Git scanning iterates every blob in the object database (crates/input-enumerator/src/git_repo_enumerator.rs:143-163, 262-274; git_metadata_graph.rs:185-226) and --git-history accepts only full|none (args.rs:776-783). No .pre-commit-hooks.yaml is shipped and the seen-blob set is per run (cmd_scan.rs:472), so a per-commit hook would rescan the whole repo each time. Inference, untested: blobs written by `git add` are loose objects and would be enumerated, but no code, doc or test targets staged content.",
+      "CI gating and coverage gaps: exit status is 0 whether or not findings exist (main.rs:124-136 only exits 2 on error; tests/scan/basic/mod.rs:130-135 asserts success with 1 match), and enumeration/read errors are logged while the scan still succeeds (cmd_scan.rs:509-541; tests/scan/basic/mod.rs:99-115), so CI must parse `report -f json|jsonl|sarif` or `summarize -f json`. Silent-by-default skips: files over --max-file-size (default 100 MB) get only a debug-level message (crates/input-enumerator/src/lib.rs:138-139; args.rs:988-998), symlinks are not followed (lib.rs:158-162, 222), and default path ignores cover lockfiles, vendored test dirs and /proc /sys /dev (crates/noseyparker/data/default/ignore.conf:34-38, 60-63), also applied to Git-history paths (CHANGELOG.md:267-268).",
+      "No credential verification: rules are regex-only (crates/noseyparker-rules/src/rule.rs:10-40; crates/noseyparker/src/matcher.rs:143-155) and the only HTTP client enumerates GitHub repos (crates/noseyparker/src/github/client.rs:35-68), so findings are never classified live/revoked. The default ruleset includes 14 generic rules (rulesets/default.yml:56-69). There is no inline allowlist or baseline mechanism (grep finds none); triage state is accept/reject annotations inside the datastore (args.rs:1113-1125).",
+      "Findings and token handling: the datastore keeps the matching text plus about 256 bytes of context per match in plaintext SQLite (crates/noseyparker/src/datastore/schema_70.sql:142-154, 215-222; args.rs:667-677), --copy-blobs can copy whole blobs (args.rs:679-693), JSON/SARIF reports embed matches (cmd_report/sarif_format.rs:88-92), and no redaction option exists (grep). The default datastore path is `datastore.np` in the current directory (args.rs:78); it self-writes a .gitignore of `*` (datastore.rs:107-110) and is skipped by later scans (input-enumerator/src/lib.rs:145-152), but the README does not discuss handling these artifacts. Separately, NP_GITHUB_TOKEN is passed to git via an always-on credential helper (git_binary.rs:30-36) and --git-url accepts any HTTPS host (git_url.rs:59-61), so it may be offered to non-GitHub hosts (inference from code, untested).",
+      "Stability and maintenance: version 0.24.0 is pre-1.0 and semver is claimed only for the CLI and output formats (Cargo.toml:15; CHANGELOG.md:6-7), yet v0.22.0 broke the JSON output and datastore schema (CHANGELOG.md:62-77). Datastores from other versions are rejected with no migration (crates/noseyparker/src/datastore.rs:1053-1063, 1081-1088). SARIF is experimental and untested (args.rs:1301-1307; tests/test_noseyparker.rs:27). The latest CHANGELOG entry is v0.24.0 dated 2025-05-08 (CHANGELOG.md:10); this shallow checkout pinned at the tag cannot show later activity. One author is listed (Cargo.toml:10) and the regex-engine binding vectorscan-rs 0.0.5 lives in a separate personal-account repo (CHANGELOG.md:330; Cargo.lock:4949-4950).",
+      "Release and supply-chain hygiene: workflows only upload Actions artifacts and push GHCR images, with no checksum files, signatures or attestations (.github/workflows/release-artifacts.yml:73-86, 151-157; docker-image.yml:87-174); macOS signing/notarization is a manual script not wired to CI (scripts/codesign-macos-release.zsh:38-39, 66, 77). Third-party actions use mutable refs such as @master, @v2, @v4 (ci.yml:144-161; release-artifacts.yml:47-58). No dependabot, cargo-deny or cargo-audit config found; the lockfile contains serde_yaml 0.9.34+deprecated (Cargo.lock:4135-4136); clippy is non-blocking (rust-checks.yml:60-65). Docker bases are Debian 11 pinned (Dockerfile:12, 56) and floating alpine:latest / rust:alpine (Dockerfile.alpine:6, 33), and images run as root (no USER directive).",
+      "Platform and build constraints: no native Windows (README.md:61-62) and WSL2 is undocumented; building needs cmake, Boost >=1.57, zsh, patch, pkg-config and a C++ toolchain via vectorscan-rs-sys (README.md:72-80). CI and release cover only Ubuntu and macOS on pinned runner labels (ubuntu-22.04/24.04, macos-13/14: ci.yml:59-141; release-artifacts.yml:22-44), and the changelog records a forced runner bump when GitHub removed ubuntu-20.04 (CHANGELOG.md:41). Several integration tests need live GitHub access (crates/noseyparker-cli/tests/github/mod.rs; tests/scan/appmaker/mod.rs:18-34; ci.yml:173-180).",
+      "Licensing documentation mismatch: README.md:292 says LICENSE details vendored third-party packages, but LICENSE is only the Apache-2.0 text (LICENSE:1-202) and the repo has no NOTICE or third-party license file, while builds bundle third-party C/C++ code: SQLite (rusqlite `bundled`, crates/noseyparker/Cargo.toml:46), OpenSSL (`native-tls-vendored`, Cargo.toml:45; Cargo.lock:3270-3271) and Vectorscan (vectorscan-rs-sys, Cargo.lock:4962-4963). Those components' licenses are not visible in this checkout."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "praetorian-inc/noseyparker",
+      "checks": [
+        {
+          "field": "readme.install (Docker image, Debian base)",
+          "statement": "Docker image, Debian base (x86_64/aarch64): `docker pull ghcr.io/praetorian-inc/noseyparker:latest` (run: `docker run -v \"$PWD\":/scan ghcr.io/praetorian-inc/noseyparker:latest <ARGS>`)",
+          "citation": "README.md:37-43, 139-147; Dockerfile:56, 66-68; .github/workflows/docker-image.yml:36-48, 125-170",
+          "holds": true,
+          "note": "README.md:37-43 gives the heading 'Docker: x86_64/aarch64', the exact pull command and the `main` tag. README.md:144 gives the exact run command, and :147 says /scan is the working directory. The cited README lines do not say 'Debian base', but Dockerfile:56 (`FROM debian:11-slim AS runner`) and docker-image.yml:36-48 (base: debian, linux/amd64 + linux/arm64, pushed to ghcr.io/<repo>) confirm it. Dockerfile:66-68 sets WORKDIR /scan and ENTRYPOINT noseyparker. I picked this method because it is the only channel the repo itself builds and pushes: Homebrew and AUR are third-party, and the Releases-page publication cannot be verified in-repo."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-202; Cargo.toml:9; crates/noseyparker-cli/Cargo.toml:4; README.md:288",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License 2.0 text with no added terms. The workspace manifest declares license = \"Apache-2.0\" and the crates inherit it (license.workspace = true). README.md:288 agrees. Separate issue, already flagged by the dossier itself: README.md:292 points to LICENSE for vendored-package details that are not there. That does not change the SPDX identification."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - README.md:34 lists prebuilt aarch64 macOS binaries; CI has a macos-14 arm64 test job (ci.yml:131-141) and the release workflow builds a macos-13.arm64 artifact (release-artifacts.yml:40-44). Signing/notarization of macOS binaries is only a manual script (scripts/codesign-macos-release.zsh).",
+          "citation": "README.md:34; .github/workflows/ci.yml:131-141; .github/workflows/release-artifacts.yml:40-44; scripts/codesign-macos-release.zsh:38, 66, 77",
+          "holds": true,
+          "note": "ci.yml:131-141 is the job 'macos-14.arm64.stable.test' on os: macos-14 (commented 'm1-based macos'), with run_tests: true. release-artifacts.yml:40-44 is build macos-13.arm64 on runner macos-13-xlarge. Grepping the whole repo (workflows included) for codesign|notar matches only scripts/codesign-macos-release.zsh, so no workflow calls it. Caveat already recorded in the dossier: the release workflow only uploads Actions artifacts (release-artifacts.yml:80-86), so the README.md:34 Releases-page claim is documented, not proven by workflow code."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "single `noseyparker` binary with subcommands scan, summarize, report, github (cargo feature), datastore, rules, annotations, generate (args.rs:194-304); help via `noseyparker help` / `-h` (README.md:92-99); env vars NP_DATASTORE, NP_GITHUB_TOKEN, NP_LOG, NO_COLOR (args.rs:181, 594-646; main.rs:45-50)",
+          "citation": "crates/noseyparker-cli/src/args.rs:181, 194-304, 594-646; crates/noseyparker-cli/src/main.rs:45-50, 111-121; README.md:92-99",
+          "holds": true,
+          "note": "The Command enum at args.rs:194-304 has exactly Scan, Summarize (alias summarise), Report, GitHub (#[cfg(feature = \"github\")], on by default per crates/noseyparker-cli/Cargo.toml:61), Datastore, Rules, Annotations and Generate. main.rs:111-121 dispatches each one. README.md:94-96 documents the no-args help, `COMMAND -h`, `help` and `--help`. NO_COLOR is at args.rs:181, NP_DATASTORE at env(\"NP_DATASTORE\") on args.rs:594/608/646, and NP_LOG at main.rs:48. Minor citation gap: NP_GITHUB_TOKEN is genuinely read, but not at the cited lines. It is read at crates/noseyparker/src/github/client_builder.rs:46-49 and crates/noseyparker/src/git_binary.rs:35; args.rs mentions it only in doc comments (223, 280). The cargo binary is named noseyparker-cli (crates/noseyparker-cli/Cargo.toml:10) and is renamed to noseyparker by scripts/create-release.zsh:119, as the dossier's entry_points already says."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Natively scans files, directories, GitHub, and Git history (README.md:12) - verified: yes; code adds limits: no staged-changes/diff mode, --git-history only accepts full|none",
+          "citation": "crates/noseyparker-cli/src/args.rs:776-783, 855-931, 979-980; crates/input-enumerator/src/git_repo_enumerator.rs:143-147, 262-274; crates/noseyparker-cli/src/cmd_scan.rs:245-279, 458-460",
+          "holds": true,
+          "note": "InputSpecifierArgs (args.rs:855-931) has positional file/dir/local-repo inputs, --git-url (881-892, https only), --enumerator JSONL (894-912), --github-user (914-919) and --github-organization/--github-org (921-931). cmd_scan.rs:245-279 runs Git enumeration on any directory that is a repo. git_repo_enumerator.rs:262-274 collects every blob in the object database, and the metadata path does the same via object_index.into_blobs() (143-147). GitHistoryMode is {Full, None}, with an XXX comment that bounded history is missing (args.rs:776-783), and is wired to --git-history (args.rs:979-980; cmd_scan.rs:458-460). Grepping crates/**/src for staged|--cached|pre-commit finds no staged/diff mode. GitHub inputs depend on the default-on `github` feature (crates/noseyparker-cli/Cargo.toml:53, 61)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

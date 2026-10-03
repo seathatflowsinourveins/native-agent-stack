@@ -1,0 +1,282 @@
+{
+  "contender": "aquasecurity/trivy",
+  "revision": {
+    "contender": "aquasecurity/trivy",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "aquasecurity/trivy",
+        "tag": "v0.75.0",
+        "commit": "591e9799316a602e703f0b484f6c6d7b234ec8f3",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.75.0",
+    "commit": "591e9799316a602e703f0b484f6c6d7b234ec8f3",
+    "read_at": "2026-10-02T03:01:59+00:00"
+  },
+  "dossier": {
+    "contender": "aquasecurity/trivy",
+    "revision": {
+      "tag": "v0.75.0",
+      "commit": "591e9799316a602e703f0b484f6c6d7b234ec8f3",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Trivy (github.com/aquasecurity/trivy; an Aqua Security open-source project, README.md:116) is a single-binary Go CLI plus client/server security scanner. Targets: container images, filesystems/rootfs, remote git repositories, VM images, Kubernetes (README.md:17-23). Scanners: vulnerabilities, IaC misconfiguration, secrets, licenses, plus SBOM generation in CycloneDX (JSON only) and SPDX (tag-value or JSON) for images and directories (README.md:25-31; docs/guide/supply-chain/sbom.md:5-20,194; pkg/types/report.go:94-102). It is static analysis only: no container or VM start-up is needed (docs/community/principles.md:8-10). Facts about the repo's own CI/supply-chain tooling (zizmor, actions/attest, cosign, Dependabot, release SBOM, absence of actionlint and of code-scanning upload) are in code.tests_and_ci, code.packaging_and_release and code.dependencies. Trivy itself is the SBOM generator for images and directories, while the repo's own release SBOM is produced by a different tool (CycloneDX/gh-gomod-generate-sbom).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Trivy is 'a comprehensive and versatile security scanner' with scanners (what it finds) and targets (where it looks).",
+          "citation": "README.md:14-15"
+        },
+        {
+          "claim": "Targets: Container Image, Filesystem, Git Repository (remote), Virtual Machine Image, Kubernetes.",
+          "citation": "README.md:17-23"
+        },
+        {
+          "claim": "Scanners: OS packages and software dependencies in use (SBOM); known vulnerabilities (CVEs); IaC issues and misconfigurations; sensitive information and secrets; software licenses.",
+          "citation": "README.md:25-31"
+        },
+        {
+          "claim": "Trivy supports most popular programming languages, operating systems, and platforms (full list on the Scanning Coverage docs page).",
+          "citation": "README.md:33"
+        },
+        {
+          "claim": "Install channels named in the README: `brew install trivy`, `docker run aquasec/trivy`, binary download from GitHub Releases.",
+          "citation": "README.md:43-46"
+        },
+        {
+          "claim": "Integrated with GitHub Actions (aquasecurity/trivy-action), Kubernetes operator and VS Code plugin; full list on the Ecosystem page.",
+          "citation": "README.md:48-53"
+        },
+        {
+          "claim": "Canary builds (Docker Hub, GHCR and ECR images, and binaries from the canary workflow) are generated with every push to main; they might have critical bugs and are not recommended for production.",
+          "citation": "README.md:55-58"
+        },
+        {
+          "claim": "General usage is `trivy TARGET [--scanners scanner1,scanner2] SUBJECT`; examples: `trivy image python:3.4-alpine`, `trivy fs --scanners vuln,secret,misconfig myproject/`, `trivy k8s --report summary cluster`.",
+          "citation": "README.md:62-91"
+        },
+        {
+          "claim": "License: Apache-2.0 (badge linking to the LICENSE file).",
+          "citation": "README.md:7,130-131"
+        },
+        {
+          "claim": "Aqua's commercial offering 'builds on top of Trivy'; Trivy is an Aqua Security open source project; contact is via GitHub Discussions.",
+          "citation": "README.md:107-118"
+        },
+        {
+          "claim": "The README (147 lines) says nothing about telemetry or network requirements, release signing or attestations, or SBOM output formats and commands (SBOM appears only as a scanner category); these are documented under docs/.",
+          "citation": "README.md:1-147"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (Linux and macOS; labelled Official in the docs)",
+          "command": "brew install trivy",
+          "citation": "README.md:43; docs/getting-started/installation.md:88-94"
+        },
+        {
+          "method": "Container image (docker.io/aquasec/trivy, ghcr.io/aquasecurity/trivy, public.ecr.aws/aquasecurity/trivy); the docs example also mounts the Docker socket and a cache dir",
+          "command": "docker run aquasec/trivy",
+          "citation": "README.md:44; docs/getting-started/installation.md:10-28"
+        },
+        {
+          "method": "GitHub Release archive (Linux/macOS)",
+          "command": "Download the archive for your OS/arch from https://github.com/aquasecurity/trivy/releases/latest/ ; tar -xzf ./trivy.tar.gz ; chmod +x ./trivy",
+          "citation": "README.md:45; docs/getting-started/installation.md:30-34"
+        },
+        {
+          "method": "Install script (Official); docs template {{ git.tag }} rendered for tag v0.75.0",
+          "command": "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.75.0",
+          "citation": "docs/getting-started/installation.md:36-42"
+        },
+        {
+          "method": "DEB package from GitHub Release (Debian/Ubuntu, Official); rendered for v0.75.0; a signed apt repository is also documented at installation.md:70-79",
+          "command": "wget https://github.com/aquasecurity/trivy/releases/download/v0.75.0/trivy_0.75.0_Linux-64bit.deb ; sudo dpkg -i trivy_0.75.0_Linux-64bit.deb",
+          "citation": "docs/getting-started/installation.md:81-86"
+        },
+        {
+          "method": "RPM package from GitHub Release (RHEL/CentOS, Official); rendered for v0.75.0; a yum repository is also documented at installation.md:46-60",
+          "command": "rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.75.0/trivy_0.75.0_Linux-64bit.rpm",
+          "citation": "docs/getting-started/installation.md:62-66"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release archive trivy_VERSION_Linux-64bit.tar.gz built from linux/amd64 (goreleaser.yml:5-24; archive naming goreleaser.yml:110-127; docs/getting-started/installation.md:65,84); container image platforms include linux/amd64 (goreleaser.yml:147-151); CI unit tests run on ubuntu-latest (.github/workflows/test.yaml:20). Also built for linux 386, arm, arm64, s390x, ppc64le.",
+        "wsl2": "unknown - no mention of WSL or WSL2 anywhere in the repo (repo-wide search of docs, code and workflows found none); Linux binaries are published, but WSL2 is neither documented nor tested.",
+        "macos_arm64": "yes - darwin/arm64 build (goreleaser.yml:41-56); asset trivy_VERSION_macOS-ARM64.tar.gz (goreleaser.yml:110-127; canary upload .github/workflows/canary.yaml:63-68); `brew install trivy` documented for macOS and Linux (docs/getting-started/installation.md:88-94); CI runs unit tests and a GoReleaser snapshot build on macos-latest (.github/workflows/test.yaml:20,214-258).",
+        "gpu": "no - not applicable: Trivy is a CPU-only static scanner (docs/community/principles.md:8-10); no GPU/CUDA code path or requirement exists (repo-wide search matched only unrelated strings, e.g. the NVIDIA package-repo heuristic at pkg/fanal/analyzer/pkg/dpkg/dpkg.go:67)."
+      },
+      "integrations": {
+        "cli": "yes - `trivy` binary (cmd/trivy/main.go:18-49); cobra sub-commands in pkg/commands/app.go: image (i), filesystem (fs), rootfs, repository (repo), convert, client, server, config, plugin, module, kubernetes (k8s), vm, sbom, clean, registry, vex, version (app.go:180-1451). Output formats: table, json, template, sarif, cyclonedx, spdx, spdx-json, github, cosign-vuln (pkg/types/report.go:94-102). Exit code control via --exit-code (pkg/flag/report_flags.go:80).",
+        "mcp": "none found - repo-wide search for MCP / 'model context protocol' in code, docs, CHANGELOG and workflows returned no matches.",
+        "sdk_or_api": "HTTP API: `trivy server` (default listen localhost:4954, pkg/flag/remote_flags.go:40-42) serves Twirp/protobuf RPC for scanner and cache services (rpc/scanner/service.proto, rpc/cache/service.proto; pkg/rpc/server/listen.go:124-138) plus /healthz and /version (listen.go:140-152); optional shared token (listen.go:157-165); plain HTTP only, TLS must come from a proxy (docs/guide/references/modes/client-server.md:314). The RPC/Protobuf definitions and client-server version compatibility are explicitly outside the compatibility policy, and 'Trivy is not designed or supported for use as a Go library' (docs/guide/references/compatibility.md:31-36). A Go SDK exists only for authoring experimental WASM modules (docs/guide/advanced/modules.md:3-4,100). Extension points: plugins (external executables, pkg/plugin) and WASM modules (pkg/module).",
+        "claude_code_or_codex": "none found - no CLAUDE.md, AGENTS.md or similar files, and no Claude/Codex/agent integration in docs or code; the only Claude/OpenAI-related strings are secret-detection rules for OpenAI keys (pkg/fanal/secret/builtin-rules.go:76,999-1023)."
+      },
+      "telemetry_and_network": "Telemetry is ON by default and is not mentioned in README.md. On scan commands that use the shared runner, a background GET to https://check.trivy.dev/updates (pkg/notification/notice.go:37-46,62-76; started at pkg/commands/artifact/run.go:143,170) sends headers Trivy-Identifier, Trivy-Command (sub-command), Trivy-Flags (names of used flags), Trivy-OS, Trivy-Arch and User-Agent trivy/VERSION (notice.go:83-91), with a 3 s timeout (notice.go:74). The identifier is a SHA-256 of 'trivy-HOSTNAME-FIRST_MAC-lowercased hostname' (pkg/notification/identifier.go:12-47). Flag values are sent only for flags marked TelemetrySafe (42 markers under pkg/flag), others are masked as '***' (notice.go:224-236); the documented list is generated by magefiles/docs.go:56-75. Opt-out: `--disable-telemetry` (pkg/flag/scan_flags.go:135-139, default false) - but the request still goes out for the version check unless `--skip-version-check` is also set, and `--skip-version-check` alone still sends the telemetry request (notice.go:57-71); to avoid contacting check.trivy.dev use both flags (docs/guide/advanced/air-gap.md:80-91; docs/guide/advanced/telemetry.md:41-43). Network services used: Trivy 'requires internet connectivity in order to function normally' (air-gap.md:3). Vulnerability DB is pulled as an OCI image, mirror.gcr.io/aquasec/trivy-db first then ghcr.io/aquasecurity/trivy-db (pkg/db/db.go:31,35; pkg/flag/db_flags.go:53-58); Java index DB from mirror.gcr.io/aquasec/trivy-java-db or ghcr.io/aquasecurity/trivy-java-db (pkg/javadb/client.go:31,34); checks bundle mirror.gcr.io/aquasec/trivy-checks with an embedded fallback (pkg/policy/policy.go:25; air-gap.md:43-45); VEX Hub on GitHub only when `--vex repo` is used (pkg/commands/operation/operation.go:62-68; air-gap.md:47-60); Maven Central for Java unless `--offline-scan` (air-gap.md:66-78); remote Terraform modules (air-gap.md:15); Kubernetes node-collector image ghcr.io/aquasecurity/node-collector:0.3.1 by default (pkg/flag/kubernetes_flags.go:42). For SBOM-only formats the vulnerability DB is skipped (pkg/commands/artifact/run.go:331) but the Java DB is still initialised (run.go:359-367). DBs can be self-hosted (air-gap.md:39-41,62-64). No Trivy account or API key requirement was found in the files read (README, install docs, air-gap.md, notice.go); registry credentials are only needed for private registries (`trivy registry login`, pkg/commands/app.go:1319-1341). Install time: contrib/install.sh downloads the archive via https://get.trivy.dev/trivy with os, arch, version, type and client query parameters (install.sh:32,373,392) and fetches the checksums file from GitHub Releases (install.sh:394)."
+    },
+    "code": {
+      "languages": [
+        "Go (go 1.27.0, go.mod:3)",
+        "Rego (test fixtures and custom-check support; built-in checks come from the external trivy-checks module, go.mod:26)",
+        "Protocol Buffers (rpc/*.proto, buf.yaml)",
+        "Shell (contrib/install.sh, ci/*.sh, misc/backport/backport.sh)",
+        "JavaScript (.github/actions/trivy-triage)",
+        "YAML (workflows, helm/trivy chart)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/trivy/main.go",
+          "what": "Binary entry point: main() -> run() -> commands.Run(ctx); behaves as a plugin when TRIVY_RUN_AS_PLUGIN is set (main.go:18-49)."
+        },
+        {
+          "path": "pkg/commands/app.go",
+          "what": "Cobra root command NewRootCommand (app.go:180) and sub-commands image, filesystem (fs), rootfs, repository (repo), convert, client, server, config, plugin, module, kubernetes (k8s), vm, sbom, clean, registry, vex, version (app.go:251-1451)."
+        },
+        {
+          "path": "pkg/commands/artifact/run.go",
+          "what": "Shared scan runner: NewRunner (run.go:121), DB init (run.go:325-351), update/telemetry check (run.go:143,170,193), per-target scan dispatch."
+        },
+        {
+          "path": "pkg/commands/server/run.go",
+          "what": "'trivy server' command; the HTTP/Twirp server is pkg/rpc/server/listen.go (ListenAndServe at listen.go:63, mux at listen.go:124-152)."
+        },
+        {
+          "path": "pkg/rpc/client/client.go",
+          "what": "Client side of client/server mode (used by `trivy image --server URL`)."
+        },
+        {
+          "path": "magefiles/magefile.go",
+          "what": "Mage build/test/lint tasks: Test.Unit, Test.Integration, Test.K8s, Test.Module, Test.VM, Test.E2e, Lint.Run, Docs, Schema, Helm, SPDX (magefile.go:156-503)."
+        },
+        {
+          "path": "contrib/install.sh",
+          "what": "Upstream install script (godownloader-derived); downloads via get.trivy.dev and verifies SHA-256 against the GitHub checksums file (install.sh:56-72,372-394)."
+        },
+        {
+          "path": "Dockerfile",
+          "what": "Runtime image: alpine:3.24.2 plus ca-certificates and git, copies the GoReleaser-built binary; ENTRYPOINT is the trivy binary; no USER or HEALTHCHECK directive (Dockerfile:1-6)."
+        }
+      ],
+      "architecture": "Single Go module (go.mod:1) built as one static binary (CGO_ENABLED=0, goreleaser.yml:12-13). Flow: cobra CLI (pkg/commands/app.go; flag groups in pkg/flag/) -> runner (pkg/commands/artifact/run.go) which fetches DBs as OCI artifacts (pkg/db, pkg/javadb, checks bundle in pkg/policy, pkg/oci) -> artifact inspection in pkg/fanal (artifact/{image,local,repo,sbom,vm}; analyzer/{os,pkg,language,config,secret,licensing,imgconf,...}; image sources docker/containerd/podman/registry/tar/OCI in pkg/fanal/image; layer cache in pkg/cache with fs, memory and redis backends) -> scan service (pkg/scan: local, ospkg, langpkg) matching packages to advisories (pkg/vulnerability; VEX in pkg/vex) -> IaC engine pkg/iac (scanners for terraform, cloudformation, kubernetes, helm, dockerfile, ansible; Rego evaluated via OPA, go.mod:85) -> report writers pkg/report (table, json, sarif, template, github, cosign-vuln, cyclonedx, spdx) and SBOM marshalers pkg/sbom/{cyclonedx,spdx,core,io}. Extension points: plugins as external executables (pkg/plugin) and experimental WASM modules run with wazero (pkg/module). Client/server mode: Twirp RPC (rpc/*.proto, pkg/rpc). Kubernetes scanning: pkg/k8s. Update check and telemetry: pkg/notification.",
+      "packaging_and_release": "Release is triggered by pushing a v* tag (.github/workflows/release.yaml:3-6); tags are created by the release-tag job after a Release Please release PR is merged (release-please.yaml:68-111; docs/community/maintainer/release-flow.md:4-9). It runs the reusable workflow (.github/workflows/reusable-release.yaml) with GoReleaser v2.16.0 on a GitHub larger runner ubuntu-2404-4core (reusable-release.yaml:34,105-115). Artifacts: static binaries (CGO_ENABLED=0, -s -w, version via ldflags) for linux 386/arm/amd64/arm64/s390x/ppc64le, freebsd/amd64, darwin amd64/arm64, windows/amd64 (goreleaser.yml:5-72); tar.gz archives, zip on Windows (goreleaser.yml:110-135); deb and rpm via nfpm with the rpm GPG-signed using a key from secrets (goreleaser.yml:79-108; reusable-release.yaml:94-119); multi-arch container images (amd64, arm64, s390x, ppc64le) pushed to docker.io/aquasec/trivy, ghcr.io/aquasecurity/trivy and public.ecr.aws/aquasecurity/trivy (goreleaser.yml:137-173); checksums file trivy_VERSION_checksums.txt (reusable-release.yaml:141). Signatures: keyless cosign sign-blob per artifact producing .sigstore.json bundles with artifacts: all, and cosign sign on image manifests (goreleaser.yml:175-193), enabled by id-token: write (reusable-release.yaml:38); verification steps in docs/getting-started/signature-verification.md:3-60. Attestation: actions/attest (pinned SHA 1e69f48, v4.2.2) generates 'build provenance attestations' for every artifact listed in the checksums file via subject-checksums, skipped for canary (reusable-release.yaml:137-141; attestations: write at :42); the docs do not describe verifying it. SBOM: the release SBOM bom.json is a Go-module CycloneDX SBOM made by CycloneDX/gh-gomod-generate-sbom v2.0.0 with tool version '^v1' (floating within v1) and attached as a release extra file (reusable-release.yaml:88-92; goreleaser.yml:74-77); it is not produced by Trivy and no SBOM attestation step exists. Canary: goreleaser-canary.yml runs in snapshot mode with no signing section, on pushes to main touching **.go, go.mod, Dockerfile.canary or the workflow; archives are uploaded as workflow artifacts and images pushed with the canary tag to the same three registries (canary.yaml:3-68; reusable-release.yaml:124-135). Post-release jobs dispatch workflows in trivy-repo (rpm/deb publishing), trivy-telemetry, trivy-downloads, trivy-chocolatey and trivy-action, and open a Helm chart version PR, using GitHub App tokens (release.yaml:22-146). Versioning is 0.x (pre-1.0): v0.75.0 dated 2026-10-01 (CHANGELOG.md:3; .release-please-manifest.json:1).",
+      "tests_and_ci": "Go testing plus testify (go.mod:106). About 590 *_test.go files (about 1,280 Test/Fuzz/Benchmark functions) across pkg/** (119 under pkg/fanal alone), integration/ (13 files), e2e/ (e2e_test.go) and magefiles/ (helm_test.go); one JS test (.github/actions/trivy-triage/helpers.test.js). Only two Go Benchmark functions exist (pkg/iac/detection/detect_test.go:611,622) and no performance numbers are published. Mage targets: unit = go test -short with coverage over ./... (magefiles/magefile.go:217-220); integration (tag integration), k8s (k8s_integration, uses kind), module, vm and e2e tags (magefile.go:223-343); integration tests pull images from ghcr.io/aquasecurity/trivy-test-images (integration/testimages.ini:2-3) and e2e needs Docker and internet (e2e/README.md:31-34). CI: 21 workflow files plus 2 composite actions under .github/. test.yaml (pull_request except docs-only paths, merge_group, workflow_dispatch; test.yaml:1-12) runs: unit tests on ubuntu/windows/macos, a go mod tidy drift check, golangci-lint v2.13.1 (18 linters incl. gosec, staticcheck, revive; .golangci.yaml:150-170; gosec excludes 13 rules, .golangci.yaml:62-76), a generated-docs drift check (mage docs:generate, test.yaml:56-63), integration, k8s integration, module, VM and e2e tests, GoReleaser snapshot builds on 3 OSes (test.yaml:214-258), and a zizmor job. Workflow audit tool: zizmorcore/zizmor-action (pinned SHA, v0.6.2) scanning .github/ with advanced-security: false, i.e. no SARIF upload (test.yaml:260-274), configured by zizmor.yml, which disables the excessive-permissions and secrets-outside-env audits (zizmor.yml:5-11), plus 3 inline ignores (auto-ready-for-review.yaml:7, release-please.yaml:55, reusable-release.yaml:148). Workflow syntax linter (actionlint-style): none found - no actionlint, shellcheck, yamllint or pre-commit config in the repo. Code-scanning alerts: none - no CodeQL, no upload-sarif and no security-events permission in .github/; golangci-lint and zizmor only pass or fail the check. Pinning and permissions: all 73 external uses: references are 40-char SHA-pinned with version comments, 17 are local; explicit permissions blocks exist in only 3 places (reusable-release.yaml:37-42, test.yaml:265-266, canary.yaml:32-33). Docs-only changes use bypass-test.yaml and the merge queue uses bypass-cla.yaml, no-op jobs deliberately named Test, Integration Test and license/cla so required checks pass (bypass-test.yaml:1-35; bypass-cla.yaml:1-12). Other workflows: canary, release, release-please, backport (issue_comment, maintainer-gated), publish-chart (chart-testing on kind), mkdocs deploys, semantic PR-title check, weekly SPDX license-ID cron with Slack notice, stale PRs, discussion triage. Only one job sets timeout-minutes (stale-issues.yaml:7) and no workflow sets concurrency.",
+      "dependencies": "go.mod (Go 1.27.0; go.sum present; no vendor dir; no replace/exclude/retract directives): 125 direct requires (go.mod:6-130), 347 indirect (go.mod:134-480), 6 tool directives (go.mod:483-490: buf, labeler, mage, protoc-gen-twirp, goyacc, kind). docs/build/requirements.in: 3 direct (mkdocs-material==9.7.0, mkdocs-macros-plugin, mike); docs/build/requirements.txt is a pip-compile lock without hashes. helm/trivy/Chart.yaml (Helm chart). Docker: Dockerfile and Dockerfile.canary use alpine:3.24.2 (tag-pinned, not digest-pinned); docs/build/Dockerfile uses squidfunk/mkdocs-material:9.5.44. Dependency-update tool: Dependabot (.github/dependabot.yml:1-49) with github-actions (directories / and /.github/actions/*, monthly, 7-day cooldown, grouped), docker (/, monthly) and gomod (/, weekly, 10 open-PR limit, ignores github.com/aquasecurity/trivy-* which are 'updated manually'); no Dependabot entry for pip (docs/build), docs/build/Dockerfile, or the ad hoc 'npm install release-please@17.11.1 -g' (release-please.yaml:56). Docs workflows run an unpinned 'pip install --upgrade pip setuptools wheel' (test-docs.yaml:22, mkdocs-dev.yaml:24, mkdocs-latest.yaml:26). Go tools used in CI are pinned via the go.mod tool directive; golangci-lint v2.13.1, GoReleaser v2.16.0 and Docker v29.2.1 are pinned in workflows (test.yaml:42,85,257); setup-go uses check-latest: true so the Go patch release floats (.github/actions/setup-go/action.yaml:28-33).",
+      "security_policy": "SECURITY.md at repo root: private vulnerability reporting via the GitHub Security tab (SECURITY.md:21); 'no supportability commitment', provided as-is (SECURITY.md:5-6); vulnerabilities in dependencies should be raised in GitHub Discussions rather than reported privately (SECURITY.md:26-27); links scope and security considerations for config files, report templates, client/server, plugins and modules, Terraform remote modules, registry credentials, VEX attestations and HTTP tracing (SECURITY.md:10-19)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:25-31 lists SBOM among Trivy's outputs; docs say CycloneDX and SPDX can be generated for images and directories (docs/guide/supply-chain/sbom.md:5-20).",
+        "verified": "yes",
+        "evidence": "pkg/report/writer.go:95-99 wires cyclonedx.NewWriter and spdx.NewWriter; marshalers at pkg/sbom/cyclonedx/marshal.go:58-90 and pkg/sbom/spdx/marshal.go:118-128; formats in pkg/types/report.go:98-100; image, filesystem and rootfs sub-commands at pkg/commands/app.go:294,376,442. CycloneDX output is JSON-only (pkg/report/cyclonedx/cyclonedx.go:24). Docs sample drift: docs show specVersion 1.5 (sbom.md:218) while unit tests expect cdx.SpecVersion1_7 (pkg/sbom/cyclonedx/marshal_test.go:331); Trivy code sets no spec version itself (marshal.go:73 uses cdx.NewBOM()), so it follows the cyclonedx-go library (go.mod:10)."
+      },
+      {
+        "claim": "README.md:17-23,91 - targets are image, filesystem, remote git repo, VM image and Kubernetes; the example uses `trivy k8s`.",
+        "verified": "yes",
+        "evidence": "Sub-commands: image pkg/commands/app.go:294, filesystem :376, repository :507, vm :1140, kubernetes :1064 with alias k8s at :1065."
+      },
+      {
+        "claim": "README.md:55-58 - canary builds are generated with every push to main.",
+        "verified": "partial",
+        "evidence": "canary.yaml:3-11 triggers on pushes to main only when **.go, go.mod, Dockerfile.canary or the canary workflow change (plus workflow_dispatch). Binaries are uploaded as workflow artifacts (canary.yaml:42-68) and canary-tagged images are pushed to docker.io, ghcr.io and public.ecr.aws (reusable-release.yaml:124-135). Canary runs are not cosign-signed or attested: goreleaser-canary.yml has no signs section and the attest step is skipped (reusable-release.yaml:137-139)."
+      },
+      {
+        "claim": "README.md:43-46 - install via `brew install trivy`, `docker run aquasec/trivy`, or GitHub Release binaries.",
+        "verified": "partial",
+        "evidence": "Docker images and GitHub Release archives are produced by goreleaser.yml:110-173 and reusable-release.yaml:40. No Homebrew formula, tap or brew automation exists in this repo (searched .github and for *.rb files), so `brew install trivy` is documented (docs/getting-started/installation.md:88-94) but not verifiable from this source."
+      },
+      {
+        "claim": "README.md:50 - Trivy is integrated with GitHub Actions via aquasecurity/trivy-action.",
+        "verified": "not_checkable",
+        "evidence": "The action lives in a separate repository; this repo only dispatches its version-bump workflow on release (release.yaml:137-146) and links it in docs/ecosystem/cicd.md:13-17. Trivy's own CI does not use trivy-action (no such uses: reference in .github/)."
+      },
+      {
+        "claim": "README.md:7 - License is Apache-2.0.",
+        "verified": "yes",
+        "evidence": "LICENSE:1-3 is the Apache License 2.0 text; goreleaser.yml:88 sets license Apache-2.0 for packages. Caveat: Terraform-function copies under pkg/iac/scanners/terraform/parser/funcs/ (e.g. string.go:1 'Copied from github.com/hashicorp/terraform/internal/lang/funcs') carry no separate license header and NOTICE:1-4 does not attribute them."
+      },
+      {
+        "claim": "docs/getting-started/signature-verification.md:3,29 - 'All binaries and container images are signed by Cosign'; every release asset has a .sigstore.json bundle.",
+        "verified": "partial",
+        "evidence": "Release config signs artifacts: all with cosign sign-blob --bundle (goreleaser.yml:175-184) and image manifests with cosign sign (goreleaser.yml:186-193); the job has id-token: write (reusable-release.yaml:38). Not covered: canary binaries and images (no signs in goreleaser-canary.yml; reusable-release.yaml:124-139). Whether GoReleaser's 'all' also signs the bom.json extra file (goreleaser.yml:74-77) is GoReleaser behaviour not visible in this repo. The docs describe cosign verification only; the actions/attest provenance (reusable-release.yaml:137-141) has no documented verification path."
+      },
+      {
+        "claim": "docs/guide/advanced/telemetry.md:3-43 and docs/guide/configuration/others.md:164-181 - Trivy collects anonymous usage data, the installation identifier is a one-way hash, and telemetry and update checks can be disabled with flags.",
+        "verified": "partial",
+        "evidence": "Code matches on default-on behaviour and flags (pkg/notification/notice.go:54-120; pkg/flag/scan_flags.go:129-139). Differences: the identifier is a SHA-256 of hostname plus first MAC address, i.e. a per-machine value that is stable across reinstalls (pkg/notification/identifier.go:12-47), not an install-scoped ID; the request also carries Trivy-Command and Trivy-Arch headers (notice.go:83-89) that telemetry.md:9-14 does not list; --skip-version-check alone does not stop the request (notice.go:57-68) - others.md:168 says the flag disables update checking, with a note at :170-172 and air-gap.md:85-91 stating both flags are needed. The captured-flag list is generated from code and drift-checked in CI (magefiles/docs.go:56-75; test.yaml:56-63)."
+      },
+      {
+        "claim": "docs/getting-started/installation.md:36-42 - the install script downloads and installs Trivy from GitHub Release.",
+        "verified": "partial",
+        "evidence": "contrib/install.sh:373,392 fetches the archive from https://get.trivy.dev/trivy with os, arch, version, type and client query parameters (client defaults to install-script, :32), not directly from GitHub; the checksums file comes from GitHub Releases (:394) and the archive SHA-256 is verified (:59-61,334-350). No cosign or signature verification is performed. The documented command pipes the script from the main branch rather than the tag (installation.md:41)."
+      },
+      {
+        "claim": "Workflows are audited for permission and pinning policy by zizmor (.github/workflows/test.yaml:260-274).",
+        "verified": "partial",
+        "evidence": "The zizmor job runs on every PR with contents: read and advanced-security: false (test.yaml:262-274). zizmor.yml:5-11 disables excessive-permissions (with a TODO to add explicit permissions blocks) and secrets-outside-env; only 3 explicit permissions blocks exist across 21 workflow files (reusable-release.yaml:37-42, test.yaml:265-266, canary.yaml:32-33); 3 inline ignores (auto-ready-for-review.yaml:7 dangerous-triggers, release-please.yaml:55 adhoc-packages, reusable-release.yaml:148 cache-poisoning). All 73 external uses: references are SHA-pinned (grep over .github/)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Telemetry and update check default to ON and are absent from the README: a request to check.trivy.dev carries a hostname+MAC-derived identifier, sub-command, flag names and OS/arch (pkg/notification/notice.go:57-91; identifier.go:12-47). --skip-version-check alone still sends it; hermetic CI needs both --skip-version-check and --disable-telemetry (docs/guide/advanced/air-gap.md:80-91). Normal operation also needs internet access to mirror.gcr.io and ghcr.io for DBs, with a documented rate-limit caveat (air-gap.md:3,17-18; pkg/db/db.go:31,35); SBOM-only runs still initialise the Java DB (pkg/commands/artifact/run.go:359-367).",
+      "Scoped-permissions posture of the repo's own CI is incomplete: 3 explicit permissions blocks in 21 workflow files, zizmor excessive-permissions and secrets-outside-env audits disabled (zizmor.yml:5-11), 3 inline zizmor ignores, issue_comment and workflow_run triggers (backport.yaml:3-5; auto-ready-for-review.yaml:7), 5 checkouts with persist-credentials: true (mkdocs-dev.yaml:18, mkdocs-latest.yaml:20, test-docs.yaml:16, release.yaml:67, backport.yaml:52); the release job holds contents/packages/id-token/attestations/discussions write (reusable-release.yaml:37-42) and writes the GPG key to the workspace, removing it in a later step without if: always() (reusable-release.yaml:94-119). Effective default GITHUB_TOKEN permissions depend on repository settings not visible in the clone.",
+      "No code-scanning publication and no workflow syntax linter in the repo: zizmor runs with advanced-security: false (test.yaml:274); no CodeQL, upload-sarif or security-events usage and no actionlint, shellcheck, yamllint or pre-commit config were found; golangci-lint (gosec with 13 rules excluded, .golangci.yaml:62-76, and _test.go files excluded from gosec, :177-180) only fails the check. govulncheck is used only by magefiles/vex.go (VEX generation), not by any workflow. Repo-level settings such as CodeQL default setup would not be visible in a clone. No-op bypass jobs reuse the required check names Test, Integration Test and license/cla (bypass-test.yaml:3,22-35; bypass-cla.yaml:3-12), so a green check name alone does not show which workflow produced it.",
+      "Release trust-chain gaps: canary images and binaries are unsigned and unattested yet published under the same image names with the canary tag (reusable-release.yaml:124-139; goreleaser-canary.yml:1-41); the documented install script is fetched from the main branch, downloads the archive via get.trivy.dev and verifies only a SHA-256 from the GitHub checksums file (installation.md:41; contrib/install.sh:61,373,392-394); the actions/attest provenance has no documented verification steps (docs/getting-started/signature-verification.md covers cosign only); the release SBOM tool version floats at ^v1 (reusable-release.yaml:88-92); the Dockerfile base image alpine:3.24.2 is tag-pinned not digest-pinned and the image has no USER directive, so it runs as root (Dockerfile:1-6; docs mount /root/.cache, installation.md:27).",
+      "Builds and SBOM outputs are not documented or configured as reproducible: no -trimpath, mod_timestamp or SOURCE_DATE_EPOCH in goreleaser.yml; setup-go uses check-latest: true so the Go patch version floats (.github/actions/setup-go/action.yaml:28-33); CI runners use floating labels (ubuntu-latest, windows-latest, macos-latest; test.yaml:20); generated CycloneDX has a random serial UUID and a timestamp (pkg/sbom/cyclonedx/marshal.go:74,94) and SPDX has a random UUID in the document namespace plus a creation time (pkg/sbom/spdx/marshal.go:135,251,642-650), with no flag found to pin them.",
+      "Interface stability: version is 0.x (v0.75.0, CHANGELOG.md:3) and that release lists a breaking change to report templates (CHANGELOG.md:6-8). The compatibility policy covers CLI, config, exit codes and machine-readable output but excludes Go APIs ('not designed or supported for use as a Go library'), RPC/Protobuf definitions, client-server version compatibility, scan results and canary builds (docs/guide/references/compatibility.md:23-38); DB and checks schema versions are tied to CLI versions and old ones stop receiving updates (compatibility.md:40-52); WASM modules are experimental (docs/guide/advanced/modules.md:3-4).",
+      "Execution and trust surface: plugins are external programs run unsandboxed with the user's environment, including credentials (docs/guide/plugin/index.md:14-20); trivy.yaml, .trivyignore and trivy-secret.yaml are loaded from the working directory by default and can change or suppress results when scanning a checkout (pkg/flag/global_flags.go:16-20; pkg/flag/secret_flags.go:7; docs/guide/configuration/index.md:46-52); server mode serves plain HTTP with an optional shared token and no per-client isolation (pkg/rpc/server/listen.go:157-165; docs/guide/references/modes/client-server.md:310-314); no signature verification of downloaded DB or checks bundles was found in pkg/db/db.go or docs/guide/configuration/db.md.",
+      "Maintenance, scope and licensing hygiene: CODEOWNERS names four individual handles plus one team and lists a pkg/scanner/ path that does not exist (.github/CODEOWNERS:2,8,11,18,20,23); SECURITY.md states no supportability commitment and asks that dependency vulnerabilities go to Discussions (SECURITY.md:5-6,26-27); out of scope by the project's principles: runtime security, malware/intentional-attack detection and a UI (docs/community/principles.md:37-49); Terraform functions copied from hashicorp/terraform carry no license header and are not attributed in NOTICE (pkg/iac/scanners/terraform/parser/funcs/string.go:1; NOTICE:1-4); Aqua Security has a commercial product that 'builds on top of Trivy' (README.md:109)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "aquasecurity/trivy",
+      "checks": [
+        {
+          "field": "readme.install[3]",
+          "statement": "Install script (Official); docs template {{ git.tag }} rendered for tag v0.75.0: `curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.75.0`",
+          "citation": "docs/getting-started/installation.md:36-42",
+          "holds": true,
+          "note": "installation.md:36 is '## Install Script (Official)' and :41 is the command with {{ git.tag }}. Filled in for the checked-out tag v0.75.0, it is exactly the dossier's command. The script supports that invocation: contrib/install.sh:11 and :33-35 accept -b <dir>, and :49-50 take the tag as the positional argument. Context only, not an error in this entry: the script is fetched from main rather than the tag, and docs line 38 says it installs 'from GitHub Release', but the archive actually comes from get.trivy.dev (install.sh:373,392) with only a SHA-256 check against the GitHub checksums file (install.sh:61,394). The dossier already records both points in claim_checks[8]."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0; file: LICENSE",
+          "citation": "LICENSE; README.md:7,130-131",
+          "holds": true,
+          "note": "LICENSE:1-201 is the unmodified Apache License 2.0 text (title at lines 1-3, 'END OF TERMS AND CONDITIONS' at :176, standard appendix at :178-201). README.md:7 has the 'License: Apache-2.0' badge and :130-131 link it to LICENSE. goreleaser.yml:88 sets license 'Apache-2.0' on the deb/rpm packages. The only other license-type file at the root is NOTICE:1-4, an Aqua Security copyright line. No second license applies at the root."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - release archive trivy_VERSION_Linux-64bit.tar.gz built from linux/amd64; container image platforms include linux/amd64; CI unit tests run on ubuntu-latest; also built for linux 386, arm, arm64, s390x, ppc64le.",
+          "citation": "goreleaser.yml:5-24,110-127,147-151; docs/getting-started/installation.md:65,84; .github/workflows/test.yaml:20",
+          "holds": true,
+          "note": "goreleaser.yml:5-24 (build-linux, CGO_ENABLED=0) targets goarch 386, arm, amd64, arm64, s390x and ppc64le. The archive template at goreleaser.yml:110-127 (tar.gz) turns linux/amd64 into trivy_<ver>_Linux-64bit. installation.md:65 and :84 use the same Linux-64bit name for the rpm and deb. The container image platforms at goreleaser.yml:147-151 include linux/amd64. test.yaml:20 puts ubuntu-latest in the matrix of the 'Test' job, which runs `mage test:unit` (test.yaml:65-66)."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `trivy` binary (cmd/trivy/main.go:18-49); cobra sub-commands image (i), filesystem (fs), rootfs, repository (repo), convert, client, server, config, plugin, module, kubernetes (k8s), vm, sbom, clean, registry, vex, version (app.go:180-1451); output formats table, json, template, sarif, cyclonedx, spdx, spdx-json, github, cosign-vuln (pkg/types/report.go:94-102); exit code control via --exit-code (pkg/flag/report_flags.go:80).",
+          "citation": "cmd/trivy/main.go:18-49; pkg/commands/app.go:180-1451; pkg/types/report.go:94-102; pkg/flag/report_flags.go:80",
+          "holds": true,
+          "note": "main.go:18-49 is main()/run(), which calls commands.Run(ctx); the TRIVY_RUN_AS_PLUGIN branch is at :34. NewApp registers exactly these 17 sub-commands at app.go:88-106. The constructors run from NewRootCommand (app.go:180) to NewVersionCommand (app.go:1448-1451). The listed aliases match: i (:295), fs (:377), repo (:508), k8s (:1065). Other aliases exist but are not listed (conv, c, s, conf, p, m); that is an omission, not an error. report.go:94-102 defines exactly the nine formats named. report_flags.go:79-84 defines ExitCodeFlag with Name 'exit-code' at line 80."
+        },
+        {
+          "field": "claim_checks[7]",
+          "statement": "telemetry.md:3-43 and others.md:164-181: Trivy collects anonymous usage data, the installation identifier is a one-way hash, and telemetry and update checks can be disabled with flags. Rated 'partial'. Evidence: default-on; the identifier is a SHA-256 of hostname plus first MAC (per machine, not per install); Trivy-Command and Trivy-Arch headers are not listed in telemetry.md:9-14; --skip-version-check alone does not stop the request; the captured-flag list is generated from code and drift-checked in CI.",
+          "citation": "docs/guide/advanced/telemetry.md:3-43; docs/guide/configuration/others.md:164-181; pkg/notification/notice.go:54-120,83-89,57-68; pkg/flag/scan_flags.go:129-139; pkg/notification/identifier.go:12-47; docs/guide/advanced/air-gap.md:85-91; magefiles/docs.go:56-75; .github/workflows/test.yaml:56-63",
+          "holds": true,
+          "note": "Every cited line matches. The docs claims are at telemetry.md:3 (anonymous usage data), :26 ('one-way hash of machine fingerprint') and :33 (--disable-telemetry). Neither flag sets a default (scan_flags.go:129-139). NewRunner always creates the checker and starts the request (pkg/commands/artifact/run.go:143,169-171), so telemetry is on by default. identifier.go:12-47 hashes 'trivy-' + hostname + first non-empty MAC + lowercased hostname with SHA-256. notice.go:83-89 sets Trivy-Command and Trivy-Arch, which telemetry.md:9-14 does not list. notice.go:57-67 skips the request only when both flags are set. others.md:168, the note at :170-172 and air-gap.md:85-91 match the dossier. docs.go:56-75 generates telemetry-flags.md, and test.yaml:56-63 fails CI on drift (ubuntu job only). Optional strengthening: telemetry.md:27 says user-controlled options are 'omitted (never collected)', but the names of non-safe flags are still sent with '***' as the value (notice.go:224-236; GetUsedFlags returns all explicitly set flags, pkg/flag/options.go:624-626,738). This supports the 'partial' rating rather than contradicting it."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

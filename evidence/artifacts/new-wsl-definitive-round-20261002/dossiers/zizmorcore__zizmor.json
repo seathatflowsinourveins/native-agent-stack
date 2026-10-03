@@ -1,0 +1,315 @@
+{
+  "contender": "zizmorcore/zizmor",
+  "revision": {
+    "contender": "zizmorcore/zizmor",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "zizmorcore/zizmor",
+        "tag": "v1.30.1",
+        "commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.30.1",
+    "commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+    "read_at": "2026-10-02T03:03:05+00:00"
+  },
+  "dossier": {
+    "contender": "zizmorcore/zizmor",
+    "revision": {
+      "tag": "v1.30.1",
+      "commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Rust static-analysis CLI that audits GitHub Actions workflows/actions, Dependabot configs and pre-commit configs for security issues (41 audits, crates/zizmor/src/registry.rs:48-88). Outputs plain, JSON, SARIF 2.1.0 or GitHub annotations; can auto-fix a subset; offline by default, extra online audits with a GitHub token. It is not an SBOM generator, attestation signer, dependency-update bot or general workflow/shell linter.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "zizmor is a static analysis tool for CI/CD systems.",
+          "citation": "README.md:10"
+        },
+        {
+          "claim": "Finds and fixes security issues in GitHub Actions, Dependabot and pre-commit.",
+          "citation": "README.md:12-13"
+        },
+        {
+          "claim": "Finds template injection, credential persistence/leakage, excessive permission scopes, impostor commits and confusable git refs, and more.",
+          "citation": "README.md:15-19"
+        },
+        {
+          "claim": "MIT licensed; README has no install commands, it points to the external docs site.",
+          "citation": "README.md:25-39"
+        },
+        {
+          "claim": "Docs: designed for GitHub Actions; easiest route is external zizmorcore/zizmor-action; manual routes are --format=sarif (code scanning) or --format=github (annotations).",
+          "citation": "docs/integrations.md:3-8, 57-61"
+        },
+        {
+          "claim": "Docs: SARIF upload needs security-events: write and github/codeql-action/upload-sarif with category: zizmor; public repos or GHEC with Advanced Security.",
+          "citation": "docs/integrations.md:63-117"
+        },
+        {
+          "claim": "Docs: with --format=sarif zizmor exits 0 unless an internal error occurs, so the workflow stays green.",
+          "citation": "docs/integrations.md:127-140"
+        },
+        {
+          "claim": "Docs: three modes (offline, online, online sans audits); default is offline unless GH_TOKEN/GITHUB_TOKEN/ZIZMOR_GITHUB_TOKEN is set.",
+          "citation": "docs/usage.md:135-168"
+        },
+        {
+          "claim": "Docs: unpinned-uses applies blanket hash-pinning by default (since v1.20.0); per-pattern policies hash-pin/ref-pin/any are configurable.",
+          "citation": "docs/audits.md:2198-2207, 2229-2299"
+        },
+        {
+          "claim": "Docs: excessive-permissions remediation is permissions: {} at workflow level plus minimal job-level permissions.",
+          "citation": "docs/audits.md:698-703"
+        },
+        {
+          "claim": "Docs: --fix[=safe|unsafe-only|all] edits in place, no remote inputs; unpinned-uses fixes need online access; Dependabot/Renovate suggested for keeping pins current.",
+          "citation": "docs/usage.md:735-782; docs/audits.md:2300-2322"
+        },
+        {
+          "claim": "Docs: static analysis only, never executes code, audits definitions only (not referenced scripts); 'not a panacea'.",
+          "citation": "docs/usage.md:1002-1083"
+        },
+        {
+          "claim": "Docs: wheels and release binaries are best-effort; Conda, Nix, Arch, Chimera, Alpine packages are community-maintained.",
+          "citation": "docs/installation.md:28-31, 72-148, 177-181"
+        },
+        {
+          "claim": "Docs: LSP, YAML anchors, parallel steps are experimental/beta; pre-commit support was introduced as experimental.",
+          "citation": "docs/integrations.md:214-224; docs/usage.md:1085-1127; docs/release-notes.md:106-107"
+        }
+      ],
+      "install": [
+        {
+          "method": "PyPI (prebuilt wheels)",
+          "command": "uv tool install zizmor   (also: pip install zizmor | pipx install zizmor | uvx zizmor --help)",
+          "citation": "docs/installation.md:21-46"
+        },
+        {
+          "method": "Homebrew",
+          "command": "brew install zizmor",
+          "citation": "docs/installation.md:11-19"
+        },
+        {
+          "method": "crates.io",
+          "command": "cargo install --locked zizmor",
+          "citation": "docs/installation.md:48-62"
+        },
+        {
+          "method": "Docker (GHCR)",
+          "command": "docker pull ghcr.io/zizmorcore/zizmor:latest",
+          "citation": "docs/installation.md:64-70"
+        },
+        {
+          "method": "GitHub release binaries (best-effort)",
+          "command": "no command; download from https://github.com/zizmorcore/zizmor/releases/latest",
+          "citation": "docs/installation.md:175-185"
+        },
+        {
+          "method": "From git source (not recommended)",
+          "command": "cargo install --locked --git https://github.com/zizmorcore/zizmor",
+          "citation": "docs/installation.md:161-173"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - x86_64-unknown-linux-gnu binary (.github/workflows/release-binaries.yml:21-22), manylinux/musllinux x86_64 wheels (release-pypi.yml:22-25, 62-64), Docker linux/amd64 (release-docker.yml:67), CI on ubuntu-latest (ci.yml:43)",
+        "wsl2": "unknown - WSL is not mentioned anywhere in docs, workflows or code; the Linux artifacts would apply but no WSL statement or test exists",
+        "macos_arm64": "yes - aarch64-apple-darwin binary (release-binaries.yml:27-28), macOS aarch64 wheels (release-pypi.yml:112-135), Homebrew (docs/installation.md:11-19), CI on macos-latest (ci.yml:43)",
+        "gpu": "no - not applicable; CPU-only static analysis, no GPU/CUDA references in code, manifests or docs"
+      },
+      "integrations": {
+        "cli": "yes - zizmor binary (crates/zizmor/src/main.rs:438-446, cli.rs:26-45); formats plain/json/json-v1/sarif/github (cli.rs:365-381); exit codes 0,1,2,3,11-14 (docs/usage.md:563-614)",
+        "mcp": "none found (repo-wide search). Closest: experimental LSP server over stdio via --lsp (docs/integrations.md:295-306; crates/zizmor/src/lsp.rs), always offline (lsp.rs:406; state.rs:21-28)",
+        "sdk_or_api": "No HTTP API and no public Rust API (docs/development.md:26-29). Machine outputs: JSON v1, SARIF; JSON Schema for zizmor.yml (docs/configuration.md:94-99). Helper crates published separately (crates/README.md:8-16). Editor/VCS: VS Code, Zed, Neovim, Sublime, pre-commit/prek, hk (docs/integrations.md:214-345); external zizmorcore/zizmor-action (docs/integrations.md:10-47)",
+        "claude_code_or_codex": "none found for using zizmor from Claude Code/Codex. CLAUDE.md (@AGENTS.md) and AGENTS.md are contributor-facing: agents must stop and show the AI Policy to the user (CLAUDE.md:1; AGENTS.md:1-3; CONTRIBUTING.md:14-15)"
+      },
+      "telemetry_and_network": "No telemetry/analytics code found; the only HTTP client code is crates/zizmor/src/github.rs (repo-wide search). Offline unless a token is set (cli.rs:185-215; main.rs:298-305, 343-357; docs/usage.md:148-156). Online mode contacts the GitHub host (default github.com, override --gh-hostname/GH_HOST; github.rs:37-75): REST API (github.rs:632, 724, 747, 776, 824, 881), git-upload-pack ls-refs with the token as basic auth (github.rs:393-421), and undocumented /branch_commits/ without token (github.rs:685-698). User-Agent zizmor/<version> (utils.rs:12). Needs only a GitHub token (contents: read for private repos; docs/usage.md:205-216). HTTP responses cached on disk in a user cache dir that may hold sensitive metadata (cli.rs:48-58; docs/usage.md:950-975). main.rs:440 installs the human_panic hook (crate not in repo; behaviour unverified). v1.27.0 logged GitHub credentials in cleartext, fixed in 1.28.0 (docs/release-notes.md:145-151); the token is now masked (github.rs:113-125)."
+    },
+    "code": {
+      "languages": [
+        "Rust (edition 2024, toolchain 1.97.0)",
+        "Python (docs/bench/support scripts)",
+        "Bash",
+        "YAML/JSON/CSV data",
+        "Dockerfile"
+      ],
+      "entry_points": [
+        {
+          "path": "crates/zizmor/src/main.rs",
+          "what": "zizmor binary: main (l.438-446) -> run (l.124-436): CLI, input collection, audits per input, output, --fix, exit code"
+        },
+        {
+          "path": "crates/zizmor/src/cli.rs",
+          "what": "clap flags/env vars (--collect, --fix, --persona, --format, --offline, --gh-token, --config, --lsp)"
+        },
+        {
+          "path": "crates/zizmor/src/lsp.rs",
+          "what": "Experimental stdio LSP server started by --lsp"
+        },
+        {
+          "path": "crates/zizmor/src/registry.rs",
+          "what": "AuditRegistry registers 41 audits; FindingRegistry filters by persona/severity/confidence/ignores"
+        },
+        {
+          "path": "crates/zizmor/src/audit/mod.rs",
+          "what": "Audit trait and one module per audit"
+        },
+        {
+          "path": "crates/zizmor/src/output/sarif.rs",
+          "what": "SARIF 2.1.0 emitter (driver zizmor, rule ids zizmor/<audit>); siblings plain.rs, json/v1.rs, github.rs, fix.rs"
+        },
+        {
+          "path": "crates/zizmor/src/github.rs",
+          "what": "GitHub REST + git ls-refs client with HTTP cache, used by online audits and remote inputs"
+        },
+        {
+          "path": "crates/zizmor/build.rs",
+          "what": "Embeds crates/zizmor/data (context capabilities, CodeQL sinks, archived-repos FSTs); no network"
+        }
+      ],
+      "architecture": "Cargo workspace of 9 crates (Cargo.toml:2-12). crates/zizmor collects inputs (files, dirs, GitHub slugs, stdin; registry/input.rs), parses them into models (src/models/*) validated against embedded JSON schemas (src/data/*.json; models.rs:81-148) using github-actions-models, github-actions-expressions, yamlpath/yamlpatch/subfeature (tree-sitter-yaml spans and format-preserving patches). 41 audits in src/audit/*.rs; permission/pinning relevant: excessive_permissions, undocumented_permissions, unpinned_uses, unpinned_images, unpinned_tools, forbidden_uses (allow/deny), ref_version_mismatch, stale_action_refs, impostor_commit, ref_confusion, known_vulnerable_actions, archived_uses, typosquat_uses, adhoc_packages, dependabot_cooldown, github_app, secrets_*. Online-only audits skip when offline (impostor_commit.rs:273-282). Only three audits parse run: shell with tree-sitter bash/pwsh (use_trusted_publishing.rs, adhoc_packages.rs, github_env.rs). Not present: SBOM (CycloneDX/SPDX) generation, attestation creation, dependency-update PRs, checking with: inputs/outputs against a referenced action.yml, general linting. unsafe_code is forbidden workspace-wide (Cargo.toml:110-112); no subprocess spawning in crates/zizmor/src.",
+      "packaging_and_release": "Tag v* runs release.yml:17-127: creates a DRAFT GitHub release (l.72; no step here publishes it) and calls four workflows. (1) release-binaries.yml: cargo build --release (no --locked, l.52) for x86_64/aarch64 linux-gnu, x86_64/aarch64 apple-darwin, x86_64 windows-msvc (l.20-30); tar.gz/zip via support/archive-release.sh; actions/attest on distrib/* (l.93-97); no checksum file. (2) release-pypi.yml: maturin wheels (manylinux, musllinux, Windows, macOS) + sdist, uv publish --trusted-publishing=always (l.173-175); attest step commented out with TODO (l.167-171); also builds on every push to main (l.3-6). (3) release-crates.yml: cargo publish --workspace via crates.io Trusted Publishing (l.29-35). (4) release-docker.yml: external docker/github-builder@v1.17.0 (SHA-pinned) to ghcr.io/zizmorcore/zizmor, linux/amd64+arm64 (l.63-75); image installs zizmor from PyPI on cgr.dev/chainguard/wolfi-base:latest (Dockerfile:15-37; release.yml:115). rust-toolchain.toml pins 1.97.0; MSRV 1.97.0 (Cargo.toml:18).",
+      "tests_and_ci": "cargo test + insta snapshots + assert_cmd (crates/zizmor/Cargo.toml:67-72). About 59 Rust test files under crates/*/tests (51 in crates/zizmor/tests/integration, 8 in other crates), 43 files with inline cfg(test) modules, about 628 #[test]/#[tokio::test] lines in 98 files; 343 files under crates/zizmor/tests (snapshots, YAML data). Feature-gated online-tests, gh-token-tests, crater-tests, tty-tests, schema (crates/zizmor/Cargo.toml:81-93). Python pytest-codspeed benches in bench/ (pyproject.toml:18-24; docs/development.md:190-214). 11 workflows: ci.yml (fmt, clippy -D warnings, cargo test with crater-tests,tty-tests,schema on ubuntu/macos/windows with GH_TOKEN, snippet/schema drift, site build, gate), zizmor.yml (self-scan of ./.github/ via zizmor-action, security-events: write), benchmark.yml (CodSpeed), codegen.yml (weekly draft PRs), release*.yml (5), site.yml, test-output.yml. Workflows use permissions: {} and SHA-pinned actions; dependabot.yml weekly, grouped, 7-day cooldown for uv, cargo, github-actions, docker; pinact only for docs (.github/pinact.yml:4-7).",
+      "dependencies": "Workspace Cargo.toml lists 61 [workspace.dependencies] (53 external + 8 path crates); Cargo.lock committed with 450 packages. Direct [dependencies]: zizmor 50 (2 optional; +1 jemalloc, 2 build, 5 dev; crates/zizmor/Cargo.toml:15-79), github-actions-expressions 3, github-actions-models 5, pre-commit-models 3, subfeature 3, tree-sitter-iter 1, yamlpatch 7, yamlpath 7, zizmor-sarif 2. Notable: reqwest 0.13, http-cache-reqwest 1.0.0-alpha.7 (Cargo.toml:49), tree-sitter 0.26 with exact =0.26.4 powershell grammar (Cargo.toml:83). Python (docs/bench only): pytest, pytest-codspeed, urllib3, zensical; maturin build backend (pyproject.toml:1-24; uv.lock).",
+      "security_policy": "none - no SECURITY.md in the checkout. Advisories are published via GitHub Security Advisories (GHSA-f42p-wjw5-97qh; docs/release-notes.md:145-151, 2112). The AI/contribution policy lives in the external zizmorcore/.github repo (not read)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:10-13: tool for CI/CD systems that finds and fixes issues in GitHub Actions, Dependabot, pre-commit",
+        "verified": "partial",
+        "evidence": "Input kinds are only workflows, actions, Dependabot, pre-commit config/hooks (registry/input.rs:131-142; cli.rs:500-515). Fixes exist in only 13 of 41 audit files (grep for .fix(). --fix is labelled EXPERIMENTAL in --help (cli.rs:91) but docs say stable since v1.15.0 (docs/usage.md:712-715). docs/audits.md:1021 still marks impostor-commit auto-fix, but impostor_commit.rs has no fix code and release-notes.md:275-277 says removed in 1.26.0."
+      },
+      {
+        "claim": "README.md:17: finds excessive permission scopes",
+        "verified": "yes",
+        "evidence": "excessive_permissions.rs:150-247 flags missing permissions block (Medium), read-all (Medium), write-all (High) at workflow and job level, and per-scope write at workflow level via severity map (l.14-37). Limit: explicit job-level permission blocks are never evaluated (l.240-244)."
+      },
+      {
+        "claim": "README.md:18: impostor commits and confusable git refs",
+        "verified": "partial",
+        "evidence": "Implemented but online-only: impostor_commit.rs:273-282 and ref_confusion.rs:75-84 skip without a token or with no_online_audits; docs mark Works offline no (docs/audits.md:1021, 1405). Default run is offline without a token (main.rs:343-357), so they do not run by default."
+      },
+      {
+        "claim": "docs/audits.md:2198-2199: unpinned-uses applies blanket hash-pinning by default",
+        "verified": "yes",
+        "evidence": "Default HashPin (config/mod.rs:394-400, 418); finding built at unpinned_uses.rs:151-167 (High). Hash means exactly 40 hex chars (models/repo_ref.rs:154-160); Docker uses needs a digest (models/uses.rs:303); container images via unpinned_images.rs:79-91 (non-latest tag is pedantic only). Default changed in v1.20.0 (docs/release-notes.md:711-716)."
+      },
+      {
+        "claim": "docs/audits.md:2300-2322, usage.md:735-782: --fix hash-pins; Dependabot/Renovate keep pins current",
+        "verified": "partial",
+        "evidence": "Pin fix requires a token (unpinned_uses.rs:32-33), only version-like refs (l.45-54), writes SHA plus '# <tag>' comment (l.85-111), has default disposition Unsafe (l.97; finding.rs:78-87) so plain --fix skips it (output/fix.rs:36-41). Already-pinned refs are never bumped (l.40-43): zizmor opens no PRs and does not update dependencies. The repo itself uses Dependabot (.github/dependabot.yml) and pinact for docs only."
+      },
+      {
+        "claim": "docs/integrations.md:112-116, 129-132: SARIF feeds code scanning; exit 0 in SARIF mode",
+        "verified": "yes",
+        "evidence": "SARIF 2.1.0 with driver name zizmor, version, rules zizmor/<id>, locations, codeflows (output/sarif.rs:37-66, 85, 140-163); exit 0 for SARIF (main.rs:428-429). Output has no partialFingerprints, commit SHA or category (repo-wide search); commit/tool/category binding comes from the separate upload-sarif step or zizmor-action, whose code is not in this repo."
+      },
+      {
+        "claim": "docs/usage.md:148-156: offline by default unless a token is set",
+        "verified": "yes",
+        "evidence": "Client built only with a token (main.rs:300-305); --offline clears the token (main.rs:209-211); warning when implicitly offline (main.rs:343-357); LSP always offline (lsp.rs:406; state.rs:21-28)."
+      },
+      {
+        "claim": "docs/usage.md:1009-1083: static only, never executes code, definitions only",
+        "verified": "yes",
+        "evidence": "No process spawning in crates/zizmor/src (only ExitCode, registry.rs:4). Shell run: blocks are parsed by three audits only (use_trusted_publishing.rs:347-356, adhoc_packages.rs:100-108, github_env.rs:358-366). Expression parse failures only warn (template_injection.rs:378-381; unsound_ternary.rs:47-50). Schema/syntax checks warn, or fail with --strict-collection (models.rs:81-148; docs/usage.md:122-129). fetch_single_file callers are only github.rs:850 and config/mod.rs:709, so with: inputs/outputs are never checked against an action.yml. Not a general workflow/expression/script linter."
+      },
+      {
+        "claim": "release.yml:96 and :120 comments: PyPI 'PEP 740 attestations' and 'signing Docker image attestations'",
+        "verified": "partial",
+        "evidence": "PyPI attest step is commented out with a TODO (release-pypi.yml:167-171); publish is uv publish --trusted-publishing=always (l.175); whether uv emits attestations is outside this repo. Docker attestations are delegated to external docker/github-builder (release-docker.yml:63), not checkable here. Binaries: actions/attest on distrib/* is present (release-binaries.yml:93-97); its predicate type is defined by the external action."
+      },
+      {
+        "claim": "docs/audits.md:538-573: dependabot-cooldown flags cooldown below 7 days by default",
+        "verified": "partial",
+        "evidence": "Default minimum 7 (config/mod.rs:224-233); findings built at dependabot_cooldown.rs:114-158. But l.108-111 does 'return Ok(findings)' inside the for loop, so the first update meeting the minimum ends the audit and later updates entries are not checked; the multi-update test only has below-threshold entries (tests/integration/audit/dependabot_cooldown.rs:316-359). Code-reading observation, not executed."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "impostor-commit audit on true positives, v1.19.0 vs earlier (release-note claim, no methodology or absolute numbers)",
+        "metric": "relative speedup",
+        "value": "over 100 times faster",
+        "source": "docs/release-notes.md:785-790",
+        "independent": false
+      },
+      {
+        "what": "Async core refactor, online and I/O-heavy audits, v1.17.0 vs earlier (release-note claim)",
+        "metric": "relative speedup on typical workloads",
+        "value": "40% to 70%",
+        "source": "docs/release-notes.md:846-850",
+        "independent": false
+      },
+      {
+        "what": "Online mode on common workloads, v1.16.0 vs earlier (release-note claim)",
+        "metric": "relative speedup",
+        "value": "40% to over 95% faster",
+        "source": "docs/release-notes.md:911-915",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Governance concentration: copyright holder is a single named individual (LICENSE:3); sponsorship links and automated-PR assignee/reviewer point to the same handle (README.md:114-116; .github/workflows/codegen.yml:11); contributions must follow an AI policy hosted outside this repo (docs/development.md:13-16).",
+      "Behavior drift in minor releases: unpinned-uses default became hash-pin for all actions in 1.20.0 (docs/release-notes.md:711-716); secrets-outside-env moved to auditor persona in 1.24.0 (docs/audits.md:1574-1581); unpinned-uses/unpinned-images responsibilities split in 1.29.0 (release-notes.md:119-122). Docs pin ZIZMOR_VERSION in CI examples (docs/integrations.md:85-108).",
+      "Scope gaps for supply-chain needs: no SBOM generation, no provenance/attestation creation for user outputs, no dependency-update PRs, no checking of with: inputs/outputs against action.yml, not a shell/expression linter (see claim_checks 8). The pin fix is online, unsafe-class and limited to version-like refs (unpinned_uses.rs:32-54, 97).",
+      "Default-offline: impostor-commit, ref-confusion, ref-version-mismatch, stale-action-refs, known-vulnerable-actions need a token (impostor_commit.rs:273-282; main.rs:343-357). In CI the default GITHUB_TOKEN cannot read other private repos, causing 'can't access ORG/REPO' errors (docs/troubleshooting.md:46-115).",
+      "Possible under-reporting in dependabot-cooldown: early return at dependabot_cooldown.rs:108-111 can skip later updates entries (code reading only; not executed).",
+      "Release integrity gaps: PyPI attestation step disabled (release-pypi.yml:167-171); no checksum files for binaries (release-binaries.yml:93-105); release created as draft with no publishing step (release.yml:72); builds lack --locked (release-binaries.yml:52; release-pypi.yml:49); Docker image is assembled from the PyPI package on unpinned wolfi-base:latest with unpinned apk add uv (Dockerfile:15-24, 30).",
+      "Platform/build: binaries and wheels are best-effort with libc compatibility caveats (docs/installation.md:28-31, 177-181); source builds need Rust 1.97.0 (Cargo.toml:18) and an alpha http-cache dependency (Cargo.toml:49; main.rs:225-229); cargo install without --locked can fail on yanked deps (docs/troubleshooting.md:11-42); WSL2 undocumented.",
+      "Security history and maturity: v1.27.0 logged GitHub credentials in cleartext (docs/release-notes.md:145-151); no SECURITY.md in the repo; LSP, YAML anchors, parallel steps and pre-commit support are experimental/beta (docs/integrations.md:214-224; docs/usage.md:1085-1127); --fix edits files in place (docs/usage.md:770-771)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "zizmorcore/zizmor",
+      "checks": [
+        {
+          "field": "readme.install[0] (PyPI)",
+          "statement": "PyPI (prebuilt wheels): uv tool install zizmor (also: pip install zizmor | pipx install zizmor | uvx zizmor --help)",
+          "citation": "docs/installation.md:21-46",
+          "holds": true,
+          "note": "Lines 34-46 list pip install zizmor, pipx install zizmor, uv tool install zizmor and uvx zizmor --help. Lines 28-31 say the wheels are best-effort. This matches pyproject.toml:1-15 (maturin backend, bindings = \"bin\", project name zizmor) and release-pypi.yml:160,175 (publishes to pypi.org/p/zizmor via uv publish)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21; Cargo.toml:21",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text: line 1 reads 'The MIT License (MIT)' and line 3 holds the copyright (2024, William Woodruff). Workspace Cargo.toml:21 sets license = \"MIT\", and all 9 crates under crates/ set license.workspace = true. pyproject.toml:9 marks the license as dynamic, so it is taken from Cargo."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - x86_64-unknown-linux-gnu binary (release-binaries.yml:21-22), manylinux/musllinux x86_64 wheels (release-pypi.yml:22-25, 62-64), Docker linux/amd64 (release-docker.yml:67), CI on ubuntu-latest (ci.yml:43)",
+          "citation": ".github/workflows/release-binaries.yml:21-22; .github/workflows/release-pypi.yml:22-25, 62-64; .github/workflows/release-docker.yml:67; .github/workflows/ci.yml:43",
+          "holds": true,
+          "note": "All four citations match. The binary is built on ubuntu-22.04 for target x86_64-unknown-linux-gnu. The x86_64 wheels are built as manylinux 2_28 and musllinux_1_2 (l.80). The Docker build sets platforms: linux/amd64,linux/arm64. CI tests on os: [ubuntu-latest, macos-latest, windows-latest]. Binaries are best-effort per docs/installation.md:177-181, which the dossier already records in its risks."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - zizmor binary (crates/zizmor/src/main.rs:438-446, cli.rs:26-45); formats plain/json/json-v1/sarif/github (cli.rs:365-381); exit codes 0,1,2,3,11-14 (docs/usage.md:563-614)",
+          "citation": "crates/zizmor/src/main.rs:438-446; crates/zizmor/src/cli.rs:26-45, 365-381; docs/usage.md:563-614",
+          "holds": true,
+          "note": "main() runs App::parse() and then run() (main.rs:438-446). The clap App struct is at cli.rs:26-45. The OutputFormat enum has Plain, Json, JsonV1, Sarif and Github. The exit-code table in docs/usage.md:568-577 matches the code: registry.rs:257-266 returns 11-14 by highest severity, main.rs:600-603 returns 3 when there are no inputs and 1 for other errors, and main.rs:428-429 returns 0 for SARIF or --no-exit-codes. crates/zizmor/Cargo.toml:2 names the package zizmor with no [[bin]] override, so the binary is zizmor."
+        },
+        {
+          "field": "claim_checks[6] (offline by default)",
+          "statement": "docs/usage.md:148-156: offline by default unless a token is set (verified: yes)",
+          "citation": "docs/usage.md:148-156; crates/zizmor/src/main.rs:209-211, 300-305, 343-357; crates/zizmor/src/lsp.rs:406; crates/zizmor/src/state.rs:21-28",
+          "holds": true,
+          "note": "The docs choose offline mode unless GH_TOKEN, GITHUB_TOKEN or ZIZMOR_GITHUB_TOKEN is set, and those env vars are bound at cli.rs:193-203. The GitHub client is built only when a token is present (main.rs:300-305). --offline clears the token (main.rs:209-211). The implicit-offline warning is at main.rs:353-356. The LSP uses AuditState::default() (lsp.rs:406), which sets no_online_audits: true and gh_client: None (state.rs:21-28). Additional checks: all reqwest use is in github.rs, remote inputs require the client (registry/input.rs:778), and online audits skip when there is no client (impostor_commit.rs:273-283)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,306 @@
+{
+  "contender": "gitguardian/ggshield",
+  "revision": {
+    "contender": "gitguardian/ggshield",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "gitguardian/ggshield",
+        "tag": "v1.55.0",
+        "commit": "94571a547a8a2f314a094d142729ee88c6ed0a3b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.55.0",
+    "commit": "94571a547a8a2f314a094d142729ee88c6ed0a3b",
+    "read_at": "2026-10-02T03:02:11+00:00"
+  },
+  "dossier": {
+    "contender": "gitguardian/ggshield",
+    "revision": {
+      "tag": "v1.55.0",
+      "commit": "94571a547a8a2f314a094d142729ee88c6ed0a3b",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "ggshield is GitGuardian's command-line client for finding hardcoded secrets (README.md:13). It gathers text (staged git patches, commit history, files and directories, Docker images, PyPI packages, CI commit ranges, AI-assistant hook payloads) and sends it to a GitGuardian instance's scanning API through py-gitguardian. Detection happens server-side and an account plus API token are required (ggshield/verticals/secret/secret_scanner.py:106-132; rust/hook/src/api.rs:1-4; ggshield/core/client.py:152-169). Coverage relevant to the needs: staged changes via `secret scan pre-commit` (ggshield/cmd/secret/scan/precommit.py:47-111); history via `secret scan repo|commit-range|ci|pre-push|pre-receive` (ggshield/verticals/secret/repo.py:41-63,167-244); directories via `secret scan path -r` (ggshield/cmd/secret/scan/path.py:35-113). Credential verification: each result carries a `validity` status returned by the GitGuardian API (valid / invalid / failed to check / no checker / not checked / cannot check / unknown) that ggshield only displays (ggshield/core/text_utils.py:61-78; ggshield/verticals/secret/secret_scan_collection.py:193-195; rust/hook/src/api.rs:72-104). The repo contains no code that calls provider APIs to verify credentials, and the README does not mention validity checks. `ggshield hmsl` queries GitGuardian's HasMySecretLeaked service with hash prefixes to check public-leak exposure, which is a different thing (ggshield/verticals/hmsl/client.py:16-20,154-164). The same CLI also ships AI-assistant hooks, machine setup/doctor, honeytoken planting, a plugin system and an MCP/AI inventory feature (ggshield/__main__.py:31-43).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'ggshield is a CLI application that runs in your local environment or in a CI environment to help you detect more than 500+ types of secrets.'",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "'ggshield uses our public API through py-gitguardian to scan and detect potential vulnerabilities in files and other text content.'",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "'Only metadata such as call time, request size and scan mode is stored from scans using ggshield, therefore secrets will not be displayed on your dashboard and your files and secrets won't be stored.'",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Install script is the recommended install: `curl -sSfL .../scripts/install/install.sh | bash` on Linux/macOS, `irm .../install.ps1 | iex` on Windows; it accepts --instance and --plugin, and EU or self-hosted instances are selected with GITGUARDIAN_INSTANCE or --instance.",
+          "citation": "README.md:61-92"
+        },
+        {
+          "claim": "Other install methods: Homebrew (`brew install ggshield`), standalone .pkg from the release page (no Python needed), Deb/RPM packages on Cloudsmith, pipx or pip from PyPI (needs a non-EOL Python and git except for standalone packages).",
+          "citation": "README.md:94-185"
+        },
+        {
+          "claim": "To use ggshield you must authenticate against GitGuardian servers; `ggshield auth login` automates provisioning a personal access token and configuring it on the workstation; alternatively set GITGUARDIAN_API_KEY manually.",
+          "citation": "README.md:189-197"
+        },
+        {
+          "claim": "Scan files (`ggshield secret scan path -r .`), repositories (`ggshield secret scan repo .`), Docker images (needs docker) and PyPI packages (needs pip).",
+          "citation": "README.md:203-209"
+        },
+        {
+          "claim": "Integrate in CI/CD, and use ggshield as a pre-commit, pre-push or pre-receive Git hook.",
+          "citation": "README.md:229-231"
+        },
+        {
+          "claim": "ggshield can scan interactions between you and your AI coding assistant in real time, blocking actions that contain secrets before they are executed; hooks are installed with `ggshield install`. Supported tools: Cursor, Claude Code, Copilot Chat, Codex, Mistral Vibe 2.21+.",
+          "citation": "README.md:233-240"
+        },
+        {
+          "claim": "macOS: upgrading to 1.54.0 triggers a Keychain prompt for `ggshield-py`, a second binary that reads the saved token; click Always Allow once.",
+          "citation": "README.md:10-11"
+        },
+        {
+          "claim": "If no secrets are found the exit code is 0; if a secret is found in staged code or in CI, the output names the file and shows a patch with the position of the secret.",
+          "citation": "README.md:248-254"
+        },
+        {
+          "claim": "'ggshield is MIT licensed.'",
+          "citation": "README.md:289"
+        }
+      ],
+      "install": [
+        {
+          "method": "Install script (standalone build, Linux/macOS, no sudo)",
+          "command": "curl -sSfL https://raw.githubusercontent.com/GitGuardian/ggshield/main/scripts/install/install.sh | bash",
+          "citation": "README.md:67-69 (behaviour: scripts/install/README.md:35-58)"
+        },
+        {
+          "method": "Homebrew (macOS; scripts/install/README.md lists it for macOS/Linux)",
+          "command": "brew install ggshield",
+          "citation": "README.md:100-102; scripts/install/README.md:136"
+        },
+        {
+          "method": "Deb / RPM packages from Cloudsmith (Linux)",
+          "command": "apt: curl -1sLf https://dl.cloudsmith.io/public/gitguardian/ggshield/setup.deb.sh | sudo -E bash && sudo apt install ggshield ; dnf: curl -1sLf https://dl.cloudsmith.io/public/gitguardian/ggshield/setup.rpm.sh | sudo -E bash && sudo dnf install ggshield",
+          "citation": "scripts/install/README.md:137-138 (README.md:116-121 links the Cloudsmith setup pages)"
+        },
+        {
+          "method": "PyPI via pipx (recommended) or pip, all OS",
+          "command": "pipx install ggshield ; pip install --user ggshield",
+          "citation": "README.md:163-165, 177-179"
+        },
+        {
+          "method": "macOS standalone .pkg from the GitHub release page",
+          "command": "sudo installer -pkg path/to/ggshield.pkg -target /",
+          "citation": "README.md:108 (download); doc/dev/os-packages.md:55 (command)"
+        },
+        {
+          "method": "Docker image",
+          "command": "docker run --rm gitguardian/ggshield ggshield --version",
+          "citation": "scripts/install/README.md:141"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release packages are built for x86_64 Linux (.github/workflows/build_release_assets.yml:107-117); install.sh picks x86_64-unknown-linux-gnu (scripts/install/install.sh:128-153); manylinux2014 and musllinux x86_64 wheels (.github/workflows/wheels.yml:259-279). The standalone build is glibc-only (install.sh:156-161).",
+        "wsl2": "unknown - WSL2 is not mentioned in the README or docs (the only 'WSL' hit is a build-time note about Windows bash.exe, hatch_build.py:150-158). WSL2 exposes a Linux userland so the Linux artifacts would be the applicable ones, but that is not documented.",
+        "macos_arm64": "yes - aarch64 macOS package build on macos-14 (.github/workflows/build_release_assets.yml:131-135); universal2 wheel (hatch_build.py:20-22; .github/workflows/wheels.yml:73-143); install.sh handles arm64-apple-darwin including Rosetta detection (scripts/install/install.sh:134-141); README.md:94-110 documents Homebrew and .pkg.",
+        "gpu": "no - not applicable; no GPU/CUDA reference exists in the source tree (repo-wide search found none outside lockfiles) and scanning runs on the GitGuardian service (rust/hook/src/api.rs:1-4)."
+      },
+      "integrations": {
+        "cli": "yes - console script `ggshield` -> ggshield.__main__:main (hatch_meta.py:17-23; ggshield/__main__.py:203-226). Command groups: secret (scan path/repo/commit-range/changes/pre-commit/pre-push/pre-receive/ci/docker/docker-archive/pypi/archive/docset/ai-hook, ignore), auth, config, install, machine, ai, hmsl, honeytoken, plugin, quota, api-status (ggshield/__main__.py:31-43; ggshield/cmd/secret/scan/__init__.py:20-37). Output formats text/JSON/SARIF (ggshield/cmd/secret/scan/secret_scan_common_options.py:208-212).",
+        "mcp": "none found as a server - the source tree has no MCP server code (searches for FastMCP, mcp.server and modelcontextprotocol returned nothing). ggshield instead discovers MCP servers configured in assistants and reports MCP tool calls to GitGuardian, which returns an allow/deny decision (ggshield/verticals/ai/discovery.py:56-124; ggshield/verticals/ai/mcp.py:18-44).",
+        "sdk_or_api": "No first-party SDK or HTTP API in this repo. ggshield consumes GitGuardian's public REST API through the separate py-gitguardian package (pyproject.toml:49; README.md:15; doc/dev/architecture.md:9-10). Other consumption surfaces: GitHub Action running docker://gitguardian/ggshield:v1.55.0 (actions/secret/action.yml:1-22), pre-commit framework hooks (.pre-commit-hooks.yaml:1-34), a pre-receive shell sample (doc/pre-receive.sample:1-18).",
+        "claude_code_or_codex": "yes - README.md:233-240. `ggshield machine setup` (or the deprecated `ggshield install -m global -t claude-code|codex`) writes hooks into ~/.claude/settings.json and ~/.codex/hooks.json (ggshield/cmd/machine/setup.py:35-136; ggshield/cmd/install.py:108-117; ggshield/verticals/ai/installation.py:252-332; ggshield/verticals/ai/agents/claude_code.py:157-158; ggshield/verticals/ai/agents/codex.py:108-109). Claude Code hook events are PreToolUse, PostToolUse and UserPromptSubmit (ggshield/verticals/ai/models.py:297-338). The hook command is `ggshield secret scan ai-hook`, which the Rust dispatcher answers natively (rust/dispatcher/src/dispatch.rs:20-23, 41-43). Codex runs the hook only after the user approves it in Codex's hook review (ggshield/verticals/ai/agents/codex.py:111-120)."
+      },
+      "telemetry_and_network": "Account and network are required: scanning needs a GitGuardian account and API token and uploads document text to the instance API; default instance is https://dashboard.gitguardian.com with the API host derived by swapping 'dashboard' for 'api' on SaaS or appending /exposed on-prem (ggshield/core/constants.py:20,25; ggshield/core/url_utils.py:68-83; ggshield/core/config/config.py:85-140,160-167; ggshield/core/client.py:152-178; ggshield/verticals/secret/secret_scanner.py:106-132). No offline mode found; unit tests run with sockets disabled (.github/workflows/ci.yml:119-121). Per-request metadata: each scan sends headers GGShield-Version, Command-Path, Command-Id (uuid), OS-Name, OS-Version, Python-Version, Machine-Id (hardware UUID, /etc/machine-id, or a generated fallback in ~/.ggshield/machine_id), Machine-Username (OS user), Repository-URL (git remote with scheme, credentials and port stripped), `mode`, plus a `scan_options` JSON of config flags/counts (ggshield/core/scan/scan_context.py:38-67; ggshield/core/machine_id.py:316-341; ggshield/utils/git_shell.py:190-208,434-460; ggshield/verticals/secret/secret_scanner.py:63-64; ggshield/core/config/user_config.py:70-89). `--filename-only` sends basenames only (ggshield/core/config/user_config.py:53-56; secret_scanner.py:95-104). Update check: after commands ggshield GETs https://api.github.com/repos/GitGuardian/ggshield/releases/latest at most once per 24 h unless --no-check-for-updates; disabled by default for pre-receive (ggshield/__main__.py:144-154; ggshield/core/check_updates.py:23-25,53-88; ggshield/cmd/utils/context_obj.py:46-61; ggshield/cmd/secret/scan/prereceive.py:96-98). AI features: hook payloads (prompts, shell commands, tool inputs and outputs, @-mentioned files) are scanned through the same API (ggshield/verticals/ai/hooks.py:141-229); MCP tool calls are logged to GitGuardian, even when the scan blocks (ggshield/verticals/ai/mcp.py:18-44; CHANGELOG.md:197-203); AI discovery uploads hostname, OS username, machine id, git user.email, assistant subscription emails and the MCP server inventory (ggshield/verticals/ai/user.py:15-39; ggshield/verticals/ai/discovery.py:56-124); `ggshield ai discover --activity` (experimental flag) uploads raw Claude Code/Codex session transcript lines that GitGuardian 'scans and strips secrets server-side before storing' (ggshield/cmd/ai/discover.py:47-53,93-96; ggshield/verticals/ai/agents/claude_code.py:25-38). Other hosts: https://api.hasmysecretleaked.com for `hmsl` commands only (ggshield/core/constants.py:23); plugin installs fetch from the GitGuardian API, GitHub releases/artifacts or URLs and verify sigstore signatures against a bundled trust root without refreshing TUF over the network (ggshield/core/plugin/signature.py:1-19,90-97; ggshield/core/plugin/downloader.py:729,1357). No separate analytics SDK was found; the README says only metadata is stored (README.md:17), which cannot be verified server-side. Credential storage: token goes to the OS keyring with a sentinel in auth_config.yaml, falling back to that YAML at mode 0600 when no keyring is usable or GGSHIELD_NO_KEYRING is set; GITGUARDIAN_API_KEY from the environment or a .env found in the working directory or git root takes precedence (ggshield/core/config/token_store.py:296-315; ggshield/core/config/auth_config.py:168-222; ggshield/core/config/utils.py:62-77; ggshield/core/config/config.py:182-207; ggshield/core/env_utils.py:23-70). Local files: auth_check.yaml in the cache dir (key hash, scopes, 300 s TTL; ggshield/core/auth_check_cache.py:18-26,41-42), `.cache_ggshield` in the current directory plus a '# Added by ggshield' entry appended to the repo's .gitignore (ggshield/core/cache.py:16-77; ggshield/utils/git_shell.py:563-590), a 15-minute clean-verdict cache for AI hooks (CHANGELOG.md:186-189)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "Rust",
+        "Shell",
+        "PowerShell"
+      ],
+      "entry_points": [
+        {
+          "path": "ggshield/__main__.py",
+          "what": "Python CLI: click group `cli` and main(); console script `ggshield` (renamed `ggshield-py` when GGSHIELD_BUILD_RUST=1) maps to ggshield.__main__:main (hatch_meta.py:17-23; __main__.py:46-110,203-226)."
+        },
+        {
+          "path": "rust/dispatcher/src/main.rs",
+          "what": "Native `ggshield` binary shipped in platform wheels and standalone bundles: answers exactly `secret scan ai-hook` itself and execs the sibling `ggshield-py` for every other command (main.rs:9-20; dispatch.rs:20-55)."
+        },
+        {
+          "path": "ggshield/cmd/secret/scan/__init__.py",
+          "what": "`secret scan` group with lazily loaded subcommands path, repo, commit-range, changes, pre-commit, pre-push, pre-receive, ci, docker, docker-archive, pypi, archive, docset, ai-hook (lines 20-37)."
+        },
+        {
+          "path": "ggshield/cmd/secret/scan/precommit.py",
+          "what": "`secret scan pre-commit`: scans `git diff --staged` or merge changes (lines 47-111)."
+        },
+        {
+          "path": "ggshield/cmd/secret/scan/ai_hook.py",
+          "what": "`secret scan ai-hook`: reads an assistant hook event as JSON on stdin, scans it, prints an allow/block JSON verdict, fails open on error (lines 29-75)."
+        },
+        {
+          "path": "ggshield/cmd/machine/setup.py",
+          "what": "`machine setup`: configures AI hooks for detected assistants, global/system git pre-commit and pre-push hooks, and plants a honeytoken unless opted out (lines 35-117)."
+        },
+        {
+          "path": ".pre-commit-hooks.yaml",
+          "what": "Hook definitions for the pre-commit framework: ggshield, ggshield-push and docker variants (lines 1-34)."
+        },
+        {
+          "path": "actions/secret/action.yml",
+          "what": "GitHub Action running docker://gitguardian/ggshield:v1.55.0 with docker/actions-secret-entrypoint.sh, which executes `ggshield secret scan -v ... ci` (action.yml:17-22; entrypoint line 4)."
+        }
+      ],
+      "architecture": "Python package ggshield/ in layers (doc/dev/architecture.md:14-32): cmd/ (click commands, file tree mirrors the CLI, lazily imported via LazyGroup/PluginAwareLazyGroup, ggshield/__main__.py:29-50), verticals/ (per-feature logic: secret/ with secret_scanner.py, repo.py and text/json/sarif/gitlab-webui output handlers; ai/ with hooks.py, installation.py, discovery.py, mcp.py, agents/ for Claude Code, Codex, Copilot, Cursor, VSCode, Junie, Kiro, Vibe, and agent_activity/; hmsl/; honeytoken/; auth/oauth.py), core/ (config/ with user_config, auth_config, token_store; client.py wrapping pygitguardian's GGClient with retry and timeout; scan/ with commit.py, scannable.py, scan_context.py; git_hooks/ci/ detecting commit ranges for supported CI systems; plugin/ sigstore-verified plugin loader; cache.py, check_updates.py, machine_id.py) and utils/ (git_shell.py etc.). Scan flow: a command builds a client (core/client.py:143-178), SecretScanner chunks Scannables into documents and calls GGClient.multi_content_scan, or scan_and_create_incidents when --source-uuid is set, on a thread pool (verticals/secret/secret_scanner.py:68-132); Result.from_scan_result applies local ignore rules (ignored_matches, ignored_detectors, ignored_paths, known secrets) before output (verticals/secret/secret_scan_collection.py:160-222). Config comes from global and local .gitguardian.yaml plus GITGUARDIAN_* env vars (ggshield/core/config/user_config.py:135-175). The rust/ workspace (common, config, hook, dispatcher) is a native re-implementation of `secret scan ai-hook`: transport and glue only, no detection rules, delegating to Python for configurations it does not support (rust/hook/src/lib.rs:1-14,38-51; rust/Cargo.toml:1-3). Wheels: a pure py3-none-any fallback plus platform wheels embedding the Rust `ggshield` (hatch_build.py:1-9).",
+      "packaging_and_release": "Artifacts: sdist and pure-Python wheel (.github/workflows/build_release_assets.yml:66-96); platform wheels carrying the Rust binary for macOS universal2, Windows amd64 and Linux manylinux2014/musllinux x86_64/aarch64 (.github/workflows/wheels.yml:73-316; hatch_build.py:40-62); PyInstaller standalone packages .pkg, .zip, .msi, Chocolatey .nupkg, .deb, .rpm and .tar.gz for Linux x86_64/aarch64, macOS x86_64/arm64 and Windows (build_release_assets.yml:98-135,358-369; doc/dev/os-packages.md:1-47); Docker images gitguardian/ggshield and ghcr.io/gitguardian/ggshield/ggshield for linux/amd64 and linux/arm64 (.github/workflows/tag.yml:170-212); Cloudsmith deb/rpm and Chocolatey pushes (tag.yml:214-271). Release flow: pushing a v* tag runs tag.yml (lines 3-6), which builds signed assets, publishes to PyPI with pypa/gh-action-pypi-publish using OIDC id-token behind the `release` environment that waits for a second approver (tag.yml:49-90), creates a draft GitHub release (tag.yml:139-158) and opens version-bump PRs in downstream repos (tag.yml:160-168; .github/workflows/update-downstream.yml:21-82). Integrity: GitHub artifact attestations (SLSA build provenance via actions/attest-build-provenance) for the OS packages (tag.yml:127-137); macOS binaries code-signed and notarized with rcodesign and Windows binaries signed through DigiCert KeyLocker when sign=true (build_release_assets.yml:240-320; doc/dev/os-packages.md:49-118); install.sh checks the sha256 digest GitHub publishes per asset and can verify attestations with gh on request (scripts/install/install.sh:175-248). No separate SHA256SUMS file, GPG signature or cosign step was found in the workflows. Supply-chain hygiene: actions pinned by commit SHA, build containers pinned by digest, downloaded tools checked with sha256 via scripts/download (build_release_assets.yml:57-63,112-135; scripts/download:13-14,60-61), `uv sync --locked`, uv exclude-newer = 3 days (pyproject.toml:103-107), Dependabot with a 3-day cooldown (.github/dependabot.yml:3-18), Grype scan of built packages (build_release_assets.yml:452-499). Release history: 1.55.0 dated 2026-09-24 (CHANGELOG.md:5).",
+      "tests_and_ci": "Python: pytest with pytest-mock, pytest-socket, pytest-xdist, pytest-voluptuous, syrupy snapshots, vcrpy cassettes, pyfakefs and factory-boy (pyproject.toml:130-136,174-187). About 146 test_*.py files: 129 under tests/unit (mirrors the ggshield/ layout), 16 under tests/functional (run real commands, API-backed ones marked uses_gitguardian_api) and tests/test_factories.py; coverage gate 80% (pyproject.toml:142-152; ci.yml:123-126). Unit tests run with --disable-socket (ci.yml:119-121; doc/dev/architecture.md:40-50). Rust: inline #[cfg(test)] modules, rust/dispatcher/tests/delegation.rs, and rust/tests/equivalence.py with rust/tests/mock_api.py comparing the Rust and Python hooks (verdict and POSTed /v1/multiscan body) against a localhost mock (ci.yml:178-273). Shell: bats suite for the install scripts (scripts/install/tests/path_config.bats; .github/workflows/install-scripts.yml:19-42). CI workflow files in .github/workflows/: ci.yml - lint via pre-commit (black, flake8, isort, pyright, ty, import-linter, prettier, shellcheck, commitizen and a ggshield self-scan; ci.yml:31-79; .pre-commit-config.yaml), build-and-test matrix ubuntu-22.04/macos-15-intel/windows-2022 x Python 3.9-3.13 with a wheel content check (ci.yml:81-142), API functional tests on non-fork runs (ci.yml:144-176), Rust/Python equivalence (ci.yml:178-273), Rust matrix on ubuntu/macos/windows (ci.yml:275-305), package builds (ci.yml:307-315), GitHub Action test (ci.yml:317-334), unstable Docker push from main (ci.yml:336-373); build_release_assets.yml - sdist/wheel, OS packages with functional tests, Linux distro smoke tests on debian, ubuntu, rocky and openSUSE, Grype scan (lines 66-499); wheels.yml - platform wheels with smoke test; tag.yml - release; update-downstream.yml; install-scripts.yml; perfbench.yml - benchmark against a reference release, failing if a run is more than 3 s slower (perfbench.yml:26-31,56-60); changelog-check.yml - requires a changelog fragment or the skip-changelog label.",
+      "dependencies": "pyproject.toml: 25 runtime dependencies (lines 34-69; two conditional: truststore for Python>=3.10, tomli for <3.11), including pygitguardian~=1.35.0, click, requests, urllib3, cryptography, sigstore, keyring, rich~=13, marshmallow and marshmallow-dataclass, pyyaml, python-dotenv, notify-py, charset-normalizer~=3.1.0 (deliberately tight, lines 36-39). Dependency groups: tests 11, dev 15, standalone 1 (pyinstaller==6.21.0) (pyproject.toml:174-208). Build backend hatchling pinned (pyproject.toml:76-81). uv.lock holds 188 locked packages. rust/Cargo.toml workspace declares 15 external dependencies (serde, serde_json, serde_yaml_ng, ureq with rustls and platform-verifier, regex, toml, sha2, dirs, chrono, libc, dotenvy, security-framework, secret-service, windows-sys, tempfile; lines 13-75); direct dependencies per crate: common 1 (+libc on unix), config 7 (+4 OS-specific), hook 8, dispatcher 1 (+windows-sys) (rust/*/Cargo.toml); rust/Cargo.lock lists 243 packages. Runtime needs git (README.md:155); docker and pip must be present for the docker and pypi scan targets (README.md:207-208).",
+      "security_policy": "SECURITY.md (lines 1-10): report vulnerabilities through GitGuardian's Vulnerability Disclosure Portal https://vdp.gitguardian.com; English or French preferred. No supported-versions list or response-time commitment is stated."
+    },
+    "claim_checks": [
+      {
+        "claim": "Runs in your local environment or in a CI environment (README.md:13)",
+        "verified": "yes",
+        "evidence": "Local commands: ggshield/cmd/secret/scan/precommit.py:47-111, path.py:35-113, repo.py:27-81. CI: ggshield/cmd/secret/scan/ci.py:26-62 refuses to run unless CI, JENKINS_HOME or BUILD_BUILDID is set and derives the commit range from the CI environment; the repo's own CI exercises the GitHub Action (.github/workflows/ci.yml:317-334)."
+      },
+      {
+        "claim": "Detects more than 500+ types of secrets (README.md:13)",
+        "verified": "not_checkable",
+        "evidence": "Detection is done by the GitGuardian service, not by this repo: SecretScanner only posts documents to GGClient.multi_content_scan (ggshield/verticals/secret/secret_scanner.py:106-132), and the Rust hook states 'Detection is entirely server-side ... There is no detector, no regex and no rule here' (rust/hook/src/api.rs:1-4). No detector list exists in the source tree, so the count cannot be confirmed from code."
+      },
+      {
+        "claim": "Uses GitGuardian's public API through py-gitguardian (README.md:15)",
+        "verified": "yes",
+        "evidence": "pyproject.toml:49 pins pygitguardian~=1.35.0; ggshield/core/client.py:12,204-211 builds a GGClient; ggshield/verticals/secret/secret_scanner.py:119-132 calls scan_and_create_incidents or multi_content_scan; doc/dev/architecture.md:9-10 says all API calls live in py-gitguardian."
+      },
+      {
+        "claim": "Only metadata (call time, request size, scan mode) is stored; files and secrets are not stored and secrets are not displayed on the dashboard (README.md:17)",
+        "verified": "partial",
+        "evidence": "Server-side retention is not checkable from this repo. Code: full document text is sent (ggshield/verticals/secret/secret_scanner.py:112-116); request headers carry more than the three items named: version, command path and id, OS name/version, Python version, machine id, OS username, repository URL and scan mode (ggshield/core/scan/scan_context.py:44-67) plus a scan_options JSON (secret_scanner.py:63-64; ggshield/core/config/user_config.py:70-89). With --source-uuid the scan goes through scan_and_create_incidents (secret_scanner.py:119-125), whose purpose is to create dashboard incidents (ggshield/cmd/secret/scan/secret_scan_common_options.py:178-184); known secrets can carry an incident_url (ggshield/verticals/secret/secret_scan_collection.py:196)."
+      },
+      {
+        "claim": "Scans files/directories (path -r), repositories (repo), Docker images and PyPI packages (README.md:205-209)",
+        "verified": "yes",
+        "evidence": "Subcommands are registered at ggshield/cmd/secret/scan/__init__.py:20-37. `repo` scans every commit via get_list_commit_SHA('--all') (ggshield/verticals/secret/repo.py:54-63); pre-commit scans `git diff --staged` (ggshield/core/scan/commit.py:111-126); path recurses with -r (ggshield/cmd/secret/scan/path.py:44,73-78)."
+      },
+      {
+        "claim": "Use ggshield as a pre-commit, pre-push or pre-receive Git hook (README.md:231)",
+        "verified": "yes",
+        "evidence": "ggshield/cmd/secret/scan/precommit.py:47-111, prepush.py:33-109, prereceive.py:73-160. `ggshield install -m local|global -t pre-commit|pre-push` writes the hook scripts (ggshield/cmd/install.py:73-124,401-450); pre-commit-framework hooks are in .pre-commit-hooks.yaml:1-34; pre-receive is a manual shell sample (doc/pre-receive.sample:1-18) and is not offered by `ggshield install`. SKIP=ggshield bypasses the hooks (ggshield/cmd/utils/hooks.py:13-28)."
+      },
+      {
+        "claim": "Scans AI-assistant interactions in real time, blocking actions that contain secrets before they are executed (README.md:235-237)",
+        "verified": "partial",
+        "evidence": "Pre-execution blocking exists for prompts, shell commands, file reads and tool inputs (templates in ggshield/verticals/ai/hooks.py:426-478; events registered at ggshield/verticals/ai/models.py:297-338). PostToolUse scans tool output after the tool ran and reports the secret as already exposed to the agent (hooks.py:480-517); CHANGELOG.md:31-37 says Claude Code and Codex outputs are now withheld. The hook allows the action with only a warning if it cannot authenticate or reach the API (hooks.py:255-292; ggshield/cmd/secret/scan/ai_hook.py:72-75)."
+      },
+      {
+        "claim": "Supported tools: Cursor, Claude Code, Copilot Chat, Codex, Mistral Vibe 2.21+ (README.md:239-240)",
+        "verified": "partial",
+        "evidence": "Code differs from the README (code preferred): eight assistants are registered - Vibe, Claude Code, Codex, Copilot, Cursor, VSCode, Junie, Kiro (ggshield/verticals/ai/agents/__init__.py:18-30); CHANGELOG.md:9-18 says Kiro and Junie CLI were added in 1.55.0. The Rust hook crate description still says 'Claude Code only' (rust/hook/Cargo.toml:6) although rust/hook/src/payload.rs:34-59 handles all eight."
+      },
+      {
+        "claim": "`ggshield auth login` provisions a personal access token and configures it locally (README.md:189-197)",
+        "verified": "yes",
+        "evidence": "ggshield/cmd/auth/login.py:99-219: methods web (browser plus localhost OAuth callback with PKCE, ggshield/verticals/auth/oauth.py:110), oob and token; default scopes scan, honeytokens:check, endpoints:send, ai-discover:send (oauth.py:32-37). The README does not say where the token goes: OS keyring by default with a sentinel in auth_config.yaml, falling back to that YAML at mode 0600 if no keyring is usable or GGSHIELD_NO_KEYRING is set (ggshield/core/config/token_store.py:296-315; ggshield/core/config/auth_config.py:211-222; ggshield/core/config/utils.py:62-77). The config dir is platformdirs' user_config_dir, not the checkout (ggshield/core/dirs.py:47-52). GITGUARDIAN_API_KEY takes precedence (ggshield/core/config/config.py:182-207)."
+      },
+      {
+        "claim": "Install script is the recommended method (README.md:61-92)",
+        "verified": "yes",
+        "evidence": "scripts/install/install.sh exists; it installs the standalone tar.gz under ~/.local/share/ggshield-standalone without sudo (install.sh:25-31,250-303), requires and checks the sha256 digest from GitHub's release API and fails closed (install.sh:192-211), makes gh build-provenance verification opt-in via GGSHIELD_REQUIRE_ATTESTATION (install.sh:213-248), is glibc-only and rejects Alpine/musl (install.sh:156-161). The README command fetches the script from the main branch (README.md:67-69)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "AI hook latency for an MCP PreToolUse event, after caching local discovery for an hour and running the secret scan and MCP-activity call concurrently; measured against a mock API at production p50 latency",
+        "metric": "p50 latency per hook event",
+        "value": "1183 ms before -> 387 ms after",
+        "source": "CHANGELOG.md:197-203 (release 1.54.0)",
+        "independent": false
+      },
+      {
+        "what": "AI hook latency for a UserPromptSubmit event mentioning three files, after batching all payloads of an event into one API call; measured against a mock API at production p50 latency",
+        "metric": "p50 latency per hook event",
+        "value": "1561 ms before -> 395 ms after",
+        "source": "CHANGELOG.md:205-208 (release 1.54.0)",
+        "independent": false
+      },
+      {
+        "what": "`ggshield --version` start-up in a fresh container when the standard library bytecode is not precompiled",
+        "metric": "extra wall-clock time without .pyc files",
+        "value": "about 0.2 s slower",
+        "source": "Dockerfile:30-32 (code comment)",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Hosted-service dependency: every scan uploads file or patch text to a GitGuardian instance and needs an account and API token; detection lives server-side with no local engine or offline mode (ggshield/verticals/secret/secret_scanner.py:106-132; ggshield/core/client.py:152-169; rust/hook/src/api.rs:1-4). Gating therefore depends on that service: defaults block on server errors, but secret.fail_on_server_error=false or --no-fail-on-server-error turns outages into exit 0 (ggshield/core/config/user_config.py:49-52; ggshield/cmd/utils/common_decorators.py:26-76), and pre-receive returns 0 when it exceeds its time budget (ggshield/cmd/secret/scan/prereceive.py:149-152).",
+      "Metadata sent exceeds what the README describes: Machine-Id (hardware UUID), OS username, repository URL, OS and Python versions and scan options go with every scan (ggshield/core/scan/scan_context.py:44-67; ggshield/core/machine_id.py:316-341), and an update check calls api.github.com about daily by default (ggshield/core/check_updates.py:53-88; ggshield/__main__.py:144-154). Server-side retention cannot be verified from the repo (README.md:17).",
+      "Scope well beyond secret scanning, partly default-on in `ggshield machine setup`: edits AI-assistant settings, sets git core.hooksPath globally or system-wide, and plants a decoy AWS credentials profile under ~/.aws (ggshield/cmd/machine/setup.py:35-117,161-246; ggshield/verticals/honeytoken/aws_profile.py:1-16). AI features upload hostname, OS username, machine id, git user.email, assistant subscription emails and MCP inventory (ggshield/verticals/ai/user.py:15-39; ggshield/verticals/ai/discovery.py:56-124), and `ai discover --activity` (experimental flag) ships raw Claude Code/Codex transcript lines (ggshield/cmd/ai/discover.py:47-53,93-96; ggshield/verticals/ai/agents/claude_code.py:25-38).",
+      "Fail-open and bypass paths: the AI hook allows the action with only a warning when it cannot authenticate or reach the API (ggshield/verticals/ai/hooks.py:255-292); SKIP=ggshield bypasses git hooks (ggshield/cmd/utils/hooks.py:13-28); the changelog records fixed bugs where hook events went unscanned (CHANGELOG.md:69-72,99-103).",
+      "Credential-handling nuances: the token falls back to a 0600 plaintext YAML when no OS keyring is usable or GGSHIELD_NO_KEYRING is set (ggshield/core/config/token_store.py:296-315; ggshield/core/config/utils.py:62-77); a .env in the working directory or git root is loaded with override=True, so an API key can live in the checkout (ggshield/core/env_utils.py:23-70); the tool writes .cache_ggshield in the current directory and appends an entry to the repo's .gitignore (ggshield/core/cache.py:16-77; ggshield/utils/git_shell.py:563-590); macOS prompts for Keychain access for the second binary ggshield-py (README.md:10-11); the pre-receive sample suggests placing the API key in the hook script (doc/pre-receive.sample:9-12).",
+      "Install and release trust: the recommended install is `curl | bash` of a script from the main branch (README.md:67-69); the sha256 it checks comes from GitHub's release API and attestation verification is off by default (scripts/install/install.sh:192-248); the Cloudsmith apt/rpm bootstrap runs as root and is not independently checksum-verified (scripts/install/README.md:143-145). The release workflows add no checksum file, GPG or cosign signature, and tag.yml sets no explicit PyPI attestation option (.github/workflows/tag.yml:81-90,127-137). The standalone build is glibc-only (scripts/install/install.sh:156-161).",
+      "No credential verification in this repo: validity values come from the GitGuardian API and can be 'no checker', 'not checked', 'failed to check' or 'cannot check' (ggshield/core/text_utils.py:61-70); nothing here calls provider APIs. `ggshield hmsl` checks hash prefixes against a public-leak service, not provider validity (ggshield/verticals/hmsl/client.py:154-164).",
+      "Maintenance and complexity: fast release cadence with growing scope (1.50.0 on 2026-04-28 to 1.55.0 on 2026-09-24; CHANGELOG.md:5,137,355,503,531,581,665); the native Rust AI hook duplicates 'security-relevant logic that now exists twice', kept aligned by a single CI equivalence job (.github/workflows/ci.yml:178-203); tight or old pins (charset-normalizer~=3.1.0, keyring<26, rich~=13, Python>=3.9 floor with 3.9-specific CVE version splits; pyproject.toml:36-47,60-64); a Grype baseline suppresses 12 CVEs in the bundled interpreter and SQLite (.grype.yaml:3-19); the README lags the code on supported AI tools (README.md:239-240 vs ggshield/verticals/ai/agents/__init__.py:18-30)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "gitguardian/ggshield",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install script (standalone build, Linux/macOS, no sudo): curl -sSfL https://raw.githubusercontent.com/GitGuardian/ggshield/main/scripts/install/install.sh | bash",
+          "citation": "README.md:67-69 (behaviour: scripts/install/README.md:35-58)",
+          "holds": true,
+          "note": "README.md:68-69 has the exact command (line 67 is the code fence; the dossier joins the `\\` continuation into one line, which is equivalent) under 'Install script (Recommended)' (README.md:61). scripts/install/README.md:35-38 says it installs the standalone build to ~/.local/share/ggshield-standalone, symlinked into ~/.local/bin '(no sudo)'; install.sh:5,25-28 match. Lines 52-58 confirm the mandatory sha256 check and opt-in attestation. Linux/macOS only: install.sh:121-123 refuses Windows and points to install.ps1."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: MIT, file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT text ('MIT License', Copyright (c) 2019 GitGuardian). Consistent with README.md:289 ('ggshield is MIT licensed.') and pyproject.toml:32 (license = { text = \"MIT\" }). No conflicting license declaration in pyproject.toml, hatch_meta.py or rust/**/Cargo.toml."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - release packages are built for x86_64 Linux; install.sh picks x86_64-unknown-linux-gnu; manylinux2014 and musllinux x86_64 wheels; the standalone build is glibc-only",
+          "citation": ".github/workflows/build_release_assets.yml:107-117; scripts/install/install.sh:128-153, 156-161; .github/workflows/wheels.yml:259-279",
+          "holds": true,
+          "note": "build_release_assets.yml:107-117 is the build_os_packages matrix entry: ubuntu-22.04 in a digest-pinned rockylinux 8.10 container, arch and nfpm_arch x86_64. tag.yml:12-13 calls this workflow for releases. install.sh:128-129 maps x86_64|amd64 to x86_64, and :143-153 sets TARGET=$linux_arch-unknown-linux-gnu. wheels.yml:259-265 is manylinux2014_x86_64 and :273-279 is musllinux_1_2_x86_64. install.sh:156-161 exits on musl ('standalone build is glibc-only')."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "yes - `ggshield machine setup` (or deprecated `ggshield install -m global -t claude-code|codex`) writes hooks into ~/.claude/settings.json and ~/.codex/hooks.json; Claude Code events PreToolUse/PostToolUse/UserPromptSubmit; hook command `ggshield secret scan ai-hook` answered natively by the Rust dispatcher; Codex runs the hook only after the user approves it",
+          "citation": "README.md:233-240; ggshield/cmd/machine/setup.py:35-136; ggshield/cmd/install.py:108-117; ggshield/verticals/ai/installation.py:252-332; ggshield/verticals/ai/agents/claude_code.py:157-158; ggshield/verticals/ai/agents/codex.py:108-109,111-120; ggshield/verticals/ai/models.py:297-338; rust/dispatcher/src/dispatch.rs:20-23,41-43",
+          "holds": true,
+          "note": "README.md:239-240 lists Claude Code and Codex. setup.py:105-136 calls install_all_agent_hooks, which installs each selected agent with mode=\"global\" (installation.py:484-517). install.py:84 accepts the agent names as -t values ('claude-code' claude_code.py:93, 'codex' codex.py:58), and :108-113 warns that this is deprecated in favor of `ggshield machine setup`. installation.py:269-270 resolves global paths under the user home; claude_code.py:157-158 gives .claude/settings.json and codex.py:108-109 gives .codex/hooks.json. models.py:297-338 is the default template with PreToolUse, PostToolUse and UserPromptSubmit, which neither agent overrides. dispatch.rs:20-23 and :41-43 match exactly `secret scan ai-hook`. codex.py:111-120 is the approval warning. Minor precision: the written command is the absolute ggshield path followed by `secret scan ai-hook` (installation.py:52-93). The dispatcher only exists in platform wheels and standalone bundles (installation.py:127-128), and it can hand declined events to ggshield-py (dispatch.rs:57-106). Neither point makes the statement wrong."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "Scans files/directories (path -r), repositories (repo), Docker images and PyPI packages (README.md:205-209) - verified: yes",
+          "citation": "ggshield/cmd/secret/scan/__init__.py:20-37; ggshield/verticals/secret/repo.py:54-63; ggshield/core/scan/commit.py:111-126; ggshield/cmd/secret/scan/path.py:44,73-78",
+          "holds": true,
+          "note": "README.md:205-208 lists the four targets. __init__.py:22-37 registers path, repo, docker, docker-archive, pypi and the rest. repo.py:54-63 passes get_list_commit_SHA(\"--all\"), which runs `git rev-list --reverse --all --` (git_shell.py:389-396), so every commit reachable from any ref is covered. commit.py:111-126 (Commit.from_staged) runs `git diff --staged`. path.py:44 defines --recursive/-r, and :73-78 refuses a directory without it. Supporting code beyond the citations: docker.py:35-51 (`docker save`) and pypi.py:121-146 (downloads the package without installing it)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

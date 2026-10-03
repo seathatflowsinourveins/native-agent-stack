@@ -1,0 +1,347 @@
+{
+  "contender": "jgravelle/jcodemunch-mcp",
+  "revision": {
+    "contender": "jgravelle/jcodemunch-mcp",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "jgravelle/jcodemunch-mcp",
+        "tag": "v1.108.323",
+        "commit": "8b85b6ad69fc9279f9c6448d157de88093081628",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.108.323",
+    "commit": "8b85b6ad69fc9279f9c6448d157de88093081628",
+    "read_at": "2026-10-02T03:02:20+00:00"
+  },
+  "dossier": {
+    "contender": "jgravelle/jcodemunch-mcp",
+    "revision": {
+      "tag": "v1.108.323",
+      "commit": "8b85b6ad69fc9279f9c6448d157de88093081628",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "LicenseRef-jCodeMunch-Dual-Use-1",
+      "file": "LICENSE"
+    },
+    "purpose": "Local-first Python MCP server (stdio by default; optional SSE/streamable-http) that indexes local folders or GitHub repos with tree-sitter (plus regex/custom parsers for some languages) into SQLite under ~/.code-index/ and serves symbol-level retrieval (search_symbols, get_symbol_source from a cached copy of each file via stored byte offsets, outlines), import-graph / text-mention / name-based reference and impact queries, and read-only preflight/planning tools (README.md:32; ARCHITECTURE.md:37-45,341-365; src/jcodemunch_mcp/server.py:9241). It is not a language-server client: definitions and references come from its own index; language servers are an optional, default-off, index-time enrichment (src/jcodemunch_mcp/enrichment/lsp_bridge.py:1-26,704-723); it does not edit user source files (src/jcodemunch_mcp/counter.py:77-87; src/jcodemunch_mcp/server.py:3438-3444).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'The most token-efficient MCP server for precise source code retrieval via tree-sitter AST parsing.' Cuts AI token costs 86-99% on code exploration (96% average, benchmarked at 28.3x fewer tokens than a grep-and-read agent).",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Indexes a codebase once; agents retrieve only the exact code they need (functions, classes, methods, constants, outlines) with byte-level precision from a local index holding tree-sitter symbol metadata plus raw file content.",
+          "citation": "README.md:32"
+        },
+        {
+          "claim": "Works with Claude Code, Cursor, VS Code, Codex CLI, Windsurf, Continue and any MCP-compatible client.",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "`jcodemunch-mcp init` auto-detects MCP clients (Claude Code, Claude Desktop, Cursor, Windsurf, Continue), writes their config entries, installs the CLAUDE.md prompt policy, optionally installs enforcement hooks, optionally indexes the project and audits agent config files.",
+          "citation": "README.md:97"
+        },
+        {
+          "claim": "Installation makes tools available but does not break the agent's brute-reading habit; one CLAUDE.md line ('Call the jcodemunch_guide tool and strictly follow its instructions.') does.",
+          "citation": "README.md:124-128"
+        },
+        {
+          "claim": "`get_symbol_source` returns the exact function body, byte-precise.",
+          "citation": "README.md:149"
+        },
+        {
+          "claim": "`find_references` answers who imports a name, over the import graph alone, so a call site is invisible to it; `check_references` answers where a name is used (import sites plus every file whose content mentions it).",
+          "citation": "README.md:151"
+        },
+        {
+          "claim": "`plan_refactoring` gives edit-ready {old_text, new_text} blocks; safety checks return null/non-terminal verdicts when the index cannot back an absence claim; type-checker output can be handed over with `import-trace --diagnostics`; 'Nothing runs a checker for you.'",
+          "citation": "README.md:152"
+        },
+        {
+          "claim": "'Trust the answers': calibrated confidence scores, freshness flags, coverage contracts on absence claims, compiler-verified references via SCIP import, and automatic secret redaction before anything reaches the LLM.",
+          "citation": "README.md:153"
+        },
+        {
+          "claim": "'Keep the index fresh automatically': watch modes, agent hooks and a VS Code extension close the staleness gap.",
+          "citation": "README.md:154"
+        },
+        {
+          "claim": "Languages: 70+ via tree-sitter (Python, JS/TS, Go, Rust, Java, C/C++, C#, PHP, Ruby, Swift, Kotlin...). Monorepos: yes.",
+          "citation": "README.md:181"
+        },
+        {
+          "claim": "Local-first: indexes live at ~/.code-index/; the base package's only default network behavior is an anonymous savings counter (random ID plus aggregate token counts; opt out with share_savings: false).",
+          "citation": "README.md:226"
+        },
+        {
+          "claim": "Reproducible benchmark on 3 pinned repos (15 task-runs, tiktoken cl100k_base): 28.3x vs grep-top-3, 241.1x vs read-all; plus an 'Independent A/B test' (50 iterations, Vue 3 + Firebase, Sonnet 4.6): success 80% vs 72%, timeouts 32% vs 40%, cache creation -10.5%.",
+          "citation": "README.md:49-67"
+        },
+        {
+          "claim": "Released under the jCodeMunch-MCP Dual-Use License: free for non-commercial use, commercial use needs a paid license (Builder $79, Studio $349, Platform $1,999); may not be renamed, rebranded or published to any public package registry.",
+          "citation": "README.md:305-313"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv tool install, then init (README 'Recommended')",
+          "command": "uv tool install jcodemunch-mcp; jcodemunch-mcp init",
+          "citation": "README.md:90-93"
+        },
+        {
+          "method": "uvx (zero install)",
+          "command": "uvx jcodemunch-mcp",
+          "citation": "README.md:104"
+        },
+        {
+          "method": "pipx",
+          "command": "pipx install jcodemunch-mcp",
+          "citation": "README.md:105"
+        },
+        {
+          "method": "pip (inside a virtualenv)",
+          "command": "pip install jcodemunch-mcp",
+          "citation": "README.md:106"
+        },
+        {
+          "method": "Claude Code manual MCP registration",
+          "command": "claude mcp add -s user jcodemunch -- uvx jcodemunch-mcp",
+          "citation": "README.md:119"
+        },
+        {
+          "method": "Codex CLI (pre-installed binary, not uvx)",
+          "command": "python3 -m venv .venv; .venv/bin/pip install -U jcodemunch-mcp; then add to ~/.codex/config.toml: [mcp_servers.jcodemunch] command = '/absolute/path/to/.venv/bin/jcodemunch-mcp'",
+          "citation": "CLIENTS.md:42-59"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - ubuntu-latest is in the CI test matrix (Python 3.10-3.13) and release smoke tests (.github/workflows/pr-gate.yml:139-143; .github/workflows/release.yml:146-149); manylinux x86_64 wheels are locked for the native grammar deps (uv.lock:3495,3517).",
+        "wsl2": "unknown - not in README or CI; code detects WSL and switches the file watcher to polling (src/jcodemunch_mcp/watcher.py:37-44,230-239); CONFIGURATION.md:337-343 shows a Linux-index/Windows-query path_map example.",
+        "macos_arm64": "unknown - no macOS runner in any workflow (pr-gate.yml:139-143; nightly.yml:69-73) and no README platform statement; code/wheels do cover it: pure-Python wheel with 'OS Independent' classifier (pyproject.toml:27), macOS arm64/universal2 wheels locked for both native grammar deps (uv.lock:3494,3515), launchd service support (SECURITY.md:255-257), macOS Claude Desktop path (src/jcodemunch_mcp/cli/init.py:198-199).",
+        "gpu": "no - not used or required; the optional local ONNX encoder is documented as CPU inference (SECURITY.md:435) and builds its onnxruntime session without GPU providers (src/jcodemunch_mcp/embeddings/local_encoder.py:286-291); no GPU/CUDA configuration found in src/."
+      },
+      "integrations": {
+        "cli": "yes - `jcodemunch-mcp` console script (pyproject.toml:99) with about 45 argparse subcommands: serve, init, install/uninstall/status, index, index-file, import-trace, import-scip, watch*, config, surface, install-pack, hook-* (src/jcodemunch_mcp/server.py:9258-10278); also `gcm` and `munch-bench` scripts (pyproject.toml:100-101). cli/cli.py is labelled 'an unsupported add-on' (cli/README.md:1).",
+        "mcp": "yes - primary interface. Default stdio; `serve --transport sse|streamable-http` (server.py:9261-9270; /mcp at server.py:8107, /sse at :7906). About 90-91 tools on the full surface (README.md:156; ROADMAP.md:572,585) versus a 3-tool order/menu/route front door ('counter') that init writes on genuinely first-ever installs (counter.py:1-30; config.py:141-158; README.md:220). Navigation-relevant tools: search_symbols, get_symbol_source, get_file_outline, find_importers, find_references, check_references, get_call_hierarchy, find_implementations, check_edit_safe/check_rename_safe/check_delete_safe, plan_refactoring (server.py:1563-4333). README documents Anthropic MCP-connector tool-search defer_loading for URL transports only (README.md:189-220). Registry entry io.github.jgravelle/jcodemunch-mcp, PyPI stdio package (server.json:2-15).",
+        "sdk_or_api": "No client SDK. Optional HTTP transports (streamable-http /mcp, SSE /sse) with optional bearer token and rate limit via env (server.py:7776-7810,7906,8107). Four opt-in POST ingest routes (/org/report, /runtime/otel|sql|stack) are off by default (SECURITY.md:413-418). Internal Python functions are importable and used by CI (.github/workflows/main.yml:118-124) but no public Python API is documented. clients/ts/decoder.ts decodes the MUNCH compact wire format only (clients/ts/README.md:1-10).",
+        "claude_code_or_codex": "Claude Code: `claude mcp add` (README.md:119; cli/init.py:500-522); `init` writes the CLAUDE.md policy and registers hooks in ~/.claude/settings.json: PreToolUse steering of Read/Grep/Glob/Bash (advisory by default, deny with --strict), PostToolUse re-index on Edit|Write, PreCompact, SessionStart, TaskCompleted, SubagentStart (cli/init.py:99-130,1064-1122; cli/hooks/steering.py:284-300,372-379). `.claude-plugin/plugin.json` and marketplace.json exist but the plugin only declares the MCP server `uvx jcodemunch-mcp` - no hooks, skills or lspServers (.claude-plugin/plugin.json:22-29); README does not document plugin install. Codex CLI: `init` appends [mcp_servers.jcodemunch] to ~/.codex/config.toml and writes AGENTS.md, but declines when no jcodemunch-mcp binary is on PATH because uvx output breaks Codex's handshake (cli/init.py:333-395,752-776; CLIENTS.md:36-47); no Codex hooks documented (AGENT_HOOKS.md has no Codex section); CLIENTS.md:66-73 notes Codex may silently decline MCP calls in non-interactive mode."
+      },
+      "telemetry_and_network": "Default-on anonymous savings counter: share_savings defaults to True (src/jcodemunch_mcp/config.py:489); a lazily started daemon thread POSTs {delta,total,anon_id} (random UUID) to https://j.gravelle.us/APIs/savings/post.php (src/jcodemunch_mcp/storage/token_tracker.py:75,1347-1352,1440-1460). Opt out with share_savings:false or JCODEMUNCH_SHARE_SAVINGS=0 (config.py:53; SECURITY.md:393); endpoint overridable via JCODEMUNCH_TELEMETRY_URL (token_tracker.py:1433-1437); `init --no-share-savings` writes the opt-out (server.py:9713-9730). Local perf telemetry (telemetry.db) is off by default (config.py:490; SECURITY.md:294-311). Other network use is user-invoked or extra-gated and enumerated in SECURITY.md:387-422: index_repo calls api.github.com with optional GITHUB_TOKEN (tools/index_repo.py:114-119,314-318); license/org-rollup/install-pack --license send a key to j.gravelle.us (org/license.py:42); install-pack fetches from jcodemunch.com (cli/install_pack.py:21); the ONNX model downloads once from huggingface.co, including on first semantic encode (embeddings/local_encoder.py:35,272-273); AI-summary providers are called only when enabled and auto-detected paid providers need allow_paid_summaries (config.py:2678-2686). The startup version hint is local-only (version_check.py:1-13). No account is needed for the base package. HTTP transport bearer auth is optional: binding a non-loopback host without JCODEMUNCH_HTTP_TOKEN only prints a warning (server.py:7924-7930,8118-8124) and the Dockerfile defaults to SSE on 0.0.0.0 with the token unset (Dockerfile:24-29). Persistent background service only on explicit `watch-install` (SECURITY.md:245-262,392)."
+    },
+    "code": {
+      "languages": [
+        "Python (src/jcodemunch_mcp, tests, harness, scripts, benchmarks)",
+        "TypeScript (vscode-extension/src/*.ts, clients/ts/decoder.ts)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/jcodemunch_mcp/server.py:9241",
+          "what": "main() for the `jcodemunch-mcp` console script (pyproject.toml:99); argparse CLI with ~45 subcommands; serves MCP when no subcommand is given."
+        },
+        {
+          "path": "src/jcodemunch_mcp/__main__.py:1-5",
+          "what": "`python -m jcodemunch_mcp` delegating to server.main."
+        },
+        {
+          "path": "src/jcodemunch_mcp/server.py:9261-9270",
+          "what": "`serve --transport stdio|sse|streamable-http` (default 127.0.0.1:8901 for HTTP); Dockerfile ENTRYPOINT is `jcodemunch-mcp serve` (Dockerfile:37)."
+        },
+        {
+          "path": "src/jcodemunch_mcp/cli/init.py:1252",
+          "what": "run_init behind `jcodemunch-mcp init`: client config, CLAUDE.md/AGENTS.md policy, hooks, index, audit; flags --minimal, --strict, --no-share-savings (server.py:9648-9755)."
+        },
+        {
+          "path": "src/jcodemunch_mcp/cli/hooks/reindex.py:55",
+          "what": "Hook handlers run as `jcodemunch-mcp hook-pretooluse|hook-posttooluse|hook-copilot-posttooluse|hook-event` (server.py:9894-9921); precompact/sessionstart/taskcomplete/subagent-start hooks are registered by init (cli/init.py:113-128; steering.py:284; taskcomplete.py:36)."
+        },
+        {
+          "path": "src/jcodemunch_mcp/server.py:9577-9645",
+          "what": "`import-trace` (OTel/SQL/stack logs or type-checker diagnostics) and `import-scip` (SCIP index) ingest commands."
+        },
+        {
+          "path": "pyproject.toml:100-101",
+          "what": "`gcm` (jcodemunch_mcp.groq.cli:main) and `munch-bench` (munch_bench.cli:main) console scripts."
+        },
+        {
+          "path": "harness/__main__.py",
+          "what": "`python -m harness fast|full|bench|check`, the CI judgement runner used by the workflows (.github/workflows/pr-gate.yml:66,158,244)."
+        }
+      ],
+      "architecture": "One Python package, src/jcodemunch_mcp/. server.py (~10k lines) is the MCP dispatcher: tool registry (_build_tools_list :1543), call_tool pipeline (steering hints, response secret redaction :7453-7470, MUNCH compact encoding), HTTP transports with bearer auth/rate limit, and the argparse CLI (:9241); counter.py implements the optional 3-tool order/menu/route front door. parser/ (languages.py LANGUAGE_REGISTRY :2036, extractor.py, imports.py, racket_reader.py, grammar_pack.py) produces symbols via tree-sitter-language-pack/tree-sitter-fsharp or regex/custom walkers. storage/ (index_store.py, sqlite_store.py, token_tracker.py) persists SQLite WAL indexes plus cached raw files under ~/.code-index/ (ARCHITECTURE.md:341-365). tools/ (113 modules, one per tool: index_folder.py, index_repo.py, search_symbols.py, get_symbol.py, find_references.py, check_references.py, get_call_hierarchy.py, find_implementations.py, plan_refactoring.py, check_*_safe.py) implements retrieval and analysis; retrieval/ (signal_fusion, confidence, freshness, provenance) ranks and annotates results; enrichment/lsp_bridge.py optionally spawns pyright/typescript-language-server/gopls/rust-analyzer during index_folder to add call and dispatch edges (tools/index_folder.py:2744-2774,3007-3039); evidence/ plus tools/_scip_consume.py ingest SCIP; runtime/ ingests OTel/SQL/stack logs and checker diagnostics; cli/ holds init, hook handlers and install-pack; watcher.py/watch_all.py/service_installer.py handle auto-reindex and login services; security.py/redact.py/secret_classifier.py hold path, secret and redaction controls; summarizer/, embeddings/, encoding/ (MUNCH), groq/, org/, investigator/ are optional layers. Also in-repo: harness/ (CI floors), benchmarks/, munch-bench/, speedreview/ (GitHub Action), vscode-extension/, clients/ts/.",
+      "packaging_and_release": "Pure-Python wheel + sdist built with hatchling (pyproject.toml:103-112; two top-level packages jcodemunch_mcp and munch_bench). Releases are cut only by workflow_dispatch of release.yml (dry_run defaults true; hand-pushed v* tags are refused): pre-flight, `uv build` + `twine check`, TestPyPI via OIDC trusted publishing with attestations, clean-venv stdio handshake smoke on ubuntu+windows, tag, PyPI via trusted publishing with `attestations: true`, post-publish smoke from PyPI with tool-count check, GitHub release with sigstore-signed wheel+sdist and CHANGELOG notes, then MCP-registry publish via mcp-publisher v1.8.1 (.github/workflows/release.yml:20-31,54-58,103-139,219-238,240-297,309-347,349-381). No checksum file is published; the PyPI publish step prints hashes (release.yml:238). Dockerfile and docker-compose.yml build from source; no workflow builds or publishes a container image (grep of .github/). SECURITY.md:163-196 documents sigstore verification but names a removed sign-release.yml workflow ('Sign release artifacts'), which release.yml:329 says was folded in (also pr-gate.yml:18-19). sdist is guarded against credential paths (pr-gate.yml:159-167). The VS Code extension is a separate MIT artifact (vscode-extension/package.json:7).",
+      "tests_and_ci": "pytest (>=9.0.2) with pytest-asyncio (asyncio_mode=auto), pytest-cov, pytest-xdist (--dist loadfile), hypothesis; ruff E4/E7/E9/F (pyproject.toml:154-224). 689 test_*.py files under tests/ (685 top-level + 4 in tests/encoding) plus 3 under munch-bench/tests; the project reports 7,859 tests collected on 2026-08-16 (pyproject.toml:197-203); coverage floor 74% (harness/thresholds.json:317-337). The LSP bridge is covered only by unit tests with mocks, not by a real language server (tests/test_lsp_bridge.py:17-26,101-121). 20 workflow files in .github/workflows: pr-gate.yml (fast tier = harness fast + ruff format + pyright error ratchet + pip-audit + gitleaks; full tier on ubuntu+windows x Python 3.10-3.13; wheel/sdist install + stdio handshake on ubuntu+windows; offline bench + token-benchmark floor >=20x; changelog/version-pin/tool-surface checks), main.yml (full + online bench on push to main, weekly results PR), nightly.yml (04:00Z full matrix + fresh-corpus bench, opens drift issues), security.yml (CodeQL python+actions), benchmark.yml (weekly pinned-corpus re-run), release.yml, health-radar*.yml, competitive-{run,feed,post}.yml, and nine inbound-*.yml issue/PR automation workflows gated by INBOUND_ENABLED (SECURITY.md:318-346). No macOS runner in any workflow. Dependabot: security-only plus monthly minor/patch groups (.github/dependabot.yml).",
+      "dependencies": "pyproject.toml: 7 direct runtime deps (mcp>=1.10,<2; httpx; tree-sitter-language-pack>=0.7,<1.0; tree-sitter-fsharp==0.3.12; tree-sitter>=0.25; pathspec; pyyaml) (pyproject.toml:37-70); 16 optional extras covering 15 further distinct packages (anthropic, google-generativeai, openai, uvicorn, starlette, anyio, watchfiles, sentence-transformers, onnxruntime, sounddevice, numpy, Pillow, rich, jinja2, keyring) (pyproject.toml:77-95); 7 dev-group deps (pyproject.toml:196-224). uv.lock: 152 package entries (revision 3); CI installs with `uv sync --locked`. vscode-extension/package.json: 0 runtime deps, 3 devDependencies; clients/ts has no manifest. Notable caps: mcp <2.0.0 because the 2.x low-level Server API breaks the server at import (pyproject.toml:38); tree-sitter-language-pack <1.0.0 because 1.x downloads grammars at runtime (pyproject.toml:40-56; README.md:228).",
+      "security_policy": "SECURITY.md: private reporting via GitHub's advisory form, acknowledgement within 3 days and verdict within 14 days, scope = the PyPI package, repo workflows and the registry entry's published container (SECURITY.md:348-365); also documents path/symlink/secret controls, background behavior and the security-sensitive files init may write (SECURITY.md:7-345,387-448)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Cuts token costs 86-99% on code exploration; 28.3x fewer tokens than a grep-and-read agent (README.md:3,49-61)",
+        "verified": "partial",
+        "evidence": "The arithmetic reproduces from benchmarks/results.md:103-113 (664,975 -> 23,467 tokens over 15 task-runs) and a >=20x floor is gated in CI (harness/thresholds.json:158-177). Scope is narrower than the headline: retrieval tokens only, not answer quality or end-to-end cost (benchmarks/METHODOLOGY.md:6-10); one of the 15 runs fetched zero symbols yet counts as a 55x saving (benchmarks/results.md:36); METHODOLOGY.md:18-22 lists symbol counts 200/6,841/1,260 while results.md and README show 455/13,240/1,451 (stale table)."
+      },
+      {
+        "claim": "get_symbol_source returns the exact function body, byte-precise (README.md:149)",
+        "verified": "yes",
+        "evidence": "Symbols store byte offsets into raw files cached at index time and the body is read from that cached copy, not live disk (src/jcodemunch_mcp/tools/get_symbol.py:499-501; ARCHITECTURE.md:363-365). verify=True hashes against the index or git HEAD (server.py:2033-2042) and per-symbol freshness reports fresh/edited_uncommitted/stale_index/unknown (retrieval/freshness.py:1-26), so exactness depends on index freshness."
+      },
+      {
+        "claim": "find_references = who imports a name (import graph only); check_references = where a name is used (README.md:151)",
+        "verified": "yes",
+        "evidence": "Tool descriptions: find_importers 'Import edges only' (server.py:2292); find_references 'NOT the tool for where is this used: call sites are invisible to the import graph' (server.py:2307); check_references = import sites plus files whose content mentions the identifier, matches in comments/strings count, capped at 20 files by default (server.py:2326); get_call_hierarchy is 'name-based, so same-name symbols in different modules can merge and dynamic dispatch is missed' (server.py:3052-3058). None is a semantic language-server reference lookup."
+      },
+      {
+        "claim": "plan_refactoring gives edit-ready {old_text,new_text} blocks (README.md:152)",
+        "verified": "yes",
+        "evidence": "Plan only: 'never writes a file. Apply the returned blocks yourself, then re-index' (server.py:3438-3444). No tool writes user source: write sites under tools/ are observatory output, session state, mermaid temp files and a dependency-source copy (grep of write_text/shutil in src/jcodemunch_mcp/tools); register_edit only invalidates caches (tools/register_edit.py:13-35); counter.py:77-87 refuses write/exec verbs 'by charter'; ROADMAP.md:1784-1785 states a 'no-mutate and no-execute position'. There are no symbol-level edit tools."
+      },
+      {
+        "claim": "Compiler-verified references via SCIP import; type-checker output via import-trace --diagnostics; 'Nothing runs a checker for you' (README.md:152-153)",
+        "verified": "yes",
+        "evidence": "Both are ingest-only CLI commands (server.py:9577-9615 import-trace --diagnostics for mypy/pyright/tsc/ruff/generic; server.py:9630-9645 import-scip). SCIP indexes come from third-party indexers the user runs and ingest adds no MCP tool (SCIP.md:7-10,14-29,71-72); diagnostics are read-only snapshots mapped to symbols (tools/_diagnostics_consume.py:1-18). A grep of src/ for checker/server names finds spawned commands only in enrichment/lsp_bridge.py:89-105; mypy/pyright/tsc/ruff elsewhere are just format names (runtime/diagnostics_log.py:30)."
+      },
+      {
+        "claim": "SCIP.md:9-10 'never spawns a language server' and CAPABILITIES.md:29 'no language server required' (README never mentions language servers; it only says 'compiler-verified references via SCIP import', README.md:153)",
+        "verified": "partial",
+        "evidence": "True by default only. enrichment/lsp_bridge.py:182-217 spawns pyright-langserver, typescript-language-server, gopls or rust-analyzer via subprocess.Popen when enrichment.lsp_enabled is true (default false: config.py:522-523; lsp_bridge.py:704-723), called from tools/index_folder.py:2744-2774,3007-3039. It sends initialize, didOpen/didClose, textDocument/definition and textDocument/implementation only (lsp_bridge.py:302-397); results become call-graph/dispatch edges stored at index time, not live queries; no references, rename, code-action or diagnostics requests and notifications are ignored (lsp_bridge.py:283-300). Enabling is documented only in the module docstring and a config-template comment (lsp_bridge.py:14-25; config.py:2697-2702), not in CONFIGURATION.md. The LSP channel's 1.0 confidence is a declared prior 'not yet gold-measured' (retrieval/provenance.py:33-37)."
+      },
+      {
+        "claim": "Automatic secret redaction before anything reaches the LLM (README.md:153)",
+        "verified": "partial",
+        "evidence": "Redaction runs in the call_tool dispatcher but skips get_file_content, get_symbol_source and get_context_bundle (server.py:7453-7465), the tools that return raw source; SECURITY.md:97-116 states this and that a hardcoded credential in an ordinary source file is caught by neither control. Default on; disable with JCODEMUNCH_REDACT_RESPONSE_SECRETS=0 (redact.py:10-12)."
+      },
+      {
+        "claim": "Works with Claude Code and Codex CLI; hooks keep the index fresh (README.md:9,154)",
+        "verified": "partial",
+        "evidence": "init registers Claude Code via `claude mcp add` and Codex by appending [mcp_servers.jcodemunch] to ~/.codex/config.toml, but refuses Codex unless a jcodemunch-mcp binary is on PATH (cli/init.py:223-227,333-395,500-522; CLIENTS.md:36-47); AGENTS.md policy is written for Codex (init.py:752-776). Hooks (PreToolUse steering, PostToolUse re-index on Edit|Write, PreCompact, SessionStart, TaskCompleted, SubagentStart) go only to ~/.claude/settings.json (init.py:99-130,1064-1122); the PostToolUse hook prints nothing and only spawns index-file (cli/hooks/reindex.py:55-86). AGENT_HOOKS.md has no Codex section, so Codex has MCP + AGENTS.md only; the project's own Codex token A/B was inconclusive (benchmarks/codex_surface/README.md:38-60)."
+      },
+      {
+        "claim": "70+ languages via tree-sitter (README.md:181)",
+        "verified": "partial",
+        "evidence": "LANGUAGE_REGISTRY has at least 79 entries and 164 extensions (floors in harness/thresholds.json:282-316; registry at parser/languages.py:2036), so '70+' holds, but not all are tree-sitter: regex-based (Verse, Blade, EJS, Assembly, AutoHotkey, AL, COBOL), custom walkers (Vue/Svelte script blocks, YAML/JSON/OpenAPI, a Racket reader in Python) and text-only SASS (LANGUAGE_SUPPORT.md:34,43-46,48,51-62). F# uses a separate pinned wheel (pyproject.toml:57-63)."
+      },
+      {
+        "claim": "Only default network behavior is an anonymous savings counter; opt out with share_savings:false (README.md:226)",
+        "verified": "yes",
+        "evidence": "Default share_savings=True (config.py:489); payload {delta,total,anon_id} sent by a lazily started daemon thread (storage/token_tracker.py:1347-1352,1440-1460). The only other httpx/urllib users in src are index_repo (GitHub API), org/license, org/report, cli/install_pack, embeddings/local_encoder and AI-summary providers, all user-invoked or opt-in (grep; SECURITY.md:405-411)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Project-run retrieval token benchmark: search_symbols(top 5) + get_symbol_source x3 vs grep-top-3 and read-all baselines; express/fastapi/gin at pinned commits, 15 task-runs, tiktoken cl100k_base; counts tokens only, no answer-quality check",
+        "metric": "token ratio / reduction",
+        "value": "28.3x / 96.5% vs grep-top-3 (664,975 -> 23,467 tokens); 241.1x / 99.6% vs read-all (5,658,685 -> 23,467); per-query 7.6x-81.2x, median 26.1x",
+        "source": "benchmarks/results.md:103-113; benchmarks/METHODOLOGY.md:6-10,259-267",
+        "independent": false
+      },
+      {
+        "what": "Third-party A/B, naming-audit task on a private Vue 3/Firebase codebase, Claude Sonnet 4.6 in Claude Code CLI on Windows 11, 25 iterations per variant (author @Mharbulous, GitHub issue #128; report hosted in the project repo; author also appears on the project's .clabot allowlist); not re-run by me",
+        "metric": "success rate, timeouts, cache creation, mean cost (jCodeMunch vs native Grep/Glob/Read)",
+        "value": "success 20/25 (80%) vs 18/25 (72%); timeouts 8/25 vs 10/25; cache creation 93,178 vs 104,135 (-10.5%); mean cost $0.738 vs $0.783 (-5.7%); isolated 'tool-layer' saving 15-25% estimated from subsets of n=1-5",
+        "source": "benchmarks/ab-test-naming-audit-2026-03-18.md:27-48; .clabot:15",
+        "independent": true
+      },
+      {
+        "what": "Third-party A/B, dead-code classification (same author, codebase and date, issue #130), 25 pairs; not cited in the README's A/B paragraph",
+        "metric": "mean F1, cost and tokens (jCodeMunch vs native)",
+        "value": "file-level F1 86.2% vs 95.8%; export-level F1 64.1% vs 93.3%; alive-file F1 69.6% vs 100%; cost $0.356 vs $0.447 (-20.0%); tokens 289,275 vs 449,356 (-36%); report lists three gaps, two fixed in v1.8.1/v1.8.3",
+        "source": "benchmarks/ab-test-dead-code-2026-03-18.md:23-42,56-91",
+        "independent": true
+      },
+      {
+        "what": "Project-run find_implementations channel accuracy on an authored gold corpus (python/typescript/go, small n; not in-the-wild rates)",
+        "metric": "precision / recall per channel",
+        "value": "AST P 0.818 (9 TP, 2 FP); duck-typed P 0.5 (6 TP, 6 FP); decorator P 0.556 (5 TP, 4 FP); recall 1.0 each. The LSP and SCIP channel confidence of 1.0 is a declared prior, 'not yet gold-measured'",
+        "source": "benchmarks/provenance/channel_accuracy.json:12-36; src/jcodemunch_mcp/retrieval/provenance.py:33-42",
+        "independent": false
+      },
+      {
+        "what": "Project-run tool-schema payload by surface (Codex-surface harness) and the project's own live-run attempt on Codex (4 arms x 3 repeats x 6 steps, FastAPI); the project labels the live result NEGATIVE and says not to quote the arm numbers",
+        "metric": "schema tokens; net token effect",
+        "value": "full surface 90 tools = 107,276 bytes / 24,007 tokens; counter surface 6 tools = 4,533 bytes / 1,030 tokens (ROADMAP.md:585-587 gives 22,741 vs 939 tokens); live arms: every effect inside noise, baseline within-arm spread 50.9% of median",
+        "source": "benchmarks/codex_surface/README.md:19-35,38-60; ROADMAP.md:585-587",
+        "independent": false
+      },
+      {
+        "what": "Third-party Reddit benchmark relayed by the project's own codex_surface README (the post itself was not opened)",
+        "metric": "net token change with jCodeMunch installed",
+        "value": "+28.45% on Codex, -3.34% on OpenCode (as quoted by the project)",
+        "source": "benchmarks/codex_surface/README.md:6-9",
+        "independent": true
+      },
+      {
+        "what": "Project-run accuracy of `route`, the discovery tool in the 3-tool counter front door that init writes on first-ever installs",
+        "metric": "route@1",
+        "value": "71.2% on human-phrased queries (2026-08-21; 60% exit bar); on 40 agent-emitted task strings 30.0% strict@1 vs 45.0% blind floor, 55.0% exact vs 80.0%, 60.0% family vs 95.0% (2026-08-07); ROADMAP.md:572,599-600 also quote 45.8% at rank 1 and 52.2% vs a 51.4% majority baseline from other corpora; catalog moratorium in force",
+        "source": "ROADMAP.md:566-600,654-688",
+        "independent": false
+      },
+      {
+        "what": "Project-run false-positive evaluation of get_dead_code_v2 on the jcodemunch-mcp repo itself, using test-suite coverage as the oracle (2026-08-03; a lower bound on the error rate)",
+        "metric": "flagged symbols that tests executed (fp_rate)",
+        "value": "cutoff 0.9 (current default, server.py:3530-3531): 74 of 154 flagged (0.4805); cutoff 1.0: 482 of 766 (0.6292); 2,288 proven-alive symbols",
+        "source": "benchmarks/deadcode_eval/results-2026-08-03.json:1-9,42-48; benchmarks/deadcode_eval/README.md:74-77",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Licensing: not OSI open source. Free only for personal/academic/non-commercial use; use inside a for-profit organization or revenue-generating workflow needs a paid license (Builder $79, Studio $349, Platform $1,999); redistribution is limited to verbatim non-commercial copies with no rename/rebrand and no publishing to any public registry (LICENSE:9-38,54-57,69-84; README.md:305-313). Custom identifier LicenseRef-jCodeMunch-Dual-Use-1, license v1.1 effective 2026-06-30 (LICENSE:1-2; pyproject.toml:10); the bundled VS Code extension is separately MIT (vscode-extension/package.json:7).",
+      "Scope vs language-server needs: no language-server navigation and no edit tools. Definitions/source come from its own tree-sitter index; references are import-graph, text-mention or name-based (server.py:2292,2307,2326,3052-3058). LSP is optional, default off, index-time only, four servers, definition/implementation requests only, tested with mocks (lsp_bridge.py:89-105,347-397,704-723; tests/test_lsp_bridge.py). Read-only by charter; plan_refactoring never writes (server.py:3444; counter.py:77-87; ROADMAP.md:1784-1785). The PostToolUse hook only re-indexes (cli/hooks/reindex.py:55-86); diagnostics exist only as user-imported checker output (server.py:9599-9615) and the TaskCompleted hook reports index-derived dead/untested/unreferenced symbols, not compiler diagnostics (cli/hooks/taskcomplete.py:36-45). The Claude Code plugin manifest declares only an MCP server (.claude-plugin/plugin.json:22-29).",
+      "Accuracy of structural answers: the changelog records repeated fixes to reference/safety answers - v1.108.320-323 (2026-09-30..10-01) fixed check_delete_safe grading a used function safe_to_delete at confidence 1.0 and entry points read as dead, with known remaining gaps L-101/L-102 (CHANGELOG.md:5-23,39-70,72-106). A third-party dead-code A/B scored lower F1 than native tools (benchmarks/ab-test-dead-code-2026-03-18.md:23-42) and the project's own eval found 74/154 flagged symbols executed by tests at the default cutoff (benchmarks/deadcode_eval/results-2026-08-03.json:42-48). Most confidences are declared priors, not measurements (retrieval/provenance.py:1-20,33-80).",
+      "Staleness and limits: source is served from a cached index copy (tools/get_symbol.py:499-501) kept fresh only by the watcher, the Claude Code Edit|Write hook (cli/init.py:109-112) or the VS Code on-save extension (vscode-extension/package.json:27-31); edits made by other routes, or on hosts without hooks (none documented for Codex; CLIENTS.md:28), can leave it stale until re-index. Defaults: 512,000 bytes per file, 2,000 files per index_folder, 10,000 per index_repo (config.py:343-347); oversize files are withheld (SECURITY.md:121). SECURITY.md:122 still says a 500-file default (tests/test_security_md_limits_parity.py:1-6).",
+      "Token cost and tool selection: the full surface advertises ~90 tools = 24,007 schema tokens (benchmarks/codex_surface/README.md:19-35; 22,741 in ROADMAP.md:585-587), above the 30-50-tool range the project quotes from Anthropic docs (ROADMAP.md:578-583). First-ever installs get the 3-tool counter front door (config.py:141-158; ROADMAP.md:629-634) whose `route` scored 30.0% strict@1 vs a 45.0% blind floor on 40 agent-emitted tasks (ROADMAP.md:674-688). A third-party Codex benchmark reportedly measured +28.45% tokens and the project's own live arms were inconclusive (benchmarks/codex_surface/README.md:6-9,38-60). A catalog moratorium (no new tools) is in force (ROADMAP.md:566-570).",
+      "Network/security posture: telemetry is default-on (config.py:489; storage/token_tracker.py:1440-1456); a non-loopback HTTP bind without JCODEMUNCH_HTTP_TOKEN only warns (server.py:7924-7930,8118-8124) and the Dockerfile defaults to SSE on 0.0.0.0 (Dockerfile:24-29; docker-compose.yml:14-24); init edits agent-policy files and ~/.claude/settings.json hooks (SECURITY.md:200-241; init.py:1064-1122; --minimal avoids this); source-returning tools are exempt from secret redaction (server.py:7458-7461). Repo docs record a PyPI quarantine/account block in 2026-06 over an undisclosed persistent service and a credential leak in v0.2.0-0.2.5 (docs/cicd/AUDIT.md:97-103); releases now use OIDC trusted publishing (release.yml:219-238).",
+      "Maintenance and process: very high release cadence (564 changelog entries; four releases between 2026-09-30 and 2026-10-01: CHANGELOG.md:5,24,39,72) under a single named author/copyright holder (pyproject.toml:7-9; LICENSE:4); issue/PR triage and fix attempts are partly model-driven, human-gated and behind INBOUND_ENABLED (SECURITY.md:318-346). Upstream pins: mcp capped <2.0.0 (server fails at import on mcp 2.x; pyproject.toml:38) and tree-sitter-language-pack capped <1.0.0 (pyproject.toml:40-56; README.md:228); Python classifiers and CI stop at 3.13 (pyproject.toml:24-36; pr-gate.yml:143).",
+      "Platform and documentation drift: CI runs only ubuntu and windows (pr-gate.yml:139-143; nightly.yml:69-73), so macOS arm64 and WSL2 are untested by the project. Docs lag code in places: SECURITY.md:166-189 verification steps name a removed sign-release.yml / 'Sign release artifacts' (signing now in release.yml:329-332); SECURITY.md:360-361 lists a 'published container' although no workflow builds one and server.json lists only the PyPI package (server.json:7-15); QUICKSTART.md:24-26 leads with pip while README.md:90-93 recommends `uv tool install`; Codex needs a pre-installed binary rather than uvx (cli/init.py:333-345)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "jgravelle/jcodemunch-mcp",
+      "checks": [
+        {
+          "field": "readme.install[0] (uv tool install, then init)",
+          "statement": "README 'Recommended' install is `uv tool install jcodemunch-mcp; jcodemunch-mcp init`.",
+          "citation": "README.md:90-93",
+          "holds": true,
+          "note": "README.md:88 heading 'Recommended: one command'; lines 90-93 are exactly `uv tool install jcodemunch-mcp` / `jcodemunch-mcp init`. The console script maps to jcodemunch_mcp.server:main (pyproject.toml:99) and `init` is a registered subcommand (server.py:9649, dispatched at :10554)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX LicenseRef-jCodeMunch-Dual-Use-1, license file LICENSE.",
+          "citation": "pyproject.toml:10-11; LICENSE:1-2",
+          "holds": true,
+          "note": "pyproject.toml:10 `license = \"LicenseRef-jCodeMunch-Dual-Use-1\"`, :11 `license-files = [\"LICENSE\"]`; LICENSE:1-2 'jCodeMunch-MCP — Dual-Use License, Version 1.1 — effective 2026-06-30'. Terms match the dossier: free for non-commercial use (LICENSE:9-14); verbatim non-commercial redistribution only, with no renaming and no public registry (16-38); for-profit or revenue use needs a paid license (54-57, 69-84: Builder $79 / Studio $349 / Platform $1,999). Custom LicenseRef, not OSI."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - ubuntu-latest in the CI test matrix (Python 3.10-3.13) and release smoke tests; manylinux x86_64 wheels locked for the native grammar deps.",
+          "citation": ".github/workflows/pr-gate.yml:139-143; .github/workflows/release.yml:146-149; uv.lock:3495,3517",
+          "holds": true,
+          "note": "pr-gate.yml:142-143: `full` job matrix os [ubuntu-latest, windows-latest] x python ['3.10','3.11','3.12','3.13']. release.yml:149: smoke-testpypi matrix os [ubuntu-latest, windows-latest]. uv.lock:3495: tree_sitter_fsharp-0.3.12 manylinux_2_28_x86_64 wheel. uv.lock:3517: tree_sitter_language_pack-0.13.0 manylinux2014_x86_64 wheel."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "MCP is the primary interface: default stdio, `serve --transport sse|streamable-http`, /mcp and /sse routes; ~90-91 tools on the full surface vs a 3-tool order/menu/route 'counter' front door that init writes on first-ever installs; navigation tools in server.py:1563-4333; defer_loading documented for URL transports only; registry entry io.github.jgravelle/jcodemunch-mcp as a PyPI stdio package.",
+          "citation": "server.py:9261-9270,7906,8107,1563-4333; README.md:156,189-220; ROADMAP.md:572,585; counter.py:1-30; config.py:141-158; server.json:2-15",
+          "holds": true,
+          "note": "--transport choices stdio/sse/streamable-http, stdio default (server.py:9265-9270). Route('/sse') at :7906, Route('/mcp') at :8107. README.md:156 '90+ tools'; ROADMAP.md:572 '91 actions', :585 '91 visible of 94'. counter.py:1-30 order/menu/route. config.py:141-158 writes tool_surface='counter' only for first-ever installs. All 12 named tools are registered at server.py:1992-3436. README.md:214 limits defer_loading to sse/streamable-http. server.json:3-14 has the registry name, pypi package and stdio transport. Two precision nuances, not errors: (a) the counter surface advertises 6 tools, the 3 front-door tools plus set_tool_tier, announce_model and jcodemunch_guide (server.py:228,4782); (b) the counter default is written by whatever first creates config.jsonc: main() calls load_config() with create_missing=True (server.py:10909; config.py:749,766-773), so a first bare `uvx` run gets it too, not only `init`."
+        },
+        {
+          "field": "claim_checks[9] (only default network behavior is the anonymous savings counter)",
+          "statement": "verified yes: share_savings defaults True; {delta,total,anon_id} is POSTed by a lazily started daemon thread; the only other httpx/urllib users in src are index_repo, org/license, org/report, cli/install_pack, embeddings/local_encoder and AI-summary providers, all user-invoked or opt-in.",
+          "citation": "README.md:226; src/jcodemunch_mcp/config.py:489; src/jcodemunch_mcp/storage/token_tracker.py:1347-1352,1440-1460; SECURITY.md:405-411",
+          "holds": true,
+          "note": "config.py:489 'share_savings': True. token_tracker.py:1350 sends only when share_savings is set; :1446-1456 httpx.post json {delta,total,anon_id}; lazy worker start at :1423-1430; anon_id = uuid4 (:1294). Grep of src/ for httpx/urllib finds exactly the enumerated set (batch_summarize.py:564, org/report.py:30, embeddings/local_encoder.py:78, org/license.py:123, token_tracker.py:1448, tools/index_repo.py:12, cli/install_pack.py:13) plus server.py:8941, which is only an availability import in a diagnostic printout. Network paths outside that scope are all user-invoked: git clone/fetch in tools/observatory.py:150-183 behind the `observatory` CLI (server.py:9940), the openai SDK in groq/ behind `gcm`, and SDK embedding providers that need both a key and an explicit model (tools/embed_repo.py:122-134). Paid summaries are off unless opted in (summarizer/batch_summarize.py:39-52). Minor upstream doc gap: SECURITY.md:405-409 does not list the observatory clone."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

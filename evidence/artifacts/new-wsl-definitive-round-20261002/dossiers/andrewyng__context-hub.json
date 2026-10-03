@@ -1,0 +1,273 @@
+{
+  "contender": "andrewyng/context-hub",
+  "revision": {
+    "contender": "andrewyng/context-hub",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "andrewyng/context-hub",
+        "tag": "v0.1.4",
+        "commit": "04c149cd82d23d037e157d5920b80b0ca10d84b5",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.1.4",
+    "commit": "04c149cd82d23d037e157d5920b80b0ca10d84b5",
+    "read_at": "2026-10-02T03:01:55+00:00"
+  },
+  "dossier": {
+    "contender": "andrewyng/context-hub",
+    "revision": {
+      "tag": "v0.1.4",
+      "commit": "04c149cd82d23d037e157d5920b80b0ca10d84b5",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Context Hub ('chub', npm package @aisuite/chub 0.1.4) is a Node.js CLI plus a stdio MCP server that lets coding agents search a registry of curated, versioned API/SDK docs and 'skills' (Markdown with YAML frontmatter) and fetch the original DOC.md/SKILL.md text by id. Need 1 (search + read-back): the same package provides `chub search`/`chub get` and MCP tools chub_search/chub_get. Search is lexical only (BM25 over id/name/tags/description plus prefix/fuzzy boosts) over registry metadata; there is no vector or hybrid search and document bodies are not indexed. Bodies are read back from a local folder, the ~/.chub cache, an npm-bundled dist/, or the cdn.aichub.org CDN (human-mode `chub get` appends annotation/feedback/footer text to the body). Controlled ingestion = `chub build <dir>` (validates frontmatter, writes registry.json + search-index.json, copies the tree) plus per-config trust filtering on an author-declared `source` field. Need 2 (difficult-layout document conversion): none. The code has no PDF/scan/Office/EPUB/HTML converter; the repo's content/ only contains skill documentation for the third-party hosted LandingAI ADE service. Repo content: 1,660 DOC.md + 7 SKILL.md files, auto-deployed to the default CDN from main.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Coding agents hallucinate APIs; Context Hub gives them curated, versioned docs plus the ability to get smarter with every task. 'All content is open and maintained as markdown in this repo - you can inspect exactly what your agent reads, and contribute back.'",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Quick start: `npm install -g @aisuite/chub`; `chub search openai` ('find what's available'); `chub get openai/chat --lang py` ('fetch current docs (Python version)').",
+          "citation": "README.md:11-15"
+        },
+        {
+          "claim": "'Chub is designed for your coding agent to use (not for you to use!)'; prompt the agent to run `chub help`, or install the SKILL.md agent skill (Claude Code: create ~/.claude/skills/get-api-docs and put SKILL.md there).",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "Workflow is 'search, fetch, use': `chub search \"stripe payments\"` then `chub get stripe/api --lang js`.",
+          "citation": "README.md:21-27"
+        },
+        {
+          "claim": "Agents can annotate docs locally (`chub annotate stripe/api \"...\"`); the annotation appears automatically on later `chub get`.",
+          "citation": "README.md:29-35"
+        },
+        {
+          "claim": "`chub feedback <id> up|down` votes docs up or down; feedback 'flows back to authors' / is 'sent to maintainers'.",
+          "citation": "README.md:37, README.md:59"
+        },
+        {
+          "claim": "Content types are versioned, language-specific docs; 'More content types than API documentation (such as agent skills) are on the roadmap.'",
+          "citation": "README.md:41-48"
+        },
+        {
+          "claim": "Command table: `chub search [query]` searches docs and skills (no query = list all); `chub get <id> [--lang py|js]` fetches docs or skills by ID.",
+          "citation": "README.md:52-59"
+        },
+        {
+          "claim": "Incremental fetch: docs can have multiple reference files; `--file` grabs specific references, `--full` fetches everything ('no wasted tokens').",
+          "citation": "README.md:86"
+        },
+        {
+          "claim": "'Content is plain markdown with YAML frontmatter, submitted as pull requests' (format in docs/content-guide.md).",
+          "citation": "README.md:94"
+        },
+        {
+          "claim": "Full command/flag reference lives in docs/cli-reference.md (README links to it).",
+          "citation": "README.md:61"
+        },
+        {
+          "claim": "MIT license; Node.js >= 18 badge.",
+          "citation": "README.md:5-7, README.md:98-100"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global install (documented for all platforms; requires Node >= 18)",
+          "command": "npm install -g @aisuite/chub",
+          "citation": "README.md:12; cli/README.md:8; Node floor at cli/package.json:16-18"
+        },
+        {
+          "method": "Agent skill via the skills CLI (printed by `chub --help`, not in README)",
+          "command": "npx skills add https://github.com/andrewyng/context-hub --skill get-api-docs",
+          "citation": "cli/src/lib/help.js:101 (asserted in cli/test/e2e.test.js:157)"
+        },
+        {
+          "method": "Manual skill copy for Claude Code (global)",
+          "command": "mkdir -p ~/.claude/skills && cp $(npm root -g)/@aisuite/chub/skills/get-api-docs/SKILL.md ~/.claude/skills/get-api-docs.md",
+          "citation": "cli/README.md:26-29 (project-level variant at cli/README.md:19-22; Cursor at cli/README.md:35-38)"
+        },
+        {
+          "method": "From source (contributor setup)",
+          "command": "git clone https://github.com/andrewyng/context-hub.git && cd context-hub && npm install && node cli/bin/chub --help",
+          "citation": "CONTRIBUTING.md:14-25"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs on the ubuntu-latest runner with Node 18/20/22 (.github/workflows/ci.yml:11-14); documented install is npm (README.md:12); runtime deps are pure JS (cli/package.json:44-52). Caveat: the Node 18 leg conflicts with vitest@4.0.18 engines (package-lock.json:2610-2612), outcome not verified.",
+        "wsl2": "unknown - no WSL2 mention in README/docs/CI. WSL2 reports process.platform 'linux' so the Linux code path applies (cli/src/lib/identity.js:23-29), but it is untested upstream.",
+        "macos_arm64": "unknown - README does not state macOS support and CI has no macOS job (ci.yml:11). Code has an explicit darwin branch (cli/src/lib/identity.js:16-21, uses `ioreg`) and deps are pure JS, but arm64 is not exercised upstream.",
+        "gpu": "no - not used or applicable: no GPU/ML code, search is plain-JS BM25 (cli/src/lib/bm25.js) and cli/package.json:44-52 has no embedding/vector dependency."
+      },
+      "integrations": {
+        "cli": "yes - `chub` binary (cli/package.json:6-9 -> cli/bin/chub -> cli/src/index.js) with search, get, annotate, feedback, update, cache, build; global --json (cli/src/index.js:55; README.md:52-59; docs/cli-reference.md).",
+        "mcp": "Present in code but NOT documented in README or docs (grep for 'mcp' hits only package.json, source and tests; no install/config snippet anywhere): `chub-mcp` stdio server (cli/package.json:8; cli/bin/chub-mcp; cli/src/mcp/server.js) registering tools chub_search, chub_get, chub_list, chub_annotate, chub_feedback (server.js:40-106) and resource chub://registry (server.js:110-155).",
+        "sdk_or_api": "none found - cli/package.json exposes only `bin` (no main/exports, :6-9) and no HTTP API is documented. The CLI consumes static files from cdn.aichub.org/v1 (registry.json, search-index.json, content files, help/<version>.json, optional bundle.tar.gz) and POSTs feedback to api.aichub.org/v1/feedback (cli/src/lib/cache.js:107-119,178,247; cli/src/lib/telemetry.js:52).",
+        "claude_code_or_codex": "Claude Code: documented only as an agent skill (not a plugin) - copy cli/skills/get-api-docs/SKILL.md into .claude/skills or ~/.claude/skills (cli/README.md:15-29); README.md:19 instead says to create ~/.claude/skills/get-api-docs/ containing SKILL.md, so the two READMEs differ on layout. `chub --help` also advertises `npx skills add ...` (cli/src/lib/help.js:101). Codex: no Codex-specific doc or config found; only a design-doc claim that the Agent Skills format is interoperable with Codex (docs/design.md:353,477) and env-var detection of Codex for feedback attribution (cli/src/lib/identity.js:97). Cursor: copy to .cursor/rules (cli/README.md:35-38)."
+      },
+      "telemetry_and_network": "Telemetry is default-on and opt-out; README.md does not mention it (documented in docs/cli-reference.md:211-219 and SECURITY.md:26-28). (1) PostHog Cloud (https://us.i.posthog.com, hard-coded project key) receives events command_run, first_run, search (raw query text up to 1000 chars + result ids), doc_fetched/skill_fetched (entry id, lang, source, duration), doc_not_found, fetch_error, command_error, feedback_sent, build, each with platform/node_version/cli_version; distinct id = SHA-256 of the machine UUID (macOS ioreg, Linux /etc/machine-id, Windows MachineGuid) saved to ~/.chub/client_id (cli/src/lib/analytics.js:14-15,54-78; cli/src/commands/search.js:101-111; cli/src/mcp/tools.js:74-85; cli/src/lib/identity.js:13-79; cli/src/index.js:64-87). Disable with `telemetry: false` in ~/.chub/config.yaml or CHUB_TELEMETRY=0|false (cli/src/lib/config.js:15; cli/src/lib/telemetry.js:5-9). (2) `chub feedback` / chub_feedback POST rating, labels, free-text comment, agent name/version, CLI version and X-Client-ID to https://api.aichub.org/v1/feedback (3 s timeout); enabled by default, disable with `feedback: false` or CHUB_FEEDBACK=0|false (cli/src/lib/telemetry.js:11-15,41-92); human-mode `chub get` output tells the agent to run chub feedback (cli/src/commands/get.js:171-175). (3) Content network: default source is https://cdn.aichub.org/v1 (config.js:6,51); `search`/`get` auto-refresh registry.json + search-index.json when the cache is older than refresh_interval (code default 21600 s at config.js:12, while docs/cli-reference.md:204 shows 86400) and fetch doc files on demand with 30 s timeouts, falling back to stale cache on failure (cli/src/lib/cache.js:85-147,224-268,385-427). Bare `chub`/`--help`/`help` fetches https://cdn.aichub.org/v1/help/<version>.json (2 s timeout, falls back to bundled text) (cli/src/lib/help.js:175-245). chub itself needs no account or API key and sends no auth header on content fetches (cache.js:85-97); the first-run notice (shown only when stdout and stderr are TTYs, welcome.js:14) says use implies agreement to Terms of Service at https://www.aichub.org/tos.html (cli/src/lib/welcome.js:27; ToS not in repo). With only local `path:` sources no registry/doc/help fetch happens (config.js:27-31,47-48; cache.js:156-158,401-405; help.js:179-181), but passive telemetry must still be disabled. The third-party LandingAI skill content tells agents to call a hosted API with VISION_AGENT_API_KEY (content/landingai/skills/ade/document-extraction/SKILL.md:38-87); that is content, not chub behavior."
+    },
+    "code": {
+      "languages": [
+        "JavaScript (Node.js ES modules, no build step, Node >= 18)",
+        "Markdown + YAML frontmatter (content/: 1,660 DOC.md + 7 SKILL.md)",
+        "YAML (GitHub Actions)"
+      ],
+      "entry_points": [
+        {
+          "path": "cli/bin/chub -> cli/src/index.js",
+          "what": "`chub` CLI (Commander): search, get, annotate, feedback, update, cache, build; bare `chub`/--help prints bootstrap help."
+        },
+        {
+          "path": "cli/bin/chub-mcp -> cli/src/mcp/server.js",
+          "what": "stdio MCP server exposing chub_search, chub_get, chub_list, chub_annotate, chub_feedback and resource chub://registry (tool logic in cli/src/mcp/tools.js)."
+        },
+        {
+          "path": "cli/src/commands/build.js",
+          "what": "`chub build <content-dir>`: the ingestion/indexing step (discover DOC.md/SKILL.md, validate frontmatter, write registry.json + search-index.json, copy tree)."
+        },
+        {
+          "path": "cli/src/lib/registry.js",
+          "what": "Merges registries from all sources, applies trust filter, id lookup, searchEntries (BM25 + lexical boosts), resolveDocPath."
+        },
+        {
+          "path": "cli/src/lib/bm25.js",
+          "what": "Tokenizer, BM25 index build (id/name/tags/description only) and scoring."
+        },
+        {
+          "path": "cli/src/lib/cache.js",
+          "what": "Registry/search-index/doc fetching, ~/.chub cache, bundled dist/ seed, optional bundle.tar.gz, fetchDoc (body read-back)."
+        },
+        {
+          "path": "scripts/prepare-cdn-build.mjs",
+          "what": "CDN build used by deploy-content.yml (`npm run prepare:cdn`): runs `chub build content/` and writes versioned help JSON."
+        },
+        {
+          "path": "cli/skills/get-api-docs/SKILL.md",
+          "what": "Packaged agent skill telling agents to run `chub --help`, search, get, annotate and give feedback."
+        }
+      ],
+      "architecture": "Single npm workspace package cli/ (@aisuite/chub) with two binaries. cli/src/index.js wires Commander commands from cli/src/commands/ (search, get, build, update, cache, annotate, feedback, help); cli/src/mcp/{server,tools,stdio-lifecycle}.js wrap the same lib functions as 5 MCP tools + 1 resource over stdio only. Core lib in cli/src/lib/: registry.js (merge sources, trust filter on `source`, searchEntries = BM25 + Levenshtein/prefix/contains boosts, keyword fallback if no search-index.json), bm25.js (index over id/name/description/tags only; field weights 4/3/1/2 at :22-27), cache.js (remote or local-path reads; cache under ~/.chub/sources/<name>; bundled dist/ seed; fetchDoc order: local path, ~/.chub cache, bundled dist/, CDN), config.js (~/.chub/config.yaml, CHUB_DIR and other env vars), frontmatter.js, annotations.js (one JSON per id in ~/.chub/annotations), analytics.js/telemetry.js/identity.js (PostHog, feedback, machine-hash id), help.js (bootstrap text + remote versioned help). Data model: registry.json {docs[], skills[]} with id author/name, languages[]/versions[]/path/files/size/lastUpdated, and an author-declared trust tier official|maintainer|community; no provenance/source-URL field. Ingestion: build.js walks <content-dir>/<author>/**, only files named DOC.md/SKILL.md become entries (docs need metadata.languages + metadata.versions), then writes registry.json + search-index.json and copies each author dir verbatim except registry.json. Retrieval returns file text as stored; docs require --lang. There is no vector store, embedding, reranker or document-conversion code. CDN content is produced from content/ by scripts/prepare-cdn-build.mjs.",
+      "packaging_and_release": "One artifact: npm package @aisuite/chub 0.1.4 (cli/package.json:2-3) with files bin/, src/, dist/, skills/ (:10-15). dist/ (registry + search index + all content) is built only by the `prepublish` script `chub build ../content -o dist --base-url https://cdn.aichub.org/v1` (cli/package.json:39) and .gitignore excludes it; publish.yml has no explicit build step, so whether the published tarball ships dist/ was not verifiable here. .github/workflows/publish.yml: on GitHub release `created`, runs `npm install` (root), `cd cli && npm test`, polls https://cdn.aichub.org/v1/help/<version>.json until live (30 x 10 s), then `cd cli && npm publish --access public` with secret NPM_TOKEN (publish.yml:3-43). `id-token: write` is granted (:10-12) but there is no --provenance flag/publishConfig, and no checksums, signatures, SBOM or attestations exist anywhere (grep). .github/workflows/deploy-content.yml: on push to main touching content/**, package.json, cli/package.json, cli/src/lib/help.js or scripts/prepare-cdn-build.mjs (or manual dispatch) validates content, runs `npm run prepare:cdn`, `aws s3 sync dist/ s3://$CDN_BUCKET_NAME/v1/ --delete --exclude 'help/*'`, syncs help/, invalidates CloudFront (deploy-content.yml:3-63). CI deletes package-lock.json before installing (ci.yml:20; deploy-content.yml:29); the committed lock still lists the cli workspace as 0.1.3 (package-lock.json:14) vs 0.1.4 in package.json. cli/ has no LICENSE file of its own (root LICENSE only). No binaries, containers or other install artifacts.",
+      "tests_and_ci": "Vitest ^4.0.18 (`npm test` = `vitest run`, cli/package.json:40-42; no vitest config file). 21 test files: cli/test/ (4: e2e.test.js + lib/{bm25,frontmatter,normalize}) and cli/tests/ (17: commands/{build,get,go-lang,search}, lib/{analytics,bm25,cache,config,frontmatter,help,normalize,registry,registry.multisource,registry.search-behavior,welcome}, mcp/{stdio-lifecycle,tools}); about 249 test cases (245 it/itCli matches + 4 itBuild in tests/commands/build.test.js). e2e.test.js spawns the real CLI against cli/test/fixtures with telemetry/feedback disabled. Several MCP tool tests return early when no registry is loaded (cli/tests/mcp/tools.test.js:93,110,131); bm25/frontmatter/normalize tests are duplicated across both test dirs. CI = .github/workflows/ci.yml on push/PR to main, ubuntu-latest, Node 18/20/22 matrix: `rm -f package-lock.json && npm install`; `cd cli && npm test`; `node cli/bin/chub build content/ --validate-only`; `cd cli && npm audit --audit-level=high` (ci.yml:3-23). No lint/type-check, coverage, macOS/Windows or scheduled jobs.",
+      "dependencies": "cli/package.json: 7 runtime deps (@modelcontextprotocol/sdk ^1.27.1, chalk ^5.3.0, commander ^12.0.0, posthog-node ^5.24.17, tar ^7.5.8, yaml ^2.3.0, zod ^4.3.6) + 1 dev dep (vitest ^4.0.18) = 8 direct (cli/package.json:44-55). Root package.json: private workspace root (workspaces: [cli]) with 0 deps (package.json:1-11). Root package-lock.json (lockfileVersion 3) has about 193 node_modules entries (MCP SDK 1.27.1, posthog-node 5.26.2, tar 7.5.11 locked). All pure JS; no native, ML or Python dependencies.",
+      "security_policy": "SECURITY.md exists: report vulnerabilities by opening a public GitHub issue labelled `security` (no private channel), 7-day fix target for critical issues, only 0.1.x supported, scope = @aisuite/chub CLI + api.aichub.org, plus a telemetry note (SECURITY.md:5-28). No Dependabot/Renovate/CodeQL config found."
+    },
+    "claim_checks": [
+      {
+        "claim": "'All content is open and maintained as markdown in this repo - you can inspect exactly what your agent reads' (README.md:3)",
+        "verified": "partial",
+        "evidence": "content/ holds 1,660 DOC.md + 7 SKILL.md and .github/workflows/deploy-content.yml:3-14,33-52 publishes it to the CDN on push to main, so the source is inspectable. But what an agent receives at runtime is resolved cache-first, then npm-bundled dist/, then CDN (cli/src/lib/cache.js:234-267), no hash/signature verification exists in cli/src (only createHash use is the telemetry id, identity.js:68), and human-mode `chub get` appends annotation + feedback-prompt text to stdout (cli/src/commands/get.js:159-181)."
+      },
+      {
+        "claim": "`chub search` finds what's available / searches docs and skills (README.md:13,54)",
+        "verified": "yes",
+        "evidence": "cli/src/commands/search.js:50-121 -> cli/src/lib/registry.js:327-419: BM25 (cli/src/lib/bm25.js:195-287; field weights id 4/name 3/tags 2/description 1 at :22-27) plus Levenshtein/prefix/contains boosts (registry.js:26-153), keyword-count fallback when no search-index.json (registry.js:362-389). Scope caveat: the index is built only from id/name/description/tags (bm25.js:170-190; build.js:313-319), so bodies are not searchable, and no vector/hybrid/rerank code exists anywhere in cli/ (grep for embedding/vector/semantic/rerank is empty)."
+      },
+      {
+        "claim": "`chub get <id> [--lang py|js]` fetches docs or skills by ID (README.md:14,55)",
+        "verified": "partial",
+        "evidence": "Fetch works for docs and skills (cli/src/commands/get.js:13-100; cli/src/mcp/tools.js:97-193) and returns the stored file text via fetchDoc (cache.js:224-268). But for docs --lang is effectively mandatory: resolveDocPath returns needsLanguage whenever no lang is given (registry.js:492-500), the option text says '(required for docs)' (get.js:205), and an e2e test asserts an error for a single-language doc without --lang (cli/test/e2e.test.js:319-322). Skills need no --lang."
+      },
+      {
+        "claim": "Language is auto-inferred when a doc has only one variant / --lang not required (docs/cli-reference.md:57,101, linked from README.md:61; MCP schema text at cli/src/mcp/server.js:57)",
+        "verified": "no",
+        "evidence": "Code contradicts the docs (code wins): registry.js:492-500 returns needsLanguage for any doc without lang regardless of language count; CLI errors (get.js:54-59); MCP errors with 'Multiple languages available' even for one language (tools.js:137-141); e2e test 'errors on single-lang doc without --lang' (cli/test/e2e.test.js:319-322). Only `chub feedback` infers a sole language (cli/src/commands/feedback.js:97-100)."
+      },
+      {
+        "claim": "Incremental fetch: `--file` for specific references, `--full` for everything (README.md:86)",
+        "verified": "yes",
+        "evidence": "CLI: get.js:71-92 (--file list validated against the registry's files at :74-78; --full at :86-88; additionalFiles footer at :176-180 and in JSON at :161). MCP chub_get supports file/full (tools.js:150-167) but traversal-checks only `file` (:100-106) and does not list reference files on success. Caveat: `--json` returns no body for multi-id/--full/multi-file fetches, only id/type/path (get.js:185-196)."
+      },
+      {
+        "claim": "Content is plain markdown with YAML frontmatter, submitted as PRs (README.md:94); skills are 'on the roadmap' (README.md:48)",
+        "verified": "partial",
+        "evidence": "Build discovers only files named DOC.md/SKILL.md and parses YAML frontmatter (cli/src/commands/build.js:20-31,75-87); it errors only on missing name and, for docs, missing metadata.languages/metadata.versions (:79-82,128-135). docs/content-guide.md:130-139 marks revision, updated-on and source as required but the code does not enforce them (source defaults to 'community', updated-on to today: build.js:90-92,98-100; revision is never read). Skills are already implemented (build.js:102-118; 7 SKILL.md under content/) despite README.md:48. CI validates content via `chub build content/ --validate-only` (ci.yml:22)."
+      },
+      {
+        "claim": "Telemetry is anonymous, 'No personally identifiable information is collected', and can be disabled (docs/cli-reference.md:213-219; SECURITY.md:28; README.md is silent)",
+        "verified": "partial",
+        "evidence": "Opt-out works: `telemetry: false` or CHUB_TELEMETRY=0|false (cli/src/lib/telemetry.js:5-9). But it is default-on (cli/src/lib/config.js:15), keyed to a SHA-256 of the machine UUID stored at ~/.chub/client_id (identity.js:13-79), and sends free-text search queries (up to 1000 chars) plus result and entry ids to PostHog (analytics.js:14-15,54-78; search.js:101-111; tools.js:74-85). SECURITY.md:28 points to docs/design.md for identifier details that it does not contain (grep of docs/ finds none); design.md:546 lists telemetry as a future item."
+      },
+      {
+        "claim": "`chub update --full` downloads the full bundle for offline use (docs/cli-reference.md:147; docs/design.md:359,370)",
+        "verified": "partial",
+        "evidence": "Consumer exists: fetchFullBundle GETs <source.url>/bundle.tar.gz and extracts it with tar (cli/src/lib/cache.js:171-219; cli/src/commands/update.js:17-31). Nothing in the repo produces bundle.tar.gz: `chub build` writes only registry.json, search-index.json and the content tree (build.js:309-330), scripts/prepare-cdn-build.mjs and deploy-content.yml sync dist/ only (:36-52), and no tar-creation code exists. Offline use otherwise relies on the npm-bundled dist/ seed (cache.js:410-423), whose presence in the published package was not verifiable."
+      },
+      {
+        "claim": "Your own docs 'work exactly like the public ones' via a local `sources:` path + `chub build` (docs/byod-guide.md:5-68)",
+        "verified": "partial",
+        "evidence": "Local path sources are supported, read directly without caching (config.js:47-48; cache.js:224-232,287-292) and searched with the build's search-index.json when present (cache.js:304-313; registry.js:354-361). But the guide's example frontmatter puts languages/versions/tags at top level (byod-guide.md:24-34) whereas build.js reads them from `metadata.*` (build.js:87,121-135), so by code reading the example fails `chub build` validation (not executed). Remote sources cannot carry credentials (cache.js:85-97) and docs/private-content.md:3 says team distribution is 'Coming Soon'."
+      },
+      {
+        "claim": "Annotations are local notes that persist and appear automatically on future `chub get` (README.md:29-35)",
+        "verified": "yes",
+        "evidence": "Stored as one JSON file per id under ~/.chub/annotations (cli/src/lib/annotations.js:5-12,22-32), appended to output by the CLI (get.js:159-169) and by MCP chub_get (tools.js:169-173); e2e tests cover it (cli/test/e2e.test.js:435-493). docs/features/agent-annotations.md describes a different, unimplemented design (markdown files, --type, --no-annotations, `chub annotations` subcommands); none of these exist in cli/src (grep)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope vs. the stated needs: search is lexical-only and metadata-only (id/name/tags/description); doc bodies are never indexed and there is no vector/hybrid/rerank code (cli/src/lib/bm25.js:170-190; cli/src/commands/build.js:313-319). Only files named DOC.md/SKILL.md become entries (build.js:20-31). There is no PDF/scan/Office/EPUB/HTML conversion in code; the only document-parsing material is third-party skill text for the hosted LandingAI ADE service, which needs VISION_AGENT_API_KEY and whose format list omits EPUB and HTML inputs (content/landingai/skills/ade/document-extraction/SKILL.md:10-14,38-87; references/file-formats.md:9-15). The registry schema has no per-entry source-URL/provenance field; `source` is only a trust tier (docs/design.md:437-445).",
+      "Body fidelity and staleness: fetchDoc serves the ~/.chub cache first, then the npm-bundled dist/ copy, and only then the CDN, with no invalidation on registry refresh and no hash/signature check of any fetched file (cli/src/lib/cache.js:224-268; no integrity code in cli/src). Bundled paths also shadow same-path files from other remote sources. Human-mode `chub get` appends annotation text, feedback-prompt lines and an additional-files footer to the body (cli/src/commands/get.js:159-181); raw bodies need `--json` (single entry only, get.js:185-196 returns no body for multi-id/--full/multi-file) or `-o`. MCP chub_get appends the annotation and does not list reference files (cli/src/mcp/tools.js:149-173). --lang is mandatory for docs (registry.js:492-500).",
+      "Privacy: telemetry and feedback are default-on and README.md does not mention them. Every non-help command sends PostHog events including raw search query text (up to 1000 chars), result ids and entry ids, tied to a SHA-256 machine-UUID id (cli/src/lib/analytics.js:14-15,54-78; cli/src/commands/search.js:101-111; cli/src/index.js:64-87; cli/src/lib/identity.js:66-79; cli/src/lib/config.js:15-16). `chub feedback`/chub_feedback POST free-text comments, agent name/version and the client id to api.aichub.org (cli/src/lib/telemetry.js:52-78), and CLI output nudges agents to send feedback (get.js:171-175; cli/src/lib/help.js:114-117). The ToS/feedback notice only shows when stdout and stderr are TTYs (cli/src/lib/welcome.js:14), so non-interactive agent runs never see it; the ToS it cites (https://www.aichub.org/tos.html) is not in the repo. Opt-outs: telemetry:false / CHUB_TELEMETRY=0 and feedback:false / CHUB_FEEDBACK=0.",
+      "Agent instructions can change without a release: bare `chub`/`--help`/`help` fetches https://cdn.aichub.org/v1/help/<version>.json at runtime and prints it (cli/src/lib/help.js:175-245); docs say it 'can be revised over time to tune prompting for that same binary' (docs/cli-reference.md:30-32); the packaged skill tells agents to run `chub --help` and follow it over the skill's own text on conflict (cli/skills/get-api-docs/SKILL.md:12-13,40-41,52-53). The CDN is updated automatically on push to main (.github/workflows/deploy-content.yml:3-14,41-52). Mitigation: `help_url: off` or CHUB_HELP_URL=off (help.js:3-16).",
+      "Release and supply-chain hygiene is minimal: npm publish uses a long-lived NPM_TOKEN with no --provenance flag even though id-token: write is granted (.github/workflows/publish.yml:10-13,41-43); no checksums, signatures, SBOM or attestations; no Dependabot/Renovate/CodeQL. CI deletes package-lock.json before installing (ci.yml:20; deploy-content.yml:29), the committed lock lists the cli workspace as 0.1.3 vs 0.1.4 (package-lock.json:14; cli/package.json:3), and runtime deps use caret ranges (cli/package.json:44-52). dist/ is built only by the `prepublish` script (cli/package.json:39) and publish.yml has no build step, so whether the tarball ships dist/ is unverified. SECURITY.md asks reporters to open a public GitHub issue (SECURITY.md:5).",
+      "Thin trust model: the `source` tier used by the trust filter is author-declared in frontmatter and unverified (cli/src/commands/build.js:90; cli/src/lib/registry.js:269-273). Registry-supplied `path`/`files` are joined into filesystem paths with no containment check for reads and cache writes (cli/src/lib/cache.js:226-267), so a hostile or compromised registry.json from any configured source could read or write outside the cache dir (code reading only, not exercised); MCP validates only its own `file` argument (cli/src/mcp/tools.js:100-106). Remote sources cannot carry credentials (cache.js:85-97,252). `chub build` copies every file under each author dir except registry.json into the output, so stray files get published (build.js:321-330).",
+      "Platform and test gaps: CI is ubuntu-latest only (ci.yml:11) with a Node 18/20/22 matrix, but vitest@4.0.18 requires Node ^20 || ^22 || >=24 (package-lock.json:2610-2612) and two test files use import.meta.dirname (cli/tests/commands/build.test.js:7; cli/tests/lib/cache.test.js:6), so the Node 18 leg's outcome is unverified; no macOS/Windows/WSL jobs, no lint or type check. Several MCP tool tests return early when no registry is loaded and so pass vacuously (cli/tests/mcp/tools.test.js:93,110,131). On minimal Linux containers lacking /etc/machine-id and /var/lib/dbus/machine-id the client-id helper throws (cli/src/lib/identity.js:23-29); passive telemetry swallows it (cli/src/index.js:84-86) but sendFeedback does not (cli/src/lib/telemetry.js:44-45).",
+      "Maintenance and doc drift: pre-1.0 (0.1.4), only 0.1.x supported (SECURITY.md:18-20); the clone is shallow so commit cadence is not assessable. Docs diverge from code on single-language auto-infer, the bundle.tar.gz producer, the version flag (code is `-V, --cli-version`, cli/src/index.js:53, vs docs/cli-reference.md:10), the refresh_interval default (21600 at config.js:12 vs 86400 example at cli-reference.md:204), the unimplemented docs/features/search-ranking.md and agent-annotations.md, the BYOD frontmatter, and a stale 'chub-first-draft' tree in docs/design.md:504-531. The MCP server is undocumented, refreshes the registry only at startup, and memoizes the registry/search index at first use, so a long-running chub-mcp will not see rebuilt or updated sources until restarted (cli/src/mcp/server.js:170-174; cli/src/lib/registry.js:6-7,194-195). content/ has no per-entry upstream license/attribution metadata or NOTICE file (CONTRIBUTING.md:127 just says contributions are MIT) and cli/ has no LICENSE file of its own."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "andrewyng/context-hub",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npm global install (documented for all platforms; requires Node >= 18): `npm install -g @aisuite/chub`",
+          "citation": "README.md:12; cli/README.md:8; Node floor at cli/package.json:16-18",
+          "holds": true,
+          "note": "README.md:12 and cli/README.md:8 both give `npm install -g @aisuite/chub`. cli/package.json:16-18 declares engines node >=18.0.0, and cli/package.json:6-9 provides the chub and chub-mcp bins. Neither README mentions platforms, so 'documented for all platforms' only means there is no platform qualifier. The >=18 figure is the declared floor only: the locked runtime dependency posthog-node 5.26.2 declares node ^20.20.0 || >=22.22.0 (package-lock.json:2079-2089), so Node 18 installs should print engine warnings. cli/src/lib/analytics.js:33-45 imports posthog-node lazily inside try/catch, so core commands should degrade rather than fail (not executed)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT; license file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the unmodified standard MIT text ('Copyright (c) 2026 Context Hub Contributors'). It agrees with cli/package.json:29 (\"license\": \"MIT\") and README.md:5,98-100. cli/ has no LICENSE file of its own (glob cli/LICENSE* is empty), as the dossier states elsewhere."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs on ubuntu-latest with Node 18/20/22; documented install is npm; runtime deps are pure JS; caveat: Node 18 leg conflicts with vitest@4.0.18 engines, outcome not verified",
+          "citation": ".github/workflows/ci.yml:11-14; README.md:12; cli/package.json:44-52; package-lock.json:2610-2612",
+          "holds": true,
+          "note": "ci.yml:11-14 is runs-on ubuntu-latest with matrix node-version [18, 20, 22]. README.md:12 is the npm install line. cli/package.json:44-52 lists 7 runtime deps. In package-lock.json only dev entries have hasInstallScript (esbuild at 1376-1381, fsevents at 1614-1619), and all 51 cpu-pinned entries are dev, so the runtime tree is pure JS. package-lock.json:2579-2612 is vitest 4.0.18 with engines ^20.0.0 || ^22.0.0 || >=24.0.0, so the caveat is accurate. It is incomplete, though not false: the runtime dependency posthog-node 5.26.2 also excludes Node 18 (package-lock.json:2087-2089), and CI deletes the lockfile before npm install (ci.yml:20)."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Present in code but NOT documented in README or docs: `chub-mcp` stdio server registering tools chub_search, chub_get, chub_list, chub_annotate, chub_feedback and resource chub://registry",
+          "citation": "cli/package.json:8; cli/bin/chub-mcp; cli/src/mcp/server.js:40-106, 110-155",
+          "holds": true,
+          "note": "cli/package.json:8 maps chub-mcp to ./bin/chub-mcp, which runs `import '../src/mcp/server.js'` (cli/bin/chub-mcp:2). server.js registers the five named tools at :40-106 and the chub://registry resource at :110-155, then connects a StdioServerTransport (:12, :176-177). A case-insensitive grep for 'mcp' outside content/ hits only package-lock.json, cli/package.json, cli/bin/chub-mcp, cli/src/mcp/*.js and tests (cli/tests/mcp/*, cli/tests/commands/get.test.js). There are no hits in README.md, cli/README.md, docs/*.md, CONTRIBUTING.md or the packaged SKILL.md; the content/ hits are third-party SDK docs, not chub."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "`chub search` finds what's available / searches docs and skills (README.md:13,54): verified yes (BM25 plus lexical boosts, keyword fallback, index over id/name/description/tags only, no vector/hybrid/rerank code)",
+          "citation": "cli/src/commands/search.js:50-121; cli/src/lib/registry.js:26-153, 327-419, 362-389; cli/src/lib/bm25.js:22-27, 170-190, 195-287; cli/src/commands/build.js:313-319",
+          "holds": true,
+          "note": "README.md:13 and :54 say what the dossier quotes. search.js:50-121 lists all entries when there is no query (:62-73) and otherwise calls searchEntries (registry.js:327-419) over getAllEntries, which covers docs and skills (:257-264). The cited ranges match exactly: BM25 scoring at bm25.js:195-287, weights id 4/name 3/tags 2/description 1 at :22-27, Levenshtein/prefix/contains boosts at registry.js:26-153, and the keyword fallback at :362-389, used when no search-index.json loads (cache.js:304-307). The index covers id/name/description/tags only (bm25.js:170-190; build.js:313-319), and a grep for embedding|vector|semantic|rerank in cli/ is empty."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

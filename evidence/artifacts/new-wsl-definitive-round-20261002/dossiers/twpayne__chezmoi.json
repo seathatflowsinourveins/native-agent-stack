@@ -1,0 +1,285 @@
+{
+  "contender": "twpayne/chezmoi",
+  "revision": {
+    "contender": "twpayne/chezmoi",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "twpayne/chezmoi",
+        "tag": "v2.73.0",
+        "commit": "24b71e4cf9d98cce0801cfc68e7553355efeaff7",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.73.0",
+    "commit": "24b71e4cf9d98cce0801cfc68e7553355efeaff7",
+    "read_at": "2026-10-02T03:02:54+00:00"
+  },
+  "dossier": {
+    "contender": "twpayne/chezmoi",
+    "revision": {
+      "tag": "v2.73.0",
+      "commit": "24b71e4cf9d98cce0801cfc68e7553355efeaff7",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "chezmoi is a single-binary Go CLI that manages personal dotfiles across machines. It reads a git-hosted 'source state' (regular files whose names carry attribute prefixes such as dot_, private_, encrypted_, run_onchange_; Go templates; .chezmoiexternal downloads), computes a per-machine 'target state', and applies the difference to a destination directory (default $HOME). Secrets are kept out of the repo by password-manager template functions or per-file age/gpg encryption. Its own docs scope it to personal home-directory configuration, 'explicitly not a full system configuration management tool'. Sources: assets/chezmoi.io/docs/reference/concepts.md:3-30; assets/chezmoi.io/docs/reference/source-state-attributes.md:3-36; assets/chezmoi.io/docs/developer-guide/architecture.md:28-35; assets/chezmoi.io/docs/user-guide/frequently-asked-questions/design.md:318-319, 352-355. Revision verified from .git/HEAD:1 and .git/packed-refs:2 (refs/tags/v2.73.0).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "[README] Tagline: 'Manage your dotfiles across multiple diverse machines, securely.' The README is 17 lines (tagline, link to chezmoi.io docs, developer-guide link, contributors image, 'License: MIT') with no install, platform or feature text; statements below tagged [docs] come from the in-repo documentation tree, not the README.",
+          "citation": "README.md:1-17"
+        },
+        {
+          "claim": "[README] Documentation is at chezmoi.io; its source ships in-repo as 'the documentation single source of truth'.",
+          "citation": "README.md:7; assets/chezmoi.io/docs/developer-guide/architecture.md:23"
+        },
+        {
+          "claim": "[README] License: MIT.",
+          "citation": "README.md:15-17; LICENSE:1-21"
+        },
+        {
+          "claim": "[docs] Feature list: templates, password manager support, importing files from archives, full file encryption (age, gpg, git-crypt, transcrypt), running scripts.",
+          "citation": "assets/chezmoi.io/docs/index.md.tmpl:12-22"
+        },
+        {
+          "claim": "[docs] chezmoi and a dotfiles repo can be installed on 'a new, empty machine with a single command'.",
+          "citation": "assets/chezmoi.io/docs/index.md.tmpl:24-30"
+        },
+        {
+          "claim": "[docs] 'chezmoi runs on all popular operating systems, is distributed as a single statically-linked binary with no dependencies, and does not require root access.'",
+          "citation": "assets/chezmoi.io/docs/index.md.tmpl:41-42"
+        },
+        {
+          "claim": "[docs] Password-manager template functions fetch the secret at apply time and insert it into the generated destination file, so a public dotfiles repo need not contain secrets.",
+          "citation": "assets/chezmoi.io/docs/user-guide/password-managers/index.md:3-10"
+        },
+        {
+          "claim": "[docs] Files can be encrypted with age, git-crypt, gpg or transcrypt, are stored with the encrypted_ attribute and decrypted automatically; the example given is `chezmoi add --encrypt ~/.ssh/id_rsa`.",
+          "citation": "assets/chezmoi.io/docs/user-guide/encryption/index.md:3-13"
+        },
+        {
+          "claim": "[docs] For private-repo git operations 'chezmoi itself does not store any credentials' and relies on local git configuration; secrets go in a password manager, encrypted files or private config files.",
+          "citation": "assets/chezmoi.io/docs/user-guide/setup.md:76-87"
+        },
+        {
+          "claim": "[docs] Package installation 'requires running imperative commands'; declarative installs can be 'simulated' with a .chezmoidata file plus a run_onchange_ script (brew bundle example).",
+          "citation": "assets/chezmoi.io/docs/user-guide/advanced/install-packages-declaratively.md:3-43"
+        },
+        {
+          "claim": "[docs] .chezmoiexternal entries (type file, archive, archive-file, git-repo) pull content from http(s)/file URLs; optional checksum.sha256/384/512/size are verified; refreshPeriod defaults to never re-download unless forced.",
+          "citation": "assets/chezmoi.io/docs/reference/special-files/chezmoiexternal-format.md:21-62, 188-193"
+        },
+        {
+          "claim": "[docs] Scope: chezmoi 'is explicitly not a full system configuration management tool'; its focus 'will always be personal home directory management'.",
+          "citation": "assets/chezmoi.io/docs/user-guide/frequently-asked-questions/design.md:318-319, 352-355"
+        },
+        {
+          "claim": "[docs] `chezmoi archive` generates a tar/tar.gz/tgz/zip archive of the target state; `chezmoi verify` exits 0 only if all targets match their target state.",
+          "citation": "assets/chezmoi.io/docs/reference/commands/archive.md:3-23; assets/chezmoi.io/docs/reference/commands/verify.md:3-5"
+        },
+        {
+          "claim": "[docs] Only the most recent version gets security updates; vulnerabilities are reported by GitHub issue or email.",
+          "citation": "assets/chezmoi.io/docs/developer-guide/security.md:3-20"
+        }
+      ],
+      "install": [
+        {
+          "method": "Installer script (curl; wget variant also documented), Linux/macOS: installs the latest release into ./bin of the current directory and does not modify PATH. The script also accepts -t <tag> to pin a version, but that flag appears only in the script's own usage text, not in install.md.tmpl.",
+          "command": "sh -c \"$(curl -fsLS https://get.chezmoi.io)\"",
+          "citation": "assets/chezmoi.io/docs/install.md.tmpl:160-175, 219-227; internal/cmds/generate-install.sh/install.sh.tmpl:15, 27-30"
+        },
+        {
+          "method": "Installer script plus init and apply from a GitHub dotfiles repo (single command on a new machine)",
+          "command": "sh -c \"$(curl -fsLS https://get.chezmoi.io)\" -- init --apply $GITHUB_USERNAME",
+          "citation": "assets/chezmoi.io/docs/index.md.tmpl:24-30; assets/chezmoi.io/docs/install.md.tmpl:189-197"
+        },
+        {
+          "method": "Homebrew (listed under macOS and under cross-platform package managers)",
+          "command": "brew install chezmoi",
+          "citation": "assets/chezmoi.io/docs/install.md.tmpl:70-74, 140-144"
+        },
+        {
+          "method": "Linux distribution package managers (one command per distro; also nix-env, zypper, xbps-install, pkg listed)",
+          "command": "apt-get install chezmoi | dnf install chezmoi | pacman -S chezmoi | apk add chezmoi",
+          "citation": "assets/chezmoi.io/docs/install.md.tmpl:12-66"
+        },
+        {
+          "method": "Version managers that can pin a chezmoi version (docs template substitutes the latest release number for <version>)",
+          "command": "mise use --global chezmoi@<version> | asdf plugin add chezmoi && asdf install chezmoi <version>",
+          "citation": "assets/chezmoi.io/docs/install.md.tmpl:128-138"
+        },
+        {
+          "method": "Pre-built release archive or package at a versioned GitHub release URL, verified against the cosign-signed SHA256 checksum file; or build from source",
+          "command": "cosign verify-blob --key=chezmoi_cosign.pub --bundle=chezmoi_<version>_checksums.txt.sigstore.json chezmoi_<version>_checksums.txt && sha256sum --check chezmoi_<version>_checksums.txt --ignore-missing (macOS: shasum --algorithm 256 --check chezmoi_<version>_checksums.txt --ignore-missing); source: git clone https://github.com/twpayne/chezmoi.git && cd chezmoi && make install-from-git-working-copy",
+          "citation": "assets/chezmoi.io/docs/install.md.tmpl:258-299, 301-349"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release builds exist for linux/amd64 as a glibc cgo build and a static musl build (.config/goreleaser.yaml:14-44, 113-128); the installer maps uname x86_64 to amd64 and selects glibc or musl (internal/cmds/generate-install.sh/install.sh.tmpl:52-71, 153-168, 187-224); CI runs go test -race on ubuntu-22.04 (.github/workflows/main.yml:264-314) and in Alpine and Arch containers (.github/workflows/main.yml:89-136; assets/docker/entrypoint.sh:17-22).",
+        "wsl2": "unknown - no WSL2-specific support statement, build or CI job found. The docs only give a template recipe to detect WSL via .chezmoi.kernel.osrelease containing 'microsoft' (assets/chezmoi.io/docs/user-guide/machines/windows.md:3-15; assets/chezmoi.io/docs/reference/templates/variables.md:20). WSL would use the Linux binaries, but that is inference, not stated.",
+        "macos_arm64": "yes - goreleaser builds darwin/arm64 with chezmoi-nocgo (CGO_ENABLED=0; only darwin/386 is ignored): .config/goreleaser.yaml:45-66, 84-85; raw binary chezmoi-darwin-arm64 is attached to releases (.config/goreleaser.yaml:151-152, 261-262); release archive documented at assets/chezmoi.io/docs/install.md.tmpl:271-274; installer maps arm64 (internal/cmds/generate-install.sh/install.sh.tmpl:153-157); CI job test-macos on runner label macos-15 runs go build and go test ./... (.github/workflows/main.yml:137-175; the runner CPU architecture is not stated in the repo). Official macOS binaries are built without cgo, so .chezmoi.username and .chezmoi.group may be wrong on some systems (assets/chezmoi.io/docs/developer-guide/packaging.md:59-61).",
+        "gpu": "no - not applicable; a case-insensitive search of the repo for gpu/cuda/nvidia/opencl found no code or docs."
+      },
+      "integrations": {
+        "cli": "yes - the `chezmoi` binary (cobra) with about 50 registered subcommands, a few hidden (add, apply, archive, diff, doctor, dump, init, ssh, docker, state, upgrade, verify, ...): internal/cmd/config.go:2030-2081; main.go:26-35. Global flags include --destination/-D, --source/-S, --dry-run, --force, --skip-secrets, --refresh-externals (internal/cmd/config.go:1969-2009; assets/chezmoi.io/docs/reference/command-line-flags/global.md). Shell completions for bash, fish, powershell and zsh are generated (main.go:1-4).",
+        "mcp": "none found - no MCP server or stdio JSON-RPC code or docs; searches for MCP, model context protocol, ListenAndServe, net.Listen and grpc over the repo's .go files and docs returned nothing relevant.",
+        "sdk_or_api": "none found - no HTTP/RPC API or published Go SDK. Docs say building on chezmoi 'should primarily be done by executing the chezmoi binary' (assets/chezmoi.io/docs/developer-guide/building-on-top-of-chezmoi.md:3-7); library code lives under internal/ (not importable from other modules; go.mod:1). Machine-readable surfaces: `chezmoi dump` and `chezmoi data` JSON/YAML (assets/chezmoi.io/docs/reference/commands/dump.md:3-14) and `chezmoi state dump` (assets/chezmoi.io/docs/reference/commands/state.md:27-29). Plugin mechanism: executables named chezmoi-<command> on $PATH (assets/chezmoi.io/docs/reference/plugins.md:3-8).",
+        "claude_code_or_codex": "none found - no skill, plugin, CLAUDE.md, AGENTS.md, .claude or .cursor files; the only LLM references are policy text banning LLM-generated contributions (.github/CONTRIBUTING.md:3-8; .github/CODE_OF_CONDUCT.md:5-8)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or crash reporting found: a case-insensitive search of the whole repo for telemetry/analytics/sentry/posthog/mixpanel/phone-home/crash-report found no code or docs hits (only substring false positives such as ContainsEntryTypeBits). No automatic update check or daemon found: GetLatestRelease is called only from `chezmoi upgrade` (internal/cmd/upgradecmd.go:80-90), `chezmoi doctor` (internal/cmd/doctorcmd.go:702-713; skippable with --no-network: internal/cmd/doctorcmd.go:176, assets/chezmoi.io/docs/reference/commands/doctor.md:7-9) and the gitHub* template functions (internal/cmd/githubtemplatefuncs.go:187-246). Every request through chezmoi's HTTP client carries User-Agent chezmoi.io/<version> (internal/cmd/config.go:1687-1700; test internal/cmd/applycmd_test.go:247-268); external downloads are cached at <cacheDir>/external/<sha256(url)> (internal/chezmoi/sourcestate.go:1842-1898). On-demand network use: init/update run git clone/pull against the user's repo, using system git or a builtin go-git limited to HTTP(S) (internal/cmd/initcmd.go:157-214, 271-319; assets/chezmoi.io/docs/reference/command-line-flags/global.md:140-152); .chezmoiexternal URLs (http, https, file) and git-repo externals (assets/chezmoi.io/docs/reference/special-files/chezmoiexternal-format.md:57-58, 183-186); GitHub API for gitHub* functions, anonymous by default, tokens read from CHEZMOI_GITHUB_ACCESS_TOKEN, CHEZMOI_GITHUB_TOKEN, GITHUB_ACCESS_TOKEN, GITHUB_TOKEN (internal/chezmoi/github.go:12-32; assets/chezmoi.io/docs/reference/templates/github-functions/index.md:3-18); getRedirectedURL sends a HEAD request (internal/cmd/templatefuncs.go:220-233); secret functions call external CLIs (internal/cmd/onepasswordtemplatefuncs.go:1-16, 68-79), cloud SDKs for AWS Secrets Manager and Azure Key Vault (internal/cmd/awssecretsmanagertemplatefuncs.go:8-54; go.mod:25-26) or the OS keyring (internal/cmd/keyringtemplatefuncs.go:22-45); `chezmoi ssh|docker|podman` run curl|wget piped to sh from get.chezmoi.io on the target (assets/templates/install-init-shell.sh.tmpl:92-97); the installer downloads from github.com/twpayne/chezmoi/releases (internal/cmds/generate-install.sh/install.sh.tmpl:77-86). HTTP/HTTPS/SOCKS5 proxies are honoured via HTTP_PROXY, HTTPS_PROXY, NO_PROXY (assets/chezmoi.io/docs/user-guide/tools/http-or-socks5-proxy.md:3-9). No chezmoi account or hosted service is required; accounts are needed only for services the user's repo or templates reference (git host, password managers, cloud secret stores)."
+    },
+    "code": {
+      "languages": [
+        "Go (all product code; go.mod:3 declares go 1.26.0)",
+        "POSIX shell (installer scripts, docker/vagrant test harnesses: assets/scripts/install.sh, assets/docker/entrypoint.sh)",
+        "PowerShell (assets/scripts/install.ps1, exercised in .github/workflows/installer.yml:109-148)",
+        "Python (docs-site tooling only: pyproject.toml:1-27)",
+        "Markdown/MkDocs (documentation under assets/chezmoi.io/docs)"
+      ],
+      "entry_points": [
+        {
+          "path": "main.go:26-35",
+          "what": "chezmoi binary main(); passes ldflags-injected version/commit/date/builtBy to cmd.Main"
+        },
+        {
+          "path": "internal/cmd/cmd.go:52-66",
+          "what": "cmd.Main: reads CHEZMOIDEV, runs the cobra root command, maps errors to exit codes"
+        },
+        {
+          "path": "internal/cmd/config.go:1957-2101",
+          "what": "newRootCmd: global flags and registration of about 50 subcommands (add, apply, archive, diff, doctor, init, ssh, docker, state, upgrade, verify, ...)"
+        },
+        {
+          "path": "assets/scripts/install.sh",
+          "what": "POSIX installer served at get.chezmoi.io; generated from internal/cmds/generate-install.sh/install.sh.tmpl (main.go:6-7); install-local-bin.sh (get.chezmoi.io/lb) and install.ps1 are siblings"
+        },
+        {
+          "path": "assets/templates/install-init-shell.sh.tmpl",
+          "what": "script piped to `sh -c` on a remote host or container by `chezmoi ssh|docker|podman` (internal/cmd/config.go:2832-2856)"
+        },
+        {
+          "path": "internal/cmds/*/main.go",
+          "what": "nine developer tools run via `go tool` (execute-template, generate-commit, generate-helps, generate-install.sh, generate-license, hexencode, lint-commit-messages, lint-txtar, lint-whitespace), declared in go.mod:5-15"
+        }
+      ],
+      "architecture": "Per assets/chezmoi.io/docs/developer-guide/architecture.md:17-159 and the code: internal/chezmoi/ is the core. All OS interaction goes through a System interface with composable wrappers (realsystem.go, debugsystem.go, dryrunsystem.go, dumpsystem.go, tarwritersystem.go, zipwritersystem.go, erroronwritesystem.go, readonlysystem.go). sourcestate.go reads the source dir, executes templates, resolves externals (download, cache, checksum: lines 1669-1898), applies and adds entries; sourcestateentry.go, targetstateentry.go and actualstateentry.go model source, target and actual entries; attr.go parses filename attributes. Encryption is an interface with AgeEncryption (external age CLI or builtin), GPGEncryption, TransparentEncryption and NoEncryption (ageencryption.go, gpgencryption.go, transparentencryption.go, noencryption.go). State lives in a bbolt key-value store (boltpersistentstate.go, persistentstate.go) holding entryState and scriptState buckets with SHA256 hashes. github.go builds the GitHub API client. internal/cmd/ holds one *cmd.go per command plus *templatefuncs.go for template functions (secret managers, GitHub, encryption); config.go defines the large Config struct, root command, flags, config-file loading and the HTTP client with httpcache; helps.gen.go and license.gen.go are generated (main.go:5-8); mackupcmd_darwin.go is a hidden darwin-only helper that adds files listed in Mackup app definitions. Supporting packages: internal/chezmoibubbles (TUI prompts), internal/chezmoigit, internal/chezmoilog, internal/chezmoiset, internal/chezmoierrors, internal/chezmoitest, internal/archivetest, internal/cmds (dev tools). assets/ holds the docs site (assets/chezmoi.io/docs), install scripts, templates, docker/vagrant harnesses and cosign keys; completions/ holds generated shell completions.",
+      "packaging_and_release": "GoReleaser v2 (.config/goreleaser.yaml:3; GORELEASER_VERSION 2.18.2 at .github/workflows/main.yml:22) is run by the `release` job on v* tags after check, lint and test jobs pass (.github/workflows/main.yml:9-10, 457-511; assets/chezmoi.io/docs/developer-guide/releases.md:20-31). Artifacts: tar.gz archives (zip on Windows) for android/darwin/freebsd/linux/openbsd/windows across 386, amd64, arm, arm64, loong64, mips64, mips64le, ppc64, ppc64le, riscv64, s390x (.config/goreleaser.yaml:45-91), including linux_amd64, linux-glibc_amd64, linux-musl_amd64 and darwin_arm64 (assets/chezmoi.io/docs/install.md.tmpl:263-274); deb/rpm/apk/archlinux/msix packages (.config/goreleaser.yaml:160-227); Snap with classic confinement (:304-318); Chocolatey, Scoop and winget publishing (:229-260, 280-361); raw binaries chezmoi-linux-amd64, chezmoi-linux-amd64-musl, chezmoi-darwin-amd64, chezmoi-darwin-arm64, chezmoi-windows-amd64.exe attached to releases and listed in the checksums (:147-158, 255-268); source archive with a COMMIT file (:320-324); SPDX-JSON SBOMs generated with syft 1.52.0 (:270-278; .github/workflows/main.yml:25). Signing: the SHA256 checksums file is signed with `cosign sign-blob --key=assets/cosign/cosign.key` (artifacts: checksum), producing <checksums>.sigstore.json; the key is password-protected, committed in the repo, with the password in the COSIGN_PWD Actions secret; the public key ships as release asset chezmoi_cosign.pub and as assets/cosign/cosign.pub (.config/goreleaser.yaml:255-258, 292-302; assets/chezmoi.io/docs/developer-guide/releases.md:79-103; assets/chezmoi.io/docs/install.md.tmpl:301-349). No GitHub artifact attestations, SLSA provenance or id-token permission found under .github. Builds embed version, commit and date through ldflags (.config/goreleaser.yaml:21-27) and the config sets no -trimpath or mod_timestamp. Linux amd64 release binaries are built on ubuntu-22.04 / glibc 2.35 (.github/workflows/main.yml:202, 469; internal/cmds/generate-install.sh/install.sh.tmpl:192-194). The install scripts served from get.chezmoi.io are pushed by the deploy-website job to a separate repo, chezmoi/get.chezmoi.io on gh-pages (.github/workflows/main.yml:543-559). Homebrew and Scoop packages are auto-bumped from releases and distro packages are maintained outside this repo (assets/chezmoi.io/docs/developer-guide/releases.md:62-77); Snap store credentials expire periodically and need manual renewal (:35-60). Packagers can remove the upgrade command with -tags noupgrade (assets/chezmoi.io/docs/developer-guide/packaging.md:63-65; Makefile:78).",
+      "tests_and_ci": "Frameworks: Go testing plus github.com/alecthomas/assert/v2 for unit tests, go-vfs for filesystem integration, rogpeppe/go-internal/testscript for end-to-end command tests (assets/chezmoi.io/docs/developer-guide/testing.md:3-22; assets/chezmoi.io/docs/developer-guide/architecture.md:161-181). Size: about 93 *_test.go files (44 in internal/chezmoi, 32 in internal/cmd, 6 in internal/chezmoibubbles, 4 in internal/cmds, 5 elsewhere under internal/, plus main_test.go and assets/chezmoi.io/docs/reference/commands/commands_test.go) and 298 testscript scenarios in internal/cmd/testdata/scripts/*.txtar (e.g. addsecrets.txtar, applyskipencrypted.txtar, archivetar.txtar, external*.txtar). No Go Benchmark functions and no published coverage numbers found. Extra harnesses: Docker images for alpine, archlinux, fedora, voidlinux (assets/docker/*.Dockerfile; Makefile:100-102 runs alpine, archlinux, fedora) and Vagrant freebsd14/openbsd7 (assets/vagrant; Makefile:104-106). CI is seven workflow files under .github/workflows: main.yml (push/PR to master plus nightly cron: changes path filter; codeql; misspell; test-alpine and test-archlinux via assets/docker/test.sh; test-macos on macos-15 running go build and go test ./...; test-oldstable-go build-only; test-release = goreleaser snapshot with --skip=sign; test-ubuntu on ubuntu-22.04 with umask 022 and 002 running go test -race; test-website; test-windows on windows-2022 with -race; check = go generate plus git diff, capslock, actionlint, shellcheck, editorconfig-checker, lint-whitespace, lint-txtar, find-typos, lint-commit-messages, markdownlint; lint = golangci-lint on macos-15, ubuntu-22.04 and windows-2022 plus a format diff; release on v* tags; deploy-website), installer.yml (install.sh and install.ps1 on macos-14, ubuntu-22.04, windows-2022), govulncheck.yml (nightly and PR/push/tags), build-docs.yml and preview-docs.yml (docs build and Cloudflare Pages preview), clear-pr-caches.yml, lock-threads.yml; composite actions setup-go and free-disk-space. Third-party actions are pinned by commit SHA. Notes: the capslock diff check is disabled with a FIXME (.github/workflows/main.yml:395-398); no workflow runs the FreeBSD/OpenBSD Vagrant tests; tests use a CHEZMOI_GITHUB_TOKEN secret and install age and rage (plus keepassxc on macOS) for tool-dependent cases (.github/workflows/main.yml:109, 157-170, 286-299).",
+      "dependencies": "go.mod (module chezmoi.io/chezmoi/v2, go 1.26.0): 57 direct requires (go.mod:24-80), 148 indirect (go.mod:84-231), 15 `tool` entries (go.mod:5-21: ten first-party tools plus editorconfig-checker, capslock, goversioninfo, actionlint, find-typos), 3 excluded charmbracelet/bubbles versions (go.mod:234-238); go.sum present. Notable direct deps by function: filippo.io/age; github.com/go-git/go-git/v5; go.etcd.io/bbolt; github.com/spf13/cobra; github.com/betterleaks/betterleaks (secret scanning); aws-sdk-go-v2 and Azure SDK (secret managers); github.com/zalando/go-keyring; github.com/google/go-github/v72; github.com/charmbracelet/bubbletea (prompts); mvdan.cc/sh/v3; github.com/Masterminds/sprig/v3 and go-sprout/sprout (template functions). pyproject.toml (with uv.lock): 9 direct Python deps for the docs site only (idna, mkdocs, mkdocs-material, pymdown-extensions, ruamel.yaml, ruff, soupsieve, taskipy, urllib3), requires Python >=3.14, classified 'Private :: Do Not Upload' (pyproject.toml:4-17). Packaging docs state the build needs only the standard Go toolchain and the binary has no runtime dependencies, though it is usually used with git (assets/chezmoi.io/docs/developer-guide/packaging.md:5-8).",
+      "security_policy": ".github/SECURITY.md:1-3 points to the security guide, assets/chezmoi.io/docs/developer-guide/security.md: only the most recent version receives security updates (:5); report vulnerabilities by opening a GitHub issue or emailing twpayne+chezmoi-security@gmail.com (:19-20); no private advisory channel, response SLA or disclosure timeline is stated. Automated checks: govulncheck nightly and on PR/push/tags (.github/workflows/govulncheck.yml:1-36) and CodeQL for Go (.github/workflows/main.yml:58-76)."
+    },
+    "claim_checks": [
+      {
+        "claim": "[docs] chezmoi is 'distributed as a single statically-linked binary with no dependencies' (assets/chezmoi.io/docs/index.md.tmpl:41-42)",
+        "verified": "partial",
+        "evidence": "Differs by target. linux/amd64: chezmoi-nocgo ignores linux/amd64 (.config/goreleaser.yaml:86-87), so the default linux_amd64 archive comes from chezmoi-cgo-glibc with CGO_ENABLED=1, a dynamically linked glibc build (.config/goreleaser.yaml:14-27, 93-108); a separate static musl build exists (:28-44, 121-128) and the installer falls back to it when glibc < 2.35 (internal/cmds/generate-install.sh/install.sh.tmpl:187-205). darwin/arm64 is built by chezmoi-nocgo with CGO_ENABLED=0 (.config/goreleaser.yaml:45-66; only darwin/386 is ignored, :84-85). Packaging docs: no runtime deps but usually used with git (assets/chezmoi.io/docs/developer-guide/packaging.md:7-8); the builtin git handles only HTTP(S) and no git-repo externals (assets/chezmoi.io/docs/reference/command-line-flags/global.md:149-152; internal/cmd/initcmd.go:277-279)."
+      },
+      {
+        "claim": "[docs] Build from source 'with Go 1.25 or later' (assets/chezmoi.io/docs/install.md.tmpl:293)",
+        "verified": "no",
+        "evidence": "go.mod:3 declares `go 1.26.0`; CI builds with Go 1.27.1 (.github/workflows/main.yml:20) and also has an 'oldstable' build job (.github/workflows/main.yml:176-199). The docs lag the code; go.mod is authoritative."
+      },
+      {
+        "claim": "[docs] run_once_/run_onchange_ state is kept in chezmoi's persistent state, default file named chezmoi.boltdb (assets/chezmoi.io/docs/reference/configuration-file/variables.md.yaml:35-37; assets/chezmoi.io/docs/user-guide/use-scripts-to-perform-actions.md:144-159)",
+        "verified": "yes",
+        "evidence": "Mechanism confirmed, filename differs: code stores state as chezmoistate.boltdb beside the config file (internal/cmd/config.go:342, 2711-2720), matching global.md:80-82 but not variables.md.yaml:36. run_once_ is keyed by SHA256 of the script contents in the scriptState bucket; run_onchange_ by target path plus contents SHA256 in the entryState bucket; both are written only after RunScript succeeds, and a missing entry means the script runs (internal/chezmoi/targetstateentry.go:336-387, 417-460; internal/chezmoi/persistentstate.go:7-16). Entry states hold a contents SHA256, not contents (internal/chezmoi/entrystate.go:26-32), as architecture.md:81-84 says. The state file is outside the source repo, so a host without it re-runs these scripts; init --one-shot/--purge delete it (internal/cmd/initcmd.go:148-155, 254-266)."
+      },
+      {
+        "claim": "[docs] .chezmoiexternal entries can set checksum.sha256/384/512/size and chezmoi verifies the download (assets/chezmoi.io/docs/reference/special-files/chezmoiexternal-format.md:46-49, 57-62)",
+        "verified": "yes",
+        "evidence": "internal/chezmoi/sourcestate.go:1684-1752 compares size and hashes and returns a joined error on mismatch; it runs on fresh and cached data alike, and every check is conditional on the field being set, so an entry without checksum fields is not verified. Code also accepts md5, sha1 and ripemd160 (with deprecation warnings) which the docs do not list (sourcestate.go:68-76, 1694-1726). Downloads are cached at <cacheDir>/external/<sha256(url)> with mode 0600 and a refreshPeriod of 0 reuses the cache until forced with -R (sourcestate.go:1842-1856, 1887-1895; chezmoiexternal-format.md:188-193). file:// URLs are read from disk (sourcestate.go:1818-1828)."
+      },
+      {
+        "claim": "[docs] `chezmoi add --secrets ignore|warning|error` scans for secrets, default warning (assets/chezmoi.io/docs/reference/commands/add.md:66-71)",
+        "verified": "yes",
+        "evidence": "Default is newChoiceFlag(\"warning\") at internal/cmd/config.go:3286. internal/cmd/addcmd.go:100-117 scans only regular, unencrypted files with the betterleaks default rules (internal/cmd/config.go:1588-1593); warning still adds the file, error aborts unless --force (internal/cmd/testdata/scripts/addsecrets.txtar:1-31). `re-add` also warns on new secrets (addsecrets.txtar:24-31). Scanning is heuristic and happens only at add/re-add time, not at apply."
+      },
+      {
+        "claim": "[docs] Password-manager template functions keep secrets out of the repo (assets/chezmoi.io/docs/user-guide/password-managers/index.md:3-10)",
+        "verified": "yes",
+        "evidence": "Functions call external CLIs via os/exec (internal/cmd/onepasswordtemplatefuncs.go:1-16, 68-79), cloud SDKs (internal/cmd/awssecretsmanagertemplatefuncs.go:8-54) or the OS keyring (internal/cmd/keyringtemplatefuncs.go:22-45). Each begins with chezmoi.SkipTemplateIf(c.skipSecrets), so the global --skip-secrets flag skips those templates (internal/cmd/config.go:2006; internal/chezmoi/templatefuncs.go:14-18). Caveat: the resolved value is rendered into the destination file in plaintext (password-managers/index.md:8-10, 22-30)."
+      },
+      {
+        "claim": "[docs] 'full file encryption (using age, gpg, git-crypt, or transcrypt)' (assets/chezmoi.io/docs/index.md.tmpl:21)",
+        "verified": "partial",
+        "evidence": "internal/cmd/config.go:2877-2907 implements encryption = age, gpg or transparent. TransparentEncryption performs no encryption in chezmoi (internal/chezmoi/transparentencryption.go:9-12); git-crypt and transcrypt rely on git filters (assets/chezmoi.io/docs/user-guide/encryption/transparent.md:5-29). age and gpg encrypt each source file separately via the external CLI or builtin age (internal/chezmoi/ageencryption.go:34-89; assets/chezmoi.io/docs/developer-guide/architecture.md:142-147); builtin age lacks passphrase, symmetric and SSH-key support (assets/chezmoi.io/docs/user-guide/encryption/age.md:71-94)."
+      },
+      {
+        "claim": "[docs] Release checksums are signed with cosign (assets/chezmoi.io/docs/install.md.tmpl:303-304)",
+        "verified": "partial",
+        "evidence": "Signing is configured: `cosign sign-blob --key=assets/cosign/cosign.key` over the checksum artifacts with a .sigstore.json bundle (.config/goreleaser.yaml:292-302); assets/cosign/cosign.key is committed in encrypted form (header 'ENCRYPTED COSIGN PRIVATE KEY', line 1; assets/chezmoi.io/docs/developer-guide/releases.md:93). No shipped tooling verifies the signature: install.sh checks only a SHA256 from the same release (internal/cmds/generate-install.sh/install.sh.tmpl:83-89, 315-331) and `chezmoi upgrade` likewise (internal/cmd/upgradecmd.go:308-323); no .go, .sh, .ps1 or .tmpl file references cosign or sigstore, and no attestation, SLSA or id-token usage exists under .github."
+      },
+      {
+        "claim": "[docs] Dotfile managers give 'an undo command and a restore from backup' (assets/chezmoi.io/docs/why-use-chezmoi.md:5-6); `chezmoi archive` 'Generate[s] an archive of the target state' (assets/chezmoi.io/docs/reference/commands/archive.md:3-4)",
+        "verified": "partial",
+        "evidence": "`archive` exists (internal/cmd/archivecmd.go:55-115) but applies the rendered target state to a tar/zip writer: encrypted source files are decrypted first (internal/chezmoi/sourcestate.go:2157-2161), scripts are written as files rather than run (internal/chezmoi/tarwritersystem.go:46-49), and output is plain tar, tar.gz or zip (internal/cmd/archivecmd.go:17, 83-115) with no encryption, deduplication or manifest. No backup, restore or snapshot command is registered (internal/cmd/config.go:2030-2081) and a search of internal/ for backup/dedup/snapshot finds only unrelated hits. `verify` compares the destination to the freshly computed target state, not to a stored backup (internal/cmd/verifycmd.go:41-51). `import` loads archives into the source state, not the destination (assets/chezmoi.io/docs/reference/commands/import.md:3-6)."
+      },
+      {
+        "claim": "[docs] `chezmoi ssh` and `chezmoi docker` install chezmoi on a target and run `init --apply` (assets/chezmoi.io/docs/reference/commands/ssh.md:3-8; assets/chezmoi.io/docs/reference/commands/docker.md:16-17)",
+        "verified": "yes",
+        "evidence": "internal/cmd/sshcmd.go:33-42 and internal/cmd/dockercmd.go:68-98 call runInstallInitShellSh (internal/cmd/config.go:2832-2856), which runs the assets/templates/install-init-shell.sh.tmpl script via `sh -c` on the target. The script reuses an existing chezmoi if found, otherwise installs the latest via `curl|wget ... get.chezmoi.io/lb | sh` (or a package manager with sudo when -p is given), then runs `chezmoi init --apply <args>` and optionally execs the shell (assets/templates/install-init-shell.sh.tmpl:29-103). There is no version pin, and FIXME comments note the curl|sh use (:3-4). The docs label ssh 'experimental, potentially destructive' (ssh.md:6-8)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Need 1 (pinned runtimes and CLI tools): no runtime/tool version manager. Package installation is imperative scripts that the docs say 'break chezmoi's declarative approach' (assets/chezmoi.io/docs/user-guide/advanced/install-packages-declaratively.md:3-6; assets/chezmoi.io/docs/user-guide/use-scripts-to-perform-actions.md:22-23); there is no lockfile or version resolver, and externals are verified only if the user writes checksum fields (internal/chezmoi/sourcestate.go:1684-1752). Latest-release helpers (assets/chezmoi.io/docs/reference/templates/github-functions/gitHubLatestReleaseAssetURL.md:3-11) and the installer default TAGARG=latest (assets/scripts/install.sh:15) are unpinned unless the user pins. .chezmoi.arch yields Go names such as amd64/arm64 (assets/chezmoi.io/docs/reference/templates/variables.md:7), so per-tool asset naming must be mapped in templates.",
+      "Need 2 (encrypted, deduplicated, verifiable backups): no backup, restore or deduplication feature found (internal/cmd/config.go:2030-2081; see the archive claim check). `archive` and `dump` emit decrypted file contents in plaintext (internal/chezmoi/dumpsystem.go:48-56, 107, 128; internal/chezmoi/tarwritersystem.go:52-63) so their output needs separate encryption before moving; `chezmoi encrypt` can encrypt arbitrary stdin or files with the configured age/gpg (assets/chezmoi.io/docs/reference/commands/encrypt.md:3-5). The `destroy` docs tell users to keep a separate backup of the home and source directories (assets/chezmoi.io/docs/reference/commands/destroy.md:5-11).",
+      "Need 3 (credentials): handling is opt-in and heuristic. chezmoi does not classify authentication stores; the docs show adding ~/.ssh/id_rsa with --encrypt (assets/chezmoi.io/docs/user-guide/encryption/index.md:9-13; assets/chezmoi.io/docs/reference/commands/add.md:109). Secret scanning runs only on add/re-add of regular unencrypted files, uses betterleaks default rules and defaults to warn-and-still-add (internal/cmd/addcmd.go:100-117; internal/cmd/config.go:3286; internal/cmd/testdata/scripts/addsecrets.txtar:6-10). Secrets fetched by templates are written in plaintext to destination files (assets/chezmoi.io/docs/user-guide/password-managers/index.md:8-10); a gpg passphrase can be kept in plaintext in the local config (assets/chezmoi.io/docs/user-guide/encryption/gpg.md:52-56, 105-106); encryption identities are not provisioned by chezmoi (assets/chezmoi.io/docs/user-guide/encryption/age.md:12-22), and the FAQ pattern stores a passphrase-encrypted age key in the repo (assets/chezmoi.io/docs/user-guide/frequently-asked-questions/encryption.md:15-52). Apply-time controls exist: --exclude=encrypted (internal/cmd/testdata/scripts/applyskipencrypted.txtar:7-14) and --skip-secrets (internal/cmd/config.go:2006).",
+      "Execution surface: applying a source state runs arbitrary scripts with the invoking user's privileges (assets/chezmoi.io/docs/user-guide/use-scripts-to-perform-actions.md:9-15, 39-43). `init --apply`, `ssh` and `docker` run whatever the repo and the unpinned get.chezmoi.io/lb installer contain, optionally via sudo (assets/templates/install-init-shell.sh.tmpl:29-32, 92-103); `ssh` is labelled experimental and potentially destructive (assets/chezmoi.io/docs/reference/commands/ssh.md:6-8). The committed capslock summary lists ARBITRARY_EXECUTION, EXEC, NETWORK, FILES and MODIFY_SYSTEM_STATE for the main package (.config/capslock-summary.json:2-16), and its CI diff check is disabled (.github/workflows/main.yml:395-398).",
+      "Run-state 'receipts' are local and hash-trusting: run_once_/run_onchange_ scripts are skipped whenever persistent state (chezmoistate.boltdb beside the config file) holds a matching SHA256, with no check that the script's effects still exist (internal/chezmoi/targetstateentry.go:417-460; internal/cmd/config.go:2711-2720). A restored state file would suppress re-runs, while a host without one re-runs everything. init --one-shot and --purge delete the state after apply (internal/cmd/initcmd.go:148-155, 254-266; assets/chezmoi.io/docs/reference/commands/init.md:82-87). The docs name the file inconsistently (chezmoi.boltdb in assets/chezmoi.io/docs/reference/configuration-file/variables.md.yaml:36 vs chezmoistate.boltdb in assets/chezmoi.io/docs/reference/command-line-flags/global.md:80-82).",
+      "Release verification gap: signatures cover only the checksums file (.config/goreleaser.yaml:292-302) and neither install.sh nor `chezmoi upgrade` checks them, only a SHA256 from the same release (internal/cmds/generate-install.sh/install.sh.tmpl:83-89; internal/cmd/upgradecmd.go:308-323). The signing key is a long-lived key committed in encrypted form with its password in a CI secret (assets/chezmoi.io/docs/developer-guide/releases.md:86-98; assets/cosign/cosign.key:1); no provenance attestations found; builds embed a timestamp with no -trimpath or mod_timestamp set (.config/goreleaser.yaml:13-91). The installer defaults to latest and its -t <tag> pin option is documented only in the script's usage text (assets/scripts/install.sh:15, 30; not in assets/chezmoi.io/docs/install.md.tmpl). The get.chezmoi.io scripts are pushed by CI to a separate repo (.github/workflows/main.yml:543-559).",
+      "Platform and docs drift: the Linux x86_64 default binary is a cgo glibc build built on glibc 2.35 with a static musl alternative (.config/goreleaser.yaml:14-27; internal/cmds/generate-install.sh/install.sh.tmpl:187-205); the official macOS arm64 binary is CGO-disabled, so .chezmoi.username/.chezmoi.group may be wrong on some systems (assets/chezmoi.io/docs/developer-guide/packaging.md:59-61; .config/goreleaser.yaml:45-47); WSL2 has no dedicated statement or CI job (assets/chezmoi.io/docs/user-guide/machines/windows.md:3-15). Docs lag code in places: Go 1.25 vs go.mod 1.26.0 (assets/chezmoi.io/docs/install.md.tmpl:293; go.mod:3), the persistent-state filename, and undocumented md5/sha1/ripemd160 checksum options (internal/chezmoi/sourcestate.go:68-76).",
+      "Contribution and maintenance: any LLM-assisted contribution is declared grounds for an immediate ban 'without recourse' (.github/CONTRIBUTING.md:3-8; .github/CODE_OF_CONDUCT.md:5-8), and the issue templates repeat the policy (.github/ISSUE_TEMPLATE/03_bug_report.md:10-11), which constrains agent-assisted upstream reports or fixes. Release, package-manager and security-contact metadata name a single maintainer (.config/goreleaser.yaml:164-166; assets/chezmoi.io/docs/developer-guide/security.md:19-20); only the latest version gets security fixes (security.md:5). The single binary compiles in a large dependency graph, 57 direct and 148 indirect Go modules including cloud SDKs and TUI libraries (go.mod:24-231)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "twpayne/chezmoi",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Installer script `sh -c \"$(curl -fsLS https://get.chezmoi.io)\"` (wget variant also documented), Linux/macOS: installs the latest release into ./bin of the current directory and does not modify PATH; the script also accepts -t <tag> to pin a version, but that flag appears only in the script's own usage text, not in install.md.tmpl.",
+          "citation": "assets/chezmoi.io/docs/install.md.tmpl:160-175, 219-227; internal/cmds/generate-install.sh/install.sh.tmpl:15, 27-30",
+          "holds": true,
+          "note": "install.md.tmpl:162-175 documents the curl command verbatim (:168) and a wget variant (:174), both installing into `./bin`; :221-223 says 'The installer does not modify your PATH'. The template sets TAGARG=latest (:15) and its usage text lists -t (:27, :30; parsed at :130). The generated script that is served has BINDIR default `bin` (assets/scripts/install.sh:14), and .github/workflows/main.yml:545 copies it to get.chezmoi.io's index.html. A repo-wide search finds `[-t tag]` only in the three installer usage texts; install.md.tmpl documents only -b (:186, :212-216). 'Linux/macOS' is the dossier's own label: the docs say 'for your operating system and architecture', and the script also detects BSD, Android and Windows shells (install.sh.tmpl:136-151). The label is narrow but not wrong."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT, file LICENSE); README states 'License: MIT'.",
+          "citation": "LICENSE:1-21; README.md:15-17",
+          "holds": true,
+          "note": "LICENSE:1 reads 'The MIT License (MIT)', :3 reads 'Copyright (c) 2018 Tom Payne', and :5-21 are the standard MIT grant and warranty disclaimer. README.md:15-17 is '## License' followed by 'MIT'. The packaging metadata agrees (license: MIT at .config/goreleaser.yaml:168, 224, 290, 313, 331)."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - darwin/arm64 is built by chezmoi-nocgo (CGO_ENABLED=0; only darwin/386 ignored); the raw chezmoi-darwin-arm64 binary is attached to releases; the release archive is documented; the installer maps arm64; CI job test-macos on macos-15 runs go build and go test ./... (runner CPU not stated in repo); official macOS binaries are built without cgo, so .chezmoi.username/.chezmoi.group may be wrong on some systems.",
+          "citation": ".config/goreleaser.yaml:45-66, 84-85, 151-152, 261-262; assets/chezmoi.io/docs/install.md.tmpl:271-274; internal/cmds/generate-install.sh/install.sh.tmpl:153-157; .github/workflows/main.yml:137-175; assets/chezmoi.io/docs/developer-guide/packaging.md:59-61",
+          "holds": true,
+          "note": "goreleaser.yaml:45-66 define chezmoi-nocgo with CGO_ENABLED=0, goos darwin and goarch arm64; the ignore list (:77-91) excludes only darwin/386 for darwin (:84-85). chezmoi-darwin-arm64 is listed in checksum.extra_files (:151-152) and release.extra_files (:261-262). install.md.tmpl:271-274 links the darwin amd64 and arm64 tar.gz archives. install.sh.tmpl:156-157 maps aarch64 and arm64 to arm64, and the generated script accepts darwin/arm64 (assets/scripts/install.sh:165). In main.yml, :141 sets runs-on: macos-15, :153 runs `go build -v ./...` and :175 runs `go test ./...`. The only architecture reference under .github is a dynamic runner.arch cache key (.github/actions/setup-go/action.yml:39), so the hedge is accurate. packaging.md:59-61 states the cgo caveat for .chezmoi.username and .chezmoi.group."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - the cobra `chezmoi` binary with about 50 registered subcommands, a few hidden (add, apply, archive, diff, doctor, dump, init, ssh, docker, state, upgrade, verify, ...); global flags include --destination/-D, --source/-S, --dry-run, --force, --skip-secrets, --refresh-externals; shell completions for bash, fish, powershell and zsh are generated.",
+          "citation": "internal/cmd/config.go:2030-2081, 1969-2009; main.go:1-4, 26-35; assets/chezmoi.io/docs/reference/command-line-flags/global.md",
+          "holds": true,
+          "note": "config.go:1957-1966 builds a cobra.Command root. The loop at :2030-2081 registers 50 constructors (:2031-2080), including every command named, and nil returns are skipped (:2082). Three are hidden: mackupcmd_darwin.go:36, internaltestcmd.go:16 and removecmd.go:16. The flags are defined at config.go:1975 (-D), :1987 (-S), :1996 (--dry-run/-n), :1997 (--force), :2004 (--refresh-externals/-R) and :2006 (--skip-secrets), and documented at global.md:32-44, 89-112. main.go:1-4 holds the go:generate completion lines for bash, fish, powershell and zsh; main.go:26-35 calls cmd.Main."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "[docs] chezmoi is 'distributed as a single statically-linked binary with no dependencies' - verified: partial. The default linux/amd64 archive is a dynamically linked cgo glibc build; a static musl build exists and the installer falls back to it when glibc < 2.35; darwin/arm64 is CGO_ENABLED=0; no runtime deps but usually used with git; builtin git supports only HTTP(S) and no git-repo externals.",
+          "citation": "assets/chezmoi.io/docs/index.md.tmpl:41-42; .config/goreleaser.yaml:14-44, 86-87, 93-108, 121-128; internal/cmds/generate-install.sh/install.sh.tmpl:187-205; assets/chezmoi.io/docs/developer-guide/packaging.md:7-8; assets/chezmoi.io/docs/reference/command-line-flags/global.md:149-152; internal/cmd/initcmd.go:277-279",
+          "holds": true,
+          "note": "The quote matches index.md.tmpl:41-42 exactly. goreleaser.yaml:86-87 drops linux/amd64 from chezmoi-nocgo, so the default archive (:93-108, whose ids include chezmoi-cgo-glibc) carries the CGO_ENABLED=1 glibc build (:14-27). That build has no static link flags, while the musl build has `-linkmode external` and `--extldflags \"-static\"` (:43-44; archive at :121-128). The binary imports os/user (internal/cmd/config.go:19) and no osusergo or netgo tag is set, so the glibc build links libc dynamically. install.sh.tmpl:191-205 confirms this: it picks the 'statically-linked musl version' when glibc is older than 2.35. packaging.md:7-8 matches. global.md:151-152 says builtin git 'only supports the HTTP and HTTPS transports and does not support git-repo externals', and initcmd.go:277-279 makes builtin git reject ssh. 'partial' is the right rating."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

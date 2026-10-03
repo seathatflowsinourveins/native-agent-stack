@@ -1,0 +1,323 @@
+{
+  "contender": "trycua/cua",
+  "revision": {
+    "contender": "trycua/cua",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "trycua/cua",
+        "tag": "cua-spaces-v0.2.0",
+        "commit": "c4d0c6625b5c93849aa8bec610782410e9d45f69",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "cua-spaces-v0.2.0",
+    "commit": "c4d0c6625b5c93849aa8bec610782410e9d45f69",
+    "read_at": "2026-10-02T03:03:09+00:00"
+  },
+  "dossier": {
+    "contender": "trycua/cua",
+    "revision": {
+      "tag": "cua-spaces-v0.2.0",
+      "commit": "c4d0c6625b5c93849aa8bec610782410e9d45f69",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE.md"
+    },
+    "purpose": "Cua Driver (`cua-driver`, v0.32.0 per libs/cua-driver/rust/VERSION:1) is a Rust cross-platform (macOS, Windows, Linux) 'background computer-use' driver in libs/cua-driver of the trycua/cua monorepo. It reads native window accessibility trees and screenshots, sends clicks/keys/scroll to apps without raising the window or moving the real pointer where the OS allows, and drives Chromium-family/Electron pages over loopback CDP via typed get_browser_state and browser_* tools. Surfaces: stdio MCP server (`cua-driver mcp`), shell CLI (`cua-driver call <tool> '<json>'` against a local `serve` daemon), in-process Python/TypeScript SDKs. For the stated web-research needs: the tool inventory (.github/scripts/cua-driver-mcp-compat/expected-tools.json:8-78; 58 base tools, +4 Linux-only, +1 Windows-only) has no tool that fetches a URL itself, extracts article/main text or metadata beyond page url and title, creates/closes/selects tabs, or exports PDF. Web path: browser_navigate (http/https/about only; libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:837-870) on an already-bound tab of a visible Chromium-family browser; get_browser_state (url+title, ranked outline capped at 300 nodes and 1,000 chars per node, optional viewport PNG; libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:307-311,454-458 and libs/cua-driver/rust/crates/cua-driver-core/src/browser/semantic.rs:26-28); browser_click/type/pointer/dialog/set_input_files/download; and a legacy read-only `page` tool with get_text/query_dom (libs/cua-driver/rust/crates/cua-driver-core/src/page.rs:253-288,461-464).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Gives agents 'tools to inspect and operate native desktop apps and browsers on macOS, Windows, and Linux', via 'the CLI, MCP, or typed SDKs'.",
+          "citation": "README.md:132"
+        },
+        {
+          "claim": "Background delivery works 'without moving your pointer or taking focus when the app and platform support it'; boundaries are deferred to the platform-support page.",
+          "citation": "README.md:132"
+        },
+        {
+          "claim": "Background computer-use driver for any agents; speaks MCP over stdio; drives native macOS apps without stealing focus.",
+          "citation": "libs/cua-driver/README.md:3"
+        },
+        {
+          "claim": "MCP agents connect to `cua-driver mcp`; shell agents and automation can use `cua-driver call`; no generated Cua language client is needed.",
+          "citation": "libs/cua-driver/README.md:44-47"
+        },
+        {
+          "claim": "Python (`cua_driver`) and TypeScript (`@trycua/cua-driver`) packages call the same in-process native runtime (UniFFI over a versioned C ABI), need no daemon, are for client apps rather than agents, and have no MCP facade.",
+          "citation": "libs/cua-driver/README.md:47-56"
+        },
+        {
+          "claim": "`standard` is the promptless default; `bounded` admits only a reviewed manifest; `unrestricted` requires `--dangerously-bypass-approvals`; the mode is fixed at launch.",
+          "citation": "libs/cua-driver/README.md:75-84"
+        },
+        {
+          "claim": "Attaching to an existing logged-in Chromium profile stays explicit (`cua-driver mcp --grant existing-profile`, host authorization, or a bounded manifest entry); Cua Driver renders no authorization modal.",
+          "citation": "libs/cua-driver/README.md:86-97"
+        },
+        {
+          "claim": "The MIT Driver works without model artifacts; the optional, explicitly installed `cua-perception` extension is not MIT (AGPL-3.0-only OmniParser detector; redistribution or network hosting can trigger AGPL source obligations).",
+          "citation": "libs/cua-driver/README.md:8-26"
+        },
+        {
+          "claim": "Claude Code: `claude mcp add --transport stdio cua-driver -- cua-driver mcp`; a compat mode `--claude-code-computer-use-compat` 'changes only `screenshot`, which requires `pid` and `window_id`'.",
+          "citation": "libs/cua-driver/README.md:200-214"
+        },
+        {
+          "claim": "macOS grants attach to the responsible app identity: install CuaDriver.app and start `open -n -g -a CuaDriver --args serve`; raw `cua-driver serve` outside the app is unsupported.",
+          "citation": "libs/cua-driver/README.md:216-227"
+        },
+        {
+          "claim": "The `cua` installer offers the cua-driver MCP and skill, runs `cua auth login`, and can add skills/MCP to Claude Code, Codex, Cursor and others (`--select`/`--only cua-driver`).",
+          "citation": "README.md:111"
+        },
+        {
+          "claim": "Driver is MIT; Cua Spaces is FSL-1.1-MIT; the cua-perception extension (AGPL-3.0-only model artifact) is separate and not MIT.",
+          "citation": "README.md:248-250,264-272"
+        },
+        {
+          "claim": "Nightly macOS builds offer an opt-in encrypted local metadata-only action history (never screenshots, typed text, clipboard, raw arguments/results, trees, paths, titles or URLs).",
+          "citation": "libs/cua-driver/README.md:58-66"
+        },
+        {
+          "claim": "Claude Code, Codex, Cursor, OpenClaw etc. are supported; Codex and Claude Agent SDK examples connect to `cua-driver mcp` without a generated client.",
+          "citation": "README.md:150; libs/cua-driver/README.md:158-161"
+        }
+      ],
+      "install": [
+        {
+          "method": "Driver release installer for macOS/Linux (prebuilt GitHub Release binary; SHA256SUMS always checked, Sigstore bundle checked when cosign is present)",
+          "command": "/bin/bash -c \"$(curl -fsSL https://cua.ai/driver/install.sh)\"",
+          "citation": "README.md:137; docs/content/docs/cua-driver/quickstart.mdx:25,52"
+        },
+        {
+          "method": "Unified cua installer with cua-driver selected (also installs the cua CLI and runs sign-in unless skipped; delegates to the driver installer and registers skill and MCP server for detected agents)",
+          "command": "curl -fsSL https://cua.ai/install.sh | sh -s -- --select cua-driver",
+          "citation": "README.md:111; docs/content/docs/cua-driver/quickstart.mdx:81; scripts/install/README.md:23,27"
+        },
+        {
+          "method": "Pinned version with mandatory signature verification (documented env overrides plus the one-liner; needs cosign on PATH)",
+          "command": "CUA_DRIVER_RS_VERSION=0.32.0 CUA_DRIVER_RS_REQUIRE_SIGNATURE=1 /bin/bash -c \"$(curl -fsSL https://cua.ai/driver/install.sh)\"",
+          "citation": "libs/cua-driver/scripts/install.sh:12-28; libs/cua-driver/scripts/_install-rust.sh:34-51"
+        },
+        {
+          "method": "Python SDK wheel with bundled cua-driver executable (PyPI)",
+          "command": "python -m pip install cua-driver",
+          "citation": "docs/content/docs/cua-driver/guides/use-the-sdk.mdx:17; libs/cua-driver/python/README.md:34-36"
+        },
+        {
+          "method": "TypeScript/Node SDK (npm; one native package per OS/CPU; does not bundle the executable)",
+          "command": "npm install @trycua/cua-driver",
+          "citation": "docs/content/docs/cua-driver/guides/use-the-sdk.mdx:24; libs/cua-driver/typescript/README.md:207-210"
+        },
+        {
+          "method": "Build from source (Rust 1.97.1 pinned) or install the checkout as the separate cua-driver-local product",
+          "command": "cd libs/cua-driver/rust && cargo build -p cua-driver --release   # or: bash libs/cua-driver/scripts/install-local.sh --release --autostart",
+          "citation": "libs/cua-driver/rust/README.md:25-30; libs/cua-driver/scripts/README.md:5-9,28-30; libs/cua-driver/rust/rust-toolchain.toml:2"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release binary x86_64-unknown-linux-gnu built in a debian:11 container, glibc 2.31 floor (.github/workflows/cd-rust-cua-driver.yml:193-222,283-285); installer maps Linux-x86_64 (libs/cua-driver/scripts/_install-rust.sh:596); docs prerequisite 'x86_64 Linux desktop (X11 or XWayland, with AT-SPI 2)' (docs/content/docs/cua-driver/quickstart.mdx:13); X11 supported with toolkit limits, Wayland with compositor limits, KDE and Hyprland experimental (docs/content/docs/cua-driver/concepts/platform-support.mdx:25-26,35-42). Needs a live graphical session with session D-Bus and AT-SPI bus; headless only via a virtual X display such as Xvfb (libs/cua-driver/rust/Skills/cua-driver/LINUX.md:186-218; libs/cua-driver/rust/crates/platform-linux/src/lib.rs:202-217). Minimal images: `sudo apt install libxi6 at-spi2-core` (docs/content/docs/cua-driver/quickstart.mdx:57). Linux CI/E2E run on ubuntu-latest only (.github/workflows/ci-rust-linux.yml:64,119).",
+        "wsl2": "unknown - neither README nor docs states WSL support. Code only detects WSL and appends a WSLg/X-server hint to 'no usable display' errors (libs/cua-driver/rust/crates/platform-linux/src/lib.rs:167-218); the installer header says 'Windows via WSL or git-bash' (libs/cua-driver/scripts/_install-rust.sh:12-14) yet its error text sends Windows users to install.ps1 (libs/cua-driver/scripts/_install-rust.sh:601); no workflow in .github/workflows mentions WSL.",
+        "macos_arm64": "yes - universal (arm64 + x86_64) binary, Developer-ID signed, notarized and stapled, MACOSX_DEPLOYMENT_TARGET 13.0 (.github/workflows/cd-rust-cua-driver.yml:716-749,854-936); installer maps Darwin-arm64 and installs /Applications/CuaDriver.app (libs/cua-driver/scripts/_install-rust.sh:594,1242-1259); docs: 'macOS 14+, Apple Silicon or Intel; Accessibility and Screen Recording' (docs/content/docs/cua-driver/index.mdx:38); hosted CI on macos-26 (.github/workflows/e2e-rust-macos.yml:62,132). See claim_checks for the 13 vs 14 floor mismatch.",
+        "gpu": "no - the driver neither requires nor uses a GPU; the optional perception extension ships a CPU ONNX Runtime ('parsing needs no GPU and no network access', docs/content/docs/cua-driver/concepts/perception-extension.mdx:63). A real or virtual display session is required instead (libs/cua-driver/rust/crates/platform-linux/src/lib.rs:202-217)."
+      },
+      "integrations": {
+        "cli": "yes - `cua-driver call <tool> '<json-args>'` (JSON positional or stdin; `--screenshot-out-file` writes the first image block), plus list-tools, describe, mcp, mcp-config --client, serve/stop/status, doctor, skills, extension, update, telemetry (docs/content/docs/cua-driver/reference/cli/index.mdx:19-154; docs/content/docs/cua-driver/reference/cli/mcp.mdx:114-145; libs/cua-driver/rust/crates/cua-driver/src/main.rs:544-550; libs/cua-driver/rust/crates/cua-driver/src/cli.rs:2322-2505). `call` requires a running `serve` daemon (docs/content/docs/cua-driver/reference/cli/mcp.mdx:118); exit codes 0/1/2/64 (docs/content/docs/cua-driver/reference/cli/index.mdx:160-167).",
+        "mcp": "yes - `cua-driver mcp` stdio server speaking MCP 2026-07-28 and legacy 2025-06-18, with the skill pack served as MCP resources (libs/cua-driver/docs/mcp-protocol-and-skills.md:3-5,55-90). On Linux/Windows bare `mcp` owns its runtime and exits on stdin EOF; on macOS it proxies to CuaDriver.app (docs/content/docs/cua-driver/reference/cli/mcp.mdx:29). Optional loopback HTTP MCP (legacy protocol only): off unless CUA_DRIVER_RS_MCP_HTTP_PORT is set, binds 127.0.0.1, bearer token required (libs/cua-driver/rust/crates/cua-driver/src/mcp_http.rs:32-61; libs/cua-driver/docs/mcp-protocol-and-skills.md:113-119).",
+        "sdk_or_api": "yes - Python package `cua-driver` (`from cua_driver import CuaDriver`) and TypeScript `@trycua/cua-driver`, in-process via UniFFI over a versioned C ABI (libs/cua-driver/README.md:47-56,143-156; libs/cua-driver/python/README.md:8-36; libs/cua-driver/typescript/README.md:7-30; libs/cua-driver/rust/include/cua_driver_abi.h). Daemon wire protocol is line-delimited JSON over a Unix socket or named pipe (libs/cua-driver/rust/crates/cua-driver/src/serve.rs:1-22). No other HTTP API found.",
+        "claude_code_or_codex": "yes - Claude Code: `claude mcp add --transport stdio cua-driver -- cua-driver mcp` (libs/cua-driver/README.md:200-204); `cua-driver mcp-config --client claude` prints `claude mcp add-json --scope user cua-computer-use ...` (libs/cua-driver/rust/crates/cua-driver/src/cli.rs:2106-2153); `cua-driver skills install` links the skill into ~/.claude/skills (libs/cua-driver/rust/crates/cua-driver/src/skills.rs:43,211). Codex: `mcp-config --client codex` prints `codex mcp add cua-driver -- <path> mcp` (libs/cua-driver/rust/crates/cua-driver/src/cli.rs:2155-2157); skill linked into ~/.agents/skills (libs/cua-driver/rust/crates/cua-driver/src/skills.rs:44,216). Claude Agent SDK and Codex SDK examples (libs/cua-driver/examples/agent-sdks/README.md:3-12,47-92). Project reports Codex 0.154.0 and Claude Code 2.1.268 interop on a clean macOS VM (libs/cua-driver/docs/mcp-protocol-and-skills.md:94-106). The cua installer can register skill and MCP server for detected agents (scripts/install/README.md:23)."
+      },
+      "telemetry_and_network": "Telemetry is ON by default and is not mentioned in README.md, libs/cua-driver/README.md or libs/cua-driver/rust/README.md (grep found none); it is disclosed in docs/content/docs/cua-driver/guides/operate.mdx:295-319, libs/cua-driver/scripts/README.md:74-79 and installer output (libs/cua-driver/scripts/_install-rust.sh:1522-1530). Code: fixed-name events (install, release installed, CLI completed, MCP session/tool completed, agent session, permissions gate, update checked/applied) with bounded properties (version, OS family/major, arch, transport, built-in tool names else 'other', bucketed durations) are POSTed to PostHog EU https://eu.i.posthog.com/capture/ with an embedded project key, a persistent pseudonymous installation ID as distinct_id, $geoip_disable=true, $process_person_profile=false, no $ip, 3 s timeout (libs/cua-driver/rust/crates/cua-driver/src/telemetry.rs:25-29,71-87,2108-2148,2220-2237). Opt-out precedence: DO_NOT_TRACK, CUA_DRIVER_RS_TELEMETRY_ENABLED, CUA_TELEMETRY_ENABLED, CUA_TELEMETRY, ~/.cua/config.toml telemetry off, persisted `cua-driver telemetry disable` (libs/cua-driver/rust/crates/cua-driver/src/telemetry.rs:216-242); the project's own release workflow sets CUA_TELEMETRY=0 and DO_NOT_TRACK=1 (.github/workflows/cd-rust-cua-driver.yml:87-90). Separate update check: GitHub Releases API on `mcp`, `serve`, `doctor`, at most about once per 20 h, opt-out CUA_DRIVER_RS_UPDATE_CHECK=false or update_check_enabled=false (libs/cua-driver/rust/crates/cua-driver/src/version_check.rs:1-26,50-70). Explicit-only downloads: `skills install` from a GitHub release asset (libs/cua-driver/rust/crates/cua-driver/src/skills.rs:680-712), `extension install` for the optional perception extension with signed catalog (docs/content/docs/cua-driver/concepts/perception-extension.mdx:72-94), `update --apply` re-runs https://cua.ai/driver/install.sh (libs/cua-driver/rust/crates/cua-driver/src/updater.rs:91-93); `install_ffmpeg` runs an OS package manager when confirm=true (libs/cua-driver/rust/crates/cua-driver-core/src/ffmpeg_install.rs:49-85). The driver has no HTTP client for fetching pages: the only HTTP crate is `ureq` in the binary crate (libs/cua-driver/rust/crates/cua-driver/Cargo.toml:33) and every raw socket in core/platform crates targets 127.0.0.1 CDP ports; the CDP client accepts only loopback ws:// (libs/cua-driver/rust/crates/cua-driver-core/src/browser/cdp_ws.rs:12-13,87-102), so page loading happens inside the browser. No account or API key is needed for the direct driver installer or runtime, and the driver 'never calls a model API' (docs/content/docs/cua-driver/guides/connect-your-agent.mdx:11-12); the unified `cua` installer path additionally runs `cua auth login` unless `--no-onboarding` (README.md:111; scripts/install/README.md:45). Installers fetch from GitHub Releases and cua.ai (libs/cua-driver/scripts/install.sh:42,121-125; libs/cua-driver/scripts/_install-rust.sh:891,1581)."
+    },
+    "code": {
+      "languages": [
+        "Rust (primary; 15-crate Cargo workspace in libs/cua-driver/rust)",
+        "Python (SDK wheel packaging, installer tests, jev-use example, fixture apps)",
+        "TypeScript/JavaScript (npm SDK, Node runtime build scripts, GNOME Shell helper)",
+        "Shell and PowerShell (installers, CI runners)",
+        "C++ (optional Hyprland plugin)",
+        "Swift and C# (GUI test-fixture apps)"
+      ],
+      "entry_points": [
+        {
+          "path": "libs/cua-driver/rust/crates/cua-driver/src/main.rs",
+          "what": "`cua-driver` binary (default-run): dispatches mcp (stdio MCP), serve (daemon), call, mcp-config, skills, extension, update, telemetry (main.rs:1-42,544-552)"
+        },
+        {
+          "path": "libs/cua-driver/rust/crates/cua-driver/src/cli.rs",
+          "what": "CLI command definitions, per-client mcp-config snippets, run_call with --screenshot-out-file (cli.rs:2106-2157,2322-2505)"
+        },
+        {
+          "path": "libs/cua-driver/rust/crates/cua-driver/src/serve.rs",
+          "what": "daemon: line-delimited JSON over Unix socket/named pipe serving call/list/describe/shutdown (serve.rs:1-22)"
+        },
+        {
+          "path": "libs/cua-driver/rust/crates/cua-driver/src/proxy.rs",
+          "what": "stdio MCP adapter that owns the SDK runtime directly or forwards to a daemon (proxy.rs:1-17)"
+        },
+        {
+          "path": "libs/cua-driver/rust/crates/cua-driver/src/mcp_http.rs",
+          "what": "optional loopback-only HTTP MCP listener (off unless CUA_DRIVER_RS_MCP_HTTP_PORT is set)"
+        },
+        {
+          "path": "libs/cua-driver/rust/crates/cua-driver-sdk",
+          "what": "cdylib/rlib libcua_driver_sdk (UniFFI + C ABI header rust/include/cua_driver_abi.h) consumed by the Python and Node SDKs"
+        },
+        {
+          "path": "libs/cua-driver/python/pyproject.toml",
+          "what": "console script `cua-driver = cua_driver.__main__:main`; wheel bundles the executable and native library (pyproject.toml:49-63)"
+        },
+        {
+          "path": "libs/cua-driver/typescript/package.json",
+          "what": "@trycua/cua-driver exports ./, ./embedded, ./electron, ./fleet (package.json:13-30)"
+        }
+      ],
+      "architecture": "Cargo workspace libs/cua-driver/rust (15 crates; libs/cua-driver/rust/Cargo.toml:2-19). cua-driver-core is the platform-independent core: MCP/JSON-RPC dispatch (src/server.rs, mcp_wire.rs, protocol.rs), tool model/registry (tool.rs), authorization, permission modes, capability manifests and Rego/YAML policy (authorization.rs, session_manifest.rs, policy.rs), sessions (session.rs; 5-minute default idle TTL at :30), daemon wire protocol (daemon.rs), recording, legacy `page` tool (page.rs), and the typed browser engine in src/browser/ (engine.rs, tools.rs, semantic.rs, cdp_ws.rs with 20 s call / 10 s connect timeouts and an allow-list for existing-profile sockets, prepare.rs, store.rs, download.rs, pointer.rs). cua-driver-contract holds typed inputs/outputs and schemas. platform-macos (AX, ScreenCaptureKit, CGEvent/SkyLight), platform-windows (UIA, Win32, Graphics Capture) and platform-linux (AT-SPI over D-Bus, X11/XTest, Wayland protocols, portals/libei) are selected by cfg(target_os). The cua-driver binary crate adds CLI, daemon, stdio proxy, optional HTTP, telemetry, updater, skills and extension manager. cua-driver-sdk is the in-process SDK/C ABI; cursor-overlay/cursor-theme-cli draw the agent cursor; cua-perception is the optional ONNX worker (AGPL models, installed separately); cua-driver-uia is a Windows UIAccess worker; testkit/e2e are never shipped. Python and TypeScript packages wrap the SDK; the skill pack in libs/cua-driver/rust/Skills/cua-driver is embedded and served as MCP resources. Web interaction: bind a native browser window with get_browser_state(pid, window_id), which mints session-scoped target/tab/ref capabilities (explicit non-default session label required, libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:53-62), then browser_* actions over CDP. The browser is either a headed isolated-profile Chromium launched by browser_prepare (libs/cua-driver/rust/crates/cua-driver-core/src/browser/prepare.rs:393-408) or an existing profile attached under an explicit grant. Bounded mode can restrict browser work to listed origins (docs/content/docs/cua-driver/guides/permissions.mdx:125-163).",
+      "packaging_and_release": "Release Please creates the cua-driver-rs-v* tag and draft; the tag push runs .github/workflows/cd-rust-cua-driver.yml:3-20,62-65, which builds Linux x86_64 and arm64 (native runners inside debian:11, glibc 2.31 floor, cargo build --locked --release; :193-222,283-285), Windows x86_64/arm64 (Authenticode-signed, signer verified; :326-338,449-470) and a macOS universal binary plus notarized CuaDriver.app (:716-749,854-936), then runs E2E gates and signature verification before the release job can publish (:1195-1255). Assets: cua-driver-rs-v<ver>-linux-{x86_64,arm64}-binary.tar.gz (+ full tarball with LICENSE/THIRD_PARTY_NOTICES), macOS universal tarballs, Windows zips, skills tarball, installer scripts, Hyprland plugin source tarballs (:293-314,1327-1387). Integrity: SHA256SUMS plus a keyless Sigstore cosign bundle (<asset>.sigstore.json) for every asset and for SHA256SUMS, issued to the workflow at the tag (:1419-1452). Installers always verify SHA256SUMS (required from 0.31.0) and refuse a release lacking the Sigstore bundle from 0.32.0, verifying it only if cosign is installed unless --require-signature (libs/cua-driver/scripts/_install-rust.sh:940-1049). No SBOM or SLSA/build-provenance attestation found for driver assets (contrast the perception extension, docs/content/docs/cua-driver/concepts/perception-extension.mdx:72-76). Python wheels (macOS, Linux x86_64/arm64, Windows x86_64/arm64; hatchling) are uploaded to PyPI via twine token with no attestation; npm packages use `npm publish --provenance` (.github/workflows/cd-py-cua-driver.yml:127-150,225-235,364-378). Nightly workflow (cron 17 4 * * *) publishes immutable nightlies with checksums.txt (.github/workflows/nightly-cua-driver.yml:3-6,94-97). Withdrawn versions list blocks 0.28.3, which shipped an unsigned macOS app (.github/release-state/cua-driver-rs-withdrawn-versions:3).",
+      "tests_and_ci": "Rust built-in harness via cargo test: about 85 files under libs/cua-driver/rust/crates/*/tests (34 desktop E2E in cua-driver-e2e, 27 hermetic protocol/CLI tests in cua-driver, 13 in cua-driver-core) plus #[test]/#[tokio::test] modules in 327 src files; cargo-fuzz with 4 targets (libs/cua-driver/rust/fuzz/fuzz_targets: mcp_request, registry_invoke, tool_arguments, typed_input_json); GUI fixture apps (AppKit, SwiftUI, GTK, WPF, WinUI3, Electron, Tauri, web) in libs/cua-driver/tests/fixtures. About 50 non-Rust test files: python/tests (6), typescript/test (5, node --test), scripts/tests (17 installer py/sh/ps1), examples/jev-use/python/tests (23). About 30 driver-related workflows in .github/workflows: ci-rust-linux/macos/windows.yml (unit + Xvfb X11 input/capture), ci-rust-format.yml (cargo fmt on 3 OSes), ci-cua-driver-quick.yml, ci-driver-mcp-candidate.yml (modern MCP client probe on Linux/macOS/Windows), ci-cua-driver-valgrind.yml, fuzz-cua-driver.yml (PR + nightly cron), ci-distro-compat-cua-driver.yml (released binary on debian:12, ubuntu 22.04/24.04, rocky 9, fedora 41), ci-installers.yml, monitor-branded-installers.yml (6-hourly canary of cua.ai installers), license-check.yml, ci-lockfiles.yml; E2E: e2e-rust-linux.yml (X11/Openbox), e2e-rust-linux-wayland.yml (Sway, Sway+XWayland, nested), e2e-rust-macos.yml (hosted macos-26 / Lume VM), e2e-rust-windows.yml, e2e-rust-standalone-browsers.yml (Chrome on Ubuntu; Chrome+Edge on Windows). The standalone-browser E2E drives browser tools through the MCP transport, not CLI call (libs/cua-driver/rust/crates/cua-driver-e2e/tests/standalone_browser_behavior_test.rs:27,758-800). Linux CI runs on ubuntu-latest only.",
+      "dependencies": "Rust workspace manifest libs/cua-driver/rust/Cargo.toml (27 workspace dependencies); libs/cua-driver/rust/Cargo.lock pins 637 packages; builds use --locked; toolchain pinned to 1.97.1 (libs/cua-driver/rust/rust-toolchain.toml:2). Direct normal-dependency counts per crate manifest under libs/cua-driver/rust/crates: cua-driver 28 (+1-3 per-OS), cua-driver-core 30 (2 optional: regex, regorus), cua-driver-contract 4, cua-driver-sdk 11 (+1-2 per-OS), cursor-overlay 13, cursor-theme-cli 8, cua-perception 9 (incl. ort 2.0.0-rc.10, libloading), pip-preview 1, cua-driver-bindgen 2, cua-driver-uia 8 (Windows only), platform-linux 16 + 29 Linux-only (6 optional), platform-macos 15 + 17 macOS-only, platform-windows 14 + 5 Windows-only; testkit (10) and e2e (17 dev-deps) are never shipped. Notable: tokio, serde, ureq 3 (telemetry/update/skills HTTP), ring, cap-std, tokio-tungstenite (loopback CDP), regorus, uniffi 0.31.0, atspi/zbus/x11rb/wayland-client/ashpd (Linux), objc2/core-graphics/screencapturekit (macOS), windows 0.58/0.61. Path dependency outside the driver tree: libs/cua/crates/cua-telemetry (config reader only; 7 deps). Python libs/cua-driver/python/pyproject.toml: 0 runtime deps (hatchling build; optional pytest). TypeScript libs/cua-driver/typescript/package.json: 2 runtime deps (@ubjs/core, @ubjs/node 0.31.0-3) and 5 dev deps. No cargo-audit/cargo-deny/Dependabot/Renovate/CodeQL/OSV configuration found under .github.",
+      "security_policy": "SECURITY.md at the repo root (covers all components including Cua Driver): private reporting through GitHub private vulnerability reporting (no dedicated mailbox or security.txt yet); targets: acknowledgment in 2 business days, initial assessment in 5, remediation timeline in 10; only the current released version of each component is supported; includes a good-faith safe-harbor section (SECURITY.md:3-38,40-90)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Shell-oriented agents and automation can use `cua-driver call` (libs/cua-driver/README.md:44-47); docs add that every tool also runs from the shell with the same code path (docs/content/docs/cua-driver/reference/mcp-tools/index.mdx:13).",
+        "verified": "partial",
+        "evidence": "`call` is wired to cli::run_call (libs/cua-driver/rust/crates/cua-driver/src/main.rs:544-550) with --screenshot-out-file (libs/cua-driver/rust/crates/cua-driver/src/cli.rs:2322-2505). But it needs a running serve daemon (docs/content/docs/cua-driver/reference/cli/mcp.mdx:118); typed browser tools refuse any call without an explicit non-default session label, so every shell step must repeat it (libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:53-62; libs/cua-driver/rust/Skills/cua-driver/RUNTIME.md:20-24); sessions idle-expire after 5 minutes (libs/cua-driver/rust/crates/cua-driver-core/src/session.rs:30); browser_download is refused on a plain CLI call because its MCP-host approval flag is injected only for live MCP proxy sessions (libs/cua-driver/rust/crates/cua-driver/src/serve.rs:155-164; libs/cua-driver/rust/crates/cua-driver-core/src/browser/download.rs:81-87,296-302); BROWSER.md says its examples are not separate shell commands and recommends one persistent MCP connection (libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:38-40,82-84); the browser E2E suite uses the MCP transport only (libs/cua-driver/rust/crates/cua-driver-e2e/tests/standalone_browser_behavior_test.rs:27,758-800)."
+      },
+      {
+        "claim": "Background delivery lets agents work without moving your pointer or taking focus when the app and platform support it (README.md:132).",
+        "verified": "partial",
+        "evidence": "Qualified by the README itself. For browsers, trusted CDP clicks default to background posture and are refused with browser_input_trust_unavailable on standalone Chromium on macOS and Linux (libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:1033-1055; libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:351-356,479-483); the dom_event alternative stays in the background but returns an unverifiable effect (libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:357-372); delivery_mode foreground accepts window activation. Only Windows Chrome/Edge have validated trusted background delivery (libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:353-356)."
+      },
+      {
+        "claim": "Tools to inspect and operate native desktop apps and browsers on macOS, Windows, and Linux (README.md:132).",
+        "verified": "partial",
+        "evidence": "Typed browser tools cover Chromium-family browsers and single-page Electron; Safari, Firefox, Tauri, WKWebView, WebKitGTK and split-process WebView2 get native-only state or browser_route_unavailable (docs/content/docs/cua-driver/guides/browsers.mdx:8-14; libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:459-462,477-487). The tool inventory has no URL-fetch, article-text, tab create/close/select, select-option or PDF tool (.github/scripts/cua-driver-mcp-compat/expected-tools.json:8-78; libs/cua-driver/rust/crates/cua-driver-core/src/browser/store.rs:34-39); screenshots are viewport PNG only (libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:307-311); a grep of libs/cua-driver for printToPDF/pdf found only fixtures and a redaction test string (libs/cua-driver/rust/crates/cua-driver-core/src/tool.rs:5806,5818)."
+      },
+      {
+        "claim": "Attaching to an existing logged-in Chromium profile remains explicit: `cua-driver mcp --grant existing-profile`; no Cua modal (libs/cua-driver/README.md:86-97).",
+        "verified": "yes",
+        "evidence": "The grant is normalised into an immutable launcher grant, never read from env or tool arguments (libs/cua-driver/rust/crates/cua-driver-core/src/authorization.rs:21-39); flag documented in CLI help (libs/cua-driver/rust/crates/cua-driver/src/cli.rs:4076); existing-profile sockets are limited to a fixed CDP method allow-list (libs/cua-driver/rust/crates/cua-driver-core/src/browser/cdp_ws.rs:33-81); standard mode otherwise denies the operation (docs/content/docs/cua-driver/guides/permissions.mdx:55)."
+      },
+      {
+        "claim": "`standard` is the promptless default; `bounded` admits only a reviewed manifest; `unrestricted` requires `--dangerously-bypass-approvals` (libs/cua-driver/README.md:75-77).",
+        "verified": "yes",
+        "evidence": "An unset mode resolves to standard (libs/cua-driver/rust/crates/cua-driver-core/src/authorization.rs:1286-1291); unrestricted is selected only with the bypass flag and prints a DANGER banner (libs/cua-driver/rust/crates/cua-driver/src/main.rs:55-106); docs: unrestricted alone fails closed and bounded needs a manifest (docs/content/docs/cua-driver/guides/permissions.mdx:28-29,42,70-72). Caveat: standard allows input to every app without prompts (docs/content/docs/cua-driver/guides/connect-your-agent.mdx:63-69)."
+      },
+      {
+        "claim": "`--claude-code-computer-use-compat` 'changes only `screenshot`, which requires `pid` and `window_id`' (libs/cua-driver/README.md:206-214).",
+        "verified": "no",
+        "evidence": "README is stale; code wins. The screenshot tool and its compat variant were removed in PR #1692 (libs/cua-driver/rust/crates/platform-linux/src/tools/impl_.rs:9742-9746; libs/cua-driver/rust/crates/platform-windows/src/tools/impl_.rs:10132-10149); the flag is a documented no-op ('there is no standalone screenshot tool', libs/cua-driver/rust/crates/cua-driver/src/cli.rs:4080); `mcp-config --client claude` no longer emits it and registers `cua-computer-use` via claude mcp add-json (libs/cua-driver/rust/crates/cua-driver/src/cli.rs:2106-2153); expected-tools.json has no screenshot tool (.github/scripts/cua-driver-mcp-compat/expected-tools.json:8-78). Window screenshots come from get_window_state or get_browser_state include_screenshot."
+      },
+      {
+        "claim": "The default MIT Driver works without model artifacts; the optional cua-perception extension is explicit-install and AGPL-3.0-only (libs/cua-driver/README.md:8-26).",
+        "verified": "yes",
+        "evidence": "parse_visual_regions returns a stable not_installed error when the extension is absent (libs/cua-driver/rust/crates/cua-driver-core/src/perception_tools.rs:649-659); installation is only via install_extension / `cua-driver extension install` (docs/content/docs/cua-driver/concepts/perception-extension.mdx:42-44,89-94); the extension crate is versioned separately (libs/cua-driver/rust/crates/cua-perception/Cargo.toml:3); AGPL text ships with the models (LICENSING.md:65-66)."
+      },
+      {
+        "claim": "Linux scope: docs require an 'x86_64 Linux desktop' (docs/content/docs/cua-driver/quickstart.mdx:13) and the Python README lists Linux x86_64 only (libs/cua-driver/python/README.md:194-199).",
+        "verified": "partial",
+        "evidence": "The release workflow also builds linux-arm64 (.github/workflows/cd-rust-cua-driver.yml:204-206), the installer maps Linux-aarch64 (libs/cua-driver/scripts/_install-rust.sh:597,600) and wheels/npm include Linux arm64 (.github/workflows/cd-py-cua-driver.yml:143-144,277,298), but Linux CI and E2E run only on ubuntu-latest (.github/workflows/ci-rust-linux.yml:64,119), so arm64 behavior has no CI evidence."
+      },
+      {
+        "claim": "macOS minimum is 14+ in prose docs (docs/content/docs/cua-driver/quickstart.mdx:13; docs/content/docs/cua-driver/index.mdx:38) but 13+ in the Python README (libs/cua-driver/python/README.md:196).",
+        "verified": "partial",
+        "evidence": "Code floor is 13.0: LSMinimumSystemVersion 13.0 (libs/cua-driver/rust/scripts/CuaDriverBundle/Contents/Info.plist:68-69) and MACOSX_DEPLOYMENT_TARGET 13.0 (libs/cua-driver/rust/.cargo/config.toml:2; .github/workflows/cd-rust-cua-driver.yml:719,724). Some features need newer macOS: window capture filter info 14+ (libs/cua-driver/rust/crates/platform-macos/src/capture.rs:495) and video recording 15+ (libs/cua-driver/rust/Skills/cua-driver/RECORDING.md:51). Docs disagree with each other; the code floor is 13.0."
+      },
+      {
+        "claim": "Docs: Cua Driver sends content-free, pseudonymous usage events to PostHog's EU endpoint, on by default (docs/content/docs/cua-driver/guides/operate.mdx:297-298); neither README mentions telemetry.",
+        "verified": "yes",
+        "evidence": "Default-on with env/config opt-outs (libs/cua-driver/rust/crates/cua-driver/src/telemetry.rs:216-242); payload builder uses fixed event names and bounded properties, GeoIP disabled, no $ip (libs/cua-driver/rust/crates/cua-driver/src/telemetry.rs:9-12,2108-2148); PostHog EU URL and embedded key (libs/cua-driver/rust/crates/cua-driver/src/telemetry.rs:25-26)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Optional perception extension: time to parse one screenshot into regions (CPU, local models)",
+        "metric": "seconds per screenshot on the project's canonical harnesses",
+        "value": "about 2-2.5 s on macOS, 3.5-4 s on Linux, 8-9 s on Windows",
+        "source": "docs/content/docs/cua-driver/concepts/perception-extension.mdx:96-101",
+        "independent": false
+      },
+      {
+        "what": "Context-size reduction from hiding unused tools and bounding get_window_state in Calculator runs (Muse Glimmer 30B with Claude Code as harness)",
+        "metric": "uncached input tokens",
+        "value": "71,088 down to 12,251",
+        "source": "docs/content/docs/cua-driver/guides/connect-your-agent.mdx:158-161",
+        "independent": false
+      },
+      {
+        "what": "Linux key-event typing throughput (XTest foreground / virtual keyboard background)",
+        "metric": "characters per second",
+        "value": "roughly 45-60 (about 30 s for a 1,300-character script)",
+        "source": "libs/cua-driver/rust/Skills/cua-driver/LINUX.md:164-169",
+        "independent": false
+      },
+      {
+        "what": "Window screenshot downscaling on a high-resolution Linux window under the 1.15 MP cap",
+        "metric": "frame_scale on a 3840x2342 window",
+        "value": "0.357 (a 24 px icon arrives at about 8.6 px)",
+        "source": "libs/cua-driver/rust/Skills/cua-driver/LINUX.md:88-101",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: no URL-fetch, main-text-with-metadata, PDF or tab-management tool exists (.github/scripts/cua-driver-mcp-compat/expected-tools.json:8-78). browser_navigate only drives a tab of an already-bound browser (libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:837-870); snapshots return page url+title and a ranked outline, not author/date/canonical metadata or response status/headers (same file:454-458); browser_download deliberately returns no source URL or filename (libs/cua-driver/rust/crates/cua-driver-core/src/browser/download.rs:5,46); screenshots are viewport-only PNG (libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:307-311); typed routes cover Chromium-family only (libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:459-462).",
+      "Shell path is daemon-backed and stateful: `cua-driver call` needs a standing `serve` daemon (docs/content/docs/cua-driver/reference/cli/mcp.mdx:118), browser capabilities need a repeated explicit session label and expire after 5 idle minutes (libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:53-62; libs/cua-driver/rust/crates/cua-driver-core/src/session.rs:30), browser_download is refused from plain CLI calls (libs/cua-driver/rust/crates/cua-driver/src/serve.rs:155-164), BROWSER.md recommends one persistent MCP connection (libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:38-40,82-84), and CI drives the browser tools over MCP, not CLI (libs/cua-driver/rust/crates/cua-driver-e2e/tests/standalone_browser_behavior_test.rs:27,758-800).",
+      "Platform prerequisites: needs a live graphical session and an installed Chrome/Chromium/Edge; browser_prepare launches a headed isolated-profile browser with no --headless flag (libs/cua-driver/rust/crates/cua-driver-core/src/browser/prepare.rs:393-408) from platform-attested system installs only (libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:132-147). Linux needs AT-SPI plus session D-Bus (libs/cua-driver/rust/Skills/cua-driver/LINUX.md:186-218) and --force-renderer-accessibility for existing-profile setup, which recognises English UI labels only (docs/content/docs/cua-driver/guides/browsers.mdx:174-176); macOS needs Accessibility and Screen Recording grants on CuaDriver.app (libs/cua-driver/README.md:216-227); GNOME needs a Shell helper and re-login (docs/content/docs/cua-driver/quickstart.mdx:59-65); Linux arm64 is built but not CI-tested; WSL2 is undocumented; trusted browser clicks refuse background delivery on macOS/Linux (libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:1033-1055).",
+      "Fast-moving beta: releases 0.30.4 (2026-09-28), 0.31.0 (2026-09-29, a listed BREAKING CHANGE to element-token resolution) and 0.32.0 (2026-10-01) (libs/cua-driver/rust/CHANGELOG.md:9-46); 0.28.3 was withdrawn after shipping an unsigned macOS app (.github/release-state/cua-driver-rs-withdrawn-versions:3); PyPI classifier is Beta (libs/cua-driver/python/pyproject.toml:23) and the installer calls the Rust driver 'BETA-stage' (libs/cua-driver/scripts/_install-rust.sh:834); the SDK READMEs announce a next breaking typed-window release (libs/cua-driver/python/README.md:95-100). The pinned tag cua-spaces-v0.2.0 is a Cua Spaces release, not a driver release: this tree is driver 0.32.0 plus an Unreleased fix (libs/cua-driver/rust/CHANGELOG.md:3-7), so a build from this commit is not identical to published cua-driver-rs-v0.32.0 assets.",
+      "Telemetry is default-on (PostHog EU, persistent pseudonymous ID), absent from the READMEs, plus a separate default-on GitHub update check; opting out needs env/config (libs/cua-driver/rust/crates/cua-driver/src/telemetry.rs:25-26,216-242; libs/cua-driver/rust/crates/cua-driver/src/version_check.rs:50-70); the installer starts a background install event after a notice (libs/cua-driver/scripts/_install-rust.sh:1522-1530).",
+      "Installer trust chain: README install is curl-to-bash from cua.ai; install.sh then downloads _install-rust.sh from cua.ai at run time and executes it (libs/cua-driver/scripts/install.sh:42,121-125), outside SHA256SUMS/Sigstore coverage; the binary checksum comes from the same GitHub release as the tarball, and Sigstore verification runs only when cosign is installed unless --require-signature is set (libs/cua-driver/scripts/_install-rust.sh:1022-1036); the endpoint monitor only greps for a marker string (.github/workflows/monitor-branded-installers.yml:106-116), so equality of cua.ai content with repository files could not be verified.",
+      "Security posture: default standard mode allows observation and input to every app without prompts (docs/content/docs/cua-driver/guides/permissions.mdx:25-29,47-56); existing-profile CDP attach exposes cookies/storage to same-user processes (libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:159-166); page text is untrusted prompt-injection surface (libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:322-324); opt-in trajectory recordings keep tool arguments, including browser_type/type_text text, redacting only a few fields (libs/cua-driver/rust/crates/cua-driver-core/src/tool.rs:5629-5674; libs/cua-driver/rust/crates/cua-driver-core/src/recording.rs:916-921); install_ffmpeg can run `sudo -n` plus a package manager when confirm=true (libs/cua-driver/rust/crates/cua-driver-core/src/ffmpeg_install.rs:56-85); a bounded origin list cannot stop a page redirecting after a click (docs/content/docs/cua-driver/guides/permissions.mdx:268-270).",
+      "Licensing and supply chain: driver is MIT (LICENSE.md) but the repo mixes licenses: the optional perception extension is AGPL-3.0-only with network-use source obligations (libs/cua-driver/README.md:19-26), Cua Spaces is FSL-1.1-MIT (LICENSING.md:12-16,72-96), cua-som is AGPL-3.0-or-later (README.md:256-258). Cargo.lock pins 637 packages including pre-release ort 2.0.0-rc.10 (libs/cua-driver/rust/Cargo.toml:46); no dependency-audit tooling (cargo-audit, cargo-deny, Dependabot, Renovate, CodeQL, OSV) found in .github; PyPI wheels are uploaded with a token and no attestation (.github/workflows/cd-py-cua-driver.yml:225-235); no SBOM/provenance for driver binaries."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "trycua/cua",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Driver release installer for macOS/Linux (prebuilt GitHub Release binary; SHA256SUMS always checked, Sigstore bundle checked when cosign is present): /bin/bash -c \"$(curl -fsSL https://cua.ai/driver/install.sh)\"",
+          "citation": "README.md:137; docs/content/docs/cua-driver/quickstart.mdx:25,52; libs/cua-driver/scripts/install.sh:2-3,14-16; libs/cua-driver/scripts/_install-rust.sh:8-10,940-1049",
+          "holds": true,
+          "note": "The exact command is at README.md:137 and quickstart.mdx:25 (macOS) and :52 (Linux). install.sh downloads the GitHub release (header at lines 2-3). verify_release_tarball always checks SHA256SUMS: it is required from 0.31.0, and older releases without it install with a warning. It requires a Sigstore bundle from 0.32.0 but runs cosign verify-blob only when cosign is on PATH, unless --require-signature is set (_install-rust.sh:1021-1036). So the parenthetical holds for the current 0.32.0 release."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE.md",
+          "citation": "LICENSE.md:1-21; README.md:248; libs/cua-driver/rust/Cargo.toml:25; libs/cua-driver/python/pyproject.toml:10; libs/cua-driver/typescript/package.json:6; LICENSING.md:13,134",
+          "holds": true,
+          "note": "LICENSE.md is the standard MIT text (Copyright 2025 Cua AI, Inc.). README.md:248 and LICENSING.md:13,134 name Cua Driver as MIT. The driver's Rust workspace (all crates use license.workspace), the PyPI package and the npm package all declare MIT. The repo is mixed-license: Spaces is FSL-1.1-MIT and the optional cua-perception models are AGPL-3.0-only. The dossier's risks section already discloses this."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - release binary x86_64-unknown-linux-gnu built in a debian:11 container with a glibc 2.31 floor; installer maps Linux-x86_64; docs require an x86_64 Linux desktop (X11 or XWayland, AT-SPI 2); X11/Wayland supported with limits, KDE and Hyprland experimental; needs a live graphical session with session D-Bus and AT-SPI, headless only via Xvfb; minimal images need libxi6 at-spi2-core; Linux CI/E2E on ubuntu-latest only",
+          "citation": ".github/workflows/cd-rust-cua-driver.yml:193-223,283-285; libs/cua-driver/scripts/_install-rust.sh:596; docs/content/docs/cua-driver/quickstart.mdx:13,57; docs/content/docs/cua-driver/concepts/platform-support.mdx:25-26,35-42; libs/cua-driver/rust/Skills/cua-driver/LINUX.md:186-218; libs/cua-driver/rust/crates/platform-linux/src/lib.rs:202-217; .github/workflows/ci-rust-linux.yml:64,119",
+          "holds": true,
+          "note": "Every sub-claim matches. The build matrix pairs x86_64 with x86_64-unknown-linux-gnu inside image debian:11, with the glibc 2.31 floor explained at lines 214-215, and builds with cargo build --locked --release (:285). The installer maps Linux-x86_64 to linux-x86_64 (:596). KDE/KWin (:40) and Hyprland (:41) are marked Experimental. lib.rs:212-213 says 'Xvfb for headless'. One small imprecision: the ci-rust-linux.yml:64 job runs an archlinux container on ubuntu-latest, and ci-driver-mcp-candidate.yml:31 pins ubuntu-24.04, which is the same hosted x86_64 image. The point that no arm64 or other runner tests Linux still stands."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes - `cua-driver mcp` stdio server speaking MCP 2026-07-28 and legacy 2025-06-18 with the skill pack served as MCP resources; Linux/Windows bare mcp owns its runtime and exits on stdin EOF, macOS proxies to CuaDriver.app; optional loopback HTTP MCP (legacy only), off unless CUA_DRIVER_RS_MCP_HTTP_PORT is set, binds 127.0.0.1, bearer token required",
+          "citation": "libs/cua-driver/docs/mcp-protocol-and-skills.md:3-5,55-90,113-119; docs/content/docs/cua-driver/reference/cli/mcp.mdx:29; libs/cua-driver/rust/crates/cua-driver/src/mcp_http.rs:32-61,339,367-390",
+          "holds": true,
+          "note": "The protocol versions are at doc lines 3-4. The embedded eight-file skill pack is read via skills/list, skills/get and resources/read (55-90). mcp.mdx:29 states the Linux/Windows vs macOS runtime ownership word for word. In mcp_http.rs, the port is None unless the env var is set (34-54) and the listener binds [127,0,0,1] (60). spawn() fails closed without CUA_DRIVER_RS_MCP_HTTP_TOKEN, which must be 32-4096 characters (58, 371-390), and requests are checked against a Bearer scheme (339). HTTP stays on legacy MCP (doc 115-116)."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "'Tools to inspect and operate native desktop apps and browsers on macOS, Windows, and Linux' is verified as partial: typed browser tools cover Chromium-family and single-page Electron only; the inventory has no URL-fetch, article-text, tab create/close/select, select-option or PDF tool; screenshots are viewport PNG only; a pdf grep finds only a test string",
+          "citation": ".github/scripts/cua-driver-mcp-compat/expected-tools.json:8-78; libs/cua-driver/rust/crates/cua-driver-core/src/browser/store.rs:34-39; libs/cua-driver/rust/crates/cua-driver-core/src/browser/tools.rs:307-311; libs/cua-driver/rust/crates/cua-driver-core/src/tool.rs:5806,5818; docs/content/docs/cua-driver/guides/browsers.mdx:8-14; libs/cua-driver/rust/Skills/cua-driver/BROWSER.md:455,459-462,477-487",
+          "holds": true,
+          "note": "expected-tools.json lists 58 base tools plus 4 Linux-only and 1 Windows-only. None fetches, extracts articles, manages tabs, selects options or prints PDFs. BrowserActionKind is limited to Click/Type/Upload/Pointer/Scroll. include_screenshot captures 'the exact tab viewport as PNG'. A grep of the driver crates for pdf hits only '/private/document.pdf' at tool.rs:5806,5818. BROWSER.md:455 sends tabs to the native loop. The names browser_new_tab, browser_close_tab and browser_select_tab exist only in a cursor-animation classifier (cua-driver-contract/src/cursor.rs:232-235) and are not registered tools. The legacy page get_text returns whole-page visible text (page.rs:269), not main-article extraction, so 'no article-text tool' holds."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

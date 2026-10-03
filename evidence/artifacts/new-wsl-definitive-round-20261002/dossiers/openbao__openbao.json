@@ -1,0 +1,338 @@
+{
+  "contender": "openbao/openbao",
+  "revision": {
+    "contender": "openbao/openbao",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "openbao/openbao",
+        "tag": "v2.7.1",
+        "commit": "a5db72cef75c24b920ade02065b18dd8eb666bac",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.7.1",
+    "commit": "a5db72cef75c24b920ade02065b18dd8eb666bac",
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "openbao/openbao",
+    "revision": {
+      "tag": "v2.7.1",
+      "commit": "a5db72cef75c24b920ade02065b18dd8eb666bac",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MPL-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "OpenBao is a community-run fork of HashiCorp Vault (publiccode.yml:24-25), governed as 'OpenBao, a Series of LF Projects, LLC' (CHARTER.md:8) and licensed MPL-2.0 (LICENSE:3). It ships as one Go binary, `bao` (server, CLI, agent, proxy), that stores, generates on demand, encrypts, leases and revokes secrets, certificates and keys behind an authenticated, ACL-gated, audited HTTP API (README.md:33-72). It is a secrets manager. It has no secret-scanning feature (staged changes, history or directories) and no feature that verifies found credentials against provider APIs. The repository's own hooks and CI use neither kind of tool (see claim_checks and risks).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "OpenBao is 'a software solution to manage, store, and distribute sensitive data including secrets, certificates, and keys'. The community 'intends to provide this software under an OSI-approved open-source license', led under open-governance principles.",
+          "citation": "README.md:33-36"
+        },
+        {
+          "claim": "Problem statement: knowing who accesses which secrets is hard, and 'adding on key rolling, secure storage, and detailed audit logs is almost impossible without a custom solution. This is where OpenBao steps in.'",
+          "citation": "README.md:38-43"
+        },
+        {
+          "claim": "Secure Secret Storage: arbitrary key/value secrets are encrypted before being written to persistent storage; 'OpenBao can write to disk, PostgreSQL, and more.'",
+          "citation": "README.md:47-51"
+        },
+        {
+          "claim": "Dynamic Secrets: generated on demand 'for some systems, such as AWS or SQL databases' (example: an AWS keypair for an S3 bucket) and automatically revoked when the lease ends.",
+          "citation": "README.md:53-57"
+        },
+        {
+          "claim": "Data Encryption: OpenBao can encrypt and decrypt data without storing it.",
+          "citation": "README.md:59-62"
+        },
+        {
+          "claim": "Leasing and Renewal: every secret has a lease and is revoked automatically at the end of it; clients renew via built-in renew APIs.",
+          "citation": "README.md:64-66"
+        },
+        {
+          "claim": "Revocation: single secrets or a tree of secrets (all read by a user, or all of a type) can be revoked.",
+          "citation": "README.md:68-72"
+        },
+        {
+          "claim": "Security issues must be reported privately to openbao-security@lists.openssf.org.",
+          "citation": "README.md:5-8"
+        },
+        {
+          "claim": "OpenSSF Scorecard and OpenSSF Best Practices badges are shown.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "Docs are on the website (openbao.org/docs). The README itself only documents building from source ('go build -o bin/bao .') and a dev server ('go run . server -dev'); it has no install section.",
+          "citation": "README.md:74-76, 95-106"
+        },
+        {
+          "claim": "The Go toolchain version used in CI and releases is pinned in .go-version.",
+          "citation": "README.md:86-90"
+        },
+        {
+          "claim": "The repo also houses the docs website (website/) and the web UI (ui/).",
+          "citation": "README.md:123-127"
+        },
+        {
+          "claim": "The repo publishes two importable libraries, github.com/openbao/openbao/api/v2 and github.com/openbao/openbao/sdk/v2. Importing the root module is 'NOT, and has NEVER been' a supported use.",
+          "citation": "README.md:129-143"
+        },
+        {
+          "claim": "Contributors must read CONTRIBUTING.md first or the PR will likely be rejected.",
+          "citation": "README.md:78-84"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (macOS)",
+          "command": "brew install openbao",
+          "citation": "website/content/docs/install.mdx:23-28"
+        },
+        {
+          "method": "APT repository (Debian/Ubuntu)",
+          "command": "Add /etc/apt/sources.list.d/openbao.sources (Types: deb; URIs: https://pkgs.openbao.org/deb/; Suites: stable; Components: main; Signed-By: <openbao-gpg-pub-20240618.asc>), then: sudo apt update && sudo apt install openbao",
+          "citation": "website/src/pages/downloads.tsx:243-253"
+        },
+        {
+          "method": "DNF via EPEL (Fedora/RHEL and derivatives)",
+          "command": "dnf install -y epel-release   then   dnf install -y openbao   (alternative: add /etc/yum.repos.d/openbao.repo with baseurl https://pkgs.openbao.org/rpm/$basearch, then sudo yum install -y openbao; downloads.tsx:270-284). Arch Linux: pacman -Sy openbao (install.mdx:44-48).",
+          "citation": "website/content/docs/install.mdx:56-66"
+        },
+        {
+          "method": "Container image (Alpine, UBI, distroless)",
+          "command": "docker pull ghcr.io/openbao/openbao:<version>   (same names on quay.io and docker.io; variants openbao-ubi and openbao-distroless)",
+          "citation": "website/src/pages/downloads.tsx:299-331; website/content/docs/install.mdx:68-82"
+        },
+        {
+          "method": "Precompiled binary archive (GitHub release) with checksum verification",
+          "command": "wget \"https://github.com/openbao/openbao/releases/download/v$VERSION/$RELEASE\" with RELEASE=\"openbao_${VERSION}_${PLATFORM}.tar.gz\", plus checksums.txt; then: sha256sum --ignore-missing --check checksums.txt. Docs say the package is a zip (install.mdx:86-87), but non-Windows archives are .tar.gz (scripts/release/archive.sh:28-31).",
+          "citation": "website/content/docs/install.mdx:203-220"
+        },
+        {
+          "method": "Build from source (Go 1.27.x)",
+          "command": "mkdir -p bin && go build -o bin/bao .   (docs variant: make bootstrap && make dev)",
+          "citation": "README.md:95-100; website/content/docs/install.mdx:119-132"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - linux/amd64 binary, deb/rpm/Arch packages and container images are built on release (.github/workflows/release.yml:121,185-200; .github/workflows/release-images.yml:63-69). All CI test jobs run on ubuntu-latest amd64 (.github/workflows/ci.yml:65-67).",
+        "wsl2": "unknown - no WSL documentation in the repo. The only reference is a test that skips a syslog audit-device test on WSL (internal/command/audit_enable_test.go:211). The linux/amd64 release binary is what a WSL2 user would run.",
+        "macos_arm64": "yes - a darwin/arm64 binary is built and archived on release (.github/workflows/release.yml:128) and Homebrew install is documented (website/content/docs/install.mdx:23-28). It is cross-compiled with CGO_ENABLED=0 on ubuntu-latest (release.yml:104,116); tests in this repo's CI run only on linux/amd64 (ci.yml:65-67).",
+        "gpu": "no - not applicable. No GPU/CUDA code or docs; the only 'nvidia' hits are company names in website blog/news pages (website/content/blog/2026-07-27-karras-oss-siemens-2026-talk.md:196, website/content/ecosystem/news.mdx:144)."
+      },
+      "integrations": {
+        "cli": "Yes - the `bao` binary (main.go:12-14). About 127 subcommands are registered in internal/command/commands.go (server, agent, proxy, operator, kv, pki, transit, token, login, policy, audit, plugin...). Docs: website/content/docs/commands/index.mdx. The CLI caches its token via a token helper at ~/.vault-token or BAO_TOKEN_PATH (website/content/docs/commands/index.mdx:261-272; internal/command/token/helper_internal.go:26-35). BAO_* env vars fall back to the legacy VAULT_* names (api/env.go:22-34), and the Alpine/UBI images symlink `vault` to `bao` (Dockerfile:32,81).",
+        "mcp": "none found - no MCP server in code or docs. The only mention is a hypothetical optional UI plugin ('An AI agent plugin with MCP command suggestions') in an RFC (website/content/community/rfcs/web-ui-modernization.mdx:77).",
+        "sdk_or_api": "Yes - HTTP API v1 (website/content/docs/api/index.mdx:6-14) with a warning that backwards compatibility is not yet promised (index.mdx:16-23). OpenAPI document served at /sys/internal/specs/openapi (website/content/docs/api/system/internal-specs-openapi.mdx:9). Official Go client github.com/openbao/openbao/api/v2 (website/content/docs/api/libraries.mdx:28-34; api/README.md:4) plus api/auth/{approle,jwt,kubernetes,ldap,userpass} helper modules (Makefile:284-299), and the plugin SDK github.com/openbao/openbao/sdk/v2 (sdk/go.mod:1). The docs state Vault client libraries should also work (libraries.mdx:15-20). `bao agent` and `bao proxy` daemons cover auto-auth, token sinks and API proxying (internal/command/agent.go, proxy.go).",
+        "claude_code_or_codex": "none found - no CLAUDE.md, .claude/, .codex/, .cursor/, .mcp.json or skill files (repo-wide glob). The project's contribution policy tells contributors to disable generative AI agents, naming Claude Code (CONTRIBUTING.md:38-54; website/content/community/contributing/index.mdx:15-17). The PR template asks contributors to certify no generative-AI use (.github/pull_request_template.md:33-35), and AI-generated issues or security reports may be closed (CONTRIBUTING.md:109-116)."
+      },
+      "telemetry_and_network": "Telemetry/phone-home: none found. A repo-wide search of Go code, docs and scripts for usage-reporting, update-check, census and Sentry patterns found nothing. getsentry/sentry-go appears only as an indirect go.mod dependency (go.mod:219) and no Go file imports it. The web UI sets Scarf telemetry off (ui/package.json:229-231). Metrics are local-first: an in-memory sink is always created (internal/helper/configutil/telemetry.go:264), and external sinks (Prometheus, statsite, statsd, Circonus, DogStatsD, Stackdriver) exist only when the operator configures them (telemetry.go:283-380; website/content/docs/configuration/telemetry.mdx:10-18). The OpenTelemetry SDK is imported only under internal/vault/diagnose for `bao operator diagnose` spans (internal/vault/diagnose/helpers.go:14-18). Opt-in outbound fetches: OCI plugin auto-download is off by default (plugin_auto_download false, website/content/docs/configuration/index.mdx:151-152; internal/command/server.go:2436-2446), while plugin_auto_register defaults true (index.mdx:154; internal/command/server/config.go:1093-1101); Raft auto_join uses go-discover provider lookups only when configured (go.mod:51; CHANGELOG.md:21). Required services/accounts: no project account or API key is needed by the documented install/run steps. The server needs a storage backend chosen by the operator (local raft/pebbledb, or external PostgreSQL; internal/command/commands.go:145-151), listens on 8200 (dev default 127.0.0.1:8200, website/content/docs/commands/server.mdx:113-115; packaged config binds 0.0.0.0:8200 with TLS cert files, .release/linux/package/etc/openbao/openbao.hcl:17-21) and uses 8201 for cluster traffic (.release/docker/docker-entrypoint.sh:33-35). Clients default to https://127.0.0.1:8200 and BAO_ADDR (api/client.go:34,403). Auth methods and auto-unseal call whatever IdP/KMS the operator configures (internal/helper/builtinplugins/registry.go:58-65). Startup logs the proxy environment (http_proxy, https_proxy, no_proxy) with URL credentials redacted (internal/command/server.go:677-700), although the CLI docs say 'All environment variables available to the OpenBao process will be logged during startup' (website/content/docs/commands/index.mdx:279-280). Project-side infrastructure that users do not need: GitHub Actions, ghcr.io/quay.io/docker.io, an S3 bucket behind pkgs.openbao.org (.github/workflows/release-packages.yml:30-34) and a Codeberg mirror (.github/workflows/mirror.yml:33-34)."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "JavaScript (Ember UI under ui/)",
+        "TypeScript/TSX (Docusaurus site under website/)",
+        "Shell (scripts/, .hooks/, .release/)",
+        "Protocol Buffers (Makefile:172-187)"
+      ],
+      "entry_points": [
+        {
+          "path": "main.go",
+          "what": "`bao` binary; main() calls command.Run(os.Args[1:]) (main.go:12-14)"
+        },
+        {
+          "path": "internal/command/main.go",
+          "what": "Run() CLI dispatcher plus global flag and env handling (main.go:145)"
+        },
+        {
+          "path": "internal/command/commands.go",
+          "what": "Registers all CLI subcommands (about 127 factories) and the audit, physical and service-registration backend maps (commands.go:125-158,180)"
+        },
+        {
+          "path": "internal/command/server.go",
+          "what": "`bao server`: config load, OCI plugin download (:1037), telemetry setup (:1048), storage setup (:710), -dev mode"
+        },
+        {
+          "path": "internal/command/agent.go",
+          "what": "`bao agent` (auto-auth, token sinks, templating); `bao proxy` is in internal/command/proxy.go"
+        },
+        {
+          "path": "api/client.go",
+          "what": "Go HTTP API client; reads BAO_ADDR / BAO_TOKEN (client.go:34,821); default address https://127.0.0.1:8200 (client.go:403)"
+        },
+        {
+          "path": "scripts/release/build.sh",
+          "what": "Release build: go build -tags=ui with version ldflags (build.sh:31)"
+        },
+        {
+          "path": "Dockerfile",
+          "what": "Three image targets (default Alpine, ubi, distroless); default CMD is `server -dev -dev-no-store-token`, which the file says is not for production (Dockerfile:56-58); entrypoint script .release/docker/docker-entrypoint.sh"
+        }
+      ],
+      "architecture": "Single Go module github.com/openbao/openbao/v2 (go.mod:1) producing `bao` (main.go -> internal/command). Layers: CLI/daemon commands (internal/command/: server, agent, proxy, operator, kv, pki, token...) -> HTTP handler (internal/http/; the web UI built from ui/ is embedded from internal/http/web_ui when built with -tags=ui, website/content/community/contributing/packaging.mdx:42,63-65) -> Core (internal/vault/): AES-GCM encryption barrier (internal/vault/barrier/aes_gcm.go:999-1013), token store (token_store.go), lease/expiration manager (expiration.go), audit (audit.go), ACL policy (internal/vault/policy/), request router (internal/vault/routing/), namespaces, identity. The server starts sealed; Shamir shares (default 5, threshold 3) or auto-unseal plugins are used (website/content/docs/internals/security.mdx:173-185). Storage backends: internal/physical/{raft,postgresql,pebbledb,inmem}, with sdk/physical/{file,inmem} left as packages (the `file` backend was removed from the server in 2.7.0, website/content/community/release-notes/2-7-0.mdx:77). Built-in plugins are registered in internal/helper/builtinplugins/registry.go:58-88. Auth: approle, cert, jwt/oidc, kubernetes, userpass. Secrets engines: kv, pki, transit, ssh, totp, kubernetes, rabbitmq, database. Database plugins: mysql, postgresql, cassandra, influxdb, valkey/redis. Audit devices: file, http, socket, syslog (commands.go:126-131). External plugins run as separate gRPC processes via sdk/plugin and go-plugin (website/content/docs/internals/limits.mdx:244-260). Separate importable Go modules: api/ (client plus api/auth/* helpers) and sdk/ (framework, logical, physical, helpers). Non-Go trees: ui/ (Ember 4.12, pnpm; ui/package.json:96,133,228) and website/ (Docusaurus 3). Layout is described in website/content/community/contributing/code-organization.mdx, which is partly stale (see risks).",
+      "packaging_and_release": "Release is a manually dispatched 'Prepare release' workflow that builds a draft GitHub release; a maintainer reviews and publishes it, which triggers the image and package-repo workflows (.github/workflows/release.yml:1-19,350-362; release-images.yml:3-6; release-packages.yml:3-6). Artifacts per version: `bao` archives for 19 OS/arch targets (linux amd64/arm64/armv6/ppc64le/riscv64/s390x, darwin amd64/arm64, freebsd/netbsd/openbsd amd64/arm64/armv6, windows amd64/arm64; release.yml:119-139), built with CGO_ENABLED=0 and -tags=ui (release.yml:116; scripts/release/build.sh:31). Archives are openbao_<ver>_<os>_<arch>.tar.gz (.zip on Windows) containing LICENSE, README.md and CHANGELOG.md (scripts/release/archive.sh:14-31). Also deb/rpm for each Linux arch plus Arch Linux packages for amd64/arm64 via nFPM (release.yml:185-200; .release/nfpm.yaml); SPDX-JSON SBOMs per artifact via Syft (release.yml:206-214); a distribution source tarball with vendored Go modules and license reports (release.yml:262-311). Integrity: every artifact gets a detached GPG signature (.gpgsig) and a keyless cosign bundle (.sigstore.json), each verified at creation, with the cosign identity restricted to release.yml on main or release/* for the main repo (scripts/release/sign.sh:17-61); checksums.txt (SHA-256) is signed with both (scripts/release/checksums.sh:13-57); deb/rpm are also GPG-signed by nFPM (.release/nfpm.yaml:50-55); verification steps are documented (website/content/docs/install.mdx:197-262). No SLSA or GitHub build-provenance attestation step exists (no 'attest|slsa|provenance' match under .github). Container images: Alpine (openbao/openbao), UBI (openbao-ubi) and distroless (openbao-distroless), multi-arch, pushed to ghcr.io, quay.io and docker.io, cosign-signed by digest, with timestamps rewritten from SOURCE_DATE_EPOCH (Dockerfile:12-21,61,114; release-images.yml:54-95,168-169,197-206). apt/rpm repositories are synced to S3 behind pkgs.openbao.org (release-packages.yml:25-137). Nightlies use the same workflow from openbao/openbao-nightly (release.yml:31-37). GitHub Actions are pinned by commit SHA. Linux package extras: hardened systemd unit (.release/linux/package/usr/lib/systemd/system/openbao.service:11-29) and a default config using pebbledb plus a TLS listener (.release/linux/package/etc/openbao/openbao.hcl:6-21).",
+      "tests_and_ci": "Go: standard testing + testify (go.mod:121) run through gotestsum (tools/go.mod:14; .github/workflows/test-go.yml:185-196). About 595 *_test.go files repo-wide (76 under sdk/, 18 under api/, the rest mainly under internal/). Acceptance tests are gated by BAO_ACC=1 (Makefile:71-77). UI: QUnit via Ember (ui/package.json:28,164), about 296 test files under ui/tests. 18 workflow files in .github/workflows: ci.yml (Go tests split into 16 partitions plus a binary-test runner with the `deadlock` tag, and a separate -race run; ci.yml:51-90, via reusable test-go.yml); code-checker.yml (golangci-lint v2.13.1 for root/sdk/api, Semgrep 1.171.0 with Go rules from tools/semgrep/ci, go mod tidy and sync-deps diff checks, protobuf regeneration diff check; the EL8 build check is disabled with `if: false`; code-checker.yml:21-132); codeql.yml (CodeQL for Go on push/PR and weekly); scorecard.yml (OpenSSF Scorecard weekly, results published); ui-ci.yml (Ember tests with Chrome); docs-ci.yml and docs-deploy.yml (Docusaurus build/lint, GitHub Pages deploy); changelog-checker.yml (requires changelog/<PR>.txt); verify-commits.yml (maintainer commits must be signature-verified); sync-deps.yaml; go-dependency-submission.yml; mirror.yml (pushes to Codeberg); publiccodeyml-check.yml; test-acc-dockeronly-nightly.yml (workflow_dispatch only; it calls ./.github/workflows/test-run-acc-tests-for-path.yml, which is not in the tree); and release.yml, release-images.yml, release-packages.yml. dependabot.yml covers docker, github-actions, gomod (/ and /tools) and npm for /website only. CI tests run on ubuntu-latest amd64 only (ci.yml:65-67). No secret-scanning or dependency-vulnerability job in CI; govulncheck exists only as the manual `make vulncheck` (Makefile:233-237). Local hooks are copied by `make prep` (Makefile:131-133): .hooks/pre-commit runs UI lint-staged and gofmt on staged Go files only (.hooks/pre-commit:38-73); .hooks/pre-push enforces DCO Signed-off-by (.hooks/pre-push:22-30).",
+      "dependencies": "Go modules (direct requires / indirect): go.mod (root, go 1.27.0) 120 / 191 (go.mod:26-147,149-341); api/go.mod (go 1.25.0) 13 / 12; sdk/go.mod (go 1.27.0) 44 / 50; tools/go.mod 0 direct and 10 `tool` directives (golangci-lint, misspell, go-licenses, changelog-build, zlint, govulncheck, protoc-gen-go-grpc, protoc-gen-go, gotestsum, gofumpt; tools/go.mod:5-16) with 247 indirect; api/auth/{approle,jwt,kubernetes,ldap,userpass}/go.mod 1 direct each (api/v2; e.g. api/auth/approle/go.mod:7); internal/helper/stubbolt/go.mod has none (a local stub replacing github.com/boltdb/bolt, go.mod:24). JS: ui/package.json 5 dependencies + 140 devDependencies (Ember 4.12, pnpm 10.34.4, engines.node '20'; ui/package.json:41-180,203-205,221-228); website/package.json 17 dependencies + 7 devDependencies (Docusaurus 3, React 19; website/package.json:19-46). The root module pulls HashiCorp libraries (raft, go-plugin, cap), Kubernetes and Google client libraries directly (go.mod:46,75,138,141-143) and Azure/AWS SDKs indirectly (go.mod:155-160,173-187). replace directives point api, sdk and api/auth/* at local paths (go.mod:14-24). The source tarball ships license reports generated by go-licenses and the pnpm license tooling (release.yml:262-292).",
+      "security_policy": "No SECURITY.md in this checkout (root and .github/ checked). Disclosure is by private mail to openbao-security@lists.openssf.org (README.md:5-8; CONTRIBUTING.md:3-5; .github/security-insights.yml:152-159). The SECURITY.md it points to lives in the org-level openbao/.github repo (CONTRIBUTING.md:141-142; website/content/community/policies/cve.mdx:26-27) and was not opened. CVE process: 7 days to confirm, 90-day patch window, embargoed fixes limited to security-list members (website/content/community/policies/cve.mdx:12-19,50-76). Threat model: website/content/docs/internals/security.mdx:18-97. GHSA advisory IDs are cited throughout CHANGELOG.md (41 lines). security-insights.yml says the project's security self-assessment 'has not yet been completed' (.github/security-insights.yml:192-195)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Dynamic Secrets 'such as AWS or SQL databases' - OpenBao generates an AWS keypair on demand (README.md:53-57)",
+        "verified": "partial",
+        "evidence": "The code differs from the README. The built-in registry has database plugins (mysql, postgresql, cassandra, influxdb, redis/valkey) plus kubernetes, rabbitmq, ssh, pki, totp, transit and kv engines, but no AWS secrets engine (internal/helper/builtinplugins/registry.go:66-88). The plugin policy says cloud-vendor engines including secrets-aws were moved out of the binary (website/content/community/policies/plugins.mdx:24-28,171), and the docs intro already uses a Kubernetes example instead (website/content/docs/what-is-openbao.mdx:46-49). SQL dynamic credentials are real; AWS would need an external plugin, which I did not inspect."
+      },
+      {
+        "claim": "OpenBao encrypts secrets before writing them to persistent storage (README.md:47-51)",
+        "verified": "yes",
+        "evidence": "The encryption barrier builds an AES-GCM AEAD (aes.NewCipher + cipher.NewGCMWithRandomNonce) in internal/vault/barrier/aes_gcm.go:999-1013, generates a 32-byte (256-bit) key at :340-344 and accepts 16-32 byte keys (:347-350). The docs describe the same design (website/content/docs/internals/security.mdx:120-129)."
+      },
+      {
+        "claim": "'OpenBao can write to disk, PostgreSQL, and more' (README.md:50-51)",
+        "verified": "yes",
+        "evidence": "Registered storage backends are inmem_ha, inmem, raft, postgresql and pebbledb (internal/command/commands.go:145-151; internal/physical/postgresql/postgresql.go). Caveat: the older `file` backend was removed in 2.7.0 (website/content/community/release-notes/2-7-0.mdx:77; CHANGELOG.md:15), so 'disk' now means raft or pebbledb."
+      },
+      {
+        "claim": "All secrets have leases that are revoked automatically; single secrets or trees can be revoked and renewed (README.md:64-72)",
+        "verified": "yes",
+        "evidence": "ExpirationManager implements Register (internal/vault/expiration.go:1483), Renew (:1259), Revoke (:957), RevokePrefix (:1139) and RevokeByToken (:1150)."
+      },
+      {
+        "claim": "Data Encryption: encrypt and decrypt data without storing it (README.md:59-62)",
+        "verified": "yes",
+        "evidence": "The transit secrets engine is built in (internal/helper/builtinplugins/registry.go:87; internal/builtin/logical/transit/backend.go)."
+      },
+      {
+        "claim": "'Detailed audit logs' are available (README.md:41-42)",
+        "verified": "yes",
+        "evidence": "Audit device factories file, http, socket and syslog are registered (internal/command/commands.go:126-131). The docs say most strings in audit entries are hashed with a salted HMAC-SHA256 so secrets are not logged in plaintext (website/content/docs/audit/index.mdx:68)."
+      },
+      {
+        "claim": "The repository publishes two libraries: api/v2 and sdk/v2 (README.md:131-132)",
+        "verified": "partial",
+        "evidence": "Both modules exist (api/go.mod:1; sdk/go.mod:1). Five more api/auth/* modules (approle, jwt, kubernetes, ldap, userpass) have their own go.mod and are tagged by `make tag-api` (api/auth/*/go.mod; Makefile:284-299), so more than two libraries are published."
+      },
+      {
+        "claim": "The Go toolchain used in CI and releases is pinned at .go-version (README.md:88-90)",
+        "verified": "yes",
+        "evidence": ".go-version:1 is 1.27.1. The in-repo set-up-go action reads it (.github/actions/set-up-go/action.yml:25-30) and release.yml:145-146 and ci.yml:38-39 use that action. go.mod:12 separately says `go 1.27.0`."
+      },
+      {
+        "claim": "Security issues go privately to openbao-security@lists.openssf.org (README.md:5-8)",
+        "verified": "yes",
+        "evidence": "Consistent with .github/security-insights.yml:152-159 and website/content/community/policies/cve.mdx:26. There is no SECURITY.md in this checkout; the referenced policy file is in the org-level .github repo (CONTRIBUTING.md:141), which I did not open."
+      },
+      {
+        "claim": "Scope for the stated needs: the README presents OpenBao as a secrets manager (manage, store, distribute) and makes no claim about scanning repositories for leaked secrets or verifying found credentials (README.md:33-36)",
+        "verified": "yes",
+        "evidence": "Matches the code. A repo-wide case-insensitive search for gitleaks, trufflehog, detect-secrets, git-secrets, secretlint, ggshield, gitguardian, 'secret scanning/scanner/detection' and 'vault radar' returned no matches. The repo's own pre-commit hook runs only UI lint-staged and gofmt (.hooks/pre-commit:38-73). CI scanners are golangci-lint, Semgrep, CodeQL and Scorecard (.github/workflows/code-checker.yml:21-67; codeql.yml; scorecard.yml). Semgrep rule files in tools/semgrep/ci/ are named for Go correctness checks (contents not opened). The only 'scan' feature is a recursive-list API operation (website/content/community/rfcs/scan-operation.mdx:11)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "KV v1 read latency on a 3-node cluster on Azure: v2.5.1 (standby nodes serve reads, load balancer spreads traffic) vs v2.4.4 (primary only). 500 req/s target, 90% reads / 10% writes, 5 minutes, benchmark-openbao; table is the combined result of several runs",
+        "metric": "latency mean / p95 / p99 in ms, request count",
+        "value": "v2.5.1: 5.75 / 19.55 / 36.94 ms (1,349,402 requests); v2.4.4: 7.92 / 28.69 / 51.64 ms (1,350,523 requests)",
+        "source": "website/content/blog/2026-03-25-improved-horizontal-scalabilty.md:157-170",
+        "independent": false
+      },
+      {
+        "what": "KV v1 write latency, same setup as the read benchmark",
+        "metric": "latency mean / p95 / p99 in ms, request count",
+        "value": "v2.5.1: 58.08 / 105.90 / 239.21 ms (150,598 requests); v2.4.4: 87.21 / 201.23 / 355.96 ms (149,477 requests)",
+        "source": "website/content/blog/2026-03-25-improved-horizontal-scalabilty.md:157-170",
+        "independent": false
+      },
+      {
+        "what": "PKI issue of RSA-2048 certificates with no_store=true, 5 req/s target, 5 minutes, same 3-node clusters",
+        "metric": "latency mean / p95 / p99 in ms, achieved rate, success rate",
+        "value": "v2.5.1: 566.77 / 1976.84 / 3575.30 ms, 15,000 requests, 5.00 req/s, 100% success; v2.4.4: 11668.62 / 27152.59 / 38203.77 ms, 3,990 requests, 1.33 req/s, 99.27% success",
+        "source": "website/content/blog/2026-03-25-improved-horizontal-scalabilty.md:174-247",
+        "independent": false
+      },
+      {
+        "what": "PKI leaf issuance throughput over 30 s with benchmark-vault on a local single-node Raft-backed instance, 'unspecified hardware', EC P-256 for CA and leaf keys",
+        "metric": "certificates issued in 30 s",
+        "value": "300k without storage; 65k when storing leaves; 20k with leases (docs say numbers are examples only)",
+        "source": "website/content/docs/secrets/pki/considerations.mdx:164-171,180-181",
+        "independent": false
+      },
+      {
+        "what": "Same PKI test with larger key types",
+        "metric": "leaves issued in 30 s",
+        "value": "RSA-4096: 160 leaves regardless of storage or leases, p95 key-generation time above 10 s; P-521: about 30k without leases and 18k with leases",
+        "source": "website/content/docs/secrets/pki/considerations.mdx:173-181",
+        "independent": false
+      },
+      {
+        "what": "Scale testing of mounts and namespaces",
+        "metric": "objects reached in testing",
+        "value": "over 300k mounts and 20k namespaces (benchmarks are in the separate benchmark-openbao repo, not opened)",
+        "source": "website/content/docs/internals/limits.mdx:45-47",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope mismatch with the stated needs: OpenBao is a secrets manager and cannot serve as the main secret scanner or the credential-verification complement. It has no scanning or verification feature, and the repo uses no such tool (repo-wide search for common scanners found nothing; .hooks/pre-commit:38-73 runs only UI lint and gofmt; CI scanners are golangci-lint, Semgrep, CodeQL and Scorecard, .github/workflows/code-checker.yml:21-67). Using it also means running, initializing and unsealing a server (website/content/docs/commands/server.mdx:10-14); -dev mode is in-memory and not for production (server.mdx:103-105).",
+      "Frequent security fixes and a thin support window: v2.7.1 (2026-10-01) carries 6 security fixes (CHANGELOG.md:1-11) and v2.7.0 (2026-09-23) carries 9 (CHANGELOG.md:25-38); 41 CHANGELOG lines cite GHSA advisories. The support policy guarantees only the latest release ('The latest release does not EoL'), with releases 'roughly every month pending maintainer availability' (website/content/community/policies/support.mdx:17).",
+      "Credentials land on disk by default: the CLI token helper writes the token in plaintext to ~/.vault-token (mode 0600) or $BAO_TOKEN_PATH (internal/command/token/helper_internal.go:27-35,67; website/content/docs/commands/index.mdx:270-272); dev mode persists the dev root token to that helper unless -dev-no-store-token is given (server.mdx:123-125); the Agent file sink writes tokens at default mode 0640 (website/content/docs/agent-and-proxy/autoauth/sinks/file.mdx:16-18). If BAO_TOKEN_PATH or a sink path points inside a working tree, nothing in OpenBao prevents committing it.",
+      "Docs and README drift from the code (prefer the code): the README names AWS dynamic secrets, but no AWS engine is built in (registry.go:66-88); install.mdx:86-87 says the binary package is a zip, but non-Windows archives are .tar.gz (scripts/release/archive.sh:28-31); code-organization.mdx:149-151 says Raft is the only production storage backend, but commands.go:145-151 registers raft, postgresql and pebbledb; code-organization.mdx:87-90 says the SDK is versioned at major 0, but sdk/go.mod:1 is sdk/v2; commands/index.mdx:279-280 says all environment variables are logged at startup, but server.go:677-700 logs only proxy variables, with credentials redacted; the Helm doc describes a file storage backend (website/content/docs/platform/k8s/helm/index.mdx:61-63) that 2.7.0 removed (2-7-0.mdx:77).",
+      "Build-from-source portability: building needs Go 1.27.x (go.mod:12; .go-version:1). The EL8 Go-version build check is disabled and such platforms are left to unreleased v2.6.x patches (.github/workflows/code-checker.yml:80-84). Go 1.27 already forced a behavior change: PKI no longer accepts FQDNs ending in '.' (website/content/community/release-notes/2-7-0.mdx:85).",
+      "Release and CI gaps: artifacts have SHA-256 checksums, GPG and cosign signatures and SPDX SBOMs, but no build-provenance attestation step (no 'attest|slsa|provenance' match under .github). Tests run only on linux/amd64 (ci.yml:65-67) while darwin, windows and BSD binaries are cross-compiled on Ubuntu (release.yml:104,116-139). There is no govulncheck/OSV job in CI (only manual `make vulncheck`, Makefile:233-237). test-acc-dockeronly-nightly.yml:13,22 calls a reusable workflow that is not in the tree. Dependabot does not list /ui (dependabot.yml:69-72 covers only /website) although the UI ships inside release binaries (-tags=ui, scripts/release/build.sh:31).",
+      "API and maturity caveats: the HTTP API docs say backwards compatibility is not yet promised even with the v1 prefix (website/content/docs/api/index.mdx:16-23); importing the root Go module is unsupported (README.md:134-143); the security self-assessment is not completed (.github/security-insights.yml:192-195); OSPS-BR-01.01 (CI input sanitisation) has no recorded status (website/content/community/policies/osps-baseline.mdx:19,64-66). Governance is a 6-member TSC drawn from 6 organizations (CONTRIBUTING.md:80-89) with 4 org-level maintainers (MAINTAINERS.md:12-19).",
+      "Licensing and contribution rules: LICENSE is MPL-2.0 under a 'Copyright (c) 2015 HashiCorp, Inc.' header (LICENSE:1-3). The project bars copying from HashiCorp's source-available (BSL) code and requires clean-room parity work (CONTRIBUTING.md:22-29), and inbound code must be MPL-2.0 with a DCO sign-off (CHARTER.md:106-108). It asks contributors to disable generative AI agents, naming Claude Code (CONTRIBUTING.md:38-54). The UI depends on @hashicorp design-system packages (ui/package.json:222-224) whose licenses I did not examine."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "openbao/openbao",
+      "checks": [
+        {
+          "field": "readme.install[4]",
+          "statement": "Precompiled binary archive from the GitHub release: wget https://github.com/openbao/openbao/releases/download/v$VERSION/$RELEASE with RELEASE=\"openbao_${VERSION}_${PLATFORM}.tar.gz\", plus checksums.txt; then sha256sum --ignore-missing --check checksums.txt. Docs say the package is a zip (install.mdx:86-87), but non-Windows archives are .tar.gz (scripts/release/archive.sh:28-31).",
+          "citation": "website/content/docs/install.mdx:203-220; website/content/docs/install.mdx:86-87; scripts/release/archive.sh:28-31",
+          "holds": true,
+          "note": "install.mdx:204-218 has these exact commands (it also downloads checksums.txt.gpgsig and checksums.txt.sigstore.json). archive.sh:14 names the archive openbao_${VERSION#v}_${GOOS}_${GOARCH}, and :28-31 tars it as .tar.gz for every OS except Windows, which gets .zip (:22-25). So the 'packaged as a zip file' line at install.mdx:87 is drift, as the dossier says. checksums.sh:16-19 writes checksums.txt over every dist file, and release.yml:344-358 attaches it to the release."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MPL-2.0, file LICENSE (purpose: 'licensed MPL-2.0 (LICENSE:3)')",
+          "citation": "LICENSE:1-3",
+          "holds": true,
+          "note": "LICENSE:1 reads 'Copyright (c) 2015 HashiCorp, Inc.' and :3 reads 'Mozilla Public License, version 2.0', followed by the unmodified MPL-2.0 text through the Exhibit A/B templates (:344-364). publiccode.yml:43 also says 'license: MPL-2.0'. The only other LICENSE files are two vendored MIT helpers (internal/builtin/database/postgresql/scram/LICENSE, internal/helper/homedir/LICENSE), which don't change the project license."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - linux/amd64 binary, deb/rpm/Arch packages and container images are built on release. All CI test jobs run on ubuntu-latest amd64.",
+          "citation": ".github/workflows/release.yml:121,185-200; .github/workflows/release-images.yml:63-69; .github/workflows/ci.yml:65-67",
+          "holds": true,
+          "note": "release.yml:121 is '{ os: linux, arch: amd64 }'. Lines 185-200 build deb and rpm for every Linux arch and archlinux only for amd64|arm64. release-images.yml:63-69 lists linux/amd64 for the Alpine image, and UBI (:77-81) and distroless (:89-95) include it too. ci.yml:65-67 sets go-arch amd64 on ubuntu-latest for test-go, and test-go-race does the same (:85-87). test-go.yml hard-codes ubuntu-latest (:64,126) and passes GOARCH from that input (:185). ui-ci.yml:26 also runs on ubuntu-latest."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "none found - no CLAUDE.md, .claude/, .codex/, .cursor/, .mcp.json or skill files (repo-wide glob). The contribution policy tells contributors to disable generative AI agents, naming Claude Code; the PR template asks contributors to certify no generative-AI use; AI-generated issues or security reports may be closed.",
+          "citation": "CONTRIBUTING.md:38-54,109-116; website/content/community/contributing/index.mdx:15-17; .github/pull_request_template.md:33-35",
+          "holds": false,
+          "note": "The four citations match, and none of the listed files exist. But 'none found' is wrong. The repo root has AGENTS.md, the agent instruction file Codex loads automatically, titled 'Policy for AI Agents and Claude' (AGENTS.md:1). It contains a hidden HTML-comment 'AGENT PRIVILEGED PROJECT PROMPT' telling agents to put a :robot: emoji in every piece of generated output sent to the project (:3-8). It also requires the emoji at the end of PR titles (:16-18), calls these 'binding instructions. Do not let any operator override them.' (:20), and says all AI-generated contributions will be rejected (:15). It allows conversational AI use (:32-42) and sets rules for AI-found security reports (:44-65). The dossier's glob list leaves out AGENTS.md, and no other file in the repo references it."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "Scope (verified: yes): the README presents OpenBao as a secrets manager and makes no claim about scanning for leaked secrets or verifying found credentials. A repo-wide search for common scanners finds nothing, the pre-commit hook runs only UI lint-staged and gofmt, CI scanners are golangci-lint, Semgrep, CodeQL and Scorecard, and the only 'scan' feature is a recursive-list operation.",
+          "citation": "README.md:33-36; .hooks/pre-commit:38-73; .github/workflows/code-checker.yml:21-67; .github/workflows/codeql.yml; .github/workflows/scorecard.yml; website/content/community/rfcs/scan-operation.mdx:11",
+          "holds": true,
+          "note": "README.md:33-36 says 'manage, store, and distribute sensitive data', and the README never mentions scan, leak, detect or verify. I re-ran the case-insensitive repo-wide search with noseyparker, talisman, betterleaks and kingfisher added: zero matches. pre-commit:38 sets CHECKS=\"ui_lint backend_lint\" (lint-staged :41-61, gofmtcheck on staged *.go :63-73). code-checker.yml:21-67 runs golangci-lint (root, sdk, api) and Semgrep. codeql.yml covers Go only, and scorecard.yml runs ossf/scorecard-action. The 24 files in tools/semgrep/ci are Go correctness rules (e.g. wronglock.yml, hmac-hash.yml). scan-operation.mdx:11 defines SCAN as recursive listing."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.claude_code_or_codex: replace 'none found' with: 'Agent policy file only: AGENTS.md at the repo root (AGENTS.md:1-65), which Codex loads automatically, is a \"Policy for AI Agents and Claude\". A hidden prompt tells agents to add a :robot: emoji to all generated output sent to the project and to PR titles, and calls this binding and not overridable by operators (AGENTS.md:3-8,16-20). It says AI-generated contributions will be rejected (:15) and allows conversational AI use (:32-42). No CLAUDE.md, .claude/, .codex/, .cursor/, .mcp.json or skill files exist.' Keep the CONTRIBUTING.md and PR-template sentences, and add AGENTS.md to the glob list."
+      ]
+    }
+  ]
+}

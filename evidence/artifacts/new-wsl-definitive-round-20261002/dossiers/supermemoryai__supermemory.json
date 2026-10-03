@@ -1,0 +1,341 @@
+{
+  "contender": "supermemoryai/supermemory",
+  "revision": {
+    "contender": "supermemoryai/supermemory",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "supermemoryai/supermemory",
+        "tag": "server-v0.0.8",
+        "commit": "5d2b5855fe492a3682a1cde4a255e2db0c4db595",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "server-v0.0.8",
+    "commit": "5d2b5855fe492a3682a1cde4a255e2db0c4db595",
+    "read_at": "2026-10-02T03:02:48+00:00"
+  },
+  "dossier": {
+    "contender": "supermemoryai/supermemory",
+    "revision": {
+      "tag": "server-v0.0.8",
+      "commit": "5d2b5855fe492a3682a1cde4a255e2db0c4db595",
+      "read_at": "2026-10-02T03:02:48+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Memory/context layer for AI agents: extracts facts from content into versioned memories grouped under container tags ('spaces'), keeps user profiles, and serves hybrid memory+RAG search, connectors and file processing. Offered as a hosted API/console (api.supermemory.ai), a hosted OAuth MCP server, client plugins (Claude Code, Codex, OpenCode, OpenClaw, Hermes, Cursor) and, per docs, a self-hosted single binary `supermemory-server` on port 6767 (README.md:43-45, 321-335; apps/docs/self-hosting/overview.mdx:8). This repo is a Turbo/Bun monorepo with the web console, the MCP Cloudflare Worker, browser and Raycast extensions, TypeScript and Python SDK-integration packages, the Mintlify docs and a Claude skill. The backend API/memory engine, the self-hosted server, the `supermemory` SDK/CLI, the installer script and the Claude Code and Codex plugins are NOT in this tree.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Supermemory is the memory and context layer for AI; '#1 on LongMemEval, LoCoMo, and ConvoMem'.",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "It 'automatically learns from conversations, extracts facts, builds user profiles, handles knowledge updates and contradictions, forgets expired information, and delivers the right context at the right time'.",
+          "citation": "README.md:45"
+        },
+        {
+          "claim": "'Once installed, Supermemory runs in the background': you talk to your AI normally, it extracts and stores facts, preferences and project context, and the next conversation already knows you.",
+          "citation": "README.md:165-171"
+        },
+        {
+          "claim": "'Memory is scoped with projects (container tags) so you can separate work and personal context, or organize by client, repo, or anything else.'",
+          "citation": "README.md:173"
+        },
+        {
+          "claim": "'Supermemory comes built with Plugins for Claude Code, OpenCode, OpenClaw, and Hermes' that are 'implementations of the supermemory API, and they are open source' (links to separate repos claude-supermemory, opencode-supermemory, openclaw-supermemory, hermes-agent; Codex is not named).",
+          "citation": "README.md:124-135"
+        },
+        {
+          "claim": "MCP server at https://mcp.supermemory.ai/mcp; tools table lists `memory` (save or forget), `recall` (search plus profile summary) and `context` ('In Cursor and Claude Code, just type /context').",
+          "citation": "README.md:139-163"
+        },
+        {
+          "claim": "Supported clients: Claude Desktop, Cursor, Windsurf, VS Code, Claude Code, OpenCode, OpenClaw, Hermes (Codex not listed); 'The MCP server is open source'.",
+          "citation": "README.md:177-179"
+        },
+        {
+          "claim": "Local: 'State-of-the-art memory, on your machine. One binary. Zero config. Bring any model - or run fully offline with Ollama.'",
+          "citation": "README.md:94-98"
+        },
+        {
+          "claim": "Install with `curl -fsSL https://supermemory.ai/install | bash` or `npx supermemory local`, then run `supermemory-server`; first boot sets up the embedded graph engine, local embeddings and credentials, prints an API key, and the full Memory API runs at http://localhost:6767.",
+          "citation": "README.md:325-335"
+        },
+        {
+          "claim": "Bring any model (OpenAI, Anthropic, Gemini, Groq or OpenAI-compatible endpoint); local `Xenova/bge-base-en-v1.5` embeddings by default (no API key); fully offline with Ollama so 'nothing leaves your machine'.",
+          "citation": "README.md:344-346"
+        },
+        {
+          "claim": "'Your data, one directory - everything lives in ./.supermemory, easy to back up or move.'",
+          "citation": "README.md:347"
+        },
+        {
+          "claim": "'Same API as the platform - prototype locally, ship on the hosted platform by changing baseURL.'",
+          "citation": "README.md:348"
+        },
+        {
+          "claim": "'Automatic forgetting': temporary facts expire after the date passes, contradictions are resolved automatically, 'noise never becomes permanent memory'.",
+          "citation": "README.md:403"
+        },
+        {
+          "claim": "LongMemEval: 95% Recall@15 adding ~720 tokens (99.4% context reduction); SMFS uses 3.0x fewer tokens on Claude (24M vs 72M) and 1.75x fewer on Codex across the 110-question xAFS benchmark.",
+          "citation": "README.md:364-366"
+        }
+      ],
+      "install": [
+        {
+          "method": "Self-hosted server via installer script (docs: macOS Apple Silicon/Intel, Linux x64/arm64)",
+          "command": "curl -fsSL https://supermemory.ai/install | bash",
+          "citation": "README.md:97 (also README.md:326; apps/docs/self-hosting/quickstart.mdx:13,28)"
+        },
+        {
+          "method": "Self-hosted server via npx (docs also show bunx supermemory local)",
+          "command": "npx supermemory local",
+          "citation": "README.md:328 (bunx: apps/docs/self-hosting/quickstart.mdx:22)"
+        },
+        {
+          "method": "Claude Code plugin from separate repo supermemoryai/claude-supermemory (requires Node.js 18+); run inside Claude Code",
+          "command": "/plugin marketplace add supermemoryai/claude-supermemory  then  /plugin install supermemory",
+          "citation": "apps/docs/integrations/claude-code.mdx:24-31"
+        },
+        {
+          "method": "Codex CLI plugin from separate repo supermemoryai/codex-supermemory (copies scripts to ~/.codex/supermemory, enables codex_hooks, registers hooks, installs skills)",
+          "command": "npx codex-supermemory@latest install",
+          "citation": "apps/docs/integrations/codex.mdx:19-30"
+        },
+        {
+          "method": "TypeScript/Python SDK for the hosted or local API",
+          "command": "npm install supermemory    # or: pip install supermemory",
+          "citation": "README.md:204"
+        },
+        {
+          "method": "SMFS filesystem-mount binary (docs: macOS arm64/x64, Linux arm64/x64; installs to ~/.local/bin)",
+          "command": "curl -fsSL https://smfs.ai/install | bash",
+          "citation": "apps/docs/smfs/install.mdx:11-14"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - docs list Linux (x64 & arm64) for the self-hosted binary (apps/docs/self-hosting/quickstart.mdx:28); the Claude Code plugin hooks are Node 18+ scripts (apps/docs/integrations/claude-code.mdx:24). Binary and installer source are not in this repo, so this is documentation-only.",
+        "wsl2": "unknown - no mention of WSL or Windows Subsystem anywhere in the tree (grep); docs list only macOS and Linux for the binary (apps/docs/self-hosting/quickstart.mdx:28).",
+        "macos_arm64": "yes - docs list macOS (Apple Silicon & Intel) for the binary (apps/docs/self-hosting/quickstart.mdx:28); SMFS lists macOS arm64 (apps/docs/smfs/install.mdx:14). Documentation-only.",
+        "gpu": "unknown - no GPU requirement or acceleration statement for the server; local embeddings are tuned via worker pool and WASM threads (apps/docs/self-hosting/configuration.mdx:79-87); a GPU is mentioned only for a user-run Ollama LLM (apps/docs/self-hosting/providers.mdx:24)."
+      },
+      "integrations": {
+        "cli": "No CLI source in this repo (no bin field in any package.json). Documented CLIs: `supermemory-server` / `npx supermemory local` (README.md:325-333); `npx supermemory` with setup, add, search, profile, docs, tags, config, whoami (apps/docs/agents-and-mcp.mdx:14-42); plugin CLI `npx codex-supermemory@latest install|status|uninstall` (apps/docs/integrations/codex.mdx:20,116,122); `smfs` mount binary (apps/docs/smfs/install.mdx:11-36).",
+        "mcp": "Yes - apps/mcp, a Cloudflare Worker (Hono, MCP SDK v2) at https://mcp.supermemory.ai/mcp using OAuth (no API key), stateless per-request server, modern MCP 2026-07-28 plus stateless compatibility for 2025 clients (apps/mcp/README.md:8-9,24-43). Model-visible tools: search_memory, add_memory (action save|forget), listDocuments, getDocument, listMemories, listSpaces, whoAmI; app launchers select-space, memory-graph, guided-save, upload-file; app-only set-active-tag, save-memory, prepare-file-upload, fetch-graph-data; prompt `context`; resources supermemory://profile and supermemory://spaces (apps/mcp/README.md:45-90; apps/mcp/src/server/tools/index.ts:18-34). Docs say the MCP is platform-only, not in the self-hosted binary (apps/docs/self-hosting/configuration.mdx:127-134). A separate docs-search MCP exists at https://supermemory.ai/docs/mcp (apps/docs/agents-and-mcp.mdx:58-66).",
+        "sdk_or_api": "HTTP API (v3 documents/search, v4 search/profile/memories) at https://api.supermemory.ai or http://localhost:6767 with Bearer API key (apps/docs/api-reference/overview.mdx:11-27; README.md:335). Scoped API keys can be limited to container tags (apps/docs/authentication.mdx:59-67). `supermemory` SDK on npm/PyPI (README.md:204; its source is not in this repo). In-repo packages: @supermemory/tools 2.1.1 (AI SDK, OpenAI, Mastra, VoltAgent, Claude memory tool; packages/tools/package.json:4,49-57), @supermemory/ai-sdk 1.0.8, @supermemory/memory-graph 0.2.3, Python supermemory-openai-sdk 1.0.5, supermemory-agent-framework 1.0.0, supermemory-cartesia 0.1.1, supermemory-pipecat 0.1.1.",
+        "claude_code_or_codex": "Claude Code: plugin in separate repo supermemoryai/claude-supermemory; hooks run as Node 18+ scripts; reasoned recall, auto-capture of conversations and important tool usage, team/project memory; commands /supermemory:index, project-config, logout, session, status; key env SUPERMEMORY_CC_API_KEY (apps/docs/integrations/claude-code.mdx:16-100). Codex: plugin in separate repo supermemoryai/codex-supermemory; registers UserPromptSubmit (recall) and Stop (flush) hooks in ~/.codex/hooks.json, enables codex_hooks in ~/.codex/config.toml, skills supermemory-search/save/forget/profile/status/login/logout; key env SUPERMEMORY_CODEX_API_KEY (apps/docs/integrations/codex.mdx:8-102). Both can instead use the remote MCP: Claude Code via ~/.claude.json or .mcp.json, Codex via ~/.codex/config.toml [mcp_servers.supermemory] with npx mcp-remote (apps/web/lib/mcp-manual-instructions.ts:28-31,67-74,101-108). Both plugin docs say they can target the self-hosted server through a base URL (apps/docs/integrations/codex.mdx:14,149; apps/docs/integrations/claude-code.mdx:19,137). The web console parses Claude Code/Codex session and save documents and groups agent spaces per project (apps/web/lib/plugin-document.ts:13-27; apps/web/lib/agent-space.ts:252-256). No plugin source is in this repo. skills/supermemory is a Claude skill that teaches API usage, not a memory plugin (skills/supermemory/README.md:18-25). SMFS can mount a container for Claude Code (apps/docs/smfs/overview.mdx:32-34)."
+      },
+      "telemetry_and_network": "Self-hosted binary: docs say it 'sends no analytics' and the only switch is SUPERMEMORY_DISABLE_TELEMETRY=1 for AI-SDK telemetry instrumentation (apps/docs/self-hosting/configuration.mdx:119-125); it may print an 'update available' notice at startup (apps/docs/self-hosting/quickstart.mdx:50), implying a version check with an undocumented endpoint; the installer and `supermemory-server upgrade` download binaries (quickstart.mdx:28,47). It needs one LLM provider (OpenAI, Anthropic, Gemini, Groq, Workers AI, Vertex or any OpenAI-compatible endpoint incl. local Ollama), so content goes to that provider unless it is local (configuration.mdx:19-58); embeddings are local by default and 'nothing is sent off-box to embed' (apps/docs/self-hosting/embeddings.mdx:14-19); image, video and high-fidelity PDF need a Gemini or Vertex key (configuration.mdx:38-40). Bind address and TLS are not documented (only http://localhost:6767 appears). None of this is verifiable here because the server source is absent. Hosted path: needs a Supermemory account and network access to api.supermemory.ai (README.md:116; apps/docs/api-reference/overview.mdx:11-27); the MCP does OAuth against api.supermemory.ai (apps/mcp/README.md:131; apps/mcp/src/server/auth/index.ts:17-19,55-66) and, only when POSTHOG_API_KEY is set, sends PostHog 'mcp_tool_executed' events with user id, org, tool name, outcome, duration and client name/version, no content (apps/mcp/src/server/analytics.ts:75-127; apps/mcp/README.md:134-135); Cloudflare observability is enabled for the Worker (apps/mcp/wrangler.jsonc:49-51). Web console: PostHog with a hard-coded project key proxied via /orange that identifies users by email and name, plus Sentry with 100% trace sampling and session replay (packages/lib/posthog.tsx:45-66; apps/web/instrumentation-client.ts:25-51). Browser extension: PostHog identify with email/name and host permissions for claude.ai, chatgpt.com, x.com and others (apps/browser-extension/utils/posthog.ts:4-26; apps/browser-extension/wxt.config.ts:33-49). Plugin browser auth: the web page calls hosted /v3/auth/key and redirects the key in a URL query string to a localhost /callback (apps/web/app/auth/connect/page.tsx:17-28,275-306). Plugins (source external) send conversation turns and tool activity to the configured API base URL, default https://api.supermemory.ai, overridable by SUPERMEMORY_API_URL or baseUrl (apps/docs/integrations/codex.mdx:14,64-72,149; apps/docs/integrations/claude-code.mdx:74-77,128; apps/web/components/integrations-view.tsx:675-691)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript/TSX (Next.js 16, Cloudflare Workers, WXT extension, React; the large majority of files)",
+        "Python (4 SDK-integration packages plus docs-test snippets)",
+        "MDX/Markdown (Mintlify docs under apps/docs)"
+      ],
+      "entry_points": [
+        {
+          "path": "apps/mcp/src/server/index.ts",
+          "what": "Cloudflare Worker main (apps/mcp/wrangler.jsonc:7): Hono app with /mcp, /upload/:uploadId and /.well-known/oauth-* routes; exports the SpaceState Durable Object."
+        },
+        {
+          "path": "apps/mcp/src/server/server.ts",
+          "what": "createSupermemoryServer builds a fresh McpServer per request and registers 15 tools, 4 resources and the `context` prompt, wrapped by PostHog analytics."
+        },
+        {
+          "path": "apps/web/app/auth/connect/page.tsx",
+          "what": "Web-console page used by plugin browser auth: mints an API key via hosted /v3/auth/key and redirects it to a localhost /callback; the rest of apps/web/app is the Next.js console deployed with opennextjs-cloudflare."
+        },
+        {
+          "path": "apps/browser-extension/entrypoints/background.ts",
+          "what": "WXT browser-extension background script; content scripts for claude.ai, chatgpt.com, gemini, grok, t3.chat and x.com live under entrypoints/content/."
+        },
+        {
+          "path": "packages/tools/src/index.ts",
+          "what": "@supermemory/tools library entry; subpath exports ai-sdk, claude-memory, mastra, openai, voltagent (packages/tools/package.json:49-57)."
+        },
+        {
+          "path": "packages/openai-sdk-python/src/supermemory_openai/__init__.py",
+          "what": "Python library entry (siblings: agent-framework-python, cartesia-sdk-python, pipecat-sdk-python); no console scripts in any pyproject."
+        },
+        {
+          "path": "apps/raycast-extension/package.json",
+          "what": "Raycast commands add-memory, search-memories, search-projects (lines 21-43); requires an API key preference."
+        },
+        {
+          "path": "(not in repository) supermemory-server / npx supermemory local",
+          "what": "The README's main self-hosted entry point (README.md:325-333) has no source, bin entry, installer script or release workflow in this tree."
+        }
+      ],
+      "architecture": "Turbo + Bun monorepo (package.json:3-22). apps/web: Next.js 16 / React 19 console deployed to Cloudflare via OpenNext (apps/web/wrangler.jsonc:3; apps/web/package.json:16-18); talks only to the hosted API via NEXT_PUBLIC_BACKEND_URL (apps/web/.env.example:1); holds plugin catalog, agent-space grouping and plugin-document parsing (apps/web/lib/plugin-catalog.ts, agent-space.ts, plugin-document.ts) and the plugin key-mint page. apps/mcp: Cloudflare Worker with JWT validation against the API issuer's JWKS (src/server/auth/index.ts), per-request McpServer (server.ts), tools (src/server/tools/*.ts), SupermemoryClient wrapping the `supermemory` SDK plus direct fetch to /v3 and /v4 (src/server/client/index.ts), per-container-tag RBAC (auth/rbac.ts), Durable Object SpaceState for the active space and upload sessions (space-state.ts), PostHog analytics (analytics.ts) and a React MCP-App widget (src/widget). Other apps: browser-extension (WXT), raycast-extension, docs (Mintlify; the only description of the local server, plugins and forget semantics), memory-graph-playground. packages: tools, ai-sdk, memory-graph (canvas graph React lib), internal @repo/lib, ui, hooks, validation (validation/schemas.ts:242-278 defines the memory entry model: version, isLatest, parent/rootMemoryId, isInference, isForgotten, forgetAfter, forgetReason), plus four Python integration packages. skills/supermemory is a Claude skill (Apache-2.0). Absent from the tree: backend API and memory engine (CLAUDE.md:37-46 describes an API app; code comments point to a separate 'mono' repo with apps/api: apps/web/lib/ingest-auto-space.ts:6-10, apps/web/lib/plugin-catalog.ts:24, apps/web/lib/oauth-plugins.ts:1), self-hosted server, SDK/CLI, installer, Claude Code and Codex plugins.",
+      "packaging_and_release": "No artifact for the self-hosted server is built here: none of the 11 workflows in .github/workflows builds a binary, a server-v* GitHub Release, checksums, signatures or attestations. Docs only say releases are GitHub Releases tagged server-vVERSION, the installer 'detects your OS and architecture, downloads the right binary, verifies it', pinning works via `... | bash -s -- 0.0.3`, and `supermemory-server upgrade` updates in place (apps/docs/self-hosting/quickstart.mdx:28,30-47). Libraries: npm packages @supermemory/tools, @supermemory/ai-sdk and @supermemory/memory-graph publish on push to main when their package.json version changes, via `npm publish --access public --provenance` with OIDC id-token: write (.github/workflows/publish-tools.yml:3-9,18-20,43-63; publish-ai-sdk.yml:63; publish-memory-graph.yml:63); four Python packages (openai-sdk, agent-framework, cartesia, pipecat) build with hatchling and publish to PyPI through pypa/gh-action-pypi-publish with OIDC (publish-openai-sdk-python.yml:18-20,36-42 and the three sibling workflows), with no explicit checksum or signing step. Web console and MCP Worker deploy via `opennextjs-cloudflare deploy` and `wrangler deploy --minify` scripts (apps/web/package.json:17; apps/mcp/package.json:16) with no deploy workflow in the repo. The browser extension is zipped with `wxt zip` (apps/browser-extension/package.json:13-14); Raycast publishes via `npx @raycast/api@latest publish` (apps/raycast-extension/package.json:72). Claude Code and Codex plugins are distributed from their own repos (plugin marketplace / npx) and are not in this tree.",
+      "tests_and_ci": "Frameworks: Vitest (apps/mcp/vitest.config.ts; packages/tools, packages/ai-sdk, packages/memory-graph), bun:test (apps/web/lib 6 files, apps/browser-extension/utils 3, packages/validation 1; those package.json files declare no test script), pytest (Python packages; pytest ini in openai-sdk and agent-framework pyproject), and 13 doc-snippet scripts run with `bun run run.ts` that need API keys (packages/docs-test/package.json:7-13). About 57 test files: 46 TypeScript (mcp 12 = 8 e2e in apps/mcp/e2e + 4 unit in apps/mcp/src/server; web 6; extension 3; memory-graph 12; tools 11; ai-sdk 1; validation 1) and 11 Python (agent-framework 6, openai-sdk 3, cartesia 1, pipecat 1). MCP e2e tests use stored OAuth credentials and otherwise skip (apps/mcp/README.md:118-125; apps/mcp/e2e/memory.test.ts:12). CI is 11 workflow files. ci.yml runs on pull_request only: `bun install --frozen-lockfile`, `turbo run check-types` filtered to @supermemory/ai-sdk and @supermemory/memory-graph, and `biome ci --changed` (ci.yml:3-33); no workflow runs any test runner. claude-auto-fix-ci.yml (on CI failure a Claude agent with contents: write and Bash(*) pushes fixes to the PR branch; lines 9-14,70-92), claude-code-review.yml (Claude review on same-repo PRs; lines 16-29), claude.yml (@claude mentions by owners/members/collaborators; lines 15-43), and 7 publish-*.yml (see packaging_and_release).",
+      "dependencies": "Direct dependency counts (dependencies / devDependencies): package.json (root, bun workspace, packageManager bun@1.3.6) 33 / 8; apps/web/package.json 94 / 12; apps/mcp/package.json 21 / 11; apps/browser-extension/package.json 7 / 7; apps/raycast-extension/package.json 2 / 6 (own package-lock.json, excluded from workspaces); apps/docs/package.json 1 / 3; apps/memory-graph-playground/package.json 4 / 7; packages/tools/package.json 7 / 10 (+2 peer); packages/ai-sdk/package.json 4 / 5; packages/memory-graph/package.json 1 / 10 (+2 peer); packages/lib/package.json 13 / 0; packages/ui/package.json 32 / 0; packages/docs-test/package.json 9 / 0; packages/validation and packages/hooks 0 / 0; packages/tools/test/chatapp/package.json 10 / 8. Python: packages/openai-sdk-python/pyproject.toml 4 (+1 optional extra) / 7 dev; agent-framework-python 3 / 7; cartesia-sdk-python 4 / 5 (also requirements.txt 4); pipecat-sdk-python 4 / 5; packages/docs-test/requirements.txt 5. Lockfiles: bun.lock (CI uses bun install --frozen-lockfile, ci.yml:27), apps/mcp/pnpm-lock.yaml, apps/raycast-extension/package-lock.json, packages/openai-sdk-python/uv.lock, packages/tools/test/chatapp/bun.lock. Notable: the `supermemory` SDK is a dependency but its source is external; versions are split across ^4.0.0 (apps/mcp/package.json:41), ^3.0.0-alpha.26 (packages/tools/package.json:19, packages/ai-sdk/package.json:16) and 3.10.0 (apps/docs/package.json:17); the self-hosted server's own dependencies are not visible in this tree.",
+      "security_policy": "none found - no SECURITY.md in the repo root or .github (glob **/SECURITY* returns nothing; .github contains only the 11 workflow files); CONTRIBUTING.md has no vulnerability-reporting section (only general help contacts, CONTRIBUTING.md:283-288). Product-level compliance claims (SOC 2 Type II, GDPR, HIPAA BAA, encryption) are on apps/docs/overview/security.mdx:12-35 with support@supermemory.com as the contact."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:94,323-335: 'One binary. Zero config.' - `supermemory-server` runs the full Memory API locally.",
+        "verified": "not_checkable",
+        "evidence": "No source for this binary exists in the tree: no bin field in any package.json, no shell/Rust/Go/C files, no server release workflow among the 11 files in .github/workflows, no server or api directory under apps/ or packages/. Only apps/docs/self-hosting/*.mdx describe it. Tag server-v0.0.8 (.git/packed-refs:2) resolves to a monorepo snapshot whose latest change is a web login button (apps/web/app/(auth)/login/page.tsx:595-643). Code comments say the backend lives in a separate 'mono' repo (apps/web/lib/ingest-auto-space.ts:6-10; apps/web/lib/plugin-catalog.ts:24)."
+      },
+      {
+        "claim": "README.md:346-347: fully offline with Ollama, 'nothing leaves your machine', and everything lives in ./.supermemory.",
+        "verified": "not_checkable",
+        "evidence": "Docs repeat the statements (apps/docs/self-hosting/overview.mdx:33-44; configuration.mdx:121; quickstart.mdx:161-166) but there is no server code to confirm them. Docs add caveats: image, video and high-fidelity PDF need a Gemini or Vertex key (configuration.mdx:38-40); the binary may print an 'update available' notice (quickstart.mdx:50); installer-saved keys live in ~/.supermemory/env, outside the data directory (configuration.mdx:10; quickstart.mdx:165-166); the default data dir ./.supermemory is relative to the working directory (configuration.mdx:17)."
+      },
+      {
+        "claim": "README.md:159-163: MCP tools are `memory`, `recall` and `context`.",
+        "verified": "partial",
+        "evidence": "Code differs from README (code preferred): apps/mcp registers add_memory (action save|forget; tools/add-memory.ts:13,18), search_memory (tools/search-memory.ts:22), listDocuments, getDocument, listMemories, listSpaces, whoAmI plus app tools (tools/index.ts:18-34); no tool named `memory` or `recall` exists. `context` is an MCP prompt, not a tool, returning up to 8 stable plus 8 recent facts and 3 recent spaces (prompts/context.ts:12-13,20-23), not the 'full profile'. apps/docs/supermemory-mcp/mcp.mdx:47-55 matches the code, so the README table is stale. Whether Claude Code exposes the prompt as '/context' is not checkable here."
+      },
+      {
+        "claim": "README.md:124-135,177: plugins for Claude Code, OpenCode, OpenClaw, Hermes are open source in linked repos; supported clients are listed (Codex absent).",
+        "verified": "partial",
+        "evidence": "No plugin source is in this tree (no hooks.json, .claude-plugin or marketplace.json; the only file mentioning UserPromptSubmit or codex_hooks is apps/docs/integrations/codex.mdx). Only docs and web UI references exist. The README omits the Codex plugin, but docs (apps/docs/integrations/codex.mdx:8-30) and the web catalog (apps/web/lib/plugin-catalog.ts:61-83) include it, and the web UI also lists 'Codex (MCP)' and 'Claude Code (MCP)' clients (apps/web/components/integrations-view.tsx:264-277)."
+      },
+      {
+        "claim": "README.md:173: memory is scoped with projects (container tags).",
+        "verified": "yes",
+        "evidence": "Every MCP tool resolves a space as explicit containerTag, else the account's durable active space (Durable Object keyed by org+user), else sm_project_default (apps/mcp/src/server/space.ts:3-14; server.ts:63-73; client/index.ts:18,186; apps/mcp/README.md:15-22) and passes it to the API on add, forget, search, profile and list calls (client/index.ts:193-196,213-216,279-285,431-444). Per-tag read/write permission logic is in auth/rbac.ts:3-34. An e2e isolation test exists but needs OAuth credentials (apps/mcp/e2e/memory.test.ts:85-100). Server-side enforcement lives in the backend, which is not in this tree."
+      },
+      {
+        "claim": "README.md:179: 'The MCP server is open source'.",
+        "verified": "partial",
+        "evidence": "Source is in apps/mcp under the repo's MIT license (apps/mcp/src/server/index.ts). But it only works against the hosted API and OAuth issuer: API_URL defaults to https://api.supermemory.ai and tokens are verified against that issuer's JWKS (apps/mcp/src/server/index.ts:15,58-69; auth/index.ts:17-19,55-66). Docs say the MCP is platform-only and not included in the self-hosted binary (apps/docs/self-hosting/configuration.mdx:127-134; overview.mdx:70)."
+      },
+      {
+        "claim": "README.md:45,403: forgets expired information; contradictions are resolved automatically; noise never becomes permanent.",
+        "verified": "partial",
+        "evidence": "The extraction/forgetting engine is not in this tree; only the data model and UI are. Memory entries carry version, isLatest, parentMemoryId, rootMemoryId, isInference, isForgotten, forgetAfter, forgetReason (packages/validation/schemas.ts:250-266) and the web UI shows memories as latest, static, expiring or forgotten (apps/web/components/document-modal/graph-list-memories.tsx:293-299). Docs describe time-based forgetting and contradiction handling (apps/docs/concepts/graph-memory.mdx:136-142)."
+      },
+      {
+        "claim": "README.md:348: same API as the platform; switch by changing baseURL.",
+        "verified": "partial",
+        "evidence": "Clients accept a base URL (apps/mcp/src/server/client/index.ts:179-184; plugin docs apps/docs/integrations/codex.mdx:149 and claude-code.mdx:128,137), but compatibility cannot be tested because the server is absent. Docs themselves list differences: no MCP, no connectors, single auto-generated API key, server logs only (apps/docs/self-hosting/local-vs-enterprise.mdx:14-25; overview.mdx:63-72). @supermemory/tools pins SDK v3, which lacks memories.forget, so it calls DELETE /v4/memories directly (packages/tools/src/shared/forget-memory.ts:15-21; packages/tools/package.json:19) while the MCP uses SDK ^4 (apps/mcp/package.json:41)."
+      },
+      {
+        "claim": "README.md:32-34,360-366: #1 on LongMemEval, LoCoMo and ConvoMem; 95% Recall@15; SMFS 3.0x/1.75x token reduction.",
+        "verified": "not_checkable",
+        "evidence": "No benchmark code, datasets or results are in the tree. MemoryBench is a separate repo (apps/docs/memorybench/overview.mdx:8) and the write-ups are at supermemory.ai/research (not opened). The only in-repo sources are README/docs statements (README.md:360-366; apps/docs/overview/what-is-supermemory.mdx:96,125)."
+      },
+      {
+        "claim": "apps/mcp/README.md:139-140: 'SpaceState stores only the active space's container tag. It never stores bearer tokens, MCP client identity, or protocol messages.'",
+        "verified": "partial",
+        "evidence": "True for the space:ORG,USER instances (space-state.ts:26-34; space.ts:3-7), but the same SpaceState class also holds upload sessions in upload:ID instances that include the caller's bearerToken, kept until consumed or a 2-minute alarm (space-state.ts:7-10,36-45,56-63,70-72; server.ts:27,74-90). The README sentence is therefore inaccurate for upload sessions."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Self-reported leaderboard standing on LongMemEval, LoCoMo and ConvoMem",
+        "metric": "rank (no scores or run details given)",
+        "value": "#1 on each",
+        "source": "README.md:32,39,358-362",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval retrieval vs context size",
+        "metric": "Recall@15, tokens added, context reduction",
+        "value": "95% Recall@15 adding ~720 tokens = 99.4% context reduction (99.6% at @10, 99.8% at @5)",
+        "source": "README.md:364",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval recall by question category",
+        "metric": "recall per category",
+        "value": "Knowledge Updates 99%, Assistant recall 100%, User recall 97%, Multi-session 93%, Temporal Reasoning 91%, Preference 90%",
+        "source": "README.md:364",
+        "independent": false
+      },
+      {
+        "what": "SMFS (Supermemory Filesystem, a separate mount product) on the 110-question xAFS benchmark",
+        "metric": "tokens used",
+        "value": "3.0x fewer tokens on Claude (24M vs 72M); 1.75x fewer on Codex",
+        "source": "README.md:366 (write-ups at supermemory.ai/research, not opened)",
+        "independent": false
+      },
+      {
+        "what": "User-profile call latency",
+        "metric": "latency per profile call",
+        "value": "~50ms (marketing figure; no method or data in repo)",
+        "source": "README.md:33,295",
+        "independent": false
+      },
+      {
+        "what": "Managed-platform retrieval latency",
+        "metric": "p50 latency target (a target, not a measurement)",
+        "value": "~sub-300ms p50 for typical search workloads",
+        "source": "apps/docs/overview/security.mdx:71",
+        "independent": false
+      },
+      {
+        "what": "Claimed standing on third-party SWEContext benchmark (arXiv 2602.08316)",
+        "metric": "ranking claim only",
+        "value": "docs say 'the best' on independently run benchmarks such as SWEContext; no figure in repo; paper not opened, so unverified",
+        "source": "apps/docs/overview/what-is-supermemory.mdx:96,125",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap: the pinned tag server-v0.0.8 does not contain what its name and the README's main pitch describe. No source for supermemory-server, the curl|bash installer, the `supermemory` SDK/CLI (`npx supermemory local`), the backend API/memory engine, or the Claude Code and Codex plugins (no bin entries in any package.json, no shell/Rust/Go files, plugins live in separate repos, backend is referenced as a separate 'mono' repo: apps/web/lib/ingest-auto-space.ts:6-10; apps/web/lib/plugin-catalog.ts:24). The tag's latest change is a web login button (apps/web/app/(auth)/login/page.tsx:595-643). Every local-server statement (data dir, no analytics, offline, update check, storage format, license) is documentation-only and unverifiable here.",
+      "Install and update supply chain: install is `curl -fsSL https://supermemory.ai/install | bash`; docs say it 'verifies' the binary but name no checksum, signature or attestation, and neither the script nor any server release workflow is in this repo (11 workflow files, none for server-v* tags). `supermemory-server upgrade` self-updates and startup shows an update notice (apps/docs/self-hosting/quickstart.mdx:28,42-50). Plugins install with `npx codex-supermemory@latest` and register hooks that run on every Codex prompt and stop (apps/docs/integrations/codex.mdx:20,26-27,66-69); Claude Code hooks run as Node scripts (claude-code.mdx:24). The server line is pre-1.0 (docs example 0.0.3; quickstart.mdx:35,42) and docs warn an older server may not read data written by a newer one (quickstart.mdx:38-40).",
+      "Deletion, inspection and recovery are uneven: memory 'forget' is a soft delete (isForgotten=true; apps/docs/recall/memory-operations.mdx:124,170) with dryRun and forgetBatchId for bulk forget (memory-operations.mdx:176-287), but document deletes are 'permanent - no recovery' (apps/docs/ingestion/document-operations.mdx:258-260), space deletion and org 'Reset data' cannot be undone (apps/web/components/space-selector.tsx:869-870; apps/web/components/settings/settings-content.tsx:520-535), and the Claude memory tool backend hard-deletes documents (packages/tools/src/claude-memory.ts:480-493). The only documented un-forget is review `undo` for inferred memories (apps/docs/recall/memory-review.mdx:173-175). No export or backup API/UI was found (only 'you can always export' in apps/docs/overview/comparison.mdx:46); self-hosted recovery means copying the data directory (quickstart.mdx:161-166). Via MCP, listMemories hides forgotten and superseded entries (apps/mcp/src/server/tools/list-memories.ts:49-54; format.ts:79-81) and there is no document-delete tool. MCP forget tries an exact match, then forgets the top hit with similarity >= 0.85 (client/index.ts:208-267); add_memory (save and forget in one tool) is annotated destructive (tools/annotations.ts:9-14); the e2e test accepts 'No matching memory found' right after a save (apps/mcp/e2e/memory.test.ts:68-82).",
+      "Account/hosting dependence and plan gating: the MCP route needs a Supermemory account and the hosted API (OAuth issuer api.supermemory.ai; apps/mcp/README.md:131) and plugin browser auth mints keys at hosted /v3/auth/key (apps/web/app/auth/connect/page.tsx:275). The self-hosted binary has no MCP, connectors, team auth or dashboard, only server logs (apps/docs/self-hosting/configuration.mdx:127-136; local-vs-enterprise.mdx:14-25). Docs conflict on plan access: billing lists Plugins (Claude Code, Cursor, Hermes) as not on Free and Pro as $19/mo (apps/docs/overview/billing.mdx:175,185) while web code says all plugins are free-tier (apps/web/lib/plugin-catalog.ts:24-32); quota exhaustion surfaces as 402 'Memory limit reached' (apps/mcp/src/server/client/index.ts:489-491).",
+      "Shared scope across Claude Code and Codex is not verified: the two plugins use separate keys, config files and tag overrides (SUPERMEMORY_CC_API_KEY, ~/.supermemory-claude/settings.json, .claude/.supermemory-claude/config.json vs SUPERMEMORY_CODEX_API_KEY, ~/.codex/supermemory.json; apps/docs/integrations/claude-code.mdx:94-139; codex.mdx:32-60,81-90,129-157). Codex docs derive tags from a hashed git user.email and git common dir with prefix 'codex' (codex.mdx:74-79,154), while the web console groups canonical repo_SLUG__HASH and user_project_HASH tags plus legacy per-agent tags (apps/web/lib/agent-space.ts:40-75,252-256). Plugin source is absent, so the tags current plugin versions write cannot be confirmed here. The connect page can issue one key to several plugins at once (apps/web/app/auth/connect/page.tsx:105-109,290-301).",
+      "Capture content and latency: hook plugins send conversation turns and tool activity (edits, new files, shell commands) to the API (apps/docs/integrations/claude-code.mdx:74-77; apps/web/components/integrations-view.tsx:675-691; codex.mdx:64-72). Private-tag redaction is documented only for the Codex plugin (codex.mdx:72); Codex saves every 3 turns by default (codex.mdx:71,155). Extraction is asynchronous: default 'dreaming: dynamic' batches documents and memories can lag after status done (apps/docs/quickstart.mdx:117,228; concepts/how-it-works.mdx:116) and the local server queues adds (configuration.mdx:94), so a just-captured handoff may not be searchable as a memory immediately. Hosted surfaces add PostHog/Sentry telemetry (see telemetry_and_network); the self-hosted 'no analytics' claim is unverified.",
+      "Maintenance and quality signals: PR CI only type-checks two packages and runs Biome on changed files, and no workflow runs any of the ~57 test files (.github/workflows/ci.yml:27-33); MCP e2e tests skip without stored OAuth credentials (apps/mcp/README.md:124-125). Claude agent workflows with contents: write and Bash(*) push fixes to PR branches (.github/workflows/claude-auto-fix-ci.yml:9-14,85-92). Documentation drift: README MCP tool names (README.md:159-163 vs apps/mcp/src/server/tools/index.ts:18-34), CLAUDE.md describes an API app and IngestContentWorkflow that are not in the tree (CLAUDE.md:37-46,70), CONTRIBUTING.md lists packages that do not exist (CONTRIBUTING.md:68-70), apps/mcp/README.md:139-140 vs space-state.ts:36-45. SDK versions are split (supermemory ^4.0.0 in apps/mcp, ^3.0.0-alpha.26 in packages/tools and ai-sdk, 3.10.0 in apps/docs). No SECURITY.md.",
+      "Licensing/openness: root LICENSE is MIT (LICENSE:1-3) but skills/supermemory is Apache-2.0 (skills/supermemory/LICENSE:1-2; skills/supermemory/README.md:194-196). The self-hosted binary is called open source and linked to git.new/memory (apps/docs/self-hosting/overview.mdx:20) but its repository and license are not stated in this tree (link not opened); production extraction uses proprietary models and the hosted backend is not published here (overview.mdx:31)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "supermemoryai/supermemory",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Self-hosted server via installer script `curl -fsSL https://supermemory.ai/install | bash` (docs: macOS Apple Silicon/Intel, Linux x64/arm64).",
+          "citation": "README.md:97; README.md:326; apps/docs/self-hosting/quickstart.mdx:13,28",
+          "holds": true,
+          "note": "README.md:97 and README.md:326 have the exact command. quickstart.mdx:13 repeats it, and quickstart.mdx:28 says the installer 'detects your OS and architecture, downloads the right binary, verifies it' and lists 'macOS (Apple Silicon & Intel), Linux (x64 & arm64)'. As the dossier says, the installer script is not in the tree (no *.sh files)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE.",
+          "citation": "LICENSE:1-3",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', 'Copyright (c) 2025 supermemory'. Package LICENSE files (packages/tools, packages/openai-sdk-python, packages/agent-framework-python) and every license field in package.json/pyproject.toml are also MIT. The only exception is skills/supermemory/LICENSE (Apache License), which the dossier already discloses under risks."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - docs list Linux (x64 & arm64) for the self-hosted binary; Claude Code plugin hooks are Node 18+ scripts; binary and installer source are not in this repo, so documentation-only.",
+          "citation": "apps/docs/self-hosting/quickstart.mdx:28; apps/docs/integrations/claude-code.mdx:24",
+          "holds": true,
+          "note": "quickstart.mdx:28 lists 'Linux (x64 & arm64)'. claude-code.mdx:24 says 'Requires Node.js 18+ on your PATH — the memory hooks run as Node scripts.' The documentation-only caveat is accurate: no package.json has a bin field, there are no .sh/.rs/.go/.c files, and there is no server/api/backend directory under apps/ or packages/."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "apps/mcp is a Cloudflare Worker (Hono, MCP SDK v2) at https://mcp.supermemory.ai/mcp using OAuth (no API key), a stateless per-request server, with the listed model-visible/app-launcher/app-only tools, `context` prompt and profile/spaces resources; docs say the MCP is platform-only; a separate docs MCP is at https://supermemory.ai/docs/mcp.",
+          "citation": "apps/mcp/README.md:8-9,24-43,45-90; apps/mcp/src/server/tools/index.ts:18-34; apps/docs/self-hosting/configuration.mdx:127-134; apps/docs/agents-and-mcp.mdx:58-66",
+          "holds": true,
+          "note": "The Worker entry is src/server/index.ts (wrangler.jsonc:7), built on Hono (index.ts:3) with @modelcontextprotocol/server 2.0.0 (package.json:27). Auth is OAuth only: index.ts:177-180 accepts only tokens that pass validateOAuthToken, a JWT check against the issuer JWKS (auth/index.ts:55-67), and there is no API-key path. createMcpHandler builds a new server per request with legacy:'stateless' (index.ts:191-202). All 15 registered tool names match the README tables. add_memory's action enum is save|forget (add-memory.ts:13). The 'context' prompt is registered at prompts/context.ts:20-21; the supermemory://profile and supermemory://spaces resources are registered in resources/*.ts. configuration.mdx:132 lists 'Supermemory MCP' as platform-only, and agents-and-mcp.mdx:58-66 gives the docs MCP URL."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README 'One binary. Zero config.' / supermemory-server runs the full Memory API locally: verified not_checkable because no source for the binary exists in the tree.",
+          "citation": "README.md:94,323-335; .git/packed-refs:2; .github/workflows/ (11 files); apps/web/app/(auth)/login/page.tsx:595-643; apps/web/lib/ingest-auto-space.ts:6-10; apps/web/lib/plugin-catalog.ts:24",
+          "holds": true,
+          "note": "The absences are confirmed: no 'bin' in any package.json; no shell/Rust/Go/C files; no server/api/backend directory under apps/ or packages/. The 11 workflows (ci, 3 claude-*, 7 publish-*) build no server binary. packed-refs:2 maps server-v0.0.8 to 5d2b585, whose change is the AgentID login button (page.tsx:595-643). Comments point to a separate 'mono' repo: ingest-auto-space.ts:8 names mono 'apps/api/...' and plugin-catalog.ts:24 names mono 'packages/lib/plugins.ts'. Besides README.md, only apps/docs/self-hosting/*.mdx describe the binary. Integration and API docs only point to `npx supermemory local`/localhost:6767, and the other install.sh matches are the uv installer."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

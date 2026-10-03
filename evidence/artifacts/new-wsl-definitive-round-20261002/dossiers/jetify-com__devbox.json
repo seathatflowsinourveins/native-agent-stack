@@ -1,0 +1,271 @@
+{
+  "contender": "jetify-com/devbox",
+  "revision": {
+    "contender": "jetify-com/devbox",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "jetify-com/devbox",
+        "tag": "0.18.4",
+        "commit": "ed729044dcdaaa379c3ac98a64efc2d68ba97c76",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "0.18.4",
+    "commit": "ed729044dcdaaa379c3ac98a64efc2d68ba97c76",
+    "read_at": "2026-10-02T03:02:17+00:00"
+  },
+  "dossier": {
+    "contender": "jetify-com/devbox",
+    "revision": {
+      "tag": "0.18.4",
+      "commit": "ed729044dcdaaa379c3ac98a64efc2d68ba97c76",
+      "read_at": "2026-10-02T03:02:17+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Devbox (Jetify) is a Go CLI that turns a committed devbox.json (plus devbox.lock) into a per-project, Nix-backed isolated dev environment. 'devbox add/install/update' resolve name@version packages (nixpkgs commits via a hosted search API, or 'runx:' GitHub-release tools) and install them into the Nix store. 'devbox shell/run/shellenv' activate them over the host environment. Built-in or included plugins add env vars, config files, init hooks and process-compose services. 'devbox generate' emits Dockerfile, devcontainer and direnv files. 'devbox global push/pull' copies only Devbox's own global config directory through git or a URL. Searches of the Go sources and *.md files for backup, restore, encrypt, dedup, keyring and dotfile handling found no such feature in this revision. Credentials appear only as optional GITHUB_TOKEN use and as plain .env files read through env_from.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Devbox is a command-line tool that creates isolated shells for development: 'You start by defining the list of packages required by your development environment, and devbox uses that definition to create an isolated environment just for your application.'",
+          "citation": "README.md:19-22"
+        },
+        {
+          "claim": "It works like a package manager (yarn) but for operating-system-level packages (what brew or apt-get install); 'you can install over 400,000 package versions from the Nix Package Registry'.",
+          "citation": "README.md:24-28"
+        },
+        {
+          "claim": "'Devbox was originally developed by Jetify and is internally powered by nix.'",
+          "citation": "README.md:30-31"
+        },
+        {
+          "claim": "Install with 'the following install script to get the latest version of Devbox': curl -fsSL https://get.jetify.com/devbox | bash; more install docs are said to be on jetify.com (that page was not fetched).",
+          "citation": "README.md:44-51"
+        },
+        {
+          "claim": "'Declare the list of tools needed by your project via a devbox.json file and run devbox shell. Everyone working on the project gets a shell environment with the exact same version of those tools.'",
+          "citation": "README.md:57-59"
+        },
+        {
+          "claim": "'Development environments created by Devbox are isolated from everything else in your laptop'; a tool can be added and removed 'all while keeping your laptop pristine'.",
+          "citation": "README.md:61-66"
+        },
+        {
+          "claim": "'Devbox can create isolated environments right on your laptop, without an extra-layer of virtualization'; 'When you're ready to ship, it'll turn it into an equivalent container'.",
+          "citation": "README.md:68-73"
+        },
+        {
+          "claim": "Per-project environments avoid conflicting versions of the same binary across projects.",
+          "citation": "README.md:75-80"
+        },
+        {
+          "claim": "Environments are 'portable': one definition usable as a local devbox shell, a VSCode devcontainer, a Dockerfile 'with the exact same tools', and 'A remote development environment in the cloud that mirrors your local environment'.",
+          "citation": "README.md:82-93"
+        },
+        {
+          "claim": "'devbox init' creates a devbox.json that 'You should commit ... to source control'. The README never mentions devbox.lock.",
+          "citation": "README.md:103-110"
+        },
+        {
+          "claim": "'devbox add python@3.10' records the package in devbox.json (packages: ['python@3.10']); more packages can be searched on Nixhub.io.",
+          "citation": "README.md:112-129"
+        },
+        {
+          "claim": "Inside a devbox shell 'Your regular tools are also available including environment variables and config settings' (example: git config --get user.name).",
+          "citation": "README.md:148-153"
+        },
+        {
+          "claim": "License: Apache 2.0.",
+          "citation": "README.md:12, README.md:194-197"
+        }
+      ],
+      "install": [
+        {
+          "method": "Official install script (the README gives one command for all platforms and does not separate Linux from macOS)",
+          "command": "curl -fsSL https://get.jetify.com/devbox | bash",
+          "citation": "README.md:44-48 (same command at CONTRIBUTING.md:20 and devbox.md:15)"
+        },
+        {
+          "method": "Build from source with Go (contributor docs; CONTRIBUTING.md says Go 1.20 but go.mod requires go 1.26.1)",
+          "command": "git clone https://github.com/jetify-com/devbox.git go.jetify.com/devbox && cd go.jetify.com/devbox && go build ./cmd/devbox",
+          "citation": "CONTRIBUTING.md:59-64 (go version: go.mod:3; stale Go 1.20 note: CONTRIBUTING.md:57)"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. The README has no platform section, so this comes from code and CI. A linux/amd64 binary is built (.goreleaser.yaml:21-28). The Nix installer and lock handle x86_64-linux (nix/install.go:35; devbox.lock:30-39). CI runs ubuntu-latest (.github/workflows/cli-tests.yaml:58,135). There is an explicit linux/amd64 container test route (devbox.json:99-102).",
+        "wsl2": "unknown. The README and repo docs do not state WSL2 support. CI has no WSL job; matrices use only ubuntu-latest and macos-latest (cli-tests.yaml:58,103,135,273,322). WSL would run the plain linux binary (.goreleaser.yaml:21-23). Code tries to detect WSL but overwrites the result with 'Linux' (internal/build/build.go:52-56). The only WSL statement is for the VS Code extension: 'Linux, MacOS, and Windows with WSL' (vscode-extension/README.md:23). The Nix installer passes '--init none' when /run/systemd/system is absent (nix/install.go:86-95).",
+        "macos_arm64": "yes. This is not stated in the README. A darwin/arm64 binary is built (.goreleaser.yaml:21-28). The installer maps aarch64-darwin (nix/install.go:37-41). The repo's own devbox.lock has aarch64-darwin store paths (devbox.lock:10-19,48-61,110-119). CI uses macos-latest for build, lint, auto-nix-install and a Nix-version matrix (cli-tests.yaml:58,103,273,322). The full testscript and example shards run on macOS only when run-mac-tests is requested or on the nightly schedule (cli-tests.yaml:154-156). The release workflow calls cli-tests without that input (cli-release.yml:27-28). The runner CPU architecture is not stated in the workflow.",
+        "gpu": "unknown. The README is silent. Code has CUDA-specific handling: when cudaPackages are in the environment it copies the host libcuda.so into a generated glibc-patch flake (internal/shellgen/flake_plan.go:259-304). The only GPU test needs a CUDA-enabled GPU and is skipped by default (testscripts/languages/python_patch_cuda.test.txt:1-13). No ROCm or Metal handling was found."
+      },
+      "integrations": {
+        "cli": "Yes: the 'devbox' cobra CLI. Stable commands: add, create, generate (alias, devcontainer, dockerfile, direnv, readme), global (add, info, install, list, path, pull, push, rm, run, services, shellenv, update), info, init, install, integrate (vscode), list, rm, run, search, services (attach, ls, start, stop, restart, up, pcport), shell, shellenv, update, version (update). Hidden or internal: setup nix, patch, log, all, gen-docs, upload-telemetry. Citations: internal/boxcli/root.go:55-90,116-125; internal/boxcli/global.go:31-46; internal/boxcli/generate.go:57-62; internal/boxcli/services.go:60-133. 'pull' and 'push' exist only under 'devbox global'.",
+        "mcp": "none found. The only 'mcp' string is a CI allowedTools entry for a GitHub inline-comment tool in a maintainer workflow (.github/workflows/claude-code-review.yml:42), not a Devbox feature.",
+        "sdk_or_api": "Go package go.jetify.com/devbox exposes only Open(path) and Install(ctx) (devbox.go:1-33). Other public Go packages: nix/, nix/flake/, pkg/autodetect/, plugins/. JSON Schema for devbox.json is at .schema/devbox.schema.json. A VS Code extension is in vscode-extension/ (vscode-extension/package.json:23-70). Devbox is a client of an HTTP Package Search API (/v2/resolve, /v1/resolve, /v1/search) specified in SEARCH_API.md, host overridable via DEVBOX_SEARCH_HOST (SEARCH_API.md:8-25). It does not run an HTTP server of its own; 'devbox services' drives a local process-compose server over HTTP (internal/services/client.go:31-63).",
+        "claude_code_or_codex": "No documented product integration. Two Agent Skill files exist: .agents/skills/use-devbox/SKILL.md tells agents to prefer 'devbox run', to install via the curl script, and to ask before 'devbox add' (lines 8-17, 26-30, 74-88). .agents/skills/release-devbox/SKILL.md is a maintainer release runbook. No .claude/, AGENTS.md, CLAUDE.md or plugin manifest exists, and the README does not mention agents. CI uses anthropics/claude-code-action for maintainer PR review and @claude mentions (.github/workflows/claude.yml:33-37; .github/workflows/claude-code-review.yml:34-42)."
+      },
+      "telemetry_and_network": "TELEMETRY. It is on by default in official release binaries and off in builds without injected keys. Start() does nothing if DO_NOT_TRACK parses as true or if build.SentryDSN or build.TelemetryKey is empty (internal/telemetry/telemetry.go:57-67; internal/envir/util.go:22-26). The keys are injected only by goreleaser ldflags from CI secrets (.goreleaser.yaml:16-17; .github/workflows/cli-release.yml:149-150; internal/build/build.go:20-35). 'go build' and the Nix flake build (flake.nix:43-48) therefore carry no telemetry. DO_NOT_TRACK is the only opt-out found. Segment events and Sentry errors carry: command name, flag names (not values), package names and nixpkgs hash, nix version, $SHELL, OS name, CPU arch, Go version, durations, shell/cloud context, feature flags, a device ID from machineid.ProtectedID with a fixed salt, an optional hashed GITHUB_USER_NAME, optional _JETIFY_* env values, and redacted error text with stack traces (internal/telemetry/segment.go:37-90; telemetry.go:63-79,125-182; sentry.go:25-52). Events are buffered as 0600 JSON files under $XDG_STATE_HOME/devbox/{sentry,segment} and uploaded by a detached child process 'devbox upload-telemetry' that exits after 5 s (telemetry.go:81-93,258-261,324-341; internal/boxcli/root.go:111-125). The README does not mention telemetry; a code comment claims anonymized data, SOC 2 storage and opt-out (internal/boxcli/midcobra/telemetry.go:20-24). VERSION CHECK. The Go binary only prints an update notice when DEVBOX_LATEST_VERSION is set by an external launcher script that is not in this repo (internal/vercheck/vercheck.go:29-31,59-95,298-305). The launcher is described as an auto-updating bash wrapper (vercheck.go:98-102; .goreleaser.yaml:76-79). 'devbox version update' re-runs 'curl -fsSL https://get.jetpack.io/devbox | bash' (vercheck.go:111-128). ACCOUNTS. No Devbox account or login is required. Jetify Cloud secrets were removed and env_from=jetify-cloud is ignored with a warning (internal/devbox/devbox.go:1027-1033). An optional GITHUB_TOKEN or DEVBOX_GITHUB_API_TOKEN is read. It is passed to every nix command as a '--option access-tokens' argument (internal/nix/command.go:11-16). It is sent as an Authorization header to raw.githubusercontent.com for github: plugins (internal/plugin/github.go:134-164). It is used for runx GitHub downloads (internal/devpkg/pkgtype/runx.go:12-49). NETWORK HOSTS. https://www.nixsearch.com is used for search, resolve and lock creation, with a DEVBOX_SEARCH_HOST override (internal/searcher/client.go:21-33; SEARCH_API.md:8-25). https://cache.nixos.org is used for narinfo HEAD checks and fetchClosure (internal/devpkg/narinfo_cache.go:19,209-243; internal/shellgen/tmpl/flake.nix.tmpl:43-54). GitHub is used for nixpkgs flake fetches via nix, plugins and 'devbox create' templates (internal/plugin/github.go:134-145; internal/templates/template.go:23-51). https://artifacts.nixos.org/experimental-installer/ is used to download the Nix installer when Nix is missing (nix/install.go:46). OFFLINE. After packages are in the Nix store, shell and run fall back to a cached environment on 'no such host' or 'connection refused' errors (internal/devbox/devbox.go:876-895; internal/devbox/errors.go:5-12). The README does not document any of this network behaviour."
+    },
+    "code": {
+      "languages": [
+        "Go (core CLI; go 1.26.1 per go.mod:3)",
+        "TypeScript (vscode-extension/, scripts/release.ts)",
+        "Nix (flake.nix, plugin flakes, generated per-project flakes)",
+        "Shell and Go-template files (internal/devbox/shellrc.tmpl, Dockerfile templates, plugin init hooks)",
+        "JSON (devbox.json, devbox.lock, built-in plugins)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/devbox/main.go",
+          "what": "Binary 'devbox'. main() calls boxcli.Main() (cmd/devbox/main.go:10-12)."
+        },
+        {
+          "path": "internal/boxcli/root.go",
+          "what": "Cobra root command, command registration (lines 55-90), Execute with trace/telemetry/debug middlewares (101-109), Main (111-132), and the hidden 'upload-telemetry' child mode (116-125)."
+        },
+        {
+          "path": "devbox.go",
+          "what": "Public Go SDK package go.jetify.com/devbox: Open(path) and Install(ctx) only."
+        },
+        {
+          "path": "internal/devbox/devbox.go",
+          "what": "Core Devbox type: Open, Add, Install, Shell, RunScript, EnvExports, GenerateDockerfile/Devcontainer/Envrc, computeEnv."
+        },
+        {
+          "path": "testscripts/testscripts_test.go",
+          "what": "Test entry points TestScripts, TestExamples, TestScriptsWithProjects; runner in testscripts/testrunner/testrunner.go."
+        },
+        {
+          "path": "scripts/release.ts",
+          "what": "Node script that drives releases ('devbox run draft-release|publish-release|release-changes|release-status', devbox.json:79-82)."
+        },
+        {
+          "path": "vscode-extension/package.json",
+          "what": "VS Code extension manifest (main ./out/extension.js, line 23; commands lines 25-70)."
+        },
+        {
+          "path": "pkg/autodetect/autodetect.go",
+          "what": "Language detectors (go, nodejs, php, poetry, python) used by the hidden 'devbox init --auto' (internal/boxcli/init.go:65-75)."
+        }
+      ],
+      "architecture": "Single Go module go.jetify.com/devbox (go.mod:1). cmd/devbox/main.go calls internal/boxcli (one cobra file per command; midcobra/ middlewares for telemetry, debug and trace; featureflag/ for DEVBOX_FEATURE_* toggles). internal/devbox holds the core Devbox type, with env composition in devbox.go (computeEnv, lines 690-856), shell.go with shellrc.tmpl (sources the user's own rc file, then the devbox env), packages.go, update.go, services.go, global.go, pushpull.go, generate/ (Dockerfile, devcontainer and direnv templates) and docgen/. Config and lock: internal/devconfig (+configfile: JSONC devbox.json/devbox.jsonc, AST-preserving edits, packages, scripts, env) and internal/lock (devbox.lock with resolved flake ref plus per-system store paths; resolve.go calls internal/searcher). Packages: internal/devpkg (package model, narinfo/binary-cache checks, pkgtype/flake and pkgtype/runx), internal/searcher (client for the hosted package-search API), internal/nix plus public nix/ (wrapper around the nix CLI: version detection, installer, flake refs, store paths, profiles), internal/shellgen (generates .devbox/gen/flake/flake.nix and script wrappers), internal/patchpkg (ELF/glibc patching). Plugins: internal/plugin plus plugins/ (JSON plugins embedded with go:embed: env, create_files, init_hook, services; includable from path, github: or git: refs). internal/services runs process-compose, which is itself installed as a Nix package (process-compose@1.116.0) into $XDG_DATA_HOME/devbox/util (internal/devbox/util.go:20-62). internal/pullbox implements 'global push/pull' via git, URL and system tar. internal/telemetry, internal/vercheck and internal/build handle telemetry, version-check glue and ldflags build info. internal/templates implements 'devbox create'. Execution model: Devbox shells out to nix ('nix print-dev-env', 'nix build --no-link', flakes with builtins.fetchClosure) and layers PATH and env over the host environment; it runs no daemon of its own. Project state is in .devbox/ (gitignored), devbox.d/ (plugin config files) and devbox.lock; global state is in $XDG_DATA_HOME/devbox/global/default (internal/devbox/global.go:19-43).",
+      "packaging_and_release": "GoReleaser (.goreleaser.yaml) builds static binaries (CGO_ENABLED=0, -trimpath, mod_timestamp=commit time) for linux and darwin on 386/amd64/arm64/armv7 (lines 5-30). It packs binary-only archives named devbox_<version>_<os>_<arch> plus a sha256 checksums.txt (lines 31-39). GoReleaser's own GitHub-release step is disabled (line 55). .github/workflows/cli-release.yml triggers on tag push '*', a weekly edge cron (Thursday 08:45 UTC) and manual dispatch (lines 6-19). It first runs the whole cli-tests suite (27-28). On a tag it runs goreleaser (139-150) and uploads 'dist/*.tar.gz dist/checksums.txt' to the draft or tag release with gh (165-184). A human publishes through scripts/release.ts. Edge snapshots (0.0.0-edge.<date>) are published as prereleases (48-109). cli-post-release.yml writes the stable pointer s3://releases.jetpack.io/devbox/stable/version (45-49), and the edge pointer is written at cli-release.yml:105-109. scripts/release.ts:898-899 says the installer reads that pointer. No signatures, SBOM or provenance are configured: .goreleaser.yaml has no signs or sboms, and no workflow has cosign or attestation steps; only sha256 checksums are published. Docker images jetpackio/devbox and jetpackio/devbox-root-user (linux/amd64 and arm64) are built when a release is published (docker-image-release.yml:3-7,44-87) from debian:stable-slim, running the same get.jetify.com installer and 'wget https://nixos.org/nix/install | sh -s -- --no-daemon' (internal/devbox/generate/tmpl/DevboxImageDockerfile:1,25,32). flake.nix builds from source with buildGo126Module, lastTag 0.18.4 and a vendor-hash file (flake.nix:20,30,35-48). The VS Code extension is published manually to the VS Marketplace and Open VSX (.github/workflows/vscode-ext-release.yaml:1-37). The curl-piped installer and launcher served at get.jetify.com are not in this repo.",
+      "tests_and_ci": "Frameworks: Go testing, stretchr/testify and rogpeppe/go-internal testscript. Counts: 52 *_test.go files (internal/, nix/, pkg/, plugins/, testscripts/) and 65 testscript .txt files under testscripts/. Of those, 62 are run by TestScripts through the **/*.test.txt glob (testscripts/testrunner/testrunner.go:32-70). testscripts/add/add_insecure.tst.txt and testscripts/lockfile/nopaths.txt do not match that glob, and testrunner/run_test.test.txt is excluded. 64 example projects under examples/ (each with devbox.json and devbox.lock) run via TestExamples and TestScriptsWithProjects only when DEVBOX_RUN_PROJECT_TESTS=1 (testscripts/testscripts_test.go:11-45). Tests need a real Nix and network. CI: 10 workflows in .github/workflows. cli-tests.yaml runs on PR, push to main, merge queue, nightly 08:30 UTC, manual and workflow_call; its jobs are: build on ubuntu and macos (55-72), a typos spell check (PR only, 74-80), a Nix flake build (PR only, 82-98), golangci-lint on both OSes through 'devbox run lint' (100-123), 'go test ./...' in 3 shards plus the project/example tests (125-247) with macOS shards only on request or nightly (154-156), a test-result gate (254-267), auto-nix-install (269-314) and a Nix version matrix 2.18.0, 2.19.2, 2.24.7, 2.30.2, 2.35.2 running install, run and rm (318-359). The other workflows are cli-release.yml (reuses cli-tests), cli-post-release.yml, docker-image-release.yml, vscode-ext-release.yaml (manual; no workflow runs the extension's mocha tests), claude.yml and claude-code-review.yml (anthropics/claude-code-action), random-reviewer-assignment.yml, stale-issue-cleanup.yml and debug.yaml (tmate session). Lint config: .golangci.yml (errcheck, govet, staticcheck, revive and others), scripts/gofumpt.sh, and a typos.toml at the repo root. 'devbox run test' uses 'go test -race -cover ./...' (devbox.json:54), but CI runs 'go test -v -timeout ... ./...' without -race (cli-tests.yaml:244). No coverage upload was found.",
+      "dependencies": "go.mod: 32 direct requires (go.mod:6-37) and 244 '// indirect' requires (go.mod:41-284). The indirect set is inflated by the 'tool' directive (go.mod:287-290: golangci-lint, gofumpt). Notable direct deps: spf13/cobra, f1bonacc1/process-compose (types), getsentry/sentry-go and segmentio/analytics-go (telemetry), denisbrodbeck/machineid, mholt/archives, tailscale/hujson (JSONC), rogpeppe/go-internal (testscript), stretchr/testify, and go.jetify.com/pkg at a pseudo-version (a separate Jetify module that provides runx and filecache; its source is not in this repo). vscode-extension/package.json: 5 dependencies and 13 devDependencies (lines 150-180; yarn.lock). flake.nix inputs: nixpkgs (nixos-unstable) and flake-utils, pinned in flake.lock. No dependabot or renovate config was found.",
+      "security_policy": "none. No SECURITY.md or .github/SECURITY.md exists. A search of *.md and .github for 'security' or 'vulnerab' only hits an unrelated line in CODE_OF_CONDUCT.md:67."
+    },
+    "claim_checks": [
+      {
+        "claim": "'Everyone working on the project gets a shell environment with the exact same version of those tools.' (README.md:57-59)",
+        "verified": "partial",
+        "evidence": "Exact pinning lives in devbox.lock, not devbox.json: it holds a resolved nixpkgs ref plus per-system store paths (internal/lock/package.go:16-53; example devbox.lock:4-41). The README never mentions the lock and only says to commit devbox.json (README.md:109-110). 'devbox install' is the 'ensure' mode (internal/devbox/devbox.go:343-350), yet any package without a lock entry is resolved on the spot through the hosted search API and written to the lock (internal/lock/lockfile.go:76-106,118-142). Version prefixes such as python@3.10 resolve to the newest matching patch (SEARCH_API.md:48-52). The lock holds only the systems the index returned; others fall back to another system's installable (internal/lock/resolve.go:155-166; SEARCH_API.md:119-125). The repo's own lock has no x86_64-darwin entry for fd, git or nodejs-slim (devbox.lock:4-99,152-225). Locked outputs install by exact store path when present in cache.nixos.org, otherwise Nix builds the pinned nixpkgs revision (internal/devpkg/package.go:287-307). Language-level dependencies such as pip or npm are outside the lock schema (internal/lock/package.go:16-27)."
+      },
+      {
+        "claim": "'you can install over 400,000 package versions from the Nix Package Registry' (README.md:26-28)",
+        "verified": "not_checkable",
+        "evidence": "The count belongs to a hosted index (default https://www.nixsearch.com, internal/searcher/client.go:21). The repo contains only the client and the API contract (SEARCH_API.md), with no package data to count."
+      },
+      {
+        "claim": "'internally powered by nix' (README.md:30-31)",
+        "verified": "yes",
+        "evidence": "Devbox shells out to the nix CLI: 'nix print-dev-env --json' (internal/nix/nix.go:76) and 'nix build --no-link' (internal/devbox/packages.go:514-553). It generates a flake per project (internal/shellgen/tmpl/flake.nix.tmpl). It requires Nix >= 2.18.0 (nix/nix.go:202; internal/nix/install.go:75-83) and auto-installs Nix if absent (internal/nix/install.go:102-150). Lix >= 2.95 is rejected because it dropped fetchClosure (nix/nix.go:205-210)."
+      },
+      {
+        "claim": "Environments are 'isolated from everything else in your laptop' (README.md:63-64), while 'Your regular tools are also available including environment variables and config settings' (README.md:148-153)",
+        "verified": "partial",
+        "evidence": "By default the whole host environment is copied into the Devbox environment (internal/devbox/devbox.go:723-725,1139-1158). 'devbox shell' also sources the user's own ~/.bashrc, ~/.zshrc, fish config or $ENV before applying the Devbox env (internal/devbox/shell.go:150-168; internal/devbox/shellrc.tmpl:21-34). The README admits the host env and config remain visible. Isolation is opt-in via --pure (internal/boxcli/shell.go:53; run.go:68), which keeps only HOME, PATH and TERM from the host (internal/devbox/devbox.go:1155,1161-1173); testscripts/run/pure.test.txt:6-10 shows a host variable not leaking. The flag help says HOME, USER and DISPLAY are retained, but no code retaining USER or DISPLAY was found (code preferred over help text). Package files are isolated in /nix/store and a per-project profile (internal/nix/nix.go:31)."
+      },
+      {
+        "claim": "'without an extra-layer of virtualization' (README.md:70-72)",
+        "verified": "yes",
+        "evidence": "No VM or container is started. computeEnv layers host env, nix print-dev-env output and plugin env (internal/devbox/devbox.go:690-756), and Shell runs the user's own shell with that env (internal/devbox/devbox.go:226-259; internal/devbox/shell.go:220-229). No performance numbers are published in the repo, so the 'don't sacrifice speed' framing itself is not measurable here."
+      },
+      {
+        "claim": "'it'll turn it into an equivalent container' / Dockerfile 'with the exact same tools' (README.md:72-73,89-91)",
+        "verified": "partial",
+        "evidence": "'devbox generate dockerfile' and 'devcontainer' exist (internal/boxcli/generate.go:81-138). The generated Dockerfile copies devbox.json and devbox.lock and installs inside the image (internal/devbox/generate/tmpl/dev.Dockerfile.tmpl:11-15,33). It starts FROM docker.io/jetpackio/devbox:latest, an unpinned tag (dev.Dockerfile.tmpl:1-3; prod.Dockerfile.tmpl:1). That base image installs Nix and Devbox at build time through piped downloads (internal/devbox/generate/tmpl/DevboxImageDockerfile:25,32). Tool equivalence therefore rests on devbox.lock, while the Devbox CLI version in the image follows the image tag."
+      },
+      {
+        "claim": "'A remote development environment in the cloud that mirrors your local environment' (README.md:92-93)",
+        "verified": "no",
+        "evidence": "No cloud or remote command is registered (internal/boxcli/root.go:55-79). Jetify Cloud secrets were removed: env_from = jetify-cloud, envsec or jetpack-cloud is ignored with a warning (internal/devbox/devbox.go:1027-1033; internal/devconfig/configfile/env.go:11-18; testscripts/run/envfrom_jetify_cloud.test.txt:1-7). Only vestigial DEVBOX_REGION checks remain (internal/envir/util.go:13-15). The README sentence is not backed by code in this revision; code preferred over README."
+      },
+      {
+        "claim": "'Use the following install script to get the latest version of Devbox: curl -fsSL https://get.jetify.com/devbox | bash' (README.md:44-48)",
+        "verified": "not_checkable",
+        "evidence": "The installer and launcher served at get.jetify.com are not in this repo, and the docs page it links was not fetched. The repo shows that the 'stable' pointer is s3://releases.jetpack.io/devbox/stable/version, written by cli-post-release after publish (.github/workflows/cli-post-release.yml:45-49; scripts/release.ts:898-899). The binary's own self-update shells out to the older https://get.jetpack.io/devbox URL (internal/vercheck/vercheck.go:111-128), so README and code name different hostnames. The launcher is described as an auto-updating bash wrapper (internal/vercheck/vercheck.go:98-102)."
+      },
+      {
+        "claim": "'devbox init' creates a devbox.json that 'You should commit it to source control' (README.md:109-110)",
+        "verified": "yes",
+        "evidence": "devbox.json (or devbox.jsonc) is the manifest (internal/devconfig/configfile/file.go:22-35). Machine-local state goes to .devbox/, which gets a '*' and '.*' .gitignore (internal/shellgen/generate.go:45-46; internal/shellgen/tmpl/.gitignore.tmpl:1-2). devbox.lock is written beside the manifest (internal/lock/lockfile.go:265-267). The repo commits its own devbox.lock and the generated Dockerfile copies it (internal/devbox/generate/tmpl/dev.Dockerfile.tmpl:12), but the README does not mention it."
+      },
+      {
+        "claim": "License: Apache 2.0 (README.md:12,196-197)",
+        "verified": "yes",
+        "evidence": "LICENSE is the standard Apache License 2.0 text (LICENSE:1-3,178-191). flake.nix declares licenses.asl20 (flake.nix:68). vscode-extension/LICENSE carries the same text (lines 1-3). Go sources carry 'Copyright 2024 Jetify Inc. and contributors' headers that point to LICENSE (cmd/devbox/main.go:1-2)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Hard dependency on Nix, and on an unprompted Nix install. Devbox needs Nix >= 2.18.0, with a /nix store, and rejects Lix >= 2.95 (nix/nix.go:185-210; internal/nix/install.go:75-105). When Nix is missing and stdout is not a TTY, install, run, shell and similar commands download and run the Nix installer with '--no-confirm' and no prompt (internal/nix/install.go:121-150; nix/install.go:97). The installer binary comes from artifacts.nixos.org with only an HTTP-200 check, no hash or signature (nix/install.go:46-71). This matters for any 'explicitly chosen host' workflow.",
+      "Reproducibility depends on committing devbox.lock, which the README never mentions (README.md:109-110). Missing lock entries are silently re-resolved through a hosted service (default https://www.nixsearch.com) and written back (internal/lock/lockfile.go:76-106; SEARCH_API.md:21-25). Lock coverage per platform depends on what that index returns (devbox.lock:4-99,152-225 lacks x86_64-darwin for 3 of 5 entries). The service is replaceable through DEVBOX_SEARCH_HOST (SEARCH_API.md:8-13). cache.nixos.org and GitHub are also required at install time (internal/devpkg/narinfo_cache.go:19; internal/nix/command.go:11-16).",
+      "Telemetry is on by default in official release binaries, with DO_NOT_TRACK as the only opt-out found. It sends command and flag names, package lists, nix version, $SHELL, a salted machine ID and redacted errors to Segment and Sentry through a detached background process (internal/telemetry/telemetry.go:57-93; segment.go:37-90; internal/boxcli/root.go:116-125; .goreleaser.yaml:16-17). The README does not disclose it. Source and Nix-flake builds carry no keys.",
+      "Out of scope for two of the needs. No backup, restore, encryption, deduplication, dotfile-management or credential-handling code exists (search of Go sources and *.md). 'devbox global push' commits the whole global config directory (devbox.json, devbox.lock, devbox.d and any other top-level files, including any .env placed there) with no secret filtering, using the user's own git credentials (internal/pullbox/git/push.go:19-40; internal/fileutil/dir.go:16-28). 'devbox global pull' wipes the global profile (after a prompt unless -f) and can fetch a URL archive with no hash or signature check, extracted by system tar (internal/pullbox/pullbox.go:40-90; internal/pullbox/files.go:21-59; internal/pullbox/download.go:13-30; internal/pullbox/tar/tar.go:37). Service data such as Postgres PGDATA sits under the gitignored .devbox/virtenv (plugins/postgresql.json:11-18; internal/shellgen/tmpl/.gitignore.tmpl:1-2). env_from reads plain .env files (internal/devconfig/configfile/env.go:20-51).",
+      "Not hermetic, and it executes project-supplied code without a trust step. By default the entire host environment, including any tokens, flows into 'devbox shell/run', and the user's rc files are sourced (internal/devbox/devbox.go:723-725,1139-1158; internal/devbox/shellrc.tmpl:21-34). init_hook, scripts and plugin hooks run arbitrary shell, and no confirmation step was found (plugins/README.md:109-111). Remote github: and git: plugins default to the mutable 'master' branch, are cached for 24 h and are not pinned in the lock (internal/plugin/github.go:74-80,134-145; internal/plugin/git.go:93-131). SSH git plugins default to StrictHostKeyChecking=accept-new (internal/plugin/git.go:111-117). GITHUB_TOKEN is passed on the nix command line (internal/nix/command.go:13-16). Generated flakes set allowUnfree = true (internal/shellgen/tmpl/flake.nix.tmpl:23-33).",
+      "Release integrity and supply chain. Artifacts are tar.gz plus a sha256 checksums.txt only, with no signatures, SBOM or provenance configured (.goreleaser.yaml:31-39; .github/workflows/cli-release.yml:165-184). The recommended installer, the launcher and the version pointer live outside the repo (S3 and get.jetify.com), so they could not be audited (internal/vercheck/vercheck.go:29-31; cli-post-release.yml:45-49). By default the installed 'devbox' is an auto-updating launcher (vercheck.go:98-102; .goreleaser.yaml:76-79); the Dockerfiles pass DEVBOX_USE_VERSION to pin a version (DevboxImageDockerfile:4,31), and honoring it is implemented in the unavailable launcher. Workflows use mutable action refs, such as the branch ref jetify-com/devbox-install-action@jl/migrate-installer (cli-tests.yaml:89-90,110-111,195-196) and 'goreleaser version: latest' (cli-release.yml:139-144). There is no SECURITY policy and no dependabot or renovate config.",
+      "Platform assurance gaps. The README has no platform matrix. WSL2 is undocumented and untested in CI, and the code's WSL detection never reports WSL (internal/build/build.go:52-56). Full macOS test shards run only nightly or on request, not on PR, push or tag-release runs (cli-tests.yaml:154-156; cli-release.yml:27-28). GPU/CUDA support exists in code but its only test needs a real GPU and is skipped by default (testscripts/languages/python_patch_cuda.test.txt:1-13). Language-level dependencies (pip, npm) are not pinned by Devbox (internal/lock/package.go:16-27), and the python plugin creates a project .venv via an init hook (plugins/python.json:5-16).",
+      "Maintenance and docs-drift signals. README promises a 'remote development environment in the cloud' that the code no longer has (internal/devbox/devbox.go:1027-1033). CONTRIBUTING.md:57 says Go 1.20 while go.mod:3 needs 1.26.1. The self-update path uses get.jetpack.io while the README uses get.jetify.com (vercheck.go:111-128). The generated devbox.md still lists runx packages that the current devbox.json no longer has (devbox.md:71-75; devbox.json:4-19). The test add_insecure.tst.txt never runs because the glob is **/*.test.txt (testscripts/testrunner/testrunner.go:33). CI sets DEVBOX_FEATURE_DETSYS_INSTALLER, which no code reads, so the use-detsys matrix duplicates runs (cli-tests.yaml:274,289). The release runbook records that main was red from 2026-07-02 until PR #2951 (.agents/skills/release-devbox/SKILL.md:205-209) and that flake.nix version bumps drift and need manual PRs (SKILL.md:147-157,210-211). Release pointers, installer and Docker images are controlled by a single vendor (S3 releases.jetpack.io, get.jetify.com, jetpackio on Docker Hub)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "jetify-com/devbox",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Official install script, one command for all platforms (README does not separate Linux from macOS): curl -fsSL https://get.jetify.com/devbox | bash",
+          "citation": "README.md:44-48; CONTRIBUTING.md:20; devbox.md:15",
+          "holds": true,
+          "note": "README.md:44-48 gives exactly this command under 'Installing Devbox' with no per-OS variants. CONTRIBUTING.md:20 and devbox.md:15 repeat it word for word. The script is served from get.jetify.com and is not in the repo, so only the documented command can be verified here, not what the script does."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE (README: 'License: Apache 2.0')",
+          "citation": "LICENSE:1-3,178-201; README.md:12,194-197; flake.nix:68; vscode-extension/LICENSE:1-3; cmd/devbox/main.go:1-2",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License 2.0 text (header at lines 1-3, appendix at 178-201). The README badge alt text (line 12) and the License section (196-197) both say Apache 2.0. flake.nix:68 sets licenses.asl20, vscode-extension/LICENSE has the same text, and the Go file headers point to LICENSE. The only other license file, examples/development/haskell/my-project/LICENSE, is a BSD-style template in an example project, not Devbox's own license."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: README has no platform section; linux/amd64 binary built; Nix installer and lock handle x86_64-linux; CI runs ubuntu-latest; explicit linux/amd64 container test route",
+          "citation": ".goreleaser.yaml:21-28; nix/install.go:35; devbox.lock:30-39; .github/workflows/cli-tests.yaml:58,135; devbox.json:99-102; README.md",
+          "holds": true,
+          "note": "The goreleaser config builds goos linux/darwin for goarch 386/amd64/arm64/arm (lines 21-28). nix/install.go:35 maps amd64 on Linux to x86_64-linux. devbox.lock:30-39 is fd's x86_64-linux store path. The build matrix (cli-tests.yaml:58) and test matrix (line 135) include ubuntu-latest. devbox.json:99-102 compiles a linux/amd64 test binary and runs it with docker build/run --platform linux/amd64. The README has no platform section."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "Stable commands: add, create, generate (...), global (...), info, init, install, integrate (vscode), list, rm, run, search, services (...), shell, shellenv, update, version (update). Hidden or internal: setup nix, patch, log, all, gen-docs, upload-telemetry. 'pull' and 'push' exist only under 'devbox global'.",
+          "citation": "internal/boxcli/root.go:55-90,116-125; internal/boxcli/global.go:31-46; internal/boxcli/generate.go:57-62; internal/boxcli/services.go:60-133; internal/boxcli/integrate.go:30-54",
+          "holds": false,
+          "note": "Most of it matches. Command registration is at root.go:56-79. global.go:31-46 registers add/info/install/list/path/pull/push/rm/run/services/shellenv/update, and pull/push are registered nowhere else. generate.go:57-62 and services.go:79-157 match. upload-telemetry is an argument check at root.go:116-125. setup, patch, log, gen-docs and all are Hidden. However, 'integrate' and its only subcommand 'vscode' are also Hidden: true (integrate.go:35,49). The dossier lists them as stable while moving the equally hidden setup/patch/log to its hidden list. The hidden 'generate debug' (generate.go:60,71-72) is also missing from the hidden list. 'devbox integrate vscode' is called internally by the VS Code extension (vscode-extension/src/devbox.ts:61)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "'Everyone working on the project gets a shell environment with the exact same version of those tools' (README.md:57-59): verified partial. Pinning lives in devbox.lock, which the README never mentions; unlocked entries are resolved on the spot and written to the lock; prefixes resolve to newest patch; missing systems fall back; cached store paths else build; language deps outside the lock.",
+          "citation": "internal/lock/package.go:16-53; devbox.lock:4-41,4-99,152-225; README.md:109-110; internal/devbox/devbox.go:343-350; internal/lock/lockfile.go:76-106,118-142; SEARCH_API.md:48-52,119-125; internal/lock/resolve.go:155-166; internal/devpkg/package.go:287-307",
+          "holds": true,
+          "note": "All cited lines match. A lock Package has a resolved ref and per-system outputs/store paths, with no fields for language-level dependencies. The README never mentions devbox.lock. Install calls ensureStateIsUpToDate(ensure), and that path ends with lockfile.Save() (packages.go:361,385), so new resolutions are written back to the lock. A version prefix resolves to the newest match. selectForSystem falls back from the current system to x86_64-linux, then to any system. fd, git and nodejs-slim have no x86_64-darwin entry (only go does, at devbox.lock:130-139). InstallableForOutput uses the store path when it is in the binary cache and otherwise the flake installable. One phrase claims too much: 'any package without a lock entry' does not go through the search API. Only versioned Nixpkgs packages do; runx packages, flake refs and unversioned names are resolved elsewhere (lockfile.go:83-102; resolve.go:36-65). The 'partial' rating still stands."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.cli: move 'integrate (vscode)' out of the stable list and into 'Hidden or internal'. Both the command and its subcommand are Hidden: true (internal/boxcli/integrate.go:35,49), and the VS Code extension calls the command internally (vscode-extension/src/devbox.ts:61). Also add the hidden 'generate debug' (internal/boxcli/generate.go:60,71-72) to the hidden list, and add internal/boxcli/integrate.go:30-54 to the citations."
+      ]
+    }
+  ]
+}

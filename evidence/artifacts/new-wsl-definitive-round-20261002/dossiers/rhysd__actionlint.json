@@ -1,0 +1,314 @@
+{
+  "contender": "rhysd/actionlint",
+  "revision": {
+    "contender": "rhysd/actionlint",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "rhysd/actionlint",
+        "tag": "v1.7.12",
+        "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.7.12",
+    "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+    "read_at": "2026-10-02T03:02:43+00:00"
+  },
+  "dossier": {
+    "contender": "rhysd/actionlint",
+    "revision": {
+      "tag": "v1.7.12",
+      "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE.txt"
+    },
+    "purpose": "Static linter for GitHub Actions workflow YAML files, shipped as a Go CLI (`actionlint`), a Go library, a Docker image and a browser/WASM playground. It checks workflow syntax, `${{ }}` expression types, `with:` inputs and `steps.<id>.outputs` for local actions and for an embedded data set of popular `owner/repo@major-tag` actions, local reusable-workflow calls, and runs shellcheck/pyflakes on `run:` scripts. Facts for the stated CI/supply-chain questions: (1) Linter for syntax, expressions, action inputs/outputs and `run:` scripts: yes, that is its purpose (README.md:10-15). (2) Permission/pinning policy audit: no. `permissions:` is validated only for scope names and values (rule_permissions.go:52-83). There is no SHA/tag-pin or freshness check (rule_action.go:346-392; docs/checks.md:1873-1874,1911-1913). CONTRIBUTING.md:3-6 says convention-enforcing checks are generally not accepted. (3) SBOM generation (CycloneDX/SPDX): none in the repo. (4) Signed provenance/SBOM attestation for users: none offered; the project only attests its own release archives (release.yaml:33-35). (5) Keeping pinned dependencies current via PRs: none; docs point to Dependabot (docs/checks.md:1913). (6) Code-scanning publication: none built in. SARIF 2.1.0 can be produced only through a user-supplied `-format` template (docs/usage.md:113-120) and no upload step is documented.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "actionlint is a static checker for GitHub Actions workflow files; an online playground is offered ('Try it online!') and 'Your browser can run actionlint through WebAssembly'.",
+          "citation": "README.md:6,103"
+        },
+        {
+          "claim": "Syntax check for workflow files to check unexpected or missing keys following workflow syntax.",
+          "citation": "README.md:10"
+        },
+        {
+          "claim": "Strong type check for `${{ }}` expressions to catch semantic errors like access to not existing property, type mismatches, ...",
+          "citation": "README.md:11-12"
+        },
+        {
+          "claim": "Actions usage check: inputs at `with:` and outputs in `steps.{id}.outputs` are correct.",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Reusable workflow check: inputs/outputs/secrets of reusable workflows and workflow calls.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "shellcheck and pyflakes integrations for scripts at `run:`.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Security checks: script injection by untrusted inputs, hard-coded credentials.",
+          "citation": "README.md:16"
+        },
+        {
+          "claim": "Other checks: glob syntax validation, dependencies check for `needs:`, runner label validation, cron syntax validation, ... (full list in docs/checks.md).",
+          "citation": "README.md:17-20"
+        },
+        {
+          "claim": "actionlint focuses on finding out mistakes; it tries to catch errors as much as possible and make false positives as minimal as possible.",
+          "citation": "README.md:95-97"
+        },
+        {
+          "claim": "Install by downloading the released binary, by Homebrew, or by `go install`; the installation doc covers package managers and Docker.",
+          "citation": "README.md:87-93"
+        },
+        {
+          "claim": "Usage doc covers local use, GitHub Actions, the online playground, an official Docker image, and integrations with reviewdog, Problem Matchers, super-linter, pre-commit, VS Code.",
+          "citation": "README.md:112-113"
+        },
+        {
+          "claim": "Configuration: labels of self-hosted runners, configuration variables, and ignore patterns of errors for each file path can be set.",
+          "citation": "README.md:114-115"
+        },
+        {
+          "claim": "Go API: actionlint can be used as a Go library.",
+          "citation": "README.md:116"
+        },
+        {
+          "claim": "actionlint is distributed under the MIT license.",
+          "citation": "README.md:128"
+        }
+      ],
+      "install": [
+        {
+          "method": "Prebuilt release archive via gh CLI (Linux x86_64 example), then optional attestation check",
+          "command": "gh release download --repo rhysd/actionlint --pattern '*_linux_amd64.tar.gz' v1.7.11\ntar xf actionlint_1.7.11_linux_amd64.tar.gz\n./actionlint -version\ngh attestation verify -R rhysd/actionlint actionlint_1.7.11_linux_amd64.tar.gz",
+          "citation": "docs/install.md:105-109,114-116 (docs examples use v1.7.11 although this checkout is v1.7.12; archive targets listed at docs/install.md:90-95)"
+        },
+        {
+          "method": "Download script (documented as the recommended way to install in shell scripts/CI); optional args VERSION and DIR",
+          "command": "bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)",
+          "citation": "docs/install.md:121-142; docs/usage.md:210-218"
+        },
+        {
+          "method": "go install (Go toolchain; go 1.25.0 in go.mod)",
+          "command": "go install github.com/rhysd/actionlint/cmd/actionlint@latest",
+          "citation": "README.md:91-93; docs/install.md:189-199 (branch head via @main at docs/install.md:198)"
+        },
+        {
+          "method": "Official Docker image rhysd/actionlint (contains actionlint, shellcheck, pyflakes)",
+          "command": "docker run --rm -v $(pwd):/repo --workdir /repo rhysd/actionlint:latest -color",
+          "citation": "docs/usage.md:269-287"
+        },
+        {
+          "method": "Homebrew on macOS (official formula), or this repository's cask",
+          "command": "brew install actionlint\n# alternative cask from this repo:\nbrew tap \"rhysd/actionlint\" \"https://github.com/rhysd/actionlint\"\nbrew install --cask actionlint",
+          "citation": "docs/install.md:65-83 (unsigned-executable warning at 81-83)"
+        },
+        {
+          "method": "Linux distro / version-manager packages documented upstream (third-party maintained)",
+          "command": "pacman -S actionlint\nnix-env -iA nixpkgs.actionlint\nmise use -g actionlint@latest\nasdf plugin add actionlint\nasdf install actionlint latest",
+          "citation": "docs/install.md:34-61 (pacman, nix-env), 150-187 (asdf, mise)"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release archive for linux/amd64 (docs/install.md:90-96; .goreleaser.yaml:21-24), Docker image for linux/amd64 (release.yaml:85); unit tests run on ubuntu-latest (ci.yaml:9-12,42).",
+        "wsl2": "unknown - WSL/WSL2 is not mentioned in README, docs, code or CI (grep). Linux release binaries are CGO-free builds (.goreleaser.yaml:14-16) but no WSL2 claim or CI job exists.",
+        "macos_arm64": "yes - darwin/arm64 release archive (docs/install.md:92; .goreleaser.yaml:17-19); Homebrew cask has an on_arm darwin_arm64 URL (Casks/actionlint.rb:23-26); CI runs unit tests on macos-latest and macos-26-intel (ci.yaml:9). Docs warn the macOS executable is unsigned (docs/install.md:81-83).",
+        "gpu": "no - not applicable: no GPU/CUDA code or docs; only example runner label names such as `gpu` / `linux-multi-gpu` appear (docs/config.md:23; docs/checks.md:1639-1661)."
+      },
+      "integrations": {
+        "cli": "`actionlint [FLAGS] [FILES...] [-]` (docs/usage.md:6-26; command.go:126-194). With no args it finds the nearest `.github/workflows`. Flags: -ignore (repeatable regex), -shellcheck/-pyflakes (path; empty disables), -format (Go template: JSON, JSON Lines, Markdown, GitHub `::error` annotations, SARIF via template; docs/usage.md:45-120), -oneline, -config-file, -init-config, -color/-no-color, -verbose, -debug, -version, -stdin-filename. Exit codes 0 none / 1 problems / 2 bad option / 3 fatal (command.go:18-27; docs/usage.md:181-190). Man page: man/actionlint.1.ronn. Other documented integrations: GitHub Problem Matchers (.github/actionlint-matcher.json; docs/usage.md:328-348), reviewdog action (310-326), super-linter, pre-commit hooks (.pre-commit-hooks.yaml; docs/usage.md:358-380), editor plugins and trunk (docs/usage.md:382-448). The SARIF template (testdata/format/sarif_template.txt:1-66) emits tool.driver name 'GitHub Actions lint', version, informationUri, rules per kind and per-error file/line/column; no upload-sarif step is documented anywhere in the repo (grep).",
+        "mcp": "none found (no MCP / Model Context Protocol mention and no .mcp.json anywhere in the repo).",
+        "sdk_or_api": "Go library `github.com/rhysd/actionlint` (docs/api.md:7-47; doc.go:1-47): Linter/NewLinter (linter.go:97-118), Command, Parse (parse.go:1585) with AST types (ast.go), Rule/RuleBase/Pass/Visitor (rule.go:99-108; pass.go:10-37), and the LinterOptions.OnRulesCreated hook for adding or removing rules (linter.go:89-93; example_your_own_rule_test.go:33-65). The library has no semver stability: any patch release may break the API (docs/api.md:49-52; doc.go:17-21). No HTTP API. The WASM build exposes window.runActionlint to the playground page only (playground/main.go:53-62).",
+        "claude_code_or_codex": "none found (no CLAUDE.md, AGENTS.md, .claude/, .codex/ or plugin files). Only related fact: the embedded popular-actions data set includes `anthropics/claude-code-action@v1` and `openai/codex-action@v1` (popular_actions.go:1662,4294; CHANGELOG.md:159-162), so `with:` inputs of those actions are validated in workflows; this is not an integration with Claude Code or Codex itself."
+      },
+      "telemetry_and_network": "No telemetry or analytics found. The shipped Go package/CLI uses no net/http or net.Dial (net/http appears only in scripts/generate-*/main.go and in no test file). The repo's own Go code calls no os.Getenv/LookupEnv (NO_COLOR is honoured by the fatih/color dependency: linter.go:41-43). Popular-action metadata is embedded in the binary, so action checks need no network (docs/checks.md:1870-1871; CHANGELOG.md:1854). Local actions and local reusable workflows are read from the checkout (rule_action.go:577-595; rule_workflow_call.go:55-62); remote actions and reusable workflows are never fetched. Child processes are only the optional `shellcheck` and `pyflakes` executables, found with execabs.LookPath (process.go:127-141; linter.go:574-593); shellcheck reads SHELLCHECK_OPTS from the environment (docs/checks.md:944-962). No account, token or service is required to run. `-init-config` writes .github/actionlint.yaml (config.go:136-157). Network is needed only for installing (GitHub Releases, Docker Hub, Go module proxy, distro packages; the download script uses github.com: scripts/download-actionlint.bash:112-125), for maintainer generators that fetch GitHub content (scripts/generate-popular-actions/main.go:57; scripts/generate-availability/main.go:24; scripts/generate-webhook-events/main.go:25), and for the project's own CI (secrets for Codecov, Docker Hub, winget: ci.yaml:60-63; release.yaml:63,81). The hosted playground (https://rhysd.github.io/actionlint/) runs through WASM and states it never sends data outside the browser (docs/usage.md:256-260); it can GET a user-supplied URL given as `?u=` (playground/index.ts:28-72)."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "TypeScript (playground)",
+        "JavaScript (Node ESM scripts)",
+        "Bash (scripts/)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/actionlint/main.go",
+          "what": "CLI binary main: builds actionlint.Command with os.Stdin/Stdout/Stderr and exits with Command.Main's status (cmd/actionlint/main.go:11-18); embeds time/tzdata (line 8)."
+        },
+        {
+          "path": "command.go",
+          "what": "Command.Main: flag parsing, version output, exit codes 0/1/2/3 (command.go:18-27,126-194)."
+        },
+        {
+          "path": "linter.go",
+          "what": "Linter/NewLinter/LintRepository/LintFiles/LintStdin: Go API entry that discovers workflows, builds the rule list (linter.go:557-593) and prints errors."
+        },
+        {
+          "path": "playground/main.go",
+          "what": "WASM entry (build tag wasm) exposing window.runActionlint to the browser playground (playground/main.go:53-63)."
+        },
+        {
+          "path": "scripts/download-actionlint.bash",
+          "what": "Installer script that downloads a release archive with curl and extracts it (scripts/download-actionlint.bash:112-131); also sets the GitHub Actions `executable` output."
+        },
+        {
+          "path": "scripts/generate-popular-actions/main.go",
+          "what": "Generator for popular_actions.go; sibling generators scripts/generate-webhook-events and scripts/generate-availability produce all_webhooks.go and availability.go; run weekly by .github/workflows/generate.yaml."
+        },
+        {
+          "path": "scripts/check-checks/main.go",
+          "what": "Dev tool that verifies/updates examples, outputs and playground links in docs/checks.md (Makefile:57)."
+        },
+        {
+          "path": "fuzz/",
+          "what": "go-fuzz harness (parse/check/expr/glob targets), run manually (CONTRIBUTING.md:130-148)."
+        }
+      ],
+      "architecture": "Flat Go package `github.com/rhysd/actionlint` at the repo root plus cmd/actionlint/main.go. Flow: Command.Main (command.go) -> Linter (linter.go) -> Projects/Project (project.go: nearest directory containing `.github/workflows` and `.git`; config.go: optional `.github/actionlint.yaml|yml` with 3 keys: self-hosted-runner.labels, config-variables, paths.<glob>.ignore) -> workflow files read concurrently -> Parse (parse.go; go.yaml.in/yaml/v4 nodes, resolves YAML anchors; AST in ast.go; syntax errors get kind `syntax-check`) -> Visitor (pass.go) runs rule passes in rule_*.go. The 15 built-in rules (linter.go:557-573) are matrix, credentials, shell name, runner label, events, job needs, action, env var, id, glob, permissions, workflow call, expression, deprecated commands and if cond. Optional shellcheck and pyflakes rules spawn external executables through process.go, bounded by CPU count. Errors are sorted/deduped, filtered by -ignore or config path ignores, and printed by error.go (text with snippets, or a -format Go template). `${{ }}` expressions have their own lexer/parser/type system/semantic checker/untrusted-input checker (expr_lexer.go, expr_parser.go, expr_type.go, expr_sema.go, expr_insecure.go). Embedded data tables: popular_actions.go (generated; 218 `owner/repo@tag` specs plus 156 outdated specs), all_webhooks.go and availability.go (generated from GitHub docs), hosted-runner labels (rule_runner_label.go), permission scopes (rule_permissions.go). Local actions (action_metadata.go) and local reusable workflows (reusable_workflow.go) are read from the repo. Generators live in scripts/; the WASM playground is in playground/.",
+      "packaging_and_release": "A push of tag `v*.*.*` triggers .github/workflows/release.yaml (release.yaml:2-5). Job `binaries` (ubuntu-latest; permissions contents/id-token/attestations: write, release.yaml:9-13) builds the man page with an unpinned `gem install ronn` (16-20), then runs goreleaser-action@v7 with `version: '~> v2'` (27-32). .goreleaser.yaml defines CGO-free builds with `-s -w` and version ldflags for darwin (amd64, arm64), linux (386, arm, amd64, arm64), windows (386, amd64, arm64) and freebsd (386, amd64) (11-34); tar.gz and zip archives containing README.md, LICENSE.txt, docs/ and man/actionlint.1 (40-53); a SHA-256 checksums file `actionlint_<ver>_checksums.txt` (36-38); a GitHub release created as a pre-release (3-5); and a Homebrew cask commit to Casks/actionlint.rb (55-69). Next, actions/attest-build-provenance@v4 with `subject-checksums` over the checksums file (release.yaml:33-35) produces a GitHub artifact attestation (SLSA provenance v1 policy shown at CHANGELOG.md:15-38; verify with `gh attestation verify`, docs/install.md:111-116; since v1.7.11). Post-release steps: a download-script smoke test (36-37) and a CI commit to main bumping the script's default version (38-53). Separate jobs: `winget` (third-party vedantmgoyal9/winget-releaser@main with WINGET_TOKEN, 54-63) and `docker` (QEMU+Buildx, Docker Hub login with a secret, linux/amd64+arm64 image tagged <ver> and latest, 64-92). The maintainer runs scripts/bump-version.bash (bump commit, tag, push; bump-version.bash:77-87) and later publishes the release notes by hand (CONTRIBUTING.md:150-169). Not present: SBOMs, GPG/cosign signatures, an attestation step for the Docker image, -trimpath/mod_timestamp settings. Go module consumers use `go install ...@version`.",
+      "tests_and_ci": "Go `testing` with github.com/google/go-cmp. 36 `*_test.go` files (32 at the root, 4 under scripts/) holding about 225 Test/Benchmark/Example functions. Table-driven UI tests run the linter over testdata/ (598 files: examples [docs/checks.md examples], ok, err, projects, config, format, action_metadata, reusable_workflow_metadata, bench; Makefile:4-12; CONTRIBUTING.md:95-108). Tests needing shellcheck/pyflakes skip when absent (linter_test.go:48-57,188-195,219-226); no test file imports net/http. Also playground/test.ts (mocha) and scripts/generate-actionlint-matcher/test.mjs. Go micro-benchmarks exist (`make bench`, Makefile:90-91; linter_test.go:671-920) but no results are published; the go-fuzz harness is manual (CONTRIBUTING.md:130-148). CI has 6 workflows. ci.yaml (push + pull_request) has four jobs. `Unit tests` runs on ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, macos-26-intel and windows-11-arm with Go 1.25 and 1.26, using `go test -race -coverprofile` (no -race on windows-11-arm), a CGO-disabled build, dog-fooding `./actionlint -color` with the problem matcher, and a Codecov upload (ci.yaml:5-65). `Wasm` builds, lints and tests the playground (66-88). `Lint` runs gofmt, `make lint` (go vet, staticcheck@latest, govulncheck@latest, check-checks; Makefile:50-59) and shellcheck on scripts (89-118). `Dockerfile` builds and runs the image on the repo and runs hadolint with `--ignore DL3018` (119-137). The other five: codeql.yaml (CodeQL for Go and JS/TS on push/PR to main, weekly cron, manual; security-events: write), download.yaml (tests the download script on 3 OSes when it changes), generate.yaml (weekly cron, manual, and pushes to main touching two generator sources; regenerates data and opens a PR with peter-evans/create-pull-request), matcher.yaml (tests the problem-matcher generator) and release.yaml. `permissions:` appears only in codeql.yaml (workflow-level), generate.yaml (job-level) and release.yaml's `binaries` job; there are 37 `uses:` references, all tag or branch refs, none SHA-pinned.",
+      "dependencies": "Go: go.mod declares 12 direct requires (go.mod:5-18: doublestar/v4, fatih/color, google/go-cmp, mattn/go-colorable, mattn/go-runewidth, mattn/go-shellwords, robfig/cron/v3, yuin/goldmark, go.yaml.in/yaml/v4, golang.org/x/net, x/sync, x/sys) and 2 indirect (clipperhouse/uax29/v2, mattn/go-isatty; go.mod:20-23); go.sum has 29 lines; Go >= 1.25.0 (go.mod:3). Of the 12 direct requires, 9 are imported by the shipped CLI/library; go-cmp is used by tests and scripts/check-checks, golang.org/x/net by scripts/generate-webhook-events, and goldmark by scripts/generate-availability. Node: playground/package.json (private package; 5 dependencies + 18 devDependencies; package-lock.json present), used only for the playground. Docker: Dockerfile uses golang:${GOLANG_VER=latest}, koalaman/shellcheck-alpine:stable, alpine:${ALPINE_VER=latest} and `apk add --no-cache py3-pyflakes`, none digest-pinned. Optional runtime tools: shellcheck, pyflakes. CI-only: staticcheck@latest, govulncheck@latest, hadolint image, ronn gem, Codecov, plus 15 distinct GitHub Actions. Dependabot (.github/dependabot.yml:1-10) covers only the `github-actions` ecosystem (weekly, one group).",
+      "security_policy": "none - no SECURITY.md or equivalent anywhere in the repository (glob `**/*ecurity*` matches nothing); CONTRIBUTING.md:13-21 only describes filing public GitHub issues. Related automation: govulncheck (Makefile:54; ci.yaml:111-116) and CodeQL (codeql.yaml:1-60)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Syntax check for workflow files and strong type check for `${{ }}` expressions (README.md:10-12).",
+        "verified": "yes",
+        "evidence": "parse.go:1585 `Parse` returns `syntax-check` errors (parse.go:74-78; error.go:258). The expression lexer/parser/type system/semantic checker (expr_lexer.go, expr_parser.go, expr_type.go, expr_sema.go:367-381,1101) is driven by RuleExpression (rule_expression.go:35-52,282-325), one of the rules in linter.go:557-573. Every example in docs/checks.md has a test in testdata/examples (CONTRIBUTING.md:101-102)."
+      },
+      {
+        "claim": "Actions usage check: inputs at `with:` and outputs in `steps.{id}.outputs` are correct (README.md:13).",
+        "verified": "partial",
+        "evidence": "Code checks only (a) local `./` actions whose action.yml is read from the repo (rule_action.go:331-335,577-595) and (b) actions whose exact `owner/repo@ref` string is a key of the embedded PopularActions map (rule_action.go:375-383; popular_actions.go:7; 218 specs generated from 105 registry entries in scripts/generate-popular-actions/popular_actions.json). Any other spec (SHA, full version, branch, unlisted action) is skipped with a debug-only message (rule_action.go:381). Docs say only major-version refs like `actions/checkout@v4` are supported, not `@v4.0.1` or `@main` (docs/checks.md:1873-1874). For unknown actions `steps.<id>.outputs` is an open string map (rule_expression.go:352-358)."
+      },
+      {
+        "claim": "Reusable workflow check: inputs/outputs/secrets of reusable workflows and workflow calls (README.md:14).",
+        "verified": "partial",
+        "evidence": "Callee metadata is loaded only for local `./path` workflow calls (rule_workflow_call.go:55-58,79-89,150-163). Calls of the form `owner/repo/path@ref` get only a format check and return (rule_workflow_call.go:60-62,165-192); output typing likewise uses the local cache (rule_expression.go:361-379). Remote reusable workflows are never fetched (no net/http in the package)."
+      },
+      {
+        "claim": "shellcheck and pyflakes integrations for scripts at `run:` (README.md:15).",
+        "verified": "yes",
+        "evidence": "rule_shellcheck.go:163-236 runs `shellcheck --norc -f json -x --shell <sh> -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -` (line 193) after replacing `${{ }}` with underscores (130-161), only for bash/sh (165-173). rule_pyflakes.go:105-115 runs only for `shell: python`. Conditions: the executables must be on PATH, otherwise the rule is dropped and the reason is logged only with -verbose (linter.go:574-593,202-208; process.go:127-141). `-shellcheck=` / `-pyflakes=` disable them (command.go:137-138; docs/usage.md:37-43)."
+      },
+      {
+        "claim": "Security checks: script injection by untrusted inputs, hard-coded credentials (README.md:16).",
+        "verified": "partial",
+        "evidence": "The injection check uses a fixed built-in tree of 20 `github.*` context paths (expr_insecure.go:86-141). docs/checks.md:1105-1122 lists only 18 and omits github.event.discussion.title/body, which the code has at expr_insecure.go:134-137. It is applied to `run:` scripts and the `script` input of `actions/github-script@*` (rule_expression.go:289,295-297); contains()/startsWith()/endsWith() are exempt (expr_insecure.go:7-10). 'Hard-coded credentials' means only a non-expression `credentials.password` in `container:` or `services:` (rule_credentials.go:35-44; docs/checks.md:2064-2066). There is no generic secret scanning and no rule on pull_request_target, persist-credentials or token permissions (rule_*.go grep)."
+      },
+      {
+        "claim": "Permissions: 'actionlint checks permission scopes and access levels in a workflow are correct' (docs/checks.md:2157; the checks list is linked from README.md:20).",
+        "verified": "yes",
+        "evidence": "rule_permissions.go:5-22 hard-codes 16 scopes with allowed values; checkPermissions (52-83) reports unknown scopes and invalid values and accepts read-all/write-all (57-60). It never requires `permissions:` and never flags write-all or broad scopes, so it validates syntax only, not least-privilege policy."
+      },
+      {
+        "claim": "The popular-action check 'doesn't report that the action version is up-to-date'; use Dependabot for that (docs/checks.md:1911-1913), and only major-version refs are supported (docs/checks.md:1873-1874).",
+        "verified": "yes",
+        "evidence": "rule_action.go:346-392 validates only the `{owner}/{repo}@{ref}` format (ref non-empty), flags specs in OutdatedPopularActionSpecs (popular_actions.go:5066-5068; 156 specs whose runner is obsolete), and checks inputs for known specs. There is no SHA-vs-tag detection and no newer-version lookup. CONTRIBUTING.md:3-6 states checks enforcing conventions are generally not accepted."
+      },
+      {
+        "claim": "Prebuilt binaries for macOS (x86_64, arm64), Linux (i386, x86_64, arm32, arm64), Windows (i386, x86_64, arm64), FreeBSD (i386, x86_64); some targets are untested (docs/install.md:90-101).",
+        "verified": "yes",
+        "evidence": ".goreleaser.yaml:11-34 builds exactly those GOOS/GOARCH pairs with CGO_ENABLED=0 (14-16). The ci.yaml:9 matrix covers ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-26-intel, windows-latest and windows-11-arm, matching the documented untested set (Linux i386/arm32, Windows i386, FreeBSD)."
+      },
+      {
+        "claim": "Release artifacts can be verified with `gh attestation verify`; attestation support since v1.7.11 (docs/install.md:111-116).",
+        "verified": "yes",
+        "evidence": "release.yaml:10-13 grants id-token/attestations write. release.yaml:33-35 runs actions/attest-build-provenance@v4 with `subject-checksums` of dist/actionlint_<ver>_checksums.txt (sha256, .goreleaser.yaml:36-38); CHANGELOG.md:15-38 shows the SLSA provenance v1 policy output. Scope is the archives only: the Docker image job (release.yaml:64-92) has no attestation/SBOM step and no `permissions:` block, and the repo has no SBOM generation (grep: no sbom/cyclonedx/spdx/syft/cosign configuration)."
+      },
+      {
+        "claim": "Download script 'downloads the latest version ... recommended way if you install actionlint in some shell script' (docs/install.md:121-123).",
+        "verified": "partial",
+        "evidence": "scripts/download-actionlint.bash:45-58 hard-codes version=1.7.11 (stale at this v1.7.12 tag; bumped by a post-release CI commit to main, release.yaml:38-53). 'latest' or no argument just keeps that default, with no GitHub API lookup. Line 125 pipes `curl -L` into `tar xvz` with no checksum or attestation verification. The docs fetch the script itself from the `main` branch (docs/install.md:126)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Parallel checking of workflow files (v1.3.1, 2021): author-reported speedup versus the previous release",
+        "metric": "speedup, 3 workflow files, 'in my environment' (author)",
+        "value": "around 1.3x faster",
+        "source": "CHANGELOG.md:1961-1963",
+        "independent": false
+      },
+      {
+        "what": "Running shellcheck processes in parallel (v1.1.2, 2021): author-reported speedup versus the previous release",
+        "metric": "speedup, 'in my environment' (author)",
+        "value": "more than 3x faster",
+        "source": "CHANGELOG.md:2021-2023",
+        "independent": false
+      },
+      {
+        "what": "Building with Go 1.17 instead of Go 1.16 (v1.6.2, 2021): author-reported change",
+        "metric": "CPU-bound speed and built binary size",
+        "value": "2~7% faster; about 2% smaller binaries",
+        "source": "CHANGELOG.md:1707,1721",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope versus policy needs: actionlint validates `permissions:` names/values only (rule_permissions.go:5-22,52-83) and has no pinning/SHA/freshness check (rule_action.go:346-392; docs/checks.md:1873-1874,1911-1913). The repo has no SBOM, user-facing provenance, dependency-update or SARIF-upload feature, and project policy rejects convention-enforcing or configuration-heavy checks (CONTRIBUTING.md:3-6). A pin or permission policy would have to be written as a custom Go Rule via OnRulesCreated (linter.go:89-93; example_your_own_rule_test.go:33-65); the CLI has no way to load custom rules.",
+      "Action input/output validation covers only local actions and 218 embedded `owner/repo@major-tag` specs (105 registry entries). SHA-pinned, full-version or branch refs and unlisted actions are silently skipped (rule_action.go:375-383; docs/checks.md:1873-1874). The data set is a snapshot fetched by tag name and refreshed weekly through a generated PR (scripts/generate-popular-actions/main.go:57; generate.yaml:11-13,40-52), so workflows pinned by SHA lose these checks.",
+      "shellcheck/pyflakes are not bundled in the binary or `go install`. When they are missing, those rules are dropped and the reason is shown only under -verbose (linter.go:574-593,202-208), so `run:` scripts can go unlinted in CI with no warning. The Docker image bundles both (Dockerfile:12-17) but from floating sources (`koalaman/shellcheck-alpine:stable`, unpinned `apk add py3-pyflakes`); the Homebrew cask depends only on shellcheck (Casks/actionlint.rb:14-16).",
+      "Install/verification posture: the documented CI install fetches a script from the unpinned `main` branch (docs/install.md:126; docs/usage.md:213) that downloads and extracts the archive with no checksum or attestation check (scripts/download-actionlint.bash:125). Attestation verification is a separate optional manual step and exists only for releases >= v1.7.11 (docs/install.md:111-116). Docs also show mutable refs (`actions/checkout@v6`, `docker://rhysd/actionlint:latest`: docs/usage.md:210,251). The macOS executable is unsigned (docs/install.md:81-83); Linux i386/arm32, Windows i386 and FreeBSD binaries are untested (docs/install.md:97-101).",
+      "The project's own CI/release hygiene (relevant to pinning/permission goals): all 37 `uses:` references in 6 workflows are tag or branch refs and none is SHA-pinned (15 distinct actions), including `vedantmgoyal9/winget-releaser@main` used with a PAT secret (release.yaml:58-63). Tools are installed with `@latest` (ci.yaml:113-114) or unpinned (`gem install ronn` release.yaml:19; `pip install pyflakes` ci.yaml:27; hadolint image ci.yaml:137). Dockerfile base images default to `latest`/`stable` without digests (Dockerfile:1-2,12-14). Dependabot covers only github-actions (dependabot.yml:1-10), not go.mod, playground/package.json or the Dockerfile. `permissions:` is absent from ci.yaml, download.yaml, matcher.yaml and release.yaml's `winget`/`docker` jobs. The release has no -trimpath/mod_timestamp settings, SBOM or image attestation (.goreleaser.yaml:11-34; release.yaml:64-92).",
+      "Tracks GitHub through hard-coded tables and manual releases: permission scopes (rule_permissions.go:5-22), hosted-runner labels (rule_runner_label.go:32-62), webhook events (all_webhooks.go) and expression functions. New GitHub syntax is reported as an error until a release (e.g. `unknown permission scope`, rule_permissions.go:75). Recent releases added case() (CHANGELOG.md:4), runner labels (CHANGELOG.md:14,112) and the artifact-metadata and models permissions (CHANGELOG.md:90,172). The release process is a manual maintainer routine (CONTRIBUTING.md:150-169) with maintainer-specific identities (release.yaml:80; generate.yaml:51). The Go library has no semver stability (docs/api.md:49-52). Mitigation present: `-ignore` and config `paths.*.ignore` regex suppression (docs/config.md:31-59).",
+      "Documentation/pointer drift at this tag: Casks/actionlint.rb:6, scripts/download-actionlint.bash:46 and docs/install.md:106-115 still reference 1.7.11 (updated by post-release CI commits: release.yaml:38-53; .goreleaser.yaml:55-69). CHANGELOG.md has no v1.7.12 entry (top entry is v1.7.11, CHANGELOG.md:2; regenerated after publishing per CONTRIBUTING.md:161-162). docs/README.md:9-10 says only runner labels are configurable while config.go:56-70 supports three keys. CONTRIBUTING.md:157 refers to a removed HomebrewFormula (CHANGELOG.md:53). docs/checks.md:1105-1122 omits two untrusted-input paths present in code (expr_insecure.go:134-137).",
+      "No security policy or private vulnerability-reporting instructions in the repo (no SECURITY.md; CONTRIBUTING.md:13-21 directs bug reports to public issues). Licensing: the project is MIT (LICENSE.txt:1-21), but dependency licenses cannot be verified from this checkout (no vendor/ directory, NOTICE or license inventory); 9 direct third-party modules are imported by the shipped CLI (go.mod:5-18)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "rhysd/actionlint",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Prebuilt release archive via gh CLI (Linux x86_64 example), then optional attestation check: `gh release download --repo rhysd/actionlint --pattern '*_linux_amd64.tar.gz' v1.7.11` / `tar xf actionlint_1.7.11_linux_amd64.tar.gz` / `./actionlint -version` / `gh attestation verify -R rhysd/actionlint actionlint_1.7.11_linux_amd64.tar.gz` (docs examples use v1.7.11 although this checkout is v1.7.12; archive targets at docs/install.md:90-95).",
+          "citation": "docs/install.md:105-109,114-116 (targets 90-95)",
+          "holds": true,
+          "note": "The commands match docs/install.md:106-108 and :115 word for word. Line 103 calls this the x86_64 Linux example, and line 112 says attestation is optional, recommended and available since v1.7.11. The caveat that the examples say v1.7.11 while the checkout is v1.7.12 is accurate. The target list at 90-95 is correct. release.yaml:33-35 attests the goreleaser checksums file (.goreleaser.yaml:36-38), which supports the verify step. Chosen because it is the only documented install path with provenance verification, which is central to the dossier's supply-chain framing."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE.txt (README.md:128: 'actionlint is distributed under the MIT license').",
+          "citation": "LICENSE.txt:1-20; README.md:128",
+          "holds": true,
+          "note": "LICENSE.txt is the standard MIT text ('the MIT License', 'Copyright (c) 2021 rhysd'), and README.md:128 says the same. LICENSE.txt is the only LICENSE, COPYING or NOTICE file in the tree, and playground/package.json:21 also declares MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - release archive for linux/amd64 (docs/install.md:90-96; .goreleaser.yaml:21-24), Docker image for linux/amd64 (release.yaml:85); unit tests run on ubuntu-latest (ci.yaml:9-12,42).",
+          "citation": "docs/install.md:90-96; .goreleaser.yaml:21-24; release.yaml:85; ci.yaml:9-12,42",
+          "holds": true,
+          "note": "docs/install.md:93 lists Linux x86_64, and it is not in the untested list at 97-101. In .goreleaser.yaml:22-24 the linux goarch list includes amd64, built with CGO_ENABLED=0 (line 16). release.yaml:85 sets `platforms: linux/amd64,linux/arm64`. ci.yaml:9 includes ubuntu-latest in the matrix, and :42 runs `go test -v -race` on every OS except windows-11-arm."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "`actionlint [FLAGS] [FILES...] [-]`; with no args it finds the nearest `.github/workflows`. Flags -ignore, -shellcheck/-pyflakes, -format (JSON, JSON Lines, Markdown, ::error, SARIF via template), -oneline, -config-file, -init-config, -color/-no-color, -verbose, -debug, -version, -stdin-filename. Exit codes 0/1/2/3. Problem Matchers, reviewdog, super-linter, pre-commit, editors/trunk. The SARIF template emits driver 'GitHub Actions lint', version, informationUri, rules per kind and per-error file/line/column. No upload-sarif step is documented.",
+          "citation": "docs/usage.md:6-26,45-120,181-190,310-448; command.go:18-27,126-194; testdata/format/sarif_template.txt:1-66; .pre-commit-hooks.yaml; .github/actionlint-matcher.json; man/actionlint.1.ronn",
+          "holds": true,
+          "note": "command.go:136-148 defines exactly the 13 listed flags. -ignore is repeatable (ignorePatternFlags.Set appends), and -shellcheck/-pyflakes are disabled when set empty. The no-argument path runs LintRepository (102-104), and the help text at 40-41 says it finds the nearest .github/workflows. Exit codes match command.go:18-27 and usage.md:185-190. usage.md:52-120 has the JSON, Markdown, JSON Lines, ::error and SARIF examples. The integrations match usage.md:310-326, 328-348, 350-356, 358-380 (its three hooks match .pre-commit-hooks.yaml) and 382-448. The SARIF template is 66 lines: name at line 8, version 9, informationUri 10, rules from allKinds 11-31, and results with uri/startLine/startColumn/endColumn at 34-63. A repo-wide grep finds no upload-sarif. Minor citation slip: the literal usage line is at command.go:36 (printUsageHeader, called through flags.Usage at 149-152), outside the cited 126-194."
+        },
+        {
+          "field": "claim_checks[6]",
+          "statement": "The popular-action check 'doesn't report that the action version is up-to-date'; use Dependabot for that (docs/checks.md:1911-1913), and only major-version refs are supported (docs/checks.md:1873-1874). verified: yes. Evidence: rule_action.go:346-392 validates only the owner/repo@ref format, flags OutdatedPopularActionSpecs (popular_actions.go:5066-5068; 156 specs) and checks inputs for known specs; no SHA-vs-tag detection or newer-version lookup; CONTRIBUTING.md:3-6 rejects convention-enforcing checks.",
+          "citation": "docs/checks.md:1873-1874,1911-1913; rule_action.go:346-392; popular_actions.go:5066-5068; CONTRIBUTING.md:3-6",
+          "holds": true,
+          "note": "Both docs/checks.md quotes are verbatim. checkRepoAction (rule_action.go:347-392) parses owner/repo@ref and errors on empty parts (371-373). That check covers owner and repo as well as ref, so the evidence's 'ref non-empty' is incomplete but not wrong. It then looks up PopularActions[spec] (375) and errors on OutdatedPopularActionSpecs (377-379). Unknown specs only get a debug log (381), and inputs are checked for known specs (389-391). The map at popular_actions.go:5068 has exactly 156 entries (lines 5069-5224). Grepping rule_*.go for sha, hash, pin or commit finds no pinning logic. CONTRIBUTING.md:3-4 says checks that enforce conventions are generally not accepted. Chosen because purpose answer (2) and risk 1 depend on it."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

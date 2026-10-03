@@ -1,0 +1,292 @@
+{
+  "contender": "run-llama/llama_index",
+  "revision": {
+    "contender": "run-llama/llama_index",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "run-llama/llama_index",
+        "tag": "v0.14.25",
+        "commit": "f12d46acab73f5b2243ef49c2f00101617b38ce4",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.14.25",
+    "commit": "f12d46acab73f5b2243ef49c2f00101617b38ce4",
+    "read_at": "2026-10-02T03:03:05+00:00"
+  },
+  "dossier": {
+    "contender": "run-llama/llama_index",
+    "revision": {
+      "tag": "v0.14.25",
+      "commit": "f12d46acab73f5b2243ef49c2f00101617b38ce4",
+      "read_at": "2026-10-02T03:03:05+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "LlamaIndex OSS is a Python 'data framework' for building LLM, RAG and agent applications. Readers load documents (SimpleDirectoryReader plus 149 reader packages). An IngestionPipeline (transformations, cache, docstore hash dedup/upsert) chunks and embeds them into indices or vector stores. Retrievers and query engines answer over them. Agents and a workflow runtime are included. It is a monorepo: llama-index-core plus 551 separately published integration packages (LLMs, embeddings, vector stores, readers, tools, retrievers and more). README.md:11-15 says the company's primary focus has shifted to the hosted LlamaParse platform, LiteParse and benchmarks, while the OSS framework stays available. It is a library: no search server, CLI or MCP server for local document collections ships in this checkout, and no single tool converts all difficult-layout formats. Converters are separate optional reader packages (see code.architecture).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Current focus is 'the best AI-powered engine for document parsing and extraction'. LlamaParse is the enterprise platform for agentic OCR, parsing, extraction and indexing. LiteParse is a free, fast, cheap text parser. ParseBench and ExtractBench are open benchmarks.",
+          "citation": "README.md:11"
+        },
+        {
+          "claim": "'While we still have the OSS framework available as an open toolkit... our primary focus has shifted towards LlamaParse, along with liteparse and our benchmarking efforts.'",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "LlamaIndex OSS is an open-source framework to build agentic applications; LlamaParse can be used with it or on its own.",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Two ways to start: the `llama-index` starter (core plus a selection of integrations) or `llama-index-core` plus chosen integration packages ('over 300' integration packages).",
+          "citation": "README.md:28-33"
+        },
+        {
+          "claim": "LlamaParse (hosted platform): Parse = 'Agentic OCR and document parsing (130+ formats)'; sign-up creates an account and API key; also Extract, Index, Split, Agents.",
+          "citation": "README.md:53-60"
+        },
+        {
+          "claim": "Data connectors ingest existing data sources and formats (APIs, PDFs, docs, SQL, etc.); indices/graphs structure the data; a retrieval/query interface returns retrieved context and augmented output.",
+          "citation": "README.md:89-91"
+        },
+        {
+          "claim": "Beginners can ingest and query data in 5 lines of code; lower-level APIs let advanced users customise data connectors, indices, retrievers, query engines and reranking modules.",
+          "citation": "README.md:94-96"
+        },
+        {
+          "claim": "Example: SimpleDirectoryReader(dir).load_data() then VectorStoreIndex.from_documents(documents) using OpenAI (OPENAI_API_KEY); alternative example with an Ollama LLM and HuggingFace embeddings.",
+          "citation": "README.md:125-164"
+        },
+        {
+          "claim": "Query with index.as_query_engine().query(...).",
+          "citation": "README.md:166-171"
+        },
+        {
+          "claim": "By default data is stored in memory; index.storage_context.persist() writes under ./storage; reload with StorageContext.from_defaults(persist_dir=...) and load_index_from_storage.",
+          "citation": "README.md:173-189"
+        },
+        {
+          "claim": "llama-index-core ships a `_static` folder with nltk and tiktoken caches so it runs where runtime disk access is restricted; the GitHub attest-build-provenance action attests those files and `gh attestation verify` can check them.",
+          "citation": "README.md:191-208"
+        },
+        {
+          "claim": "New integrations should integrate meaningfully with core; maintainers may decline some.",
+          "citation": "README.md:103"
+        },
+        {
+          "claim": "README is not updated as frequently as the documentation; docs are hosted at developers.llamaindex.ai.",
+          "citation": "README.md:76, README.md:105-109"
+        },
+        {
+          "claim": "Examples are in docs/examples; 'Indices are in the `indices` folder (see list of indices below)'.",
+          "citation": "README.md:121"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (starter bundle)",
+          "command": "pip install llama-index",
+          "citation": "docs/src/content/docs/framework/getting_started/installation.mdx:17-19"
+        },
+        {
+          "method": "pip (core plus chosen integrations)",
+          "command": "pip install llama-index-core; pip install llama-index-llms-openai; pip install llama-index-llms-ollama; pip install llama-index-embeddings-huggingface",
+          "citation": "README.md:113-119"
+        },
+        {
+          "method": "pip (local-model setup that includes readers-file)",
+          "command": "pip install llama-index-core llama-index-readers-file llama-index-llms-ollama llama-index-embeddings-huggingface",
+          "citation": "docs/src/content/docs/framework/getting_started/installation.mdx:49-51"
+        },
+        {
+          "method": "from source (editable)",
+          "command": "git clone https://github.com/run-llama/llama_index.git; pip install -e llama-index-core   (docs precede this with `poetry shell`; CONTRIBUTING.md:15-20 uses `uv sync` instead)",
+          "citation": "docs/src/content/docs/framework/getting_started/installation.mdx:59-77"
+        },
+        {
+          "method": "pip (Docling document-conversion reader)",
+          "command": "pip install llama-index-readers-docling",
+          "citation": "llama-index-integrations/readers/llama-index-readers-docling/README.md:9-11"
+        },
+        {
+          "method": "pip (MCP client tool package)",
+          "command": "pip install llama-index-tools-mcp",
+          "citation": "llama-index-integrations/tools/llama-index-tools-mcp/README.md:9-11"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs build, lint, typecheck and unit tests on Ubuntu runners (.github/workflows/unit_test.yml:12, build_package.yml:16, lint.yml:11). The CPU architecture is not stated in the repo. llama-index-core is built with hatchling from Python sources (llama-index-core/pyproject.toml:109-125); compiled dependencies such as numpy and tiktoken come from PyPI.",
+        "wsl2": "unknown - no WSL2 statement in README or framework docs (the only WSL mention is a Celery-on-Windows aside, docs/src/content/docs/framework/understanding/putting_it_all_together/apps/fullstack_with_delphic.md:43) and no WSL CI job.",
+        "macos_arm64": "unknown - no macOS support statement and no macOS CI job (build matrix is ubuntu-latest + windows-latest, .github/workflows/build_package.yml:16; unit tests are Ubuntu only, unit_test.yml:12). Docs show macOS/Linux shell syntax (docs/src/content/docs/framework/getting_started/starter_example.mdx:25-26), note Linux/macOS multiprocessing behaviour (docs/src/content/docs/framework/module_guides/loading/simpledirectoryreader.md:37-42), and core can select the Apple 'mps' torch device (llama-index-core/llama_index/core/utils.py:593-594).",
+        "gpu": "yes (optional, integration-specific) - llama-index-core has no torch/GPU dependency (llama-index-core/pyproject.toml:57-87) and only picks cuda/mps/cpu when a local torch model is used (llama-index-core/llama_index/core/utils.py:583-595). GPU use lives in optional packages, e.g. LayoutIR use_gpu (llama-index-integrations/readers/llama-index-readers-layoutir/README.md:54-63), the marker reader's VRAM note (llama-index-integrations/readers/llama-index-readers-pdf-marker/llama_index/readers/pdf_marker/base.py:33) and the Donut image reader (llama-index-integrations/readers/llama-index-readers-file/llama_index/readers/file/image/base.py:108)."
+      },
+      "integrations": {
+        "cli": "None for search, ingest or readback in this checkout. The old `llamaindex-cli` RAG CLI moved to a separate `llama-index-cli` package: llama-index-core/llama_index/core/command_line/__init__.py:1 says 'Deprecated. CLI is now its own package llama-index-cli'. No llama-index-cli/ directory exists at v0.14.25 and the starter does not depend on it (pyproject.toml:41-46), although SECURITY.md:14 and CONTRIBUTING.md:66 still name it. The only CLI shipped from this repo is `llama-dev` (monorepo package/test/release tooling: llama-dev/pyproject.toml:28-29, llama-dev/llama_dev/cli.py:24-44).",
+        "mcp": "Client side only in this repo. `llama-index-tools-mcp` provides BasicMCPClient, McpToolSpec and get_tools_from_mcp_url so agents can call tools of existing MCP servers (llama-index-integrations/tools/llama-index-tools-mcp/README.md:3, llama_index/tools/mcp/__init__.py:1-15; depends on mcp>=2.0.0,<3 at pyproject.toml:44). The helper `workflow_as_mcp(workflow, ...)` wraps a user-written Workflow as an `MCPServer` (llama_index/tools/mcp/utils.py:77-141; README.md:58-101). It is not a ready-made document-search server, and the bundled example server is an IP-info demo (examples/mcp_server.py:27-54). Docs point to a separate `llamacloud-mcp` server (a different repo, not in this checkout) that queries LlamaCloud indexes and LlamaExtract agents and needs a LlamaCloud org, project and API key (docs/src/content/docs/framework/module_guides/mcp/llamacloud_mcp.md:5-9, 17-52).",
+        "sdk_or_api": "Python SDK: llama-index-core plus integration packages, imported as llama_index.core.* or llama_index.<kind>.<name> (README.md:35-49). Relevant classes are SimpleDirectoryReader, IngestionPipeline, VectorStoreIndex/VectorIndexRetriever, BM25Retriever and QueryFusionRetriever (see code.entry_points). No HTTP API or server ships in the repo. The hosted LlamaCloud API (https://api.cloud.llamaindex.ai, llama-index-core/llama_index/core/constants.py:35-36) is a separate service, and core's LlamaCloud client helpers are marked deprecated and never called (llama-index-core/llama_index/core/ingestion/api_utils.py:14-49).",
+        "claude_code_or_codex": "No Claude Code plugin/skill/hook, CLAUDE.md/AGENTS.md or Codex integration found (searched repo-wide for 'claude code', 'codex', CLAUDE.md, AGENTS.md; the only other hit is a gitignore entry at llama-index-integrations/readers/llama-index-readers-layoutir/.gitignore:155-157). The sole mention: docs show adding the external `llamacloud-mcp` server to the config of 'an MCP host like claude-code' (docs/src/content/docs/framework/module_guides/mcp/llamacloud_mcp.md:19-52, with the API key passed in args at :38-39). No Codex mention."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found in llama-index-core (searched telemetry, posthog, sentry, analytics, mixpanel, opt-out; only unrelated names in llama-index-core/llama_index/core/command_line/mappings.json). Observability is opt-in: set_global_handler() can enable third-party handlers (wandb, openinference, arize_phoenix, honeyhive, promptlayer, deepeval, simple, argilla, langfuse, agentops, literalai, opik; llama-index-core/llama_index/core/callbacks/global_handlers.py:6-147); the default global_handler is None (llama_index/core/__init__.py:145) and the instrumentation dispatcher defaults to Null handlers (llama-index-instrumentation/src/llama_index_instrumentation/__init__.py:13-18). Accounts and network: the default LLM and embedding model resolve to OpenAI and raise unless OPENAI_API_KEY is valid (llama_index/core/llms/utils.py:40-71, llama_index/core/embeddings/utils.py:42-76; docs/src/content/docs/framework/getting_started/installation.mdx:30-33). Env IS_TESTING swaps in mocks (llms/utils.py:42-47). A local alternative (Ollama plus HuggingFace embeddings) is documented (README.md:138-164; docs/.../getting_started/starter_example_local.mdx:26-30, 128-147). Runtime downloads: NLTK stopwords/punkt_tab are bundled in `_static` of the released package and fetched with nltk.download only if the bundled cache is missing (llama_index/core/utils.py:56-70, 83-102; installation.mdx:28); tiktoken uses the bundled cache dir unless TIKTOKEN_CACHE_DIR is set (utils.py:165-179). In a git checkout `_static` holds only .gitignore placeholders (llama-index-core/llama_index/core/_static/.gitignore) because the caches are generated in release.yml:36-41. URL inputs are fetched with requests.get in resolve_binary (utils.py:626-710, 704), and SimpleDirectoryReader can read remote filesystems via fsspec (docs/.../loading/simpledirectoryreader.md:166-189). LlamaParse (hosted) needs a LlamaCloud account and API key (README.md:55; env LLAMA_CLOUD_API_KEY, default API URL constants.py:35-36); the in-repo llama-parse reader is a deprecated wrapper (llama-index-integrations/readers/llama-index-readers-llama-parse/README.md:3). Other converter readers: the Upstage reader posts to https://api.upstage.ai and needs UPSTAGE_API_KEY (llama-index-readers-upstage/llama_index/readers/upstage/base.py:13, 145-171); DashScope parse needs an API key (llama-index-readers-dashscope/README.md:27-33); the Legacy Office reader downloads a Tika JAR on first use and runs a local server on port 9998 (llama-index-readers-legacy-office/README.md:63-64); Donut image OCR, when enabled, downloads naver-clova-ix/donut-base-finetuned-cord-v2 from Hugging Face (llama-index-readers-file/.../image/base.py:62-67); PPTX image captioning (off by default, slides/base.py:43) downloads nlpconnect/vit-gpt2-image-captioning (slides/image_extractor.py:46-53). The Docling reader accepts URLs (llama-index-readers-docling/llama_index/readers/docling/base.py:56); whether Docling downloads models is not checkable from this repo."
+    },
+    "code": {
+      "languages": [
+        "Python (all packages)",
+        "Markdown/MDX and Jupyter notebooks (docs/)",
+        "YAML (GitHub Actions)",
+        "JavaScript (docs-site assets only: docs/src/content/docs/framework/_static/js, docs/src/content/docs/framework/javascript)"
+      ],
+      "entry_points": [
+        {
+          "path": "llama-index-core/llama_index/core/readers/file/base.py",
+          "what": "SimpleDirectoryReader (line 208): directory/file loader. Default PDF/DOCX/PPTX/EPUB/image/XLSX extractors come from llama-index-readers-file only if installed (68-113). Unmapped extensions (.md, .html, .txt) are read as raw text (634-644). Metadata includes file_path, file_name, file_type, file_size and dates (148-184). filename_as_id=True gives stable ids (628-643)."
+        },
+        {
+          "path": "llama-index-core/llama_index/core/ingestion/pipeline.py",
+          "what": "IngestionPipeline (262): transformations, IngestionCache, optional vector_store and docstore. DocstoreStrategy UPSERTS/DUPLICATES_ONLY/UPSERTS_AND_DELETE (242-259) based on doc-id/hash maps. run()/arun() store input documents in the docstore when store_doc_text=True (518-536, 539-662). persist()/load() default to ./pipeline_storage (374-421)."
+        },
+        {
+          "path": "llama-index-core/llama_index/core/indices/vector_store/retrievers/retriever.py",
+          "what": "VectorIndexRetriever (24-80): vector_store_query_mode (VectorStoreQueryMode DEFAULT/SPARSE/HYBRID/TEXT_SEARCH/SEMANTIC_HYBRID/MMR, vector_stores/types.py:45-60), alpha, sparse_top_k, hybrid_top_k, metadata filters, doc_ids. Used by VectorStoreIndex (indices/vector_store/base.py)."
+        },
+        {
+          "path": "llama-index-core/llama_index/core/retrievers/fusion_retriever.py",
+          "what": "QueryFusionRetriever (33): fuses several retrievers (e.g. vector plus BM25) with simple / reciprocal-rank / relative-score / dist-based fusion (24-30); num_queries defaults to 4, so it calls the LLM to generate extra queries unless num_queries=1 (41, 276-279)."
+        },
+        {
+          "path": "llama-index-integrations/retrievers/llama-index-retrievers-bm25/llama_index/retrievers/bm25/base.py",
+          "what": "BM25Retriever (41): lexical retriever over nodes using bm25s and PyStemmer; from_defaults(index|nodes|docstore), persist()/from_persist_dir() (211-227), metadata-filter weight mask. Separate PyPI package; its README is a single heading line."
+        },
+        {
+          "path": "llama-index-integrations/readers/llama-index-readers-docling/llama_index/readers/docling/base.py",
+          "what": "DoclingReader (15): wraps docling DocumentConverter; exports each source (file path or URL) to Markdown or Docling-JSON text as one Document with a random uuid4 id by default (41-44, 46-83). Wrapper only; the conversion is done by the docling library."
+        },
+        {
+          "path": "llama-dev/llama_dev/cli.py",
+          "what": "`llama-dev` console script (llama-dev/pyproject.toml:28-29): click group with pkg, test and release subcommands for monorepo development. It is the only CLI shipped from this repo. (llama-index-instrumentation/pyproject.toml:18-19 declares a `llama-index-instrumentation` script pointing at llama_index_instrumentation:main, but no `main` exists in that package.)"
+        },
+        {
+          "path": "llama-index-integrations/tools/llama-index-tools-mcp/llama_index/tools/mcp/utils.py",
+          "what": "workflow_as_mcp (77-141) returns an MCPServer exposing a Workflow as one tool; get_tools_from_mcp_url/aget_tools_from_mcp_url (20-74) are client-side. No server main."
+        }
+      ],
+      "architecture": "Python monorepo (hatchling build, uv workflows) of independently versioned packages. (1) llama-index-core/llama_index/core/ is the framework: readers/ (BaseReader; readers/file/base.py SimpleDirectoryReader), ingestion/ (pipeline.py, cache.py), node_parser/ (SentenceSplitter, file/markdown.py MarkdownNodeParser, HTML/JSON parsers, relational/ element parsers incl. markdown_element.py and llama_parse_json_element.py that summarise tables with an LLM via base_element.py:194-236), schema.py (Document, TextNode, NodeRelationship.SOURCE, sha256 hash), indices/ (vector_store, keyword_table incl. Simple/RAKE variants, summary, tree, knowledge graph, property graph), retrievers/ (fusion, auto_merging, recursive, router, transform), vector_stores/ (types.py VectorStoreQueryMode; simple.py in-memory store), storage/ (StorageContext, docstore, index_store, kvstore; default persist dir ./storage), plus embeddings/, llms/, query_engine/, chat_engine/, agent/, tools/, memory/, evaluation/ and callbacks/. instrumentation/ and workflow/ are thin re-exports of the separately published llama-index-instrumentation and `workflows` (llama-index-workflows) packages (llama-index-core/pyproject.toml:83; llama-index-core/uv.lock:1590-1597). (2) llama-index-integrations/<kind>/<package>/ holds 551 separately published packages (e.g. 149 under readers/, plus llms, embeddings, vector_stores, tools, retrievers, node_parser, graph_stores, callbacks, indices, ingestion, agent, extractors, graph_rag), each with its own pyproject.toml, uv.lock and tests/. (3) The root pyproject.toml is the `llama-index` starter meta-package (dependencies only; its hatch include path _llama-index/llama_index is absent from the checkout). (4) llama-index-instrumentation/ (dispatcher/event/span observability), llama-index-utils/ (4 packages), llama-dev/ (monorepo CLI), docs/ (framework docs, API reference, examples). llama-index-cli, llama-index-packs, llama-index-experimental and llama-index-finetuning are absent from this checkout although CONTRIBUTING.md:61-66, SECURITY.md:14 and Makefile:22-29 still reference them. Document path: SimpleDirectoryReader -> Document -> IngestionPipeline (transformations plus optional vector_store and docstore) -> TextNodes with a SOURCE relationship to the parent document and best-effort char offsets (node_parser/node_utils.py:42, node_parser/interface.py:104-118) -> vector store and/or docstore -> retrievers. Document-conversion options in the repo (none is a single all-format tool; each is a separately installed wrapper): llama-index-readers-file defaults (PDF via pypdf plain text per page, docs/base.py:79-98; DOCX via docx2txt text, docs/base.py:126-133; PPTX via python-pptx; EPUB via EbookLib+html2text, epub/base.py:51-56; images with OCR off by default, image/base.py:31; PyMuPDFReader plain text; UnstructuredReader via local `unstructured` or the Unstructured API, unstructured/base.py:124-152; HTML only via HTMLTagReader <section> text, html/base.py:11-77, not in the default map); llama-index-readers-docling (PDF, DOCX, HTML and 'other document types' to Markdown or Docling JSON; README.md:5, base.py:72-77; JSON export needs the Docling node parser, README.md:43-45); llama-index-readers-markitdown (MarkItDown 0.1.0 to Markdown for .docx .html .xml .csv .pdf .pptx .xlsx .json .zip .txt .md; no .epub or image types in its allow-list, markitdown/base.py:53-66; ignores extra_info, 109-129); llama-index-readers-pdf-marker (PDF to Markdown with OCR languages, marker-pdf>=0.2.0,<0.3, GPL-3.0-or-later); llama-index-readers-nougat-ocr (PDF to Markdown via the nougat CLI, GPL-2.0-or-later); llama-index-readers-paddle-ocr (PDF text plus OCR of embedded images); llama-index-readers-layoutir (PDF layout blocks, Python>=3.12); llama-index-readers-legacy-office (.doc via a local Apache Tika server, Java 11+); cloud: LlamaParse via the deprecated llama-index-readers-llama-parse wrapper (account/API key), Upstage Document Parse (text/html output, API key, AGPL-3.0), DashScope.",
+      "packaging_and_release": "Artifacts: sdists and wheels built with `uv build` (hatchling) and published to PyPI for llama-index-core and the llama-index starter (both 0.14.25; requires-python >=3.10,<4.0; llama-index-core/pyproject.toml:37-40, pyproject.toml:68-69) and for each sub-package. .github/workflows/release.yml runs on workflow_dispatch or when the release PR from vars.RELEASE_BRANCH_NAME is merged into main (3-9, 18): it populates the nltk/tiktoken caches (36-41), runs actions/attest-build-provenance@v4 over llama-index-core/llama_index/core/_static/**/* (43-47), runs core tests (49-52), then `uv publish --token ${{ secrets.LLAMA_INDEX_PYPI_TOKEN }}` (54-59, 116-120). The GitHub Release v<version> attaches only dist/*.tar.gz built at the repo root, i.e. the starter meta-package sdist (105-137). publish_sub_package.yml publishes any sub-package whose version is missing from PyPI on every push to main with `uv publish --token` and no test step (67-124). pre_release.yml opens the release PR using `llama-dev release prepare/changelog` (39-62). No checksums, signatures or attestations are produced for the wheels/sdists; the only attestation covers the `_static` cache files (README.md:191-208 documents verifying them with `gh attestation verify`). The cache directories are .gitignore placeholders in git and are generated at release time. sync-docs.yml copies docs to the run-llama/developers repo (sync-docs.yml:33-38, 49-63).",
+      "tests_and_ci": "pytest (+pytest-asyncio, pytest-cov, pytest-timeout, pytest-mock; llama-index-core/pyproject.toml:5-33). Test dirs: llama-index-core/tests/ (192 test_*.py files; 256 .py including conftest/helpers), llama-index-integrations/**/tests/ (737 test_*.py across 551 packages), llama-index-instrumentation/tests/ (4), llama-dev/tests/ (8): roughly 940 test files. CONTRIBUTING.md:104-110 asks contributors to mock remote systems and states CI fails below 50% coverage. 14 workflows in .github/workflows: unit_test.yml (pull_request only; `llama-dev test --base-ref` runs pytest in changed packages and their dependants on Python 3.10/3.11/3.12 on ubuntu-latest-unit-tester, plus llama-index-core with coverage on 3.14: lines 3-4, 12-16, 44-71); coverage_check.yml (PR; diff-cover >=50% on changed lines, Python 3.12: lines 6-10, 35-46); build_package.yml (push to main and PR; uv build, install the wheel, import llama_index on ubuntu-latest and windows-latest); lint.yml (pre-commit: ruff, ruff-format, mypy, black/blacken-docs, prettier, codespell, nb-clean, toml-sort, detect-private-key; .pre-commit-config.yaml); core-typecheck.yml (mypy on llama-index-core, Python 3.12); codeql.yml (python; push, PR and weekly cron); llama_dev_tests.yml (pytest for llama-dev when it changes); release.yml, pre_release.yml, publish_sub_package.yml (release); sync-docs.yml (docs sync); close_new_integration_prs.yml, stale_bot.yml, issue_classifier.yml (repo hygiene; the classifier uses a LlamaCloud API key secret, issue_classifier.yml:24); dependabot.yml (weekly github-actions and uv updates). llama-dev test skips packages without tests or with incompatible Python, does not fail CI when a package fails to install, and reports a 300 s pytest timeout as 'no tests' (llama-dev/llama_dev/test/__init__.py:360-365, 538-548). The Makefile still lists pants-based test targets (Makefile:13-29) that CI does not use. Reader-wrapper tests are thin: docling has 2 mocked tests (readers-docling/tests/test_readers_docling.py:92-140), markitdown has 1 class test (tests/test_markitdownreader.py:5), pdf-marker has no tests directory.",
+      "dependencies": "Root pyproject.toml (llama-index starter): 4 runtime deps (llama-index-core, llama-index-embeddings-openai, llama-index-llms-openai, nltk) plus a 19-entry dev group (lines 5-26, 41-46); not llama-index-readers-file. llama-index-core/pyproject.toml: 29 runtime deps at lines 58-86 (SQLAlchemy[asyncio], dataclasses-json, deprecated, fsspec, httpx, nest-asyncio, nltk, numpy, tenacity, tiktoken, typing-extensions, typing-inspect, requests, aiohttp, networkx, dirtyjson, tqdm, pillow, PyYAML, wrapt, pydantic>=2.8, filetype, eval-type-backport (python<3.10 marker, moot), banks, aiosqlite, llama-index-workflows, setuptools, platformdirs, tinytag) plus a 26-entry dev group; llama-index-core/uv.lock is present. llama-index-instrumentation/pyproject.toml: 2 (deprecated, pydantic). llama-dev/pyproject.toml: 4 (click, packaging, rich, tomli). Integration manifests: 551 llama-index-integrations/*/*/pyproject.toml plus 4 under llama-index-utils, each with its own dependencies and usually a uv.lock (602 uv.lock files repo-wide). Examples: readers-file 6 (beautifulsoup4, pypdf, striprtf, pandas, llama-index-core, defusedxml; optional pymupdf extra, pyproject.toml:72-82); readers-docling 4 (llama-index-core, docling-core, docling, numpy>=2.0); readers-markitdown 2 (markitdown[all]==0.1.0, llama-index-core); readers-llama-parse 2 (llama-parse>=0.5.0, llama-index-core); readers-pdf-marker 2 (marker-pdf>=0.2.0,<0.3, llama-index-core); retrievers-bm25 3 (bm25s, pystemmer, llama-index-core); tools-mcp 3 (mcp>=2.0.0,<3, llama-index-core, pydantic). docs/api_reference/pyproject.toml is a Poetry manifest for the docs build only.",
+      "security_policy": "SECURITY.md (repo root). Huntr bug bounty covers only llama-index, llama-index-core, llama-index-embeddings-openai, llama-index-llms-openai and llama-index-cli (SECURITY.md:5-14); other integrations are out of scope but reportable via GitHub's private 'Report a vulnerability' form (16-28); LlamaCloud issues and other concerns go to security@llamaindex.ai (70-80). Threat model: a library for trusted execution environments; input validation, authN/Z and rate limiting belong to the host application (30-38). Out-of-scope classes: SSRF via loaders/helpers (resolve_image, download_loader, readers), path traversal/deserialization with untrusted paths, prompt injection, DoS from unbounded input, OWASP-style bugs in host handlers (40-48). In-scope examples: insecure temp files, secrets in debug logs, disabled TLS verification (52-68). Supporting controls: CodeQL (.github/workflows/codeql.yml), dependabot (.github/dependabot.yml), detect-private-key hook (.pre-commit-config.yaml:16)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:28 - `llama-index` is a starter package that includes core LlamaIndex plus a selection of integrations",
+        "verified": "partial",
+        "evidence": "Root pyproject.toml:41-46 lists only llama-index-core, llama-index-embeddings-openai, llama-index-llms-openai and nltk. docs/src/content/docs/framework/getting_started/installation.mdx:21-26 also lists llama-index-readers-file in the bundle, but the manifest does not depend on it (code wins). So `pip install llama-index` does not install the default PDF/DOCX/PPTX/EPUB readers (llama-index-core/llama_index/core/readers/file/base.py:68-90)."
+      },
+      {
+        "claim": "README.md:89 - data connectors ingest existing data sources and formats (APIs, PDFs, docs, SQL, etc.)",
+        "verified": "partial",
+        "evidence": "Connectors are separate packages (149 under llama-index-integrations/readers). SimpleDirectoryReader's default PDF/DOCX/PPTX/EPUB/image/XLSX readers come from llama-index-readers-file and are used only if it is installed. Otherwise a warning is logged and the file is decoded as UTF-8 text with errors ignored (llama-index-core/llama_index/core/readers/file/base.py:68-113, 634-644). Even with it installed, DOCX/EPUB/PPTX/XLSX/HWP readers import packages it does not declare: docx2txt (readers/file/docs/base.py:117), ebooklib+html2text (epub/base.py:29-31), pptx (slides/base.py:342), openpyxl (tabular/base.py:189), olefile (docs/base.py:165); declared deps are at llama-index-readers-file/pyproject.toml:72-79. An ImportError aborts the whole load (core readers/file/base.py:614-617). PDF output is plain text from pypdf (docs/base.py:79-98) and DOCX output is docx2txt text (docs/base.py:126-133), not Markdown."
+      },
+      {
+        "claim": "docs/.../module_guides/loading/simpledirectoryreader.md:9-22 - SimpleDirectoryReader explicitly supports .md (Markdown), .pdf, .docx, .epub, .pptx and images",
+        "verified": "partial",
+        "evidence": "The default extractor map in code (llama-index-core/llama_index/core/readers/file/base.py:92-112) has no .md (nor .html/.txt) entry, so those files fall through to a raw-text read (634-644): the full original text is kept as Document.text but nothing parses Markdown or HTML. MarkdownReader (llama-index-readers-file/.../markdown/base.py:28-31, 56-59, 95-101) must be passed via file_extractor and strips hyperlinks, images, HTML tags and blank lines. Docs and code differ here; code wins."
+      },
+      {
+        "claim": "README.md:56 - LlamaParse Parse offers 'Agentic OCR and document parsing (130+ formats)'; README.md:55 requires an account and API key",
+        "verified": "not_checkable",
+        "evidence": "Hosted service outside this repo. The in-repo pieces are a deprecated wrapper (llama-index-readers-llama-parse/llama_index/readers/llama_parse/__init__.py:1-4 re-exports llama_parse.LlamaParse; its README.md:3 says deprecated, use the llama-cloud package) and an LLM-assisted parser for LlamaParse JSON output (llama-index-core/llama_index/core/node_parser/relational/llama_parse_json_element.py:11-18, base_element.py:194-236). The format count and OCR quality cannot be verified from the source."
+      },
+      {
+        "claim": "README.md:11 - LiteParse is the best free, fast, cheap text parser; ParseBench and ExtractBench are open benchmarks",
+        "verified": "not_checkable",
+        "evidence": "These live in other repositories/sites (github.com/run-llama/liteparse, parsebench.ai, extractbench.ai) that are not in the working directory and were not opened. No LiteParse code and no benchmark numbers exist in this repo (searching for ParseBench/ExtractBench finds only README.md:11)."
+      },
+      {
+        "claim": "README.md:94-95 - ingest and query data in 5 lines of code",
+        "verified": "partial",
+        "evidence": "True as API shape (README.md:125-134, 169-171). With default settings the LLM and embedding model resolve to OpenAI and raise unless OPENAI_API_KEY is valid (llama-index-core/llama_index/core/llms/utils.py:40-71, embeddings/utils.py:42-76; installation.mdx:30-33). Local models need extra packages and settings (README.md:138-164). Default retrieval returns DEFAULT_SIMILARITY_TOP_K=2 chunks (constants.py:12), and the stock in-memory store supports only default/MMR/learner query modes (vector_stores/simple.py:35-41, 286-310)."
+      },
+      {
+        "claim": "README.md:173-189 - data is in-memory by default; persist() writes under ./storage; reload with load_index_from_storage",
+        "verified": "yes",
+        "evidence": "SimpleVectorStore keeps embeddings in an in-memory dataclass (llama-index-core/llama_index/core/vector_stores/simple.py:47-57, 244-315); StorageContext.persist defaults to persist_dir './storage' (storage/storage_context.py:47, 151-153); StorageContext and load_index_from_storage are exported (llama_index/core/__init__.py:44-48, 81)."
+      },
+      {
+        "claim": "README.md:191-208 - llama-index-core ships a `_static` nltk/tiktoken cache and it is attested with attest-build-provenance",
+        "verified": "partial",
+        "evidence": "Config and code match: wheel/sdist include the _static nltk_cache and tiktoken_cache globs (llama-index-core/pyproject.toml:109-125), runtime prefers the bundled cache (llama_index/core/utils.py:56-70, 165-179), and .github/workflows/release.yml:36-47 populates the caches and runs actions/attest-build-provenance@v4 on llama-index-core/llama_index/core/_static/**/*. Not verified: the contents of the PyPI artifact. The attestation covers only the _static files, not the wheel/sdist. The git checkout has only .gitignore placeholders in _static (llama-index-core/llama_index/core/_static/.gitignore). NLTK falls back to nltk.download when the bundled cache is absent (utils.py:83-102)."
+      },
+      {
+        "claim": "README.md:103 - new integrations are accepted at maintainers' discretion",
+        "verified": "no",
+        "evidence": "Superseded: CONTRIBUTING.md:59 says new integration packages are no longer accepted and PRs adding a pyproject.toml are auto-closed; .github/workflows/close_new_integration_prs.yml:3-8, 27-62 implements the auto-close. STALE.md:5, 44-46 moves low-health packages to a stale_packages branch. Workflow and CONTRIBUTING win over the README."
+      },
+      {
+        "claim": "README.md:15 - primary focus has shifted to LlamaParse/liteparse/benchmarks while the OSS framework remains available",
+        "verified": "yes",
+        "evidence": "Consistent with the repo: CONTRIBUTING.md:59-66 (no new integrations; CLI, packs, finetuning and experimental 'not recommended'); llama-index-cli, -packs, -experimental and -finetuning directories are absent from this checkout and llama-index-core/llama_index/core/command_line/__init__.py:1 says the CLI moved out. The framework is still released: CHANGELOG.md:5,55 lists llama-index-core 0.14.25 under 2026-09-21, and .git/packed-refs:2 maps tag v0.14.25 to commit f12d46a."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Maintenance focus and stale directories: README.md:11-15 says the primary focus moved to hosted LlamaParse/LiteParse/benchmarks. CONTRIBUTING.md:59-66 stops accepting new integration packages and discourages CLI/packs/finetuning/experimental work. STALE.md:5, 32-46 lets low-health integrations move to a stale_packages branch. Those CLI/packs/experimental/finetuning directories are absent from this checkout, yet SECURITY.md:14, CONTRIBUTING.md:61-66 and Makefile:22-29 (pants test targets) still reference them. The project is still actively released (CHANGELOG.md:5,55: llama-index-core 0.14.25, 2026-09-21).",
+      "No turnkey 'search a Markdown collection and read original bodies back' tool for any CLI agent: no CLI (llamaindex-cli moved to a package not in this repo, llama-index-core/llama_index/core/command_line/__init__.py:1); no MCP server for local documents (llama-index-tools-mcp is a client plus a `workflow_as_mcp` helper, llama-index-integrations/tools/llama-index-tools-mcp/README.md:3, llama_index/tools/mcp/utils.py:77-141); the documented llamacloud-mcp server is in another repo, serves LlamaCloud indexes and needs an account and API key (docs/src/content/docs/framework/module_guides/mcp/llamacloud_mcp.md:5-9, 38-39). Any Claude Code/Codex wiring means writing glue code; no Claude Code/Codex integration, CLAUDE.md or AGENTS.md ships.",
+      "Ingestion fidelity and silent-failure hazards: (a) the starter omits llama-index-readers-file (pyproject.toml:41-46), so PDFs/Office/EPUB are decoded as raw text bytes with errors ignored after only a logger warning (llama-index-core/llama_index/core/readers/file/base.py:85-90, 634-644); (b) with it installed, docx/epub/pptx/xlsx readers need undeclared extra packages and an ImportError aborts the whole load (llama-index-readers-file/pyproject.toml:72-79; core base.py:614-617); (c) other read errors print 'Skipping...' and drop the file unless raise_on_error=True (base.py:618-626); (d) scans/images yield empty text by default (ImageReader parse_text=False, llama-index-readers-file/.../image/base.py:31, 101-102); (e) wrapper behaviour varies: PDFPaddleOCRReader returns the exception text as a Document on failure (llama-index-readers-paddle-ocr/.../base.py:161-168), PDFNougatOCR returns None on failure and writes to a relative ./output dir (nougat_ocr/base.py:29-31, 53-54), PDFMarkerReader reloads all models on every call (pdf_marker/base.py:43); (f) MarkdownReader strips links/images/HTML/blank lines (markdown/base.py:56-59, 95-101), and MarkItDownReader ignores extra_info and has no .epub or image extensions in its allow-list (markitdown/base.py:53-66, 109-129).",
+      "Original-body readback and provenance are not automatic: VectorStoreIndex.from_documents stores only per-document hashes plus chunk nodes, not the full Document text (llama-index-core/llama_index/core/indices/base.py:111-129). Only IngestionPipeline with a docstore keeps the input documents (store_doc_text defaults True, ingestion/pipeline.py:518-536, 546, 655-660). When a vector store keeps text, the docstore gets no chunk text unless store_nodes_override=True (indices/vector_store/base.py:43, 234-250). Document ids default to random uuid4 (schema.py:275-277), so stable upserts need filename_as_id=True or explicit ids (readers/file/base.py:628-631), and UPSERTS silently falls back to duplicates_only when no vector store is attached (pipeline.py:574-588). Chunk start/end offsets are best-effort str.find() matches (node_parser/interface.py:104-118); the source link is a node relationship (node_parser/node_utils.py:42).",
+      "Search-mode caveats: the stock SimpleVectorStore supports only default, MMR and learner modes, and other modes (hybrid, sparse, text_search) raise ValueError (llama-index-core/llama_index/core/vector_stores/simple.py:35-41, 286-310). BM25 is a separate package with a one-line README (llama-index-retrievers-bm25/README.md:1, base.py:41-86). Hybrid needs a vector store implementing HYBRID/SPARSE or manual fusion, and QueryFusionRetriever defaults to num_queries=4, which makes an LLM call (default resolves to OpenAI) per query unless num_queries=1 (retrievers/fusion_retriever.py:41, 62-64, 276-279). Default similarity_top_k is 2 (constants.py:12). Default LLM and embeddings need OPENAI_API_KEY and network (llms/utils.py:40-71, embeddings/utils.py:42-76). MarkdownElementNodeParser and LlamaParseJsonNodeParser summarise tables with an LLM (node_parser/relational/base_element.py:194-236).",
+      "Licensing is not uniformly MIT. The top-level LICENSE and core are MIT (LICENSE:1; llama-index-core/pyproject.toml:42), but several in-repo packages declare copyleft licenses, including document converters: GPL-3.0-or-later for readers pdf-marker (pyproject.toml:36; its LICENSE file is the GPLv3 text), pdf-table (:34), web (:35), boarddocs, stripe-docs and service-now; GPL-2.0-or-later for readers nougat-ocr (:36); GPL-2.0-only for imdb-review; AGPL-3.0 for readers-upstage (:34, hard-depends on pymupdf at :36), llms-upstage, callbacks-uptrain and readers-kaltura. readers-file also offers an optional pymupdf extra (pyproject.toml:81-82). Licenses of third-party converters (Docling, MarkItDown, marker, PyMuPDF) are not stated in this repo and were not checked.",
+      "Release and CI assurance gaps: PyPI publishing uses a long-lived token secret (.github/workflows/release.yml:59, 120; publish_sub_package.yml:115). The only provenance attestation covers llama-index-core's `_static` cache files (release.yml:43-47); there are no checksums/signatures/attestations for sdists or wheels, and the GitHub Release attaches only the root starter's sdist (release.yml:130-137). Sub-package publishing on push to main has no test step (publish_sub_package.yml:67-124). llama-dev test does not fail CI on install failures and treats a 300 s pytest timeout as 'no tests' (llama-dev/llama_dev/test/__init__.py:360-365, 538-548). Unit tests run only on pull requests and only on Linux, with no macOS job (unit_test.yml:3-4, 12). Reader-wrapper tests are thin (docling 2 mocked tests, markitdown 1 class test, pdf-marker none). Converter pins are narrow or old: marker-pdf>=0.2.0,<0.3 (pdf-marker/pyproject.toml:38), markitdown[all]==0.1.0 (markitdown/pyproject.toml:37), and the LayoutIR reader needs Python>=3.12 versus core's >=3.10 (layoutir/pyproject.toml:34).",
+      "Security model leaves untrusted-input handling to the host app: SECURITY.md:32-48 puts SSRF via loaders/helpers, path traversal or deserialization from untrusted paths, prompt injection and unbounded-input DoS out of scope. SimpleDirectoryReader reads every non-hidden file it finds as text by default (required_exts=None, llama-index-core/llama_index/core/readers/file/base.py:249-266; docs/.../simpledirectoryreader.md:9), and resolve_binary fetches arbitrary URLs with requests.get (llama_index/core/utils.py:626-710, 704). SECURITY.md:5-14 limits the bounty to llama-index, core, the OpenAI LLM/embeddings packages and llama-index-cli, which is not in this repo."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "run-llama/llama_index",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip starter bundle)",
+          "statement": "Install method 'pip (starter bundle)': `pip install llama-index`",
+          "citation": "docs/src/content/docs/framework/getting_started/installation.mdx:17-19",
+          "holds": true,
+          "note": "Lines 17-19 are exactly the fenced `pip install llama-index` block. The package name and version match the root manifest (pyproject.toml:66 name = \"llama-index\", :69 version 0.14.25). The same page (21-26) also lists llama-index-readers-file in the bundle, which the manifest does not include. The dossier already flags this in claim_checks[0]."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE:1 reads 'The MIT License' and the rest is the standard MIT text (Copyright (c) Jerry Liu). The starter (pyproject.toml:57) and llama-index-core/pyproject.toml:42 both declare license = \"MIT\". This covers the repo, starter and core only. Several sub-packages are copyleft, e.g. readers-pdf-marker/pyproject.toml:36 GPL-3.0-or-later, readers-nougat-ocr/pyproject.toml:36 GPL-2.0-or-later, readers-upstage/pyproject.toml:34 AGPL-3.0. The dossier's risks section already discloses this."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs build, lint, typecheck and unit tests on Ubuntu runners; CPU architecture not stated in the repo; llama-index-core is a hatchling build from Python sources; compiled deps such as numpy/tiktoken come from PyPI",
+          "citation": ".github/workflows/unit_test.yml:12; .github/workflows/build_package.yml:16; .github/workflows/lint.yml:11; llama-index-core/pyproject.toml:109-125",
+          "holds": true,
+          "note": "unit_test.yml:12 and :45 use the custom label `ubuntu-latest-unit-tester`; the apt-get steps at :24-25 confirm a Debian/Ubuntu host. build_package.yml:16 is [ubuntu-latest, windows-latest] and lint.yml:11 is ubuntu-latest. The typecheck job (uncited) runs on ubuntu-latest at core-typecheck.yml:11. Searching .github, docs and the READMEs finds no x86_64/amd64/arm64/aarch64 support statement; the only hits are sample data and discord dumps. llama-index-core declares a hatchling build-system (:1-3) with targets at :109-125 and contains no C/C++/Cython/Rust sources. numpy and tiktoken are runtime deps at :65 and :67."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Client side only in this repo: llama-index-tools-mcp provides BasicMCPClient, McpToolSpec and get_tools_from_mcp_url (depends on mcp>=2.0.0,<3); workflow_as_mcp wraps a user Workflow as an MCPServer; it is not a ready-made document-search server and the example server is an IP-info demo; docs point to the external llamacloud-mcp server, which needs a LlamaCloud org, project and API key",
+          "citation": "llama-index-integrations/tools/llama-index-tools-mcp/README.md:3, 58-101; llama_index/tools/mcp/__init__.py:1-15; pyproject.toml:44; llama_index/tools/mcp/utils.py:77-141; examples/mcp_server.py:27-54; docs/src/content/docs/framework/module_guides/mcp/llamacloud_mcp.md:5-9, 17-52",
+          "holds": true,
+          "note": "Every citation matches. README.md:3 says the package connects to MCP servers. __init__.py exports the three client classes and functions. pyproject.toml:44 is mcp>=2.0.0,<3. utils.py:83/107 returns an mcp.server.mcpserver.MCPServer. mcp_server.py:27-54 is the fetch_ipinfo demo. llamacloud_mcp.md:7 links github.com/run-llama/llamacloud-mcp, and :34-39 pass --project-name, --org-id and --api-key. No llamacloud-mcp code is in the checkout. Wording nit: 'client side only' is loose given the workflow_as_mcp server helper, but the statement itself names that helper. Omission: llama-index-tools-mcp-discovery also exists, but it is client-only too (its README.md:7-10 says it 'acts only as a client'), so the conclusion stands."
+        },
+        {
+          "field": "claim_checks[0] (README.md:28 starter package)",
+          "statement": "verified 'partial': root pyproject.toml:41-46 lists only llama-index-core, llama-index-embeddings-openai, llama-index-llms-openai and nltk; installation.mdx:21-26 also lists llama-index-readers-file but the manifest does not depend on it; so `pip install llama-index` does not install the default PDF/DOCX/PPTX/EPUB readers",
+          "citation": "pyproject.toml:41-46; docs/src/content/docs/framework/getting_started/installation.mdx:21-26; llama-index-core/llama_index/core/readers/file/base.py:68-90",
+          "holds": true,
+          "note": "pyproject.toml:42-45 has exactly those four deps, and installation.mdx:26 lists llama-index-readers-file. base.py:71-90 imports the readers from llama_index.readers.file and, on ImportError, only logs a warning and returns {}. The in-repo llms-openai (pyproject.toml:36) and embeddings-openai (:35-38) manifests do not pull in readers-file either. Caveat: the starter pins llms-openai <0.8 and embeddings-openai <0.7 (pyproject.toml:43-44), while the checkout holds 0.8.1 and 0.7.0, so the versions pip actually resolves are not in this checkout. 'partial' is defensible: README.md:28 is literally true (core plus two OpenAI integrations), and the gap is the docs overstating the bundle."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

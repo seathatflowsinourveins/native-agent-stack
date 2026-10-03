@@ -1,0 +1,355 @@
+{
+  "contender": "maximhq/bifrost",
+  "revision": {
+    "contender": "maximhq/bifrost",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "maximhq/bifrost",
+        "tag": "ent-v2.2.4-base",
+        "commit": "f790ef25b13385d65f155145ed2729844e51ea07",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "ent-v2.2.4-base",
+    "commit": "f790ef25b13385d65f155145ed2729844e51ea07",
+    "read_at": "2026-10-02T03:03:16+00:00"
+  },
+  "dossier": {
+    "contender": "maximhq/bifrost",
+    "revision": {
+      "tag": "ent-v2.2.4-base",
+      "commit": "f790ef25b13385d65f155145ed2729844e51ea07",
+      "read_at": "2026-10-02T03:03:16+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Open-source (Apache-2.0) AI gateway written in Go: an HTTP server (bifrost-http, React dashboard embedded in the binary), a Go SDK (github.com/maximhq/bifrost/core) and a CLI launcher for coding agents. It fronts 33 provider entries (core/schemas/bifrost.go:94-128) through one OpenAI-compatible API, plus SDK-compat routes for OpenAI, Anthropic, GenAI, Bedrock, LiteLLM, LangChain, PydanticAI, Cohere and Cursor (transports/bifrost-http/handlers/integrations.go:33-51). Features in this tree: weighted API-key pools, retries and fallbacks, governance (virtual keys, budgets, rate limits), request/usage/cost logging in SQLite or Postgres, Prometheus and OTEL, an MCP gateway with Code Mode, optional semantic cache. This checkout is the OSS repo at tag ent-v2.2.4-base; version files read transports 2.2.4, core 1.11.0, framework 1.7.5 (transports/version:1, core/version:1, framework/version:1). The enterprise-only features named at README.md:62-63 live in a separate repository that is not in this tree (docs/changelogs/ent-v2.2.4.mdx:42-44,468-472).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Bifrost is a high-performance AI gateway that unifies access to 23+ providers (OpenAI, Anthropic, AWS Bedrock, Google Vertex, and more) through a single OpenAI-compatible API. Deploy in seconds with zero configuration and get automatic failover, load balancing, semantic caching, and enterprise-grade features.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Quick start: 'npx -y @maximhq/bifrost' or 'docker run -p 8080:8080 maximhq/bifrost', then configure via the web UI at http://localhost:8080.",
+          "citation": "README.md:25-38"
+        },
+        {
+          "claim": "First call is POST http://localhost:8080/v1/chat/completions with a provider-prefixed model string, e.g. openai/gpt-4o-mini, and no auth header.",
+          "citation": "README.md:43-49"
+        },
+        {
+          "claim": "Enterprise deployments unlock adaptive load balancing, clustering, guardrails, MCP gateway and other advanced capabilities (private networking, custom security controls).",
+          "citation": "README.md:62-63"
+        },
+        {
+          "claim": "Automatic Fallbacks between providers and models; Load Balancing: intelligent request distribution across multiple API keys and providers.",
+          "citation": "README.md:85-86"
+        },
+        {
+          "claim": "Model Context Protocol (MCP): enable AI models to use external tools (filesystem, web search, databases).",
+          "citation": "README.md:90"
+        },
+        {
+          "claim": "Semantic Caching: intelligent response caching based on semantic similarity to reduce costs and latency.",
+          "citation": "README.md:91"
+        },
+        {
+          "claim": "Governance: usage tracking, rate limiting, and fine-grained access control; Budget Management with virtual keys, teams and customer budgets.",
+          "citation": "README.md:94,98"
+        },
+        {
+          "claim": "Observability: native Prometheus metrics, distributed tracing, and comprehensive logging.",
+          "citation": "README.md:100"
+        },
+        {
+          "claim": "Secrets management: secure API key management with environment variables and deployment secrets.",
+          "citation": "README.md:101"
+        },
+        {
+          "claim": "Drop-in Replacement: replace OpenAI/Anthropic/GenAI APIs with one line of code, e.g. OpenAI SDK base_url = http://localhost:8080/openai.",
+          "citation": "README.md:106,176-192"
+        },
+        {
+          "claim": "In sustained 5,000 RPS benchmarks the gateway added only 11 µs of overhead per request (t3.xlarge; 59 µs on t3.medium); ~10 ns to pick weighted API keys; 100% success at 5k RPS.",
+          "citation": "README.md:200-214"
+        },
+        {
+          "claim": "Licensed under Apache 2.0.",
+          "citation": "README.md:284"
+        },
+        {
+          "claim": "Absence: the README does not mention Codex CLI, the Codex SDK, GPT-6, ChatGPT/Codex OAuth accounts, reasoning-effort handling or request compression (all found only in docs/, code and tests).",
+          "citation": "README.md:1-287"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx (gateway; downloads and runs the bifrost-http binary)",
+          "command": "npx -y @maximhq/bifrost",
+          "citation": "README.md:27"
+        },
+        {
+          "method": "npx, pinned gateway release",
+          "command": "npx -y @maximhq/bifrost --transport-version v2.2.4",
+          "citation": "docs/changelogs/v2.2.4.mdx:8"
+        },
+        {
+          "method": "Docker (Docker Hub maximhq/bifrost, linux amd64+arm64), with persistence",
+          "command": "docker run -p 8080:8080 -v $(pwd)/data:/app/data maximhq/bifrost",
+          "citation": "README.md:157"
+        },
+        {
+          "method": "Go SDK",
+          "command": "go get github.com/maximhq/bifrost/core",
+          "citation": "README.md:169"
+        },
+        {
+          "method": "Helm chart (Kubernetes); the chart README example pins image.tag v1.4.3",
+          "command": "helm repo add bifrost https://maximhq.github.io/bifrost/helm-charts && helm repo update && helm install bifrost bifrost/bifrost --set image.tag=<tag>",
+          "citation": "helm-charts/bifrost/README.md:536-542"
+        },
+        {
+          "method": "Bifrost CLI (launcher for Claude Code, Codex CLI, Gemini CLI, Opencode; needs Node 18+ and a running gateway)",
+          "command": "npx -y @maximhq/bifrost-cli",
+          "citation": "docs/quickstart/cli/getting-started.mdx:36-43"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - gateway binary built for linux/amd64 (.github/workflows/scripts/build-executables.sh:30-36; release-pipeline.yml:2826), Docker amd64 image (release-pipeline.yml:3054-3063), npx wrapper maps linux x64 to amd64 (npx/bifrost/bin.js:170-173).",
+        "wsl2": "unknown - no upstream statement about WSL2; only incidental mentions (docs/cli-agents/claude-code.mdx:88, docs/deployment-guides/how-to/install-make.mdx:77). Linux amd64/arm64 binaries and Docker images are published, so a Linux build exists, but WSL2 is not documented or tested.",
+        "macos_arm64": "yes - darwin/arm64 gateway binary and CLI binary are built (build-executables.sh:31; build-cli-executables.sh:26) and the npx wrapper selects darwin/arm64 (npx/bifrost/bin.js:165-169). Caveat: binaries are cross-compiled on Ubuntu with clang and a downloaded macOS 12.3 SDK (install-cross-compilers.sh:27-69) and no workflow uses a macOS runner (.github/workflows/*.yml runs-on values are ubuntu-latest, ubuntu-24.04-arm, codspeed-macro).",
+        "gpu": "no - no GPU/CUDA requirement or use found; the gateway is a Go HTTP proxy to remote provider APIs (README.md:15). The only 'gpu' string in product code is in core/providers/replicate/types.go."
+      },
+      "integrations": {
+        "cli": "Gateway binary flags -port -host -app-dir -log-level -log-style (transports/bifrost-http/main.go:105-110). Separate 'bifrost' CLI (cli/main.go:19-59; subcommands update, version; flags -config -no-resume -worktree) launches claude, codex, gemini, opencode via a harness registry (cli/internal/harness/harness.go:48-138); documented at docs/quickstart/cli/getting-started.mdx:19-31, not in README.md.",
+        "mcp": "Yes. The gateway exposes an MCP server endpoint at /mcp (transports/bifrost-http/handlers/mcpserver.go; docs/cli-agents/overview.mdx:94-132) and acts as an MCP client/agent host with per-client tool filtering and Code Mode (core/mcp/; docs/mcp/code-mode.mdx:176-180); README.md:90.",
+        "sdk_or_api": "HTTP API: OpenAI-compatible POST /v1/chat/completions, /v1/responses, /v1/responses/compact, /v1/embeddings etc. (transports/bifrost-http/handlers/inference.go:728-796), WebSocket GET /v1/responses (handlers/wsresponses.go:74-84), SDK-compat routers under /openai, /anthropic, /genai, /bedrock, /litellm, /langchain, /pydanticai, /cohere plus raw /openai_passthrough, /anthropic_passthrough, /azure_passthrough, /genai_passthrough, /chatgpt_passthrough (handlers/integrations.go:33-51), management API under /api/*, Prometheus /metrics (server/server.go:2542). Go SDK: github.com/maximhq/bifrost/core (README.md:169). No Python/TypeScript SDK of its own; Python/JS SDKs are used via base_url (README.md:176-192).",
+        "claude_code_or_codex": "Codex: docs/cli-agents/codex-cli.mdx:29-47 (config.toml model_providers.bifrost with base_url http://localhost:8080/openai/v1, wire_api responses, supports_websockets false, OPENAI_API_KEY set to a Bifrost virtual key; run /logout first, :25-27), :55-70 (HTTPS mode needed for non-OpenAI models), :72-125 (model_catalog_json workaround); docs/runbooks/codex-bedrock.mdx; Bifrost CLI 'codex' harness (cli/internal/harness/harness.go:78-99, native_config.go:99-184); session-id/thread-id headers adopted for key stickiness (core/schemas/useragents.go:84-92; docs/providers/session-affinity.mdx:9); Codex marketplace skill serving (handlers/skills_serving.go:142-147); undocumented POST-only /chatgpt_passthrough/backend-api/codex/responses to https://chatgpt.com (integrations/passthrough.go:52-66); CI runs real 'codex exec' against the gateway (tests/e2e/clis/README.md:5-14,155). Codex SDK: none found. Claude Code: docs/cli-agents/claude-code.mdx, 'claude mcp add --transport http bifrost http://localhost:8080/mcp' (docs/cli-agents/overview.mdx:101), /anthropic route forwards sk-ant-oat OAuth tokens (integrations/router.go:3435-3464)."
+      },
+      "telemetry_and_network": "No product-analytics or phone-home SDK found in core, framework, transports, plugins, cli or ui (searched posthog, segment, sentry, mixpanel, amplitude, DISABLE_TELEMETRY: only MCP-catalog entries, test fixtures and Weaviate compose env). Network the code does perform: (1) provider calls to configured upstreams; OpenAI default https://api.openai.com (core/providers/openai/openai.go:66); optional https://chatgpt.com via /chatgpt_passthrough (integrations/passthrough.go:52-66). (2) Model catalog: GET https://getbifrost.ai/datasheet and /datasheet/model-parameters (pricing, capabilities, parameter allow-lists) at startup and every 24 h (framework/modelcatalog/datasheet/store.go:19-23; config.schema.json:4282-4288); on first boot with an empty DB the fetch blocks startup and failure is fatal (framework/modelcatalog/main.go:149-215; transports/bifrost-http/lib/config.go:5426-5429); file:// URLs support air-gapped use (config.schema.json:4273-4294; examples/configs/withlocalpricingfiles/README.md:1-17). (3) MCP server catalog sync from https://getbifrost.ai/mcp-library, non-fatal, interval 0 disables (framework/modelcatalog/config.go:114; main.go:222-261). (4) Background list-models refresh per provider, default hourly (config.schema.json:4308-4311). (5) The dashboard in the browser calls https://getbifrost.ai/latest-release (ui/lib/store/apis/configApi.ts:73; ui/index.html:8-9). (6) npx wrapper downloads binaries from https://downloads.getmaxim.ai and queries https://getbifrost.ai/latest-release (npx/bifrost/bin.js:9,264); the CLI checks https://downloads.getmaxim.ai/bifrost-cli/latest/version.txt every 24 h unless BIFROST_NO_UPDATE_CHECK=1 (cli/internal/update/check.go:15-18,50-73; cli/internal/app/app.go:71). (7) Optional sinks only when configured: OTEL, Maxim, semantic cache, Prometheus push, Datadog etc. (transports/bifrost-http/server/plugins.go:274-311). No Bifrost account is required; provider credentials are. Local state: SQLite config.db and logs.db in the app dir (docs/quickstart/gateway/setting-up.mdx:81-85); request/response content is logged by default (lib/config.go:686-687); provider keys are stored in plain text unless an encryption key is set (config.schema.json:43-46). Bind: localhost for the binary (server/server.go:56), 0.0.0.0 in the Docker image (transports/Dockerfile:70-80)."
+    },
+    "code": {
+      "languages": [
+        "Go (go 1.27.0; core, framework, transports, plugins, cli; CGO + static SQLite for the gateway binary)",
+        "TypeScript/React (ui/, Vite, Tailwind 4, Redux Toolkit; built and embedded into the Go binary)",
+        "JavaScript (npx wrappers, Playwright e2e)",
+        "Python (tests/integrations/python, docs/openapi tooling)",
+        "Shell (CI scripts), Makefile, Nix flake",
+        "HCL/Helm/YAML (terraform/, helm-charts/), MDX docs (Mintlify)"
+      ],
+      "entry_points": [
+        {
+          "path": "transports/bifrost-http/main.go",
+          "what": "Gateway binary 'bifrost-http': flags -port/-host/-app-dir/-log-level/-log-style (lines 105-110), embeds ui/ (line 73), calls server.Bootstrap then server.Start (lines 154-160)."
+        },
+        {
+          "path": "transports/bifrost-http/server/server.go",
+          "what": "BifrostHTTPServer: bootstrap, route and plugin registration (server/plugins.go:225-326), fasthttp server wrapped by SecurityHeaders, CORS and RequestDecompression middleware (server.go:3087), /metrics at :2542."
+        },
+        {
+          "path": "core/bifrost.go",
+          "what": "Go SDK engine: per-provider request queues, key-pool selection, retry/fallback loop (executeRequestWithRetries ~line 6297), plugin pipeline, MCP manager; module github.com/maximhq/bifrost/core."
+        },
+        {
+          "path": "transports/bifrost-http/handlers/integrations.go",
+          "what": "Registers SDK-compat routers (OpenAI, Anthropic, GenAI, LiteLLM, Cohere, LangChain, PydanticAI, Bedrock, Typesafe, Cursor) and raw passthrough routers including /chatgpt_passthrough (lines 33-51); WebSocket Responses/Realtime routes."
+        },
+        {
+          "path": "transports/bifrost-http/handlers/inference.go",
+          "what": "Native /v1 endpoints: chat, text, responses (+retrieve/delete/cancel/input_items/input_tokens/compact), embeddings, images, audio, batches, files, MCP execution (lines 728-796)."
+        },
+        {
+          "path": "cli/main.go",
+          "what": "'bifrost' CLI (Bubble Tea TUI): harness registry for claude/codex/gemini/opencode, PTY tab manager, OS-keyring virtual key storage, self-update (cli/internal/app, harness, runtime, secrets, update)."
+        },
+        {
+          "path": "npx/bifrost/bin.js",
+          "what": "npx @maximhq/bifrost wrapper: resolves version, downloads bifrost-http from downloads.getmaxim.ai into the OS cache dir and executes it (lines 9, 264, 319-363)."
+        },
+        {
+          "path": "npx/bifrost-cli/bin.js",
+          "what": "npx @maximhq/bifrost-cli installer: downloads the CLI binary to ~/.bifrost/bin, verifies SHA-256 if the .sha256 file exists, offers PATH setup (lines 153-183, 291-330)."
+        }
+      ],
+      "architecture": "Multi-module Go workspace (go.work is gitignored and generated by 'make setup-workspace': .gitignore:39, Makefile:1832). core/: library engine (bifrost.go: queues, key pool, retries, fallbacks, plugin hooks); providers/<name>/ adapters (openai/ holds Responses and Chat converters plus name-based capability defaults, utils.go); schemas/ shared types (Key, ProviderConfig, context keys, ModelCaps); keyselectors/ (weighted random); sessionaffinity.go; encryptedreasoning.go; mcp/ (client manager, agent loop, Starlark Code Mode). framework/: configstore (SQLite/Postgres), logstore (SQLite/Postgres/ClickHouse request logs with token, cost and latency columns, tables.go:192-282), modelcatalog + datasheet (pricing/capabilities synced from getbifrost.ai), vectorstore, streaming accumulator, tracing, objectstore, plugins (.so loader). transports/bifrost-http/: server/ (bootstrap, plugin registration order prompts, logging, governance, routing, otel, semanticcache, compat, maxim, modelcatalogresolver: server/plugins.go:225-326), handlers/ (inference, governance, providers, logging, MCP server and OAuth, WebSocket), integrations/ (SDK-compat converters and passthrough routers), lib/ (config load, header-to-context conversion). plugins/: 12 separately versioned modules (governance, logging, telemetry, otel, semanticcache, routing, compat, modelcatalogresolver, prompts, maxim, mocker, jsonparser). Request path: fasthttp -> decompression -> integration converter -> middleware -> HTTP plugin hooks -> PreLLM plugins (governance/routing/model-catalog resolver) -> provider queue -> key selection -> provider call -> PostLLM hooks (logging, cost) (AGENTS.md:193-213). Also cli/, ui/, npx/, helm-charts/, terraform/, docs/ and .claude/skills (14 contributor skills).",
+      "packaging_and_release": "Releases are driven by .github/workflows/release-pipeline.yml (push to main or v2.0.0 branch, or manual dispatch; lines 4-7): version files (transports/version etc.) select what to release; the pipeline runs the test jobs, then core/framework/plugin Go module tags, bifrost-http binaries for darwin/amd64, darwin/arm64, linux/amd64, linux/arm64, windows/amd64 uploaded to a Cloudflare R2 bucket served as downloads.getmaxim.ai (build-executables.sh:30-36; release-pipeline.yml:2766-2906), Docker images maximhq/bifrost (amd64 and arm64 built separately, merged by create-docker-manifest.sh, mirrored to ghcr.io/maximhq/bifrost) plus a UBI9 variant (release-pipeline.yml:2956-3535; transports/Dockerfile, Dockerfile.redhat), changelog push and notification. Other workflows: npx-publish.yml (npm publish --provenance for npx/bifrost and npx/bifrost-cli, lines 54,121), release-cli.yml (CLI tag cli/v<version>, 5 platforms, CGO off, per-binary .sha256 via build-cli-executables.sh:47-54, R2 upload), helm-release.yml, release-bifrost-migration-cli.yml. No checksum, signature or SBOM step exists for the gateway binaries; Docker images rely on buildx default provenance (create-docker-manifest.sh:16-23); no cosign/attestation workflow found. Builds use -trimpath, stripped symbols, static SQLite (build-executables.sh:92-95; transports/Dockerfile:43-48); Docker base alpine:3.23.5 pinned by digest, runs as USER 1000:0, HEALTHCHECK on /health (transports/Dockerfile:54,106,116-117).",
+      "tests_and_ci": "Frameworks: Go testing + testify (gotestsum via Makefile), Newman/Postman provider harness (tests/e2e/api/collections/provider-harness.json, >170k lines), Playwright UI e2e (tests/e2e), vitest (ui), pytest SDK-integration suites (tests/integrations/python, typescript), CodSpeed walltime benchmarks. Approximate file counts: 891 Go _test.go files (core 465, framework 158, transports 105, plugins 104, tests 49, cli 7), 48 UI vitest files, 19 Playwright specs, 10 Python test_*.py files. Notable dirs: core/internal/llmtests (live-provider scenarios), core/internal/mcptests (mock-based agent/MCP tests), tests/e2e/clis (drives real claude/codex/opencode in non-interactive mode against the gateway; CI runs the three most recent CLI releases each run: tests/e2e/clis/README.md:283-301), tests/governance, tests/semanticcache. Workflows (17 files in .github/workflows): release-pipeline.yml (push to main/v2.0.0: core live-provider tests, unit, memory, CLI harness, vLLM, framework, plugins, bifrost-http, migrations, API integrations, cost accuracy, load, Docker image tests, then release); pr-tests.yml and run-core-tests.yml are manual-dispatch only (pr-tests.yml:3-5); automatic on pull_request are only workflow-lint.yml, codspeed.yml and dependency-review.yml; snyk.yml (push, ends with '|| true' at line 78), scorecards.yml (weekly + main), docs-validation.yml, openapi-bundle.yml, e2e-tests.yml (push to one stale feature branch, line 5), dependabot-alerts.yml, pr-test-notifier.yml. All jobs run on Linux runners.",
+      "dependencies": "Go (all go 1.27.0): core/go.mod 27 direct requires (lines 5-33); framework/go.mod 28 (5-34); transports/go.mod 38 (5-44); cli/go.mod 8 (5-14); 12 plugin modules each with own go.mod (e.g. plugins/logging 5, governance 6, routing 8). Notable: valyala/fasthttp, bytedance/sonic, gorm (sqlite/postgres/clickhouse drivers), mark3labs/mcp-go, aws-sdk-go-v2, azure-sdk-for-go, go.starlark.net, pion/webrtc, go-git, prometheus client, charmbracelet bubbletea (cli), zalando/go-keyring (cli). JS: ui/package.json 63 dependencies + 17 devDependencies, exact-pinned, with package-lock.json; npx/bifrost/package.json 0 dependencies; tests/e2e/package.json 3 devDependencies. Python: tests/integrations/python/pyproject.toml 38 test dependencies with uv.lock. Dependabot covers gomod/npm (daily) and docker/github-actions (weekly) (.github/dependabot.yml).",
+      "security_policy": "SECURITY.md exists: report privately via GitHub Security Advisories or email akshay@getmaxim.ai (lines 12-16); acknowledgement within 48 h, updates about every 5 business days, public disclosure typically 30 days after a fix (lines 28-36, 68-79); scope covers core, transports, framework, CLI, official plugins, the maximhq/bifrost image and the UI (lines 81-94); the supported-versions table is stale (transports 1.4.x, core 1.4.x, framework 1.2.x at lines 42-47 vs 2.2.4/1.11.0/1.7.5 in the version files). Separate docs/security.mdx describes Snyk, CodeQL, SHA-pinned Actions, StepSecurity harden-runner and npm provenance."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:15 'Deploy in seconds with zero configuration' (also README.md:21).",
+        "verified": "partial",
+        "evidence": "Code differs on first boot. With a fresh DB (or no config store) catalog Init fetches the pricing and model-parameter datasheets from https://getbifrost.ai/datasheet[/model-parameters] and returns an error if that fails (framework/modelcatalog/main.go:149-215,262-269; framework/modelcatalog/datasheet/store.go:19-20; datasheet/sync.go:30-49); the caller then logger.Fatal()s (transports/bifrost-http/lib/config.go:5426-5429). file:// pricing_url/model_parameters_url avoid the fetch (transports/config.schema.json:4273-4294; examples/configs/withlocalpricingfiles/README.md:1-17). On later boots with data in the DB the sync runs in the background and failures only warn (framework/modelcatalog/main.go:160-172). Provider keys must still be added, and a key with an empty models list serves no model (core/bifrost.go:9340-9343,9458)."
+      },
+      {
+        "claim": "README.md:200-207 'the gateway added only 11 µs of overhead per request' at 5,000 RPS (59 µs on t3.medium).",
+        "verified": "partial",
+        "evidence": "Project-reported, not reproduced here. Docs say the runs used mocked OpenAI calls (docs/benchmarking/getting-started.mdx:49-51) and the 'total overhead' footnotes exclude JSON marshaling and HTTP calls (docs/benchmarking/t3.xl.mdx:50-52; t3.medium.mdx:48-50). Marshaling (26.80 µs / 63.47 µs) and response parsing (2.11 ms / 11.30 ms) are separate rows (getting-started.mdx:43-44). README.md:200 gives 11 µs without those qualifiers. The gateway records per-request upstream and overhead latency in its logs (framework/logstore/tables.go:272-275), so the figure can be re-measured."
+      },
+      {
+        "claim": "README.md:85-86 Load Balancing: intelligent request distribution across multiple API keys.",
+        "verified": "partial",
+        "evidence": "Selection is weighted random only (core/keyselectors/weightedrandom.go:9-35). Per-key models/blacklist/enabled filters shape the pool (core/bifrost.go:9424-9476). Moving to another key after 429/401/402/403 happens inside the retry loop (core/bifrost.go:6288-6296,6379-6382) whose budget is MaxRetries, default 0 (core/schemas/provider.go:13,634-636), so with defaults there is no in-request key rotation (provider/model fallbacks are separate). Sessions can pin a key and a pinned key is reused on every retry (docs/providers/session-affinity.mdx:47-51,195; core/bifrost.go:9507-9520). Adaptive load balancing and circuit breaker are Enterprise (README.md:63; docs/providers/session-affinity.mdx:88-98)."
+      },
+      {
+        "claim": "README.md:106,176-192 Drop-in Replacement: point OpenAI SDK base_url at http://localhost:8080/openai.",
+        "verified": "yes",
+        "evidence": "Routes exist for POST /openai/v1/responses, /openai/responses and /v1/responses (transports/bifrost-http/integrations/openai.go:703-707; handlers/inference.go:728,776) and WebSocket GET /openai/v1/responses (handlers/wsresponses.go:74-84), registered by default (handlers/integrations.go:33-51). Codex needs a base URL ending in /v1 (docs/cli-agents/overview.mdx:73; docs/cli-agents/codex-cli.mdx:43) while the Bifrost CLI sets {base}/openai without /v1 (cli/internal/harness/harness.go:86), served by the bare /openai/responses alias. Unprefixed model strings are parsed with an empty default provider (core/providers/openai/responses.go:18) and resolved through the model catalog; if it lists no provider the request fails (plugins/modelcatalogresolver/main.go:62-84,148-165). Docs advise the explicit provider/model prefix (docs/providers/provider-routing.mdx:884-886), and Codex's own model metadata lookup does not know prefixed slugs (docs/cli-agents/codex-cli.mdx:114-125)."
+      },
+      {
+        "claim": "docs/quickstart/cli/getting-started.mdx:31,106,195: Codex harness 'Sets OPENAI_BASE_URL'; virtual keys go to the OS keyring, 'never plaintext on disk'.",
+        "verified": "partial",
+        "evidence": "Code differs from the docs. The CLI exports OPENAI_BASE_URL (cli/internal/runtime/runtime.go:26-33) but the repo's own e2e notes say codex 0.146.1 does not read it (tests/e2e/clis/matrix_test.go:488-495; tests/e2e/clis/README.md:101). codexPreLaunch persistently writes openai_base_url, env_key and model into ~/.codex/config.toml and, when a virtual key is set, auth_mode=apikey plus the key into ~/.codex/auth.json (mode 0600) on every launch (cli/internal/harness/native_config.go:99-184; invoked at cli/internal/runtime/runtime.go:71-86). The keyring is used for the CLI's own storage (cli/internal/secrets/secrets.go:11-40) but the key also lands in plaintext in the harness file."
+      },
+      {
+        "claim": "README.md:100 Observability: native Prometheus metrics, distributed tracing, comprehensive logging (and README.md:94 usage tracking).",
+        "verified": "yes",
+        "evidence": "GET /metrics (transports/bifrost-http/server/server.go:2542; plugins/telemetry/main.go:1-30). The logging plugin is registered by default when a logs store exists (server/plugins.go:233-246; EnableLogging=true and DisableContentLogging=false in transports/bifrost-http/lib/config.go:686-687). Each row stores provider, model (plus original alias and served model), selected key id/name, virtual key, session id, user-agent/app, token usage, input/output cost, latency and overhead latency (framework/logstore/tables.go:192-282); passthrough responses get usage extracted from /responses bodies (core/providers/openai/passthrough_usage.go:18-30). Cost is skipped when the datasheet has no row for the model (framework/modelcatalog/datasheet/cost.go:2165-2170). OTEL, Maxim and semantic cache load only when configured (server/plugins.go:274-311). Query endpoints /api/logs and /api/logs/stats (handlers/logging.go:376-384)."
+      },
+      {
+        "claim": "docs/changelogs/v2.1.0.mdx:70 and v2.2.3.mdx:26: GPT-6 Astra max reasoning effort is preserved; reasoning.effort none is forwarded for gpt-6-sol and gpt-6-luna while other GPT-6 models keep reasoning on.",
+        "verified": "partial",
+        "evidence": "An effort inside the model's ladder passes through unchanged; anything else is snapped to the nearest published level, ties upward (core/schemas/modelcapsreasoning.go:150-196). The ladder is the datasheet row's reasoning_effort_levels, else a name-based default giving every gpt-6 model low/medium/high/xhigh/max (core/providers/openai/utils.go:111-126,132-147,196-203), applied on Responses and Chat (core/providers/openai/responses.go:684-710; chat.go:90-98,238-266). none is forwarded only for gpt-6-sol/-luna; gpt-6-astra and unknown gpt-6 variants are treated as always-reasoning so none becomes low (utils.go:55-70; core/providers/openai/responses_test.go:580-596; harness case 115.1, tests/e2e/api/collections/provider-harness.json:170265-170269). max on gpt-6-astra reaches the wire (core/reasoningeffort_e2e_test.go:26-110; core/providers/openai/responsesmarshal_test.go:179). So effort is preserved when valid for the model, and rewritten otherwise. Outbound bodies can be inspected via extra_fields.raw_request when raw send-back is enabled (transports/config.schema.json:115-119; docs/features/prompt-caching.mdx:411-413)."
+      },
+      {
+        "claim": "docs/features/prompt-caching.mdx:31 'Off by default'; need-driven check that request compression is not applied unless chosen.",
+        "verified": "yes",
+        "evidence": "Prompt-cache marker injection requires a provider prompt_cache config with auto_inject or injection points (core/providers/utils/promptcache.go:19-34; core/schemas/provider.go:575-597) and a request header cannot opt in by itself (promptcache.go:36-65). No gateway-initiated request, prompt or context compression was found: the only gzip writer is for log object storage (framework/objectstore/gzip.go:15,32; default false at transports/config.schema.json:2222-2224); POST /v1/responses/compact is forwarded as a normal request type (handlers/inference.go:737,796,1804-1819); context_management is forwarded only if the client sends it and stripped for Bedrock (core/providers/openai/responses.go:854-857); inbound gzip/deflate/br/zstd request bodies are decompressed, capped by max_request_body_size_mb (default 100), and never re-compressed upstream (server/server.go:3087; handlers/middlewares.go:233-285,367-396; lib/config.go:693). Opt-in token-reduction features are separate: MCP Code Mode per client (docs/mcp/code-mode.mdx:178) and semantic cache needing a cache key (docs/features/semantic-caching.mdx:55)."
+      },
+      {
+        "claim": "README.md:62-63 Enterprise unlocks adaptive load balancing, clustering, guardrails, MCP gateway.",
+        "verified": "not_checkable",
+        "evidence": "Enterprise gateway code is not in this repository. docs/changelogs/ent-v2.2.4.mdx:42-44 says the enterprise build pins OSS transports v2.2.4, and its go.mod sample replaces github.com/maximhq/bifrost-enterprise/{core,framework,plugins} with sibling directories (ent-v2.2.4.mdx:468-472); docs/enterprise/overview.mdx:7,24 calls Enterprise a strict superset; AGENTS.md:940 refers to a bifrost-enterprise tree. OSS code has hooks for it (KeySelector/KeyPoolFilter, core/bifrost.go:277-278; BifrostContextKeyIsEnterprise, transports/bifrost-http/server/plugins.go:225,249) but those features cannot be inspected here. The MCP gateway itself is present in OSS (handlers/mcpserver.go, core/mcp/)."
+      },
+      {
+        "claim": "docs/integrations/passthrough.mdx:36-38: passthrough is not a credential proxy; provider keys in the incoming request are never forwarded upstream.",
+        "verified": "partial",
+        "evidence": "Code strips api-key style headers and x-bf-* (transports/bifrost-http/integrations/router.go:3469-3485) but, for passthrough to OpenAI, forwards the caller's Authorization header when it is a JWT bearer (ChatGPT/Codex OAuth access token) and for Anthropic when it is sk-ant-oat..., and sets SkipKeySelection so no stored key is used (router.go:3435-3464,3507; integrations/utils.go:494-505; core/bifrost.go:9396-9399). A POST-only route /chatgpt_passthrough/backend-api/codex/responses to https://chatgpt.com is registered by default (integrations/passthrough.go:52-66; handlers/integrations.go:45) and is not mentioned anywhere under docs/. Such traffic gets usage extracted (core/providers/openai/passthrough_usage.go:28-29) but is never drawn from a Bifrost key pool."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Gateway-added overhead per request at 5,000 RPS, AWS t3.xlarge (4 vCPU, 16 GB), mocked OpenAI upstream, ~10 KB responses",
+        "metric": "Bifrost overhead (excludes JSON marshaling and HTTP calls); success rate",
+        "value": "11 µs; 100% success",
+        "source": "README.md:200-207; docs/benchmarking/getting-started.mdx:37-51; docs/benchmarking/t3.xl.mdx:50-52",
+        "independent": false
+      },
+      {
+        "what": "Same test on AWS t3.medium (2 vCPU, 4 GB), ~1.4 KB responses",
+        "metric": "Bifrost overhead (excludes JSON marshaling and HTTP calls); success rate",
+        "value": "59 µs; 100% success",
+        "source": "README.md:202-207; docs/benchmarking/t3.medium.mdx:27,48-50",
+        "independent": false
+      },
+      {
+        "what": "Internal queue wait time at 5,000 RPS",
+        "metric": "average queue wait",
+        "value": "47.13 µs (t3.medium) / 1.67 µs (t3.xlarge)",
+        "source": "docs/benchmarking/getting-started.mdx:42; README.md:206",
+        "independent": false
+      },
+      {
+        "what": "Weighted API-key selection",
+        "metric": "time per selection",
+        "value": "16 ns (t3.medium) / 10 ns (t3.xlarge)",
+        "source": "docs/benchmarking/t3.medium.mdx:38; docs/benchmarking/t3.xl.mdx:40; README.md:214",
+        "independent": false
+      },
+      {
+        "what": "End-to-end latency including the mocked provider call",
+        "metric": "average request latency at 5,000 RPS",
+        "value": "2.12 s (t3.medium) / 1.61 s (t3.xlarge)",
+        "source": "docs/benchmarking/getting-started.mdx:41",
+        "independent": false
+      },
+      {
+        "what": "Costs listed outside the headline overhead",
+        "metric": "JSON marshaling; response parsing",
+        "value": "marshaling 63.47 µs (t3.medium) / 26.80 µs (t3.xlarge); response parsing 11.30 ms / 2.11 ms",
+        "source": "docs/benchmarking/getting-started.mdx:43-44",
+        "independent": false
+      },
+      {
+        "what": "Peak memory during the 5,000 RPS runs",
+        "metric": "peak memory usage",
+        "value": "1,312.79 MB (t3.medium) / 3,340.44 MB (t3.xlarge)",
+        "source": "docs/benchmarking/getting-started.mdx:45",
+        "independent": false
+      },
+      {
+        "what": "MCP Code Mode versus classic MCP tool exposure as tool count grows (benchmark rounds, setup not in repo)",
+        "metric": "input-token savings and LLM round trips",
+        "value": "58.2% to 92.8% input-token savings; 3-4x fewer LLM round trips",
+        "source": "docs/mcp/code-mode.mdx:172",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Not byte-preserving on the OpenAI route. /openai/v1/responses and /chat/completions decode into typed structs and re-serialize (core/providers/openai/responses.go:13-37; types.go:928), then reshape per model capability: reasoning.effort is normalized to the model ladder (responses.go:684-710; chat.go:90-98,238-266), none becomes low on gpt-6-astra and unknown gpt-6 variants (utils.go:55-70), temperature/top_p/logprobs are stripped for GPT-6 (responses.go:772-790,862-896; harness case 115.1, provider-harness.json:170265-170269), service_tier is dropped when the catalog says unsupported (chat.go:185-205), unmodeled top-level body fields are forwarded only via extra_params plus x-bf-passthrough-extra-params (integrations/router.go:779-795), per-key aliases can rewrite the wire model (core/bifrost.go:9459-9461; docs/runbooks/codex-bedrock.mdx:21), and compat flags default to true when a config.json 'client' block omits 'compat' (framework/configstore/clientconfig.go:129-146; fresh installs default false, lib/config.go:682-700) which can drop reasoning/tools/temperature by catalog allow-list (plugins/compat/dropparams.go:140-218). History: GPT-6 Astra max effort was silently downgraded until v2.1.0 (docs/changelogs/v2.1.0.mdx:70,236). Raw /openai_passthrough and /chatgpt_passthrough forward the body as received (integrations/router.go:3497-3519; core/providers/openai/openai.go:8240).",
+      "WebSocket Responses forces store=true. handleResponseCreate sets store=true on every response.create unless the OpenAI provider has disable_store=true, replacing a client-sent store:false (transports/bifrost-http/handlers/wsresponses.go:177-191; core/schemas/provider.go:618) although the in-code comment says an explicit client value is respected (wsresponses.go:177-179). The HTTP Responses path only forces false when disable_store is set (core/providers/openai/openai.go:1826-1831). Codex defaults to websocket mode (docs/cli-agents/codex-cli.mdx:57) while the docs and CI configure supports_websockets=false (codex-cli.mdx:46; tests/e2e/clis/matrix_test.go:529-531), so the WS path with Codex is outside the documented and CI-tested setup.",
+      "Account pooling covers API keys only. ChatGPT/Codex OAuth logins are not stored or rotated anywhere; the only support is pass-through of the caller's JWT with key selection skipped (integrations/router.go:3435-3464) and Codex docs require /logout so API-key auth is used (docs/cli-agents/codex-cli.mdx:25-27). Key choice is weighted-random (core/keyselectors/weightedrandom.go:9-35); rotation on 429/401/402/403 needs max_retries>=1 but the default is 0 (core/schemas/provider.go:13; core/bifrost.go:6288-6296,6379-6382); allow_direct_keys (default false) bypasses the pool (transports/config.schema.json:266-270). OpenAI encrypted reasoning is bound to the issuing key's organization, so a key change between turns draws a 400 that Bifrost heals by stripping replayed reasoning and retrying once (core/encryptedreasoning.go:191-209; core/bifrost.go:6358-6368; docs/changelogs/v2.2.4.mdx:30). Stickiness comes from session headers only (core/schemas/useragents.go:84-92) and no previous_response_id-to-key binding was found outside WS upstream pinning (transports/bifrost-http/websocket/session.go:15).",
+      "Behaviour for new models depends on a remote datasheet. Capabilities, parameter allow-lists, reasoning ladders, pricing and the model-to-provider map come from https://getbifrost.ai/datasheet (core/schemas/modelcapabilities.go:5-23; framework/modelcatalog/datasheet/store.go:19-24), refreshed every 24 h, with name-based fallbacks that treat unknown gpt-6 variants conservatively (core/providers/openai/utils.go:14-70). A bare model absent from the catalog and from hourly live model lists (config.schema.json:4308-4311) fails with an unresolved-provider error (plugins/modelcatalogresolver/main.go:62-84); a model without a pricing row is logged without cost (datasheet/cost.go:2165-2170); first boot with an empty DB is fatal if getbifrost.ai is unreachable (lib/config.go:5426-5429) unless file:// datasheets are configured. When the catalog lists several providers for a bare model the resolver also adds the others as automatic fallbacks (modelcatalogresolver/main.go:96-122).",
+      "Defaults favour convenience over hardening. No auth on inference or management APIs until an admin account or enforce_auth_on_inference is configured (transports/bifrost-http/lib/config.go:689; handlers/middlewares.go:1173-1186); the Docker image binds 0.0.0.0 (transports/Dockerfile:70-80; docker-entrypoint.sh:110) while the binary binds localhost (server/server.go:56); prompts and responses are written to logs.db unless disable_content_logging (lib/config.go:686-687; logstore/tables.go:241-244); provider keys are stored in plain text unless an encryption key is set (config.schema.json:43-46); Go .so plugins can be downloaded from a URL into the gateway process (framework/plugins/utils.go:61; soloader.go:36), with unauthenticated callers blocked only by a special-case flag (middlewares.go:1182-1186). The Bifrost CLI persistently rewrites ~/.codex/auth.json (auth_mode=apikey, virtual key in plaintext) and config.toml on every Codex launch, displacing a ChatGPT login mode (cli/internal/harness/native_config.go:131-161).",
+      "Release integrity gaps. Gateway binaries are built with no checksum, signature or SBOM step and uploaded to R2 served as downloads.getmaxim.ai (.github/workflows/scripts/build-executables.sh:1-125; release-pipeline.yml:2826-2840); 'npx -y @maximhq/bifrost' downloads and executes that binary without verification and resolves 'latest' from getbifrost.ai (npx/bifrost/bin.js:190-242,264-271,319-363). Only the CLI gets .sha256 files (build-cli-executables.sh:52-54), fetched from the same host and skipped with a warning when missing in the npx installer (npx/bifrost-cli/bin.js:154-167). Docker images get only buildx default provenance (create-docker-manifest.sh:16-23; release-pipeline.yml:3054-3063); no cosign or attestation workflow found. macOS binaries are cross-compiled on Ubuntu with clang and a macOS 12.3 SDK tarball downloaded from a third-party GitHub repo without a checksum (install-cross-compilers.sh:27-45); no macOS or Windows runner exists in any workflow.",
+      "Scope and maintenance drift. The tag is an enterprise base tag in the OSS repo; enterprise features are not in the tree. Release cadence is fast: v2.0.0 on 2026-08-26 with breaking changes (docs/changelogs/v2.0.0.mdx:3,24-26) through v2.2.4 on 2026-09-29 (docs/changelogs/v2.1.0.mdx:3, v2.2.0.mdx:3, v2.2.1.mdx:3, v2.2.2.mdx:3, v2.2.3.mdx:3, v2.2.4.mdx:3). Docs and policy lag the code: SECURITY.md lists supported versions transports 1.4.x, core 1.4.x, framework 1.2.x (SECURITY.md:42-47) against 2.2.4/1.11.0/1.7.5 in the version files; AGENTS.md cites core/inference.go and core/mcp.go (absent), 9 plugin modules (12 present) and a checked-in go.work (gitignored, .gitignore:39); docs/security.mdx claims a FIPS base image (transports/Dockerfile:54 is plain alpine), CodeQL scans (no CodeQL analysis workflow; only SARIF uploads at snyk.yml:82,155 and scorecards.yml:92) and Snyk coverage of tests/ (snyk.yml:78 excludes examples,tests and ends with '|| true'). Unit-test workflow pr-tests.yml is manual-only (pr-tests.yml:3-5).",
+      "GPT-6 plus Codex coverage is narrower than the claim surface. CI's Codex CLI matrix exercises gpt-5.4, gpt-5.5 and gpt-5.6-sol/-terra/-luna over HTTP with API-key auth, requires_openai_auth=false and supports_websockets=false (tests/e2e/clis/matrix_test.go:307-311,347-351,515-537; tests/e2e/clis/README.md:155). GPT-6 is covered by Go unit tests, one mocked-upstream test (core/reasoningeffort_e2e_test.go:26-110) and live harness folder 115 (provider-harness.json:170265-170267); live-provider jobs need paid keys and run only in the push-to-main release pipeline (release-pipeline.yml:4-7,277-280), not on pull requests. The ChatGPT-OAuth lane has only a route-registration unit test (transports/bifrost-http/integrations/router_test.go:45-60) and no Codex SDK-specific code or docs were found."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "maximhq/bifrost",
+      "checks": [
+        {
+          "field": "install[0]",
+          "statement": "npx (gateway; downloads and runs the bifrost-http binary): npx -y @maximhq/bifrost",
+          "citation": "README.md:27",
+          "holds": true,
+          "note": "README.md:27 is exactly `npx -y @maximhq/bifrost` (repeated at :154). npx/bifrost/package.json:2,26-27 publishes @maximhq/bifrost with bin 'bifrost' (Node >=18, :20-22). npx/bifrost/bin.js:319 builds the URL https://downloads.getmaxim.ai/bifrost/<version>/<os>/<arch>/bifrost-http, :354 downloads it into the OS cache dir and :363 runs it with execFileSync. 'latest' is resolved via https://getbifrost.ai/latest-release (:264). No checksum is verified before execution."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0, file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is 'Apache License Version 2.0, January 2004', full text through 'END OF TERMS AND CONDITIONS' (:176), with the appendix notice 'Copyright 2025 H3 Labs Inc.' (:189-201). README.md:284 and npx/bifrost/package.json:18 ('Apache-2.0') agree. It is the only license file in the tree; the only other license declarations are MIT on two CI helper stubs under .github/workflows/tools/."
+        },
+        {
+          "field": "platforms.macos_arm64",
+          "statement": "yes - darwin/arm64 gateway binary and CLI binary are built (build-executables.sh:31; build-cli-executables.sh:26) and the npx wrapper selects darwin/arm64 (npx/bifrost/bin.js:165-169). Caveat: binaries are cross-compiled on Ubuntu with clang and a downloaded macOS 12.3 SDK (install-cross-compilers.sh:27-69) and no workflow uses a macOS runner (runs-on values are ubuntu-latest, ubuntu-24.04-arm, codspeed-macro).",
+          "citation": ".github/workflows/scripts/build-executables.sh:31; .github/workflows/scripts/build-cli-executables.sh:26; npx/bifrost/bin.js:165-169; .github/workflows/scripts/install-cross-compilers.sh:27-69; .github/workflows/*.yml",
+          "holds": true,
+          "note": "darwin/arm64 is in build-executables.sh's platform list (:30-36) at line 32, not 31 (31 is darwin/amd64). The release job builds it on ubuntu-latest (release-pipeline.yml:2770,2826) with oa64-clang (build-executables.sh:111-113). install-cross-compilers.sh:27-69 downloads MacOSX12.3.sdk from a third-party GitHub repo with no checksum (:30-45) and wraps 'clang -target arm64-apple-darwin' (:58-61). The CLI is built at build-cli-executables.sh:26, called from release-cli.sh:34; it uses CGO_ENABLED=0 (:46-50), so the clang/SDK caveat applies only to the gateway binary. bin.js:165-169 maps darwin+arm64 to darwin/arm64. Every runs-on value in .github/workflows is ubuntu-latest, ubuntu-24.04-arm or codspeed-macro."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Codex: codex-cli.mdx config (model_providers.bifrost, base_url http://localhost:8080/openai/v1, wire_api responses, supports_websockets false, OPENAI_API_KEY = Bifrost virtual key, /logout first), HTTPS mode for non-OpenAI models, model_catalog_json workaround, Bifrost CLI codex harness, session-id/thread-id stickiness, Codex marketplace skill serving, undocumented POST-only /chatgpt_passthrough/backend-api/codex/responses to chatgpt.com, CI runs real 'codex exec'; Codex SDK: none. Claude Code: 'claude mcp add --transport http bifrost http://localhost:8080/mcp'; /anthropic route forwards sk-ant-oat OAuth tokens.",
+          "citation": "docs/cli-agents/codex-cli.mdx:25-27,29-47,55-70,72-125; cli/internal/harness/harness.go:78-99; cli/internal/harness/native_config.go:99-184; core/schemas/useragents.go:84-92; docs/providers/session-affinity.mdx:9; handlers/skills_serving.go:142-147; integrations/passthrough.go:52-66; tests/e2e/clis/README.md:5-14,155; docs/cli-agents/overview.mdx:101; integrations/router.go:3435-3464",
+          "holds": true,
+          "note": "Every factual part holds. These cited lines match exactly: codex-cli.mdx:25-27 (/logout), :34 and :41-47 (virtual key; model_providers.bifrost with /openai/v1, wire_api responses, supports_websockets false), :55-70 (HTTPS for non-OpenAI models); harness.go:78-99; native_config.go:99-184; useragents.go:88-91 (session-id, session_id, thread-id, conversation_id); session-affinity.mdx:9; skills_serving.go:142-147; passthrough.go:52-66 (POST-only, upstream https://chatgpt.com). Nothing under docs/ mentions chatgpt_passthrough. The e2e README :5-14,155 matches, and release-pipeline.yml:972-1143 runs that harness (codex exec --json, matrix_test.go:164). overview.mdx:101 matches, and there is no Codex SDK reference in the repo. Two citations are wrong. (a) router.go:3435-3464 (applyPassthroughCallerAuth) runs only for the *_passthrough routers; NewAnthropicRouter passes a nil passthrough config (anthropic.go:1598), so /anthropic never reaches it. The /anthropic sk-ant-oat forwarding actually lives at anthropic.go:404-419 and applies only when the User-Agent is Claude Code and the model is a Claude model (anthropic.go:772-774; core/providers/anthropic/utils.go:4500-4505). (b) The model_catalog_json workaround is at codex-cli.mdx:114-219 (the key itself at :209-213); lines 72-112 cover model selection."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "README.md:85-86 Load Balancing — verified 'partial': selection is weighted random only; per-key models/blacklist/enabled filters shape the pool; key rotation after 429/401/402/403 happens only inside the retry loop whose MaxRetries defaults to 0, so with defaults there is no in-request key rotation; a session-pinned key is reused on every retry; adaptive load balancing and circuit breaker are Enterprise.",
+          "citation": "core/keyselectors/weightedrandom.go:9-35; core/bifrost.go:9424-9476,6288-6296,6379-6382,9507-9520; core/schemas/provider.go:13,634-636; docs/providers/session-affinity.mdx:47-51,88-98,195; README.md:63",
+          "holds": true,
+          "note": "All the cited lines match. weightedrandom.go:9-35 is the weighted pick, and it is the default selector (core/bifrost.go:299-300). Go SDK users can plug in a custom KeySelector (core/schemas/bifrost.go:36), so 'weighted random only' is true for the gateway and the defaults. bifrost.go:9424-9476 filters keys by enabled, models and blacklist. bifrost.go:6288-6296 and 6379-6382 rotate keys only on per-key failures, inside the loop bounded by MaxRetries+extraAttempts (:6370). DefaultMaxRetries=0 is set at provider.go:13 and applied at :634-636; the UI default is also 0 (ui/lib/constants/config.ts:113), and the schema sets no other default (config.schema.json:4338-4342). Session pinning is at bifrost.go:9507-9520 and session-affinity.mdx:47-51 and :195 ('A bound key is used for every retry'). The ALB and circuit-breaker rows are marked Enterprise at session-affinity.mdx:92,94, and README.md:63 lists adaptive load balancing as Enterprise."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking, integrations.claude_code_or_codex: cite transports/bifrost-http/integrations/anthropic.go:404-419 (gate at anthropic.go:772-774) for '/anthropic route forwards sk-ant-oat OAuth tokens' instead of integrations/router.go:3435-3464. That function is the *_passthrough handler (sk-ant-oat on /anthropic_passthrough; JWT bearers on /openai_passthrough and /chatgpt_passthrough), and NewAnthropicRouter registers no passthrough config (anthropic.go:1598). Add the condition: only when the User-Agent is Claude Code and the model is a Claude model.",
+        "Non-blocking, integrations.claude_code_or_codex: change the model_catalog_json workaround citation from docs/cli-agents/codex-cli.mdx:72-125 to docs/cli-agents/codex-cli.mdx:114-219 (key at :209-213).",
+        "Non-blocking, platforms.macos_arm64: change build-executables.sh:31 to :32 (line 31 is darwin/amd64) and optionally add release-pipeline.yml:2826 as the release-time build. Limit the 'clang + downloaded macOS 12.3 SDK' caveat to the gateway binary; the CLI is a CGO_ENABLED=0 Go cross-compile (build-cli-executables.sh:46-50)."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,290 @@
+{
+  "contender": "microsoft/pg_durable",
+  "revision": {
+    "contender": "microsoft/pg_durable",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "microsoft/pg_durable",
+        "tag": "v0.2.8",
+        "commit": "5bbbe46216f9cf1a20a4a14fd16eb9a5b8723656",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.2.8",
+    "commit": "5bbbe46216f9cf1a20a4a14fd16eb9a5b8723656",
+    "read_at": "2026-10-02T03:02:24+00:00"
+  },
+  "dossier": {
+    "contender": "microsoft/pg_durable",
+    "revision": {
+      "tag": "v0.2.8",
+      "commit": "5bbbe46216f9cf1a20a4a14fd16eb9a5b8723656",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "PostgreSQL",
+      "file": "LICENSE.txt"
+    },
+    "purpose": "A Rust (pgrx) PostgreSQL extension, not a standalone daemon. Workflows are written in a SQL DSL as structured graphs of SQL steps (plus HTTPS calls, timers, cron waits, loops, signals). A background worker inside the Postgres server runs them on the duroxide durable-task runtime, with state kept in the same database. Run history is read back with SQL functions (df.list_instances, df.instance_nodes, df.explain and others). It requires PostgreSQL 17 or 18, shared_preload_libraries plus a restart, and a superuser to CREATE EXTENSION. It has no UI, no CLI, and no OS command or process step type.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Long-running, fault-tolerant SQL functions: define the workflow in SQL, pg_durable checkpoints each step and resumes after crashes, restarts, or failed steps.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "A pg_durable function is a graph of SQL steps that PostgreSQL executes and checkpoints; if the database crashes, restarts, or a step fails, execution resumes from the last durable checkpoint.",
+          "citation": "README.md:30"
+        },
+        {
+          "claim": "Intended workloads include scheduled maintenance (detect bloat, notify, wait for approval, run next action), fan-out aggregation, ingest/embedding pipelines and external API workflows.",
+          "citation": "README.md:38-44"
+        },
+        {
+          "claim": "Positioned as a replacement for pg_cron plus a jobs table/status columns/retry counters/polling worker, or an external orchestrator (Airflow, Temporal, Step Functions, Argo) calling back into Postgres.",
+          "citation": "README.md:46-51"
+        },
+        {
+          "claim": "Retry state, progress tracking and checkpointing move into Postgres; operational visibility comes from Postgres tables such as df.instances, under the same auth and backup model as the data.",
+          "citation": "README.md:61-66"
+        },
+        {
+          "claim": "When not to use it: cannot install extensions or run a background worker; workflow mostly lives outside Postgres; arbitrary application logic that does not map to SQL steps, branching, loops or HTTP calls.",
+          "citation": "README.md:68-74"
+        },
+        {
+          "claim": "Limitation: a step needing arbitrary code or a non-HTTP SDK must be wrapped in a SQL function, exposed behind an HTTP endpoint for df.http(), or handled by a general-purpose orchestrator.",
+          "citation": "README.md:83-85"
+        },
+        {
+          "claim": "Features: durable (survives crashes, restarts, failovers); SQL-native operators; first-class scheduling, conditions and parallel execution; zero infrastructure (a PostgreSQL extension, no Redis/Temporal/external services).",
+          "citation": "README.md:89-92"
+        },
+        {
+          "claim": "Tagged releases publish Debian packages for PG17 and PG18 on amd64 and a GHCR Docker image (linux/amd64); the image is for evaluating and learning only, not production; arm64 images/packages are not yet published.",
+          "citation": "README.md:106-110"
+        },
+        {
+          "claim": "Source installation is supported on Linux and macOS for PostgreSQL 17 and 18; Windows source installation is not supported.",
+          "citation": "README.md:154-155"
+        },
+        {
+          "claim": "CREATE EXTENSION grants nothing to PUBLIC; RLS restricts each user to their own instances; the worker role (pg_durable.worker_role, default postgres) must be a superuser.",
+          "citation": "README.md:272-302"
+        },
+        {
+          "claim": "Everything runs inside the PostgreSQL server on top of duroxide (orchestration runtime: deterministic replay, checkpoints, sub-orchestrations, timers) and duroxide-pg (state in a dedicated schema).",
+          "citation": "README.md:352-355"
+        },
+        {
+          "claim": "Status: Preview.",
+          "citation": "README.md:384-386"
+        },
+        {
+          "claim": "pg_durable does not send telemetry to Microsoft.",
+          "citation": "README.md:400-402"
+        }
+      ],
+      "install": [
+        {
+          "method": "Docker image from GHCR (linux/amd64, PG17 or PG18; evaluation only)",
+          "command": "docker run -d --name pg_durable_pg17 -p 5432:5432 -e POSTGRES_PASSWORD=secret ghcr.io/microsoft/pg_durable:pg17   (PG18: tag pg18, e.g. -p 5433:5432)",
+          "citation": "README.md:116-125"
+        },
+        {
+          "method": "Debian package from GitHub release assets (amd64, PG17/PG18)",
+          "command": "No install command is given. README names the asset pg-durable-postgresql-<PG major>_<pg_durable version>-1_<arch>.deb. After installing: add pg_durable to shared_preload_libraries, restart PostgreSQL, then run: CREATE EXTENSION pg_durable;",
+          "citation": "README.md:106, 134-138"
+        },
+        {
+          "method": "Build from release source archive (Linux and macOS; needs Rust and cargo-pgrx 0.16.1)",
+          "command": "export PG_CONFIG=/usr/lib/postgresql/17/bin/pg_config; cargo pgrx init --pg17 \"$PG_CONFIG\"; make PG_CONFIG=\"$PG_CONFIG\"; sudo make install PG_CONFIG=\"$PG_CONFIG\"",
+          "citation": "README.md:142-159"
+        },
+        {
+          "method": "PGXN (source distribution compiled locally; needs PG dev headers, Rust, pgxnclient, cargo-pgrx 0.16.1)",
+          "command": "cargo install --locked cargo-pgrx --version 0.16.1; pgxn install --sudo -- pg_durable",
+          "citation": "README.md:162-187"
+        },
+        {
+          "method": "Local pgrx-managed dev cluster (development; Codespace, Dev Container or bare machine; builds and installs into PG17 on port 28817)",
+          "command": "./scripts/pg-start.sh",
+          "citation": "README.md:223-254"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. Debian .deb for PG17 and PG18 on amd64 (README.md:106; .github/workflows/package-release.yml:63-71, built on rust:bookworm and validated on debian:bookworm). GHCR image is linux/amd64 (.github/workflows/docker-publish.yml:171-177).",
+        "wsl2": "unknown. WSL is not mentioned anywhere in the repo. Windows source install is stated as unsupported (README.md:154-155), so a WSL2 Linux distro would be an undocumented, untested path.",
+        "macos_arm64": "yes, source build only; there is no prebuilt macOS binary. README.md:154 says macOS is supported; CI builds and installs on macos-latest against Homebrew PG17 and runs CREATE EXTENSION, but not the E2E suite (.github/workflows/ci.yml:56-114); .cargo/config.toml:1-5 has aarch64-apple-darwin linker flags. The workflow does not state the runner CPU architecture.",
+        "gpu": "no. Not used or required; no GPU dependency in Cargo.toml:34-72. Steps are SQL or HTTPS calls executed inside PostgreSQL."
+      },
+      "integrations": {
+        "cli": "None found. The interface is SQL through psql (README.md:127-129). The only binary target, pgrx_embed_pg_durable, is a build-time schema-embedding helper (Cargo.toml:12-14; src/bin/pgrx_embed.rs:4). Dev/test shell scripts exist under scripts/.",
+        "mcp": "None found. No MCP server or config in the repo; a repo-wide search for MCP matched nothing.",
+        "sdk_or_api": "SQL API in schema df: df.start, df.cancel, df.status, df.result, df.signal, df.await_instance, df.list_instances, df.instance_info, df.instance_executions, df.instance_nodes, df.explain, df.metrics, df.setvar/getvar and the DSL builders (USER_GUIDE.md:256-285, 1760-1950; docs/api-reference.md:445-474). No HTTP server API and no client SDK in this repo. README.md:382 points to the separate duroxide and duroxide-pg libraries for Rust/Python/Node authoring.",
+        "claude_code_or_codex": "No Claude Code- or Codex-specific integration found (no CLAUDE.md, AGENTS.md, .claude/ or .mcp.json). The repo ships an agent skill file .agents/skills/pg-durable-sql/SKILL.md (guidance for generating pg_durable SQL; the website describes it as for GitHub Copilot 'and other agents', docs/website/index.html:770-772). It also has .github/copilot-instructions.md and prompts/README.md (LLM prompts for contributors)."
+      },
+      "telemetry_and_network": "README states 'pg_durable does not send telemetry to Microsoft' (README.md:402). A search of src/, build.rs and scripts/ for telemetry, analytics, OpenTelemetry, Sentry and phone-home code found none. Runtime network use: (1) PostgreSQL connections from the background worker and from per-node SQL execution via sqlx, to pg_durable.host, else PGHOST, else 127.0.0.1, on the server's own port (src/types.rs:183-190, 236-252, 282-336). The worker connects as arbitrary submitting roles with no password, so pg_hba.conf trust or peer auth for local connections is required (docs/user-isolation.md:26-28; docs/spec-security-model.md:646-649). (2) Outbound HTTPS only when a workflow contains df.http()/df.http_multipart() nodes. Source builds without an http feature block all HTTP. Released .deb/Docker builds allow only HTTPS to 20 hard-coded Azure domain suffixes plus api.github.com. Redirects are disabled and system proxies ignored in restricted builds. The http-allow-all build removes limits and is labelled development-only (src/ssrf.rs:9-17, 51-87; src/activities/execute_http.rs:57-78; docs/http-security.md:29-40; CHANGELOG.md:76). TLS uses native-tls/OpenSSL (Cargo.toml:54-61; .deb Depends on libssl3 and ca-certificates, scripts/package-deb.sh:69). No account, API key or cloud service is needed to run it; README.md:18 promotes the optional managed Azure HorizonDB, and the Azure examples under examples/ are optional. Local logging: the worker writes fully substituted workflow SQL and workflow results to the PostgreSQL server log by default (pg_durable.log_workflow_sql=on, src/lib.rs:63; USER_GUIDE.md:2189-2214). Network is touched at install time only for GitHub Releases, GHCR or PGXN."
+    },
+    "code": {
+      "languages": [
+        "Rust (extension: pgrx 0.16.1, edition 2021)",
+        "SQL (generated DDL, upgrade scripts sql/pg_durable--*.sql, pg_regress and E2E tests)",
+        "Bash (build/test/package scripts)",
+        "Python (examples only: Azure Functions samples)",
+        "HTML/CSS (static website under docs/website)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/lib.rs",
+          "what": "_PG_init (line 94): refuses to load unless via shared_preload_libraries, defines the pg_durable.* GUCs, registers the background worker. extension_sql! blocks (line 263 onward) create schemas df and _duroxide and the tables df.instances, df.nodes, df.vars, df._worker_epoch."
+        },
+        {
+          "path": "src/worker.rs",
+          "what": "duroxide_worker_main (line 93) leads to run_duroxide_runtime (line 127): background-worker main that hosts the duroxide runtime, publishes the readiness record and epoch heartbeat, and runs retention/reconciliation (register_background_worker at lines 58-67)."
+        },
+        {
+          "path": "src/dsl.rs",
+          "what": "SQL-callable df.* functions: DSL builders (sql, seq, sleep, wait_for_schedule, loop, break, if, join, race, http, http_multipart, wait_for_signal) and control calls (start, cancel, status, result, await_instance, signal)."
+        },
+        {
+          "path": "src/monitoring.rs",
+          "what": "SQL-callable df.list_instances, df.instance_info, df.instance_executions, df.instance_nodes and df.metrics (df.explain is in src/explain.rs)."
+        },
+        {
+          "path": "src/orchestrations/execute_function_graph.rs",
+          "what": "Deterministic orchestrations execute (line 476) and execute_subtree (line 596), registered in src/registry.rs:62-74; they walk the node graph and schedule activities."
+        },
+        {
+          "path": "src/activities/",
+          "what": "Seven registered activities (src/registry.rs:25-59): execute_sql, execute_http, execute_multipart, load_function_graph (+ transaction-aware probe), update_instance_status, update_node_status."
+        },
+        {
+          "path": "src/bin/pgrx_embed.rs",
+          "what": "pgrx_embed_pg_durable binary used at build time for SQL schema generation; not a user CLI."
+        },
+        {
+          "path": "Makefile",
+          "what": "package (cargo pgrx package), install/uninstall (DESTDIR-aware), test-regress/installcheck (PGXS), pgxn-zip; the dev entry point is ./scripts/pg-start.sh (README.md:243-254)."
+        }
+      ],
+      "architecture": "A pgrx cdylib (Cargo.toml:9-10) preloaded into PostgreSQL. _PG_init registers ONE background worker (pg_durable_worker, restart delay 5 s, src/worker.rs:58-67). The worker runs a current-thread Tokio runtime (src/worker.rs:101-104; the code comment at :680-683 says no extra OS threads) that hosts the duroxide runtime and the duroxide-pg PostgreSQL provider (src/worker.rs:739-769). Workflow state lives in schemas df (instances, nodes, vars, _worker_epoch; src/lib.rs:298-392) and _duroxide (provider schema, src/lib.rs:263-282) in the single database named by pg_durable.database. The SQL DSL (src/dsl.rs; operators ~> |=> & | ?> !> @> in src/lib.rs; types in src/types.rs) builds a tree of structured nodes (SQL, THEN, IF, JOIN, RACE, LOOP, BREAK, SLEEP, WAIT_SCHEDULE, HTTP, HTTP_MULTIPART, SIGNAL; src/types.rs:1067-1079, 1404-1417). There are no arbitrary dependency edges: nodes have left/right children, and JOIN may carry one extra branch (join3). df.start() writes df rows in the caller's transaction (or on a separate loopback session with transaction_mode => 'new', src/client.rs:331-372) and enqueues a duroxide orchestration. Orchestrations replay deterministically, running JOIN/RACE branches and non-root loops as child sub-orchestrations and loops via continue_as_new. SQL nodes open one PostgreSQL connection per node as the submitting role (src/activities/execute_sql.rs:231; src/types.rs:282-336). Concurrency is bounded by connection GUCs (management 6, duroxide 10, user-execution 10, new-start 2; src/lib.rs:25-30; USER_GUIDE.md:2364-2431). No OS processes are spawned by the engine (only build.rs and test helpers spawn). Supervision: postmaster restarts the worker, the worker heartbeats df._worker_epoch every ~5 s (src/worker.rs:847-858; USER_GUIDE.md:1986-1999), and a reconciliation pass prunes terminal instances (src/worker.rs:27-34, 860-956). Related modules: src/monitoring.rs, src/explain.rs and src/node_status.rs (derived inferred_status), src/ssrf.rs and src/redact.rs (HTTP allow-list and URL redaction).",
+      "packaging_and_release": "Tag v* push or manual dispatch runs .github/workflows/package-release.yml. It builds amd64 .deb packages for PG17 and PG18 in a rust:bookworm container with cargo-pgrx 0.16.1 and the http-allow-azure-domains feature (lines 36, 59-168; Makefile:44-46), validates them on debian:bookworm by installing from PGDG and running pg_regress (scripts/validate-deb-package.sh), and creates source archives (.tar.gz, .tar.bz2 via git archive, lines 244-279). The release job creates a draft GitHub release if none exists, generates SHA256SUMS with sha256sum, and uploads .deb, source archives and SHA256SUMS (lines 281-325). No GPG, cosign or SLSA signing of these assets was found in .github/. The Docker Publish workflow (on release published or dispatch; defaults to dry-run on dispatch) installs the released .deb onto postgres:<major>-bookworm (Dockerfile.release), smoke-tests it, and pushes to ghcr.io/microsoft/pg_durable with buildx provenance and SBOM attestations (docker-publish.yml:14-37, 190-264, 306-317). The .deb Depends on postgresql-N, libssl3 and ca-certificates (scripts/package-deb.sh:69). The PGXN upload is deliberately manual (prompts/pg_durable-release.md:327-337); META.json is generated from META.json.in (Makefile:159-166). No arm64, macOS or Windows binaries are produced. Third-party actions are pinned by commit SHA in the workflows read; the one exception seen is dtolnay/rust-toolchain@stable in copilot-setup-steps.yml:29. Dependabot updates the lockfile and GitHub Actions weekly (.github/dependabot.yml). CHANGELOG lists releases 0.2.2 (2026-05-28) through 0.2.8 (2026-09-11) (CHANGELOG.md:7, 63, 82, 108, 135, 182, 220).",
+      "tests_and_ci": "Three suites (docs/TESTING.md:19-31). (1) Rust unit tests via cargo pgrx test: 394 #[pg_test]/#[test]/#[tokio::test] attributes across 13 src files, largest in src/lib.rs (129), src/types.rs (85) and src/ssrf.rs (65). (2) pg_regress: REGRESS = 00_init simple sequence variables parallel conditional (Makefile:173), i.e. 6 sql/*.sql plus 6 expected/*.out; sql/ also holds 11 install/upgrade fixture scripts pg_durable--*.sql. (3) E2E: 58 SQL files in tests/e2e/sql plus tests/e2e/run.sh, driven by scripts/test-e2e-local.sh (local pgrx PG) and scripts/test-e2e-docker.sh. There are also lifecycle scripts (test-upgrade.sh, test-shutdown.sh, test-epoch-race.sh, test-make-install.sh, test-all-local.sh, test-coverage.sh) and 4 example smoke checks (examples/*/scripts/smoke_check.sh). CI is .github/workflows/ci.yml, on PRs, push to main and dispatch. Jobs: example smoke checks, source-install checks, macOS source install (PG17), cargo fmt, then a Clippy & Tests matrix. PRs run PG17 only unless labelled test-pg18; main runs 17 and 18, and PG18 failures are non-blocking (ci.yml:136-148, 160-161). The matrix runs: clippy -D warnings with http-allow-test-domains, the pgspot SQL security gate (PG17), cargo pgrx test, E2E default-build phases, upgrade tests, shutdown regression, epoch-race regression, and pg_regress (ci.yml:243-293). Other workflows: docker.yml (path-triggered and nightly 03:00 UTC Docker build + E2E), package-release.yml (build + validate .deb on PRs touching packaging files), docker-publish.yml, prebuild.yml (devcontainer validation), pages.yml (website deploy), copilot-setup-steps.yml. No cargo-audit, cargo-deny or CodeQL workflow was found. Makefile targets test, test-unit and test-e2e call ./scripts/test.sh, which does not exist in this revision (Makefile:49-59).",
+      "dependencies": "One manifest, Cargo.toml: 16 direct [dependencies] (pgrx =0.16.1, serde, serde_json, uuid, percent-encoding, duroxide =0.1.30, duroxide-pg =0.1.34, tokio, sqlx 0.8, bigdecimal, cron 0.13, chrono, reqwest 0.13 with native-tls, url, base64, tracing-subscriber) plus 1 dev-dependency (pgrx-tests =0.16.1) (Cargo.toml:34-75). Cargo.lock has 424 package entries including the root. Features: pg13-pg18 (default pg17), http-allow-all / http-allow-azure-domains / http-allow-test-domains, test-hooks, unsafe, pg_test (Cargo.toml:16-31). pgrx, duroxide and duroxide-pg are exact-pinned pre-1.0 crates; duroxide and duroxide-pg are separate microsoft/ repos. Python: two examples/*/function-app/requirements.txt (azure-functions; tiktoken in one), not part of the extension. NOTICE's direct-dependency inventory is stale (lists duroxide 0.1.29 and reqwest 0.12.28; omits url, base64, percent-encoding; NOTICE:22-23, 38-39).",
+      "security_policy": "SECURITY.md is the standard Microsoft block: do not file public issues; report privately per https://aka.ms/SECURITY.md (SECURITY.md:3-12). Also present: docs/spec-security-model.md, docs/security-review/ (a review of v0.2.0 dated 2026-03-18 with a threat model; docs/security-review/security-review.md:1-8), docs/http-security.md, and a pgspot SQL security gate in CI (ci.yml:246-259, scripts/pgspot-gate.sh). CONTRIBUTING.md requires the Microsoft CLA."
+    },
+    "claim_checks": [
+      {
+        "claim": "Zero infrastructure: runs as a PostgreSQL extension with no Redis, Temporal or external services (README.md:92, 352).",
+        "verified": "yes",
+        "evidence": "One pgrx cdylib registers a single background worker hosting duroxide in-process, persisting to schemas df/_duroxide in the same database (src/worker.rs:58-67, 101-124, 739-769; src/lib.rs:263-282, 298-392). The only other clients in src/ are sqlx back to PostgreSQL and reqwest for user-authored df.http nodes. Prerequisites the README lists elsewhere still apply: shared_preload_libraries + restart (src/lib.rs:95-100), superuser to CREATE EXTENSION (pg_durable.control:11), superuser worker role (README.md:299), pg_hba trust/peer for loopback (docs/user-isolation.md:26-28). docs/ARCHITECTURE.md:154-165 shows an older registration snippet (1 s restart, enable_spi_access) than the code (5 s restart, enable_shmem_access; src/worker.rs:58-67)."
+      },
+      {
+        "claim": "If the database crashes, restarts, or a step fails, execution resumes from the last durable checkpoint (README.md:14, 30).",
+        "verified": "partial",
+        "evidence": "Crash/restart resume is by design: orchestrations are deterministic replay code (src/orchestrations/execute_function_graph.rs:4-9), history lives in PostgreSQL through duroxide-pg (src/worker.rs:739-769) and the postmaster restarts the worker after 5 s (src/worker.rs:65). The replay engine itself is in the duroxide crate, which is not in this repo and was not run. A failed step does not resume: an activity error becomes NodeError::Application (execute_function_graph.rs:910-913), the node is stamped failed (:825-842) and the instance ends failed (:562-581). The df.* API has no retry/resume/restart function (src/dsl.rs); only df.loop(..., continue_on_failure => true) carries on to the next iteration (execute_function_graph.rs:1290-1313)."
+      },
+      {
+        "claim": "Docs say the extension handles 'persistence, retries, and scheduling' (USER_GUIDE.md:5); df.http 5xx and timeouts: 'Activity fails and may be retried' (USER_GUIDE.md:772-773); PGXN metadata lists 'retries' as a first-class primitive (META.json.in:4).",
+        "verified": "no",
+        "evidence": "Code differs from the docs. SQL, HTTP and multipart activities are scheduled with plain schedule_activity and no retry policy (execute_function_graph.rs:910-913, 1978-1981, 2081-2084), and docs/http_problems.md:506-512 states nothing retries. The only retries are internal and bounded: graph admission (MAX_GRAPH_RETRY_ATTEMPTS = 20, execute_function_graph.rs:149-156) and terminal status writes (MAX_STATUS_FINALIZE_ATTEMPTS = 20, :158-165, 427-462). Half of the HTTP line holds: a 5xx makes the activity return Err (src/activities/execute_http.rs:247-255), which contradicts docs/http_problems.md:490-499 (stale for this revision); 4xx is returned as data (:257-259). Any default retry inside the duroxide runtime is not visible in this repo and was not checked."
+      },
+      {
+        "claim": "Built-in cron-style scheduling for recurring jobs; the next schedule is computed only after the prior iteration finishes, so runs do not overlap or backfill (USER_GUIDE.md:43, 1282-1340).",
+        "verified": "yes",
+        "evidence": "df.wait_for_schedule validates a 5-field cron (a '0 ' seconds field is prepended) with the cron crate (src/dsl.rs:287-307). The next tick is computed at execution time from duroxide's deterministic UTC clock (src/orchestrations/execute_function_graph.rs:990-1046). Recurring jobs use @>/df.loop with a 1 s minimum iteration (:1052, 1342-1359) and a 2^23 iteration cap (:1057, 1333-1340). Cron fields are therefore evaluated in UTC; there is no timezone argument. tests/e2e/sql/24_wait_for_schedule_exec_time.sql covers only '* * * * *'. The documented day-of-week numbering (0-6, Sun=0; USER_GUIDE.md:428) is not exercised by any test and depends on the cron 0.13 crate (not checkable here)."
+      },
+      {
+        "claim": "Operational visibility comes from Postgres tables such as df.instances; status, history and metrics are queryable in SQL (README.md:66; USER_GUIDE.md:44, 1760-1950).",
+        "verified": "yes",
+        "evidence": "Tables df.instances/df.nodes (src/lib.rs:298-337) plus df.list_instances (src/monitoring.rs:231-304), df.instance_executions (:645-737, one row per continue-as-new execution, default last 5), df.instance_nodes/df.explain (USER_GUIDE.md:1834-1901) and df.metrics (src/monitoring.rs:746). History is bounded: terminal instances are kept at most 30 days by default and at most 10,000 (src/lib.rs:50; src/worker.rs:34; USER_GUIDE.md:2032-2042). No UI or CLI exists in the repo (docs/website is a static landing page, docs/website/README.md:3). Doc drift: USER_GUIDE.md:2755 says failed nodes store no error and :2680-2684 says df.result() carries a failed instance's message. In code, df.result() returns a value only when the root node is 'completed' (src/dsl.rs:1410-1419), and a failed node's error text is stored in df.nodes.result (src/activities/update_node_status.rs:116-122; tests/e2e/sql/06_http_and_ssrf.sql:252-258)."
+      },
+      {
+        "claim": "Cancellation: df.cancel stops an instance and cascades from the parent to active loop children (USER_GUIDE.md:1407-1419; docs/api-reference.md:445-456).",
+        "verified": "partial",
+        "evidence": "df.cancel does an RLS ownership check, calls the duroxide client's cancel_instance, then sets df.instances.status='cancelled' unless already terminal (src/dsl.rs:1351-1385; src/client.rs:375-388). tests/e2e/sql/22_cancel_status_consistency.sql:116-162 cancels a running loop and checks status agreement across APIs. Nothing in this repo interrupts a statement or request already in flight: there is no pg_cancel_backend/pg_terminate_backend in src/, no cancellation check in src/activities/execute_sql.rs:187-266, and no statement_timeout on user connections (src/types.rs:282-336). Whether duroxide drops an in-flight activity and cascades cancel to child sub-orchestrations happens inside the duroxide crate (not in this repo, not checkable)."
+      },
+      {
+        "claim": "Completed steps are not re-executed; in-progress steps resume from the last checkpoint (USER_GUIDE.md:141-146).",
+        "verified": "partial",
+        "evidence": "The replay design records activity results, but each SQL node runs on its own autocommit connection as the submitting role (src/activities/execute_sql.rs:231-258) and its result is recorded by the engine afterwards. An interrupted step is therefore re-run whole, not resumed (an inference from this design). The maintainers call this at-least-once behaviour real but unverified (docs/http_problems.md:516-526). Idempotency advice appears only for transaction_mode => 'new' (USER_GUIDE.md:233-235; docs/api-reference.md:422-425)."
+      },
+      {
+        "claim": "Steps are SQL; arbitrary code must be wrapped in a SQL function or exposed behind an HTTP endpoint for df.http() (README.md:68-74, 85).",
+        "verified": "yes",
+        "evidence": "Node dispatch supports only sql/then/sleep/wait_schedule/loop/if/join/race/http/http_multipart/signal/break and errors on anything else (src/orchestrations/execute_function_graph.rs:862-878; src/types.rs:1404-1417). No code in src/ spawns OS processes (only build.rs does). The README omits that df.http reach is further limited at build time. Source builds without an http feature disable HTTP, and released packages allow HTTPS only to 20 Azure suffixes plus api.github.com (src/ssrf.rs:51-87; docs/http-security.md:29-40; CHANGELOG.md:76)."
+      },
+      {
+        "claim": "pg_durable does not send telemetry to Microsoft (README.md:402).",
+        "verified": "yes",
+        "evidence": "No telemetry, analytics, OpenTelemetry, Sentry or phone-home code in src/, build.rs or scripts/ (only the README statement and a CHANGELOG mention match). Outbound traffic is limited to PostgreSQL connections (src/types.rs:238-252, 282-336) and user-authored df.http/df.http_multipart nodes (src/activities/execute_http.rs:86-260). tracing-subscriber output goes to the PostgreSQL server log (src/worker.rs:46-55)."
+      },
+      {
+        "claim": "Source installation is supported on Linux and macOS for PostgreSQL 17 and 18; Windows is not supported (README.md:154-155).",
+        "verified": "partial",
+        "evidence": "The Makefile accepts only PG 17/18 and selects .dylib vs .so by uname (Makefile:190-193, 217). CI covers macOS by building and installing against PG17 only (ci.yml:56-114). The CI test matrix runs PG18 only on labelled PRs or main, with failures non-blocking (ci.yml:136-148, 160-161). Prebuilt packages and the image are linux/amd64 only (package-release.yml:63-71; README.md:110). Cargo.toml still defines pg13-pg16 features although the Makefile and README support 17/18 only (Cargo.toml:25-30)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: executes only SQL statements (as the submitting role, on per-node PostgreSQL connections) and HTTPS calls. There is no process/shell/command node (src/orchestrations/execute_function_graph.rs:862-878; README.md:85). Wrapping existing OS commands needs an external HTTP endpoint, and released builds reach only 20 Azure domain suffixes plus api.github.com (src/ssrf.rs:51-83; docs/http-security.md:29-40); http-allow-all is development-only. Graphs are trees of structured nodes (THEN/IF/JOIN/RACE/LOOP), not arbitrary dependency edges (src/types.rs:1067-1079).",
+      "No per-step retry, backoff or resume: SQL/HTTP/multipart activities have no retry policy (execute_function_graph.rs:910-913, 1978-1981, 2081-2084), so one failed node ends the instance as failed (:562-581). Only df.loop(..., continue_on_failure => true), marked experimental (USER_GUIDE.md:1220-1221), moves on to the next iteration. A saturated execution-slot pool also fails the node after 30 s (src/activities/execute_sql.rs:210-229). Docs and metadata still claim retries (USER_GUIDE.md:5, 772-773; META.json.in:4), while docs/http_problems.md:506-512 says nothing retries.",
+      "No bound on a running step and no in-flight abort: user SQL connections set no statement_timeout (src/types.rs:282-336), execute_sql has no cancellation check (src/activities/execute_sql.rs:187-266), and df.cancel only asks the duroxide client to cancel and flips the status row (src/dsl.rs:1351-1385; src/client.rs:375-388). The 2026-03-18 security review recommended statement_timeout and per-user rate limits/quotas (docs/security-review/security-review.md:241, 249). No per-user instance cap or statement timeout was found in src/. HTTP timeout_seconds has no upper bound (docs/http_problems.md:35).",
+      "Effect semantics and upgrades: each SQL node commits on its own connection while the step result is checkpointed separately, so a crash between the two can re-run an effect. The maintainers flag this as unverified (docs/http_problems.md:516-526); the user guide gives idempotency advice only for transaction_mode => 'new' (USER_GUIDE.md:233-235). Replay-breaking upgrades can leave df.instances rows pending/running forever (docs/loop_rework_problems.md:111-128, listed Blocking/Open). docs/upgrade-testing.md:259-266 records that every in-flight JOIN/RACE failed on 0.2.4 to 0.2.5 and loops may fail; CHANGELOG.md:33-36 warns of a loop replay break at iteration 100,000 on 0.2.8.",
+      "Maturity: README says Preview (README.md:386) and CHANGELOG says pre-1.0 minor releases may break (CHANGELOG.md:5), while META.json.in:10 says release_status stable. Seven releases landed 2026-05-28 to 2026-09-11 (CHANGELOG.md:7-220). docs/loop_rework_problems.md:20-22 lists three Blocking/Open loop issues: whole graph/vars/results re-persisted on every continue_as_new, clock-read failure disables the loop rate limit, replay failures strand instances. docs/http_problems.md:22 lists unbounded HTTP payloads as Blocking/Open. The public df.run() is a no-op stub (src/dsl.rs:1398-1406; TODO.md:12).",
+      "Deployment and security posture: needs superuser to CREATE EXTENSION (pg_durable.control:11), preload plus restart (src/lib.rs:95-100), a superuser worker role (README.md:299), and pg_hba trust/peer for the worker's passwordless per-role connections (docs/user-isolation.md:26-28). Superuser-submitted workflows are rejected unless pg_durable.enable_superuser_instances=on (src/lib.rs:34; src/dsl.rs:1103-1117); the published Docker image turns that on and is evaluation-only (Dockerfile.release:52-58; README.md:110). Workflow SQL and results are logged to the server log by default (src/lib.rs:63; USER_GUIDE.md:2189-2214); df.vars are plaintext and copied into execution history (USER_GUIDE.md:1057-1098).",
+      "Platform coverage: prebuilt artifacts are linux/amd64 for PG17/18 only (README.md:106-110; scripts/package-deb.sh:21-29). There are no arm64, macOS or Windows binaries; macOS CI covers a PG17 source install and CREATE EXTENSION, not E2E (ci.yml:56-114). PG18 CI failures are non-blocking and PRs run PG17 only unless labelled (ci.yml:136-148, 160-161). WSL2 is not mentioned. make test/test-unit/test-e2e reference a missing scripts/test.sh (Makefile:49-59). Release assets carry SHA256SUMS but no signature (package-release.yml:322), and no dependency-audit workflow was found.",
+      "Capacity and operations: one background worker on a current-thread Tokio runtime serves all workflows (src/worker.rs:101-104; multiple workers are unimplemented, TODO.md:9). Default 10 concurrent SQL executions with a 30 s wait before a node fails (src/lib.rs:27-29; USER_GUIDE.md:2433-2444). One control database per runtime (USER_GUIDE.md:2560-2561; TODO.md:35). Terminal run history is pruned at 30 days or 10,000 rows (USER_GUIDE.md:2032-2042). Loop-child instances are not listed by df.list_instances and per-iteration node status is overwritten (USER_GUIDE.md:1396-1401). There is no UI or CLI: visibility is SQL functions and the text output of df.explain()."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "microsoft/pg_durable",
+      "checks": [
+        {
+          "field": "readme.install[1] (Debian package from GitHub release assets)",
+          "statement": "Debian package from GitHub release assets (amd64, PG17/PG18). No install command is given. README names the asset pg-durable-postgresql-<PG major>_<pg_durable version>-1_<arch>.deb. After installing: add pg_durable to shared_preload_libraries, restart PostgreSQL, then run: CREATE EXTENSION pg_durable;",
+          "citation": "README.md:106, 134-138",
+          "holds": true,
+          "note": "README.md:106 says tagged releases publish Debian packages for PG 17 and 18 on amd64 and gives that exact name pattern. README.md:134-138 gives the preload, restart and CREATE EXTENSION steps. The README has no dpkg/apt command; the only 'dpkg -i' mention in the repo is a comment at Dockerfile.release:28. Cross-check: scripts/package-deb.sh:17-19 and :104 build pg-durable-postgresql-${PG_VERSION}_${CLEAN_VERSION}-1_amd64.deb and reject any other architecture (:21-29). The postinst message (:85) repeats the same three steps. package-release.yml:319-325 uploads the .deb files to the GitHub release."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX PostgreSQL; file LICENSE.txt",
+          "citation": "LICENSE.txt:1-18",
+          "holds": true,
+          "note": "LICENSE.txt is the PostgreSQL License text, headed 'PostgreSQL License', with 'Copyright (c) 2025, Microsoft Corporation' as the copyright holder. It matches Cargo.toml:5 (license = \"PostgreSQL\"), META.json.in:9 (\"postgresql\"), the README badge and License section (README.md:7, 410), and the image label org.opencontainers.image.licenses=PostgreSQL (docker-publish.yml:187, 324)."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes. Debian .deb for PG17 and PG18 on amd64 (README.md:106; package-release.yml:63-71, built on rust:bookworm and validated on debian:bookworm). GHCR image is linux/amd64 (docker-publish.yml:171-177).",
+          "citation": "README.md:106; .github/workflows/package-release.yml:63-71; .github/workflows/docker-publish.yml:171-177",
+          "holds": true,
+          "note": "package-release.yml:63-71 has the matrix pg_version [17, 18] and platform amd64 / linux/amd64 / file_pattern x86-64. The build runs in a rust:bookworm container (:111), :181 checks that the .so is x86-64, and validation runs in debian:bookworm (:230). docker-publish.yml:171-177 is the 'Build image (amd64)' step with platforms: linux/amd64, and the publish step is also linux/amd64 (:312)."
+        },
+        {
+          "field": "integrations.sdk_or_api",
+          "statement": "SQL API in schema df: df.start, df.cancel, df.status, df.result, df.signal, df.await_instance, df.list_instances, df.instance_info, df.instance_executions, df.instance_nodes, df.explain, df.metrics, df.setvar/getvar and the DSL builders. No HTTP server API and no client SDK in this repo. README.md:382 points to the separate duroxide and duroxide-pg libraries for Rust/Python/Node authoring.",
+          "citation": "USER_GUIDE.md:256-285, 1760-1950; docs/api-reference.md:445-474; README.md:382",
+          "holds": true,
+          "note": "USER_GUIDE.md:256-285 lists the builders (sleep, wait_for_schedule, http, join/join3, race, if, loop, break, wait_for_signal) plus start, cancel, status, result, explain, setvar/getvar, signal and await_instance. Lines 1760-1950 cover list_instances, instance_info, instance_executions and instance_nodes. api-reference.md:445-474 covers cancel and status. Each function is a #[pg_extern(schema = \"df\")] in src/: dsl.rs:138, 161, 711, 994 (start_v2 exported as \"start\"), 1351, 1389, 1410, 1452; monitoring.rs:231, 558, 645, 746, 948; explain.rs:61. Cargo.toml:34-72 has no HTTP server crate (reqwest is a client), and TcpListener appears only in test modules (execute_http.rs:262-267; http_response.rs:221). The repo has no package.json, pyproject.toml or SDK/client directory; the only requirements.txt files are the two under examples/. README.md:382 says what the dossier says. One small gap: df.metrics is documented at USER_GUIDE.md:1952-1961, two lines past the cited range."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "'If the database crashes, restarts, or a step fails, execution resumes from the last durable checkpoint' (README.md:14, 30), verified 'partial'. Crash/restart resume is by design (deterministic replay, duroxide-pg history, 5 s worker restart). A failed step does not resume: activity error becomes NodeError::Application, the node is stamped failed and the instance ends failed. The df.* API has no retry/resume/restart function, and only df.loop(continue_on_failure => true) carries on.",
+          "citation": "src/orchestrations/execute_function_graph.rs:4-9, 562-581, 825-842, 910-913, 1290-1313; src/worker.rs:65, 739-769; src/dsl.rs",
+          "holds": true,
+          "note": "README.md:14 and :30 contain the quoted claim. execute_function_graph.rs:4-9 is the 'DETERMINISTIC CODE ONLY' replay header. worker.rs:739-769 builds the duroxide_pg::PostgresProvider (imported at :16) and starts the runtime on it, and worker.rs:65 sets set_restart_time(5 s). :910-913 calls plain schedule_activity(...).map_err(NodeError::Application)?. The node is then written as 'failed' (:825-842), the error propagates through THEN via ? (:955-963), and the instance is finalized as 'failed' (:562-581). src/ has no RetryPolicy, with_retry or max_attempts; its only retries are internal (graph admission, status finalization, worker init). No exported df.* function or SQL-defined function retries, resumes or restarts an instance; df.run (dsl.rs:1398-1406) is a no-op that only returns a string. :1290-1313 maps ApplicationFailed to None when continue_on_failure is set. docs/http_problems.md:506-512 separately says 'Nothing retries'. As the dossier itself says, the duroxide replay internals are outside this repo."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Optional, does not affect the verdict: integrations.sdk_or_api cites USER_GUIDE.md:1760-1950, but df.metrics is documented at USER_GUIDE.md:1952-1961. Change the range to USER_GUIDE.md:1760-1961, or add src/monitoring.rs:745-746."
+      ]
+    }
+  ]
+}

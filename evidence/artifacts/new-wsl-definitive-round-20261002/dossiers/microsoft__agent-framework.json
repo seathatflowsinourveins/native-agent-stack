@@ -1,0 +1,315 @@
+{
+  "contender": "microsoft/agent-framework",
+  "revision": {
+    "contender": "microsoft/agent-framework",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "microsoft/agent-framework",
+        "tag": "dotnet-1.23.0",
+        "commit": "95e711a6280d0ed7bafa5bafb8ff38eba4cffd3e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "dotnet-1.23.0",
+    "commit": "95e711a6280d0ed7bafa5bafb8ff38eba4cffd3e",
+    "read_at": "2026-10-02T03:02:26+00:00"
+  },
+  "dossier": {
+    "contender": "microsoft/agent-framework",
+    "revision": {
+      "tag": "dotnet-1.23.0",
+      "commit": "95e711a6280d0ed7bafa5bafb8ff38eba4cffd3e",
+      "read_at": "2026-10-02T03:02:26+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "MIT-licensed SDK/library monorepo (Python workspace under python/ and .NET solution under dotnet/; the Go SDK is a separate repo, README.md:17) for building agents and graph-based multi-agent workflows. It ships provider chat clients (OpenAI, Azure OpenAI, Foundry, Anthropic, Bedrock and others), tools, sessions/history, MCP/A2A/AG-UI support, checkpointed workflows, OpenTelemetry, Foundry hosting, and a 'harness' layer (HarnessAgent in .NET, create_harness_agent in Python) that wraps any supplied chat client with planning todos, plan/execute modes, file memory, skills, compaction, tool approval, looping and background sub-agents. It also ships wrappers around external agent SDKs (Claude Agent SDK, Python only; GitHub Copilot SDK, Python and .NET) and separate sandbox/shell packages (Hyperlight, Monty, Docker/local shell, LocalCodeAct). No worker daemon, task queue, or packaged deep-research product exists at this revision: the only console scripts are devui and Lab tools (python/packages/devui/pyproject.toml:44-45; python/packages/lab/pyproject.toml:96-98) and dotnet/src has no executable project.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "MAF is an open, multi-language framework for building production-grade AI agents and multi-agent workflows in .NET and Python.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "Provides a consistent foundation across Python, .NET and Go; supports Microsoft Foundry, Azure OpenAI, OpenAI and the GitHub Copilot SDK, with samples and hosting patterns for local development and cloud deployment. The Go SDK lives in a separate repository (microsoft/agent-framework-go).",
+          "citation": "README.md:14,17"
+        },
+        {
+          "claim": "Strong fit if you run agents in production, need orchestration beyond a stateless chat loop, want sequential/concurrent/handoff/group patterns, care about durability, restartability, observability, governance or human-in-the-loop control, and need provider flexibility.",
+          "citation": "README.md:33-38"
+        },
+        {
+          "claim": "Python and C#/.NET Support: 'Full framework support for both Python and C#/.NET implementations with consistent APIs'.",
+          "citation": "README.md:43"
+        },
+        {
+          "claim": "Orchestration Patterns & Workflows: graph-based workflows (sequential, concurrent, handoff, group collaboration) that 'include checkpointing, streaming, human-in-the-loop, and time-travel'.",
+          "citation": "README.md:50"
+        },
+        {
+          "claim": "Foundry Hosted Agents (new): deploy and host agents to Foundry-hosted infrastructure 'with just 2 additional lines of code'.",
+          "citation": "README.md:52"
+        },
+        {
+          "claim": "Observability: built-in OpenTelemetry integration for distributed tracing, monitoring and debugging.",
+          "citation": "README.md:54"
+        },
+        {
+          "claim": "AF Labs: experimental packages for benchmarking, reinforcement learning and research initiatives; installed separately via agent-framework-lab.",
+          "citation": "README.md:60,82-85"
+        },
+        {
+          "claim": "pip install agent-framework installs the standard package set (experimental Lab modules are separate).",
+          "citation": "README.md:82-85"
+        },
+        {
+          "claim": "Durable Task and Azure Functions samples live in a separate Durable Agent Framework extension repository, not in this repo.",
+          "citation": "README.md:171,180"
+        },
+        {
+          "claim": "Using third-party servers, agents, code or non-Azure-direct models is at the user's own risk; users must review data flows and implement their own responsible-AI mitigations.",
+          "citation": "README.md:213-218"
+        },
+        {
+          "claim": "create_harness_agent builds a pre-configured, batteries-included agent: function invocation, per-service-call persistence, compaction, TodoProvider, AgentModeProvider (plan/execute), memory/skills/shell (when provided), tool approval, looping and OpenTelemetry; each feature can be disabled or customized.",
+          "citation": "python/samples/02-agents/harness/README.md:3-25"
+        },
+        {
+          "claim": ".NET HarnessAgent is an opinionated pre-configured agent 'suitable for interactive agentic scenarios such as research, coding, data analysis, and general task automation', assembled around a caller-supplied IChatClient with function invocation, per-service-call history persistence, optional compaction, context providers and decorators.",
+          "citation": "dotnet/src/Microsoft.Agents.AI.Harness/HarnessAgent.cs:17-28"
+        },
+        {
+          "claim": "LocalShellTool 'is not a sandbox' (the boundary is approval-in-the-loop). Sandbox tiers: Hyperlight WASM microVM for untrusted code, DockerShellTool OCI container for untrusted shell, LocalShellTool approval-in-the-loop for trusted dev.",
+          "citation": "python/packages/tools/README.md:43-48,157-163"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (Python meta-package; depends on agent-framework-core[all]==1.19.0, which pulls claude, github-copilot, hyperlight, monty, tools and other extras)",
+          "command": "pip install agent-framework",
+          "citation": "README.md:82-85; python/README.md:12; python/pyproject.toml:25-27; python/packages/core/pyproject.toml:35-67"
+        },
+        {
+          "method": "NuGet (.NET core; Foundry quickstart adds more packages)",
+          "command": "dotnet add package Microsoft.Agents.AI",
+          "citation": "README.md:91-95"
+        },
+        {
+          "method": "pip (Claude Agent SDK integration, beta, Python only)",
+          "command": "pip install agent-framework-claude --pre",
+          "citation": "python/packages/claude/README.md:5-7"
+        },
+        {
+          "method": "pip (GitHub Copilot SDK integration; requires Python >=3.11)",
+          "command": "pip install agent-framework-github-copilot",
+          "citation": "python/packages/github_copilot/README.md:5-7; python/packages/github_copilot/pyproject.toml:6"
+        },
+        {
+          "method": "pip (Hyperlight microVM CodeAct sandbox, beta)",
+          "command": "pip install agent-framework-hyperlight --pre",
+          "citation": "python/packages/hyperlight/README.md:7-9"
+        },
+        {
+          "method": "pip (shell tools incl. DockerShellTool, beta)",
+          "command": "pip install agent-framework-tools --pre",
+          "citation": "python/packages/tools/README.md:9-11"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Python unit tests run on ubuntu-latest for Python 3.10-3.15 (.github/workflows/python-tests.yml:24-27); .NET build/unit tests run on ubuntu-latest (.github/workflows/dotnet-build-and-test.yml:105,107,184); the Hyperlight Wasm backend wheel is published for linux x86_64 but needs /dev/kvm (python/packages/hyperlight/pyproject.toml:28; python/samples/04-hosting/container/hyperlight_codeact/README.md:45-50); DockerShellTool needs a docker/podman binary (python/packages/tools/README.md:153-155).",
+        "wsl2": "unknown - no WSL2 runtime support statement; python/DEV_SETUP.md:13-18,36-42 only gives WSL development-setup advice, and the shell tools mention WSL only as a Windows bash fallback (python/packages/tools/agent_framework_tools/shell/_environment.py:71). Hyperlight on WSL2 would additionally need /dev/kvm; not documented.",
+        "macos_arm64": "yes for the SDK, harness and provider clients (python/README.md:40-43 lists macOS as a supported OS; uv environments include darwin in python/packages/core/pyproject.toml:79-85; shell tools document /bin/bash on macOS, python/packages/tools/README.md:83), with caveats: arm64 is never named, neither CI matrix has a macOS runner (python-tests.yml:26 'todo: add macos-latest'; dotnet-build-and-test.yml:105-108), and the Hyperlight microVM sandbox is not available on macOS (python/packages/hyperlight/pyproject.toml:28,32-37; dotnet/samples/02-agents/AgentWithCodeAct/AgentWithCodeAct_Step01_Interpreter/README.md:27-28 lists only KVM/WHP). Monty (Rust Python interpreter sandbox) lists macOS (python/packages/monty/README.md:15-17).",
+        "gpu": "no - no GPU requirement or GPU code path in the SDK, harness or sandbox packages; inference is remote through provider clients (e.g. python/packages/openai/pyproject.toml:25-28). GPU appears only in the optional Lab RL example (40GB GPU memory, python/packages/lab/lightning/README.md:86) and an Ollama sample note (dotnet/samples/02-agents/AgentProviders/ollama/Agent_With_Ollama/README.md:15)."
+      },
+      "integrations": {
+        "cli": "No CLI for running or resuming workers. Console scripts are only `devui` (python/packages/devui/pyproject.toml:44-45; a sample app 'not intended for production use', python/packages/devui/README.md:5-6) and Lab `gaia_viewer`/`lightning` (python/packages/lab/pyproject.toml:96-98). Samples include a Textual harness console (python/samples/02-agents/harness/README.md:49-63) and a .NET console harness (dotnet/samples/02-agents/Harness/README.md:5-12).",
+        "mcp": "Client: Python MCPTool/MCPStdioTool/MCPStreamableHTTPTool/MCPWebsocketTool (python/packages/core/agent_framework/_mcp.py:870,3498,3708,4317); .NET Microsoft.Agents.AI.Mcp, alpha (dotnet/src/Microsoft.Agents.AI.Mcp/Microsoft.Agents.AI.Mcp.csproj:6,20-21); OpenAI hosted MCP tool via get_mcp_tool (python/packages/openai/agent_framework_openai/_chat_client.py:1460-1500). Server: Python Agent.as_mcp_server() exposes an agent as one MCP tool (python/packages/core/agent_framework/_agents.py:1812-1858); .NET sample McpServerTool.Create(agent.AsAIFunction()) over stdio (dotnet/samples/02-agents/Agents/Agent_Step07_AsMcpTool/Program.cs:36-43); alpha conversion helpers in agent-framework-hosting-mcp (python/packages/hosting-mcp/README.md:1-20; python/PACKAGE_STATUS.md:41).",
+        "sdk_or_api": "Library SDK in Python and .NET. Harness entry points: create_harness_agent (python/packages/core/agent_framework/_harness/_agent.py:312) and HarnessAgent/AsHarnessAgent (dotnet/src/Microsoft.Agents.AI.Harness/ChatClientHarnessExtensions.cs:34-39). HTTP surfaces: Foundry Responses/Invocations hosts (Python ResponsesHostServer(agent).run(), python/samples/04-hosting/foundry-hosted-agents/responses/basic/main.py:30-31; .NET AddFoundryResponses/MapFoundryResponses, dotnet/samples/02-agents/Harness/BuildYourOwnClaw/Claw_Step04_ProductionReady/ClawAgent.Hosted/README.md:11-16); .NET ASP.NET Core hosting for AG-UI, A2A and OpenAI Responses/Conversations/Chat Completions (dotnet/samples/04-hosting/README.md:7-14); alpha Python helper packages hosting, hosting-responses, hosting-a2a, hosting-mcp, hosting-telegram (python/PACKAGE_STATUS.md:39-43; harness-over-FastAPI sample python/samples/04-hosting/af-hosting/local_responses_harness/app.py:128-149); DevUI serves an OpenAI-Responses-compatible /v1 API (python/packages/devui/README.md:136-151). Provider-side long runs: OpenAI Responses background=True with continuation_token (python/packages/openai/agent_framework_openai/_chat_client.py:184-185,291-299) and hosted code-interpreter/web-search/shell/MCP tools (_chat_client.py:1218-1500).",
+        "claude_code_or_codex": "Claude: Python-only ClaudeAgent wraps the Claude Agent SDK / Claude Code CLI (python/packages/claude/agent_framework_claude/_agent.py:37-47,289-300; depends on claude-agent-sdk>=0.1.46,<0.3, python/packages/claude/pyproject.toml:25-28; samples python/samples/02-agents/providers/anthropic/README.md:14-25); no Claude Agent SDK integration under dotnet/ (searched), only the Anthropic API client (dotnet/src/Microsoft.Agents.AI.Anthropic/AnthropicClientExtensions.cs:35-64). GitHub Copilot SDK: GitHubCopilotAgent in Python (python/packages/github_copilot/agent_framework_github_copilot/_agent.py:592) and .NET (dotnet/src/Microsoft.Agents.AI.GitHub.Copilot/GitHubCopilotAgent.cs:24); model option accepts e.g. 'gpt-5' or 'claude-sonnet-4' and a BYOK provider config for OpenAI/Azure/Anthropic endpoints (_agent.py:492-518). Codex: none found (no 'codex' string anywhere in the repo). AGENTS.md files in the repo (dotnet/AGENTS.md:3) are contributor instructions for AI coding agents, not an integration."
+      },
+      "telemetry_and_network": "Besides the items below, no other phone-home was found in the telemetry, client-setup and hosting paths reviewed. (1) HTTP header stamping, on by default: the Python OpenAI client merges 'agent-framework-version: python/<ver>' and a 'agent-framework-python/<ver>' User-Agent prefix into its default headers (python/packages/openai/agent_framework_openai/_shared.py:197-201); disable with env AGENT_FRAMEWORK_USER_AGENT_DISABLED=true|1 (python/packages/core/agent_framework/_telemetry.py:19-30,210-211). A coarse boolean feature-usage mask '(feat=vN.hex)' is appended to User-Agent only for approved HTTPS Azure/Foundry origins (cognitiveservices.azure.com, openai.azure.com, services.ai.azure.com; python/packages/openai/agent_framework_openai/_feature_usage.py:24-28,61-67) and is disabled by AGENT_FRAMEWORK_FEATURE_MASK_DISABLED (python/packages/core/agent_framework/_telemetry.py:21,135-137); design record says no identifiers, prompts, payloads or model names are encoded (docs/decisions/0033-feature-usage-bitmask-user-agent.md:25-48,57-72). .NET: 'agent-framework-dotnet/<version>' User-Agent added on approved Azure origins for the OpenAI client (dotnet/src/Microsoft.Agents.AI.OpenAI/UserAgentPolicies.cs:9-16; dotnet/src/Shared/FeatureUsage/AgentFrameworkUserAgentPolicy.cs:47-89) and on all Foundry-client requests (dotnet/src/Microsoft.Agents.AI.Foundry/AgentFrameworkUserAgentPolicy.cs:9-15); the .NET feature token is disabled by AGENT_FRAMEWORK_FEATURE_MASK_DISABLED=true|1 (dotnet/src/Microsoft.Agents.AI.Abstractions/FeatureUsage.cs:23,40-42,178-183). (2) OpenTelemetry: harness agents wrap OpenTelemetry by default (dotnet/src/Microsoft.Agents.AI.Harness/HarnessAgent.cs:58,190-193; python/packages/core/agent_framework/_harness/_agent.py:699-700); Python instrumentation defaults to enabled but core depends only on opentelemetry-api (python/packages/core/pyproject.toml:30), exporters are developer-configured via OTLP env vars (python/packages/core/agent_framework/observability.py:691-703); sensitive-data capture defaults to False (observability.py:1013-1016; .NET EnableSensitiveData, dotnet/src/Microsoft.Agents.AI/OpenTelemetryAgent.cs:28,154); harness README says default telemetry is metadata only (python/samples/02-agents/harness/README.md:169-171). Foundry-hosted runs inject APPLICATIONINSIGHTS_CONNECTION_STRING and an OTLP pipeline (dotnet/samples/02-agents/Harness/BuildYourOwnClaw/Claw_Step04_ProductionReady/ClawAgent.Hosted/README.md:24-36). (3) Required services/accounts: a model endpoint - OpenAI API key (python/packages/openai/README.md:49-57), Azure OpenAI/Foundry endpoint plus Azure credential via az login (README.md:111-135,191-198), Anthropic API key (python/samples/02-agents/providers/anthropic/README.md:27-48), or a GitHub Copilot CLI session. Foundry Hosted Agents, the Foundry Deep Research tool (needs a Bing grounding connection and an o3-deep-research deployment, dotnet/samples/02-agents/Agents/Agent_Step15_DeepResearch/README.md:12-18) and FoundryEvals need Azure resources. (4) Build/run-time downloads: the .NET GitHub.Copilot package downloads the Copilot CLI binary at build time unless CopilotSkipCliDownload=true (dotnet/src/Microsoft.Agents.AI.GitHub.Copilot/buildTransitive/Microsoft.Agents.AI.GitHub.Copilot.targets:14-25). (5) Local state defaults: harness file memory under {cwd}/agent-file-memory (dotnet/src/Microsoft.Agents.AI.Harness/HarnessAgent.cs:337-347; python/packages/core/agent_framework/_harness/_agent.py:185-190); Foundry-hosting stores as JSON under ~/.agentserver/state_stores outside Foundry (python/packages/foundry_hosting/README.md:93-98); Copilot CLI state under ~/.copilot (python/packages/github_copilot/agent_framework_github_copilot/_agent.py:453-456)."
+    },
+    "code": {
+      "languages": [
+        "Python (3.10+; github_copilot package 3.11+)",
+        "C# (.NET 8/9/10 plus netstandard2.0/net472 for most core packages)",
+        "TypeScript/React (DevUI frontend, python/packages/devui/frontend)",
+        "PowerShell and JavaScript (build and GitHub automation scripts)",
+        "YAML/Bicep (workflows, declarative agents, sample infra)"
+      ],
+      "entry_points": [
+        {
+          "path": "python/packages/core/agent_framework/_harness/_agent.py",
+          "what": "create_harness_agent(client, ...) factory (exported from agent_framework, python/packages/core/agent_framework/__init__.py:688); signature :312-356, pipeline assembly :659-703."
+        },
+        {
+          "path": "dotnet/src/Microsoft.Agents.AI.Harness/HarnessAgent.cs",
+          "what": "HarnessAgent (:80), built from any IChatClient; IChatClient.AsHarnessAgent() in ChatClientHarnessExtensions.cs:34-39; options in HarnessAgentOptions.cs."
+        },
+        {
+          "path": "python/packages/claude/agent_framework_claude/_agent.py",
+          "what": "ClaudeAgent/RawClaudeAgent wrapping the Claude Agent SDK (:289,:1022); import path agent_framework.anthropic (python/packages/core/agent_framework/anthropic/__init__.py:15-38)."
+        },
+        {
+          "path": "python/packages/github_copilot/agent_framework_github_copilot/_agent.py",
+          "what": "GitHubCopilotAgent/RawGitHubCopilotAgent (:592) over github-copilot-sdk; .NET twin dotnet/src/Microsoft.Agents.AI.GitHub.Copilot/GitHubCopilotAgent.cs:24 (CreateSession/Resume via ResumeSessionAsync :187-192)."
+        },
+        {
+          "path": "python/packages/hyperlight/agent_framework_hyperlight/_provider.py",
+          "what": "HyperlightCodeActProvider (:24) and HyperlightExecuteCodeTool (_execute_code_tool.py:1521), microVM CodeAct sandbox; .NET twin dotnet/src/Microsoft.Agents.AI.Hyperlight/HyperlightCodeActProvider.cs."
+        },
+        {
+          "path": "python/packages/tools/agent_framework_tools/shell/_docker.py",
+          "what": "DockerShellTool (:352) and LocalShellTool (_tool.py:65); .NET twins dotnet/src/Microsoft.Agents.AI.Tools.Shell/DockerShellExecutor.cs and LocalShellExecutor.cs."
+        },
+        {
+          "path": "python/packages/foundry_hosting/agent_framework_foundry_hosting/_responses.py",
+          "what": "ResponsesHostServer (:514) and InvocationsHostServer (_invocations.py:51): HTTP hosts for Foundry Responses/Invocations protocols with session, checkpoint and approval stores; .NET AddFoundryResponses in dotnet/src/Microsoft.Agents.AI.Foundry.Hosting/ServiceCollectionExtensions.cs."
+        },
+        {
+          "path": "python/packages/devui/pyproject.toml",
+          "what": "[project.scripts] devui = agent_framework_devui:main (:44-45), the only console entry point in the Python workspace besides Lab (python/packages/lab/pyproject.toml:96-98); no <OutputType>Exe</OutputType> or PackAsTool project exists in dotnet/src."
+        }
+      ],
+      "architecture": "Monorepo with two parallel implementations. Python workspace (python/packages, 41 packages built with flit-core; Lab excluded from the workspace, python/pyproject.toml:71-73). `core` (agent_framework): _agents.py (Agent), _clients.py, _tools.py (function-invocation loop: max_iterations default 40, max_function_calls/max_duration_seconds default None, :104,1851-1856; tool approval_mode default never_require, :667), _sessions.py (sessions, history providers, SessionStore), _compaction.py, _middleware.py, _mcp.py, _skills.py, _workflows/ (graph workflows, _checkpoint.py with InMemory/File storage), _evaluation.py (LocalEvaluator, evaluate_agent, evaluate_workflow), observability.py, security.py, and _harness/ (_agent.py factory, _todo.py, _mode.py, _file_memory.py, _file_access.py, _background_agents.py, _loop.py, _tool_approval.py, _memory.py). Other packages: provider clients (openai, anthropic, foundry, bedrock, gemini, ollama, mistral...), SDK wrappers (claude, github_copilot), sandboxes/tools (hyperlight, monty, tools), hosting (foundry_hosting, hosting, hosting-responses, hosting-a2a, hosting-mcp, hosting-telegram, a2a, ag-ui, devui), stores (azure-cosmos, redis, postgres, ...), orchestrations (sequential/concurrent/handoff/group chat/Magentic) and lab (gaia, tau2, lightning). .NET (dotnet/src, 35 projects): Microsoft.Agents.AI.Abstractions (AIAgent, AgentSession, ChatHistoryProvider, AIContextProvider, FeatureUsage), Microsoft.Agents.AI (ChatClientAgent, decorators, compaction, Harness/ providers: Todo, AgentMode, FileMemory, FileAccess, BackgroundAgents, ToolApproval, Loop), Microsoft.Agents.AI.Harness (HarnessAgent pipeline assembly), Workflows (+Declarative, Generators), provider packages (OpenAI, Anthropic, Foundry, GitHub.Copilot), sandboxes (Hyperlight, LocalCodeAct, Tools.Shell), hosting (Hosting*, Foundry.Hosting), stores (CosmosNoSql, Hosting.AzureStorage, Valkey), Mcp, AgentHooks. Harness pipeline in both languages (HarnessAgent.cs:167-300; _agent.py:659-703): supplied chat client -> function invocation (bounded iterations) -> message injection -> per-service-call history persistence -> optional compaction (only when context/output token budgets are given) -> default context providers (todo, mode, file memory, skills; opt-in file access, background agents, shell) -> tool-approval layer -> optional loop (default max 10 iterations) -> OpenTelemetry; a hosted web-search tool is added when the client supports it (HarnessAgent.cs:312-319; _agent.py:634-644). The harness runs in the host process and contains no model-specific code; isolation comes only from add-ons (Hyperlight, Docker shell, provider-hosted containers, Foundry hosted containers).",
+      "packaging_and_release": "Python: 41 distributable packages under python/packages, each built with flit-core (e.g. python/packages/core/pyproject.toml:151-153); the meta-package agent-framework pins agent-framework-core[all]==1.19.0 (python/pyproject.toml:25-27); package maturity (released/beta/alpha) is tracked in python/PACKAGE_STATUS.md:15-58. .github/workflows/python-release.yml:3-17,119-131 triggers on a GitHub release with a python-* tag, runs `uv run poe build` and attaches python/dist/* to the release with softprops/action-gh-release; .github/workflows/python-docs.yml also triggers on release. No checksum, signature, SBOM or attestation step and no PyPI-publish step exists in this repo's workflows (searched for twine/pypi/uv publish/attest/cosign/sigstore/checksum); id-token: write is granted in python-release.yml:9 but not used there. .NET: NuGet metadata in dotnet/nuget/nuget-package.props (VersionPrefix 1.23.0 :4; IsReleased packages publish exactly the prefix :10, others '1.23.0-<suffix>.260928.1' :7-9; SourceLink and .snupkg symbols :55-57,66; PublicAPI analyzers for released packages :67-84; package-validation baseline :16-19; NuGetAudit :25-32; MIT license expression :44). Microsoft.Agents.AI.Harness, Microsoft.Agents.AI, Abstractions, OpenAI, GitHub.Copilot and Workflows set IsReleased=true (e.g. dotnet/src/Microsoft.Agents.AI.Harness/Microsoft.Agents.AI.Harness.csproj:4); Hyperlight, LocalCodeAct and Tools.Shell are VersionSuffix=preview; Mcp, AgentHooks and Hosting.OpenAI are alpha. `dotnet pack` appears only as a package-install check (.github/workflows/dotnet-build-and-test.yml:137-171); no NuGet push, signing or attestation workflow exists in the repo, so the .NET publish path is outside the visible CI. The checked-out tag dotnet-1.23.0 is an annotated tag peeling to commit 95e711a6 (.git/packed-refs:2-3). No documented `dotnet add package Microsoft.Agents.AI.Harness` command; harness samples use ProjectReference (dotnet/samples/02-agents/Harness/Harness_Step01_Research/Harness_Step01_Research.csproj:15-20).",
+      "tests_and_ci": "Python: pytest with pytest-asyncio, xdist, cov, timeout and retry (python/pyproject.toml:30-45); about 301 test_*.py files under python/packages; an `integration` marker is excluded from the default unit task (e.g. python/packages/core/pyproject.toml:144-146); harness tests python/packages/core/tests/core/test_harness_*.py. .NET: xunit.v3 on Microsoft.Testing.Platform (dotnet/global.json:7-9; dotnet/Directory.Packages.props:155-156), 49 test projects under dotnet/tests and about 488 *Tests.cs files; HarnessAgent unit tests use mock clients (dotnet/tests/Microsoft.Agents.AI.Harness.UnitTests/HarnessAgentTests.cs:59-100); no integration test of HarnessAgent or create_harness_agent against a live model was found. Workflows (.github/workflows): python-tests.yml (Python 3.10-3.15 on ubuntu and windows, `uv run poe test -A`, :24-31,53-54); python-merge-tests.yml and python-integration-tests.yml (path-filtered provider integration jobs on PR, merge group and nightly, Azure OIDC); python-code-quality.yml (prek hooks, pyright/mypy package checks, samples and markdown lint); python-test-coverage.yml (85% threshold for packages at Beta or higher, :24; .github/scripts/python_check_coverage.py:18,91); python-api-compatibility.yml; python-lab-tests.yml; python-sample-validation.yml (nightly LLM-driven sample runs including 02-agents/harness, :3-6,129-173); python-docs.yml; python-release.yml; python-dependency-maintenance.yml; python-openai-dependency-bounds.yml; dotnet-build-and-test.yml (builds all slnx on net10.0/net9.0/net8.0/net472 on ubuntu and windows with --warnaserror, package install check, unit tests on net10.0 and net472 with 80% coverage gate, integration tests only on non-PR events with Azure/OpenAI secrets; Anthropic integration tests are disabled, :105-108,137-171,184-185,388-409,427-464,482-485); dotnet-integration-tests.yml and integration-tests-manual.yml (manual/callable integration runs); dotnet-verify-samples.yml (weekday sample build-and-verify with AI checks); dotnet-format.yml; codeql-analysis.yml (csharp and python, :7-28); github-automation-tests.yml (9 files under .github/tests); markdown-link-check.yml; promote-shipped-apis.yml; merge-gatekeeper.yml; label and triage automation (issue-triage.yml, devflow-*.yml). Dependabot covers nuget, pip, uv and github-actions (.github/dependabot.yml:9,63,98,131,160).",
+      "dependencies": "Python manifests: python/pyproject.toml (meta package: 1 runtime dependency, agent-framework-core[all]==1.19.0; 20 pinned dev tools; 3 test deps; uv overrides for mcp, uvicorn, python-multipart security floors :64); python/packages/core/pyproject.toml (7 runtime deps: msgspec, typing-extensions, pydantic, python-dotenv, opentelemetry-api, pyyaml, regex; an `all` extra with 30 entries incl. claude, github-copilot, hyperlight, monty, tools, foundry, openai, anthropic, a2a, ag-ui, devui, plus agent-framework-azurefunctions and agent-framework-durabletask that now live in a separate repo, docs/decisions/0032-durable-azure-functions-extraction.md:10-21); 41 package-level pyproject.toml files, e.g. claude 2 deps (agent-framework-core, claude-agent-sdk>=0.1.46,<0.3), github_copilot 2 (github-copilot-sdk==1.0.11 exact pin), hyperlight 4 (hyperlight-sandbox>=0.7.0,<0.8, Wasm backend only for linux x86_64/win32 AMD64 on Python <3.15, guest), tools 2 (core, psutil), monty 2 (pydantic-monty), openai 2 (openai>=2.25.0,<4), anthropic 2, foundry 6, foundry_hosting 6 (azure-ai-agentserver-*, httpx, mcp); python/uv.lock lockfile. .NET manifests: dotnet/Directory.Packages.props (133 centrally managed PackageVersion entries, incl. OpenAI 2.14.0, Anthropic 12.45.0, GitHub.Copilot.SDK 1.0.14, Hyperlight.HyperlightSandbox.Api/Guest.Python 0.6.0, ModelContextProtocol 2.2.0, Microsoft.Extensions.AI 10.10.0, OpenTelemetry 1.18.0); dotnet/Directory.Build.props (TFMs net10.0;net9.0;net8.0;netstandard2.0;net472, TreatWarningsAsErrors); dotnet/global.json (SDK 10.0.401); 35 src csproj files, e.g. Microsoft.Agents.AI 1 project + 8 package refs (+1 conditional Evaluation), Abstractions 1 package ref, Harness 1 project ref and 0 package refs, GitHub.Copilot 1 project + 1 package, Hyperlight 1 project + 1 package, LocalCodeAct 1 project + 1 package, Tools.Shell 1 project + 1 package, Anthropic 1 project + 2 packages.",
+      "security_policy": "SECURITY.md (Microsoft MSRC template: report privately via MSRC or secure@microsoft.com, not public issues; coordinated vulnerability disclosure, SECURITY.md:3-39). TRANSPARENCY_FAQ.md:50,83 advises human oversight and containerization/sandboxing for code execution. SUPPORT.md:11 limits Microsoft support to Azure-service scenarios; other usage is GitHub issues only."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:43 - 'Full framework support for both Python and C#/.NET implementations with consistent APIs'",
+        "verified": "partial",
+        "evidence": "Harness, GitHub Copilot SDK agent, Hyperlight and shell tools exist in both languages (python/packages/core/agent_framework/_harness/_agent.py:312; dotnet/src/Microsoft.Agents.AI.Harness/HarnessAgent.cs:80; dotnet/src/Microsoft.Agents.AI.GitHub.Copilot/GitHubCopilotAgent.cs:24). But the Claude Agent SDK integration is Python-only (python/packages/claude/pyproject.toml:25-28; no ClaudeAgent/claude-agent-sdk match under dotnet/), Monty is Python-only (python/packages/monty/README.md:15) and LocalCodeAct is .NET-only (dotnet/src/Microsoft.Agents.AI.LocalCodeAct/README.md:1-3; no match under python/). Versions and stages differ (Python core 1.19.0, python/packages/core/pyproject.toml:7; .NET 1.23.0, dotnet/nuget/nuget-package.props:4; Hyperlight beta in Python vs preview in .NET). Harness defaults differ: skills auto-discovered from the working directory by default in .NET (HarnessAgent.cs:354-361) but opt-in in Python (_agent.py:204-208)."
+      },
+      {
+        "claim": "README.md:52 - Foundry Hosted Agents deploy 'with just 2 additional lines of code'",
+        "verified": "partial",
+        "evidence": "The code change is two lines in both languages: Python ResponsesHostServer(agent) + server.run() (python/samples/04-hosting/foundry-hosted-agents/responses/basic/main.py:30-31) and .NET AddFoundryResponses + MapFoundryResponses (dotnet/samples/02-agents/Harness/BuildYourOwnClaw/Claw_Step04_ProductionReady/ClawAgent.Hosted/README.md:11-16). Deployment still needs a container image, azd and an AcrPull role assignment (same README:104-170), and the default Foundry hosted runtime exposes no hypervisor so Hyperlight CodeAct cannot run there (python/samples/04-hosting/container/hyperlight_codeact/README.md:11-20,58-63; ClawAgent.Hosted README:69-95)."
+      },
+      {
+        "claim": "README.md:50 - workflows 'include checkpointing, streaming, human-in-the-loop, and time-travel'",
+        "verified": "partial",
+        "evidence": "Checkpoint save/resume exists: Python Workflow.run(checkpoint_id=...) restores from storage (python/packages/core/agent_framework/_workflows/_workflow.py:706-733,761-798; FileCheckpointStorage at _checkpoint.py:505) and .NET InProcessExecution.ResumeAsync(workflow, CheckpointInfo, ...) (dotnet/src/Microsoft.Agents.AI.Workflows/InProcessExecution.cs:60-74). The term 'time-travel' appears only in README.md:50 and TRANSPARENCY_FAQ.md:13; no code, API or sample uses it."
+      },
+      {
+        "claim": "README.md:33-38 - fit for teams that care about durability and restartability",
+        "verified": "partial",
+        "evidence": "Harness history defaults to in-memory providers (dotnet HarnessAgent.cs:69-73,225-231; python _agent.py:585); file memory writes under {cwd}/agent-file-memory (HarnessAgent.cs:337-347). Crash recovery of hosted runs is opt-in (.NET ResilientBackground default false, dotnet/src/Microsoft.Agents.AI.Foundry.Hosting/FoundryResponsesOptions.cs:60-84), Foundry-specific, and in Python restricted to workflow agents - a non-workflow agent raises RuntimeError (python/packages/foundry_hosting/agent_framework_foundry_hosting/_responses.py:444-449). In-flight background-agent tasks are marked Lost after a restart (dotnet/src/Microsoft.Agents.AI/Harness/BackgroundAgents/BackgroundAgentRuntimeState.cs:14-17). Durable Task hosting moved to a separate repo (README.md:171; docs/decisions/0032-durable-azure-functions-extraction.md:10-21). Hosted state writes are not transactional (python/packages/foundry_hosting/README.md:195-199)."
+      },
+      {
+        "claim": "python/samples/02-agents/harness/README.md:18 - 'MemoryContextProvider | File-based durable memory (when memory_store provided)'",
+        "verified": "no",
+        "evidence": "create_harness_agent has no memory_store parameter; it wires FileMemoryProvider by default, rooted at {cwd}/agent-file-memory, configurable via file_memory_store (python/packages/core/agent_framework/_harness/_agent.py:185-190,333,451-455). MemoryContextProvider is defined in _harness/_memory.py:976 but is not wired by _assemble_context_providers (_agent.py:146-228). The README table is stale; the code is authoritative."
+      },
+      {
+        "claim": "dotnet HarnessAgent.cs:57 - ToolApprovalAgent provides 'don't ask again' approval rules 'enabling safe unattended execution'",
+        "verified": "partial",
+        "evidence": "ToolApprovalAgent only coordinates approvals for tools that already require approval, queues requests, and caps auto-approval rounds at 40 (dotnet/src/Microsoft.Agents.AI/Harness/ToolApproval/ToolApprovalAgent.cs:20-35,55). In Python, tools default to approval_mode 'never_require' (python/packages/core/agent_framework/_tools.py:667) so nothing is gated unless tools are marked; max_function_calls and max_duration_seconds default to None and are best-effort (_tools.py:1765-1785,1851-1856). Built-in file-access auto-approval rules match by tool name, so a same-named tool could be auto-approved (python/samples/02-agents/harness/README.md:162-168)."
+      },
+      {
+        "claim": "python/samples/03-workflows/declarative/deep_research/README.md:15-18 - KnowledgeAgent 'Performs web searches', CoderAgent 'Writes and executes code'",
+        "verified": "no",
+        "evidence": "python/samples/03-workflows/declarative/deep_research/main.py:162-172 constructs KnowledgeAgent and CoderAgent with instructions only and no tools. The .NET declarative DeepResearch sample has Bing grounding commented out ('TODO: Use Bing Grounding when available') for ResearchAgent and KnowledgeAgent (dotnet/samples/03-workflows/Declarative/DeepResearch/Program.cs:116-121,254-260); only its CoderAgent has a code-interpreter tool (:269-273). The only use of a provider Deep Research tool is the .NET sample Agent_Step15_DeepResearch (Foundry Agent Service DeepResearchToolDefinition, o3-deep-research, Bing connection; Program.cs:12-14,27-37), which relies on [Obsolete] Persistent Agents APIs (Program.cs:3; dotnet/src/Microsoft.Agents.AI.AzureAI.Persistent/PersistentAgentsClientExtensions.cs:22)."
+      },
+      {
+        "claim": "python/packages/tools/README.md:121-155 - DockerShellTool applies --network none, non-root user, read-only root, --cap-drop ALL, no-new-privileges, memory and pids limits, tmpfs /tmp",
+        "verified": "yes",
+        "evidence": "python/packages/tools/agent_framework_tools/shell/_docker.py:14-19,69-104,275-287 sets --user 65534:65534, --network none, --read-only, --cap-drop ALL, --security-opt no-new-privileges, --memory, --pids-limit and --tmpfs /tmp; the .NET DockerShellExecutor applies the same flags (dotnet/src/Microsoft.Agents.AI.Tools.Shell/DockerShellExecutor.cs:25-26,384-394). The same README states LocalShellTool is not a sandbox (python/packages/tools/README.md:45-48); LocalShellTool approval can only be disabled with acknowledge_unsafe (README.md:52-54; dotnet LocalShellExecutor.cs:341-345)."
+      },
+      {
+        "claim": "python/packages/claude/README.md:11 - the Claude agent integrates the Claude Agent SDK and its agentic capabilities",
+        "verified": "yes",
+        "evidence": "ClaudeAgent wraps ClaudeSDKClient and sends each run through client.query()/receive_response() (python/packages/claude/agent_framework_claude/_agent.py:37-47,289-300,929-931). It exposes resume of a provider session (session.service_session_id, :579-581,1014-1016), allowed_tools/disallowed_tools, permission_mode (including bypassPermissions), max_turns, max_budget_usd, a SandboxSettings option, MCP servers and file checkpointing (:149-170,197-251). Framework FunctionTools marked always_require are denied unless an on_function_approval callback is configured (:101-115,672-688). Python only; depends on claude-agent-sdk>=0.1.46,<0.3 (python/packages/claude/pyproject.toml:25-28)."
+      },
+      {
+        "claim": "Need-side premise - the project can drive autonomous workers with GPT-6.1 Sol through a supported harness SDK",
+        "verified": "not_checkable",
+        "evidence": "No 'GPT-6.1' or 'Sol' model reference exists in the repo. The only 'gpt-6-sol' string is the stubbed Bedrock Converse model id 'us.openai.gpt-6-sol' in unit tests (python/packages/bedrock/tests/test_bedrock_client.py:125-129,147,504-508). OpenAI, Foundry and Bedrock clients take the model as a free-form string (python/packages/openai/README.md:65-67; python/packages/openai/agent_framework_openai/_chat_client.py:578; python/packages/bedrock/agent_framework_bedrock/_chat_client.py:110,187) and the harness has no model-specific code (HarnessAgent.cs:80-134; _agent.py:312-356). Samples default to gpt-5.4 (dotnet/samples/02-agents/Harness/Harness_Step01_Research/Program.cs:29) and gpt-5.6-luna (python/samples/02-agents/providers/openai/client_prompt_caching.py:71); all harness samples use Foundry clients (Program.cs:72-82; python/samples/02-agents/harness/harness_research.py:99). The GitHub Copilot SDK agent accepts a model string and a BYOK provider config (python/packages/github_copilot/agent_framework_github_copilot/_agent.py:492-518), but nothing in the repo shows a GPT-6.x model reached through it."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "tau2-bench airline domain (50 tasks) run with Agent Framework Lab's tau2 module; rows are agent model / user-simulator model. Measures model quality inside the Lab runner, not the harness, sandboxing or research tooling.",
+        "metric": "average task success rate",
+        "value": "gpt-5/gpt-4.1 62.0%; gpt-5-mini/gpt-4.1 52.0%; gpt-4.1/gpt-4.1 60.0%; gpt-4.1-mini/gpt-4.1 50.0%; gpt-4.1/gpt-4o-mini 42.0%; gpt-4o/gpt-4.1 42.0%; gpt-4o-mini/gpt-4.1 26.0%",
+        "source": "python/packages/lab/tau2/README.md:109-121",
+        "independent": false
+      },
+      {
+        "what": "Agent Lightning RL training of a math agent (Qwen2.5-1.5B-Instruct, GRPO) via the Lab lightning module",
+        "metric": "validation accuracy",
+        "value": "10% to 35% in the first 8 steps, then begins to overfit",
+        "source": "python/packages/lab/lightning/README.md:102",
+        "independent": false
+      },
+      {
+        "what": "Agent Lightning RL training of a tau2 airline assistant agent (Qwen2.5-1.5B-Instruct, GRPO, user simulator fixed)",
+        "metric": "validation accuracy",
+        "value": "28% to 40% over 8 epochs",
+        "source": "python/packages/lab/lightning/README.md:138",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No evidence for the stated model or harness pairing: the only 'gpt-6-sol' string is a stubbed Bedrock model id in unit tests (python/packages/bedrock/tests/test_bedrock_client.py:125-129,504-508). The harness is a thin wrapper over whatever chat client is passed (HarnessAgent.cs:80-134), all harness samples use Foundry-hosted Responses clients (Harness_Step01_Research/Program.cs:72-82), and HarnessAgent tests use mocks with no live-model integration test (dotnet/tests/Microsoft.Agents.AI.Harness.UnitTests/HarnessAgentTests.cs:59-100).",
+      "Not an isolated, resumable worker runtime by itself: no worker daemon or CLI ships (python/packages/devui/pyproject.toml:44-45; python/packages/lab/pyproject.toml:96-98). Default history is in-memory (HarnessAgent.cs:69-73), in-flight background-agent tasks become Lost after a restart (BackgroundAgentRuntimeState.cs:14-17), crash recovery is Foundry-hosting-only, opt-in, and workflow-only in Python (python/packages/foundry_hosting/agent_framework_foundry_hosting/_responses.py:444-449; dotnet FoundryResponsesOptions.cs:60-84), and Durable Task/Azure Functions hosting lives in another repo (README.md:171,180).",
+      "Sandbox tiers are platform-limited and pre-GA: Hyperlight (Python beta, .NET preview) needs /dev/kvm or MSHV/WHP; its Python Wasm backend exists only for linux x86_64 and win32 AMD64 on Python <3.15 and uv environments omit macOS (python/packages/hyperlight/pyproject.toml:28,32-37; python/samples/04-hosting/container/hyperlight_codeact/README.md:45-63); the default Foundry hosted runtime exposes no hypervisor (same README:11-20). LocalCodeAct and LocalShellTool are explicitly not sandboxes (dotnet/src/Microsoft.Agents.AI.LocalCodeAct/README.md:5-8; python/packages/tools/README.md:45-48). Neither CI matrix includes macOS (python-tests.yml:26; dotnet-build-and-test.yml:105-108,184-185).",
+      "Fast-moving, partly experimental API surface: Python harness features (background agents, file access, looping, memory, todo storage) are experimental and emit warnings (python/PACKAGE_STATUS.md:126-129; _harness/_agent.py:377-383,572-582); claude, hyperlight, tools, monty, devui and foundry-hosting are beta and the hosting* helpers are alpha (PACKAGE_STATUS.md:20-58); .NET HarnessAgentOptions carries many [Experimental(MAAI001)] members (HarnessAgentOptions.cs:45,62,82,94,165,175,252,264,274,369,379); Python minor releases carry [BREAKING] entries (python/CHANGELOG.md:10,23-26,61,76-81); .NET Anthropic integration tests are disabled in CI (dotnet-build-and-test.yml:460-464).",
+      "Bounded tool access is opt-in, not default: Python tools default to approval_mode never_require (python/packages/core/agent_framework/_tools.py:667) and max_function_calls/max_duration_seconds default to None (_tools.py:1851-1856); the .NET harness auto-loads skills (which may carry scripts) from the current directory (HarnessAgent.cs:354-361; python/samples/02-agents/harness/README.md:152-154); ClaudeAgent exposes permission_mode bypassPermissions (python/packages/claude/agent_framework_claude/_agent.py:162,207); FileSystemAgentFileStore is 'not a sandbox against a hostile process' (python/packages/core/agent_framework/_harness/_file_access.py:1217-1219); background agents, external skill sources, loop judges and summarizers extend the trust boundary (python/samples/02-agents/harness/README.md:142-171).",
+      "Python workflow checkpoints embed pickle data; the restricted unpickler is 'not a security boundary' and checkpoint storage must be access-controlled and trusted (python/packages/core/agent_framework/_workflows/_checkpoint_encoding.py:18-46). Hosted default stores changed to a scoped v2 namespace without migrating old sessions, checkpoints or approvals, and saved sessions expire 30 days after last write (python/packages/foundry_hosting/README.md:149-158,187-192).",
+      "No packaged deep-research harness at this revision. The nearest items are samples: a .NET sample using the Foundry Agent Service Deep Research tool (o3-deep-research plus a Bing grounding connection) through [Obsolete] Persistent Agents APIs (dotnet/samples/02-agents/Agents/Agent_Step15_DeepResearch/Program.cs:3,12-14,27-37; PersistentAgentsClientExtensions.cs:22); a Magentic-style declarative workflow whose search tools are absent or commented out (dotnet/samples/03-workflows/Declarative/DeepResearch/Program.cs:116-121,254-260; python/samples/03-workflows/declarative/deep_research/main.py:162-172); and a harness research assistant that only instructs the model to cite sources inline (python/samples/02-agents/harness/harness_research.py:81-90). Citations exist only as provider-returned annotations (python/packages/core/agent_framework/_types.py:401-412). Evaluation APIs (LocalEvaluator, evaluate_agent, FoundryEvals) are experimental (python/PACKAGE_STATUS.md:92-97).",
+      "Support and provenance gaps: Microsoft support covers only Azure-service usage, otherwise GitHub issues (SUPPORT.md:11). Release workflows have no signing, attestation or checksum step and the .NET publish path is not in the repo (.github/workflows/python-release.yml:119-131; dotnet-build-and-test.yml:137-171). Third-party binaries and pins vary: the .NET GitHub.Copilot package downloads a CLI binary at build time (dotnet/src/Microsoft.Agents.AI.GitHub.Copilot/buildTransitive/Microsoft.Agents.AI.GitHub.Copilot.targets:14-25); claude-agent-sdk is a pre-1.0 range (python/packages/claude/pyproject.toml:27); github-copilot-sdk is pinned ==1.0.11 in Python vs 1.0.14 in .NET (python/packages/github_copilot/pyproject.toml:26; dotnet/Directory.Packages.props:115); Hyperlight is 0.7.x in Python vs 0.6.0 in .NET (python/packages/hyperlight/pyproject.toml:26-29; dotnet/Directory.Packages.props:129-130)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "microsoft/agent-framework",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip install agent-framework installs the Python meta-package. It depends on agent-framework-core[all]==1.19.0, which pulls claude, github-copilot, hyperlight, monty, tools and other extras.",
+          "citation": "README.md:82-85; python/README.md:12; python/pyproject.toml:25-27; python/packages/core/pyproject.toml:35-67",
+          "holds": true,
+          "note": "README.md:83 and python/README.md:12 give the command, and README.md:84 says Lab is installed separately. python/pyproject.toml:26 is the only runtime dependency: agent-framework-core[all]==1.19.0. The core `all` extra (:36-67) lists claude (:47), monty (:60) and tools (:66) with no conditions. github-copilot (:56) needs python_version >= '3.11', and hyperlight (:57) installs only on linux x86_64 or win32 AMD64 with Python < 3.15. So on macOS or Python 3.10 those two are not pulled. That is a precision gap, not an error."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, declared in the LICENSE file.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License' and :3 reads 'Copyright (c) Microsoft Corporation'; lines 5-21 are the standard MIT grant and warranty disclaimer. The packaging metadata agrees: python/pyproject.toml:14 and python/packages/core/pyproject.toml:14 both carry 'License :: OSI Approved :: MIT License'."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "Yes. Python unit tests run on ubuntu-latest for Python 3.10-3.15, and .NET builds and unit tests run on ubuntu-latest. The Hyperlight Wasm backend wheel is published for linux x86_64 but needs /dev/kvm. DockerShellTool needs a docker or podman binary.",
+          "citation": ".github/workflows/python-tests.yml:24-27; .github/workflows/dotnet-build-and-test.yml:105,107,184; python/packages/hyperlight/pyproject.toml:28; python/samples/04-hosting/container/hyperlight_codeact/README.md:45-50; python/packages/tools/README.md:153-155",
+          "holds": true,
+          "note": "python-tests.yml:25,27 runs Python 3.10-3.15 on ubuntu-latest and windows-latest via `uv run poe test -A` (:54); 3.15 is continue-on-error (:21) and a few packages are skipped on 3.10/3.15 (:48). dotnet-build-and-test.yml builds net10.0 (:105) and net8.0 (:107) on ubuntu-latest and runs net10.0 tests there (:184). hyperlight/pyproject.toml:28 limits hyperlight-sandbox-backend-wasm to linux x86_64 and win32 AMD64 with Python < 3.15. hyperlight_codeact/README.md:45-49 requires /dev/kvm on Linux. tools/README.md:154-155 lets you swap the runtime with docker_binary='podman'; the default is 'docker' (_docker.py:447). One inconsistency inside the repo, not a dossier error: hyperlight_codeact/README.md:39-40 says Python <3.14 while pyproject.toml says <3.15."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "Library SDK in Python and .NET. Harness entry points are create_harness_agent and HarnessAgent/AsHarnessAgent. HTTP surfaces: Foundry Responses/Invocations hosts, .NET ASP.NET Core hosting for AG-UI, A2A and OpenAI Responses/Conversations/Chat Completions, alpha Python hosting* packages, a FastAPI harness sample, and DevUI's /v1 API. OpenAI Responses supports background=True with continuation_token, plus hosted code-interpreter, web-search, shell and MCP tools.",
+          "citation": "python/packages/core/agent_framework/_harness/_agent.py:312; dotnet/src/Microsoft.Agents.AI.Harness/ChatClientHarnessExtensions.cs:34-39; python/samples/04-hosting/foundry-hosted-agents/responses/basic/main.py:30-31; dotnet/samples/02-agents/Harness/BuildYourOwnClaw/Claw_Step04_ProductionReady/ClawAgent.Hosted/README.md:11-16; dotnet/samples/04-hosting/README.md:7-14; python/PACKAGE_STATUS.md:39-43; python/samples/04-hosting/af-hosting/local_responses_harness/app.py:128-149; python/packages/devui/README.md:136-151; python/packages/openai/agent_framework_openai/_chat_client.py:184-185,291-299,1218-1500",
+          "holds": true,
+          "note": "_agent.py:312 defines create_harness_agent(client: SupportsChatGetResponse...). ChatClientHarnessExtensions.cs:34-39 has AsHarnessAgent returning a new HarnessAgent. main.py:30-31 calls ResponsesHostServer(agent) and then server.run(). ClawAgent.Hosted/README.md:11 and :16 show AddFoundryResponses and MapFoundryResponses. 04-hosting/README.md:9-12 has table rows for AG-UI, A2A, OpenAI Responses/Conversations and Chat Completions. PACKAGE_STATUS.md:39-43 marks hosting, hosting-a2a, hosting-mcp, hosting-responses and hosting-telegram as alpha. app.py:128-149 calls create_harness_agent, and app = FastAPI() is at :152. devui/README.md:136-151 shows POST /v1/responses. _chat_client.py:183-187 defines OpenAIContinuationToken, and :291-300 defines background and continuation_token. Hosted-tool helpers: get_code_interpreter_tool (:1218), get_web_search_tool (:1257), get_shell_tool (:1376, hosted when func is None) and get_mcp_tool (:1460, which says tools are 'executed remotely by OpenAI' at :1471-1473)."
+        },
+        {
+          "field": "claim_checks[9] (need-side premise, verified: not_checkable)",
+          "statement": "No 'GPT-6.1' or 'Sol' model reference exists; the only 'gpt-6-sol' is a stubbed Bedrock model id in unit tests. OpenAI, Foundry and Bedrock clients take free-form model strings, and the harness has no model-specific code. Samples default to gpt-5.4 and gpt-5.6-luna, and all harness samples use Foundry clients. The Copilot agent accepts a model string and a BYOK provider, but nothing shows a GPT-6.x model reached through it.",
+          "citation": "python/packages/bedrock/tests/test_bedrock_client.py:125-129,147,504-508; python/packages/openai/README.md:65-67; python/packages/openai/agent_framework_openai/_chat_client.py:578; python/packages/bedrock/agent_framework_bedrock/_chat_client.py:110,187; HarnessAgent.cs:80-134; _agent.py:312-356; dotnet/samples/02-agents/Harness/Harness_Step01_Research/Program.cs:29,72-82; python/samples/02-agents/providers/openai/client_prompt_caching.py:71; python/samples/02-agents/harness/harness_research.py:99; python/packages/github_copilot/agent_framework_github_copilot/_agent.py:492-518",
+          "holds": true,
+          "note": "A repo-wide case-insensitive grep for 'gpt-?6' finds only test_bedrock_client.py:126, :147 and :505, where BedrockChatClient(model='us.openai.gpt-6-sol') is built against a stub client. No 'GPT-6.1' or 'Sol' model name appears anywhere. openai/README.md:65-67: a model= argument overrides the environment variables. _chat_client.py:578 types model as str | None. bedrock/_chat_client.py:109-110 and :187 map model to modelId. HarnessAgent.cs:127 accepts any IChatClient. Program.cs:29 defaults to 'gpt-5.4', and :72-82 chains AIProjectClient, GetProjectOpenAIClient, GetResponsesClient and AsHarnessAgent. client_prompt_caching.py:71 uses 'gpt-5.6-luna', and harness_research.py:99 uses FoundryChatClient. Grepping the Python and .NET harness samples finds only Foundry clients; the one OpenAIChatClient() (harness/console/harness_console.py:61) is a docstring example. github_copilot/_agent.py:492-493 takes a model string and :514-518 a BYOK ProviderConfig. 'not_checkable' is the right label."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

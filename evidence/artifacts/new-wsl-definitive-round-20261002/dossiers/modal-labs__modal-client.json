@@ -1,0 +1,315 @@
+{
+  "contender": "modal-labs/modal-client",
+  "revision": {
+    "contender": "modal-labs/modal-client",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "modal-labs/modal-client",
+        "tag": null,
+        "commit": "0b5f9154e72ecb3998114c932a088664432b3828",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "0b5f9154e72ecb3998114c932a088664432b3828",
+    "read_at": "2026-10-02T03:02:28+00:00"
+  },
+  "dossier": {
+    "contender": "modal-labs/modal-client",
+    "revision": {
+      "tag": null,
+      "commit": "0b5f9154e72ecb3998114c932a088664432b3828",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Official client SDKs (Python, JavaScript/TypeScript, Go) and the `modal` CLI for Modal, a hosted serverless cloud platform. The Python SDK defines Apps (functions, classes, HTTP servers, plus images, volumes, secrets) in Python code. It builds, runs and deploys them on Modal's cloud over gRPC. The JS and Go SDKs can only create Sandboxes, call already-deployed Functions and manage some resources (README.md:36; go/doc.go:6-14). The repo is a public mirror of a private monorepo (AGENTS.md:6-7), and the backend is not included. The SDK code has no local container-engine backend: py/modal has no Docker, Podman, Compose, containerd or Kubernetes integration. py/modal/_utils/docker_utils.py only parses Dockerfile COPY lines and .dockerignore for server-side image builds.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "This repository contains the source code for Modal's official SDKs (Python, JavaScript/TypeScript, Go).",
+          "citation": "README.md:5,11,31"
+        },
+        {
+          "claim": "The Modal Python SDK allows you to deploy high-performance serverless applications and programmatically interact with the Modal platform.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "The Python SDK provides convenient, on-demand access to serverless cloud compute from Python scripts on your local computer.",
+          "citation": "py/README.md:7-8"
+        },
+        {
+          "claim": "Install the package with uv or pip (`uv pip install modal`); the library requires Python 3.10 - 3.14.",
+          "citation": "README.md:19-23; py/README.md:19-25"
+        },
+        {
+          "claim": "The Python package includes the `modal` CLI, which can also be installed as a standalone tool via uvx.sh (`curl -LsSf uvx.sh/modal/install.sh | sh`).",
+          "citation": "README.md:25-29"
+        },
+        {
+          "claim": "You can create a Modal account (or link an existing one) from the command line with `python3 -m modal setup`.",
+          "citation": "py/README.md:27-32"
+        },
+        {
+          "claim": "The JS and Go SDKs allow you to use Modal Sandboxes, invoke deployed Modal Functions, and interact with some Modal platform resources.",
+          "citation": "README.md:36"
+        },
+        {
+          "claim": "JS/Go are 'approaching feature parity' with the Python SDK, although defining Modal Functions will likely remain exclusive to Python.",
+          "citation": "js/README.md:14-16; go/README.md:10-12"
+        },
+        {
+          "claim": "JS SDK needs Node 22 or later (ESM and CJS bundles); Go SDK needs Go 1.25 or later.",
+          "citation": "js/README.md:28-31; go/README.md:57-59"
+        },
+        {
+          "claim": "Modal distributes an official skill for coding agents, installed and maintained via the `modal` CLI (`modal skills install`).",
+          "citation": "README.md:43-49"
+        },
+        {
+          "claim": "When the skill is installed via the modal CLI, the skill references will be populated with version-aligned documentation.",
+          "citation": "README.md:51"
+        },
+        {
+          "claim": "The skill can also be managed via `npx skills add modal-labs/modal-client`; that route will not include versioning or reference documentation.",
+          "citation": "README.md:53-59"
+        },
+        {
+          "claim": "JS and Go SDKs support custom gRPC middleware/interceptors for telemetry and tracing (OpenTelemetry, DataDog, etc.).",
+          "citation": "js/README.md:101-108; go/README.md:49-55"
+        },
+        {
+          "claim": "Documentation, guides and examples are hosted at modal.com; support goes through Modal Slack.",
+          "citation": "README.md:7-9"
+        }
+      ],
+      "install": [
+        {
+          "method": "Python SDK + CLI via uv (pip also named)",
+          "command": "uv pip install modal",
+          "citation": "README.md:19-23"
+        },
+        {
+          "method": "Standalone `modal` CLI via the uvx.sh installer (script hosted outside this repo)",
+          "command": "curl -LsSf uvx.sh/modal/install.sh | sh",
+          "citation": "README.md:25-29"
+        },
+        {
+          "method": "JavaScript/TypeScript SDK (npm)",
+          "command": "npm install modal",
+          "citation": "js/README.md:22-24"
+        },
+        {
+          "method": "Go SDK",
+          "command": "go get -u github.com/modal-labs/modal-client/go",
+          "citation": "go/README.md:18-20"
+        },
+        {
+          "method": "Agent skill via the modal CLI",
+          "command": "modal skills install",
+          "citation": "README.md:45-49"
+        },
+        {
+          "method": "Agent skill via npx (no versioning or reference docs)",
+          "command": "npx skills add modal-labs/modal-client",
+          "citation": "README.md:53-59"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - the Python package is declared 'Operating System :: OS Independent' (py/pyproject.toml:31-35), requires Python >=3.10,<3.15 (py/pyproject.toml:10) and declares no extension modules. The README gives no OS support matrix, and the CI matrix is not in this mirror. Workloads run on Modal's cloud, and registry images must be linux/amd64 (py/modal/_image.py:2229).",
+        "wsl2": "unknown - no WSL reference anywhere in the repo. Native-Windows limits are in code: `modal shell` unsupported (py/modal/cli/shell.py:423-424), live reload unsupported (py/modal/serving.py:72-73), interactive exec unsupported (py/modal/container_process.py:191-192). Nothing states how WSL2 behaves.",
+        "macos_arm64": "yes (arm64 not called out explicitly) - client code has explicit macOS handling (py/modal/client.py:49-50; py/modal/_utils/browser_utils.py:11-13), import tracing supports darwin (py/modal/_runtime/telemetry.py:168-169), and the package is OS independent (py/pyproject.toml:31-35). The Go proto toolchain script lists Darwin-arm64 (go/scripts/proto_toolchain.sh:33). There is no wheel or CI matrix in the repo.",
+        "gpu": "yes, but only on Modal's cloud - there is no local GPU path. `gpu=` is a string such as 'A100:2' that the client parses only into type+count (py/modal/_utils/function_utils.py:655-669) and sends to the backend (py/modal/app.py:808; py/modal/sandbox.py:638). No code in the SDK uses a local GPU or local container runtime."
+      },
+      "integrations": {
+        "cli": "yes - `modal` console script (py/pyproject.toml:107-108; py/modal/__main__.py:12-49). Commands: run/serve/deploy/shell/curl; groups app, container, endpoint, function, server, image, dict, nfs, secret, queue, volume, workspace, environment, profile, config, token, skills, billing, changelog, dashboard, and setup (py/modal/cli/entry_point.py:108-137). Many commands take --json (py/modal/skills/modal/SKILL.md:45).",
+        "mcp": "none found - no MCP server or MCP reference in any non-generated file in the repo (searched 'mcp' and 'model context protocol').",
+        "sdk_or_api": "Python SDK `modal` (py/modal/__init__.py:9-52), JS/TS SDK `modal` on npm (js/package.json:2-3,17-24; js/src/index.ts) and Go module github.com/modal-labs/modal-client/go (go/go.mod:1; go/client.go:77,125). All three are gRPC clients of Modal's hosted API, defined in modal_proto/api.proto (service ModalClient, 254 rpcs, line 5145) and modal_proto/task_command_router.proto (23 rpcs, line 397). The raw gRPC API is 'not a supported interface' (py/modal/client.py:91-99,177-187; js/src/client.ts:63-65). No REST API is documented in the repo. User Apps expose HTTP via @modal.fastapi_endpoint/asgi_app/wsgi_app/web_server and @app.server (py/modal/__init__.py:28-41; py/modal/app.py:1294-1331).",
+        "claude_code_or_codex": "yes, as a documentation/skill integration only. `modal skills install` writes SKILL.md into `.agents/skills/modal` by default, `.claude/skills/modal` with --claude, or the home dir with -g (py/modal/cli/skills.py:32-35,282-299). It also downloads docs from modal.com unless --no-docs (skills.py:24-29,177-206). `npx skills add modal-labs/modal-client` is the alternative (README.md:53-57), and `modal setup` prints a hint to run `modal skills install` (py/modal/cli/entry_point.py:105). The Python client detects agent harnesses from env vars (AGENT, CLAUDECODE, CODEX_THREAD_ID, GEMINI_CLI, CURSOR_AGENT, ...) and reports the name to Modal in an `x-modal-agent-harness` header (py/modal/config.py:132-160; py/modal/client.py:81-82). The repo's CLAUDE.md only imports AGENTS.md contributor guidance (CLAUDE.md:1; AGENTS.md:1-7). No MCP, plugin or hook integration found."
+      },
+      "telemetry_and_network": "ACCOUNT/NETWORK REQUIRED: all CLI/SDK operations need internet and a Modal token. The project's own skill says 'There is no \"local development mode\" with Modal' (py/modal/skills/modal/SKILL.md:69), and the client raises AuthError 'Token missing' without credentials (py/modal/client.py:339-343). Credentials are MODAL_TOKEN_ID/SECRET or OAuth values (py/modal/config.py:7-15), stored in plain-text ~/.modal.toml (override MODAL_CONFIG_PATH) with toml.dump, no chmod and no keyring (py/modal/config.py:121,523-531; py/modal/token_flow.py:159-165). `modal setup`/`modal token new` opens a browser, runs a temporary localhost HTTP server and polls Modal (py/modal/token_flow.py:24-50,86-108).\nENDPOINTS: default https://api.modal.com with failover https://api.modal2.com (py/modal/config.py:115-116; py/modal/_utils/grpc_utils.py:409-463). JS and Go default to https://api.modal.com:443 (js/src/config.ts:140-143; go/config.go:155). MODAL_SERVER_URL/server_url can point elsewhere, including plain http:// (py/modal/_utils/grpc_utils.py:372-379; go/client.go:374-377), but no server implementation is in the repo.\nSENT TO MODAL: Python client sends, on every gRPC call, client version/type, Python version, hostname (platform.node()), OS/release/arch, token id+secret or OAuth credentials, and the detected AI-agent-harness name (py/modal/client.py:41-88). JS/Go send client type/version, SDK version, target host and credentials, but not local hostname/platform (js/src/client.ts:538-568; go/client.go:431-460). `modal deploy`/App.deploy collects git commit hash, timestamp, author name, author email, branch, dirty flag and `origin` URL and sends them in AppPublish (py/modal/_utils/git_utils.py:45-95; py/modal/runner.py:641-681; modal_proto/api.proto:702,1193-1202); no opt-out flag found. By default the Function's source file/dir is uploaded (include_source=True, py/modal/app.py:204,214-216,878-880), and local Dockerfiles/build contexts are uploaded for image builds (py/modal/_image.py:736-764,2427). `modal shell` injects the user's MODAL_TOKEN_ID/SECRET into the remote sandbox (py/modal/runner.py:748-753).\nNO ANALYTICS SDK found in Python/JS/Go source. py/modal/_runtime/telemetry.py is a container-side import tracer writing to a local Unix socket named by MODAL_TELEMETRY_SOCKET (py/modal/_container_entrypoint.py:12-16). The JS/Go 'telemetry' examples are user-supplied gRPC middleware that only prints locally (js/examples/telemetry.ts; go/examples/telemetry/main.go). The legacy 2023.12 container requirements list ddtrace for Python<3.11 (py/modal/builder/2023.12.txt:8); newer builder files do not.\nOTHER OUTBOUND CALLS: `modal changelog` fetches https://modal.com/docs/sdk/py/releases.md (py/modal/cli/changelog.py:13-26). `modal skills install/update` fetches https://modal.com/llms.txt and docs pages unless --no-docs (py/modal/cli/skills.py:24-29,177-206). No PyPI/update check found. HTTP(S)/SOCKS proxies are honoured for API traffic only with the `modal[api-proxy-support]` extra; opt out with MODAL_DISABLE_API_PROXY (py/modal/_utils/grpc_utils.py:81-83; py/pyproject.toml:37-38; py/CHANGELOG.md:110)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "TypeScript",
+        "Go",
+        "Protocol Buffers",
+        "Bash (build/release helper scripts)"
+      ],
+      "entry_points": [
+        {
+          "path": "py/modal/__main__.py",
+          "what": "`main()` is the `modal` console script (py/pyproject.toml:107-108) and `python -m modal`. It wraps `entrypoint_cli()` with rich tracebacks and output."
+        },
+        {
+          "path": "py/modal/cli/entry_point.py",
+          "what": "Click group `entrypoint_cli` that registers run/serve/deploy/shell/curl, the app/container/endpoint/function/server/image/dict/nfs/secret/queue/volume/workspace/environment/profile/config/token/skills/billing/changelog/dashboard groups, and `setup` (lines 36-137)."
+        },
+        {
+          "path": "py/modal/cli/run.py",
+          "what": "Implements `modal run` (line 497), `modal deploy` (line 575) and `modal serve` (line 647)."
+        },
+        {
+          "path": "py/modal/app.py",
+          "what": "`modal.App` definition API: @app.function, @app.cls, @app.server, @app.local_entrypoint, App.run/deploy/include/lookup."
+        },
+        {
+          "path": "py/modal/runner.py",
+          "what": "`_run_app`, `_deploy_app`, `_serve_update`: create objects and publish Apps via AppCreate/AppPublish RPCs; rolling/recreate deployment strategies."
+        },
+        {
+          "path": "py/modal/_container_entrypoint.py",
+          "what": "Entry point executed inside Modal cloud containers to run user code (not a local runtime)."
+        },
+        {
+          "path": "js/src/index.ts",
+          "what": "JS/TS SDK entry (`ModalClient` in js/src/client.ts; package main dist/index.js, js/package.json:17-24)."
+        },
+        {
+          "path": "go/client.go",
+          "what": "Go SDK entry: `modal.NewClient()` (line 77) and `NewClientWithOptions()` (line 125)."
+        }
+      ],
+      "architecture": "Monorepo mirror with three client SDKs sharing one gRPC API defined in modal_proto/api.proto (service ModalClient, 254 RPCs) and modal_proto/task_command_router.proto (23 RPCs). Apps are defined in Python code, not a declarative file; ~/.modal.toml holds only client config and credentials (py/modal/config.py:4-30).\nPython SDK (py/modal, 156 .py files): client.py + _utils/grpc_utils.py (grpclib/HTTP2 client, auth metadata, retries, host failover); config.py (profiles + MODAL_* env); app.py/_functions.py/cls.py/_server.py (App, Function, Cls, Server definitions); _image.py (Image recipe -> Dockerfile commands -> ImageGetOrCreate RPC, so builds run server-side; versioned pins in modal/builder/); volume.py, dict.py, queue.py, secret.py, cloud_bucket_mount.py, proxy.py, _tunnel.py, network_file_system.py (deprecated) for state and network objects; sandbox.py, sandbox_fs.py, _utils/task_command_router_client.py for Sandboxes (arbitrary containers with exec, filesystem, tunnels, in/outbound allowlists, gVisor or VM runtime, py/modal/types.py:59); runner.py, serving.py, _watcher.py (run/deploy/serve + hot reload); _runtime/ and _container_entrypoint.py (code that runs inside Modal containers); cli/ (34 Click modules); _vendor/ (cloudpickle, tblib, a2wsgi, packaging version).\nThe sync/async dual interface comes from `synchronicity`, and .pyi stubs are generated (py/tasks.py:68-117) and git-ignored. JS SDK: js/src/*.ts on nice-grpc/protobufjs, with generated proto/ git-ignored and produced by the `prepare` script (js/.gitignore; js/scripts/gen-proto.sh). Go SDK: go/*.go on grpc-go with generated go/proto/modal_proto/*.pb.go committed.\nEverything executes on Modal's hosted backend: `modal run` makes an ephemeral App, `modal serve` an ephemeral hot-reload App, `modal deploy` a named persistent App (py/modal/runner.py:409,594-706; py/modal/serving.py:116-129). Function.local() just calls the Python function in-process (py/modal/_functions.py:2107-2148).",
+      "packaging_and_release": "Python: setuptools backend (py/pyproject.toml:1-3), dist name `modal`, version from py/modal_version/__init__.py (1.6.0 at this commit), console script `modal`. Package data ships generated `modal_proto`, *.pyi and py.typed (py/pyproject.toml:110-131). Generated protobuf modules are git-ignored (py/.gitignore:1-3). Building from a checkout needs `inv protoc` / py/compile_protos.py with pinned grpcio-tools (py/requirements.protos.txt; .github/CONTRIBUTING.md:12).\nPyPI publishing appears only as 'a commit bumping modal_version triggers a full release to PyPI' (.github/pull_request_template.md:22-27; py/requirements.protos.txt:4). The PyPI/npm/Go publish workflows are NOT in this mirror. The only release workflow here is .github/workflows/publish-tags.yml, which on push to main creates git tags py/v<ver>, js/v<ver>, go/v<ver> (and pings proxy.golang.org) through .github/scripts/tag-py-releases.sh:14 and tag-go-js-releases.sh:15-31.\nJS: tsup build, `prepublishOnly: npm run build` (js/package.json:26-36), version 0.11.0. Go: module github.com/modal-labs/modal-client/go (go/go.mod:1), generated protobufs checked in. No checksums, signatures, SBOM, provenance or attestations for released artifacts were found (searched attest/provenance/sigstore/cosign/gpg/checksum). The only checksum check is for the protoc download in go/scripts/proto_toolchain.sh:26-55. Workflow actions are pinned by commit SHA (publish-tags.yml:16,43; sast-codeql.yml:48-79). py/tasks.py:315-348 and tasks.py:107-140 refer to nightly dev tags (sdk-py/*.devN, sdk-js/v*-dev.N) whose workflow is not in this repo.",
+      "tests_and_ci": "Python: pytest (+pytest-asyncio, pytest-timeout, pytest-markdown-docs, flaky) in py/test: 97 *_test.py files (~2,370 top-level test functions). Tests run against an in-process mock gRPC servicer `MockClientServicer` with MODAL_SERVER_URL pointed at it (py/test/conftest.py:862,5032-5077). Docstring examples run against the real service via `pytest --markdown-docs` and need an account (py/conftest.py:29-81; py/tasks.py:162-165). Static checks: ruff, mypy, pyright (py/tasks.py:62-65,120-145; py/pyproject.toml:136-252).\nJS: vitest, 44 *.test.ts files in js/test and js/src. They mix mock-based tests with live tests that call a real workspace app `libmodal-test-support` under MODAL_ENVIRONMENT=libmodal (js/package.json:33; js/test/function.test.ts:13-24). Go: `go test`, 48 *_test.go files using gomega/goleak and go/internal/grpcmock, also with live tests (go/test/testutils_test.go:43-53). About 189 test files in total.\nCI in this repo: only .github/workflows/sast-codeql.yml (CodeQL for Python on push/PR to main plus weekly cron '43 3 * * 1') and publish-tags.yml (release tagging). The unit-test/lint CI that CONTRIBUTING.md points to (.github/workflows/ci-cd.yml) does not exist here, and the Bazel test matrix (py/pyproject.toml:80-82; BUILD.bazel) is not in the mirror, so test status cannot be verified from the repo. Pre-commit runs ruff + ruff-format (.pre-commit-config.yaml).",
+      "dependencies": "Python (py/pyproject.toml): 14 runtime requirement lines (13 distinct packages: aiohttp, cbor2, certifi, click~=8.1, grpclib [two python-version markers], protobuf>=3.19,<7, rich, synchronicity~=0.12.5, toml, types-certifi, types-toml, watchfiles, typing_extensions~=4.6), lines 14-29. One optional extra `api-proxy-support` (2 packages, line 38). A 45-entry `dev` dependency group (lines 40-99). Build requires setuptools>=83,<84 + wheel. py/uv.lock is committed.\nJS (js/package.json): 6 runtime deps (cbor-x, long, nice-grpc, protobufjs, smol-toml, uuid) and 16 devDependencies; package-lock.json committed.\nGo (go/go.mod): 10 direct requires (cbor/v2, jwt/v5, uuid, og-rek, gomega, go-toml/v2, goleak, x/sync, grpc, protobuf; gomega and goleak are test-only) plus 16 indirect; go 1.25.0; go.sum committed.",
+      "security_policy": "SECURITY.md: report vulnerabilities to security@modal.com; acknowledgement within one business day; points to a bug bounty program (SECURITY.md:1-8)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Python SDK lets you 'deploy high-performance serverless applications' (README.md:15)",
+        "verified": "partial",
+        "evidence": "Deployment is implemented: `modal deploy` / App.deploy publish a named App to Modal's backend (py/modal/cli/run.py:548-631; py/modal/runner.py:594-706; py/modal/app.py:499-585). It targets only Modal's hosted cloud, with no local container-engine target (no podman/compose/containerd/kubernetes code in py/modal). 'High-performance' is not checkable from the repo; only self-reported changelog numbers exist. The CLI is a console script (py/pyproject.toml:107-108)."
+      },
+      {
+        "claim": "SDK gives on-demand serverless cloud compute from local scripts; the project's skill says 'There is no local development mode' (py/README.md:7-8; py/modal/skills/modal/SKILL.md:69)",
+        "verified": "yes",
+        "evidence": "Client refuses to run without a token (py/modal/client.py:339-343) and defaults to api.modal.com (py/modal/config.py:115-116). run/deploy create and publish Apps via AppCreate/AppPublish RPCs (py/modal/runner.py:85-110,273-306), and `modal serve` re-publishes an ephemeral App on file changes (py/modal/serving.py:116-129). Function.local() only calls the Python function in-process and warns Volumes are not mounted (py/modal/_functions.py:2107-2148). The mock servicer in py/test/conftest.py:862 is a test double, not a runtime."
+      },
+      {
+        "claim": "Library requires Python 3.10 - 3.14 (py/README.md:19)",
+        "verified": "yes",
+        "evidence": "py/pyproject.toml:10 `requires-python = \">=3.10,<3.15\"`; py/modal/__init__.py:4-7 raises RuntimeError below 3.10 and at 3.15+."
+      },
+      {
+        "claim": "CLI can also be installed standalone via uvx.sh (README.md:25-29)",
+        "verified": "not_checkable",
+        "evidence": "The installer script is hosted outside the repo (README.md:28). Nothing in the repo builds, hosts or references it besides the README line. It is a curl-pipe-to-shell install."
+      },
+      {
+        "claim": "JS and Go SDKs cover Sandboxes, deployed Functions and some resources; defining Functions stays Python-only (README.md:36; js/README.md:14-16)",
+        "verified": "yes",
+        "evidence": "js/src/index.ts:1-160 exports Sandbox, Function_, Cls, Queue, Image, Secret, Volume, Proxy, CloudBucketMount and ModalClient but no function-definition API. go/doc.go:11-14 says deployment is Python-only. py/modal/skills/modal/SKILL.md:79-84 repeats the scope. MIGRATION-GUIDE.md:5-8 lists Dicts and Volume filesystem API as not supported."
+      },
+      {
+        "claim": "Go package doc: 'Read, write, and list files in Modal Volumes' (go/doc.go:8)",
+        "verified": "no",
+        "evidence": "Code disagrees with the doc. go/volume.go only has WithMountOptions (line 95), CloseEphemeral (159) and Delete (172); js/src/volume.ts (lines 42-183) has only fromName/ephemeral/delete/withMountOptions. Neither SDK has Volume read/write/list. MIGRATION-GUIDE.md:5-8 agrees with the code. Python has the full Volume file API (py/modal/volume.py:933-1210). The Sandbox filesystem API is separate (go/sandbox_fs.go:300-330)."
+      },
+      {
+        "claim": "Skill installed via the modal CLI gets 'version-aligned documentation' (README.md:51)",
+        "verified": "partial",
+        "evidence": "Only the API reference is generated locally from the installed SDK (py/modal/cli/skills.py:209-242,267-270). Guide and examples pages are downloaded live from https://modal.com/llms.txt and the docs site, not pinned to the SDK version (skills.py:24-29,177-206). Download failures only print a warning (skills.py:179-203). The SDK version is stamped into SKILL.md metadata (skills.py:42-64)."
+      },
+      {
+        "claim": "`npx skills add modal-labs/modal-client` installs the skill without versioning or reference docs (README.md:53-59)",
+        "verified": "partial",
+        "evidence": "The skill source exists at py/modal/skills/modal/SKILL.md (SKILL.md:1-11), and version stamping plus doc download happen only in the `modal skills install` code path (py/modal/cli/skills.py:245-279). The npx tool itself is external and not inspectable here."
+      },
+      {
+        "claim": "Environments, workspaces and profiles scope accounts, state and deployments explicitly (CLI help text, py/modal/cli/environment.py:28-38)",
+        "verified": "yes",
+        "evidence": "Environments are sub-divisions of Workspaces and name lookups default to the active Environment (py/modal/cli/environment.py:28-38; py/modal/_functions.py:1527,1539; py/modal/config.py:370). Deleting an Environment deletes its Apps, Secrets, Volumes, Dicts and Queues (py/modal/cli/environment.py:137-140). `modal run` makes ephemeral Apps (py/modal/runner.py:409), `modal deploy` named persistent ones with rolling/recreate strategy (runner.py:56,615-626,677), and `modal app list/stop/rollback/rollover` manage them (py/modal/cli/app.py:99-408). Profiles live in ~/.modal.toml (py/modal/cli/profile.py:25-123; py/modal/config.py:245-296)."
+      },
+      {
+        "claim": "Image environments are reproducible via image-builder versions (py/modal/builder/README.md:3-15)",
+        "verified": "partial",
+        "evidence": "Container-side deps are pinned with == in py/modal/builder/2025.06.txt:1-21 (builder/README.md:12-15). The builder version comes from MODAL_IMAGE_BUILDER_VERSION / .modal.toml or else a server-side workspace/environment setting (py/modal/_image.py:311-339,665-668; py/modal/cli/workspace.py:255-260). Versions available: 2023.12, 2024.04, 2024.10, 2025.06, PREVIEW (_image.py:72). `Image.from_registry` takes mutable tags (_image.py:2259-2261), and user pip installs are only reproducible if the user pins them (py/CHANGELOG.md:508)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Sandbox filesystem large writes (copy_from_local / write_bytes / write_text) after switching to streaming",
+        "metric": "relative speedup (no baseline, hardware or method published)",
+        "value": "about 2.5x (Python 1.5.3, 2026-07-23); '~2.5x faster' (JS and Go 0.10.0, 2026-08-27)",
+        "source": "py/CHANGELOG.md:82; js/CHANGELOG.md:27; go/CHANGELOG.md:25",
+        "independent": false
+      },
+      {
+        "what": "Throughput of writing to stdin of a Sandbox.exec process",
+        "metric": "relative throughput increase (no baseline or method published)",
+        "value": "8x (Python 1.3.4, 2026-02-23)",
+        "source": "py/CHANGELOG.md:249",
+        "independent": false
+      },
+      {
+        "what": "Image.uv_pip_install versus Image.pip_install build speed",
+        "metric": "relative build time (no baseline or method published)",
+        "value": "'up to 50% faster' (Python 1.1.0, 2025-07-17)",
+        "source": "py/CHANGELOG.md:500",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope/platform: this is a client for a hosted cloud, not a local container-engine tool. Every CLI/SDK operation needs internet, a Modal account and a token. The project's own skill says there is no local development mode (py/modal/skills/modal/SKILL.md:69; py/modal/client.py:339-343). The Python SDK has no Docker, Podman, Compose, containerd or Kubernetes integration. docker_utils.py only parses Dockerfile/.dockerignore for server-side builds (py/modal/_utils/docker_utils.py:10-107), and Function.local() runs in-process without Volumes (py/modal/_functions.py:2107-2142). It does not define or run an app plus services, volumes and networks on a local container engine.",
+      "Closed backend, lock-in and licensing: the Apache-2.0 license covers the client only (LICENSE; py/pyproject.toml:11). The server behind api.modal.com is not in the repo, and the hosted-service terms are not in the repo either. The raw gRPC API is 'not a supported interface' and may change without notice (py/modal/client.py:91-99,177-187; js/src/client.ts:63-65). The repo is a mirror of a private monorepo (AGENTS.md:6-7), and the CI it references (.github/workflows/ci-cd.yml, .github/CONTRIBUTING.md:5-7) is absent. Vendored cloudpickle/tblib (BSD) and a2wsgi (Apache-2.0) keep their own notices (py/modal/_vendor/).",
+      "Data egress by default: `modal deploy` sends git author name, author email, remote URL, branch, commit hash and dirty flag, with no opt-out found (py/modal/_utils/git_utils.py:45-95; py/modal/runner.py:641-681; modal_proto/api.proto:1193-1202). The Python client sends hostname, OS, Python version and detected AI-agent harness name on every gRPC call (py/modal/client.py:41-88). The Function's source file/dir is uploaded by default (py/modal/app.py:204,214-216,878-880).",
+      "Credential handling: API tokens are stored in plain-text ~/.modal.toml with no permission restriction or keyring (py/modal/config.py:523-531; py/modal/token_flow.py:159-165). Only the `modal curl` cache sets 0600 (py/modal/cli/curl.py:77-80). `modal shell` copies the token into the remote sandbox environment (py/modal/runner.py:748-753). Tokens travel as gRPC headers, and plain http:// server URLs are accepted (py/modal/_utils/grpc_utils.py:372-379; go/client.go:374-377). The documented standalone CLI install is `curl | sh` from a host outside the repo (README.md:25-29).",
+      "Release integrity and build-from-source: no signing, checksums, SBOM, provenance or attestation for PyPI/npm/Go artifacts were found, and the publish workflows are not in the mirror. Only a tagging workflow exists (.github/workflows/publish-tags.yml). Generated protobuf modules are git-ignored, so a plain checkout is not installable until `inv protoc` runs with pinned grpcio-tools (py/.gitignore:1-3; .github/CONTRIBUTING.md:12; py/requirements.protos.txt). The CI that CONTRIBUTING.md references is absent, so test status cannot be verified from the repo.",
+      "Fast-moving, breaking API: 1.6.0 (2026-09-28) bundled breaking changes (py/CHANGELOG.md:41-48), with releases every 2-4 weeks since 1.5.0 on 2026-06-09 (py/CHANGELOG.md:5,52,60,72,84,96,112). Many deprecations are live: NetworkFileSystem (py/modal/network_file_system.py:67), Mount (py/modal/mount.py:298), cidr_allowlist (py/modal/sandbox.py:756-764), and the async_warnings/default_cloud settings (py/modal/config.py:368,378). JS (0.11.0) and Go SDKs are pre-1.0 beta and ship breaking changes in minor releases (js/CHANGELOG.md:38-39; go/CHANGELOG.md:27-28; MIGRATION-GUIDE.md:1-12). They cannot define Functions or work with Volume files (MIGRATION-GUIDE.md:5-8).",
+      "Platform limits: native Windows lacks `modal shell`, live reload and interactive exec (py/modal/cli/shell.py:423-424; py/modal/serving.py:72-73; py/modal/container_process.py:191-192). WSL2 is undocumented. Registry images must be linux/amd64 (py/modal/_image.py:2229). The client supports Python 3.10-3.14 only (py/pyproject.toml:10).",
+      "Reproducibility and state semantics depend on server-side settings: the image builder version defaults to a workspace/environment setting held on Modal's servers (py/modal/_image.py:311-339,665-668). Base images are referenced by mutable tags (py/modal/_image.py:2259-2261), and the changelog notes Image method changes can force rebuilds (py/CHANGELOG.md:486,508). Volumes need explicit commit/reload, and concurrent writers to the same file are last-write-wins with no locking (py/modal/volume.py:485-503)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "modal-labs/modal-client",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Python SDK + CLI via uv (pip also named): `uv pip install modal`",
+          "citation": "README.md:19-23",
+          "holds": true,
+          "note": "README.md:19 'Install the package with `uv` or `pip`:' and README.md:22 `uv pip install modal`. README.md:25 says the package includes the `modal` CLI, which matches the console script modal = \"modal.__main__:main\" (py/pyproject.toml:107-108) in dist `modal` (py/pyproject.toml:6). py/README.md:21-25 repeats the command, and its 3.10-3.14 requirement (py/README.md:19) matches requires-python >=3.10,<3.15 (py/pyproject.toml:10). Checked at HEAD 0b5f9154e72ecb3998114c932a088664432b3828, the dossier's revision."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License 2.0 text (header LICENSE:1-3, ends at LICENSE:176 'END OF TERMS AND CONDITIONS', no appendix) and is the only LICENSE file in the repo. Declarations agree: py/pyproject.toml:11 license = \"Apache-2.0\"; js/package.json:5 \"license\": \"Apache-2.0\". Vendored files keep their own permissive notices (py/modal/_vendor/tblib.py:8 BSD-2; a2wsgi_wsgi.py:15 Apache-2.0; version.py:9 Apache-2.0/BSD-2; cloudpickle.py has its own notice)."
+        },
+        {
+          "field": "readme.platforms.gpu",
+          "statement": "yes, but only on Modal's cloud, with no local GPU path. `gpu=` is a string such as 'A100:2' that the client parses only into type+count and sends to the backend. No SDK code uses a local GPU or local container runtime.",
+          "citation": "py/modal/_utils/function_utils.py:655-669; py/modal/app.py:808; py/modal/sandbox.py:638",
+          "holds": true,
+          "note": "parse_gpu_config splits on ':' and returns GPUConfig(gpu_type=value.upper(), count) (function_utils.py:655-669). app.py:808 and sandbox.py:638 are the `gpu` parameters. The value is sent inside api_pb2.Resources (_resources.py:47, called at sandbox.py:565-566) and in function definitions (_functions.py:1223,1236). A grep of py/modal finds no nvidia-smi/pynvml/docker/podman/containerd/kubectl calls. The only GPU runtime code (_runtime/gpu_memory_snapshot.py:3-5,18) runs inside Modal's gVisor containers. Minor imprecision, not an error: App.function also accepts a list of such strings (app.py:808 `str | list[str] | None`)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "yes, as a documentation/skill integration only. `modal skills install` writes SKILL.md into .agents/skills/modal by default, .claude/skills/modal with --claude, or the home dir with -g, and downloads modal.com docs unless --no-docs. npx alternative; `modal setup` hints at it. The client reports the detected agent harness in an x-modal-agent-harness header. CLAUDE.md only imports AGENTS.md. No MCP, plugin or hook integration.",
+          "citation": "py/modal/cli/skills.py:24-29,32-35,177-206,282-299; README.md:53-57; py/modal/cli/entry_point.py:105; py/modal/config.py:132-160; py/modal/client.py:81-82; CLAUDE.md:1; AGENTS.md:1-7",
+          "holds": true,
+          "note": "_target_dir uses Path.home() for -g and cwd otherwise, then '.claude' with --claude or '.agents', then skills/modal (skills.py:32-35). Options --claude, -g/--global and --no-docs are at skills.py:282-299. Docs come from https://modal.com/llms.txt plus guide/example pages (skills.py:24-29,177-206) and are skipped with --no-docs (skills.py:267-270). entry_point.py:105 prints 'Run modal skills install to install agent skills'. config.py:141-158 checks AGENT, CLAUDECODE, CODEX_THREAD_ID, GEMINI_CLI, CURSOR_AGENT and others, and client.py:81-82 sets x-modal-agent-harness. CLAUDE.md:1 is '@AGENTS.md'. No 'mcp' match anywhere in the repo and no plugin/hook files. Not mentioned, but not contradicting: js/examples/sandbox-agent.ts and go/examples/sandbox-agent/main.go run the Claude Code CLI inside a Modal Sandbox."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "SDK gives on-demand serverless cloud compute from local scripts; the project's skill says 'There is no local development mode' (verified: yes)",
+          "citation": "py/README.md:7-8; py/modal/skills/modal/SKILL.md:69; py/modal/client.py:339-343; py/modal/config.py:115-116; py/modal/runner.py:85-110,273-306; py/modal/serving.py:116-129; py/modal/_functions.py:2107-2148; py/test/conftest.py:862",
+          "holds": true,
+          "note": "Both quotes are verbatim (py/README.md:7-8; SKILL.md:69, which also says internet access and a token are required). client.py:339-343 raises AuthError 'Token missing...' when no token or OAuth credentials are configured outside a container. config.py:116 sets DEFAULT_SERVER_URL = 'https://api.modal.com,https://api.modal2.com'. The AppCreate RPC is at runner.py:93-100 and AppPublish at runner.py:294-306, and runner.py:409 makes run apps EPHEMERAL (or DETACHED). serving.py:116-129 runs the app, then starts the file-watch reload loop. In _functions.py:2124-2148, local() calls the raw function in-process and warns that Volume/NFS data is unavailable (2138-2142). conftest.py:862 is `class MockClientServicer(api_grpc.ModalClientBase)` under py/test."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

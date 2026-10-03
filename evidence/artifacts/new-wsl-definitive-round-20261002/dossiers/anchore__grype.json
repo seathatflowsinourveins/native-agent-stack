@@ -1,0 +1,297 @@
+{
+  "contender": "anchore/grype",
+  "revision": {
+    "contender": "anchore/grype",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "anchore/grype",
+        "tag": "v0.119.0",
+        "commit": "b6f5194537747ee7f705f4113069ac9eb269919f",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.119.0",
+    "commit": "b6f5194537747ee7f705f4113069ac9eb269919f",
+    "read_at": "2026-10-02T03:01:53+00:00"
+  },
+  "dossier": {
+    "contender": "anchore/grype",
+    "revision": {
+      "tag": "v0.119.0",
+      "commit": "b6f5194537747ee7f705f4113069ac9eb269919f",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Grype is an Apache-2.0 vulnerability scanner (CLI plus Go library) from Anchore for container images, filesystems/directories and SBOMs (README.md:7,24). It builds a package inventory in-process with the Syft library (or ingests an SBOM, PURL list or CPE list), matches packages against a locally cached SQLite vulnerability DB that it downloads from Anchore-hosted endpoints, applies ignore rules and OpenVEX/CSAF VEX, and writes table, JSON, CycloneDX, SARIF or Go-template reports. `--fail-on <severity>` makes the process exit 2 (cmd/grype/cli/cli.go:83-94; grype/pkg/provider.go:273-314; grype/vulnerability_matcher.go:99-142). It consumes SBOMs and matches vulnerabilities; it is not a standalone SBOM generator, workflow linter or attestation tool.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'A vulnerability scanner for container images and filesystems.'",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Scans container images, filesystems and SBOMs for known vulnerabilities",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "Supports major OS package ecosystems (Alpine, Debian, Ubuntu, RHEL, Oracle Linux, Amazon Linux, and more)",
+          "citation": "README.md:25"
+        },
+        {
+          "claim": "Supports language-specific packages (Ruby, Java, JavaScript, Python, .NET, Go, PHP, Rust, and more)",
+          "citation": "README.md:26"
+        },
+        {
+          "claim": "Supports Docker, OCI and Singularity image formats",
+          "citation": "README.md:27"
+        },
+        {
+          "claim": "Threat & risk prioritization with EPSS, KEV and risk scoring",
+          "citation": "README.md:28"
+        },
+        {
+          "claim": "OpenVEX support for filtering and augmenting scan results",
+          "citation": "README.md:29"
+        },
+        {
+          "claim": "Quickest install: curl -sSfL https://get.anchore.io/grype | sudo sh -s -- -b /usr/local/bin",
+          "citation": "README.md:36-39"
+        },
+        {
+          "claim": "Installation docs list more ways to get Grype, including Homebrew, Docker, Chocolatey, MacPorts and more",
+          "citation": "README.md:41-42"
+        },
+        {
+          "claim": "Scan an SBOM 'for even faster vulnerability detection': `grype sbom:./sbom.json` or `cat ./sbom.json | grype`",
+          "citation": "README.md:56-64"
+        },
+        {
+          "claim": "Development is sponsored by Anchore and released under the Apache-2.0 License (license badge also shown)",
+          "citation": "README.md:15,77"
+        },
+        {
+          "claim": "CI badges for workflows named 'Static Analysis + Unit + Integration' and 'Validations'",
+          "citation": "README.md:10-11"
+        },
+        {
+          "claim": "Commercial support for Syft or Grype is available by contacting Anchore",
+          "citation": "README.md:81"
+        }
+      ],
+      "install": [
+        {
+          "method": "Install script (curl | sh); detects linux/darwin/windows and amd64/arm64/ppc64le/s390x",
+          "command": "curl -sSfL https://get.anchore.io/grype | sudo sh -s -- -b /usr/local/bin",
+          "citation": "README.md:36-39; install.sh:126-157"
+        },
+        {
+          "method": "Install script with cosign signature verification of the release checksums file (-v flag; needs cosign on PATH)",
+          "command": "install.sh -v -b /usr/local/bin (flag documented in the script usage text; CI runs it as ../../install.sh -v -b /usr/local/bin)",
+          "citation": "install.sh:790-795; test/install/Makefile:19"
+        },
+        {
+          "method": "Container image from Docker Hub or GHCR (prod, nonroot and debug variants; entrypoint /grype); no docker run example is given in the repo",
+          "command": "image refs: ghcr.io/anchore/grype:latest, anchore/grype:latest (also :<tag>, :nonroot, :debug)",
+          "citation": ".goreleaser.yaml:271-356; Dockerfile:29; RELEASE.md:6"
+        },
+        {
+          "method": "Homebrew (macOS and Linux archives are published as a cask to the anchore/homebrew-grype tap)",
+          "command": "exact command is not in the repo; README.md:42 defers to the external install docs page (https://oss.anchore.com/docs/installation/grype/), which was not opened",
+          "citation": "README.md:42; .goreleaser.yaml:83-97; RELEASE.md:7"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - linux/amd64 static binary is built (.goreleaser.yaml:13-22, static link flags :25-32); hosted CI tests run on ubuntu-24.04 (.github/workflows/validations.yaml:16,33,113,258). arm64, ppc64le and s390x are also built.",
+        "wsl2": "unknown - no WSL or WSL2 mention anywhere in the repo (searched). The Linux builds are CGO-free static binaries (.goreleaser.yaml:7-10,25-28), so a Linux-kernel environment is expected to run them, but upstream neither documents nor tests it.",
+        "macos_arm64": "yes - darwin/arm64 binary is built and signed/notarized with quill (.goreleaser.yaml:34-48). Hosted macOS CI runs only the install.sh test suites and acceptance install of released builds, not the Go unit/integration/CLI suites (.github/workflows/validations.yaml:212-251; test/install/Makefile:35-36).",
+        "gpu": "no - not applicable: CPU-only scanner; no GPU/CUDA/OpenCL references found in the repo (searched)."
+      },
+      "integrations": {
+        "cli": "Yes. `grype` binary (cmd/grype/main.go:22-34). Root scan command `grype [IMAGE|PATH|sbom:FILE|purl|cpe|...]` (cmd/grype/cli/commands/root.go:50-97) with -o/--output (table, json, cyclonedx, cyclonedx-json, sarif, template; internal/format/format.go:57-65), --file, --fail-on, --only-fixed/--only-notfixed, --vex, --exclude, --platform, --from, -s scope (cmd/grype/cli/options/grype.go:83-167), -c config and -v/-q (cmd/grype/cli/cli.go:37-41). Subcommands: db {check,delete,import,list,status,update,search,providers,diff} (cmd/grype/cli/commands/db.go:21-31), explain, completion [bash|zsh|fish], version, config (cmd/grype/cli/cli.go:105-111). Exit codes: 2 = severity threshold met, 100 = DB upgrade available (db check), 1 = other errors (cli.go:83-94).",
+        "mcp": "none found (searched the repo for mcp / model context protocol; no server or tool-definition code).",
+        "sdk_or_api": "Go library only, no HTTP/gRPC server code found. Module github.com/anchore/grype (go.mod:1) exposes grype.LoadVulnerabilityDB (grype/load_vulnerability_db.go:13), grype.VulnerabilityMatcher with FindMatches/FindMatchesContext (grype/vulnerability_matcher.go:39,90,99), pkg.Provide/ProvideFromReader (grype/pkg/provider.go:23,58) and SetLogger/SetBus (grype/lib.go:11-15). The older FindVulnerabilities API is marked deprecated 'will remove before v1.0.0' (grype/deprecated.go:14,34). The README does not document the library API. Machine-readable output: JSON, CycloneDX (JSON/XML), SARIF (internal/format/format.go:57-65); JSON schemas under schema/grype/ cover db-search, db-search-vuln, db-diff and DB blobs.",
+        "claude_code_or_codex": "none found. The only hits are .gitignore entries that ignore local .claude and CLAUDE.md files (.gitignore:2-3,18-20); no skills, plugins, hooks or agent docs are shipped."
+      },
+      "telemetry_and_network": "No telemetry or analytics code found: zero OpenTelemetry/metrics imports in *.go (OTel modules appear only as indirect deps, go.mod:98-100,311-319). The README is silent on network use. Default outbound calls: (1) application update check, on by default: GET https://toolbox-data.anchore.io/grype/releases/latest/VERSION with header `User-Agent: grype <version>`, skipped for non-production builds (cmd/grype/cli/commands/update.go:14-27,52-57; cmd/grype/cli/options/grype.go:72; cmd/grype/cli/commands/root.go:161,348-370). (2) vulnerability DB: listing fetched from https://grype.anchore.io/databases/v6/latest.json and the DB archive downloaded when newer, auto-update on by default, same User-Agent (grype/db/v6/distribution/client.go:54-61,195-203,211-215; cmd/grype/cli/options/database.go:39; cmd/grype/cli/commands/root.go:181). DB cached under the XDG cache dir at grype/db, 5-day max DB age and checksum validation on by default; a DB older than 5 days makes the load fail unless updated, imported or validate-age is disabled (grype/db/v6/installation/curator.go:53-60,598-617; grype/load_vulnerability_db.go:38-41; cmd/grype/cli/commands/root.go:495-513). (3) Image sources contact registries or the local Docker/Podman daemon as selected. (4) Maven Central search (https://search.maven.org/solrsearch/select) only if external-sources.enable is set; default off (cmd/grype/cli/options/datasources.go:11,29-50). No Anchore account, API key or login is required; registry credentials are optional and cleared before the report is built (cmd/grype/cli/commands/root.go:251-252). Offline/limited use: GRYPE_CHECK_FOR_APP_UPDATE=false and GRYPE_DB_AUTO_UPDATE=false (test/cli/subprocess_test.go:36-38) plus `grype db import FILE | URL` (cmd/grype/cli/commands/db_import.go:19-24). DB integrity: sha256 digest from latest.json enforced by go-getter via a checksum query parameter and the on-disk digest is re-validated at load; no asymmetric signature verification of the DB or listing exists in code (grype/db/v6/distribution/client.go:139-143; grype/db/v6/distribution/latest.go:134-138; grype/db/v6/installation/curator.go:560-590). The DB downloader enables http, https, file, git, gcs, hg and s3 schemes (internal/file/getter.go:91-102)."
+    },
+    "code": {
+      "languages": [
+        "Go (primary; go 1.26.3 per go.mod:3)",
+        "POSIX shell (install.sh; test/install/*.sh)",
+        "Python (test/quality yardstick harness; test/validate-grype-db-schema.py)",
+        "YAML and Makefile (CI workflows, goreleaser)",
+        "Go text templates (templates/*.tmpl)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/grype/main.go",
+          "what": "Binary main: builds the clio identification from ldflag vars (version, buildDate, gitCommit, gitDescription) and runs cli.Application (cmd/grype/main.go:15-34); imports the pure-Go sqlite driver."
+        },
+        {
+          "path": "cmd/grype/cli/cli.go",
+          "what": "Wires the clio/cobra app: global -c/-v/-q flags, UI selection, syft/stereoscope logger+bus hoisting, exit-code mapping (2 severity threshold, 100 DB upgrade available), subcommands db/completion/explain/version/config (cli.go:37-114)."
+        },
+        {
+          "path": "cmd/grype/cli/commands/root.go",
+          "what": "Root scan command `grype [IMAGE]` and the runGrype pipeline: parallel app-update check, DB load and package gathering, then matching, VEX, output (root.go:50-280)."
+        },
+        {
+          "path": "cmd/grype/cli/commands/db.go",
+          "what": "`grype db` subcommands: check, delete, import, list, status, update, search, providers, diff (db.go:15-34)."
+        },
+        {
+          "path": "install.sh",
+          "what": "POSIX installer served at https://get.anchore.io/grype; flags -b DIR, -d, -v (cosign verify), optional TAG (install.sh:766-862, 773-801)."
+        },
+        {
+          "path": ".make/main.go",
+          "what": "go-make task runner behind `make`: unit/lint/release tasks come from github.com/anchore/go-make; repo-specific build, integration, cli, quality, generate, schema-drift and install-test tasks are defined here (.make/main.go:23-53). Root Makefile only runs `go run -C .make .` (Makefile:1-18)."
+        },
+        {
+          "path": "grype/load_vulnerability_db.go",
+          "what": "Library entry: LoadVulnerabilityDB (distribution client + curator + reader) (grype/load_vulnerability_db.go:13-49); matching entry is grype/vulnerability_matcher.go (VulnerabilityMatcher.FindMatches/FindMatchesContext, :39,90,99)."
+        }
+      ],
+      "architecture": "Single Go module. cmd/grype/: CLI (cobra via anchore/clio; commands/, options/ for config+flags, cli/ui and internal/ui Bubble Tea TUI fed by a partybus event bus). grype/pkg/: input providers; provide() tries PURL, CPE, SBOM file/stdin, Zarf, then Syft cataloging (provider.go:273-314); syft_provider.go:25 calls syft.CreateSBOM in-process for images/dirs, syft_sbom_provider.go decodes SBOMs via Syft format.Decode. grype/db/v6/: SQLite (GORM + glebarez/sqlite, CGO-free) vulnerability store, with distribution/ (latest.json client + go-getter download) and installation/ (curator: update, import, validate age/checksum); grype/db/v5 (earlier schema) is still in the tree; grype/db/v6/build, grype/db/processors and grype/db/provider hold DB build/transform code (no separate DB-builder main in this repo). grype/matcher/{apk,bitnami,dotnet,dpkg,golang,hex,java,javascript,msrc,pacman,portage,python,rpm,ruby,rust,stock}: per-ecosystem matchers. grype/vulnerability_matcher.go: orchestrates matchers, ignore rules, EOL tracking and VEX; grype/vex/{openvex,csaf}: VEX filtering/augmenting. grype/presenter/{table,json,cyclonedx,sarif,template,models}: output formats. internal/{dbtest,file,format,...}: DB test fixtures, go-getter wrapper, output selection. schema/: JSON schemas for db-search, db-search-vuln, db-diff and DB blobs. templates/: sample Go templates (html, junit, csv, markdown, table). test/{cli,integration,install,quality}: test suites.",
+      "packaging_and_release": "GoReleaser v2 (.goreleaser.yaml:1): static CGO-free binaries (CGO_ENABLED=0; ldflags -s -w -extldflags '-static' plus version/commit/date, :7-32) for linux amd64/arm64/ppc64le/s390x, darwin amd64/arm64 (quill sign-and-notarize post-hook, :34-48) and windows amd64 (:50-58); tar.gz archives, zip for Windows (:60-72); rpm and deb via nfpms (:74-81); Homebrew cask pushed to anchore/homebrew-grype (:83-97); 12 Docker images (prod, nonroot, debug x amd64/arm64v8/ppc64le/s390x) pushed to Docker Hub and ghcr.io with multi-arch manifests :latest, :<tag>, :nonroot, :debug (:99-356; Dockerfile* use gcr.io/distroless/static-debian12 bases). Checksums: goreleaser file grype_<version>_checksums.txt, signed with cosign keyless (GitHub OIDC issuer) producing .sig and .pem for the checksum file only (.goreleaser.yaml:358-370; names per install.sh:383,400-416). install.sh always verifies the archive SHA-256 (install.sh:660) and, with -v, runs cosign verify-blob against identity https://github.com/anchore/grype/.github/workflows/release.yaml@refs/heads/main and issuer https://token.actions.githubusercontent.com (install.sh:599-604). No SLSA/build-provenance attestation, no cosign attest, no signed container images and no per-artifact SBOM in goreleaser; Docker builds set --provenance=false (.goreleaser.yaml:109 and 11 others). Release workflow (.github/workflows/release.yaml): manual workflow_dispatch with version, phase, skip-checks inputs, serialized by a concurrency group (:5-28); jobs version-available -> check-gate (requires the 8 validations check names, :39-49) -> release (environment `release`, permissions contents/packages/id-token write, `make ci-release` with Docker Hub/GHCR logins, Apple notarization, tag and brew tokens; :55-111) -> anchore/sbom-action producing sbom.spdx.json over the checkout with continue-on-error (:113-116) -> release-install-script publishing install.sh to R2/S3 via anchore/workflows (:118-133). Process: RELEASE.md (`make release`, release admin approval :23-24, retraction steps :27-37, target cadence 1-2 weeks :9-11). go.mod pins syft v1.52.0 and a make task rejects non-release syft pins (.make/main.go:250-267; not shown wired to a workflow). Build is not bit-reproducible: mod_timestamp is set from the commit time (:23-24) but main.buildDate={{.Date}} (:31) and BUILD_DATE={{.Date}} (:111) embed build time.",
+      "tests_and_ci": "Tests: Go testing + testify (go.mod:65), go-snaps snapshots (go.mod:32), go-cmp (go.mod:38), go-test/deep (go.mod:34); about 288 *_test.go files (cmd 25, grype 230, internal 18, test 15) plus 6 shell suites test/install/*_test.sh and a Python yardstick quality gate. Dirs: test/cli (runs the built snapshot binary), test/integration (Docker image fixtures), test/install (install.sh in Ubuntu/Alpine/Busybox containers), test/quality (yardstick F1/false-negative gate vs previous release with a pinned DB and the anchore/vulnerability-match-labels submodule, .gitmodules:1-4). `make unit` enforces a 47% coverage floor excluding **/test/** (.make/main.go:26-30). CI workflows in .github/workflows: validations.yaml (pull_request, push main, dispatch) runs jobs Static analysis=`make static-analysis`, Unit tests=`make unit`, Quality tests=`make quality`, Integration tests=`make integration` (also `db update` and `go run -race ./cmd/grype alpine:latest`, .make/main.go:87-94), Build snapshot artifacts=`make snapshot`, Acceptance tests (Linux)=`make install-test`, Acceptance tests (Mac)=`make install-test-ci-mac`, CLI tests (Linux)=`make cli`; validate-github-actions.yaml runs zizmor (zizmorcore/zizmor-action v0.6.3, advanced-security: true, inputs .github; config `rules: {}` in .github/zizmor.yml:1); codeql.yaml calls the reusable anchore/workflows CodeQL workflow on PR/push main/weekly cron with security-events: write (codeql.yaml:3-21); scorecards.yaml runs OSSF Scorecard weekly and on v* tags and uploads SARIF via github/codeql-action/upload-sarif (scorecards.yaml:6-10,46-49); release.yaml is manual (see packaging). Supply-chain facts: every workflow sets top-level permissions: {} with per-job scopes; all external `uses:` refs (13 distinct actions/reusable workflows) are pinned to 40-char SHAs with version comments (grep of .github); no pull_request_target, workflow_run, secrets: inherit or self-hosted runners; every checkout sets persist-credentials: false except the release job (release.yaml:72-75); test-fixture cache is write-enabled only on the upstream default branch (.github/actions/bootstrap/action.yaml:51-73). Dependabot (.github/dependabot.yaml): gomod for / and /.make, github-actions for / and /.github/actions/*, weekly Friday, 7-day cooldown, max 10 PRs; no docker or pip ecosystem. Static analysis config: golangci-lint (.golangci.yaml:5-28 incl. gosec, staticcheck, govet, errcheck, revive; gci+gofmt formatters), license allow-list .bouncer.yaml; what `make static-analysis` bundles is defined in the external go-make module, not in this checkout. No actionlint, shellcheck or hadolint anywhere (searched). In-repo SBOM generation: anchore/sbom-action in release only; Grype itself embeds Syft (go.mod:81). No workflow uploads Grype's own SARIF to code scanning; the code-scanning producers are CodeQL, Scorecard and zizmor.",
+      "dependencies": "go.mod: 74 direct requires (including github.com/anchore/syft v1.52.0 at go.mod:81, go-containerregistry, stereoscope, clio, cobra, gorm + glebarez/sqlite, go-getter, cyclonedx-go, go-sarif, openvex/go-vex, csaf) and 257 `// indirect` requires (AWS/GCP SDKs, containerd, docker, otel); go 1.26.3; no replace or exclude directives; go.sum present. .make/go.mod: 1 direct (github.com/anchore/go-make v0.8.0) + 4 indirect; go 1.25.0. test/quality/requirements.txt: 3 pinned Python requirements (yardstick==v0.15.0, tabulate==0.9.0, dataclass-wizard==0.36.2). .binny.yaml declares only skopeo v1.24.0 (go-install) and inherits all other tool definitions (golangci-lint, goreleaser, cosign, quill, ...) from go-make's embedded config, which is not visible here (.binny.yaml:1-20). Five further go.mod files under testdata dirs are test fixtures, not product dependencies.",
+      "security_policy": "SECURITY.md (repo root): security updates apply only to the most recent release (SECURITY.md:5); report privately by email to security@anchore.com with description, reproduction steps, affected versions and mitigations, and an urgency level; support is best effort (SECURITY.md:9-14); links to https://oss.anchore.com/docs/contributing/security/ (SECURITY.md:16). CONTRIBUTING.md:11 tells reporters not to open public issues. GitHub-side settings (private reporting, rulesets) are not visible in the checkout."
+    },
+    "claim_checks": [
+      {
+        "claim": "Scans container images, filesystems and SBOMs; supports Docker, OCI and Singularity images (README.md:24,27)",
+        "verified": "yes",
+        "evidence": "Root command help lists docker, podman, registry, docker-archive, oci-archive, oci-dir, singularity, dir, file, sbom, purl, cpes and zarf sources (cmd/grype/cli/commands/root.go:56-77). Input dispatch tries PURL, CPE, SBOM, Zarf, then Syft cataloging (grype/pkg/provider.go:273-314); image/dir cataloging calls syft.CreateSBOM in-process (grype/pkg/syft_provider.go:25)."
+      },
+      {
+        "claim": "Threat & risk prioritization with EPSS, KEV and risk scoring (README.md:28)",
+        "verified": "yes",
+        "evidence": "JSON model carries risk (grype/presenter/models/vulnerability.go:15,64) and knownExploited/epss (grype/presenter/models/vulnerability_metadata.go:17-18); sort strategies epss and risk (grype/presenter/models/sort.go:15-16); DB build processors for EPSS and KEV exist (grype/db/processors/epss_processor.go, kev_processor.go)."
+      },
+      {
+        "claim": "OpenVEX support for filtering and augmenting scan results (README.md:29)",
+        "verified": "yes",
+        "evidence": "grype/vex/processor.go:24-32,97-108 applies FilterMatches (moves not_affected/fixed matches to ignored) and AugmentMatches (adds matches for products the VEX lists as affected); OpenVEX implementation in grype/vex/openvex/implementation.go; CSAF VEX is also supported (grype/vex/csaf/); --vex flag at cmd/grype/cli/options/grype.go:163-166."
+      },
+      {
+        "claim": "Quickest install is the curl | sudo sh one-liner (README.md:36-39)",
+        "verified": "yes",
+        "evidence": "install.sh:9 sets https://get.anchore.io/grype as base URL; the script re-fetches the tag-specific install.sh and pipes it into sh (install.sh:837-846), always verifies the archive SHA-256 against the release checksums file (install.sh:631-660), and verifies the cosign signature of that checksums file only when -v is passed and cosign is installed (install.sh:642-654,757-763,794). The README one-liner omits -v, so it checks integrity but not signature authenticity."
+      },
+      {
+        "claim": "README badge for a workflow named 'Static Analysis + Unit + Integration' (README.md:10)",
+        "verified": "no",
+        "evidence": "No such workflow exists: .github/workflows contains Validations (validations.yaml:1), Release, CodeQL, Scorecards and Validate GitHub Actions. Static analysis, unit and integration tests now run as jobs of validations.yaml:13-133. The first badge points at a stale workflow name; code wins."
+      },
+      {
+        "claim": "More ways to install include Homebrew, Docker, Chocolatey, MacPorts (README.md:42)",
+        "verified": "partial",
+        "evidence": "Homebrew cask (.goreleaser.yaml:83-97) and Docker Hub/GHCR images (.goreleaser.yaml:99-356; RELEASE.md:6-7) are produced by this repo's release. No Chocolatey or MacPorts configuration found in the repo (searched for choco/port install), so those are not checkable here; exact commands live on an external docs page that was not opened."
+      },
+      {
+        "claim": "Scanning an SBOM is 'even faster'; `cat ./sbom.json | grype` works (README.md:56-64)",
+        "verified": "partial",
+        "evidence": "Piped stdin and the sbom: prefix are implemented (grype/pkg/syft_sbom_provider.go:101-108,118-120; cmd/grype/cli/commands/root.go:515-539), decoded with Syft format.Decode (syft_sbom_provider.go:86), and SBOM inputs skip cataloging because provide() tries the SBOM provider before syftProvider (grype/pkg/provider.go:286-313). The 'faster' claim is not measured anywhere in the repo (no published benchmark results)."
+      },
+      {
+        "claim": "(Workflow comment, not README) zizmor findings are enforced by a pass/fail repo ruleset (.github/workflows/validate-github-actions.yaml:30)",
+        "verified": "not_checkable",
+        "evidence": "GitHub repository rulesets are not in the checkout. In-repo facts: zizmor-action pinned by SHA (validate-github-actions.yaml:28), advanced-security: true and inputs: .github (:30-32), config `rules: {}` (.github/zizmor.yml:1), job permissions contents: read and security-events: write (:19-21)."
+      },
+      {
+        "claim": "(Goreleaser comment, not README) mod_timestamp is set 'to ensure a reproducible build' (.goreleaser.yaml:23-24)",
+        "verified": "partial",
+        "evidence": "Binary mtime is set from the commit timestamp, with CGO_ENABLED=0 and static linking (.goreleaser.yaml:7-10,24-28). But ldflags also inject main.buildDate={{.Date}} (:31) and Docker builds pass BUILD_DATE={{.Date}} (:111); no -trimpath is configured; no CI job rebuilds and compares artifacts (only this comment matches 'reproducib' in non-test config)."
+      },
+      {
+        "claim": "(CLI help text, not README) --fail-on sets the return code to 2 (cmd/grype/cli/options/grype.go:118-121) vs config text saying the return code 'will be 1' (grype.go:199)",
+        "verified": "partial",
+        "evidence": "The code maps ErrAboveSeverityThreshold to exit code 2 (cmd/grype/cli/cli.go:84-88) and DB-upgrade-available to 100 (cli.go:89-92); the config-file description at cmd/grype/cli/options/grype.go:199 still says 1. Code behavior (2) wins; help text inside the tool is inconsistent, which matters when gating CI on exit codes."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Match-quality gate thresholds vs the previous release (these are pass/fail thresholds, not measured results); no scan-speed or accuracy results are published in the repo",
+        "metric": "max-f1-regression / max-new-false-negatives / max-unlabeled-percent",
+        "value": "0.0 / 0 / 10 (%)",
+        "source": "test/quality/.yardstick.yaml:88-94 (repeated for the 2022-2025 result sets, e.g. :127-134); criteria prose in test/quality/README.md:34-61",
+        "independent": false
+      },
+      {
+        "what": "Unit-test coverage floor enforced by `make unit` (threshold, not a measurement)",
+        "metric": "minimum test coverage",
+        "value": "47%",
+        "source": ".make/main.go:26-30",
+        "independent": false
+      },
+      {
+        "what": "Vulnerability DB download sizes as stated in config help text (stale sample)",
+        "metric": "DB archive size / latest.json listing size",
+        "value": "~156MB / ~156KiB as of 2024-04-17",
+        "source": "cmd/grype/cli/options/database.go:63-66",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Signing/attestation gap: only the release checksums file is cosign-signed (.goreleaser.yaml:358-370); no build-provenance/SLSA attestation, no cosign attest, no signed container images or SBOM attestations in goreleaser or .github (searched); Docker builds pass --provenance=false (.goreleaser.yaml:109 and 11 others); the only SBOM step is anchore/sbom-action over the checkout with continue-on-error (.github/workflows/release.yaml:113-116); the README one-liner verifies only a SHA-256 from the same release unless -v and cosign are used (install.sh:660,794).",
+      "Not bit-for-bit reproducible: mod_timestamp is normalized to commit time (.goreleaser.yaml:23-24) but ldflags embed main.buildDate={{.Date}} (:31) and Docker builds pass BUILD_DATE={{.Date}} (:111); no -trimpath; no rebuild-and-compare job exists in .github/workflows.",
+      "Pinning gaps outside Go modules and actions: Dockerfile base images use mutable tags gcr.io/distroless/static-debian12:latest|nonroot|debug-nonroot (Dockerfile:1; Dockerfile.nonroot:1; Dockerfile.debug:1) while Dependabot watches only gomod and github-actions (.github/dependabot.yaml:7,25); install-test images download the latest cosign (test/install/environments/Dockerfile-ubuntu-20.04:3-5); apt packages unpinned (.github/actions/bootstrap/action.yaml:42-49); floating runner labels ubuntu-latest and macos-latest (.github/workflows/scorecards.yaml:17; validate-github-actions.yaml:18; validations.yaml:216). All action refs themselves are SHA-pinned.",
+      "Key CI/release logic lives outside this checkout: `make static-analysis`, `make ci-release` and `make snapshot` come from anchore/go-make v0.8.0 (.make/main.go:23-53; .make/go.mod:5); CodeQL, check-gate, version check and install-script publishing are reusable workflows in anchore/workflows@7212994d (v0.8.0) (release.yaml:35,44,123; codeql.yaml:16); tool versions come from go-make's embedded .binny.yaml (.binny.yaml:3-5). Release workflow: skip-checks input bypasses the check-gate (release.yaml:24-28,40), checkout persists credentials (release.yaml:72-75), and the job holds contents/packages/id-token write plus Docker Hub, Apple, tag, brew and R2/S3 secrets (release.yaml:67-70,96-111,126-133); gated by environment `release` approval (release.yaml:65; RELEASE.md:23-24).",
+      "No workflow-syntax linter: no actionlint or shellcheck anywhere (searched), so workflow expressions, action inputs/outputs and run: scripts are not linted; zizmor runs with default rules (`rules: {}`, .github/zizmor.yml:1) and its pass/fail enforcement is a repo ruleset not visible in the checkout (validate-github-actions.yaml:30).",
+      "Version/maintenance: pre-1.0 (v0.119.0); deprecated APIs and output formats are slated for removal before v1.0 (grype/deprecated.go:14,34; internal/format/format.go:17,67); .chronicle.yaml sets enforce-v0 so breaking-change labels do not bump the major version (.chronicle.yaml:1); security fixes apply only to the latest release (SECURITY.md:5); DB distribution has deprecated and end-of-life states that stop DB updates for old Grype versions (grype/db/v6/distribution/status.go:11-15; client.go:113-117).",
+      "Runtime network and integrity: app-update check and DB auto-update are on by default and call Anchore-hosted endpoints (cmd/grype/cli/options/grype.go:72; options/database.go:39; commands/update.go:18-19; distribution/client.go:56); with the default 5-day max DB age an offline or stale DB makes scans fail unless updated, imported or age validation is disabled (installation/curator.go:56-58,598-614; grype/load_vulnerability_db.go:38-41); DB authenticity rests on HTTPS plus a digest from latest.json with no signature verification (distribution/client.go:139-143; latest.go:134-138); the downloader also enables file/git/gcs/hg/s3 schemes (internal/file/getter.go:91-102).",
+      "Test and platform coverage: hosted unit, integration and CLI tests run on Linux only; macOS CI runs just the install.sh suites (validations.yaml:212-251; test/install/Makefile:35-36); WSL2 is undocumented and untested; the quality gate relies on a custom runner label ubuntu-22.04-4core-16gb (validations.yaml:52), a pinned DB URL and a GHCR SBOM store (test/quality/test-db:1; test/quality/Makefile:1-2) and `make quality` runs 3 of the 5 defined result sets (2023 and 2025 defined at .yardstick.yaml:171,265 but not invoked at Makefile:30,37-39); coverage floor is only 47% (.make/main.go:27); dependency surface is 74 direct and 257 indirect modules (go.mod)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "anchore/grype",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install script (curl | sh); detects linux/darwin/windows and amd64/arm64/ppc64le/s390x. Command: curl -sSfL https://get.anchore.io/grype | sudo sh -s -- -b /usr/local/bin",
+          "citation": "README.md:36-39; install.sh:126-157",
+          "holds": true,
+          "note": "README.md:38 has the exact one-liner. install.sh:126-157 is the GOOS/GOARCH allow-list from uname_os_check/uname_arch_check: darwin:126, linux:129, windows:136, amd64:146, arm64:147, ppc64le:152, s390x:157. The detection itself is uname_os (install.sh:444-457, which maps cygwin/mingw/msys to windows) and uname_arch (:463-481, x86_64->amd64, aarch64->arm64). The allow-list also accepts values with no release asset (freebsd, 386, armv7...). The asset is then looked up by name in the checksums file (:423-438), so only goreleaser's targets resolve: linux amd64/arm64/ppc64le/s390x, darwin amd64/arm64, windows amd64 (.goreleaser.yaml:16-22,37-41,53-56)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0; file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is the unmodified Apache License, Version 2.0 text (appendix boilerplate left unfilled). Consistent with README.md:15 (badge) and :77, and .goreleaser.yaml:75,93 (package/cask metadata). There is no other license file at the repo root; the only other LICENSE is a test fixture under test/integration/testdata."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - linux/amd64 static binary is built (.goreleaser.yaml:13-22, static link flags :25-32); hosted CI tests run on ubuntu-24.04 (.github/workflows/validations.yaml:16,33,113,258). arm64, ppc64le and s390x are also built.",
+          "citation": ".goreleaser.yaml:13-22,25-32; .github/workflows/validations.yaml:16,33,113,258",
+          "holds": true,
+          "note": "linux-build targets amd64/arm64/ppc64le/s390x (.goreleaser.yaml:16-22) with CGO_ENABLED=0 (:10) and -extldflags '-static' (:28). Lines 16/33/113/258 are runs-on: ubuntu-24.04 for the Static analysis, Unit, Integration and CLI (Linux) jobs. The CLI job runs against snapshot/linux-build_linux_amd64_v1/grype (validations.yaml:290). Quality tests use a custom ubuntu-22.04-4core-16gb runner (:52), but that runner isn't cited."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "`grype` binary; root scan command with -o/--output (table, json, cyclonedx, cyclonedx-json, sarif, template), --file, --fail-on, --only-fixed/--only-notfixed, --vex, --exclude, --platform, --from, -s scope, -c, -v/-q; subcommands db {check,delete,import,list,status,update,search,providers,diff}, explain, completion [bash|zsh|fish], version, config; exit codes 2 (severity threshold), 100 (DB upgrade available), 1 (other).",
+          "citation": "cmd/grype/main.go:22-34; cmd/grype/cli/commands/root.go:50-97; internal/format/format.go:57-65; cmd/grype/cli/options/grype.go:83-167; cmd/grype/cli/cli.go:37-41,83-94,105-111; cmd/grype/cli/commands/db.go:21-31",
+          "holds": true,
+          "note": "All verified: main() runs cli.Application (main.go:22-34); AvailableFormats = json, table, cyclonedx, cyclonedx-json, sarif, template (format.go:58-65); flags -s/--scope :84, -o/--output :89, --file :94, --fail-on/-f :118, --only-fixed :123, --only-notfixed :128, --exclude :148, --platform :153, --from :158, --vex :163; -c/-v/-q via clio (cli.go:39-40); db adds check, delete, import, list, status, update, search, providers, diff (db.go:22-30); root adds db, completion ('completion [bash|zsh|fish]', completion.go:19), explain, version, config (cli.go:105-111); exit codes 2/100/1 (cli.go:83-94). Nit: the literal cobra Use string is `grype [IMAGE]` (root.go:54); the bracketed IMAGE|PATH|sbom:FILE|purl|cpe list paraphrases the help text at root.go:58-77."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Scans container images, filesystems and SBOMs; supports Docker, OCI and Singularity images (README.md:24,27) - verified: yes",
+          "citation": "README.md:24,27; cmd/grype/cli/commands/root.go:56-77; grype/pkg/provider.go:273-314; grype/pkg/syft_provider.go:25",
+          "holds": true,
+          "note": "README.md:24 and :27 say this. The root help lists podman/docker/docker-archive/oci-archive/oci-dir/singularity/dir/file/sbom/registry/purl/PURL/cpes/CPE/zarf (root.go:63-77). provide() tries purlProvider :274, cpeProvider :280, syftSBOMProvider :286, zarfProvider :299 and then syftProvider :313. syftProvider calls syft.CreateSBOM in-process (syft_provider.go:25), and runGrype reaches it through pkg.Provide (root.go:197)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

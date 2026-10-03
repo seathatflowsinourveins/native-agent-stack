@@ -1,0 +1,335 @@
+{
+  "contender": "boxlite-ai/boxlite",
+  "revision": {
+    "contender": "boxlite-ai/boxlite",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "boxlite-ai/boxlite",
+        "tag": "v0.10.5",
+        "commit": "4fbf2aeded7520fe77bc724468c831a29684f2cb",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.10.5",
+    "commit": "4fbf2aeded7520fe77bc724468c831a29684f2cb",
+    "read_at": "2026-10-02T03:02:01+00:00"
+  },
+  "dossier": {
+    "contender": "boxlite-ai/boxlite",
+    "revision": {
+      "tag": "v0.10.5",
+      "commit": "4fbf2aeded7520fe77bc724468c831a29684f2cb",
+      "read_at": "2026-10-02T03:02:01+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0 (LICENSE; core runtime, CLI, SDKs) + AGPL-3.0 (Daytona-derived apps/ cloud stack; mixed-license repository per NOTICE)",
+      "file": "LICENSE"
+    },
+    "purpose": "Embeddable micro-VM runtime (Rust core; Python/Node/Go/Rust/C SDKs; a `boxlite` CLI; a `boxlite serve` REST/WebSocket API) that runs OCI images as per-box hardware-isolated VMs (libkrun on KVM or Hypervisor.framework) for executing untrusted or agent code. The repo also contains a separately licensed cloud control plane under apps/. Commands run inside the guest VM via exec; the host-side OS sandbox (bubblewrap on Linux, sandbox-exec/Seatbelt on macOS) confines the per-box `boxlite-shim` VMM process, not the commands themselves (docs/concepts/security.md:3-4; src/boxlite/src/jailer/THREAT_MODEL.md:8-10; src/boxlite/src/vmm/controller/spawn.rs:99-183). Defaults: jailer on, guest network fully open (empty `allow_net`), inbound private; `network=disabled` removes the guest NIC; `allow_net` is a user-space connect-time egress allowlist; host directories reach the guest only as explicit virtiofs volumes flagged ro/rw (src/boxlite/src/runtime/advanced_options.rs:215-249; src/boxlite/src/runtime/options.rs:526-552,1095-1155).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "BoxLite runs isolated applications in lightweight virtual machines, locally or through a cloud control plane.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "A Box is a hardware-isolated micro-VM that runs any OCI image, and it persists across turns.",
+          "citation": "README.md:30"
+        },
+        {
+          "claim": "Real isolation: its own kernel — stronger than a container, lighter than a full VM.",
+          "citation": "README.md:34"
+        },
+        {
+          "claim": "Daemonless: embed as a library — no root, no background service (optional server mode).",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "Controlled networking: restrict egress with `allow_net`; inject real secrets via placeholders.",
+          "citation": "README.md:37"
+        },
+        {
+          "claim": "Isolation & security: a hardware-virtualized VM per box (KVM / Hypervisor.framework); OS sandbox (seccomp / sandbox-exec); CPU, memory & resource limits; egress allow-list (`allow_net`); secret injection — real values never enter the VM; env sanitization.",
+          "citation": "README.md:167"
+        },
+        {
+          "claim": "Storage & state: volume mounts (ro/rw), per-box QCOW2 disk with copy-on-write, bidirectional file copy, clone or export/import as `.boxlite` archives, detached boxes that outlive the parent process.",
+          "citation": "README.md:168"
+        },
+        {
+          "claim": "Networking: outbound internet, local TCP port forwarding, portable local/remote tunnels, network I/O metrics.",
+          "citation": "README.md:169"
+        },
+        {
+          "claim": "Security layers: hardware isolation (KVM/Hypervisor.framework); OS-level sandboxing (seccomp on Linux, sandbox-exec on macOS); resource limits (cgroups, rlimits); environment sanitization.",
+          "citation": "README.md:212-216"
+        },
+        {
+          "claim": "Interfaces: Python, Node.js, Go, Rust, C SDKs, the `boxlite` CLI, and a REST API (WebSocket exec, optional auth).",
+          "citation": "README.md:172"
+        },
+        {
+          "claim": "Supported platforms: macOS Apple Silicon, Linux x86_64, Linux ARM64 and Windows (WSL2) x86_64 supported; macOS Intel 'Coming soon'.",
+          "citation": "README.md:229-235"
+        },
+        {
+          "claim": "System requirements: macOS Apple Silicon with macOS 12+; Linux with KVM enabled (`/dev/kvm` accessible); Windows (WSL2) with KVM support and the user in the `kvm` group.",
+          "citation": "README.md:239-243"
+        },
+        {
+          "claim": "One-line install `curl -fsSL https://sh.boxlite.ai | sh` installs to `$HOME/.local/bin/boxlite` with the runtime embedded — no extra setup.",
+          "citation": "README.md:115-120"
+        },
+        {
+          "claim": "`boxlite serve` runs BoxLite as a REST service (shown as 'Listening on 0.0.0.0:8100'); REST-capable CLI commands accept `--url`.",
+          "citation": "README.md:127-139"
+        }
+      ],
+      "install": [
+        {
+          "method": "One-line installer for the `boxlite` CLI (Linux x86_64/ARM64, macOS Apple Silicon); version pin via BOXLITE_VERSION / BOXLITE_EXPECTED_SHA256 placed on the `sh` side of the pipe",
+          "command": "curl -fsSL https://sh.boxlite.ai | sh",
+          "citation": "README.md:116; src/cli/README.md:30-34; docs/reference/cli/README.md:60-87"
+        },
+        {
+          "method": "CLI from crates.io (build from source; build.rs fetches the prebuilt runtime tarball)",
+          "command": "cargo install boxlite-cli",
+          "citation": "docs/reference/cli/README.md:62-66; src/cli/README.md:40-44"
+        },
+        {
+          "method": "CLI prebuilt binary via cargo-binstall",
+          "command": "cargo binstall boxlite-cli",
+          "citation": "docs/reference/cli/README.md:66; src/cli/README.md:46-50; src/cli/Cargo.toml:94-97"
+        },
+        {
+          "method": "Python SDK (Python 3.10+)",
+          "command": "pip install boxlite",
+          "citation": "README.md:46-49"
+        },
+        {
+          "method": "Node.js SDK (Node 18+)",
+          "command": "npm install @boxlite-ai/boxlite",
+          "citation": "README.md:67"
+        },
+        {
+          "method": "Go SDK (Go 1.24+ with CGO; native library fetched by the setup tool) and Rust crate",
+          "command": "go get github.com/boxlite-ai/boxlite/sdks/go ; cargo add boxlite tokio futures --features tokio/macros,tokio/rt-multi-thread",
+          "citation": "README.md:81,93; .github/workflows/build-go.yml:6-9"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes — listed as supported with KVM required (README.md:232,242); startup check opens /dev/kvm read-write and runs a KVM smoke test (src/boxlite/src/system_check.rs:107-145); hosted CI builds/tests linux-x64-gnu on ubuntu-latest (.github/ci-config.json:4) and runs KVM hardware tests (.github/workflows/test.yml:307-314); full-VM E2E runs on a self-hosted AWS c8i.4xlarge Linux x64 runner launched with NestedVirtualization=enabled (.github/workflows/e2e-local.yml:93,253,275,340-346); installer maps Linux-x86_64 to x86_64-unknown-linux-gnu (scripts/release/install.sh.template:75-76). The Linux jailer needs unprivileged user namespaces for bubblewrap (src/boxlite/src/jailer/bwrap.rs:94-158).",
+        "wsl2": "yes (documented only; no CI job and no WSL-specific code path) — README.md:234,243, docs/faq.md:49-78 and docs/getting-started/README.md:49-72 describe WSL2 + /dev/kvm + `kvm` group (+ `wsl.exe --shutdown`); src/boxlite/src/system_check.rs:196-203 only adds a hint when /dev/kvm is missing and /proc/sys/fs/binfmt_misc/WSLInterop exists (Windows 11 or Windows 10 build 21390+, `nestedVirtualization=true` in .wslconfig). The CI platform matrix has no WSL2 entry (.github/ci-config.json:2-6) and the strings wsl/windows do not occur anywhere under .github/. The ordinary Linux path is used unchanged (bubblewrap jailer; cgroups v2 via the user's systemd service scope: src/boxlite/src/jailer/cgroup.rs:12-17,85-96). Native Windows: no (docs/faq.md:78); a Windows Hypervisor Platform backend is only a design-doc milestone M10 (docs/contributing/architecture/vmm/README.md:596-605).",
+        "macos_arm64": "yes — Apple Silicon supported (README.md:231,241); Hypervisor.framework via libkrun (docs/faq.md:124-133); the shim is ad-hoc signed with the com.apple.security.hypervisor entitlement at build (src/boxlite/build.rs:1070-1146); the host sandbox is a deny-default Seatbelt profile run through /usr/bin/sandbox-exec (src/boxlite/src/jailer/sandbox/seatbelt.rs:12-26,46); CI target macos-15 aarch64 (.github/ci-config.json:3); the installer rejects Intel Macs (scripts/release/install.sh.template:73-74). The macOS floor is stated as 12+ (README.md:241) but the Python wheels build with MACOSX_DEPLOYMENT_TARGET 14.0 (sdks/python/pyproject.toml:142-144), and the in-house-VMM plan raises the floor to 15 at milestone M5 (docs/contributing/architecture/vmm/README.md:49-50).",
+        "gpu": "no — BoxOptions has no GPU option (src/boxlite/src/runtime/options.rs:319-443); the libkrun GPU wrapper `set_gpu_options` is defined but has no caller (src/boxlite/src/vmm/krun/context.rs:315-319); GPU/VFIO/virtio-gpu is a future milestone (M9) of the in-house VMM design (docs/contributing/architecture/vmm/README.md:345,590-595); README and docs list no GPU feature."
+      },
+      "integrations": {
+        "cli": "yes — `boxlite` binary from crate boxlite-cli (src/cli/Cargo.toml:13-15): run/exec/create/list/rm/start/stop/restart/pull/images/inspect/cp/info/logs/stats/network tunnel/serve/volume/auth/completion (docs/reference/cli/README.md:17-38; dispatch at src/cli/src/main.rs:106-130). Sandbox-related flags: `--network <enabled|disabled>`, `--allow-net HOST`, `--security <enable|disable>` (docs/reference/cli/README.md:816-817,844; src/cli/src/cli.rs:1146-1160,1457-1462). The CLI reference documents no snapshot/clone/export command.",
+        "mcp": "none found as a BoxLite-provided MCP server for driving boxes (no MCP code in src/cli, the Rust core, or the SDK APIs). The only MCP code is src/boxlite/resources/images/skillbox/local_computer_mcp.py, an MCP server that runs inside the optional SkillBox guest image so a Claude CLI in the box can take screenshots and use mouse/keyboard (docstring at lines 1-10).",
+        "sdk_or_api": "yes — SDKs: Python (PyO3/maturin; sdks/python, pip `boxlite`), Node.js (napi-rs; sdks/node, `@boxlite-ai/boxlite`), Go (CGO + prebuilt libboxlite; sdks/go), Rust crate `boxlite` (src/boxlite), C (cbindgen; sdks/c) — README.md:44-106. HTTP: `boxlite serve` exposes REST + WebSocket attach (src/cli/src/commands/serve/README.md:3-6,108-193) against the contract openapi/box.openapi.yaml (OpenAPI 3.1.1, 'BoxLite Box API' v0.1.0, lines 16-19) whose default server host is api.boxlite.ai (lines 94-103); SDK/CLI 'REST mode' targets a server (docs/reference/cli/README.md:664-690). Over REST the server owns the security policy and rejects client-supplied `security` fields (src/cli/src/commands/serve/mod.rs:1188-1193,2782-2830).",
+        "claude_code_or_codex": "No documented integration that routes Claude Code or Codex tool calls through BoxLite (no plugin, hook or MCP server for that). Related items: (a) examples that install and run the Claude Code CLI inside a box via exec + stream-json (examples/python/06_ai_agents/chat_with_claude.py:1-13,151-206; examples/node/claude_in_boxlite.js:1-17); (b) the SkillBox guest image bundles Claude Code, Codex, Gemini CLI and OpenCode (src/boxlite/resources/images/skillbox/README.md:7-18); (c) repo-contributor tooling for developing BoxLite itself, not a product integration: .claude/settings.json:5-50 (SessionStart/UserPromptSubmit hooks, plugin from boxlite-ai/agent-tooling), .codex/hooks.json:1-17, .agent-tooling/profile.json:5-8, .agents/plugins/marketplace.json:6-21."
+      },
+      "telemetry_and_network": "Core runtime/CLI/SDKs: no telemetry, analytics, crash-upload or update-check code found (case-insensitive search for telemetry|analytics|posthog|sentry|mixpanel|opentelemetry|otlp|phone home|update check under src/ and sdks/ returned no matches); crash reports are only formatted locally for log/error text (src/boxlite/src/litebox/crash_report.rs:1-30). No account is needed for the local runtime. Network used by the local runtime: OCI registry pulls on first use (unqualified images resolve to docker.io when image_registries is empty: src/boxlite/src/images/mod.rs:103; src/boxlite/src/runtime/options.rs:172-176; docs/reference/configuration.md:33). Install/build-time downloads: install.sh fetches boxlite-cli-<ver>-<target>.tar.gz from github.com/boxlite-ai/boxlite releases and verifies SHA-256 (scripts/release/install.sh.template:137-181); sh.boxlite.ai is a Cloudflare Worker that proxies the latest release install.sh (scripts/release/sh-installer/src/index.ts:10-26); crates.io / `cargo install` builds download boxlite-runtime-v<ver>-<target>.tar.gz from GitHub Releases via curl with no checksum check (src/boxlite/build.rs:585-665,693-701), while the libkrunfw prebuilt is SHA-256 pinned (src/deps/libkrun-sys/build.rs:10-32,72-137). REST/cloud mode is opt-in via BOXLITE_REST_URL/--url, BOXLITE_API_KEY or `boxlite auth login` (API key, browser OIDC or device flow) (docs/reference/cli/README.md:148-193). `boxlite serve` opens a TCP listener, default 0.0.0.0:8100, with optional bearer auth (src/cli/src/defaults.rs:7-10). The apps/ cloud stack (AGPL-3.0) does contain analytics: posthog-js in the dashboard and posthog-node in the API (client created only when posthog.apiKey and posthog.host are configured), a Pylon support-chat widget in production builds, and billing/usage-export calls (apps/api/src/analytics/services/analytics.service.ts:26-40; apps/API.md:649-661); apps/package.json also lists @clickhouse/client and @opentelemetry/* dependencies (lines 56, 88-106)."
+    },
+    "code": {
+      "languages": [
+        "Rust (core runtime, shim, guest agent, CLI, SDK bindings, in-house VMM crates)",
+        "Go (gvproxy bridge in src/deps/libgvproxy-sys, Go SDK, apps/runner, apps/proxy)",
+        "TypeScript (apps/api NestJS, apps/dashboard React, Node SDK wrappers)",
+        "Python (SDK wrappers, openapi/reference-server)",
+        "C (SDK header and tests, KVM smoke test src/boxlite/src/kvm_smoke.c)",
+        "Shell (scripts/, installer)",
+        "Protobuf (src/shared/proto)",
+        "SBPL Seatbelt profiles (src/boxlite/resources/seatbelt)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/cli/src/main.rs",
+          "what": "`boxlite` CLI binary (crate boxlite-cli; [[bin]] at src/cli/Cargo.toml:13-15): run/exec/create/list/rm/start/stop/restart/pull/images/inspect/cp/info/logs/stats/network/serve/volume/auth/completion, dispatched at main.rs:106-130"
+        },
+        {
+          "path": "src/cli/src/commands/serve/mod.rs",
+          "what": "`boxlite serve` axum REST + WebSocket server; defaults 0.0.0.0:8100 (src/cli/src/defaults.rs:7-10); optional bearer API key, permissive when unset (mod.rs:50-71,1364-1379)"
+        },
+        {
+          "path": "src/shim/src/main.rs",
+          "what": "`boxlite-shim`: per-box VMM process spawned under the jailer; reads InstanceSpec JSON from stdin, starts in-process gvproxy, applies the seccomp filter only when no network backend exists, then enters libkrun (main.rs:64-246)"
+        },
+        {
+          "path": "src/guest/src/main.rs",
+          "what": "`boxlite-guest`: agent running as PID 1 inside the VM; gRPC over vsock, libcontainer-based OCI containers, storage/virtiofs mounts, optional SSH service (src/guest/Cargo.toml:10-12,41; docs/contributing/architecture/README.md:124-140)"
+        },
+        {
+          "path": "src/boxlite/src/lib.rs",
+          "what": "Rust library crate `boxlite` (BoxliteRuntime, BoxOptions, SecurityOptions, NetworkSpec): the embeddable runtime (src/boxlite/Cargo.toml:17-20)"
+        },
+        {
+          "path": "src/boxlite/src/jailer/mod.rs",
+          "what": "Jailer: `Jail` trait and JailerBuilder that wrap the shim command with BwrapSandbox (Linux) or SeatbeltSandbox (macOS) (mod.rs:143-166,412-523; sandbox/mod.rs:165-177)"
+        },
+        {
+          "path": "sdks/python/src/lib.rs",
+          "what": "Language bindings over the Rust core: PyO3/maturin Python wheel `boxlite` (sdks/python), napi-rs Node package (sdks/node/src), C ABI with cbindgen header (sdks/c/src, sdks/c/include/boxlite.h), Go CGO module over libboxlite (sdks/go)"
+        },
+        {
+          "path": "openapi/box.openapi.yaml",
+          "what": "REST contract (OpenAPI 3.1.1, 'BoxLite Box API' v0.1.0) implemented by `boxlite serve` and the cloud API; openapi/reference-server/server.py is a Python reference server"
+        }
+      ],
+      "architecture": "Rust workspace of 15 members (Cargo.toml:1-18). Core crate src/boxlite: runtime/ (BoxliteRuntime; options.rs, advanced_options.rs), litebox/ (box handle + init pipeline tasks, e.g. init/tasks/vmm_spawn.rs), images/ (OCI pull/cache and safe layer extraction via archive/safe_root), rootfs/ + disk/ (overlay, qcow2/ext4) + volumes/, net/ (gvproxy backend, per-box MITM CA), jailer/ (sandbox/{bwrap,seatbelt,landlock,composite}.rs, seccomp.rs, cgroup.rs, THREAT_MODEL.md), vmm/ (libkrun 'krun' engine; controller/spawn.rs launches the shim), portal/ (gRPC host-to-guest), db/ (SQLite via rusqlite), rest/ (REST client runtime). Per box the runtime spawns src/shim (`boxlite-shim`) under the jailer with config on stdin; the shim hosts gvproxy (Go c-archive in src/deps/libgvproxy-sys/gvproxy-bridge: user-space NAT, DNS/DHCP, allow_net filter in forked_tcp.go/forked_udp.go/allow_net_filter.go, MITM secret substitution in mitm*.go, bandwidth shaper) and enters libkrun (src/deps/libkrun-sys; boxlite-ai forks of libkrun/libkrunfw as git submodules, .gitmodules:1-6) to boot a KVM/Hypervisor.framework microVM whose PID 1 is src/guest (`boxlite-guest`: gRPC server, libcontainer OCI containers, virtiofs/qcow2 storage). Agent commands run via exec inside the guest container: root unless the image sets USER (src/boxlite/src/runtime/options.rs:418-421), Docker-default 14 capabilities without CAP_SYS_ADMIN/CAP_NET_ADMIN, container rootfs writable, protected-link sysctls on (src/boxlite/tests/security_enforcement.rs:249-340). Host directories are shared only as virtiofs volumes flagged ro/rw at the hypervisor (src/boxlite/src/vmm/krun/context.rs:460-488; engine.rs:409-423); with network disabled libkrun's TSI socket forwarding is turned off (src/boxlite/src/vmm/krun/engine.rs:363-375). Host-side sandbox rules are computed per box: Linux bubblewrap binds /usr,/lib,/lib64,/bin,/sbin read-only plus per-box dirs/volumes ro or rw and does not unshare the network namespace; macOS Seatbelt uses (deny default) plus per-path read/write literals and subpaths (src/boxlite/src/jailer/mod.rs:181-352; sandbox/bwrap.rs:62-125; sandbox/seatbelt.rs:204-338). src/cli = `boxlite` CLI + `boxlite serve` (axum); sdks/{python,node,c,go} are bindings. src/hypervisor + src/vmm are an in-progress in-house VMM intended to replace libkrun and are not dependencies of src/boxlite or src/shim (docs/contributing/architecture/vmm/README.md:3-14; src/boxlite/Cargo.toml:33-102; src/shim/Cargo.toml:14-24). apps/ (NestJS API, Go runner/proxy, React dashboard, OTel collector, SST infra) is a separate cloud control plane, AGPL-3.0 (apps/README.md:1-22; apps/NOTICE:14-19).",
+      "packaging_and_release": "GitHub `release: published` triggers the artifact workflows (.github/workflows/build-runtime.yml:6-23). build-runtime.yml builds boxlite-runtime-v<ver>-<target>.tar.gz and boxlite-cli-v<ver>-<rust-target>.tar.gz (darwin-arm64, linux x86_64/arm64; Linux in a manylinux_2_28 container), per-file .sha256 sidecars, a combined SHA256SUMS, and a rendered install.sh (+ .sha256) with embedded digests; tarballs and install.sh get sigstore build-provenance attestations via actions/attest-build-provenance@v2 (build-runtime.yml:148-238; verification steps in docs/reference/cli/README.md:60-118). crates.io: boxlite-shared, libkrun-sys, e2fsprogs-sys, libgvproxy-sys, bubblewrap-sys, boxlite and boxlite-cli are published with a CARGO_REGISTRY_TOKEN secret (build-runtime.yml:246-342; cargo-binstall metadata at src/cli/Cargo.toml:94-97). PyPI wheels (cibuildwheel; manylinux_2_28 + macOS arm64; musllinux skipped) via trusted publishing (build-wheels.yml:42-89; sdks/python/pyproject.toml:62-77,142-167). npm `@boxlite-ai/boxlite` + per-platform packages via OIDC trusted publishing with `npm publish --provenance` (build-node.yml:167-244). C SDK archives boxlite-c-v<ver>-<target>.tar.gz (static+shared lib + header) are uploaded to the release with no checksum or attestation step (build-c.yml:149-211); the Go module is tagged sdks/go/v<ver> after tests (build-go.yml:64-89) and users fetch the native library with `go run .../sdks/go/cmd/setup` (build-go.yml:6-9; sdks/go/cmd/setup/main.go:62-68). Box images are pushed to GHCR only by release-box-images.yml (.github/workflows/README.md:67). Native inputs: libkrunfw prebuilt tarballs from boxlite-ai/libkrunfw releases with pinned SHA-256 (src/deps/libkrun-sys/build.rs:10-32,72-137); libkrun, libkrunfw, e2fsprogs and bubblewrap are git submodules (.gitmodules:1-12) not populated in this checkout.",
+      "tests_and_ci": "Tests (counts from this checkout): Rust integration tests in src/boxlite/tests (35 files) and src/cli/tests (26 files) plus inline #[cfg(test)] modules (263 occurrences in 206 files under src/); gvproxy-bridge Go tests (17 files, 186 `func Test`); Go SDK 22 `_test.go` files; Python SDK 27 pytest files (sdks/python/tests); Node SDK 19 vitest files (sdks/node/tests); C SDK 5 files (sdks/c/tests) — about 357 test files outside apps/ plus about 290 spec/test files under apps/ (Jest/vitest/Go). Isolation-relevant suites: src/boxlite/tests/security_enforcement.rs (ro volumes, remount denial, capabilities, TSI off when network disabled), network_spec.rs, jailer.rs (default-on jailer; Linux test checks mount-namespace isolation only: lines 169-181,403-442), SDK tests test_readonly_volume_remount.py, test_symlink_escape.py, test_tcp_filter.py. CI: 23 workflow files in .github/workflows (index at .github/workflows/README.md:44-67): lint.yml (format/lint per language + installer smoke test); test.yml (hosted macos-15 arm64 / ubuntu-latest / ubuntu-24.04-arm: Rust unit + non-VM integration with BOXLITE_DEPS_STUB=1 via cargo-nextest + llvm-cov, KVM hardware tests on linux-x64, Python 3.10-3.13, Node 18/20/22, Go, API Jest, dashboard vitest, Codecov 90% patch gate; .github/ci-config.json:2-12; test.yml:288-314; workflows README.md:48,96-98); e2e-local.yml (full-VM `make test:integration` on one self-hosted AWS EC2 c8i.4xlarge Linux x64 KVM runner with nested virtualization; PRs need a maintainer-applied `e2e-local` label; e2e-local.yml:1-16,93,253,275,524); codeql.yml (actions, c-cpp, go, js/ts, python, rust; workflows README.md:254-256); plus api-client-drift, author-review, agent-tooling, build-*/release workflows, box-image build/release and cloud deploy workflows. No WSL2 job exists.",
+      "dependencies": "Direct dependency entries per manifest, as written (include optional and target-gated entries): Cargo.toml workspace with 15 members; Cargo.lock lists 746 packages, two of them (libcontainer, libcgroups 0.6.0) from a git pin of youki rev 4b2f0e0 (Cargo.toml:33-37; Cargo.lock:3018-3036). src/boxlite/Cargo.toml: 61 [dependencies] (incl. 3 optional -sys path crates and 5 optional REST deps) + 8 Linux-only (bubblewrap-sys, caps, fuse-backend-rs, seccompiler, bincode, displaydoc, landlock, pathrs) + 7 build + 5 dev. src/cli/Cargo.toml: 37 (+8 dev). src/guest/Cargo.toml: 22 (+5 Linux-only: procfs, tokio-vsock, libcontainer, oci-spec, rtnetlink). src/shim/Cargo.toml: 10. src/shared/Cargo.toml: 9 (+1 build, 3 dev). src/test-utils/Cargo.toml: 7. src/hypervisor/Cargo.toml: 3 (Linux x86_64 only). src/vmm/Cargo.toml: 1. src/deps: bubblewrap-sys 0 (+1 build), e2fsprogs-sys 0 (+1 build), libgvproxy-sys 1, libkrun-sys 1 (+2 build). sdks/python/Cargo.toml 7, sdks/node/Cargo.toml 7, sdks/c/Cargo.toml 4. Go bridge src/deps/libgvproxy-sys/gvproxy-bridge/go.mod: 5 direct (gvisor-tap-vsock v0.8.7, logrus, x/net, x/sync, gvisor) + 18 indirect. sdks/python/pyproject.toml: 0 runtime dependencies (extras: dev 5, sync 1, orchestration 1; build backend maturin). sdks/node/package.json: 0 runtime dependencies, 7 devDependencies, optional peer playwright-core. sdks/go/go.mod: 0 requires. apps/package.json: 185 dependencies + 94 devDependencies (NestJS, React, Astro, OpenTelemetry, PostHog, AWS/GCP SDKs) and apps/go.work with 6 modules.",
+      "security_policy": "SECURITY.md (root): report privately via GitHub Private Vulnerability Reporting (preferred) or a Discord DM to a maintainer (SECURITY.md:8-26); acknowledgement target 3 business days, disclosure typically within 90 days (SECURITY.md:36-46); pre-1.0, fixes land on main and the latest minor with no back-patching, and the supported-versions table lists 0.9.x (SECURITY.md:51-59); in scope: VM escape, guest-to-host escalation, jailer bypass, image-handling host corruption, host memory-safety bugs (SECURITY.md:61-74); safe-harbor clause (SECURITY.md:92-106); two published Critical advisories fixed in 0.9.0 — GHSA-g6ww-w5j2-r7x3 (read-only volume remount bypass) and GHSA-f396-4rp4-7v2j (OCI layer symlink escape to arbitrary host write) (SECURITY.md:108-117)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Controlled networking: restrict egress with `allow_net` (README.md:37,167)",
+        "verified": "partial",
+        "evidence": "Implemented as a connect-time allowlist in the Go gvproxy bridge: TCP routing in decideTCPRoute/decideTCPInspectRoute (src/deps/libgvproxy-sys/gvproxy-bridge/forked_tcp.go:64-146) with exact IP/CIDR/hostname/wildcard matching (allow_net_filter.go:56-137); hostname rules are only evaluated via SNI/Host on TCP 443/80 (forked_tcp.go:82-84); UDP is dropped unless an IP/CIDR rule matches (forked_udp.go:28-69); non-IPv4 destinations never match (allow_net_filter.go:119-123). But the default is full egress (src/boxlite/src/runtime/options.rs:1100-1102,1148-1155; src/boxlite/tests/network_spec.rs:77-84,107-111; CLI bare `run` keeps full access: src/cli/src/cli.rs:2302-2312), DNS is not filtered, and the project's own docs say 'Treat `allow_net` as a routing control, not a containment boundary' (docs/reference/configuration.md:77-83,100-110). The filter runs in user space inside the shim, whose host network namespace is shared on Linux (src/boxlite/src/jailer/bwrap.rs:317-332) and which the macOS Seatbelt profile grants blanket network-outbound/inbound (src/boxlite/resources/seatbelt/seatbelt_network_policy.sbpl:48-50). `network=disabled` removes the guest NIC and disables TSI forwarding (src/boxlite/src/vmm/krun/engine.rs:363-375; src/boxlite/tests/security_enforcement.rs:343-409)."
+      },
+      {
+        "claim": "OS sandbox (seccomp / sandbox-exec) (README.md:167,214)",
+        "verified": "partial",
+        "evidence": "macOS matches: Seatbelt profile starts from (deny default) with per-path read/write grants (src/boxlite/src/jailer/sandbox/seatbelt.rs:12-26,204-259; src/boxlite/resources/seatbelt/seatbelt_base_policy.sbpl:22-28). Linux differs: the default sandbox stack is bubblewrap only; Landlock exists but is intentionally excluded (src/boxlite/src/jailer/sandbox/composite.rs:83-98, despite the doc comment at sandbox/mod.rs:165-168 and docs/guides/ai-agent-integration.md:337); the seccomp filter is applied only when no network backend exists, i.e. not for default network-enabled boxes (src/shim/src/main.rs:154-190), and the filter is described as 'intentionally broad' (src/boxlite/src/jailer/seccomp.rs:27-33). The sandbox wraps the VMM shim process, not commands run in the guest (docs/concepts/security.md:3-4; src/boxlite/src/vmm/controller/spawn.rs:118-141)."
+      },
+      {
+        "claim": "Security layers incl. namespace isolation (mount, PID, network), privilege dropping, resource limits (cgroups, rlimits), environment sanitization (README.md:212-216; docs/concepts/security.md:15-24; src/boxlite/src/jailer/THREAT_MODEL.md:120-126)",
+        "verified": "partial",
+        "evidence": "bubblewrap is invoked with --unshare-user/pid/ipc/uts and deliberately NOT the network namespace (src/boxlite/src/jailer/bwrap.rs:317-333; sandbox/bwrap.rs:74); SecurityOptions fields uid/gid, chroot_enabled/chroot_base, new_pid_ns, new_net_ns, close_fds, sanitize_env and env_allowlist are defined (src/boxlite/src/runtime/advanced_options.rs:112-160) but a code search finds no reads of them in the shim, vmm, litebox or jailer code (pre_exec.rs:66-143 only writes the PID file, closes FDs, applies rlimits and optionally setsid; jailer/credentials.rs only probes user-namespace creation); Linux env clearing is hard-coded `--clearenv` (sandbox/bwrap.rs:141-153) while the macOS spawn path does not clear the environment (src/boxlite/src/vmm/controller/spawn.rs:185-210); cgroup limits are best-effort — setup failure logs a warning and the box continues without them (sandbox/bwrap.rs:49-57; jailer/cgroup.rs:85-96)."
+      },
+      {
+        "claim": "Real isolation: a hardware-virtualized VM per box with its own kernel (README.md:30,34,167)",
+        "verified": "yes",
+        "evidence": "Each box is one `boxlite-shim` process hosting a libkrun microVM (src/shim/src/main.rs:196-246; src/boxlite/src/vmm/krun/engine.rs:340-440); KVM preflight with smoke test on Linux (src/boxlite/src/system_check.rs:107-182) and Hypervisor.framework probe on macOS (system_check.rs:239-280); guest kernel/firmware from libkrunfw releases (src/deps/libkrun-sys/build.rs:10-32); the guest agent starts OCI containers with libcontainer (src/guest/Cargo.toml:41; docs/contributing/architecture/README.md:124-140); FAQ describes separate-kernel microVMs (docs/faq.md:124-133). Note libkrun is slated to be replaced by an in-house VMM (docs/contributing/architecture/vmm/README.md:3-14)."
+      },
+      {
+        "claim": "Volume mounts (ro/rw) (README.md:168)",
+        "verified": "yes",
+        "evidence": "Read-only is passed to libkrun's virtiofs device (`krun_add_virtiofs3(..., read_only)`: src/boxlite/src/vmm/krun/context.rs:460-488; engine.rs:409-423); integration test covers read, write-block, remount-block and rw-write (src/boxlite/tests/security_enforcement.rs:61-113,208-274). `rw` writes land directly on the host directory (docs/reference/configuration.md:288-292) and no copy-on-write overlay of host directories is documented. Host-path binds are local-runtime only; `boxlite serve` rejects volumes (src/cli/src/commands/serve/mod.rs:1195-1201). Advisory GHSA-g6ww-w5j2-r7x3 (read-only volume remount bypass) was fixed in 0.9.0 (SECURITY.md:112)."
+      },
+      {
+        "claim": "Daemonless: embed as a library — no root, no background service (README.md:35)",
+        "verified": "partial",
+        "evidence": "No central daemon: BoxliteRuntime runs in-process (docs/faq.md:36-47; docs/getting-started/README.md:74-76), but every box runs as a separate `boxlite-shim` subprocess (src/boxlite/src/vmm/controller/spawn.rs:99-183) and detached boxes outlive the parent process (src/boxlite/src/runtime/options.rs:376-387). Linux needs /dev/kvm access (src/boxlite/src/system_check.rs:121-145), unprivileged user namespaces for bubblewrap (src/boxlite/src/jailer/bwrap.rs:94-158; Ubuntu 24.04 AppArmor case in docs/guides/troubleshooting.md:79-177) and, for cgroup limits, a writable user systemd cgroup scope (src/boxlite/src/jailer/cgroup.rs:12-17,85-96)."
+      },
+      {
+        "claim": "Secret injection — real values never enter the VM (README.md:37,167)",
+        "verified": "partial",
+        "evidence": "The guest gets placeholders (env BOXLITE_SECRET_<NAME>) and a per-box MITM CA in its trust store while real values stay with the host-side proxy (src/boxlite/src/runtime/options.rs:433-466; docs/concepts/networking.md:33-41; docs/reference/configuration.md:118-145); the Python integration test asserts real values are absent from the guest environment (sdks/python/tests/test_secret_substitution.py:176-212) but the same file relies on an echoing upstream returning the substituted value into the guest (lines 235-285). A secret's hosts are also reachable on port 443 regardless of `allow_net` (docs/reference/configuration.md:84-92,131-138), and real values are serialized into the shim config and persisted in the DB (src/boxlite/src/runtime/options.rs:459-465)."
+      },
+      {
+        "claim": "Windows (WSL2) x86_64 supported; requires WSL2 with KVM and the user in the `kvm` group (README.md:234,243)",
+        "verified": "partial",
+        "evidence": "Setup steps are documented (docs/faq.md:49-78; docs/getting-started/README.md:49-72) and the runtime detects WSL2 only to print nested-virtualization hints when /dev/kvm is missing (src/boxlite/src/system_check.rs:196-203); otherwise WSL2 takes the ordinary Linux path. No WSL2 entry in the CI matrix (.github/ci-config.json:2-6) and no wsl/windows string under .github/. src/cli/README.md:9 lists platforms without WSL2 while src/cli/README.md:79 includes it. Native Windows is unsupported (docs/faq.md:78)."
+      },
+      {
+        "claim": "macOS: Apple Silicon, macOS 12+; macOS Intel 'Coming soon' (README.md:231,235,241)",
+        "verified": "partial",
+        "evidence": "Apple-Silicon-only is enforced by the installer (scripts/release/install.sh.template:71-74) and CI (.github/ci-config.json:3). The 12+ floor conflicts with the Python wheel deployment target 14.0 (sdks/python/pyproject.toml:142-144) and with the VMM design note that macOS 12-14 stay on libkrun until M5 and the floor then becomes 15 (docs/contributing/architecture/vmm/README.md:44,49-50). 'Intel coming soon' conflicts with src/cli/README.md:80 ('Not supported'), docs/getting-started/README.md:18-19 and the VMM design listing Intel Macs as out of scope (vmm/README.md:37-38)."
+      },
+      {
+        "claim": "A REST API (WebSocket exec, optional auth) (README.md:172,127-139)",
+        "verified": "yes",
+        "evidence": "`boxlite serve` (axum + WebSocket attach) binds 0.0.0.0:8100 by default (src/cli/src/defaults.rs:7-10; src/cli/src/commands/serve/README.md:3-6,108-193); the bearer key is optional, compared in constant time, and unset means any/no bearer is accepted (src/cli/src/commands/serve/mod.rs:60-70,1364-1379); clients cannot set `security` over REST (mod.rs:1188-1193,2782-2830); contract in openapi/box.openapi.yaml (OpenAPI 3.1.1, v0.1.0)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Typical box startup time (project FAQ; no methodology given)",
+        "metric": "startup latency with cached image; Docker listed for comparison",
+        "value": "~1-2 s typical, 5-30 s on first run including image pull; Docker listed as ~100-500 ms",
+        "source": "docs/faq.md:21,160-171",
+        "independent": false
+      },
+      {
+        "what": "Per-box memory overhead (project FAQ; no methodology given)",
+        "metric": "memory overhead per box",
+        "value": "~50-100 MB VM overhead plus ~20-40 MB guest kernel; default 512 MiB guest memory, minimum 128 MiB",
+        "source": "docs/faq.md:135-146",
+        "independent": false
+      },
+      {
+        "what": "Node.js SDK performance statements (no methodology; the startup figure conflicts with the FAQ's 1-2 s)",
+        "metric": "startup time / overhead vs Python SDK / memory per box",
+        "value": "startup < 100 ms; overhead vs Python SDK < 5%; ~50-100 MB per box",
+        "source": "sdks/node/README.md:518-523",
+        "independent": false
+      },
+      {
+        "what": "Boot latency analysis on macOS ARM64 with alpine:latest, dated 2026-02-22 (project investigation; macOS only, no Linux/WSL2 numbers)",
+        "metric": "handle.start() wall time, jailer on vs off",
+        "value": "~2067 ms with jailer vs ~696 ms without; sandbox-exec itself adds ~4-5 ms; macOS code-signing page validation of freshly copied dylibs accounts for ~1450 ms (~70%) of the jailer-on time",
+        "source": "docs/contributing/investigations/boot-latency-analysis.md:9-12,56,108-118",
+        "independent": false
+      },
+      {
+        "what": "Cold vs warm shim binary start on macOS (same investigation, standalone micro-benchmarks)",
+        "metric": "process startup time in ms",
+        "value": "original binary 13 ms; cold copy 850 ms; warm copy 10 ms; warm copy + sandbox 14 ms",
+        "source": "docs/contributing/investigations/boot-latency-analysis.md:78-89",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Network default and containment: the guest network defaults to full outbound with unfiltered DNS (empty `allow_net`); a deny posture requires choosing `network=disabled` (no NIC, TSI off) or a non-empty `allow_net`. `allow_net` is a user-space connect-time filter in the Go gvproxy inside the shim, which shares the host network namespace on Linux and receives blanket network-outbound/inbound under Seatbelt; project docs call it 'a routing control, not a containment boundary' and note host loopback services are reachable via host.boxlite.internal when `allow_net` is empty; `SecurityOptions.network_enabled=false` does not take the guest offline and is rejected while the network is enabled. [src/boxlite/src/runtime/options.rs:627-645,1095-1155; docs/reference/configuration.md:77-110; docs/guides/networking.md:127-131; src/boxlite/src/jailer/bwrap.rs:317-332; src/boxlite/resources/seatbelt/seatbelt_network_policy.sbpl:48-50]",
+      "Host-sandbox hardening is narrower than documented: Linux uses bubblewrap only (Landlock is built but excluded), no network namespace, seccomp is skipped for network-enabled boxes (the default) and its filter is described as intentionally broad, and several SecurityOptions fields (uid/gid, chroot_*, new_pid_ns/new_net_ns, close_fds, sanitize_env) have no readers in the sandbox code although README/THREAT_MODEL/docs list privilege dropping, chroot and network namespaces. The sandbox protects the host from the VMM process; it is not a per-command filesystem/network rule layer. [src/boxlite/src/jailer/sandbox/composite.rs:83-98; src/shim/src/main.rs:154-190; src/boxlite/src/jailer/seccomp.rs:27-33; src/boxlite/src/runtime/advanced_options.rs:112-160; src/boxlite/src/jailer/THREAT_MODEL.md:120-126; README.md:212-216]",
+      "Fail-open and opt-out paths: if the sandbox binary is unavailable the shim is spawned unsandboxed with a warning; cgroup setup failure continues without limits; `SecurityOptions::disabled()` / `--security disable` switch the host sandbox off; the Python `SecurityOptions()` constructor defaults jailer and seccomp to off; the macOS spawn path does not clear the inherited environment. Linux user-namespace failure is fail-closed with guidance (Ubuntu 24.04 AppArmor needs a bwrap profile or a sysctl change). [src/boxlite/src/jailer/mod.rs:499-506; src/boxlite/src/jailer/sandbox/bwrap.rs:32-60; src/boxlite/src/runtime/advanced_options.rs:262-279; src/cli/src/cli.rs:1457-1462; sdks/python/src/advanced_options.rs:137-139; src/boxlite/src/vmm/controller/spawn.rs:185-210; docs/guides/troubleshooting.md:79-177]",
+      "Platform coverage: WSL2 is documented but has no CI job or WSL-specific code (it needs nested virtualization, /dev/kvm and `kvm` group membership); macOS is Apple Silicon only with inconsistent floors (README 12+, Python wheels 14.0, in-house-VMM plan 15) and 'Intel coming soon' contradicts other docs; no GPU support. Hosted CI stubs the native dependencies (BOXLITE_DEPS_STUB=1) and the only full-VM E2E workflow found targets one self-hosted Linux x64 KVM runner. [README.md:229-243; .github/ci-config.json:2-6; sdks/python/pyproject.toml:142-144; docs/contributing/architecture/vmm/README.md:44,49-50; .github/workflows/test.yml:299-305; .github/workflows/e2e-local.yml:1-16,253,340-346]",
+      "Server exposure: `boxlite serve` binds 0.0.0.0:8100 by default and accepts any or no bearer unless `--api-key` / BOXLITE_SERVE_API_KEY is set; it exposes box create/exec/file-transfer endpoints, and the README quick-start shows the permissive default. [src/cli/src/defaults.rs:7-10; src/cli/src/commands/serve/mod.rs:60-70,1364-1379; src/cli/src/commands/serve/README.md:8-15,119-122; README.md:127-130]",
+      "Licensing and scope: the root LICENSE and README badge say Apache-2.0, but NOTICE states the repository is mixed-license and the Daytona-derived apps/ cloud stack (api, dashboard, infra, otel-collector, proxy, runner) is AGPL-3.0; apps/ also contains PostHog analytics, a support-chat widget and billing/usage-export integrations (inactive unless configured). Vendored native components (libkrun, libkrunfw, e2fsprogs, bubblewrap submodules) are not present in this checkout, so their licenses were not inspected. [NOTICE:3-9; apps/NOTICE:14-19; apps/api/LICENSE:1-4; apps/API.md:649-661; .gitmodules:1-12; README.md:20,258]",
+      "Maturity and maintenance: pre-1.0 (v0.10.5; SECURITY.md calls the project pre-1.0 and fast-moving while its supported-versions table still lists 0.9.x; PyPI classifier is Beta while docs/faq.md says production-ready). Two Critical advisories (read-only volume remount bypass; OCI layer symlink escape to arbitrary host write) were fixed in 0.9.0. The VMM is being replaced (libkrun to an in-house KVM/HVF VMM, default switch at M5), libcontainer is pinned to a non-release youki git rev, and some docs disagree with code (Node SDK listed as 'In Progress'; Python-only development/standard/maximum presets vs core enabled/disabled; jailer test header says jailer is off by default on Linux). [SECURITY.md:51-59,108-117; sdks/python/pyproject.toml:12; docs/faq.md:101-103; docs/contributing/architecture/vmm/README.md:3-14,49-50; Cargo.toml:33-37; docs/contributing/architecture/README.md:309-313; src/boxlite/tests/jailer.rs:4,169-181]",
+      "Install and supply chain: the documented `curl | sh` goes through a Cloudflare Worker passthrough and the docs state it cannot self-verify (checksums and attestations exist for release assets); `cargo install`/crates.io builds download the runtime tarball from GitHub Releases at build time with no checksum check; the Go SDK setup tool downloads the native library from releases; the C SDK archives have no checksum/attestation step; most GitHub Actions references (137 vs 12 SHA-pinned), including release steps (attest-build-provenance@v2, action-gh-release@v2, pypi-publish@release/v1), use mutable tags. The repo also ships project-scoped Claude Code/Codex hooks (contributor tooling) that run `make setup:submodules`, install a plugin from the floating boxlite-ai/agent-tooling@main ref and block prompts (exit 2) if bootstrap fails. [scripts/release/sh-installer/src/index.ts:10-26; docs/reference/cli/README.md:99-101; src/boxlite/build.rs:585-665; sdks/go/cmd/setup/main.go:62-68; .github/workflows/build-c.yml:149-211; .github/workflows/build-runtime.yml:219-225; .github/actions/upload-to-release/action.yml:25; .github/workflows/build-wheels.yml:86; .claude/settings.json:5-50; .agent-tooling/claude-plugin-bootstrap.sh:100-110]"
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "boxlite-ai/boxlite",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "One-line installer for the `boxlite` CLI (Linux x86_64/ARM64, macOS Apple Silicon); version pin via BOXLITE_VERSION / BOXLITE_EXPECTED_SHA256 placed on the `sh` side of the pipe — `curl -fsSL https://sh.boxlite.ai | sh`",
+          "citation": "README.md:116; src/cli/README.md:30-34; docs/reference/cli/README.md:60-87",
+          "holds": true,
+          "note": "README.md:116 has the exact command. src/cli/README.md:30-34 is headed 'One-line install (Linux & macOS Apple Silicon)'. docs/reference/cli/README.md:62-87 lists the install routes and shows BOXLITE_VERSION and BOXLITE_EXPECTED_SHA256 after the pipe; line 77 explains that variables before `curl` never reach the installer. The installer source agrees: scripts/release/install.sh.template:9-11 (env vars), 70-81 (accepts Darwin-arm64, Linux-x86_64, Linux-aarch64/arm64; rejects Intel Macs), 135 ($HOME/.local/bin default) and 158-181 (digest precedence, SHA-256 check). sh.boxlite.ai is a passthrough Worker to releases/latest/download/install.sh (scripts/release/sh-installer/src/index.ts:10-11,26-50)."
+        },
+        {
+          "field": "license",
+          "statement": "Apache-2.0 (LICENSE; core runtime, CLI, SDKs) + AGPL-3.0 (Daytona-derived apps/ cloud stack; mixed-license repository per NOTICE)",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 is Apache 2.0. Cargo.toml:43 sets the workspace license to \"Apache-2.0\", which src/cli and sdks/{c,python,node} inherit via license.workspace = true. sdks/python/pyproject.toml:8 and sdks/node/package.json:68 also say Apache-2.0. NOTICE:3-10 calls the repo mixed-license and places the Daytona-derived AGPL-3.0 code under apps/. apps/NOTICE:16-17 names api, dashboard, infra, otel-collector, proxy and runner as AGPL-3.0 (see also apps/api/LICENSE:1-2). Footnotes: apps/ also has Apache-2.0 parts (apps/libs/common-go and generated SDK/client packages; apps/NOTICE:18-19). One boxlite_dev-tagged Go SDK test, sdks/go/get_or_create_integration_test.go:4, carries 'SPDX-License-Identifier: AGPL-3.0'; it is the only SPDX header under sdks/go. Neither changes the summary."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes — supported with KVM required; startup check opens /dev/kvm read-write and runs a KVM smoke test; hosted CI builds/tests linux-x64-gnu on ubuntu-latest and runs KVM hardware tests; full-VM E2E on a self-hosted AWS c8i.4xlarge Linux x64 runner with NestedVirtualization=enabled; installer maps Linux-x86_64 to x86_64-unknown-linux-gnu; the Linux jailer needs unprivileged user namespaces for bubblewrap",
+          "citation": "README.md:232,242; src/boxlite/src/system_check.rs:107-145; .github/ci-config.json:4; .github/workflows/test.yml:307-314; .github/workflows/e2e-local.yml:93,253,275,340-346; scripts/release/install.sh.template:75-76; src/boxlite/src/jailer/bwrap.rs:94-158",
+          "holds": true,
+          "note": "Every citation matches. README.md:232 and 242 list Linux x86_64 as supported and require KVM. system_check.rs:108-113 runs open_kvm then smoke_test_kvm at startup, and open_kvm opens /dev/kvm read+write (121-145). ci-config.json:4 is ubuntu-latest / linux-x64-gnu. test.yml:307-314 runs 'KVM hardware tests' on linux-x64-gnu, but that make target (make/coverage.mk:67-70) runs only boxlite-hypervisor's kvm::vm::tests, the in-house VMM, not the shipping libkrun runtime. Full-runtime VM tests run only in e2e-local. e2e-local.yml:93 is c8i.4xlarge, 253 has labels self-hosted,linux,x64,kvm, 275 sets NestedVirtualization=enabled and 340-346 is the self-hosted job. install.sh.template:75-76 matches. bwrap.rs:94-158 probes user-namespace creation, and sandbox/bwrap.rs:32-45 refuses to start the sandbox if the probe fails."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "No documented integration that routes Claude Code or Codex tool calls through BoxLite (no plugin, hook or MCP server for that). Related: (a) examples running Claude Code CLI inside a box via exec + stream-json; (b) the SkillBox guest image bundles Claude Code, Codex, Gemini CLI and OpenCode; (c) repo-contributor tooling (.claude/.codex hooks, agent-tooling plugin)",
+          "citation": "examples/python/06_ai_agents/chat_with_claude.py:1-13,151-206; examples/node/claude_in_boxlite.js:1-17; src/boxlite/resources/images/skillbox/README.md:7-18; .claude/settings.json:5-50; .codex/hooks.json:1-17; .agent-tooling/profile.json:5-8; .agents/plugins/marketplace.json:6-21",
+          "holds": false,
+          "note": "The main point holds: nothing routes a host Claude Code or Codex session's tool calls through BoxLite. The only MCP server is the in-guest local_computer_mcp.py (lines 1-10), and docs/ never mention Claude Code or Codex. Items (a) and (c) match their citations; the agent-tooling plugin source itself is at .claude/settings.json:52-63. Item (b) is contradicted by the image's own source. The cited README lists four CLIs, but the SkillBox Dockerfile installs only Claude Code plus mcp/anyio and a Claude MCP config (Dockerfile:1-4,46-60). Nothing in the checkout installs Codex, Gemini CLI or OpenCode. The entry also omits a public SDK API that runs Claude Code in a box. Python exports SkillBox and SyncSkillBox (sdks/python/boxlite/__init__.py:156-161,184) and Node exports SkillBox (sdks/node/lib/index.ts:132). The default image is ghcr.io/boxlite-ai/boxlite-skillbox:0.1.0 (sdks/python/boxlite/constants.py:30). It launches Claude with --dangerously-skip-permissions, stream-json and --mcp-config /config/.claude.json (sdks/python/boxlite/skillbox.py:412-437). The same code undercuts the separate integrations.mcp entry's claim of 'no MCP code in … the SDK APIs'."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Controlled networking: restrict egress with `allow_net` (README.md:37,167) — verified: partial (connect-time allowlist in the gvproxy bridge; default full egress; DNS unfiltered; 'routing control, not a containment boundary'; shim shares host netns on Linux / blanket Seatbelt network grants; network=disabled removes NIC and TSI)",
+          "citation": "src/deps/libgvproxy-sys/gvproxy-bridge/forked_tcp.go:64-146,82-84; allow_net_filter.go:56-137,119-123; forked_udp.go:28-69; src/boxlite/src/runtime/options.rs:1100-1102,1148-1155; src/boxlite/tests/network_spec.rs:77-84,107-111; src/cli/src/cli.rs:2302-2312; docs/reference/configuration.md:77-83,100-110; src/boxlite/src/jailer/bwrap.rs:317-332; src/boxlite/resources/seatbelt/seatbelt_network_policy.sbpl:48-50; src/boxlite/src/vmm/krun/engine.rs:363-375; src/boxlite/tests/security_enforcement.rs:343-409",
+          "holds": true,
+          "note": "Every citation matches, and 'partial' is the right rating. forked_tcp.go:64-146 holds decideTCPRoute and decideTCPInspectRoute; 82-84 sends only :443/:80 to hostname inspection. allow_net_filter.go:56-137 parses IP, CIDR, exact-host and wildcard rules, and 119-123 makes non-IPv4 destinations never match. forked_udp.go:28-69 drops UDP unless an IP/CIDR rule matches. DNS is unfiltered (forked_udp.go:10-15; gvproxy-bridge/main.go:221; options.rs:1139). options.rs:1102 and 1148-1155 make empty allow_net (full egress) the default; network_spec.rs:77-84,107-111 and cli.rs:2302-2312 test this. configuration.md:109-110 says 'Treat allow_net as a routing control, not a containment boundary'. bwrap.rs:330-331 deliberately omits --unshare-net, and sandbox/bwrap.rs:74 applies that setting. seatbelt_network_policy.sbpl:48-49 allows all outbound and inbound connections. engine.rs:363-371 turns off TSI when the network is disabled, and security_enforcement.rs:346-409 tests it."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.claude_code_or_codex, item (b): replace 'the SkillBox guest image bundles Claude Code, Codex, Gemini CLI and OpenCode (src/boxlite/resources/images/skillbox/README.md:7-18)' with 'the SkillBox image's Dockerfile installs only Claude Code plus an in-guest computer-use MCP server and Claude MCP config (src/boxlite/resources/images/skillbox/Dockerfile:46-60); its README also lists Codex, Gemini CLI and OpenCode (README.md:7-18), but nothing in this checkout installs them'.",
+        "readme.integrations.claude_code_or_codex: add the public SDK integration, e.g. '(d) the Python and Node SDKs export SkillBox (sdks/python/boxlite/__init__.py:156-161; sdks/node/lib/index.ts:132), which runs Claude Code inside a box from ghcr.io/boxlite-ai/boxlite-skillbox:0.1.0 (sdks/python/boxlite/constants.py:30) with --dangerously-skip-permissions, stream-json I/O and --mcp-config /config/.claude.json (sdks/python/boxlite/skillbox.py:412-437); this puts the agent inside the box rather than routing host tool calls through BoxLite'."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,338 @@
+{
+  "contender": "volcengine/openviking",
+  "revision": {
+    "contender": "volcengine/openviking",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "volcengine/OpenViking",
+        "tag": "v0.4.22",
+        "commit": "e8716760934d95ef73414484a45bfe475b9296e2",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.4.22",
+    "commit": "e8716760934d95ef73414484a45bfe475b9296e2",
+    "read_at": "2026-10-02T03:03:03+00:00"
+  },
+  "dossier": {
+    "contender": "volcengine/openviking",
+    "revision": {
+      "tag": "v0.4.22",
+      "commit": "e8716760934d95ef73414484a45bfe475b9296e2",
+      "read_at": "2026-10-02T03:03:03+00:00"
+    },
+    "license": {
+      "spdx": "AGPL-3.0",
+      "file": "LICENSE"
+    },
+    "purpose": "OpenViking is an open-source 'context database' for AI agents (README.md:9,43). It is a self-hostable server (Python/FastAPI, a Rust filesystem layer, a C++ vector engine) that keeps memories, resources and skills as files in a virtual viking:// tree with generated L0/L1/L2 summaries and semantic retrieval. Sessions are committed into archives, and the server extracts Markdown memories from them with a configured VLM and embedding model (README.md:43-61,124; docs/en/concepts/08-session.md:101-113). It exposes an `ov` CLI, an HTTP API, Python/TypeScript/Go SDKs and a built-in `/mcp` endpoint. It also ships hook-based memory plugins for Claude Code and Codex that recall before each prompt and capture after each turn, installed by one shared installer that reads one shared ~/.openviking/ovcli.conf (docs/en/agent-integrations/02-claude-code.md:3-9,63-74; 04-codex.md:3-9). Memory is scoped by account, user and a per-repository 'peer' derived from the git origin (docs/en/agent-integrations/16-capability-reference.md:217-237). A hosted Volcano Engine edition and a licensed self-managed edition exist alongside the AGPL open-source server (README.md:258-279).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "OpenViking is an open-source context database for AI agents: one filesystem for everything an agent knows (knowledge, memory, skills).",
+          "citation": "README.md:43"
+        },
+        {
+          "claim": "Context is a virtual filesystem under viking://; agents navigate it with ls, tree, read, write, grep, and 'you can open any directory to inspect and edit what your agent knows' (contrasted with black-box agent memory).",
+          "citation": "README.md:45"
+        },
+        {
+          "claim": "Generated L0 abstracts / L1 overviews let agents judge relevance before reading L2; 'Committing a session archives the conversation and extracts memories as Markdown you can inspect, edit, and merge.'",
+          "citation": "README.md:60-61,88-94"
+        },
+        {
+          "claim": "OpenViking 0.3.22 evaluated on LoCoMo (OpenClaw 24.20% native vs 82.08%; Hermes 33.38% vs 82.86%; Claude Code 57.21% vs 80.32%) and tau2-bench (Retail 70.94% vs 77.81%; Airline 54.38% vs 66.25%); input tokens -34.3 to -91.0%, query latency -58.45 to -66.10%; run with Doubao 2.0 Pro (VLM) and Doubao-embedding-vision-251215.",
+          "citation": "README.md:110-120"
+        },
+        {
+          "claim": "Requires Python 3.10+ and access to an embedding model and a VLM (cloud or local).",
+          "citation": "README.md:124"
+        },
+        {
+          "claim": "`pip install openviking --upgrade`, then `openviking-server init` (writes ~/.openviking/ov.conf; Volcengine, OpenAI, Codex OAuth, Kimi, GLM, local Ollama), `openviking-server doctor`, `openviking-server`.",
+          "citation": "README.md:126-133"
+        },
+        {
+          "claim": "The package includes the `ov` CLI; integrations can be built on the Python, Go or TypeScript SDK or the HTTP API.",
+          "citation": "README.md:135,150"
+        },
+        {
+          "claim": "Native integrations give automatic recall and session capture: Claude = 'Hooks + MCP', Codex = 'Hooks + MCP' (also Cursor, TRAE, OpenClaw, Hermes, OpenCode, pi, ...); MCP clients get memory and context tools only.",
+          "citation": "README.md:154-166,223"
+        },
+        {
+          "claim": "Desktop app (beta, macOS and Windows x64) configures local agent integrations, inspects recall/capture events in sessions and syncs local memories and skills to OpenViking; downloads are on a CDN host.",
+          "citation": "README.md:230-238"
+        },
+        {
+          "claim": "The official Docker image bundles VikingBot and starts it by default alongside the server and console UI.",
+          "citation": "README.md:250"
+        },
+        {
+          "claim": "The open-source server runs under AGPLv3 and 'requires no activation key'; supports accounts, user isolation and opt-in resource ACLs; 'Configure authentication before exposing it beyond localhost.'",
+          "citation": "README.md:254-256"
+        },
+        {
+          "claim": "Commercial editions: Managed SaaS hosted by Volcano Engine (migration tooling for open-source deployments) and a Self-Managed BYOC/offline edition that adds distributed deployment and official support, activated by a license key.",
+          "citation": "README.md:267,275"
+        },
+        {
+          "claim": "VikingMem research: 'OpenViking open-sources a subset of these core capabilities' (event-driven extraction, update and consolidation of long-term memory).",
+          "citation": "README.md:283"
+        },
+        {
+          "claim": "Vulnerability reporting and supported versions are in SECURITY.md; licenses differ by component: main AGPLv3, crates/ov_cli Apache-2.0, examples Apache-2.0 (Hermes plugin MIT), third_party original licenses.",
+          "citation": "README.md:327,331-336"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (server + bundled `ov` CLI; Python >=3.10)",
+          "command": "pip install openviking --upgrade\nopenviking-server init\nopenviking-server doctor\nopenviking-server",
+          "citation": "README.md:126-131"
+        },
+        {
+          "method": "uv tool (self-hosted server, quickstart doc)",
+          "command": "uv tool install openviking --upgrade\nopenviking-server init\nopenviking-server doctor\nopenviking-server",
+          "citation": "docs/en/getting-started/02-quickstart.md:26-29"
+        },
+        {
+          "method": "Docker image on GHCR (binds 0.0.0.0 inside the container, so server.root_api_key must be set in ov.conf or the server refuses to start)",
+          "command": "docker run -d --name openviking -p 1933:1933 -v ~/.openviking:/app/.openviking --restart unless-stopped ghcr.io/volcengine/openviking:latest",
+          "citation": "docs/en/guides/03-deployment.md:214-238"
+        },
+        {
+          "method": "Shared one-line installer for the Claude Code and Codex memory plugins (macOS/Linux; interactive, or `--harness claude` / `--harness codex`; writes ~/.openviking/ovcli.conf)",
+          "command": "bash <(curl -fsSL https://raw.githubusercontent.com/volcengine/OpenViking/main/examples/memory-plugin-shared/install.sh)",
+          "citation": "docs/en/agent-integrations/02-claude-code.md:9-13; examples/claude-code-memory-plugin/README.md:16-19; examples/codex-memory-plugin/README.md:29"
+        },
+        {
+          "method": "Claude Code plugin, manual marketplace install",
+          "command": "claude plugin marketplace add https://raw.githubusercontent.com/volcengine/OpenViking/main/.claude-plugin/marketplace.json\nclaude plugin install openviking-memory@openviking",
+          "citation": "docs/en/agent-integrations/02-claude-code.md:37-38"
+        },
+        {
+          "method": "Codex plugin, manual marketplace install (needs Node >=22, Codex >=0.130.0, `[features] plugin_hooks = true` in ~/.codex/config.toml)",
+          "command": "codex plugin marketplace add volcengine/OpenViking\ncodex plugin add openviking-memory@openviking",
+          "citation": "docs/en/agent-integrations/04-codex.md:61-72"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release wheels are built for Linux x86_64 and aarch64 in an ubuntu:20.04 container (glibc 2.31) with auditwheel repair and a smoke test (.github/workflows/_build.yml:114-133,290-377); Docker image is multi-arch linux/amd64+arm64 (.github/workflows/build-docker-image.yml:22-28); `ov` ships as a static musl binary (.github/workflows/rust-cli.yml:31-42); systemd deployment is documented (docs/en/guides/03-deployment.md:105-157); the plugin installer targets 'macOS / Linux' (examples/claude-code-memory-plugin/README.md:19).",
+        "wsl2": "unknown - no document states WSL2 support for the server, the `ov` CLI or the Claude Code/Codex plugins. The only WSL2 mentions are the VikingBot Docker deploy table (bot/deploy/docker/README.md:269) and Docker Desktop notes (bot/README.md:500); no CI job targets WSL.",
+        "macos_arm64": "yes - wheel built on macos-14 with platform tag macosx-14.0-arm64 (.github/workflows/_build.yml:409-427); `ov` built for aarch64-apple-darwin (.github/workflows/rust-cli.yml:49-54); plugin installer supports macOS (examples/claude-code-memory-plugin/README.md:19); `openviking-server init` has an Ollama path aimed at macOS/Apple Silicon (openviking_cli/setup_wizard.py:4); API integration tests run on macos-14 for scheduled/release runs (.github/workflows/api_test.yml:43).",
+        "gpu": "yes (optional only) - not required and not mentioned in the README. The default vector backend is local/CPU (docs/en/guides/03-deployment.md:77-82); an opt-in NVIDIA cuVS backend needs Linux x86_64/aarch64, an NVIDIA GPU and CUDA 12/13 (docs/en/guides/16-cuvs.md:7-19)."
+      },
+      "integrations": {
+        "cli": "yes - Rust `ov` CLI (crates/ov_cli, binary `ov`: crates/ov_cli/Cargo.toml:10-12) with ls/tree/read/write/rm/find/search/grep/glob/session/privacy/export/backup/import/restore/snapshot commands (crates/ov_cli/src/main.rs:481,550,626,684,702,787,856,928,1000,1035,1048,1053,1065,1074,1099,1200). It ships inside the wheel as `ov`/`openviking` (pyproject.toml:204-205), via npm `@openviking/cli` (npm/cli/package.json), or `cargo install --path crates/ov_cli` (crates/ov_cli/README.md:19-24). The server is started with `openviking-server` (pyproject.toml:206).",
+        "mcp": "yes - the server mounts a streamable-HTTP MCP endpoint at /mcp (openviking/server/mcp_endpoint.py:3-15; openviking/server/app.py:793-807) with 16 tools: find, search, read, list, tree, remember, write, edit, add_resource, add_skill, list_watches, cancel_watch, grep, glob, forget, health (mcp_endpoint.py:261-1802; docs/en/agent-integrations/16-capability-reference.md:87-108). `remember` creates a one-shot session and commits it (mcp_endpoint.py:934-953). Both plugins also ship a stdio proxy servers/mcp-proxy.mjs (examples/claude-code-memory-plugin/.mcp.json:2-7; examples/codex-memory-plugin/.mcp.json:3-9). Generic client setup is in docs/en/agent-integrations/06-mcp-clients.md.",
+        "sdk_or_api": "yes - Python `openviking-sdk` (sdk/python/pyproject.toml:6), TypeScript `@openviking/sdk` (sdk/typescript/package.json:2), Go module (sdk/go/go.mod:1), and the HTTP API under /api/v1 (docs/en/api/01-overview.md; README.md:150). Web Studio is served at /studio (docs/en/getting-started/02-quickstart.md:41).",
+        "claude_code_or_codex": "yes - Claude Code plugin `openviking-memory` v0.6.2: 9 hook registrations (SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, Stop, PreCompact, SessionEnd, SubagentStart, SubagentStop), a stdio MCP proxy, a /openviking-memory:ov command, an optional statusline and 4 skills (examples/claude-code-memory-plugin/hooks/hooks.json; .claude-plugin/plugin.json:3). Codex plugin v0.10.2: 6 hooks (SessionStart, UserPromptSubmit, PreToolUse on Bash, Stop, SessionEnd, PreCompact), a stdio MCP proxy and 4 skills (examples/codex-memory-plugin/hooks/hooks.json; .codex-plugin/plugin.json:3). Both read the same ~/.openviking/ovcli.conf or OPENVIKING_* env vars and recall from viking://~/memories (examples/claude-code-memory-plugin/README.md:5-8,35-50; examples/codex-memory-plugin/README.md:6-8,112-118); OV session ids are host-prefixed `cc-<id>` / `cx-<id>` (capability-reference.md:171-172). Both plugins add to, rather than replace, host-native memory: the Claude README says the plugin 'complements' the built-in MEMORY.md (examples/claude-code-memory-plugin/README.md:449-460) and no code or doc was found that disables native memory in either host; the installer's only Codex config edits are the plugin enable flag and `[features] plugin_hooks = true` (examples/memory-plugin-shared/install.sh:1854-1855). A doctor script (ov-memory-doctor.mjs) ships with each plugin; the statusline exists for Claude only."
+      },
+      "telemetry_and_network": "No analytics or phone-home code was found: external hostnames in openviking/, crates/ov_cli/src and the two plugins' scripts are model-provider, Feishu, git-host or the user-configured OpenViking endpoints. Built-in observability is local or opt-in: per-request 'operation telemetry' only when requested (docs/en/guides/07-operation-telemetry.md:15); OTLP trace/log/metric exporters default enabled=false with endpoint localhost:4317 (openviking/server/config.py:185-202,215); usage_reporter default enabled=false (config.py:248-253); a local SQLite usage/audit projection is on by default with 14/7-day retention (config.py:223-237). Required network: (1) the server calls the configured embedding model and VLM, cloud (Volcengine, OpenAI, Kimi, GLM, others) or local (Ollama, llama.cpp); memory extraction raises without a VLM (openviking/session/compressor_v3.py:284-287,703-707; README.md:124). The optional `openai-codex` VLM provider reads Codex OAuth tokens from ~/.codex/auth.json and talks to auth.openai.com and chatgpt.com (openviking/models/vlm/backends/codex_auth.py:33-36,83-87). (2) Hooks and the stdio MCP proxy talk only to the OpenViking URL: default http://127.0.0.1:1933, or the managed endpoint https://api.vikingdb.cn-beijing.volces.com/openviking offered by the wizard (examples/claude-code-memory-plugin/scripts/shared/setup-wizard.mjs:19-20). They send full user/assistant turns and tool inputs/outputs verbatim (docs/en/agent-integrations/02-claude-code.md:78). (3) By default each prompt may spawn the host CLI for recall compression, local `claude -p` (Sonnet, low effort) or `codex exec` (gpt-5.3-codex-spark, then gpt-5.6-luna), spending the user's own model quota (docs/en/agent-integrations/01-overview.md:47-52). (4) The installer fetches from github.com / raw.githubusercontent.com or the Volcengine TOS mirror ovrelease.tos-cn-beijing.volces.com (examples/memory-plugin-shared/install.sh:47-52). Accounts: none needed for OpenViking itself ('no activation key', README.md:254); provider API keys for cloud models; a Volcengine account only for the managed service (docs/en/getting-started/02-quickstart.md:11-19). Desktop-app binaries come from lf3-cdn-tos.bytegoofy.com (README.md:236-238)."
+    },
+    "code": {
+      "languages": [
+        "Python (server, SDK, CLI wrapper)",
+        "Rust (ov CLI, ragfs, PyO3 bindings)",
+        "C++ (vector index engine, src/)",
+        "TypeScript/React (web-studio, TS SDK)",
+        "JavaScript ESM (Claude Code/Codex plugins, shared runtime)",
+        "Go (SDK)",
+        "Shell (installers)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:206 -> openviking_cli/server_bootstrap.py:main",
+          "what": "`openviking-server`: subcommands `init` (setup wizard), `doctor`, `ingest`; otherwise starts the FastAPI server through openviking/server/bootstrap.py:main (uvicorn.run at lines 333/343). Default bind 127.0.0.1:1933."
+        },
+        {
+          "path": "pyproject.toml:204-205 -> openviking_cli/rust_cli.py; crates/ov_cli/src/main.rs",
+          "what": "`ov` / `openviking` console scripts exec the bundled Rust CLI binary (openviking/bin/ov, else PATH); `doctor` is handled in Python."
+        },
+        {
+          "path": "openviking/server/app.py; openviking/server/mcp_endpoint.py",
+          "what": "FastAPI app (routers in openviking/server/routers/), auth plugins (server/auth/plugins/{dev,api_key,trusted,oidc,ldap}.py) and the /mcp streamable-HTTP endpoint exposing 16 MCP tools (app.py:793-807)."
+        },
+        {
+          "path": "examples/claude-code-memory-plugin/hooks/hooks.json",
+          "what": "Claude Code plugin: 9 hook registrations to scripts/*.mjs (auto-recall, auto-capture, session-start/end, pre-compact, subagent-start/stop, uri-guard, skill-experience), .mcp.json -> servers/mcp-proxy.mjs, commands/ov.md, scripts/statusline.mjs."
+        },
+        {
+          "path": "examples/codex-memory-plugin/hooks/hooks.json",
+          "what": "Codex plugin: 6 hooks (session-start-commit, auto-recall, uri-guard, auto-capture, session-end, pre-compact-capture) plus .mcp.json -> servers/mcp-proxy.mjs; per-session state in ~/.openviking/codex-plugin-state."
+        },
+        {
+          "path": "examples/memory-plugin-shared/install.sh",
+          "what": "One-line installer for Claude Code and Codex (also Cursor, TRAE, ZCode, Kimi Code, OpenCode, pi, DSH): writes ~/.openviking/ovcli.conf, registers the `openviking` marketplace, sets Codex `[features] plugin_hooks = true` (line 1855), optionally registers a Claude statusline in ~/.claude/settings.json."
+        },
+        {
+          "path": "pyproject.toml:207 -> bot/vikingbot/cli/commands.py",
+          "what": "`vikingbot` agent-framework CLI (extra `bot`); also started by `openviking-server --with-bot` and by default in the Docker image."
+        },
+        {
+          "path": "web-studio/ -> openviking/web_studio/dist",
+          "what": "React SPA (Web Studio) served at /studio by the server; built into wheels and the Docker image."
+        }
+      ],
+      "architecture": "Layered server: openviking_cli/ (bootstrap, init wizard, doctor) -> openviking/server/ (FastAPI app, routers, auth plugins dev/api_key/trusted/oidc/ldap, mcp_endpoint.py with 16 tools, config.py) -> openviking/service/ (fs_service.py, session_service.py, search, resources, pack). openviking/session/ owns the capture path: session.py implements a two-phase commit (phase 1 archives messages.jsonl synchronously; phase 2 in the background writes summaries, extracts memories and writes memory_diff.json), compressor_v3.py runs the LLM extract loop with merge ops under openviking/session/memory/, and memory_policy.py / auto_commit_policy.py control extraction (auto-commit is off by default; the plugins drive commits). openviking/retrieve/ (intent analysis, hierarchical retrieval, context_assembler.py), openviking/parse/ (parsers), openviking/models/ (VLM, embedding, rerank backends) and openviking/storage/ (VikingFS in storage/viking_fs/, content_write.py, queuefs, vectordb) sit below. Content lives in AGFS (Rust crates/ragfs via openviking/pyagfs; local, S3 and cache backends; gitoxide snapshots; AES-256-GCM option) with a derived vector index (C++ engine in src/); the filesystem is the source of truth and the index can be rebuilt (docs/en/concepts/09-transaction.md:7). Memories are Markdown files under viking://user/<id>/memories/ (and peers/<peer>/memories/) with a trailing `<!-- MEMORY_FIELDS -->` JSON block (openviking/session/memory/utils/memory_file_utils.py:17,124); archives and memory_diff.json live under viking://user/<id>/sessions/<sid>/history/ (docs/en/concepts/08-session.md:228-256). Identity is account/user headers or API key; with no root key the server runs in 'dev' mode as 'default' (docs/en/agent-integrations/16-capability-reference.md:113; server/config.py:365-377). Clients: crates/ov_cli, sdk/{python,typescript,go}, web-studio/, bot/vikingbot, and Node plugins sharing examples/memory-plugin-shared/lib (recall-core, capture-utils, pending-queue, credentials, workspace-peer, mcp-proxy-core).",
+      "packaging_and_release": "Main release: a GitHub Release tagged v* triggers .github/workflows/release.yml, which reuses _build.yml to build an sdist and cp310-abi3 wheels (setup.py:541): Linux x86_64 and aarch64 (ubuntu:20.04 container, glibc 2.31, auditwheel, import smoke test; _build.yml:114-377), macOS arm64 (macosx-14.0) and x86_64 (macosx-15.0), Windows x86_64 (_build.yml:379-603); default Python matrix is 3.10 only (_build.yml:11). Publishing to PyPI uses trusted publishing (id-token: write, pypa/gh-action-pypi-publish@release/v1; release.yml:125-157; _publish.yml). build-docker-image.yml pushes multi-arch images to GHCR and Docker Hub on v*.*.* tags and main; it grants `attestations: write` (line 33) but has no attest or cosign step, release.yml:159-215 asserts tag and latest digests match, the Dockerfile has no USER directive, and by default re-locks uv.lock when stale (Dockerfile:67-69,83-92). release-tos.yml uploads a source zip, a marketplace zip, a dumb-HTTP git mirror of the plugins and the installer scripts to Volcengine TOS (versioned plus latest), with no checksums. rust-cli.yml (tags cli@*) builds static musl Linux, macOS and Windows binaries and publishes 5 platform npm packages plus the @openviking/cli wrapper without --provenance (lines 31-60,173-243). Separate tag namespaces and workflows: python-sdk@* (python-sdk-release.yml, PyPI OIDC), typescript-sdk@* (npm --provenance, line 59), plugin-npm-release.yml (npm --provenance, line 110), clawhub-dev-release.yml, controlplane-mcp-release.yml, python-langchain-release.yml. No workflow emits checksum files, signatures or SBOMs; whether PyPI attestations are produced depends on pypa/gh-action-pypi-publish defaults (not verified). The Claude Code and Codex plugins have no separate release artifact: they install from marketplace manifests that track the repository (Claude: `ref: main`, .claude-plugin/marketplace.json:11-16; Codex: local path in the added marketplace, .agents/plugins/marketplace.json; installer default OPENVIKING_REPO_REF=main, install.sh:49,1880-1885), and plugin-shared-sync.yml:43-55 pushes regenerated plugin copies to main as github-actions[bot]. Only the TOS channel is tagged per release (release-tos.yml:182-189). RELEASE.md documents the process.",
+      "tests_and_ci": "Frameworks: pytest with pytest-asyncio/xdist/cov (pyproject.toml:253-264; testpaths=tests; tests/api_test and tests/oc2ov_test excluded by norecursedirs), `node --test` for the plugins, Vitest (web-studio, TS SDK, OpenClaw plugin), cargo tests (5 files in crates/ragfs/tests plus inline tests in crates/ov_cli/src/main.rs), `go test` (sdk/go/client_test.go). Approximate test files: ~700 tests/**/test_*.py (118 in tests/api_test, 10 in tests/oc2ov_test, ~570 default-suite), 11 in sdk/python/tests, 36 in bot/tests, ~110 *.test.mjs (8 Claude Code plugin, 11 Codex plugin, ~35 shared), ~100 web-studio Vitest files, 42 OpenClaw Vitest files per pr.yml:112; roughly 1,000 overall. CI is 26 workflow files in .github/workflows. pr.yml runs the plugin Node tests, installer tests, `bash -n` on installers and a plugin version-bump check, and conditionally OpenClaw Vitest, standalone Python SDK tests (3.8-3.12), LangChain tests, cuVS CPU tests and full multi-platform wheel builds when dependency files change. api_test.yml runs the HTTP API and CLI integration tests (tests/api_test) against a live server: PR on ubuntu-24.04, cron five times a day and releases on ubuntu/macos-14/windows; it uses real VLM/embedding secrets if present, else dummy keys (api_test.yml:6,43,187-258). api_test_effect.yml and oc2ov_test.yml run further API/OpenClaw suites; ci.yml (main) and schedule.yml (weekly) run CodeQL for python and cpp (_codeql.yml). Gap: no workflow runs `pytest tests/` over the main suite. _test_full.yml has no test step (only cargo check and build_ext) and is not referenced; _test_lite.yml runs four cuVS test files. CONTRIBUTING.md says to run the full Python suite 'only when the scope and risk justify it' (CONTRIBUTING.md:241-245). Dependabot covers github-actions and pip only (.github/dependabot.yml).",
+      "dependencies": "pyproject.toml: 54 direct runtime dependencies (lines 32-89; mostly lower-bound ranges, exact pins only for tree-sitter*, grep-ast, tree-sitter-language-pack; includes fastapi, uvicorn, litellm<1.91.2, openai, volcengine SDKs, scrapy, mcp, opentelemetry-*, cryptography, argon2-cffi) and 13 optional extras (bot 32, test 10, benchmark 7, build 5, others <=3; lines 92-195). uv.lock is present and used by CI/Docker, not by `pip install`. Rust workspace (Cargo.toml, Cargo.lock): ov_cli 31 deps (crates/ov_cli/Cargo.toml:14-45), ragfs 44 (7 optional, plus windows-sys; crates/ragfs/Cargo.toml:41-123), ragfs-python 12 (crates/ragfs-python/Cargo.toml:20-32). Vendored C/C++ in third_party/ (leveldb 1.23, spdlog 1.14.1, rapidjson, croaring) built via CMake (src/CMakeLists.txt). sdk/python/pyproject.toml: 1 (httpx); sdk/typescript/package.json: 0 runtime (6 dev); sdk/go/go.mod: 0 requires; web-studio/package.json: 64 runtime + 22 dev (package-lock.json); examples/claude-code-memory-plugin/package.json: 0 deps; the Codex plugin has no package.json (zero-dependency .mjs; examples/codex-memory-plugin/README.md:514). Plugin hooks run `node` (installer requires 18+, Codex docs say 22+).",
+      "security_policy": "SECURITY.md: report privately to ByteDance Security Response Center (security.bytedance.com/src or src@bytedance.com), no public issues; CVSS 3.1 triage; disclosure-coordination request; bug bounty pointer (SECURITY.md:1-11). It contains no supported-versions section."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:61 - Committing a session archives the conversation and extracts memories as Markdown you can inspect, edit, and merge.",
+        "verified": "yes",
+        "evidence": "Two-phase commit archives messages.jsonl, then writes summaries, extracted memories, memory_diff.json and a .done marker (docs/en/concepts/08-session.md:101-113; openviking/session/compressor_v3.py:1291-1311 writes {archive_uri}/memory_diff.json with before/after content). Memory files are Markdown with a trailing `<!-- MEMORY_FIELDS {json} -->` block (openviking/session/memory/utils/memory_file_utils.py:17,124). Paths containing memories/ or resources/ are writable through the public write/edit API, while plain files under skills/, peers/, privacy/ and sessions/ are not (openviking/storage/content_write.py:92,1636-1669). Extraction needs a configured VLM (compressor_v3.py:284-287,703-707)."
+      },
+      {
+        "claim": "README.md:45 - Agents navigate viking:// with ls, tree, read, write, grep, and you can open any directory to inspect and edit what the agent knows.",
+        "verified": "yes",
+        "evidence": "MCP tools list, tree, read, write, edit, grep, glob (openviking/server/mcp_endpoint.py:637,778,856,959,999,1690,1759) and CLI ls/tree/read/write/rm/grep (crates/ov_cli/src/main.rs:481,550,684,702,626,928) act on viking:// URIs. New-file writes are limited to .md/.txt/.json/.yaml/.yml/.toml/.py/.js/.ts (openviking/storage/content_write.py:73-85). Web Studio has a memory-diff view (web-studio/src/lib/sessions/memory-diff.ts)."
+      },
+      {
+        "claim": "README.md:154-166 - Claude and Codex have native 'Hooks + MCP' integrations with automatic recall and session capture.",
+        "verified": "yes",
+        "evidence": "Claude plugin registers 9 hook events plus a stdio MCP proxy (examples/claude-code-memory-plugin/hooks/hooks.json; .mcp.json:2-7); Codex plugin registers 6 hooks plus a proxy (examples/codex-memory-plugin/hooks/hooks.json; .mcp.json:3-9). Caveat: Codex hooks do nothing until trusted at first launch and again after any hook-touching update (docs/en/agent-integrations/04-codex.md:49-56), and SessionEnd needs Codex >=0.145, otherwise a 30-minute idle sweep at the next start commits the session (04-codex.md:85)."
+      },
+      {
+        "claim": "README.md:124 - Requires Python 3.10+ and access to an embedding model and a VLM (cloud or local).",
+        "verified": "yes",
+        "evidence": "pyproject.toml:16 requires-python >=3.10; extraction raises without a resolved VLM (openviking/session/compressor_v3.py:284-287,703-707). Local options exist: embedding providers include ollama/local (docs/en/guides/01-configuration.md:307; extra local-embed, pyproject.toml:188-190), VLM via litellm to Ollama (01-configuration.md:811-821), and the init wizard has an Ollama path (openviking_cli/setup_wizard.py:4)."
+      },
+      {
+        "claim": "README.md:254-256 - The open-source server requires no activation key; configure authentication before exposing it beyond localhost.",
+        "verified": "yes",
+        "evidence": "No license-key or activation logic found in openviking/ (grep for license_key/activation key: none). Default bind is 127.0.0.1:1933 (openviking/server/config.py:305-306); auth mode 'dev' (no key) is refused on non-localhost hosts (openviking/server/auth/plugins/dev.py:46-64) and api_key mode requires server.root_api_key (api_key.py:179-202); with no root key mode auto-selects dev (config.py:365-377). Defaults still leave cors_origins ['*'] and file encryption / API-key hashing off (config.py:331,334-335)."
+      },
+      {
+        "claim": "README.md:119 - With OpenViking all three agent integrations reach 80-83% LoCoMo accuracy vs 24-57% on native memory, with 34.3-91.0% fewer input tokens and 58.45-66.10% lower query latency.",
+        "verified": "not_checkable",
+        "evidence": "Figures match docs/images/benchmark-light.svg:16-49 but were measured on '0.3.22' with Doubao models via Volcengine (README.md:110-112), before v0.4.8 made v3 extraction the active pipeline (docs/en/about/02-changelog.md:47). Reproduction scripts exist (benchmark/locomo/*) but need model keys and the LoCoMo dataset; not re-run. The 'native' Claude Code baseline appears to be the 'Prompted' MEMORY.md mode (benchmark/locomo/claudecode/README.md:8-11; inferred). No Codex measurement is published."
+      },
+      {
+        "claim": "README.md:327 - SECURITY.md covers vulnerability reporting and supported versions.",
+        "verified": "partial",
+        "evidence": "SECURITY.md:1-11 gives reporting channels (ByteDance SRC), CVSS 3.1 triage, a disclosure-coordination request and a bounty pointer, but no supported-versions section."
+      },
+      {
+        "claim": "README.md:331-336 - License split: main AGPLv3, crates/ov_cli Apache-2.0, examples Apache-2.0 (Hermes plugin MIT), third_party original licenses.",
+        "verified": "partial",
+        "evidence": "LICENSE (GNU AGPL v3; section 13 network clause at LICENSE:541-549), crates/LICENSE and examples/LICENSE (Apache-2.0) exist, and crates/ov_cli and crates/ragfs declare Apache-2.0 in Cargo.toml. Not covered by the README list: bot/license/LICENSE is MIT (nanobot contributors); sdk/python has no license field or LICENSE file; examples/langchain/pyproject.toml:14, examples/openwebui-plugin/pyproject.toml:11 and agent-plugins/plugin.json:12 declare AGPL-3.0 despite 'examples: Apache 2.0'. Plugin READMEs say 'Apache-2.0 - same as OpenViking' (examples/claude-code-memory-plugin/README.md:562), which differs from the main AGPL-3.0."
+      },
+      {
+        "claim": "README.md:232 - A desktop app (beta, macOS/Windows x64) configures local agent integrations, inspects recall/capture events and syncs local memories and skills.",
+        "verified": "not_checkable",
+        "evidence": "No source for the app is in this repository (glob for *helper* finds only unrelated files); the docs call it a 'Closed-source desktop app' outside this codebase (docs/en/agent-integrations/16-capability-reference.md:756), binaries come from a third-party CDN host (README.md:236-238), and no workflow here builds it."
+      },
+      {
+        "claim": "docs/en/api/05-sessions.md:932 (docs, not README; code differs) - Deleting a session deletes all its data, 'including messages, archive history, memories'.",
+        "verified": "no",
+        "evidence": "SessionService.delete only calls viking_fs.rm(session_uri, recursive=True) on the session subtree (openviking/service/session_service.py:347-367; route openviking/server/routers/sessions.py:545-552). Extracted memories live under viking://~/memories (docs/en/concepts/08-session.md:246-255) and no cascade to them was found. `rm` itself hard-deletes files and vector records (openviking/storage/viking_fs/_ops.py:215-241). The code, not the doc, was taken as authoritative."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LoCoMo long-conversation memory, OpenClaw agent: native memory vs with OpenViking (OpenViking 0.3.22; Doubao 2.0 Pro VLM, Doubao-embedding-vision-251215)",
+        "metric": "QA accuracy",
+        "value": "24.20% native vs 82.08% with OpenViking",
+        "source": "README.md:110-120; docs/images/benchmark-light.svg:16-18",
+        "independent": false
+      },
+      {
+        "what": "LoCoMo, Hermes agent: native memory vs with OpenViking (same setup)",
+        "metric": "QA accuracy",
+        "value": "33.38% native vs 82.86% with OpenViking",
+        "source": "README.md:116; docs/images/benchmark-light.svg:21-23",
+        "independent": false
+      },
+      {
+        "what": "LoCoMo, Claude Code: native memory vs with OpenViking (baseline likely the 'Prompted' MEMORY.md mode, inferred from benchmark/locomo/claudecode/README.md:8-11; original runs used doubao-seed-2-0 via Volces ARK, README.md:24-31 of that file)",
+        "metric": "QA accuracy",
+        "value": "57.21% native vs 80.32% with OpenViking",
+        "source": "README.md:116; docs/images/benchmark-light.svg:26-28",
+        "independent": false
+      },
+      {
+        "what": "tau2-bench Retail: same LLM without memory vs with OpenViking experience memory",
+        "metric": "task success",
+        "value": "70.94% vs 77.81% (+6.87 pp)",
+        "source": "README.md:116,120; docs/images/benchmark-light.svg:42-44",
+        "independent": false
+      },
+      {
+        "what": "tau2-bench Airline: same LLM without memory vs with OpenViking experience memory",
+        "metric": "task success",
+        "value": "54.38% vs 66.25% (+11.87 pp)",
+        "source": "README.md:116,120; docs/images/benchmark-light.svg:47-49",
+        "independent": false
+      },
+      {
+        "what": "LoCoMo cost side effects across the three tested integrations (OpenClaw, Hermes, Claude Code); no Codex measurement is published",
+        "metric": "input-token reduction; query-latency reduction",
+        "value": "34.3-91.0% fewer input tokens; 58.45-66.10% lower query latency",
+        "source": "README.md:119",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Single-owner is not enforced: OpenViking adds to, not replaces, each host's native memory. The Claude Code plugin README says it 'complements' the built-in MEMORY.md (examples/claude-code-memory-plugin/README.md:449-460); no setting, hook or installer step that disables Claude Code's or Codex's native memory was found in examples/ or docs/en. The installer's only Codex config edits are the plugin enable flag and `[features] plugin_hooks` (examples/memory-plugin-shared/install.sh:1854-1855). Default recall is cross-project (`peer_scope: all`, other repositories' memories can surface with a score penalty) unless `actor` scope is set (examples/claude-code-memory-plugin/README.md:175,186; examples/codex-memory-plugin/README.md:141-143).",
+      "Capture breadth and cloud exposure: by default the hooks send user and assistant turns plus tool inputs/outputs verbatim (docs/en/agent-integrations/02-claude-code.md:78; capture mode 'semantic', assistant turns on, examples/claude-code-memory-plugin/README.md:195-198). The shared capture code has no secret redaction (no redact/secret/token/password matches in examples/memory-plugin-shared/lib/capture-utils.mjs); redaction is opt-in via regex captureFilters (docs/en/agent-integrations/02-claude-code.md:97). Extraction then runs on whatever VLM the server is configured with (openviking/session/compressor_v3.py:703-707). The privacy-extraction feature covers skills only (docs/en/concepts/13-privacy.md:3-7). ovcli.conf holds the API key in plaintext (installer writes it 0600, capability-reference.md:191).",
+      "Deletion and recovery are manual and partial: `forget` / `ov rm` hard-delete files and vector records with no trash (openviking/server/mcp_endpoint.py:1787; openviking/storage/viking_fs/_ops.py:215-241; no soft-delete in docs/en). Session delete removes only the session subtree although the docs say memories too (openviking/service/session_service.py:347-367 vs docs/en/api/05-sessions.md:932). Snapshots (git.enabled defaults true) only version paths covered by an explicit commit, and the only commit call site is the snapshot router (docs/en/guides/15-snapshot.md:11,51; openviking/server/routers/snapshot.py:63). ovpack backup is not an atomic snapshot and exports plaintext (docs/en/guides/09-ovpack.md:13,172-174). memory_diff.json records before/after per commit, but no restore command was found (grep of openviking/server for rollback/revert/undo finds only skill and account rollbacks).",
+      "Plugin supply chain follows `main`: Claude marketplace entry `ref: main` (.claude-plugin/marketplace.json:11-16), installer default OPENVIKING_REPO_REF=main (install.sh:49) and a curl|bash one-liner from raw.githubusercontent.com/.../main (docs/en/agent-integrations/02-claude-code.md:12). A workflow pushes regenerated plugin copies to main (plugin-shared-sync.yml:43-55). Hooks run `node` with user privileges, and Codex states hooks 'can run outside the sandbox after you trust them' (docs/en/agent-integrations/04-codex.md:42). Release workflows add no checksums, signatures or SBOMs; the Docker job has `attestations: write` but no attest step (build-docker-image.yml:33); @openviking/cli npm publish lacks --provenance (rust-cli.yml:218,243).",
+      "Licensing is mixed: server AGPL-3.0 (LICENSE; section 13 network clause at LICENSE:541-549) vs Apache-2.0 crates/ and plugins (crates/LICENSE, examples/LICENSE, plugin.json files), MIT for bot/ (bot/license/LICENSE), which README.md:331-336 omits; sdk/python carries no license metadata; some examples and agent-plugins declare AGPL-3.0 (examples/langchain/pyproject.toml:14, agent-plugins/plugin.json:12); pyproject uses the deprecated SPDX id 'AGPL-3.0' (pyproject.toml:20); plugin READMEs say 'Apache-2.0 - same as OpenViking' (examples/claude-code-memory-plugin/README.md:562). Only a subset of the VikingMem capabilities is open-sourced (README.md:283); distributed deployment and official support are in the licensed edition (README.md:275).",
+      "Maturity and churn: classifier 'Development Status :: 3 - Alpha' (pyproject.toml:22); four releases in 12 days earlier in the 0.4 line (docs/en/about/02-changelog.md:30-64) and unreleased breaking changes already listed (changelog:6-28, e.g. the peer-derivation default switched to git). The checked-out tag is v0.4.22, 13 patch versions after the last released entry in the in-repo changelog (v0.4.9). Plugin manifests are at 0.6.2 and 0.10.2. No CI workflow runs the ~570-file main pytest suite (see tests_and_ci). Published benchmark numbers were measured on 0.3.22, before v3 extraction became the active pipeline (changelog:47).",
+      "Host-specific capture caveats: Codex hooks stay off until trusted (and again after hook-touching updates), silently disabling recall and capture (docs/en/agent-integrations/04-codex.md:49-56); Codex SessionEnd needs Codex >=0.145 and a graceful exit, otherwise a 30-minute idle sweep at the next start commits the session (04-codex.md:85). Codex keeps no on-disk pending queue (capability-reference.md:556); Claude's capture cursor lives in the OS temp dir (examples/claude-code-memory-plugin/scripts/auto-capture.mjs:52; capability-reference.md:547). Extraction is asynchronous (~60 s after commit per examples/codex-memory-plugin/README.md:454), so cross-host handoff is not immediate and the two hosts use separate session ids (cc-/cx-). By default each prompt may spawn `claude -p` or `codex exec` for recall compression (docs/en/agent-integrations/01-overview.md:47-52) under per-prompt hook budgets of 60 s (Claude) and 130 s (Codex) (hooks.json).",
+      "Operational footprint: needs a running OpenViking server plus embedding and VLM access (README.md:124), 54 direct Python dependencies (pyproject.toml:32-89; mostly lower-bound ranges, so pip installs do not use uv.lock), and Node.js on every host (installer 18+, Codex docs 22+). The embedded vector backend allows one server process per workspace (docs/en/guides/03-deployment.md:340). The default workspace `./data` is resolved against the launch directory unless `init` placed it at ~/.openviking/data (openviking_cli/utils/config/storage_config.py:26,113; setup_wizard.py:1051-1053). The Docker image has no USER directive or privilege drop (Dockerfile; deploy/docker) and starts VikingBot by default (docs/en/guides/03-deployment.md:224-227). Server defaults leave CORS at '*' and file encryption and API-key hashing off (openviking/server/config.py:331,334-335)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "volcengine/openviking",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip)",
+          "statement": "pip (server + bundled `ov` CLI; Python >=3.10): `pip install openviking --upgrade`, `openviking-server init`, `openviking-server doctor`, `openviking-server`.",
+          "citation": "README.md:124,126-131,135; pyproject.toml:12,16,204-206,228-229; openviking_cli/server_bootstrap.py:78-88",
+          "holds": true,
+          "note": "README.md:126-131 contains exactly these four commands, and README.md:124 requires Python 3.10+. pyproject.toml names the package `openviking` (:12), sets requires-python >=3.10 (:16), defines the `ov`, `openviking` and `openviking-server` console scripts (:204-206) and packages bin/ov and bin/ov.exe (:228-229). server_bootstrap.py:78-88 handles the `init` (setup wizard) and `doctor` subcommands."
+        },
+        {
+          "field": "license",
+          "statement": "spdx AGPL-3.0, file LICENSE",
+          "citation": "LICENSE:1-2,541-549; pyproject.toml:20; openviking/__init__.py:2",
+          "holds": true,
+          "note": "LICENSE is the GNU AGPL v3 text, with the section 13 network clause at 541-549. pyproject.toml:20 declares license = \"AGPL-3.0\" and source files carry `SPDX-License-Identifier: AGPL-3.0`. No 'any later version' or '-or-later' grant exists outside LICENSE and third_party, so the deprecated SPDX id AGPL-3.0 corresponds to AGPL-3.0-only. Both plugin manifests declare Apache-2.0 (plugin.json:10), which the dossier already reports under risks."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - wheel built on macos-14 with platform tag macosx-14.0-arm64; `ov` built for aarch64-apple-darwin; plugin installer supports macOS; `openviking-server init` has an Ollama path aimed at macOS/Apple Silicon; API integration tests run on macos-14 for scheduled/release runs.",
+          "citation": ".github/workflows/_build.yml:409-427; .github/workflows/release.yml:51; .github/workflows/rust-cli.yml:49-54; examples/claude-code-memory-plugin/README.md:19; openviking_cli/setup_wizard.py:4; .github/workflows/api_test.yml:43",
+          "holds": true,
+          "note": "_build.yml:413-427 maps the macos-14 runner to arm64 and sets _PYTHON_HOST_PLATFORM=macosx-14.0-arm64. release.yml:51 includes macos-14 in the default os_json, so release builds produce this wheel. rust-cli.yml:49-54 builds target aarch64-apple-darwin on macos-14 (npm cli-darwin-arm64). The plugin README:19 says 'macOS / Linux only', and setup_wizard.py:4 says 'local deployment via Ollama for macOS / Apple Silicon beginners'. api_test.yml:43 adds macos-14 for schedule, workflow_dispatch and release events."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code plugin openviking-memory v0.6.2: 9 hooks, stdio MCP proxy, /openviking-memory:ov, optional statusline, 4 skills. Codex plugin v0.10.2: 6 hooks (PreToolUse on Bash), stdio MCP proxy, 4 skills. Both use ~/.openviking/ovcli.conf or OPENVIKING_* env vars and recall from viking://~/memories; cc-/cx- session ids; the plugin complements native memory; the installer's only Codex config edits are the plugin enable flag and [features] plugin_hooks = true.",
+          "citation": "examples/claude-code-memory-plugin/hooks/hooks.json:3-108; examples/claude-code-memory-plugin/.claude-plugin/plugin.json:3; examples/codex-memory-plugin/hooks/hooks.json:3-74; examples/codex-memory-plugin/.codex-plugin/plugin.json:3; examples/claude-code-memory-plugin/README.md:5-8,35-50,449-460; examples/codex-memory-plugin/README.md:6-8,112-118; docs/en/agent-integrations/16-capability-reference.md:171-172; examples/memory-plugin-shared/install.sh:1854-1855",
+          "holds": true,
+          "note": "The Claude hooks.json registers exactly SessionStart, UserPromptSubmit, PostToolUse, PreToolUse, Stop, PreCompact, SessionEnd, SubagentStart and SubagentStop (9). The Codex hooks.json registers SessionStart, UserPromptSubmit, PreToolUse (matcher Bash), Stop, SessionEnd and PreCompact (6). Versions are 0.6.2 and 0.10.2. Both .mcp.json files run `node servers/mcp-proxy.mjs`. The plugin trees contain commands/ov.md and scripts/statusline.mjs (Claude only), 4 skills each and scripts/ov-memory-doctor.mjs each. The Claude README:451 says the plugin 'complements' MEMORY.md. In install.sh, ensure_codex_config (1828-1858) is the only writer of ~/.codex/config.toml and sets only those two keys. No setting that disables native memory was found in examples/ or docs/en. capability-reference.md:172 writes the Codex id as `cx-<safeId>` (deterministically derived), which the dossier abbreviates acceptably."
+        },
+        {
+          "field": "claim_checks[0] (README.md:61)",
+          "statement": "README.md:61 - Committing a session archives the conversation and extracts memories as Markdown you can inspect, edit, and merge. verified: yes",
+          "citation": "README.md:61; docs/en/concepts/08-session.md:101-113,152,164; openviking/session/compressor_v3.py:284-287,343-396,703-707,1291-1311; openviking/session/memory/utils/memory_file_utils.py:17,124; openviking/storage/content_write.py:92,1636-1669",
+          "holds": true,
+          "note": "README.md:61 is quoted correctly. 08-session.md:101-113 describes a synchronous phase 1 that writes messages.jsonl to the archive and an async phase 2 that writes the summary, extracts memories and writes memory_diff.json and .done. compressor_v3.py:1307-1311 writes {archive_uri}/memory_diff.json, with before/after entries assembled at 343-396. memory_file_utils.py:124 appends the `<!-- MEMORY_FIELDS -->` JSON comment to the Markdown body. content_write.py:92 and 1649-1669 allow writes under memories/ and resources/ but reject skills/, peers/, privacy/ and sessions/. compressor_v3.py:284-287 and 703-707 raise without a VLM. 'Merge' is supported by the extractor's LLM merge decision (08-session.md:152,164) plus manual edit; the dossier's evidence does not cite this, but it does not contradict the verdict."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,335 @@
+{
+  "contender": "yamadashy/repomix",
+  "revision": {
+    "contender": "yamadashy/repomix",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "yamadashy/repomix",
+        "tag": "v1.18.1",
+        "commit": "80b4280a9196feace092fc672dfe2b5fac62ef08",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.18.1",
+    "commit": "80b4280a9196feace092fc672dfe2b5fac62ef08",
+    "read_at": "2026-10-02T03:03:04+00:00"
+  },
+  "dossier": {
+    "contender": "yamadashy/repomix",
+    "revision": {
+      "tag": "v1.18.1",
+      "commit": "80b4280a9196feace092fc672dfe2b5fac62ef08",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Node.js/TypeScript CLI (npm package repomix 1.18.1) that packs a local or remote git repository, or a piped file list, into one AI-oriented file (XML by default; Markdown, JSON or plain). The file carries a directory tree, optional git diffs/logs, and per-file and total token counts. Options include Tree-sitter --compress, per-glob inclusion levels, size-limited split output, and a Secretlint scan that drops files matching known secret formats. It also ships a stdio MCP server (pack tools plus read/grep tools over generated outputs), Claude Code plugins, Claude Agent Skills generation, a Node library API and a GitHub Action. Answer to the evaluation question (a single tool that measures provider usage from the local logs Claude Code and Codex write): none. Repomix reads no agent logs and reports no provider input, output, cache-creation or cache-read tokens. Its token figures describe the packed artifact only and are computed with OpenAI BPE tokenizers (src/core/metrics/tokenEncodings.ts:3).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Repomix 'packs your entire repository into a single, AI-friendly file' for feeding to LLMs and other AI tools.",
+          "citation": "README.md:62-64"
+        },
+        {
+          "claim": "Token Counting: 'Provides token counts for each file and the entire repository, useful for LLM context limits.'",
+          "citation": "README.md:88"
+        },
+        {
+          "claim": "Code Compression: --compress uses Tree-sitter to extract key code elements, reducing token count while preserving structure; the README labels it experimental.",
+          "citation": "README.md:93, README.md:797-803, README.md:851-852"
+        },
+        {
+          "claim": "--token-count-encoding selects an OpenAI-family tokenizer (o200k_base for GPT-4o, cl100k_base, etc.; default o200k_base), powered by gpt-tokenizer.",
+          "citation": "README.md:679, README.md:1472"
+        },
+        {
+          "claim": "--token-budget <N> makes the run exit non-zero when the packed output exceeds N tokens; the output is still generated; meant as a CI/agent context guard.",
+          "citation": "README.md:680, README.md:1458"
+        },
+        {
+          "claim": "--token-count-tree [threshold] prints a file tree with token counts to find token-heavy files and plan compression.",
+          "citation": "README.md:620, README.md:885-917"
+        },
+        {
+          "claim": "output.patterns (config file) and the MCP outputPatterns parameter set per-glob inclusion levels: full content, Tree-sitter compressed, or directory-structure-only; first matching pattern wins.",
+          "citation": "README.md:854-883, README.md:1052"
+        },
+        {
+          "claim": "Compression 'Reduces token usage by ~70% while preserving semantic meaning' (MCP tool parameter text); the repomix-mcp plugin advertises '~70% token reduction'.",
+          "citation": "README.md:1049, README.md:1157"
+        },
+        {
+          "claim": "MCP tools read_repomix_output (line ranges) and grep_repomix_output (regex with context) retrieve parts of a generated output by outputId instead of reading it whole.",
+          "citation": "README.md:1074-1097"
+        },
+        {
+          "claim": "--split-output <size> splits output into numbered files under a size limit; 'A single file or directory will never be split across multiple output files.'",
+          "citation": "README.md:919-935"
+        },
+        {
+          "claim": "Security-Focused: Secretlint detects files matching known credential formats and leaves them out of the output; --no-security-check disables the scan.",
+          "citation": "README.md:92, README.md:1715-1755"
+        },
+        {
+          "claim": "input.processors runs an external command per matching file before packing (for example JSON to TOON, svgo); default-deny: local CLI only, disabled for the library API, MCP server and repomix.com, and for remote repos unless --remote-trust-config.",
+          "citation": "README.md:1679-1713"
+        },
+        {
+          "claim": "Claude Code/Codex integrations: 'claude mcp add repomix -- npx -y repomix --mcp'; official plugins via '/plugin marketplace add yamadashy/repomix'; --skill-generate writes Claude Agent Skills to .claude/skills/<name>/; Explorer skill for Codex via 'npx skills add yamadashy/repomix --skill repomix-explorer --agent codex'.",
+          "citation": "README.md:1014, README.md:1119-1136, README.md:1216-1236, README.md:1314-1324"
+        },
+        {
+          "claim": "Privacy: the README links to a Privacy Policy stating the CLI collects and transmits no user data or telemetry and needs network only for install, --remote and manual update checks.",
+          "citation": "README.md:2011-2013, website/client/src/en/guide/privacy.md:10-15"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx (no install)",
+          "command": "npx repomix@latest",
+          "citation": "README.md:102"
+        },
+        {
+          "method": "npm global",
+          "command": "npm install -g repomix",
+          "citation": "README.md:109"
+        },
+        {
+          "method": "yarn global",
+          "command": "yarn global add repomix",
+          "citation": "README.md:112"
+        },
+        {
+          "method": "bun global",
+          "command": "bun add -g repomix",
+          "citation": "README.md:115"
+        },
+        {
+          "method": "Homebrew (README says macOS/Linux; the formula is not in this repository)",
+          "command": "brew install repomix",
+          "citation": "README.md:117-118"
+        },
+        {
+          "method": "Docker (ghcr.io image; Dockerfile uses node:22-slim, WORKDIR /app, ENTRYPOINT repomix)",
+          "command": "docker run -v .:/app -it --rm ghcr.io/yamadashy/repomix",
+          "citation": "README.md:319, Dockerfile:1,19-25"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs the test suite on ubuntu-latest with Node 22/24/26 (.github/workflows/ci.yml:90-91,102-103) and the Docker image is built for linux/amd64 (.github/workflows/docker.yml:34-35). Node >=22 is required (package.json:127-130); the README itself does not state the Node version (website/client/src/en/guide/faq.md:18 and llms-install.md:13 do).",
+        "wsl2": "unknown - no WSL/WSL2 mention in the README, English docs, code or workflows (searched). The runtime is Node plus WASM with no native addons (package-lock.json flags install scripts only on dev-only esbuild/fsevents), so Linux behaviour would be expected, but upstream neither documents nor tests it.",
+        "macos_arm64": "yes - CI tests and benchmarks on macos-latest (.github/workflows/ci.yml:90, .github/workflows/perf-benchmark.yml:70) and the README documents brew install (README.md:118). The workflow files do not name the CPU architecture; the runtime has no native addons (WASM Tree-sitter: src/core/treeSitter/parseFile.ts:4-19; pure-JS tokenizer: src/core/metrics/TokenCounter.ts:93).",
+        "gpu": "no - not used or needed; no GPU/CUDA reference in src/ (searched). Tokenization is pure JS (gpt-tokenizer, src/core/metrics/TokenCounter.ts:93) and parsing is CPU WASM (src/core/treeSitter/parseFile.ts:4-19)."
+      },
+      "integrations": {
+        "cli": "Yes. Binary repomix (package.json:21 -> bin/repomix.cjs); options documented at README.md:606-736 (include/ignore, --remote, --stdin, --stdout, --compress, --token-count-tree, --token-budget, --split-output, --skill-generate, --watch, --mcp) and defined in src/cli/cliRun.ts:51-216. Config via repomix.config.{ts,js,json5,jsonc,json} (README.md:1353-1375).",
+        "mcp": "Yes. repomix --mcp starts a stdio-only MCP server (src/mcp/mcpServer.ts:95-125; README.md:937-1111). Without --sandbox the code registers 6 tools: pack_codebase, pack_remote_repository, attach_packed_output, read_repomix_output, grep_repomix_output, generate_skill (generate_skill is absent from the README tool list). With --mcp --sandbox [dir] it registers only pack_codebase, read_repomix_output, grep_repomix_output, file_system_read_file, file_system_read_directory (src/mcp/mcpServer.ts:64-84). outputIds live in an in-memory registry and outputs are written under $TMPDIR/repomix/mcp-outputs (src/mcp/tools/mcpToolRuntime.ts:98-109,144-154). server.json lists it for the MCP Registry (server.json:13-39); a Docker variant is shown at README.md:1019-1038.",
+        "sdk_or_api": "Node.js library: npm install repomix; exports pack, runCli, searchFiles, collectFiles, processFiles, TokenCounter, runSecurityCheck, parseFile, loadFileConfig, defineConfig and more (README.md:1903-1973; src/index.ts:4-73; package.json:6-20). File processors are disabled for library callers (README.md:1710). A composite GitHub Action is provided (README.md:1788-1901; .github/actions/repomix/action.yml). No HTTP API is documented for users: website/server exposes POST /api/pack for repomix.com behind Cloudflare/bot/rate-limit/Turnstile guards (website/server/src/index.ts:45-67) but the README does not offer it. A browser extension (README.md:157-169) and a community VS Code extension (README.md:171-178) exist.",
+        "claude_code_or_codex": "Claude Code: (a) MCP via 'claude mcp add repomix -- npx -y repomix --mcp' (README.md:1014); (b) official plugin marketplace (.claude-plugin/marketplace.json) with repomix-mcp (.claude/plugins/repomix-mcp/.mcp.json runs 'npx -y repomix@latest --mcp'), repomix-commands (pack-local, pack-remote) and repomix-explorer (agent plus explore-local/explore-remote that shell out to 'npx repomix@latest' and grep the output) (README.md:1113-1212); (c) repomix --skill-generate writes Claude Agent Skills to ~/.claude/skills or ./.claude/skills (README.md:1214-1299; src/cli/prompts/skillPrompts.ts:25-27). Codex: only the standalone Explorer skill, installed with 'npx skills add yamadashy/repomix --skill repomix-explorer --agent codex' (README.md:1314-1324); no Codex-specific MCP configuration is documented. None of these read Claude Code or Codex session logs or report provider usage."
+      },
+      "telemetry_and_network": "Docs: the CLI 'does not collect, transmit, or store any user data, telemetry, or repository information' and works offline except npm install, --remote, and manually triggered update checks; the hosted website uses Google Analytics and Cloudflare Turnstile and temporarily stores uploaded ZIPs/folders; the browser extension collects nothing (website/client/src/en/guide/privacy.md:10-26). Code agrees: no telemetry, analytics or update-check code or dependency in src/ or package.json:80-109 (searched); no accounts or API keys are read. Network use found in code: (1) --remote, URL or owner/repo input: GitHub archive download via global fetch from codeload.github.com (src/core/git/gitHubArchive.ts:122, src/core/git/gitHubArchiveApi.ts:13), falling back to git ls-remote/fetch/clone subprocesses with GIT_TERMINAL_PROMPT=0 and a 30s timeout (src/core/git/gitCommand.ts:33,132-200; src/cli/actions/remoteAction.ts:46-105); URLs are credential-redacted in logs and cloud-metadata endpoints are refused (.github/releases/v1.x/v1.18.0.md:42-51). (2) An implicit probe not listed on the privacy page: a single positional argument shaped like owner/repo that does not exist locally triggers 'git ls-remote https://github.com/<arg>.git HEAD' with a 5s timeout (src/cli/cliRun.ts:419-446; src/core/git/gitCommand.ts:36-40). (3) User-configured input.processors commands (for example npx ...) can reach the network (README.md:1704). Tree-sitter WASM grammars load from the local @repomix/tree-sitter-wasms package (src/core/treeSitter/loadLanguage.ts:44-62). Local state written outside the project: token-count cache $TMPDIR/repomix/cache/token-counts.json (disable with REPOMIX_TOKEN_CACHE=0; src/core/metrics/tokenCountCache.ts:23-26,68-80), MCP outputs $TMPDIR/repomix/mcp-outputs (src/mcp/tools/mcpToolRuntime.ts:144-154), remote-config trust markers $TMPDIR/repomix/trusted-remotes (src/cli/prompts/remoteConfigTrustStore.ts:15-30), optional global config ~/.config/repomix (src/config/globalDirectory.ts:4-15). The completion banner prints a repomix.com link (src/cli/cliReport.ts:249) and --init writes a $schema URL on repomix.com into new configs (src/cli/actions/initAction.ts:107). Plugin config and README snippets run unpinned npx -y repomix[@latest], which fetches from the npm registry (.claude/plugins/repomix-mcp/.mcp.json:4-9; README.md:1014)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (ESM; 142 .ts files under src/)",
+        "JavaScript (CJS launcher bin/repomix.cjs; .mjs CI/bench scripts)",
+        "Vue (website/client components)",
+        "Shell (scripts/bench-cores.sh, .devcontainer/init-firewall.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "bin/repomix.cjs",
+          "what": "npm bin launcher (package.json:21): enables Node compile cache, installs error/signal handlers, imports ../lib/cli/cliRun.js (compiled from src/) and calls run() (bin/repomix.cjs:55-60)."
+        },
+        {
+          "path": "src/cli/cliRun.ts",
+          "what": "Commander program with all CLI options (:51-216) and the runCli() dispatcher to MCP, version, --init, remote, watch and default actions (:336-450)."
+        },
+        {
+          "path": "src/cli/actions/defaultAction.ts",
+          "what": "Local pack action: merges file and CLI config, calls pack(), prints the report, enforces --token-budget (:79-204)."
+        },
+        {
+          "path": "src/core/packager.ts",
+          "what": "pack(): the pipeline from file search through output and metrics (:76-361); exported as the library entry from src/index.ts:4."
+        },
+        {
+          "path": "src/mcp/mcpServer.ts",
+          "what": "MCP stdio server (createMcpServer/runMcpServer, :53-125) started by repomix --mcp via src/cli/actions/mcpAction.ts; tools live in src/mcp/tools/."
+        },
+        {
+          "path": "src/index.ts",
+          "what": "Library exports (package.json main/types/exports -> lib/index.js): pack, runCli, searchFiles, collectFiles, processFiles, TokenCounter, defineConfig, etc. (:4-73)."
+        },
+        {
+          "path": ".github/actions/repomix/action.yml",
+          "what": "Composite GitHub Action that runs npm install --global repomix@<repomix-version> (default latest) and then repomix; compress input defaults to true (:25-28,37-40,61-66)."
+        },
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "what": "Claude Code plugin marketplace listing repomix-mcp, repomix-commands and repomix-explorer from .claude/plugins/*; standalone Agent Skill at skills/repomix-explorer/SKILL.md."
+        }
+      ],
+      "architecture": "Single TypeScript package (ESM) compiled to lib/ with tsc. CLI layer src/cli/: cliRun.ts (commander) routes to actions/{defaultAction,remoteAction,initAction,mcpAction,watchAction,migrationAction,versionAction}.ts, plus cliReport.ts, cliTokenBudget.ts, prompts/, reporters/tokenCountTreeReporter.ts. Config: src/config/configLoad.ts (JSON/JSON5 parsed; .ts/.js configs executed through jiti) and configSchema.ts (valibot). Core pipeline src/core/packager.ts: file/ (fileSearch.ts globby with .gitignore/.ignore/.repomixignore; fileCollect.ts; fileProcessorRun.ts external-command processors; fileProcess*.ts comment removal, base64 truncation, compress dispatch) -> security/ (Secretlint in worker threads) -> treeSitter/ (web-tree-sitter WASM, per-language queries and strategies, 16 languages) -> output/ (Handlebars templates for xml/markdown/plain, fast-xml-builder only for parsable XML, JSON.stringify for json; outputSort.ts git-change ordering; outputSplit.ts) -> metrics/ (gpt-tokenizer in tinypool worker threads with an on-disk token cache) -> packager/produceOutput.ts (file, stdout or clipboard). Git: core/git/ (diff/log via hardened git subprocesses; remote via GitHub tar.gz download or git clone into a temp dir). Skills: core/skill/. MCP: src/mcp/ (mcpServer.ts, tools/*, pathScope.ts sandbox confinement, prompts/). Shared: src/shared/ (logger, processConcurrency.ts and unifiedWorker.ts worker pools, urlRedact.ts). Separate private packages in the repo: browser/ (WXT extension), website/client (VitePress/Vue), website/server (Hono API for repomix.com), scripts/memory.",
+      "packaging_and_release": "npm package repomix ships lib/, bin/, README.md and LICENSE (package.json:73-78), built by tsc -p tsconfig.build.json on prepare (package.json:23-24). Release is a manual workflow_dispatch of .github/workflows/npm-publish.yml (:20-27): a check job runs lint and coverage tests (:32-59); a build job runs npm ci, npm audit signatures, npm pack and records the tarball sha256 (:61-135); a publish job with no checkout verifies that digest and runs npm publish --provenance --access public through OIDC trusted publishing (:137-198), giving an npm provenance attestation (.github/releases/v1.x/v1.10.0.md:39-41). No workflow publishes GPG/cosign signatures, checksum files or GitHub Release assets (searched). Docker: .github/workflows/docker.yml builds linux/amd64, linux/arm64 and linux/arm/v7 and pushes a multi-arch manifest to ghcr.io/yamadashy/repomix on main pushes and published releases (:31-145), with no explicit signing or attestation step. MCP Registry: .github/workflows/mcp-registry-publish.yml publishes server.json (npm package repomix, stdio, npx -y repomix --mcp) via GitHub OIDC (:131-137; server.json:13-39). Actions are SHA-pinned and checked by pinact.yml; .npmrc sets min-release-age=7 and Renovate sets minimumReleaseAge 7 days (.github/renovate.json5:106). Release notes are kept in .github/releases/**.",
+      "tests_and_ci": "Vitest (package.json:31-32; vitest.config.ts:3-16: tests/**/*.test.ts, node env, 15s timeout, v8 coverage over src/). 153 *.test.ts files under tests/ (cli, config, core including 21 tree-sitter files, integration-tests, mcp including sandbox contract tests, shared) plus 1 in browser/tests and 10 in website/server/tests. No test or benchmark asserts a compression ratio (searched tests/). 20 workflow files in .github/workflows. ci.yml: Biome, oxlint, tsc --noEmit and secretlint jobs; tests on ubuntu/windows/macos x Node 22/24/26 (:86-104); Bun tests (:106-124); coverage to Codecov (:126-156); build-and-run smoke tests after npm prune --omit=dev, also with Bun (:158-212). ci-quality.yml: actionlint, zizmor, typos. codeql.yml: CodeQL for JS/TS on push, PR and weekly. pinact.yml: enforces pinned actions. ci-website.yml, ci-browser.yml, test-action.yml, pack-repository.yml: website, extension and Action checks. benchmark.yml: memory test. perf-benchmark.yml: PR vs main pack wall-time on 3 OSes. perf-benchmark-history.yml: median pack ms per OS stored via github-action-benchmark on a gh-pages branch that is not in this clone. autofix.yml and schema-update.yml (opens a PR with the regenerated JSON schema). Release workflows: npm-publish.yml, docker.yml, mcp-registry-publish.yml. Four claude*.yml workflows run Claude-based issue triage, similar-issue and PR-review automation. A comment in schema-update.yml:42-46 says main's ruleset requires review/code-owner approval and no status checks.",
+      "dependencies": "Root package.json: 28 runtime dependencies (package.json:80-109), e.g. @modelcontextprotocol/sdk, commander, globby, gpt-tokenizer, web-tree-sitter with @repomix/tree-sitter-wasms, @secretlint/core with preset-recommend, tinypool, valibot, zod, handlebars, fast-xml-builder, jiti, tar, tinyclip, chokidar, json5, minimatch, iconv-lite, jschardet, isbinaryfile, is-binary-path, git-url-parse, @clack/prompts, picocolors, picospinner, @repomix/strip-comments; and 15 devDependencies (package.json:110-126: biome, oxlint, typescript ^7.0.2, vitest ^5, secretlint, tsx, vite, rimraf, ...). Other manifests: browser/package.json 0 runtime / 8 dev (private); website/client/package.json 4 / 8; website/server/package.json 9 / 8 (includes repomix: github:yamadashy/repomix#main); scripts/memory/package.json 3 / 2. A package-lock.json is committed for each. Engines: node >=22.0.0 (package.json:127-130). Runtime deps have no native addons (only dev esbuild/fsevents carry install scripts in package-lock.json). jschardet is LGPL-2.1+ (package-lock.json:3630-3634).",
+      "security_policy": "SECURITY.md at the repo root: report via a GitHub private security advisory (https://github.com/yamadashy/repomix/security/advisories/new) or by email to the address given there (SECURITY.md:3-5); no supported-versions table or response-time commitment. Past advisories named in release notes: GHSA-rpmv-562j-qxrv and GHSA-w8cw-mgw9-74h7 (.github/releases/v1.x/v1.18.0.md:39-47)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Token Counting: per-file and whole-repository token counts (README.md:88).",
+        "verified": "yes",
+        "evidence": "Counts for every processed file and a total are computed in src/core/metrics/calculateMetrics.ts:172-182,243-264 with gpt-tokenizer (src/core/metrics/TokenCounter.ts:1-2,25-37) and printed in the Pack Summary and top-files list (src/cli/cliReport.ts:36-44,88-92). Caveats: only OpenAI encodings exist (o200k_base default, cl100k_base, p50k_base, p50k_edit, r50k_base - src/core/metrics/tokenEncodings.ts:3); the total is a sum of per-file counts plus wrapper tokens, or of 200K-char chunks, not one end-to-end tokenization (calculateMetrics.ts:195-232; src/core/metrics/calculateOutputMetrics.ts:5-45); the MCP attach_packed_output tool estimates tokens as chars/4 (src/mcp/tools/attachPackedOutputTool.ts:279-286). No Anthropic tokenizer is used."
+      },
+      {
+        "claim": "--compress uses Tree-sitter to reduce token count while preserving structure (README.md:93).",
+        "verified": "yes",
+        "evidence": "src/core/treeSitter/parseFile.ts:44-110 parses with web-tree-sitter and keeps captured signature chunks joined by a chunk-separator line; 16 languages are configured (src/core/treeSitter/languageConfig.ts:64-161). Unsupported languages, parse failures and WASM aborts silently keep the full uncompressed content (parseFile.ts:56-60,110-123; src/core/file/fileProcessContent.ts:37-53). Function bodies are dropped, so compressed content cannot be turned back into the original and no unpack/restore feature exists (searched src/). The output header notes when content is compressed (src/core/output/outputStyleDecorate.ts:88-90)."
+      },
+      {
+        "claim": "Compression 'Reduces token usage by ~70%' (README.md:1049, 1157).",
+        "verified": "not_checkable",
+        "evidence": "The figure appears in README.md:1049,1157, src/mcp/tools/packCodebaseTool.ts:47, src/mcp/tools/packRemoteRepositoryTool.ts:27 and the plugin/skill texts, but no code, test or benchmark in the repo computes or asserts it (searched src/ and tests/). The CLI reports only the output's token total, never a before/after pair (src/cli/cliReport.ts:88-92). The only other number is '~50% token reduction for Dart and Flutter' in .github/releases/v1.x/v1.8.0.md:26."
+      },
+      {
+        "claim": "--token-budget fails with a non-zero exit code when output exceeds N tokens; output is still generated (README.md:680).",
+        "verified": "yes",
+        "evidence": "src/cli/actions/defaultAction.ts:191-198 calls validateTokenBudget after the output is written; src/cli/cliTokenBudget.ts:13-22 throws RepomixError when totalTokens > budget; for --remote the check is deferred until the output is copied out of the temp dir (src/cli/actions/remoteAction.ts:176-197). The compared total is the same OpenAI-encoding estimate."
+      },
+      {
+        "claim": "Secretlint detects files matching known credential formats and leaves them out of the output (README.md:92).",
+        "verified": "partial",
+        "evidence": "Files flagged by Secretlint are removed from the output (src/core/packager.ts:247-253; src/core/security/validateFileSafety.ts:28-41), but flagged git diffs and git logs are still included (validateFileSafety.ts:54-65; src/cli/cliReport.ts:187). Only known secret formats are recognised (.github/releases/v1.x/v1.18.0.md:33,37) and the scan can be disabled (src/cli/cliRun.ts:180). The bundled explorer agent text 'trust its security checks' (.claude/plugins/repomix-explorer/agents/explorer.md:301,309) is stronger than the code."
+      },
+      {
+        "claim": "README 'Available MCP Tools' lists 7 tools with their parameters (README.md:1044-1111).",
+        "verified": "partial",
+        "evidence": "The code registers 8 distinct tools; the README omits generate_skill (src/mcp/tools/generateSkillTool.ts:49-50; mentioned only in src/mcp/mcpServer.ts:24 and .github/releases/v1.x/v1.10.0.md:33). pack_codebase and pack_remote_repository also accept a style parameter (xml|markdown|json|plain) that the README parameter lists omit (src/mcp/tools/packCodebaseTool.ts:69-74; src/mcp/tools/packRemoteRepositoryTool.ts:49-54; documented in website/client/src/en/guide/mcp-server.md:144,177). Without --sandbox 6 tools are registered; with it 5 (src/mcp/mcpServer.ts:64-84)."
+      },
+      {
+        "claim": "Guardrails: --sandbox confines the MCP file tools (application-level, not OS-level); remote repo config is never loaded by default; file processors are default-deny (README.md:684, 793, 957, 1707-1711).",
+        "verified": "yes",
+        "evidence": "Sandbox: only 5 tools are registered and remote/skill/attach tools are withheld (src/mcp/mcpServer.ts:64-84); pack_codebase resolves against the root, rejects escaping include/ignore globs and skips local and global config (src/mcp/tools/packCodebaseTool.ts:129-183); docs say it is not an OS sandbox (website/client/src/en/guide/mcp-server.md:40) and no OS-level sandbox code exists (the only 'kernel sandbox' text is a stale comment, src/cli/cliRun.ts:310). Remote config: loaded only with --remote-trust-config (src/cli/actions/remoteAction.ts:107,163; src/config/configLoad.ts:109-118) and --config must be absolute with --remote (remoteAction.ts:36-44). Processors: gate checked in src/core/file/fileProcessorRun.ts:199-203, enabled only by the real CLI entry (src/cli/cliRun.ts:254-259) and for remote clones only with trust (remoteAction.ts:175). Non-interactive runs with REPOMIX_REMOTE_TRUST_CONFIG=true trust without a prompt (README.md:1778; .github/releases/v1.x/v1.17.0.md:48)."
+      },
+      {
+        "claim": "--split-output: 'A single file or directory will never be split across multiple output files' (README.md:934-935).",
+        "verified": "partial",
+        "evidence": "Files are never split, but directories are: an oversized group is subdivided one directory level deeper and only a single file larger than the limit aborts (src/core/output/outputSplit.ts:42-77,278-290; .github/releases/v1.x/v1.17.0.md:64). Git diffs and logs appear only in part 1 (outputSplit.ts:125-129,166-167). The README note is inaccurate for directories; code preferred."
+      },
+      {
+        "claim": "--no-git-sort-by-changes: 'default: most changed files first' (README.md:644).",
+        "verified": "no",
+        "evidence": "The CLI help repeats that text (src/cli/cliRun.ts:139-142), but the code sorts ascending by change count so the most-changed files come last (src/core/output/outputSort.ts:132-139), matching README.md:1461 and the generated notes (src/core/output/outputStyleDecorate.ts:198). Code preferred."
+      },
+      {
+        "claim": "Not a README claim but required by the evaluation: Repomix reads Claude Code/Codex local logs to measure provider usage (input, output, cache-creation, cache-read tokens).",
+        "verified": "no",
+        "evidence": "Searched the whole repo for .claude/projects, .codex, CODEX_HOME, .jsonl, cache_creation, cache_read, input_tokens and output_tokens, and src/ for usage/cost/session/transcript handling: no code reads agent logs. The only .claude references in src/ write generated skills (src/cli/prompts/skillPrompts.ts:25-27); the only output_tokens hit is the hosted website's Google Cloud monitoring dashboard for packed output (website/server/monitoring/dashboard.json:354). Repomix token counts describe the packed artifact (OpenAI encodings), not provider usage. Answer: none."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Tree-sitter --compress token reduction, generic claim with no dataset or method given",
+        "metric": "token reduction",
+        "value": "~70%",
+        "source": "README.md:1049; README.md:1157; src/mcp/tools/packCodebaseTool.ts:47",
+        "independent": false
+      },
+      {
+        "what": "Tree-sitter compression for Dart/Flutter projects (release-note claim, no method given)",
+        "metric": "token reduction",
+        "value": "~50%",
+        "source": ".github/releases/v1.x/v1.8.0.md:26",
+        "independent": false
+      },
+      {
+        "what": "Time to pack the Repomix repository itself, v1.13.1 to v1.14.0 (cumulative optimizations; hardware not stated)",
+        "metric": "wall-clock pack time",
+        "value": "3.3 s -> ~1.4 s (~2.4x faster, -58%)",
+        "source": ".github/releases/v1.x/v1.14.0.md:1,11",
+        "independent": false
+      },
+      {
+        "what": "Individual v1.14.0 optimizations: token-count wrapper fast path; disabling the @secretlint/profiler",
+        "metric": "reduction in total pack time",
+        "value": "~13% (-13.2%); ~6.5%",
+        "source": ".github/releases/v1.x/v1.14.0.md:21-23,57-59",
+        "independent": false
+      },
+      {
+        "what": "Node V8 compile cache (v1.12.0)",
+        "metric": "startup time",
+        "value": "~10% faster",
+        "source": ".github/releases/v1.x/v1.12.0.md:23",
+        "independent": false
+      },
+      {
+        "what": "npm package lib/ size after removing source maps (v1.12.0)",
+        "metric": "unpacked size",
+        "value": "2.4 MB -> 1.2 MB (~50%)",
+        "source": ".github/releases/v1.x/v1.12.0.md:38",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope mismatch for usage measurement: Repomix reads no Claude Code/Codex logs and reports no provider input/output/cache-creation/cache-read tokens (searched; the only .claude references write skills, src/cli/prompts/skillPrompts.ts:25-27). Its token figures are OpenAI-BPE estimates of the packed artifact (src/core/metrics/tokenEncodings.ts:3; totals built from summed pieces, src/core/metrics/calculateMetrics.ts:195-232) and the MCP attach tool uses chars/4 (src/mcp/tools/attachPackedOutputTool.ts:279-286), so they will not match Claude- or Codex-billed tokens.",
+      "Reduction is not measured by the tool: the CLI prints only the output's token total, never before/after (src/cli/cliReport.ts:88-92), so a reduction needs two runs; the ~70% figure has no method, dataset or test behind it (README.md:1049; tests/ has no ratio assertion). Compression covers 16 languages and silently keeps full content for the rest and on parse failure (src/core/treeSitter/languageConfig.ts:64-161; src/core/file/fileProcessContent.ts:37-53). The README calls it experimental (README.md:851-852).",
+      "Originals are not recoverable from the artifact: compression, comment removal and processors are lossy and no unpack feature exists (src/core/treeSitter/parseFile.ts:106-109; searched src/). By default the packed output records no source commit SHA, content digest or generation time (generationDate is computed but ignored by the header: src/core/output/outputGenerate.ts:442, src/core/output/outputStyleDecorate.ts:56), so provenance back to the on-disk originals must be tracked outside Repomix.",
+      "Executable config and processors: a repomix.config.ts/js/mjs/cjs in the working directory is executed via jiti on every local run without a prompt (src/config/configLoad.ts:20-30,171-175), and input.processors shells out arbitrary commands (src/core/file/fileProcessorRun.ts:76-98); the README states local config is trusted like a Makefile (README.md:1709). REPOMIX_REMOTE_TRUST_CONFIG=true in non-interactive shells trusts a cloned repo's config without a prompt (README.md:1778).",
+      "Secret scanning and MCP read scope are heuristic or permissive: only known secret formats are detected, flagged git diffs/logs remain in the output (src/core/security/validateFileSafety.ts:54-65), --no-security-check exists, and outside --sandbox the MCP server can pack any directory the user can read while generate_skill writes into the target tree (src/mcp/tools/packCodebaseTool.ts:92-98; src/mcp/tools/generateSkillTool.ts:107). The sandbox is application-level only (website/client/src/en/guide/mcp-server.md:40). v1.18.0 fixed two advisories in this surface, GHSA-rpmv-562j-qxrv and GHSA-w8cw-mgw9-74h7 (.github/releases/v1.x/v1.18.0.md:33-47).",
+      "Network and supply-chain exposure: an owner/repo-shaped argument that is not a local path triggers a git ls-remote to github.com (src/cli/cliRun.ts:419-446); recommended MCP/plugin/skill configs run unpinned npx -y repomix[@latest] (.claude/plugins/repomix-mcp/.mcp.json:4-9; README.md:1014); the GitHub Action installs latest by default and the README references it at @main (.github/actions/repomix/action.yml:37-40,66; README.md:1795). npm releases carry provenance (.github/workflows/npm-publish.yml:185-198), but docker.yml has no explicit signing or attestation step and no workflow publishes checksums or GitHub Release assets.",
+      "Local persistence: MCP packed outputs (full source text) are written under $TMPDIR/repomix/mcp-outputs and no code in src/mcp deletes them (src/mcp/tools/mcpToolRuntime.ts:144-154), while the outputId registry is in-memory only (mcpToolRuntime.ts:98-109), so IDs die with the server process but files remain. A token cache (src/core/metrics/tokenCountCache.ts:23-26) and remote-trust markers (src/cli/prompts/remoteConfigTrustStore.ts:15-30) also live in $TMPDIR/repomix. Legacy Repopack config/output files, if present in the working directory, are rewritten in place on local runs (src/cli/actions/defaultAction.ts:47-49; src/cli/actions/migrationAction.ts:41-64).",
+      "Maintenance, platform, licensing and docs drift: single maintainer and code owner (CONTRIBUTING.md:13; .github/CODEOWNERS:2); releases are manual dispatches (.github/workflows/npm-publish.yml:20-27) and a workflow comment says main requires no status checks (.github/workflows/schema-update.yml:42-46). Node >=22 is required (package.json:127-130) while the launcher only warns below 20 (bin/repomix.cjs:27-31) and the README omits the version; WSL2 is undocumented. Runtime dependency jschardet is LGPL-2.1+ under an MIT project (package.json:98; package-lock.json:3630-3634); tree-sitter queries derive from Aider/Cline (Apache-2.0) (src/core/treeSitter/queries/README.md:3-5). README drift examples: sort order (README.md:644), split-output note (README.md:934-935), MCP tool list (README.md:1044-1111)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "yamadashy/repomix",
+      "checks": [
+        {
+          "field": "readme.install (npm global)",
+          "statement": "npm global install: `npm install -g repomix` (README.md:109)",
+          "citation": "README.md:105-109; package.json:2-3,21; .git/HEAD",
+          "holds": true,
+          "note": "README.md:109 reads exactly `npm install -g repomix`, under 'Or install globally for repeated use' (README.md:105). The package is named repomix, version 1.18.1 (package.json:2-3), with bin ./bin/repomix.cjs (package.json:21). The checkout HEAD is 80b4280a9196feace092fc672dfe2b5fac62ef08, the commit the dossier names."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE:1-7; package.json:69",
+          "holds": true,
+          "note": "LICENSE contains the standard MIT permission and warranty-disclaimer text ('Copyright 2024 Kazuki Yamada'), and package.json:69 declares \"license\": \"MIT\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "Yes: CI runs tests on ubuntu-latest with Node 22/24/26, the Docker image is built for linux/amd64, Node >=22 is required, and the README omits the Node version (faq.md:18 and llms-install.md:13 state it).",
+          "citation": ".github/workflows/ci.yml:90-91,102-103; .github/workflows/docker.yml:34-35; package.json:127-130; website/client/src/en/guide/faq.md:18; llms-install.md:13; README.md (grep)",
+          "holds": true,
+          "note": "ci.yml:90-91 sets the matrix os [ubuntu-latest, windows-latest, macos-latest] x node [22.x, 24.x, 26.x], and :102-103 runs `node --run test`. docker.yml:34-35 sets `platform: linux/amd64` on ubuntu-latest. package.json:127-130 sets engines node >=22.0.0. The README's only Node mention is README.md:1905 ('Node.js applications'), with no version. faq.md:18 says 'Node.js 22 or later' and llms-install.md:13 says 'Node.js 22.0.0 or higher'. ci.yml does not name the CPU architecture; amd64 is explicit only in docker.yml."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: MCP via 'claude mcp add repomix -- npx -y repomix --mcp'; an official marketplace with repomix-mcp (npx -y repomix@latest --mcp), repomix-commands (pack-local, pack-remote) and repomix-explorer; --skill-generate writes to ~/.claude/skills or ./.claude/skills. Codex: only the standalone Explorer skill via 'npx skills add ... --agent codex'; no Codex MCP config is documented.",
+          "citation": "README.md:1014, 1113-1212, 1214-1299, 1314-1324; .claude-plugin/marketplace.json:10-26; .claude/plugins/repomix-mcp/.mcp.json:4-9; .claude/plugins/repomix-explorer/commands/explore-local.md:48,68; explore-remote.md:46,65; agents/explorer.md:44-49; src/cli/prompts/skillPrompts.ts:25-27",
+          "holds": true,
+          "note": "The README.md:1014 command matches exactly. marketplace.json lists the three plugins from ./.claude/plugins/*. .mcp.json runs npx -y repomix@latest --mcp. pack-local.md and pack-remote.md exist. skillPrompts.ts:25,27 joins homedir or cwd with .claude/skills (also README.md:1236-1237). README.md:1323 has the Codex command. Codex appears only at README.md:1303/1314/1323 and website/client/src/en/guide/repomix-explorer-skill.md:23,32, so no Codex MCP config is documented. Wording nit: the explore-* commands delegate to the explorer agent, and that agent runs `npx repomix@latest` and uses Grep/Read."
+        },
+        {
+          "field": "claim_checks (agent-log provider usage, verified: no)",
+          "statement": "Repomix reads no Claude Code/Codex local logs and reports no provider input/output/cache-creation/cache-read tokens. The only .claude references in src/ write skills, the only output_tokens hit is the website's Google Cloud monitoring dashboard, and token counts use OpenAI encodings. Answer: none.",
+          "citation": "whole-repo grep; src/ grep; src/cli/prompts/skillPrompts.ts:25-27; website/server/monitoring/dashboard.json:348-354; src/core/metrics/tokenEncodings.ts:3",
+          "holds": true,
+          "note": "The whole-repo search covers hidden dirs (confirmed by matches in .github/workflows/docker.yml and .claude/plugins/repomix-mcp/.mcp.json). Searching for .claude/projects|.codex|CODEX_HOME|cache_creation|cache_read|input_tokens|output_tokens matches only dashboard.json:354,369,384, all the logging.googleapis.com/user/pack_output_tokens metric in the 'Pack output tokens (P50 / P95 / P99)' widget. 'jsonl' matches only JsonLd in website/client/.vitepress/config/configShard.ts. In src/, every claude match is skill generation, and every transcript/session/cost/usage match is a comment, a memory stat or output guidelines. tokenEncodings.ts:3 lists only o200k_base, cl100k_base, p50k_base, p50k_edit and r50k_base. Nit: the dossier cites only :354, but the same metric also matches at :369 and :384."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

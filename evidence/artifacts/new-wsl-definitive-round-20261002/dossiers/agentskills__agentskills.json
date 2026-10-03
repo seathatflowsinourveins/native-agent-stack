@@ -1,0 +1,250 @@
+{
+  "contender": "agentskills/agentskills",
+  "revision": {
+    "contender": "agentskills/agentskills",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "agentskills/agentskills",
+        "tag": null,
+        "commit": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+    "read_at": "2026-10-02T03:01:52+00:00"
+  },
+  "dossier": {
+    "contender": "agentskills/agentskills",
+    "revision": {
+      "tag": null,
+      "commit": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "skills-ref is the Python reference library and CLI (subdirectory skills-ref/ of the agentskills/agentskills repo) for the Agent Skills format. It finds SKILL.md in a skill directory, parses the YAML frontmatter, checks the name/description/compatibility/field rules, prints properties as JSON, and generates an <available_skills> XML catalog block (name, description, SKILL.md path) for agent system prompts. Its README labels it demonstration-only. The surrounding repo holds the format specification (docs/specification.mdx), a Mintlify documentation site, a client showcase, and contributor/agent guidance. It ships no skills: the tree contains no SKILL.md files, and CONTRIBUTING.md says no directory of community skills is maintained. Per-task loading of skills (progressive disclosure) is described as client-agent behaviour and is not implemented in this repo.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "A skill is a folder containing a SKILL.md file (metadata with name and description at minimum, plus instructions); skills can also bundle scripts, reference materials, templates and other resources.",
+          "citation": "README.md:9-20"
+        },
+        {
+          "claim": "Skills package procedural knowledge into portable, version-controlled folders that agents load on demand (domain expertise, repeatable workflows, cross-product reuse).",
+          "citation": "README.md:24-28"
+        },
+        {
+          "claim": "Agents load skills through progressive disclosure in three stages: Discovery (only name+description at startup), Activation (full SKILL.md read when a task matches), Execution (optionally run bundled code or load referenced files). 'Full instructions load only when a task calls for them, so agents can keep many skills on hand with only a small context footprint.'",
+          "citation": "README.md:30-40"
+        },
+        {
+          "claim": "Agent Skills are supported by a large number of AI tools and agentic clients; see the Client Showcase.",
+          "citation": "README.md:42-44"
+        },
+        {
+          "claim": "Example skills are linked externally (https://github.com/anthropics/skills); the README does not host or list skills.",
+          "citation": "README.md:46-51"
+        },
+        {
+          "claim": "The format was originally developed by Anthropic, released as an open standard, and is open to contributions per CONTRIBUTING.md.",
+          "citation": "README.md:53-55"
+        },
+        {
+          "claim": "Code in the repository is Apache 2.0; documentation is CC-BY-4.0; see individual directories for details.",
+          "citation": "README.md:57-59"
+        },
+        {
+          "claim": "skills-ref is a 'Reference library for Agent Skills'. IMPORTANT: 'This library is intended for demonstration purposes only. It is not meant to be used in production.'",
+          "citation": "skills-ref/README.md:3-6"
+        },
+        {
+          "claim": "On macOS/Linux, install with a venv plus `pip install -e .`, or with `uv sync`; the `skills-ref` executable is then on PATH inside the activated virtualenv.",
+          "citation": "skills-ref/README.md:10-25,52"
+        },
+        {
+          "claim": "CLI: `skills-ref validate <path>`, `skills-ref read-properties <path>` (JSON output), `skills-ref to-prompt <path-a> <path-b>` (<available_skills> XML).",
+          "citation": "skills-ref/README.md:56-67"
+        },
+        {
+          "claim": "Python API: `from skills_ref import validate, read_properties, to_prompt`.",
+          "citation": "skills-ref/README.md:69-87"
+        },
+        {
+          "claim": "`to-prompt` generates the suggested <available_skills> XML block for an agent's system prompt. The format is 'recommended for Anthropic's models, but Skill Clients may choose to format it differently'; the <location> element tells the agent where to find the full skill instructions.",
+          "citation": "skills-ref/README.md:89-109"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip in a venv, editable install from a source checkout (macOS/Linux). The README does not state it, but this must be run inside the skills-ref/ directory where pyproject.toml lives.",
+          "command": "python -m venv .venv\nsource .venv/bin/activate\npip install -e .",
+          "citation": "skills-ref/README.md:10-18"
+        },
+        {
+          "method": "uv, from a source checkout (macOS/Linux); same note about running inside skills-ref/",
+          "command": "uv sync\nsource .venv/bin/activate",
+          "citation": "skills-ref/README.md:20-25"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - the README documents a 'macOS / Linux' install (skills-ref/README.md:10-25). Requires Python >=3.11 (skills-ref/pyproject.toml:10). Pure Python: the wheel packages only src/skills_ref (pyproject.toml:23-24) and the locked dependencies resolve to py3-none-any / py2.py3-none-any wheels (skills-ref/uv.lock:14,87,122,161). Architecture is not stated and no CI exists in this checkout, so no upstream test run on Linux is evidenced.",
+        "wsl2": "unknown - WSL is not mentioned anywhere in the tree. The README documents only macOS/Linux and native Windows (skills-ref/README.md:10-50). The package is pure Python, so the Linux path would presumably apply, but upstream does not state it.",
+        "macos_arm64": "yes - the README documents macOS (skills-ref/README.md:10-25); architecture is not stated. No native code in src/ and dependencies are pure-Python wheels (skills-ref/uv.lock:14,87,122,161). The only arm64-specific entry in the lockfile is the dev-only ruff wheel (skills-ref/uv.lock:98).",
+        "gpu": "no - not used or needed; the code only parses YAML frontmatter and formats strings (skills-ref/src/skills_ref/*.py)."
+      },
+      "integrations": {
+        "cli": "Yes. `skills-ref` console script (skills-ref/pyproject.toml:16-17 -> skills_ref.cli:main) with subcommands `validate` (exactly one path), `read-properties` (one path, JSON on stdout) and `to-prompt` (one or more paths) (skills-ref/src/skills_ref/cli.py:27-101; skills-ref/README.md:56-67). Paths may point at the skill directory or at its SKILL.md (cli.py:15-17,39-40). Errors exit with code 1.",
+        "mcp": "none found - no MCP server or MCP code under skills-ref/. The only 'mcp' hits in the repo are a Mintlify docs-site menu option (docs/docs.json:51) and third-party client descriptions (docs/snippets/clients.jsx:327,377,381).",
+        "sdk_or_api": "Python library API only: validate, read_properties, to_prompt, find_skill_md, SkillProperties, and SkillError/ParseError/ValidationError (skills-ref/src/skills_ref/__init__.py:3-18; skills-ref/README.md:69-87). No HTTP API found. The README labels the library demonstration-only (skills-ref/README.md:5-6) and no registry publication is documented.",
+        "claude_code_or_codex": "No Claude Code or Codex plugin, hook, or loader code for skills-ref. Related facts: (1) `to-prompt` emits an <available_skills> block that the README says is recommended for Anthropic's models (skills-ref/README.md:91; skills-ref/src/skills_ref/prompt.py:12). (2) Docs state the same skill 'works in any compatible agent, including Claude Code and OpenAI Codex' (docs/skill-creation/quickstart.mdx:13) and list Claude Code and 'ChatGPT & Codex' as clients, with links to their own skills docs (docs/snippets/clients.jsx:135-142,151-159). (3) The client guide says some clients also scan .claude/skills/ besides the cross-client .agents/skills/ convention (docs/client-implementation/adding-skills-support.mdx:45-57). (4) Docs include a sample script using `claude -p ... --output-format json` to detect Skill tool calls (docs/skill-creation/optimizing-descriptions.mdx:99-107). (5) The repo's own .claude/settings.json registers a SessionStart hook for .claude/hooks/session-start.sh, which only prints a JSON line and checks whether the Mintlify `mint` CLI is on PATH (.claude/settings.json:3-12; .claude/hooks/session-start.sh:3-8); it is a docs-contributor convenience, not a skills-ref integration."
+      },
+      "telemetry_and_network": "No telemetry, analytics or network calls in skills-ref. Its imports are stdlib (json, sys, pathlib, html, unicodedata, dataclasses, typing) plus click and strictyaml (import grep over skills-ref/src/skills_ref/*.py). A grep over skills-ref/ for requests/urllib/httpx/socket/subprocess/telemetry found nothing except a license-text false positive. A grep of skills-ref/src for environment-variable, home-directory and skill-directory-scan APIs also found nothing. The CLI only reads the local SKILL.md (parser.py:89; validator.py:172) and writes to stdout/stderr (cli.py:45-50,70,98). No account or hosted service is required. Network is needed only at install time to fetch dependencies from PyPI (lockfile registry https://pypi.org/simple, e.g. skills-ref/uv.lock:7-8,20-21,153-155). Docs side: the docs are a Mintlify site auto-deployed on push to the default branch (docs/README.md:3,15-17); previewing needs the Mintlify CLI from npm via `npm i -g mint` or `npx mint dev` (CONTRIBUTING.md:57-63; docs/README.md:9-11; package.json:4-6). docs/docs.json contains no analytics or tracking configuration (docs/docs.json:1-66), although the hosted site's own behaviour is not visible in the repo. The docs mention 'Track activation for analytics' only as an optional feature for client implementors (docs/client-implementation/adding-skills-support.mdx:252)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "MDX/Markdown (docs)",
+        "JavaScript/JSX (docs snippets)",
+        "Shell (one Claude Code hook script)"
+      ],
+      "entry_points": [
+        {
+          "path": "skills-ref/src/skills_ref/cli.py",
+          "what": "`skills-ref` console script = `skills_ref.cli:main` (skills-ref/pyproject.toml:16-17). Click group with `validate`, `read-properties`, `to-prompt` (cli.py:20-101). Also runnable as `python -m skills_ref.cli` through the __main__ guard (cli.py:104-105); the package has no __main__.py."
+        },
+        {
+          "path": "skills-ref/src/skills_ref/__init__.py",
+          "what": "Python API exports: validate, read_properties, to_prompt, find_skill_md, SkillProperties, SkillError/ParseError/ValidationError; __version__ = '0.1.0' (lines 3-20)."
+        },
+        {
+          "path": "package.json",
+          "what": "Root `dev` script `cd docs && npx mint dev` (package.json:4-6): local preview of the Mintlify docs site only; not part of skills-ref."
+        },
+        {
+          "path": ".claude/hooks/session-start.sh",
+          "what": "Claude Code SessionStart hook registered in .claude/settings.json:3-12; prints a JSON line and checks whether `mint` is on PATH (lines 3-8). Contributor convenience for the docs site."
+        }
+      ],
+      "architecture": "Small single-purpose library under skills-ref/src/skills_ref/. parser.py: find_skill_md (prefers SKILL.md, then skill.md; lines 12-27), parse_frontmatter (requires a leading '---', splits with content.split('---', 2), loads YAML with strictyaml and no schema, coerces metadata keys/values to str; lines 30-64), read_properties (builds SkillProperties; only checks name/description are non-empty strings; lines 67-112). validator.py: limits name<=64, description<=1024, compatibility<=500 (lines 10-12); ALLOWED_FIELDS = name, description, license, allowed-tools, metadata, compatibility (lines 15-22); NFKC-normalised name rules (lowercase, no leading/trailing/consecutive hyphens, isalnum-or-hyphen, directory name must match; lines 25-67); returns list[str] of errors. prompt.py: to_prompt emits <available_skills> XML with HTML-escaped name/description and the resolved SKILL.md path (lines 9-58). models.py: SkillProperties dataclass with to_dict. errors.py: SkillError -> ParseError, ValidationError. cli.py: thin Click wrapper. It operates only on explicitly supplied paths: no skill-directory discovery/scanning, no env or home-dir access, no body parsing or size checks, and no inspection of scripts/, references/ or assets/. Around it: docs/ (Mintlify site; docs/specification.mdx is declared authoritative in AGENTS.md:14-17; client-guide and skill-authoring guides; client showcase data in docs/snippets/clients.jsx), plus AGENTS.md and CONTRIBUTING.md. The tree contains no SKILL.md files.",
+      "packaging_and_release": "Build backend hatchling; wheel target packages = ['src/skills_ref'] (skills-ref/pyproject.toml:19-24). Version 0.1.0 is set in pyproject.toml:3 and hard-coded again in skills_ref/__init__.py:20. The README documents only editable installs from a source checkout (skills-ref/README.md:10-25); no PyPI or other registry publication is documented anywhere in the tree. No release workflow: there is no .github/ directory (Glob of .github/* and .github/**/* returned nothing), no YAML/CI files at all (Glob of **/*.yml,*.yaml returned none), no publish/twine/sigstore/attest/checksum settings in pyproject.toml, READMEs, CONTRIBUTING.md or AGENTS.md (grep), no CHANGELOG/RELEASE file, and the shallow clone carries no tags (.git/packed-refs lists only refs/remotes/origin/main). So no release artifacts, checksums, signatures or attestations are produced by anything visible in this repo. skills-ref/uv.lock pins dependencies with sha256 hashes (e.g. uv.lock:12-14), which is dependency integrity, not release signing. Docs deploy automatically on push to the default branch via Mintlify (docs/README.md:15-17); that pipeline's configuration is not in the repo.",
+      "tests_and_ci": "Framework: pytest (dev dependency, skills-ref/pyproject.toml:26-30; pytest 9.0.1 locked, uv.lock:62-76) using the tmp_path fixture. Tests are in skills-ref/tests/: 3 test modules plus __init__.py. Counted with grep on '^def test_': test_parser.py 15, test_prompt.py 4, test_validator.py 21, 40 test functions in total. They cover frontmatter parsing, property reading, SKILL.md/skill.md lookup, name/description/compatibility validation, unexpected-field rejection, i18n names (Chinese/Russian) and NFKC normalisation, and XML escaping in to_prompt. cli.py has no tests (no CliRunner or CLI references under skills-ref/tests). ruff is a dev dependency (pyproject.toml:29) but pyproject.toml has no [tool.ruff] or [tool.pytest] configuration; no pre-commit config, tox/nox, Makefile or justfile was found. CI: none; the checkout has no .github/ directory and no other CI configuration, so nothing runs the tests automatically. I read the tests but did not execute them (no shell available).",
+      "dependencies": "skills-ref/pyproject.toml: 2 direct runtime dependencies, click>=8.0 and strictyaml>=1.7.3 (lines 11-14); 2 direct dev dependencies, pytest>=7.0 and ruff>=0.8.0 (lines 26-30); build requirement hatchling (lines 19-21); requires-python >=3.11 (line 10). skills-ref/uv.lock has 12 [[package]] entries (11 third-party + skills-ref itself). Runtime closure: click 8.3.1 (colorama 0.4.6 only on win32), strictyaml 1.7.3 -> python-dateutil 2.9.0.post0 -> six 1.17.0 (5 third-party packages). Dev-only: pytest 9.0.1 (iniconfig, packaging, pluggy, pygments) and ruff 0.14.7. Root package.json: 0 dependencies (private; a single `dev` script, package.json:1-7). The Mintlify CLI for docs preview is installed ad hoc via npm/npx and is not pinned (CONTRIBUTING.md:57-63; docs/README.md:9-11).",
+      "security_policy": "none - no SECURITY.md or equivalent anywhere in the tree (Glob for SECURITY*/security* found nothing) and no .github/ directory. CONTRIBUTING.md:13 routes bug reports to public GitHub Issues; no private vulnerability-reporting channel is described."
+    },
+    "claim_checks": [
+      {
+        "claim": "The project provides a skills collection / catalog (README points to example skills; README.md:46-51). CONTRIBUTING.md:46 says 'We don't maintain a directory of community skills.'",
+        "verified": "yes",
+        "evidence": "The tree contains no skills. Glob for **/{SKILL,skill}.md returned no files, and skills-ref/ holds only src/, tests/, pyproject.toml, uv.lock, README.md, LICENSE and .gitignore. Example skills are only linked to an external repo (README.md:50; https://github.com/anthropics/skills), which was not opened. No engineering or security procedures are shipped here."
+      },
+      {
+        "claim": "Agents load skills via progressive disclosure; full instructions load only when a task calls for them (README.md:30-40).",
+        "verified": "partial",
+        "evidence": "This describes client behaviour. In this repo only tier 1 exists: to_prompt emits name/description/location (skills-ref/src/skills_ref/prompt.py:35-56) and the skills-ref README says the agent then reads SKILL.md itself (skills-ref/README.md:109). The client guide spells out the three tiers (docs/client-implementation/adding-skills-support.mdx:18-30). No code here selects skills per task, scans directories or loads SKILL.md bodies on activation (grep of skills-ref/src found no glob/walk/iterdir/env use); `to-prompt` just lists the paths the caller passes (cli.py:76-101). Actual Claude Code/Codex behaviour is not checkable here."
+      },
+      {
+        "claim": "'The same skill works in any compatible agent, including Claude Code and OpenAI Codex' (docs/skill-creation/quickstart.mdx:13); both are listed as supporting clients (docs/snippets/clients.jsx:135-159).",
+        "verified": "not_checkable",
+        "evidence": "Client behaviour lives in third-party products. The repo only lists them with links to their own docs (clients.jsx:141,157: https://code.claude.com/docs/en/skills, https://developers.openai.com/codex/skills/; not opened). There is no client code and no conformance test here, and skills-ref has no Claude/Codex-specific code (grep for claude/codex hits only docs, the docs-contributor hook and a prompt.py docstring)."
+      },
+      {
+        "claim": "skills-ref 'is intended for demonstration purposes only. It is not meant to be used in production.' (skills-ref/README.md:5-6)",
+        "verified": "yes",
+        "evidence": "Corroborated by AGENTS.md:23-26 ('a demonstration artifact, not a production SDK'; modify only when explicitly scoped) and CONTRIBUTING.md:40 (direction undecided, code contributions not accepted). Version is 0.1.0 (skills-ref/pyproject.toml:3)."
+      },
+      {
+        "claim": "The CLI offers validate, read-properties and to-prompt, and the Python API exports validate, read_properties, to_prompt (skills-ref/README.md:56-87).",
+        "verified": "yes",
+        "evidence": "pyproject.toml:16-17 registers the script; cli.py:27,53,76 define the three commands; __init__.py:3-18 exports the API. `validate` takes exactly one path (cli.py:28) and `to-prompt` takes one or more (cli.py:77-79), so there is no bulk or recursive validation of a collection. The CLI has no tests."
+      },
+      {
+        "claim": "`to-prompt` outputs the <available_skills> XML shown in the README, with each tag on its own line (skills-ref/README.md:93-107).",
+        "verified": "yes",
+        "evidence": "prompt.py:35-56 emits <name>, <description> and <location> on separate lines and test_prompt.py:23-24 asserts that form. The docstring example in prompt.py:23-30 and the client guide (adding-skills-support.mdx:167-180) show single-line or indented variants, so the code defines the exact output and the README matches it. name/description are HTML-escaped (prompt.py:43,46) but <location> (the absolute resolved SKILL.md path) is not (prompt.py:38,49-52)."
+      },
+      {
+        "claim": "Spec name rules: <=64 chars, lowercase unicode alphanumerics and hyphens, no leading/trailing/consecutive hyphens, must match the parent directory (docs/specification.mdx:58-65).",
+        "verified": "yes",
+        "evidence": "validator.py:25-67 enforces each rule after NFKC normalisation. c.isalnum() admits non-Latin letters and digits (test_validator.py:165-218 covers Chinese and Russian; uppercase Russian is rejected). The directory comparison is also NFKC-normalised (validator.py:60-65)."
+      },
+      {
+        "claim": "Spec field constraints: compatibility 'Must be 1-500 characters if provided', metadata is a string-to-string map, allowed-tools is a space-separated string (docs/specification.mdx:126,147-152,163-167).",
+        "verified": "partial",
+        "evidence": "Code differs from the docs and wins. _validate_compatibility only checks the type is str and len<=500, so an empty string passes (validator.py:87-101). validate_metadata never type-checks license, metadata or allowed-tools (validator.py:118-147); the parser only coerces metadata keys/values to str (parser.py:61-62) and passes allowed-tools through untouched (parser.py:110). Read from code, not executed."
+      },
+      {
+        "claim": "`skills-ref validate` 'checks that your SKILL.md frontmatter is valid and follows all naming conventions' (docs/specification.mdx:243-247).",
+        "verified": "partial",
+        "evidence": "True for frontmatter shape and name rules (validator.py:150-177), but the check is strict. Any key outside the six ALLOWED_FIELDS is an error (validator.py:15-22,104-115; test_validator.py:120-131), whereas the client guide mentions a `disable-model-invocation` flag (adding-skills-support.mdx:226) and recommends lenient, warn-and-load validation (adding-skills-support.mdx:128-141). validate discards the body (validator.py:173): no body-size, script, references/ or assets/ checks."
+      },
+      {
+        "claim": "Token-cost guidance: ~100 tokens of metadata per skill at startup, SKILL.md body <5000 tokens and <500 lines recommended (docs/specification.mdx:220-224; adding-skills-support.mdx:24,184).",
+        "verified": "not_checkable",
+        "evidence": "These are unmeasured guidance figures. The repo has no tokenizer or measurement code, no published measurements, and the validator does not enforce body size (validator.py:173)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: skills-ref is a format validator and prompt-snippet generator, not a skills collection. The tree has no SKILL.md files, CONTRIBUTING.md:46 says no directory of community skills is maintained, and README.md:50 only links an external examples repo (not opened here). No engineering or security procedures are shipped, and per-task skill loading is left to clients (README.md:30-40; docs/client-implementation/adding-skills-support.mdx:18-30).",
+      "Self-declared demo status: 'intended for demonstration purposes only... not meant to be used in production' (skills-ref/README.md:5-6; AGENTS.md:23-26). The version is 0.1.0 (skills-ref/pyproject.toml:3), CONTRIBUTING.md:40 says the direction is undecided and code contributions are not accepted, and AGENTS.md:14-17 says implementations and tests add no format requirements, so skills-ref behaviour is explicitly non-normative.",
+      "No release, provenance or CI machinery: no .github/ directory or any CI/workflow file, no tags in the clone (.git/packed-refs), no registry install documented (only editable installs from a checkout, skills-ref/README.md:10-25), no checksums/signatures/attestations, and the version is hard-coded in two places (pyproject.toml:3; __init__.py:20). The 40 tests (parser/validator/prompt only, none for cli.py) are not run by any automation in this repo, and I did not run them.",
+      "No security policy: no SECURITY.md or private vulnerability-reporting instructions anywhere in the tree; CONTRIBUTING.md:13 routes bugs to public GitHub Issues.",
+      "Skills are an instruction/code injection surface that skills-ref does not assess. The spec lets skills bundle executable scripts (docs/specification.mdx:191-198) and pre-approve tools via the experimental `allowed-tools` field (specification.mdx:163-173). The client guide warns that untrusted repositories can 'silently inject instructions into the agent's context' (adding-skills-support.mdx:89-91). validate checks only frontmatter shape and name/directory match (validator.py:150-177), with no content, script or permission scanning, and to-prompt places author-supplied descriptions into a system-prompt block (skills-ref/README.md:91; prompt.py:43-46).",
+      "Validator versus spec and client behaviour (read from code, not executed). Any frontmatter key outside {name, description, license, allowed-tools, metadata, compatibility} is an error (validator.py:15-22,104-115) even though the client guide cites a `disable-model-invocation` flag (adding-skills-support.mdx:226) and recommends lenient loading (adding-skills-support.mdx:128-141). The spec's compatibility minimum of 1 character, string-typed metadata/allowed-tools and the body-size recommendations are not enforced (validator.py:87-147,173; docs/specification.mdx:126,147-167,221-224).",
+      "Implementation quirks found by reading, not executed. parse_frontmatter uses content.split('---', 2) (parser.py:45), so a '---' inside a frontmatter value would end the frontmatter early. The <location> element in to-prompt output is not XML-escaped although name and description are (prompt.py:43,46,50-52). read_text() is called without an explicit encoding (parser.py:89; validator.py:172) although i18n skill names are supported (test_validator.py:165-218). to_prompt calls read_properties, which does not run validate (prompt.py:39; parser.py:67-112). The CLI documents only exit codes 0/1 (cli.py:35-37).",
+      "Licensing and notices: code is Apache-2.0 (LICENSE:190 'Copyright 2025 Anthropic, PBC'; skills-ref/pyproject.toml:5) and docs are CC-BY-4.0 (docs/LICENSE; README.md:59), so reused documentation text carries attribution terms. skills-ref/LICENSE retains the unfilled template line 'Copyright [yyyy] [name of copyright owner]' (skills-ref/LICENSE:190), so the subdirectory's own notice names no owner. Contributions are licensed under Apache-2.0 (code) and CC-BY-4.0 (docs) (CONTRIBUTING.md:114)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "agentskills/agentskills",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip in a venv, editable install from a source checkout (macOS/Linux); the README does not say so, but it must be run inside skills-ref/ where pyproject.toml lives. Command: python -m venv .venv / source .venv/bin/activate / pip install -e .",
+          "citation": "skills-ref/README.md:10-18",
+          "holds": true,
+          "note": "Lines 10-18 are the '### macOS / Linux' > 'Using pip:' block with exactly these three commands (lines 14-18). The README names no working directory, and the added note is correct: the only pyproject.toml in the tree is skills-ref/pyproject.toml (hatchling backend, pyproject.toml:19-24), there is no setup.py/setup.cfg anywhere, and the root package.json is npm-only (package.json:1-7). So `pip install -e .` works only from skills-ref/."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0, file: LICENSE",
+          "citation": "LICENSE:2-3,190; skills-ref/pyproject.toml:5; README.md:59",
+          "holds": true,
+          "note": "LICENSE is the Apache License 2.0 text (lines 2-3) with 'Copyright 2025 Anthropic, PBC' (line 190), and skills-ref/pyproject.toml:5 declares license = \"Apache-2.0\". No file declares a conflicting project license; 'MIT' appears only in test fixtures. The field covers the code only: docs/ is CC BY 4.0 ('Attribution 4.0 International', docs/LICENSE:1; README.md:59; CONTRIBUTING.md:114), and skills-ref/LICENSE:190 keeps the unfilled 'Copyright [yyyy] [name of copyright owner]' line. The dossier already records both points elsewhere."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - README documents a 'macOS / Linux' install; requires Python >=3.11; pure Python (wheel packages only src/skills_ref; locked dependencies are py3-none-any / py2.py3-none-any wheels); architecture not stated; no CI in this checkout.",
+          "citation": "skills-ref/README.md:10-25; skills-ref/pyproject.toml:10,23-24; skills-ref/uv.lock:14,87,122,161",
+          "holds": true,
+          "note": "README.md:10 is '### macOS / Linux' with pip and uv blocks through line 25 and no architecture given. pyproject.toml:10 has requires-python = \">=3.11\" and :23-24 has packages = [\"src/skills_ref\"]; src/skills_ref holds only .py files. uv.lock:14/87/122/161 are click-8.3.1-py3-none-any, python_dateutil-2.9.0.post0-py2.py3-none-any, six-1.17.0-py2.py3-none-any and strictyaml-1.7.3-py3-none-any. No .github/ and no .yml/.yaml file exist (Glob does search hidden dirs; it finds .claude/). 'Locked dependencies' is accurate for the runtime closure only; the dev-only ruff ships platform wheels (uv.lock:96-113), including manylinux x86_64 (uv.lock:105), so `uv sync` with the default dev group is still covered."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "Yes. `skills-ref` console script (-> skills_ref.cli:main) with subcommands validate (exactly one path), read-properties (one path, JSON on stdout) and to-prompt (one or more paths); paths may be the skill directory or its SKILL.md; errors exit with code 1.",
+          "citation": "skills-ref/pyproject.toml:16-17; skills-ref/src/skills_ref/cli.py:15-17,27-101; skills-ref/README.md:56-67",
+          "holds": true,
+          "note": "pyproject.toml:16-17 has skills-ref = \"skills_ref.cli:main\". validate takes a single argument (cli.py:27-28); read-properties takes a single argument and prints json.dumps(..., indent=2) to stdout (cli.py:53-54,70); to-prompt uses nargs=-1, required=True (cli.py:76-79). _is_skill_md_file matches the name 'skill.md' case-insensitively and swaps in the parent dir (cli.py:15-17,39-40,66-67,92-93). Every in-command error path calls sys.exit(1) (cli.py:48,73,101). Caveat: click.Path(exists=True) (cli.py:28,54,78) rejects non-existent paths before those branches run. Click usage errors conventionally exit 2, but Click is not vendored, so that cannot be confirmed in-tree."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Claim: 'The project provides a skills collection / catalog (README points to example skills; README.md:46-51). CONTRIBUTING.md:46 says \"We don't maintain a directory of community skills.\"' - verified: \"yes\".",
+          "citation": "README.md:46-51; CONTRIBUTING.md:46; Glob **/{SKILL,skill}.md and skills-ref/**/*",
+          "holds": false,
+          "note": "Each cited fact checks out: README.md:50 only links https://github.com/anthropics/skills, CONTRIBUTING.md:46 reads 'We don't maintain a directory of community skills', no SKILL.md/skill.md exists (all 14 .md/.mdx files are READMEs or docs; .claude/ holds only settings.json and a hook), and skills-ref/ holds exactly src/, tests/, pyproject.toml, uv.lock, README.md, LICENSE and .gitignore. But that evidence refutes the claim being tested, and the label still says verified \"yes\". This contradicts the entry's own evidence, the dossier's purpose ('It ships no skills') and risks[0]. A reader keying on the label would conclude the repo supplies skills."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "claim_checks[0]: change \"verified\" from \"yes\" to \"no\". The claim 'The project provides a skills collection / catalog' is refuted by its own evidence: the tree has no SKILL.md/skill.md, CONTRIBUTING.md:46 says no directory of community skills is maintained, and README.md:50 only links the external anthropics/skills repo. Leave the evidence text as is."
+      ]
+    }
+  ]
+}

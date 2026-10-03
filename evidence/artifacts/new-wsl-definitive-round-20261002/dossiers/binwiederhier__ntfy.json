@@ -1,0 +1,284 @@
+{
+  "contender": "binwiederhier/ntfy",
+  "revision": {
+    "contender": "binwiederhier/ntfy",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "binwiederhier/ntfy",
+        "tag": "v2.28.0",
+        "commit": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.28.0",
+    "commit": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+    "read_at": "2026-10-02T03:01:59+00:00"
+  },
+  "dossier": {
+    "contender": "binwiederhier/ntfy",
+    "revision": {
+      "tag": "v2.28.0",
+      "commit": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0 OR GPL-2.0-only",
+      "file": "LICENSE, LICENSE.GPLv2"
+    },
+    "purpose": "ntfy is a self-hostable HTTP pub-sub push-notification service with a CLI, a Go client package and a React web app (README.md:28-31). Messages are published with PUT/POST to a topic URL and received via JSON-stream, SSE, raw or WebSocket subscriptions or the mobile/web apps (server/server.go:670-689). For the roles named in the needs (OTLP collector/privacy filter, metrics store, events/logs store, dashboards over those stores, trace/dataset/experiment store, local model server) the checkout contains none of them: no OTLP receiver and no gRPC/protobuf/OpenTelemetry imports in first-party code (OpenTelemetry appears only as indirect Go modules, go.mod:87-95); no telemetry store; no dashboard UI (only an example Grafana JSON for ntfy's own Prometheus /metrics, examples/grafana-dashboard/ntfy-grafana.json); no trace/eval tooling; no model-serving or GPU code. All facts below come from static reading of the v2.28.0 checkout; nothing was built, run or tested.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "ntfy ('notify') is 'a simple HTTP-based pub-sub notification service'; notifications can be sent 'to your phone or desktop via scripts from any computer, without having to sign up or pay any fees'.",
+          "citation": "README.md:28-30"
+        },
+        {
+          "claim": "Self-hosting is offered: 'If you'd like to run your own instance of the service, you can easily do so since ntfy is open source.'",
+          "citation": "README.md:30-31"
+        },
+        {
+          "claim": "A free hosted instance exists at ntfy.sh, plus an open-source Android app (Google Play / F-Droid) and an open-source iOS app (App Store) in separate repositories.",
+          "citation": "README.md:33-35"
+        },
+        {
+          "claim": "Paid hosted plans ('ntfy Pro') are offered for ntfy.sh for people who don't want to self-host.",
+          "citation": "README.md:51-53"
+        },
+        {
+          "claim": "Documentation is hosted at ntfy.sh/docs: getting started, Android/iOS, API (publish), install/self-hosting, building.",
+          "citation": "README.md:57-63"
+        },
+        {
+          "claim": "'The project is dual licensed under the Apache License 2.0 and the GPLv2 License.'",
+          "citation": "README.md:252"
+        },
+        {
+          "claim": "go-sqlite3 (MIT) 'is used to provide the persistent message cache'.",
+          "citation": "README.md:266"
+        },
+        {
+          "claim": "Firebase Admin SDK (Apache 2.0) 'is used to send FCM messages'; webpush-go (MIT) 'is used to send web push notifications'.",
+          "citation": "README.md:267, README.md:275"
+        },
+        {
+          "claim": "Go's text/template (BSD-3-Clause) 'is vendored under template/gotext/ with a small patch adding an execution deadline'; Sprig (MIT) 'is used to add template parsing functions'.",
+          "citation": "README.md:269, README.md:276"
+        },
+        {
+          "claim": "Bundled notification sounds come from Mixkit (Mixkit Free License) and notificationsounds.com (Creative Commons Attribution).",
+          "citation": "README.md:256-257"
+        },
+        {
+          "claim": "Sponsor banner: 'Special thanks to: Warp, built for coding with multiple AI agents'. This is a sponsorship notice only; Warp is mentioned nowhere else in the repository.",
+          "citation": "README.md:5-10"
+        },
+        {
+          "claim": "The README is silent on OTLP/OpenTelemetry, telemetry, metrics/Prometheus, dashboards, tracing/evals, Claude Code, Codex, MCP, GPUs and model serving (read in full; a keyword search matches only 'MUI dashboard template' at line 261 and an unrelated substring in a username at line 116).",
+          "citation": "README.md:1-277"
+        }
+      ],
+      "install": [
+        {
+          "method": "Linux release tarball (amd64 shown; armv6/armv7/arm64 variants documented)",
+          "command": "wget https://github.com/binwiederhier/ntfy/releases/download/v2.28.0/ntfy_2.28.0_linux_amd64.tar.gz\ntar zxvf ntfy_2.28.0_linux_amd64.tar.gz\nsudo cp -a ntfy_2.28.0_linux_amd64/ntfy /usr/local/bin/ntfy\nsudo mkdir /etc/ntfy && sudo cp ntfy_2.28.0_linux_amd64/{client,server}/*.yml /etc/ntfy\nsudo ntfy serve",
+          "citation": "docs/install.md:35-42"
+        },
+        {
+          "method": "Debian/Ubuntu apt repository at archive.ntfy.sh (GPG-signed; amd64 shown, armhf/arm64 documented)",
+          "command": "sudo mkdir -p /etc/apt/keyrings\nsudo curl -L -o /etc/apt/keyrings/ntfy.gpg https://archive.ntfy.sh/apt/keyring.gpg\nsudo apt install apt-transport-https\necho \"deb [arch=amd64 signed-by=/etc/apt/keyrings/ntfy.gpg] https://archive.ntfy.sh/apt stable main\" | sudo tee /etc/apt/sources.list.d/ntfy.list\nsudo apt update\nsudo apt install ntfy\nsudo systemctl enable ntfy\nsudo systemctl start ntfy",
+          "citation": "docs/install.md:162-175"
+        },
+        {
+          "method": "Release .deb or .rpm package (amd64 shown; armv6/armv7/arm64 also documented)",
+          "command": "wget https://github.com/binwiederhier/ntfy/releases/download/v2.28.0/ntfy_2.28.0_linux_amd64.deb\nsudo dpkg -i ntfy_*.deb\nsudo systemctl enable ntfy\nsudo systemctl start ntfy\n# Fedora/RHEL/CentOS:\nsudo rpm -ivh https://github.com/binwiederhier/ntfy/releases/download/v2.28.0/ntfy_2.28.0_linux_amd64.rpm\nsudo systemctl enable ntfy\nsudo systemctl start ntfy",
+          "citation": "docs/install.md:205-211, docs/install.md:239-244"
+        },
+        {
+          "method": "Docker image binwiederhier/ntfy (amd64, armv6, armv7, arm64)",
+          "command": "docker run -p 80:80 -it binwiederhier/ntfy serve",
+          "citation": "docs/install.md:357-373"
+        },
+        {
+          "method": "macOS release tarball (universal binary; CLI client only, server unsupported on macOS)",
+          "command": "curl -L https://github.com/binwiederhier/ntfy/releases/download/v2.28.0/ntfy_2.28.0_darwin_all.tar.gz > ntfy_2.28.0_darwin_all.tar.gz\ntar zxvf ntfy_2.28.0_darwin_all.tar.gz\nsudo cp -a ntfy_2.28.0_darwin_all/ntfy /usr/local/bin/ntfy\nmkdir ~/Library/Application\\ Support/ntfy\ncp ntfy_2.28.0_darwin_all/client/client.yml ~/Library/Application\\ Support/ntfy/client.yml\nntfy --help",
+          "citation": "docs/install.md:302-321"
+        },
+        {
+          "method": "Homebrew (community-maintained per docs; CLI only; Linux and macOS)",
+          "command": "brew install ntfy",
+          "citation": "docs/install.md:323-330"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes: static linux/amd64 binary (tar.gz), deb/rpm packages and a Docker image are release artifacts (.goreleaser.yml:7-15, 68-103, 104-119, 151-158); documented in docs/install.md:12-13, 27-42, 155-265, 357-373.",
+        "wsl2": "unknown: no WSL/WSL2 mention in the README or docs (repo-wide search found only unrelated text). A linux/amd64 binary and a native Windows amd64 build exist (docs/install.md:332-355), but WSL2 itself is undocumented.",
+        "macos_arm64": "yes, CLI client only: a universal darwin (amd64+arm64) binary built with CGO disabled and the `noserver` tag (.goreleaser.yml:58-67, 137-140). docs/install.md:302-321 say only `ntfy publish`/`ntfy subscribe` are supported on macOS and the server is not supported (it can be built from source for development: Makefile:207-215).",
+        "gpu": "no: there is no GPU/CUDA/inference code or documentation; a repo-wide search for gpu|cuda|nvidia|rtx matched only unrelated identifiers."
+      },
+      "integrations": {
+        "cli": "Yes. A single `ntfy` binary with `serve`, `publish` (aliases pub/send/trigger; --wait-cmd/--wait-pid publish when a command or PID finishes), `subscribe` (alias sub; prints JSON per message, runs a command per message with NTFY_* env vars, or runs as a service from client.yml via --from-config) and server-side admin commands `user`, `access`, `token`, `tier`, `webpush keys` (cmd/serve.go:125-141, cmd/publish.go:22-88, cmd/subscribe.go:32-83, cmd/user.go:44, cmd/access.go:26, cmd/token.go:21, cmd/tier.go:33, cmd/webpush.go:23; docs/subscribe/cli.md:26-96). The admin commands are excluded from `noserver` (macOS) builds.",
+        "mcp": "None found in this repository. The only matches for 'mcp' are links to a third-party 'ntfy-me-mcp' server (github.com/gitmotion/ntfy-me-mcp; docs/integrations.md:182); that external repository was not opened.",
+        "sdk_or_api": "HTTP API: publish via PUT/POST /{topic} (also GET /{topic}/publish|send|trigger and JSON publishing), subscribe via GET /{topic}/json, /sse, /raw, /ws with poll and since= replay, update/delete/clear by sequence ID, built-in webhook templates for github, grafana and alertmanager (server/server.go:670-689; server/templates/*.yml; docs/publish.md:2925-2963, 3549; docs/subscribe/api.md:9-237). Also /v1/health, public /v1/stats, /metrics when enabled, and account/admin REST under /v1 (server/server.go:105-136, 563-698). First-party Go client package client/ (Publish/PublishReader/Poll/Subscribe, client/client.go:78-205); no other first-party SDKs, community libraries are only listed (docs/integrations.md:69-88). No OTLP endpoint.",
+        "claude_code_or_codex": "None found. A repo-wide search for claude|codex matches only docs/releases.md:359 (a release note saying the PostgreSQL code was written by Cursor and Claude). There are no hooks, plugins, CLAUDE.md/AGENTS.md or other agent config files."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code exists in the Go server/CLI or the web app: repo-wide searches find only payments/payments.go:17-21, which sets stripe.EnableTelemetry=false (docs/privacy.md:91); the web app's VersionChecker only polls its own server's /v1/config every 5 minutes (web/src/app/VersionChecker.js:6,48). No OTLP/OpenTelemetry code is in first-party sources (OpenTelemetry modules are only indirect Go dependencies, go.mod:87-95). The server connects out only for features the operator configures: iOS `upstream-base-url` poll-request forwarding, which sends the message ID and the SHA-256 of the topic URL (cmd/serve.go:71-72; server/server.go:1096-1126; docs/config.md:1598-1638), Firebase FCM via `firebase-key-file` (server/server.go:281-294), outgoing SMTP (mail/sender.go:129), Twilio (twilio/client.go:101,140), Stripe (payments), S3 attachments via an `s3://` URL (server/server.go:338-345), Web Push to browser-vendor endpoints (server/server_webpush.go:159) and PostgreSQL via `database-url`. Incoming SMTP and Matrix requests are handled in-process (server/smtp_server.go:196-213; server/server.go:2115-2131). The ntfy CLI defaults to the public hosted service https://ntfy.sh unless `default-host` or a full topic URL is given (client/config.go:11,40; client/client.yml:6). Server defaults: open read-write access for anyone who can reach it (cmd/serve.go:53; docs/config.md:611-613), listens on :80 (server/config.go:19), keeps messages in memory for 12 h (docs/config.md:486-487), and logs topic names and IP addresses (docs/faq.md:25-29). At log-level trace it dumps full request headers (including Authorization) and message bodies without redaction (server/server.go:500-501, 930-931; server/log.go:100-127). Prometheus /metrics and pprof listeners are off unless enabled (cmd/serve.go:113-115; docs/config.md:2226-2269). No account is required for core use; optional external accounts or services are Firebase, Twilio, Stripe, an SMTP relay, S3 and, for hosted use, ntfy.sh. The Android/iOS apps use Firebase Cloud Messaging for the ntfy.sh host (docs/privacy.md:58-67, 105-130); those apps live in separate repositories that were not opened."
+    },
+    "code": {
+      "languages": [
+        "Go (server, CLI, client; go.mod 'go 1.25.8'; CI/release toolchain pinned to 1.27.0 in .go-version)",
+        "JavaScript/JSX (React + MUI + Vite web app in web/)",
+        "Python (only MkDocs documentation build dependencies, requirements.txt)",
+        "Shell, Make and YAML (build, packaging, examples)"
+      ],
+      "entry_points": [
+        {
+          "path": "main.go",
+          "what": "Binary `ntfy`: sets version/commit/date via ldflags and runs the urfave/cli app built by cmd.New() (main.go:19-42)."
+        },
+        {
+          "path": "cmd/serve.go",
+          "what": "`ntfy serve`: starts the server; dozens of flags, env vars and config-file keys (cmd/serve.go:33-123, 125-141); compiled out by the `noserver` build tag."
+        },
+        {
+          "path": "cmd/publish.go",
+          "what": "`ntfy publish` (aliases pub, send, trigger): CLI publisher with --wait-cmd/--wait-pid, attachments and templates (cmd/publish.go:22-88)."
+        },
+        {
+          "path": "cmd/subscribe.go",
+          "what": "`ntfy subscribe` (alias sub): prints JSON per message, runs a command per message, or runs as a service from client.yml (cmd/subscribe.go:32-83)."
+        },
+        {
+          "path": "server/server.go",
+          "what": "server.New / (*Server).Run: HTTP, HTTPS, Unix-socket and SMTP listeners plus optional metrics and pprof listeners; route table handleInternal (server/server.go:178-325, 349-439, 563-698)."
+        },
+        {
+          "path": "cmd/user.go",
+          "what": "Server-side admin commands `ntfy user|access|token|tier` (cmd/user.go:44, cmd/access.go:26, cmd/token.go:21, cmd/tier.go:33) and `ntfy webpush keys` (cmd/webpush.go:23); present only in !noserver builds."
+        },
+        {
+          "path": "client/client.go",
+          "what": "Go client library: Client.Publish/PublishReader/Poll/Subscribe/Unsubscribe (client/client.go:78-205); config in client/config.go."
+        },
+        {
+          "path": "tools/pgimport/main.go",
+          "what": "One-off SQLite to PostgreSQL migration program. Other helper mains (tools/loadtest, tools/loadgen, tools/fbsend, tools/s3cli) are dev tools; GoReleaser builds only the root main.go (.goreleaser.yml:6-67)."
+        }
+      ],
+      "architecture": "One Go module (heckel.io/ntfy/v2) building a single `ntfy` binary: main.go calls cmd/, the urfave/cli layer (serve, publish, subscribe, user, access, token, tier, webpush; YAML/env/flag loading in cmd/config_loader.go). server/ is the HTTP/WebSocket/SMTP server: server.go holds the route table (handleInternal) and publish/subscribe fan-out to in-memory topics (topic.go), visitor.go does per-visitor rate limiting, server_account.go/server_admin.go/server_auth.go handle accounts, admin and auth, server_template.go renders user templates using the vendored template/gotext and util/sprig, and optional integrations live in server_firebase.go, server_webpush.go, server_matrix.go, server_twilio.go, server_payments.go and smtp_server.go (several gated by build tags nofirebase, nowebpush, nopayments, noserver). Storage: message/ (message cache: in-memory by default, SQLite, PostgreSQL or no-op; server/server.go:327-336), user/ (users, ACLs, tokens, tiers; SQLite/PostgreSQL), webpush/ (subscriptions), attachment/ plus s3/ (filesystem or S3 attachments), db/ (pgx pool with read replicas, schema migrations). metrics/ defines 21 Prometheus collectors served at /metrics when enabled; ban/ writes a fail2ban-style ban file; log/ is the structured logger (trace to error, text or JSON); client/ is the Go client used by the CLI. The React web app (web/) and MkDocs docs (docs/) are built and embedded into the binary via `//go:embed site` and `//go:embed docs` (server/server.go:144-152).",
+      "packaging_and_release": "Releases are cut by GoReleaser v2 (.goreleaser.yml:1) through `make release` (Makefile:389-390), triggered by pushing a tag matching v[0-9]+.[0-9]+.[0-9]+ (.github/workflows/release.yaml:3-5, 46-49). `make release` first runs release-checks (docs/install.md and docs/releases.md must mention the tag, clean git tree, Go must equal .go-version; Makefile:395-412) and the full `check` suite (Makefile:389). Artifacts: statically linked Linux binaries in tar.gz for amd64, armv6, armv7 and arm64 (CGO, -extldflags=-static; .goreleaser.yml:7-47, 104-119), Windows amd64 zip (:48-57, 120-128), macOS universal client-only tar.gz (:58-67, 129-140), deb and rpm via nfpm (:68-103), and Docker Hub images binwiederhier/ntfy for amd64/arm64v8/armv7/armv6 with latest, <tag>, v<major> and v<major>.<minor> manifests (:151-206; Dockerfile is `FROM alpine`, no USER). A checksums.txt is generated (:141-142) and printed in CI (Makefile:264-272). No signing, attestation, SBOM or provenance step exists in the release workflow or GoReleaser config (a search for cosign/attest/sbom/signs/gpg found only the NodeSource key in Dockerfile-build:10-11). The documented apt repository archive.ntfy.sh is GPG-signed with a published fingerprint (docs/install.md:158-175) but its publishing pipeline is not in this repository. GoReleaser is installed with @latest (Makefile:245-246); GitHub Actions are pinned to commit SHAs (release.yaml:28-40). v2.28.0 is dated Aug 27, 2026 (docs/releases.md:9, 16).",
+      "tests_and_ci": "Go: standard `testing` plus stretchr/testify (go.mod:15); 76 _test.go files holding 971 top-level Test/Example functions (970 Test + 1 Example; no Benchmark or Fuzz functions), e.g. server/server_test.go 219 and user/manager_test.go 107, spread over server/, user/, message/, s3/, util/ (incl. util/sprig), cmd/, client/, ban/ and others; helper packages test/ and db/test/. PostgreSQL and S3 tests skip unless NTFY_TEST_DATABASE_URL / NTFY_TEST_S3_URL are set (db/test/test.go:19-24; attachment/store_s3_test.go:17-19). Web: vitest, 7 test files in web/src/app (about 90 it/test cases). Workflows in .github/workflows: test.yaml (push to main and PRs, ubuntu-latest only, Postgres 17 service; runs `make docs`, `make web`, `make checkv` = Go tests + prettier/gofmt/go vet/eslint/golint/staticcheck/vendored-template drift check, then `make coverage` = `go test -race -coverprofile`); build.yaml (push to main and PRs; `make build` = web + docs + GoReleaser snapshot builds for all targets); docs.yaml (push to main; builds MkDocs and pushes to binwiederhier/ntfy-docs.github.io); release.yaml (tag push, see above). No workflow calls `make coverage-upload` (Makefile:303-304), so the README codecov badge (README.md:21) is not fed by these workflows. Dependabot runs weekly for npm, gomod and github-actions with a 7-day cooldown (.github/dependabot.yml:1-26). Tests were not executed here.",
+      "dependencies": "go.mod: 21 direct and 69 indirect Go modules (68 in the require blocks plus github.com/pkg/errors at go.mod:28), direct ones at go.mod:10-23 and 31-38 (go-smtp, mimetype, gorilla/websocket, go-sqlite3, olebedev/when, testify, urfave/cli/v2, x/crypto, x/sync, x/term, x/time, google.golang.org/api, yaml.v2, firebase.google.com/go/v4, webpush-go, pgx/v5, bluemonday, prometheus/client_golang, stripe-go/v74, x/sys, x/text); a replace pins go-smtp to v0.17.0 although require says v0.25.0 (go.mod:10,26). tools/loadtest/go.mod is a separate module with 1 dependency (gorilla/websocket). web/package.json: 18 dependencies plus 12 devDependencies, react and react-dom set to 'latest' (lines 26-27), web/package-lock.json present and `npm ci` used (Makefile:154). requirements.txt: 2 unpinned Python packages (mkdocs-material, mkdocs-minify-plugin) used only to build docs. Vendored in-tree: template/gotext (Go stdlib text/template, BSD-3-Clause, patched) and util/sprig (Sprig, MIT).",
+      "security_policy": "SECURITY.md: only the latest version is supported (SECURITY.md:5); vulnerabilities are to be reported privately to security@mail.ntfy.sh (SECURITY.md:9) or via Discord/Matrix (SECURITY.md:11-12). GitHub security advisories are referenced in the changelog (GHSA IDs at docs/releases.md:213, 250) and in template/gotext/README.md:21."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:28 - ntfy is 'a simple HTTP-based pub-sub notification service'",
+        "verified": "yes",
+        "evidence": "Publish routes (PUT/POST /{topic}, GET /{topic}/publish|send|trigger) and subscribe routes (GET /{topic}/json|sse|raw|ws) are in the route table at server/server.go:670-689; topic and path regexes at server/server.go:84-95. Static read only."
+      },
+      {
+        "claim": "README.md:29-30 - notifications can be sent from any computer 'without having to sign up or pay any fees'",
+        "verified": "yes",
+        "evidence": "The user/auth manager is created only when auth-file or database-url is set (server/server.go:256-280) and auth-default-access defaults to read-write (cmd/serve.go:53; docs/config.md:611-613), so a default server accepts anonymous publish and subscribe, subject to per-visitor limits (burst 60, one request per 5 s; server/config.go:96-97). The CLI defaults to the hosted https://ntfy.sh (client/config.go:11)."
+      },
+      {
+        "claim": "README.md:30-31 - 'you can easily [run your own instance] since ntfy is open source'",
+        "verified": "partial",
+        "evidence": "`ntfy serve` exists (cmd/serve.go:125-141) and the Linux (static amd64/armv6/armv7/arm64) and Windows release binaries include the server (.goreleaser.yml:7-57). The official macOS binary is built with CGO off and the `noserver` tag (.goreleaser.yml:58-67) and docs/install.md:319-321 say the server is not supported on macOS. The default listen address :80 (server/config.go:19) needs root or CAP_NET_BIND_SERVICE (server/ntfy.service:11) unless --listen-http is changed."
+      },
+      {
+        "claim": "README.md:252 - 'dual licensed under the Apache License 2.0 and the GPLv2 License'",
+        "verified": "partial",
+        "evidence": "Both full texts are present (LICENSE:1-2 Apache 2.0; LICENSE.GPLv2:1-2 GPL v2), but no source file carries an SPDX identifier or per-file licence header (the only SPDX hits are inside GitHub webhook test fixtures under server/testdata). Metadata is inconsistent: nfpm package licence 'Apache 2.0' (.goreleaser.yml:73), web/index.html:25 'Apache License 2.0', Dockerfile:8 'Apache-2.0, GPL-2.0', CLI banner 'Apache License 2.0 & GPLv2' (main.go:28)."
+      },
+      {
+        "claim": "README.md:266 - go-sqlite3 'is used to provide the persistent message cache'",
+        "verified": "partial",
+        "evidence": "SQLite is used only when cache-file is set (server/server.go:332-333). The default cache is in-memory for 12 h and lost on restart (server/server.go:335; docs/config.md:486-487), cache-duration 0 disables it (server/server.go:328-329), and PostgreSQL via pgx is an alternative backend (cmd/serve.go:44; server/server.go:330-331; docs/config.md:420-430). The README's third-party list also omits direct dependencies such as pgx, Prometheus client_golang, Stripe, bluemonday and gorilla/websocket (README.md:254-276 vs go.mod:10-37)."
+      },
+      {
+        "claim": "README.md:267 - Firebase Admin SDK 'is used to send FCM messages'",
+        "verified": "yes",
+        "evidence": "server/server_firebase.go (build tag !nofirebase, line 1) with firebase.google.com/go/v4 (go.mod:31); active only when firebase-key-file is set (cmd/serve.go:43, 325-328; server/server.go:281-294); docs/config.md:1571-1596 call it optional. Release builds do not set the nofirebase tag (.goreleaser.yml:11), so the SDK is compiled in even when unused."
+      },
+      {
+        "claim": "README.md:269, 276 - Go's text/template is vendored under template/gotext/ with a small execution-deadline patch; Sprig 'is used to add template parsing functions'",
+        "verified": "yes",
+        "evidence": "template/gotext/README.md:1-11 and 54-64 describe the verbatim stdlib copy plus patches/0001-exec-context.patch, with drift checks in Makefile:333-374; it is used for user-supplied templates (template/gotext/README.md:33-36; server/server_template.go:19). Sprig is a vendored copy at util/sprig/ (util/sprig/LICENSE.txt:1, Masterminds), imported at server/server_template.go:21, not a go.mod module."
+      },
+      {
+        "claim": "docs/install.md:158-175 - the Debian/Ubuntu apt repository at archive.ntfy.sh is GPG-signed (fingerprint 55BA 774A 6F5E E674 31E4 B6B7 CFDB 962D 4F1E C4AF)",
+        "verified": "not_checkable",
+        "evidence": "The signed repository is hosted outside this repository; no workflow, script or config here builds, signs or publishes it (a search of .github, Makefile, .goreleaser.yml and scripts/ for gpg/cosign/sign found only the NodeSource key in Dockerfile-build:10-11). GitHub release artifacts get only checksums.txt (.goreleaser.yml:141-142)."
+      },
+      {
+        "claim": "docs/config.md:2227 - 'ntfy can expose a /metrics endpoint for Prometheus' (the only monitoring surface; the README is silent on it)",
+        "verified": "yes",
+        "evidence": "metrics/metrics.go:14-107 defines and registers 21 Prometheus collectors (messages, Firebase, e-mail, calls, UnifiedPush, Matrix, attachments, visitors, users, subscribers, topics, HTTP requests). The handler is mounted at /metrics or on metrics-listen-http when enabled (server/server.go:415-422, 660) and is off by default (cmd/serve.go:113-114; server/server.yml:466-467). It is a pull endpoint for ntfy's own server metrics; no OTLP export or ingestion exists."
+      },
+      {
+        "claim": "docs/privacy.md:159-161 - when self-hosting, 'No data is shared with ntfy.sh or any third party (unless you configure those integrations)'",
+        "verified": "yes",
+        "evidence": "No analytics/telemetry code exists in first-party Go or web sources (only payments/payments.go:17-21 disabling Stripe telemetry). Outbound calls are config-gated: upstream poll forwarding (server/server.go:1096-1126), Firebase (server/server.go:281-294), SMTP (mail/sender.go:129), Twilio (twilio/client.go:101,140), Web Push (server/server_webpush.go:159), S3 (server/server.go:338-345). Incoming SMTP and Matrix requests are handled in-process (server/smtp_server.go:196-213; server/server.go:2115-2131). Caveats: the CLI's default host is ntfy.sh (client/config.go:11) and trace logging dumps headers and bodies (server/server.go:500-501, 930-931). Static read only."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: ntfy is a push-notification pub-sub service, not an observability or inference stack. First-party code has no OTLP receiver or privacy-filter pipeline (route table server/server.go:563-698; no gRPC/protobuf/OpenTelemetry imports, OpenTelemetry only as indirect modules go.mod:87-95), no store for telemetry events/logs/traces/datasets, no dashboard UI beyond an example Grafana JSON for its own Prometheus metrics (examples/grafana-dashboard/ntfy-grafana.json), and no model-serving or GPU code. The only agent-related integration referenced is a third-party MCP server (docs/integrations.md:182) that was not reviewed; no Claude Code or Codex hook/plugin exists in this repo.",
+      "Open-by-default exposure: the server listens on :80 on all interfaces (server/config.go:19; docker-compose.yml:13-14) and auth-default-access is read-write, so anyone who can reach the port can publish to and read any topic until auth-file or database-url plus deny-all are configured (cmd/serve.go:53; docs/config.md:611-626); topic names are the only secret (docs/index.md:11-13). The Docker image has no USER directive and runs as root unless -u is passed (Dockerfile:1-16; docs/install.md:386-396).",
+      "Wrong-destination default: `ntfy publish` and `ntfy subscribe` use the public hosted https://ntfy.sh unless default-host or a full topic URL is set (client/config.go:11,40; client/client.yml:6), and topics on ntfy.sh are public (docs/publish.md:4910-4912), so an unconfigured CLI would send message text to a third-party service.",
+      "Sensitive logging: at log-level trace the server logs every HTTP request in full (all headers including Authorization, plus up to 4 KB of body) and the full message JSON, with no redaction (server/server.go:500-501, 930-931; server/log.go:100-127; no redaction code in log/ or server/log.go). Docs only say debug/trace are 'very verbose' and should be used briefly (docs/config.md:2282-2283). Normal levels log topic names, client IPs and body sizes (docs/faq.md:25-29; model/model.go:55-71).",
+      "Release integrity and supply chain: GitHub release artifacts and Docker Hub images come with only a checksums.txt, with no signatures, attestations or SBOM in .goreleaser.yml or release.yaml; GoReleaser is installed with @latest at release time (Makefile:245-246); the Docker base image is the untagged `alpine` (Dockerfile:1). Release binaries compile in the Stripe, Firebase/Google Cloud and Web Push SDKs because no nofirebase/nopayments/nowebpush tags are set (.goreleaser.yml:11), part of 21 direct plus 69 indirect Go modules (go.mod).",
+      "Platform limits: the official macOS release is client-only (CGO off, `noserver`; .goreleaser.yml:58-67) and docs state the server is unsupported on macOS (docs/install.md:319-321); building the server from source needs CGO for SQLite (docs/develop.md:14-15); WSL2 is not documented anywhere; CI runs on ubuntu-latest only (.github/workflows/test.yaml:8).",
+      "Maintenance and drift: SECURITY.md supports only the latest release (SECURITY.md:5). Releases are frequent (v2.12.0 May 29, 2025 to v2.28.0 Aug 27, 2026; docs/releases.md) and 2026 releases fixed SSRF (v2.22.0), web-app script execution via a crafted SVG preview (v2.23.0), template CPU/memory DoS (v2.26.0, v2.27.0) and unbounded replay cost (v2.28.0) (docs/releases.md:15-28, 41-44, 110-112, 213, 250). The PostgreSQL backend was written by AI tools and reviewed by the maintainer and stayed 'experimental' until v2.27.0 (docs/releases.md:33-36, 356-364). go-smtp is held at v0.17.0 by a replace while require says v0.25.0 (go.mod:10,26); the Go pin (.go-version 1.27.0) differs from go.mod (1.25.8), docs/develop.md:68 (1.25.8) and Dockerfile-build:1 (golang:1.25).",
+      "Licensing: README.md:252 says dual licensed under Apache 2.0 and GPLv2 without SPDX identifiers, per-file headers, or wording on whether the licensee may choose either; package metadata names only Apache 2.0 (.goreleaser.yml:73; web/index.html:25) while the Docker label lists both (Dockerfile:8). Vendored stdlib text/template (BSD-3-Clause) and Sprig (MIT) are in-tree (template/gotext/README.md:106-109; util/sprig/LICENSE.txt), and bundled sounds use the Mixkit Free License and CC-BY (README.md:256-257). The 'OR' in this dossier's SPDX expression is an interpretation of 'dual licensed'."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "binwiederhier/ntfy",
+      "checks": [
+        {
+          "field": "readme.install[0] (Linux release tarball)",
+          "statement": "Linux release tarball (amd64 shown; armv6/armv7/arm64 variants documented): wget .../v2.28.0/ntfy_2.28.0_linux_amd64.tar.gz; tar zxvf; sudo cp -a ntfy_2.28.0_linux_amd64/ntfy /usr/local/bin/ntfy; sudo mkdir /etc/ntfy && sudo cp ntfy_2.28.0_linux_amd64/{client,server}/*.yml /etc/ntfy; sudo ntfy serve",
+          "citation": "docs/install.md:35-42",
+          "holds": true,
+          "note": "docs/install.md:35-42 is the 'x86_64/amd64' tab and lines 37-41 contain the five commands word for word. The armv6, armv7/armhf and arm64 tabs follow at lines 44-69. Cross-check: .goreleaser.yml:104-119 packs ntfy_linux_amd64 with wrap_in_directory: true and includes server/server.yml and client/client.yml, so the {client,server}/*.yml copy matches the tarball layout. Checkout HEAD is 10cb6506f836dbb00bb77e3b52669f6ace37f555, as the dossier states. Static read only; the release URL was not fetched."
+        },
+        {
+          "field": "license",
+          "statement": "spdx 'Apache-2.0 OR GPL-2.0-only'; files 'LICENSE, LICENSE.GPLv2'",
+          "citation": "LICENSE, LICENSE.GPLv2",
+          "holds": true,
+          "note": "LICENSE:1-2 is 'Apache License Version 2.0, January 2004'. LICENSE.GPLv2:1-2 is 'GNU GENERAL PUBLIC LICENSE Version 2, June 1991'. README.md:252 and docs/terms.md:120-123 say the project is 'dual licensed' under both, which fits SPDX OR. No first-party file grants 'any later version' (the only such text is the GPL's own clause in LICENSE.GPLv2:244-245, 299), so GPL-2.0-only is correct. Other files label the license differently but don't contradict it: main.go:28 'Apache License 2.0 & GPLv2', Dockerfile:8 'Apache-2.0, GPL-2.0', and nfpm package metadata .goreleaser.yml:73 'Apache 2.0'. The dossier's risks already flag this."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes, CLI client only: universal darwin (amd64+arm64) binary built with CGO disabled and the noserver tag; docs say only ntfy publish/subscribe are supported on macOS and the server is not supported (it can be built from source for development)",
+          "citation": ".goreleaser.yml:58-67, 137-140; docs/install.md:302-321; Makefile:207-215",
+          "holds": true,
+          "note": ".goreleaser.yml:58-67: id ntfy_darwin_all, CGO_ENABLED=0, tags [noserver] ('don't include server files'), goos darwin, goarch [amd64, arm64]. Lines 137-140 merge them into one universal binary. The noserver tag excludes the server commands: line 1 of cmd/serve.go, user.go, access.go, token.go and tier.go has //go:build !noserver, and cmd/webpush.go:1 has !noserver && !nowebpush. docs/install.md:303 says 'ntfy publish and ntfy subscribe only'; lines 319-321 say the server is not supported but can be built for development. Makefile:207-215 is the cli-darwin-server target (CGO_ENABLED=1, 'Use this for macOS/iOS development')."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "None found in this repository. The only matches for 'mcp' are links to a third-party 'ntfy-me-mcp' server (github.com/gitmotion/ntfy-me-mcp); that external repository was not opened.",
+          "citation": "docs/integrations.md:182",
+          "holds": true,
+          "note": "A case-insensitive search for 'mcp' finds docs/integrations.md:182 plus docs/releases.md:703 and 711. All three are links to github.com/gitmotion/ntfy-me-mcp. The only other hits are random characters inside two integrity hashes in web/package-lock.json (lines 474, 5279). Searches for 'model context', 'modelcontextprotocol', 'mcpServers' and the whole word 'mcp' find nothing else. The statement holds; the citation leaves out the two releases.md links, which doesn't change the claim."
+        },
+        {
+          "field": "claim_checks[9] (docs/privacy.md:159-161)",
+          "statement": "When self-hosting, 'No data is shared with ntfy.sh or any third party (unless you configure those integrations)' — verified: yes, with outbound calls config-gated and caveats for the CLI default host and trace logging",
+          "citation": "docs/privacy.md:159-161; payments/payments.go:17-21; server/server.go:1096-1126, 281-294, 338-345, 2115-2131, 500-501, 930-931; mail/sender.go:129; twilio/client.go:101,140; server/server_webpush.go:159; server/smtp_server.go:196-213; client/config.go:11",
+          "holds": true,
+          "note": "docs/privacy.md:161 reads as quoted, and every evidence citation matches. Each outbound path is gated by a setting: payments.go:19 sets stripe.EnableTelemetry=false. forwardPollRequest (server.go:1096-1126) runs only when UpstreamBaseURL != \"\" (server.go:849), which defaults to \"\" (cmd/serve.go:71). Firebase needs FirebaseKeyFile (server.go:282). The SMTP sender needs SMTPSenderAddr (server.go:180, 843; mail/sender.go:129). Twilio needs TwilioAccount (server.go:846; twilio/client.go:101, 140). Web Push needs WebPushPublicKey (server.go:220, 852; server_webpush.go:159). S3 needs an s3:// attachment dir (server.go:339). Incoming SMTP is passed to the server's own handler through an httptest recorder (smtp_server.go:196-213), and Matrix requests are rewritten in-process (server.go:2115-2131; server_matrix.go:108-142). The caveats are confirmed: client/config.go:11 DefaultBaseURL is https://ntfy.sh, and trace logging writes out all headers and up to 4 KB of the request body (server/log.go:100-127). A search for telemetry/analytics found nothing else in first-party Go or web code. The embedded docs set font: false (mkdocs.yml:12), so they don't load Google Fonts. The web app's hard-coded ntfy.sh (SubscribeDialog.jsx:34, 95) is only an autocomplete suggestion. VersionChecker polls only its own /v1/config (VersionChecker.js:48)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,337 @@
+{
+  "contender": "arize-ai/phoenix",
+  "revision": {
+    "contender": "arize-ai/phoenix",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "Arize-ai/phoenix",
+        "tag": "arize-phoenix-v20.19.0",
+        "commit": "1328fd6e27a506ca4ba585b88db5cbada4186c42",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "arize-phoenix-v20.19.0",
+    "commit": "1328fd6e27a506ca4ba585b88db5cbada4186c42",
+    "read_at": "2026-10-02T03:01:58+00:00"
+  },
+  "dossier": {
+    "contender": "arize-ai/phoenix",
+    "revision": {
+      "tag": "arize-phoenix-v20.19.0",
+      "commit": "1328fd6e27a506ca4ba585b88db5cbada4186c42",
+      "read_at": "2026-10-02T03:01:58+00:00"
+    },
+    "license": {
+      "spdx": "Elastic-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Phoenix (PyPI arize-phoenix 20.19.0; src/phoenix/version.py:1) is a self-hostable AI observability and evaluation server. It receives OpenTelemetry/OpenInference traces (OTLP/HTTP protobuf POST /v1/traces on :6006, OTLP/gRPC on :4317). It stores them with annotations, datasets, experiments, prompts and cost data in SQLite (default) or PostgreSQL. It serves a web UI, REST (/v1) and GraphQL APIs, an in-process MCP server (/mcp), and a Playground plus background experiment runner that call external LLM providers. It also ships Python/TypeScript clients and a Node CLI (px). Facts mapped to the stated need questions, no judgement: (1) OTLP receiver: traces only; no receiver/processor/exporter pipeline and no server-side privacy filter (masking is client-side). (2) Store for OTLP usage metrics: none (no OTLP metrics endpoint or tables; the UI 'metrics' are time series computed from stored spans). (3) Store for OTLP events/logs: none. (4) Dashboards: the built-in web UI (per-project Metrics dashboard, span/trace/session tables) over Phoenix's own span database only; custom dashboards/alerting are pointed to the commercial Arize AX (docs/phoenix/tracing/llm-traces/metrics.mdx:31-33). (5) Traces + datasets + experiments store: yes (spans, versioned datasets with splits, experiments/runs/evaluations; Playground, Span Replay, server-side experiment runner, client run_experiment). (6) Local model server: none; Phoenix only calls model servers as a client (Ollama via OLLAMA_BASE_URL, OpenAI-compatible custom base URLs), and its own /v1/chat/completions proxy states 'Phoenix is not an AI gateway'. Claude Code/Codex: no handling of their native OTLP metrics/logs was found; the documented integrations are MCP/skills plugins in this repo and hook-based session-tracing plugins in a separate repo (Arize-ai/coding-harness-tracing) that emit OpenInference spans.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tracing: 'Trace your LLM application's runtime using OpenTelemetry-based instrumentation.'",
+          "citation": "README.md:49"
+        },
+        {
+          "claim": "Datasets: 'Create versioned datasets of examples for experimentation, evaluation, and fine-tuning.'",
+          "citation": "README.md:51"
+        },
+        {
+          "claim": "Experiments: 'Track and evaluate changes to prompts, LLMs, and retrieval.'",
+          "citation": "README.md:52"
+        },
+        {
+          "claim": "Playground: 'Optimize prompts, compare models, adjust parameters, and replay traced LLM calls.'",
+          "citation": "README.md:53"
+        },
+        {
+          "claim": "Remote MCP Server: 'Connect Claude Code, Cursor, and other MCP clients directly to your Phoenix instance's /mcp endpoint to query traces, datasets, experiments, and more.'",
+          "citation": "README.md:56"
+        },
+        {
+          "claim": "'Phoenix is vendor and language agnostic with out-of-the-box support for popular frameworks (... Claude Agent SDK ...) and LLM providers (... LiteLLM, and more)'; auto-instrumentation comes from the separate OpenInference project.",
+          "citation": "README.md:62"
+        },
+        {
+          "claim": "'Phoenix runs practically anywhere, including your local machine, a containerized deployment, or in the cloud.'",
+          "citation": "README.md:64"
+        },
+        {
+          "claim": "'Phoenix is open-source and self-hosted.' (managed alternative: Arize AX)",
+          "citation": "README.md:66-67"
+        },
+        {
+          "claim": "'Install Phoenix via pip or conda': `pip install arize-phoenix` then `phoenix serve`, or `uvx arize-phoenix serve`.",
+          "citation": "README.md:83-94"
+        },
+        {
+          "claim": "`npx @arizeai/phoenix-cli setup` (or `px setup`): 'Setup detects your framework and LLM provider, installs the right OpenInference instrumentation, and wires up trace export.'",
+          "citation": "README.md:98-105"
+        },
+        {
+          "claim": "Phoenix container images are available via Docker Hub and deployable with Docker or the Helm chart.",
+          "citation": "README.md:109-111"
+        },
+        {
+          "claim": "Three surfaces let coding agents (Claude Code, Codex, Cursor, others) work with traces, datasets and experiments: the CLI (`npx @arizeai/phoenix-cli`), Skills (.agents/skills/) and the Remote MCP Server (/mcp).",
+          "citation": "README.md:267-271"
+        },
+        {
+          "claim": "Telemetry: 'By default, Phoenix collects basic web analytics (e.g., page views, UI interactions)... None of your trace data, evaluation results, or any sensitive information is ever collected.' Opt out with PHOENIX_TELEMETRY_ENABLED=false.",
+          "citation": "README.md:287-289"
+        },
+        {
+          "claim": "License: 'licensed under the terms of the Elastic License 2.0 (ELv2)'; portions are patent protected (IP_NOTICE).",
+          "citation": "README.md:311-315"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (PyPI)",
+          "command": "pip install arize-phoenix   # then: phoenix serve",
+          "citation": "README.md:85-88; docs/phoenix/self-hosting/deployment-options/terminal.mdx:12-18"
+        },
+        {
+          "method": "uvx (no install)",
+          "command": "uvx arize-phoenix serve",
+          "citation": "README.md:93"
+        },
+        {
+          "method": "Docker image (Docker Hub)",
+          "command": "docker run -p 6006:6006 -p 4317:4317 -i -t arizephoenix/phoenix:latest",
+          "citation": "docs/phoenix/self-hosting/deployment-options/docker.mdx:51"
+        },
+        {
+          "method": "Docker Compose with PostgreSQL",
+          "command": "docker compose up --build   (docs compose file uses image arizephoenix/phoenix:latest + postgres; the repo's docker-compose.yml builds from ./Dockerfile)",
+          "citation": "docs/phoenix/self-hosting/deployment-options/docker.mdx:113-148; docker-compose.yml:1-26"
+        },
+        {
+          "method": "Helm chart (OCI on Docker Hub)",
+          "command": "export CHART_URL=oci://registry-1.docker.io/arizephoenix/phoenix-helm; helm install phoenix $CHART_URL --version $CHART_VERSION",
+          "citation": "docs/phoenix/self-hosting/deployment-options/kubernetes-helm.mdx:15,32"
+        },
+        {
+          "method": "Node CLI (px / phoenix-cli)",
+          "command": "npm install -g @arizeai/phoenix-cli   # or: npx @arizeai/phoenix-cli setup",
+          "citation": "docs/phoenix/integrations/developer-tools/coding-agents.mdx:242; README.md:101"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Linux is the primary CI target: daily PyPI smoke test pip / uv pip / uv tool run installs on ubuntu-latest and polls /healthz (.github/workflows/pypi-smoke-test.yml:26-78); unit tests on ubuntu-latest in the scheduled all-platforms run (.github/workflows/python-all-platforms.yml:56-67) and on the oss-4-core-runner label per PR (.github/workflows/python-CI.yml:582-590); Docker images for linux/amd64 (.github/workflows/docker-build-release.yml:44); required C-extension arize-phoenix-sqlean ships manylinux wheels for cp311-cp314 (packages/phoenix-sqlean/cibuildwheel.toml:8,19-20).",
+        "wsl2": "unknown - no mention of WSL/WSL2 in the README, docs, workflows or code (searched the checkout excluding lockfiles/notebooks). Linux install paths (pip, Docker) and Windows CI exist (python-all-platforms.yml:67), but WSL2 itself is neither documented nor tested.",
+        "macos_arm64": "yes - unit tests run on macos-latest (py3.11 and 3.14, sqlite) in the weekday-scheduled all-platforms workflow (.github/workflows/python-all-platforms.yml:5-8,56-67; the runner architecture is not stated in the file); the required arize-phoenix-sqlean extension builds macOS arm64 and x86_64 wheels (packages/phoenix-sqlean/cibuildwheel.toml:22-23); the Dockerfile mentions Apple-Silicon arm64 images (Dockerfile:22-24) and release images are multi-arch linux/amd64+linux/arm64 (docker-build-release.yml:44). The README has no explicit supported-platform table.",
+        "gpu": "no - Phoenix does not use a GPU: no CUDA/torch/GPU dependency in pyproject.toml:23-81 and no GPU/CUDA references in src/ (only 'nvidia/' dataset URLs in fixture descriptions, src/phoenix/trace/fixtures.py:265-286); model inference is delegated to external providers."
+      },
+      "integrations": {
+        "cli": "yes - Python console scripts `phoenix` and `arize-phoenix` (subcommands serve, trace-fixture, db migrate, datagen) (pyproject.toml:84-86; src/phoenix/server/main.py:17-30; src/phoenix/server/cli/commands/serve.py:160-211). Node CLI @arizeai/phoenix-cli (bins phoenix-cli, px, pxi; Node >=22) with commands for traces, spans, sessions, datasets, experiments, prompts, projects, annotations, `setup` and `setup mcp` (js/packages/phoenix-cli/package.json:21-25,70-72; js/packages/phoenix-cli/src/commands/*.ts).",
+        "mcp": "yes - in-process remote MCP server generated from the /v1 REST API and mounted at /mcp; enabled by default, with code-mode (sandboxed Python `execute` via Monty) also default-on; OAuth2 authorization-code+PKCE or API-key bearer when auth is enabled (src/phoenix/server/mcp_server.py:1-24,83; src/phoenix/config.py:116-131,3656-3661; docs/phoenix/integrations/remote-mcp.mdx:7-34,237-257). Standalone stdio package @arizeai/phoenix-mcp is in maintenance mode (README.md:147; js/packages/phoenix-mcp/package.json:19-21). The Phoenix docs MCP is hosted by Mintlify (src/phoenix/server/agents/capabilities/docs_mcp.py:14).",
+        "sdk_or_api": "yes - ingest: OTLP/HTTP POST /v1/traces (protobuf only) and OTLP/gRPC :4317 (traces only) (src/phoenix/server/api/routers/v1/traces.py:440-509; src/phoenix/server/grpc_server.py:33-52,110). REST /v1 (OpenAPI in schemas/openapi.json) for projects, traces, spans, sessions, datasets, experiments, prompts, annotations, users, secrets, API keys, model providers (src/phoenix/server/api/routers/v1/__init__.py:10-30,65-90). GraphQL (src/phoenix/server/app.py:1152). OpenAI-compatible POST /v1/chat/completions proxy to configured providers (src/phoenix/server/api/routers/v1/chat_completions.py:1,383-405). Libraries: Python arize-phoenix-client and -otel (Apache-2.0), arize-phoenix-evals (Elastic-2.0); TypeScript @arizeai/phoenix-client, -otel, -evals (README.md:128-148).",
+        "claude_code_or_codex": "yes (read-side and via a separate tracing repo), with limits. (a) This repo is a Claude Code plugin marketplace (.claude-plugin/marketplace.json; plugins/claude/arize-phoenix/.mcp.json registers the Phoenix MCP server at ${endpoint}/mcp) and a Codex plugin marketplace (.agents/plugins/marketplace.json; plugins/codex/arize-phoenix/.mcp.json plus scripts/phoenix-mcp, which bridges via `npx --yes mcp-remote`) (docs/phoenix/integrations/developer-tools/coding-agents.mdx:51-221). (b) Agent skills in .agents/skills/phoenix-cli, phoenix-evals, phoenix-tracing (README.md:269-279). (c) `px setup` can hand app instrumentation to a detected claude/codex/opencode/cursor binary (js/packages/phoenix-cli/src/setup/agents/registry.ts:1-16). (d) Session tracing of Claude Code, the Codex CLI and the Claude Agent SDK is done by hook-based plugins from a separate repository, Arize-ai/coding-harness-tracing, which emit OpenInference spans to Phoenix and expose ARIZE_LOG_PROMPTS / ARIZE_LOG_TOOL_DETAILS / ARIZE_LOG_TOOL_CONTENT redaction flags (docs/phoenix/integrations/coding-agents/claude-code.mdx:9,84-102; docs/phoenix/integrations/coding-agents/codex.mdx:9,60-74); that code is not in this checkout and was not verified. (e) ATIF trajectory import for Claude Code/Codex runs exported through Harbor (docs/phoenix/tracing/how-to-tracing/importing-and-exporting-traces/importing-atif-trajectories.mdx:6-26). Not found: any code or doc consuming Claude Code or Codex native OTLP metrics/logs/events; CLAUDE_CODE_ENABLE_TELEMETRY, OTEL_METRICS_EXPORTER and OTEL_LOGS_EXPORTER do not occur anywhere in the checkout (excluding lockfiles)."
+      },
+      "telemetry_and_network": "Analytics/phone-home: by default the web UI embeds a Scarf.sh tracking pixel, an <img> the browser loads from https://static.scarf.sh/a.png?x-pxid=<id> with referrerpolicy='no-referrer-when-downgrade' (src/phoenix/server/templates/index.html:155-157); the pixel id defaults to a hard-coded value (src/phoenix/config.py:3713-3723). FullStory loads only if PHOENIX_FULLSTORY_ORG is set (config.py:3700-3710; index.html:102-125). Master opt-out PHOENIX_TELEMETRY_ENABLED=false (config.py:151-156,3683-3697; README.md:289; docs/phoenix/self-hosting/security/privacy.mdx:20-41). Docs state self-hosted trace/eval/dataset data is never sent to Arize or third parties (privacy.mdx:8). Other default outbound requests while PHOENIX_ALLOW_EXTERNAL_RESOURCES is true (default; config.py:157-162,3848-3853): Google Fonts (index.html:92-96); browser-side GitHub star-count and PyPI latest-version lookups (js/app/src/components/nav/GitHubStarCount.tsx:10; js/app/src/hooks/useLatestPhoenixVersion.ts:3,45); a server-side download of a CPython WASM sandbox binary from GitHub at startup when the WASM sandbox provider is allowed (all providers are allowed by default) (src/phoenix/server/sandbox/_download.py:25-33,148-171,193-198; config.py:865-878,1300-1315); PXI assistant tools: Mintlify-hosted docs MCP (src/phoenix/server/app.py:1102-1106; agents/capabilities/docs_mcp.py:14), web access and GitHub MCP at https://api.githubcopilot.com/mcp/ (config.py:1436-1456). PHOENIX_ALLOW_EXTERNAL_RESOURCES=false disables all of these plus telemetry (privacy.mdx:43-53; network-security.mdx:157-185). The `--no-internet` CLI flag is declared but never read (src/phoenix/server/cli/commands/serve.py:152). Opt-in outbound: the server can export its own traces to an OTLP collector (src/phoenix/server/telemetry.py:38-68) and PXI assistant traces to a remote collector via PHOENIX_AGENTS_COLLECTOR_ENDPOINT (config.py:70-79); the Prometheus endpoint on :9090 is off by default (config.py:323-326; src/phoenix/server/prometheus.py:184). Required services/accounts: none for self-hosting; the default store is a SQLite file under ~/.phoenix (config.py:1150-1154,3374-3381), with optional PostgreSQL >=14 (docs/phoenix/self-hosting/architecture.mdx:13-32); no account is needed (README.md:64-67; terminal.mdx:12-18). LLM calls (Playground, evals, PXI) go only to operator-configured providers, and the app does not validate custom base URLs (docs/phoenix/self-hosting/security/network-security.mdx:8-12,572-574). Listening: HTTP 0.0.0.0:6006 (UI, REST, GraphQL, MCP and OTLP/HTTP share the port) and gRPC [::]:4317, optional TLS/mTLS (config.py:3112-3121; grpc_server.py:95-109; serve.py:281-289,414-422); authentication is off by default (config.py:1237-1241)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "TypeScript (React UI, CLI, client packages)",
+        "SQL (Alembic migrations, DDL)",
+        "C (arize-phoenix-sqlean extension)",
+        "Jinja2/HTML templates",
+        "Shell"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:84-86",
+          "what": "console scripts `phoenix` and `arize-phoenix` -> phoenix.server.main:main (subcommands serve, trace-fixture, db migrate, datagen; src/phoenix/server/main.py:17-30)"
+        },
+        {
+          "path": "src/phoenix/server/cli/commands/serve.py",
+          "what": "`serve` runner: reads env config, builds the ASGI app via create_app and runs uvicorn (lines 214-430)"
+        },
+        {
+          "path": "src/phoenix/server/app.py",
+          "what": "create_app ASGI factory: mounts REST /v1, GraphQL, agent routers, MCP at /mcp and the static UI (lines 1147-1159, 1233-1236, 1287)"
+        },
+        {
+          "path": "src/phoenix/server/grpc_server.py",
+          "what": "OTLP/gRPC trace server on :4317 with optional TLS/mTLS (lines 55-112)"
+        },
+        {
+          "path": "src/phoenix/server/api/routers/v1/traces.py",
+          "what": "OTLP/HTTP POST /v1/traces (protobuf only) plus trace query, annotation, delete and transfer endpoints (lines 440-509)"
+        },
+        {
+          "path": "Dockerfile",
+          "what": "container image; CMD `-m phoenix.server.main serve`; exposes 6006 (HTTP), 4317 (gRPC), 9090 (Prometheus) (lines 164-172)"
+        },
+        {
+          "path": "js/packages/phoenix-cli/package.json",
+          "what": "Node CLI binaries phoenix-cli, px, pxi (lines 21-25)"
+        },
+        {
+          "path": "js/packages/phoenix-mcp/package.json",
+          "what": "standalone stdio MCP server binary @arizeai/phoenix-mcp (lines 19-21; maintenance mode per README.md:147)"
+        }
+      ],
+      "architecture": "Single Python ASGI service (FastAPI/Starlette + uvicorn) with a bundled React 19/Relay UI built from js/app into src/phoenix/server/static. src/phoenix/server/main.py -> cli/commands/serve.py -> app.py:create_app mounts the REST /v1 routers (src/phoenix/server/api/routers/v1/*.py), GraphQL (strawberry; src/phoenix/server/api/), the MCP app at /mcp (src/phoenix/server/mcp_server.py, mcp/skills), agent/PXI routers (src/phoenix/server/agents/) and the static UI (app.py:1147-1153,1233-1236,1287). Ingestion: the OTLP/HTTP handler (routers/v1/traces.py) and an asyncio gRPC server (grpc_server.py) decode OTLP spans (src/phoenix/trace/otel.py; OTel GenAI -> OpenInference conversion in src/phoenix/trace/gen_ai/conversion.py) and enqueue them on a bounded queue drained by a bulk inserter (src/phoenix/db/bulk_inserter.py; HTTP 503 when the queue is full, traces.py:431-437; HTTP 507 when DB storage thresholds are exceeded, src/phoenix/server/authorization.py:130-149). Project routing uses the x-project-name header or the openinference.project.name resource attribute (traces.py:706-728). Storage: SQLAlchemy models (src/phoenix/db/models.py: projects, traces, spans, span/trace/session annotations, datasets/versions/examples/splits, experiments/runs/jobs, prompts, evaluators, span_costs, users/API keys, sandbox configs, agent sessions), Alembic migrations (src/phoenix/db/migrations), SQLite through the bundled sqlean fork (src/phoenix/db/engines.py:14,28; packages/phoenix-sqlean) or PostgreSQL via asyncpg (extra [pg]). Background daemons (src/phoenix/server/daemons/): experiment runner/sweeper, span cost calculator, DB disk-usage monitor, system settings. Code-evaluator sandboxes: WASM, Deno, Monty, E2B, Daytona, Vercel, Modal (src/phoenix/server/sandbox/). Provider clients for Playground/evals (src/phoenix/server/api/helpers/playground_clients.py) and the PXI assistant on pydantic-ai (src/phoenix/server/agents/). Sibling packages: packages/phoenix-client, phoenix-evals, phoenix-otel, phoenix-sqlean; js/packages/phoenix-{cli,client,evals,otel,mcp,config,testing}; helm/ chart.",
+      "packaging_and_release": "release-please on push to main manages versions and tags such as arize-phoenix-v20.19.0 via .release-please-manifest.json and then dispatches publish.yaml (.github/workflows/release.yml:1-24). publish.yaml builds the UI with pnpm, runs `uv build` (hatchling) to make a wheel and sdist, checks the wheel for bundled UI assets and with check-wheel-contents, and publishes to PyPI through PyPI Trusted Publishing/OIDC (environment `pypi`, id-token: write, pypa/gh-action-pypi-publish) (.github/workflows/publish.yaml:83-164). The same flow covers arize-phoenix-client/-evals/-otel (publish.yaml:166-275) and arize-phoenix-sqlean, built with cibuildwheel for manylinux, macOS x86_64/arm64 and Windows AMD64/ARM64 on cp311-cp314 plus an sdist (publish.yaml:284-357; packages/phoenix-sqlean/cibuildwheel.toml:8-26). Tag-triggered docker-build-release.yml builds Docker Hub images arizephoenix/phoenix for linux/amd64 and linux/arm64 in root (unsuffixed tags such as latest), nonroot and debug variants on distroless python3-debian13, pushed by digest and merged into manifest lists; builds use BuildKit `--provenance mode=max --sbom true` (docker-build-release.yml:7,44-128; .github/actions/docker-build-image/action.yml:117-133). The Dockerfile pins the CPython WASM binary by SHA-256 (Dockerfile:101-117). The Helm chart is packaged and pushed to oci://registry-1.docker.io/arizephoenix (.github/workflows/helm-release.yaml:45-49), and a post-release job opens a PR bumping kustomize/Helm versions (docker-build-release.yml:130-168). npm packages are published via changesets with NPM_CONFIG_PROVENANCE=true (.github/workflows/typescript-packages-publish.yml:48-65). No checksum files, cosign/sigstore signatures or explicit PyPI attestation inputs appear under .github (searched for cosign|sigstore|attest|slsa|checksum|gpg; only the docker provenance/sbom flags and npm provenance match). Dev preview builds can be published from a feature branch (publish.yaml:469-646). uv is pinned (`required-version = \"==0.12.19\"`) with `exclude-newer = \"3 days\"` (pyproject.toml:462-463), and Actions are pinned by commit SHA.",
+      "tests_and_ci": "Python: pytest (asyncio auto mode, xdist, randomly, rerunfailures, postgresql fixtures, doctest-modules; pyproject.toml:308-331) driven through tox (tox.ini:127-175). Approximately 329 test_*.py files in tests/ (tests/unit and tests/integration) plus about 64 in packages/*/tests (phoenix-client 41, phoenix-evals 20, phoenix-otel 3). JS: vitest with about 429 *.test.ts(x) files (js/app, js/packages/*) and about 33 Playwright e2e specs (js/app/tests/*.spec.ts). CI in .github/workflows: python-CI.yml (ruff format/lint, mypy --strict, unit tests on sqlite and PostgreSQL 14 with py3.11, integration tests on sqlite and PostgreSQL, Alembic up/down migration continuity, client/evals/otel on py3.11/3.13/3.14, GraphQL/OpenAPI/DDL drift checks, doctests, SDK canary tests, uv.lock check; aggregate gate at lines 807-843); python-all-platforms.yml (weekday cron; unit tests on Windows/macOS/Ubuntu, integration on Windows/Ubuntu, py3.11 and 3.14; lines 5-8,56-180); typescript-CI.yml (build, typecheck, oxfmt, oxlint, codegen drift, vitest; lines 41-101); playwright.yaml (e2e on oss-4-core-runner, macOS leg disabled per comment at line 102); pypi-smoke-test.yml (daily install + boot of the published package, /healthz); zizmor.yml (GitHub Actions security analysis); cla.yml (CLA assistant). Also present but not read: helm-ci.yml, storybook-CI.yml, openapi-schema.yaml, pxi-evals.yml, pxi-online-evals.yml, harbor-evals.yml, and several LLM-driven maintenance workflows (claude-*.yml).",
+      "dependencies": "pyproject.toml (root arize-phoenix): 54 direct runtime dependencies (lines 23-81; e.g. fastapi, starlette, uvicorn, strawberry-graphql==0.327.7, sqlalchemy[asyncio], alembic, aiosqlite, grpcio, opentelemetry-sdk/-proto/-exporter-otlp, openinference-*, pydantic-ai-slim, fastmcp-slim, anthropic, pandas, numpy, scipy, scikit-learn, pyarrow, arize-phoenix-client/-evals/-otel/-sqlean); 97 entries in the `dev` dependency-group (lines 89-187); optional extras wasm, e2b, daytona, vercel, modal, pg, aws, azure, container (container pins 25; lines 189-251); uv.lock pins the tree. packages/phoenix-client/pyproject.toml: 7 runtime deps (lines 24-32). packages/phoenix-evals/pyproject.toml: 9 (lines 24-34). packages/phoenix-otel/pyproject.toml: 9 (lines 24-34). packages/phoenix-sqlean/setup.py: C extension with no install_requires. JS (pnpm workspace, packageManager pnpm@12.0.0, Node >=24.20; js/package.json): js/app/package.json (phoenix-ui, private, license 'None') 71 runtime + 56 dev; js/packages/phoenix-cli 13 + 9; phoenix-client 7 + 16 (+5 optional peers); phoenix-otel 12 + 2; phoenix-evals 7 + 12; phoenix-mcp 6 + 5; phoenix-testing 4 + 3; phoenix-config 0 + 2; js/package.json root 0 runtime + 11 dev.",
+      "security_policy": "SECURITY.md: report vulnerabilities by email to opensource-security[@]arize.com (coordinated disclosure; no public issues; no bounty for open-source repos); the supported-versions table lists only 2.x.x as supported (1.x.x and 0.0.x unsupported) although the current release is 20.19.0; refers to the Arize trust center (SECURITY.md:5-9,11-21,34-35; src/phoenix/version.py:1). Per-package SECURITY files also exist under packages/phoenix-client, packages/phoenix-evals, packages/phoenix-otel (listed, not read)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:49 'Tracing - Trace your LLM application's runtime using OpenTelemetry-based instrumentation.'",
+        "verified": "yes",
+        "evidence": "Traces are ingested over OTLP/HTTP (POST /v1/traces, application/x-protobuf only with 415 otherwise, optional gzip/deflate; src/phoenix/server/api/routers/v1/traces.py:440-509) and OTLP/gRPC (src/phoenix/server/grpc_server.py:33-52,95-110). Spans without an OpenInference kind load as UNKNOWN and gen_ai.* attributes are converted to OpenInference (src/phoenix/trace/schemas.py:51-54; src/phoenix/trace/gen_ai/conversion.py:58-82). Scope is the trace signal only."
+      },
+      {
+        "claim": "docs/phoenix/production-guide.mdx:19,37,45 (docs, not README): exporters/collectors 'carry spans, metrics, and logs to Phoenix'; the server 'receives, stores, and serves that telemetry'; 'log and trace ingestion'.",
+        "verified": "no",
+        "evidence": "Code differs from this docs wording and code wins: only the trace signal is implemented. gRPC registers only TraceServiceServicer (grpc_server.py:110); the v1 router set has no metrics/logs routes (src/phoenix/server/api/routers/v1/__init__.py:10-30,65-90); the strings MetricsService, LogsService, ExportMetrics, ExportLogs, v1/metrics and v1/logs occur nowhere in the checkout (excluding lockfiles/notebooks); there are no metric or log-record tables (src/phoenix/db/models.py). The only 'metrics' features are span-derived time series (src/phoenix/server/api/types/Project.py:1614-2393; docs/phoenix/tracing/llm-traces/metrics.mdx:13-29) and Phoenix's own opt-in Prometheus exporter on :9090 (src/phoenix/config.py:323-326; src/phoenix/server/prometheus.py:184). The experiment_logs tables are experiment-run logs, not OTLP logs (src/phoenix/db/models.py:2046-2094)."
+      },
+      {
+        "claim": "README.md:51 'Datasets - Create versioned datasets of examples for experimentation, evaluation, and fine-tuning.'",
+        "verified": "yes",
+        "evidence": "Tables datasets, dataset_versions, dataset_examples, dataset_example_revisions, dataset_splits (src/phoenix/db/models.py:1439,1550,1565,1598,1632); REST /v1/datasets, /datasets/{id}/versions, /datasets/upload, /datasets/{id}/examples, splits, csv/jsonl/openai_ft/openai_evals export (src/phoenix/server/api/routers/v1/datasets.py:106,274,347,1318,1697,1986-2155)."
+      },
+      {
+        "claim": "README.md:52 'Experiments - Track and evaluate changes to prompts, LLMs, and retrieval.'",
+        "verified": "yes",
+        "evidence": "Tables experiments, experiment_runs, experiment_run_annotations, experiment_jobs (src/phoenix/db/models.py:1681,1782,1826,1879); REST (src/phoenix/server/api/routers/v1/experiments.py:114,292,771); server-side background runner with retries and resume (src/phoenix/server/daemons/experiment_runner.py:1-70); client run_experiment with repetitions, retries, dry_run (packages/phoenix-client/src/phoenix/client/resources/experiments/__init__.py:744-833); Playground runs over a dataset are recorded as experiments (docs/phoenix/prompt-engineering/how-to-prompts/using-the-playground.mdx:171)."
+      },
+      {
+        "claim": "README.md:53 'Playground - Optimize prompts, compare models, adjust parameters, and replay traced LLM calls.'",
+        "verified": "yes",
+        "evidence": "Docs: Span Replay loads stored LLM spans into the Playground (docs/phoenix/prompt-engineering/overview-prompts/span-replay.mdx:10-12); side-by-side variants (docs/phoenix/prompt-engineering/how-to-prompts/test-a-prompt.mdx:22). Code: provider clients including Ollama via OLLAMA_BASE_URL (src/phoenix/server/api/helpers/playground_clients.py:1296-1314,3672-3701) and custom OpenAI-compatible base_url (src/phoenix/db/types/model_provider.py:211-220). Phoenix calls model servers; it does not host them."
+      },
+      {
+        "claim": "README.md:56 and 267-271: Remote MCP, CLI and Skills let Claude Code/Codex/Cursor query traces, datasets and experiments.",
+        "verified": "yes",
+        "evidence": "MCP server mirrors every /v1 REST endpoint, mounted at /mcp (src/phoenix/server/mcp_server.py:1-24,83); default-on (src/phoenix/config.py:116-121,3656-3657); plugin marketplaces and skills present (.claude-plugin/marketplace.json; .agents/plugins/marketplace.json; plugins/claude/arize-phoenix; plugins/codex/arize-phoenix; .agents/skills/phoenix-cli, phoenix-evals, phoenix-tracing). Caveat: when auth is disabled the /mcp mount is not wrapped in BearerAuthGuard (src/phoenix/server/app.py:1018,1233-1236). These surfaces read/operate on Phoenix data; they do not ingest Claude Code/Codex native telemetry."
+      },
+      {
+        "claim": "README.md:287-289 telemetry: basic web analytics by default, no trace data collected, opt-out via PHOENIX_TELEMETRY_ENABLED=false.",
+        "verified": "yes",
+        "evidence": "Mechanism is a Scarf.sh <img> pixel in the served HTML (default hard-coded pixel id) plus optional FullStory only if PHOENIX_FULLSTORY_ORG is set (src/phoenix/config.py:3683-3723; src/phoenix/server/templates/index.html:102-125,155-157). The pixel uses referrerpolicy='no-referrer-when-downgrade', so the browser may send the page URL as Referer to static.scarf.sh. The opt-out and PHOENIX_ALLOW_EXTERNAL_RESOURCES=false both return no pixel (config.py:3690-3697,3720-3721)."
+      },
+      {
+        "claim": "README.md:98-105 `px setup` 'detects your framework and LLM provider, installs the right OpenInference instrumentation, and wires up trace export'.",
+        "verified": "partial",
+        "evidence": "The CLI hands instrumentation to a coding agent found on PATH (claude, codex, opencode, cursor), or copies the prompt for the user to run, or points to manual docs; it then verifies via the API that traces arrived (js/packages/phoenix-cli/src/commands/setup.ts:1-16,80-86; js/packages/phoenix-cli/src/setup/steps/instrumentApp.ts:1-19; js/packages/phoenix-cli/src/setup/agents/registry.ts:1-16). Framework detection and package installation are performed by the delegated agent rather than by deterministic CLI code."
+      },
+      {
+        "claim": "README.md:83-94,109-111 install via pip or conda; Docker Hub images; Helm chart.",
+        "verified": "partial",
+        "evidence": "pip, uvx, Docker (linux/amd64+arm64) and Helm are backed by workflows and docs (pyproject.toml:84-86; .github/workflows/pypi-smoke-test.yml:28-78; .github/workflows/docker-build-release.yml:44-128; .github/workflows/helm-release.yaml:45-49). conda appears only as a badge link (README.md:28-30); no conda recipe or install command exists in the repo, so it is not checkable here."
+      },
+      {
+        "claim": "README.md:66-67 'Phoenix is open-source and self-hosted.' with README.md:311-315 ELv2.",
+        "verified": "partial",
+        "evidence": "Self-hosting works (SQLite default, config.py:3374-3381). The license is Elastic License 2.0 (LICENSE:1-45; pyproject.toml:6), which bars offering the software as a hosted/managed service (LICENSE:10) and circumventing license-key functionality (LICENSE:12); IP_NOTICE:3 adds a patent notice. docs/phoenix/self-hosting/license.mdx:6-10 says self-hosting is free with no feature gates. Sub-packages carry different licenses (Apache-2.0 for arize-phoenix-client/-otel and most JS packages; Elastic-2.0 for arize-phoenix-evals)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "PII-detection LLM evaluator (default prompt) on a 40-example authored synthetic suite (24 with PII, 16 without); judge gpt-4o-mini",
+        "metric": "accuracy / macro precision / macro recall / macro F1",
+        "value": "0.93 / 0.94 / 0.91 / 0.92",
+        "source": "docs/phoenix/evaluation/pre-built-metrics/pii-detection.mdx:186-192",
+        "independent": false
+      },
+      {
+        "what": "PII-detection evaluator on a stratified 150-record sample of nvidia/Nemotron-PII (all positives); judge gpt-4o-mini",
+        "metric": "detection rate (recall); precision not measurable because the fixture has effectively no negatives",
+        "value": "0.96",
+        "source": "docs/phoenix/evaluation/pre-built-metrics/pii-detection.mdx:193-198",
+        "independent": false
+      },
+      {
+        "what": "User-friction evaluator (default prompt) on a 40-example public synthetic benchmark; judge gpt-4o-mini",
+        "metric": "accuracy / macro precision / macro recall / macro F1",
+        "value": "0.97 / 0.98 / 0.97 / 0.97",
+        "source": "docs/phoenix/evaluation/pre-built-metrics/user-friction.mdx:147-153",
+        "independent": false
+      },
+      {
+        "what": "Completeness evaluator on a 45-example categorized synthetic suite; judge gpt-4o-mini",
+        "metric": "accuracy / macro F1 / misses",
+        "value": "0.84 / 0.84 / 7",
+        "source": "docs/phoenix/evaluation/pre-built-metrics/completeness.mdx:149-158",
+        "independent": false
+      },
+      {
+        "what": "Completeness evaluator, same 45-example suite; judge gpt-5.6",
+        "metric": "accuracy / macro F1 / misses",
+        "value": "1.00 / 1.00 / 0",
+        "source": "docs/phoenix/evaluation/pre-built-metrics/completeness.mdx:149-162",
+        "independent": false
+      },
+      {
+        "what": "Completeness evaluator, same 45-example suite; judge claude-sonnet-4-6",
+        "metric": "accuracy / macro F1 / misses",
+        "value": "0.91 / 0.90 / 4",
+        "source": "docs/phoenix/evaluation/pre-built-metrics/completeness.mdx:149-160",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No OTLP metrics/logs path. The gRPC server registers only the trace service (src/phoenix/server/grpc_server.py:5-12,110) and the only OTLP HTTP route is POST /v1/traces, protobuf-only (HTTP 415 for any other content type; src/phoenix/server/api/routers/v1/traces.py:440-486). MetricsService, LogsService, /v1/metrics, /v1/logs, ExportMetrics and ExportLogs occur nowhere in the checkout, and there are no metric/log-record tables (src/phoenix/db/models.py). docs/phoenix/production-guide.mdx:19,37,45 nonetheless speak of spans, metrics and logs reaching Phoenix. No handling of Claude Code/Codex native telemetry settings (CLAUDE_CODE_ENABLE_TELEMETRY, OTEL_METRICS_EXPORTER, OTEL_LOGS_EXPORTER) exists in README, docs or src.",
+      "No server-side privacy filter for ingested telemetry. Spans are decoded and stored as received (src/phoenix/trace/otel.py:97-134). Masking is client-side via OpenInference TraceConfig / OPENINFERENCE_HIDE_* variables (docs/phoenix/tracing/how-to-tracing/advanced/masking-span-attributes.mdx:8-45) or the separate coding-harness-tracing plugins' ARIZE_LOG_* flags (docs/phoenix/integrations/coding-agents/claude-code.mdx:84-102), whose code is outside this checkout and unverified. src/phoenix/server/redaction.py only encrypts transient secrets (redaction.py:1-21).",
+      "Open-by-default exposure. HTTP binds 0.0.0.0:6006 and gRPC [::]:4317 (src/phoenix/config.py:3112-3118; src/phoenix/server/grpc_server.py:109); authentication is off unless PHOENIX_ENABLE_AUTH is set (config.py:1237-1241); the /mcp app is mounted by default and is not wrapped in BearerAuthGuard when auth is off, with MCP code-mode `execute` default-on (config.py:3656-3661; src/phoenix/server/app.py:1018,1233-1236); the repo docker-compose.yml uses postgres/postgres credentials and publishes 6006 and 4317 (docker-compose.yml:8-19).",
+      "Default outbound requests unless PHOENIX_ALLOW_EXTERNAL_RESOURCES=false: Scarf pixel, Google Fonts, GitHub star-count and PyPI version lookups from the browser; a startup download of a WASM sandbox binary from GitHub; PXI docs/web/GitHub tools (src/phoenix/config.py:157-162,3695-3723; src/phoenix/server/templates/index.html:92-96,155-157; src/phoenix/server/sandbox/_download.py:25-33,193-198; src/phoenix/server/app.py:1102-1106). The `--no-internet` flag is declared but never read (src/phoenix/server/cli/commands/serve.py:152).",
+      "Not a model server or gateway. There is no inference-serving code and no GPU/CUDA use (pyproject.toml:23-81). Local models are reachable only as client targets: OLLAMA_BASE_URL or a custom OpenAI-compatible base_url (src/phoenix/server/api/helpers/playground_clients.py:3672-3701; src/phoenix/db/types/model_provider.py:211-220). The built-in /v1/chat/completions proxy says 'Phoenix is not an AI gateway', warns that routing production calls competes with trace ingestion, and does not support tool calling (src/phoenix/server/api/routers/v1/chat_completions.py:400-404). The app does not validate provider base URLs, so SSRF controls must be at the network layer (docs/phoenix/self-hosting/security/network-security.mdx:16-24,572-574).",
+      "Licensing is mixed. The server, arize-phoenix-evals and the JS workspace root are Elastic License 2.0 (LICENSE:1-45; pyproject.toml:6; packages/phoenix-evals/pyproject.toml:6; js/package.json:16), a source-available license that forbids offering the software as a hosted/managed service and circumventing license-key functionality (LICENSE:10-12). IP_NOTICE:3 lists patents US 11,315,043 and 11,615,345, and the README still calls the project 'open-source' (README.md:66-67). arize-phoenix-client, -otel and most @arizeai JS packages are Apache-2.0 (packages/phoenix-client/pyproject.toml:6; packages/phoenix-otel/pyproject.toml:6; js/packages/phoenix-cli/package.json:15). Contributions require a CLA (.github/workflows/cla.yml:24-31).",
+      "Footprint and platform limits. 54 direct Python runtime dependencies including pandas, scipy, scikit-learn, pyarrow, pydantic-ai and fastmcp (pyproject.toml:23-81) plus a required C extension, arize-phoenix-sqlean, whose wheels cover manylinux/macOS/Windows on cp311-cp314 only; musllinux and PyPy fall back to an sdist build needing a C toolchain (packages/phoenix-sqlean/cibuildwheel.toml:5-8); Python >=3.11,<3.15 (pyproject.toml:5). SQLite is the single-node default and PostgreSQL >=14 is recommended for production (docs/phoenix/self-hosting/architecture.mdx:13-32). The only published measurements are first-party LLM-judge accuracy tables; no ingestion throughput/latency or local-model figures were found in the docs.",
+      "Maintenance and policy signals. SECURITY.md lists only 2.x.x as supported while the release is 20.19.0 (SECURITY.md:5-9; src/phoenix/version.py:1). MIGRATION.md records breaking changes for every major from v13 to v20 (MIGRATION.md:3,32,142,156,168,208,212,434). .github/dependabot.yml is an unfilled template (package-ecosystem is empty, line 8) while dependency upgrades run through an LLM-driven weekly workflow (.github/workflows/claude-weekly-deps-upgrade.yml:1-6). Full macOS/Windows test legs run only on a weekday schedule, not per PR (python-all-platforms.yml:5-8), and the macOS e2e leg is disabled (.github/workflows/playwright.yaml:102)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "arize-ai/phoenix",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip (PyPI))",
+          "statement": "pip install arize-phoenix   # then: phoenix serve",
+          "citation": "README.md:85-88; docs/phoenix/self-hosting/deployment-options/terminal.mdx:12-18",
+          "holds": true,
+          "note": "README.md:85-88 is the shell block `pip install arize-phoenix` / `phoenix serve`; terminal.mdx:12 `pip install arize-phoenix`, :18 `phoenix serve`. Package name arize-phoenix (pyproject.toml:2) and console script `phoenix = phoenix.server.main:main` (pyproject.toml:86) back the command. Supporting: the daily PyPI smoke test pip-installs arize-phoenix and boots it (pypi-smoke-test.yml:67-71,104-119), via the `arize-phoenix serve` alias."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Elastic-2.0; file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 'Elastic License 2.0 (ELv2)' with the full ELv2 text (limitations at lines 10-14). Consistent with pyproject.toml:6 `license = {text=\"Elastic-2.0\"}` (license-files LICENSE + IP_NOTICE, :7) and README.md:315."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - Linux is the primary CI target: daily PyPI smoke test (pip / uv pip / uv tool run) on ubuntu-latest polling /healthz; unit tests on ubuntu-latest in the scheduled all-platforms run and on oss-4-core-runner per PR; Docker images for linux/amd64; arize-phoenix-sqlean ships manylinux wheels for cp311-cp314.",
+          "citation": ".github/workflows/pypi-smoke-test.yml:26-78; .github/workflows/python-all-platforms.yml:56-67; .github/workflows/python-CI.yml:582-590; .github/workflows/docker-build-release.yml:44; packages/phoenix-sqlean/cibuildwheel.toml:8,19-20",
+          "holds": true,
+          "note": "pypi-smoke-test.yml:26 runs-on ubuntu-latest; matrix pip/uv pip/uv tool run :30-39; installs :67-78. The daily cron (:9) and the /healthz poll (:104-119) are outside the cited 26-78 range (citation nit only). python-all-platforms.yml:67 includes ubuntu-latest (excludes :73-78 leave py3.14 only on Ubuntu); weekday cron :5-8. python-CI.yml:584 runs-on oss-4-core-runner, gated to pull_request events touching phoenix paths/uv.lock (:586); comment :616-618 refers to the runner's Ubuntu. docker-build-release.yml:44 platform [linux/amd64, linux/arm64]. cibuildwheel.toml:8 builds cp311-cp314 manylinux*, :19-20 linux archs [\"auto\"]. No workflow states the runners' CPU architecture explicitly; amd64 is evidenced by the Docker matrix."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "yes (read-side and via a separate tracing repo), with limits: (a) Claude Code and Codex plugin marketplaces registering the Phoenix /mcp server (Codex via scripts/phoenix-mcp + npx mcp-remote); (b) skills phoenix-cli/-evals/-tracing; (c) px setup hands instrumentation to a detected claude/codex/opencode/cursor binary; (d) session tracing via hook plugins in separate repo Arize-ai/coding-harness-tracing with ARIZE_LOG_* redaction flags; (e) ATIF import via Harbor. No handling of native OTLP metrics/logs; CLAUDE_CODE_ENABLE_TELEMETRY, OTEL_METRICS_EXPORTER, OTEL_LOGS_EXPORTER absent from the checkout.",
+          "citation": ".claude-plugin/marketplace.json; plugins/claude/arize-phoenix/.mcp.json; .agents/plugins/marketplace.json; plugins/codex/arize-phoenix/.mcp.json; plugins/codex/arize-phoenix/scripts/phoenix-mcp; docs/phoenix/integrations/developer-tools/coding-agents.mdx:51-221; README.md:269-279; js/packages/phoenix-cli/src/setup/agents/registry.ts:1-16; docs/phoenix/integrations/coding-agents/claude-code.mdx:9,84-102; docs/phoenix/integrations/coding-agents/codex.mdx:9,60-74; docs/phoenix/tracing/how-to-tracing/importing-and-exporting-traces/importing-atif-trajectories.mdx:6-26",
+          "holds": true,
+          "note": "(a) .claude-plugin/marketplace.json:3,12 -> plugins/claude/arize-phoenix, whose .mcp.json:4-5 registers http `${user_config.endpoint}/mcp` (dossier paraphrases as `${endpoint}/mcp`); .agents/plugins/marketplace.json:11 -> plugins/codex/arize-phoenix, .mcp.json:4 runs ./scripts/phoenix-mcp which execs `npx --yes mcp-remote` (:26-27); coding-agents.mdx:51-221 documents both. (b) README.md:270,275-279; .agents/skills/phoenix-{cli,evals,tracing}/SKILL.md exist. (c) registry.ts:4-8 binary-on-PATH probe + hand-off; :16 ids claude|codex|opencode|cursor (Cursor's probed binary is `cursor-agent`, :177). (d) claude-code.mdx:9 and codex.mdx:9 name Arize-ai/coding-harness-tracing hooks streaming OpenInference spans; ARIZE_LOG_PROMPTS/TOOL_DETAILS/TOOL_CONTENT at claude-code.mdx:84-102 and codex.mdx:60-74. (e) atif.mdx:6-8 Claude Code/Codex ATIF via Harbor. Negative claim confirmed: grep for the three variables finds no file anywhere, including .agents/ and .github/."
+        },
+        {
+          "field": "claim_checks[1] (docs/phoenix/production-guide.mdx:19,37,45)",
+          "statement": "Docs say exporters/collectors 'carry spans, metrics, and logs to Phoenix', the server 'receives, stores, and serves that telemetry', and 'log and trace ingestion' - verified: no; only the trace signal is implemented in code.",
+          "citation": "docs/phoenix/production-guide.mdx:19,37,45; src/phoenix/server/grpc_server.py:110; src/phoenix/server/api/routers/v1/__init__.py:10-30,65-90; src/phoenix/db/models.py:2046-2094; src/phoenix/server/api/types/Project.py:1614-2393; docs/phoenix/tracing/llm-traces/metrics.mdx:13-29; src/phoenix/config.py:323-326; src/phoenix/server/prometheus.py:184",
+          "holds": true,
+          "note": "Docs wording confirmed: :19 'carry spans, metrics, and logs to Phoenix', :45 'Disk scaling for log and trace ingestion'; the verbatim 'receives, stores, and serves that telemetry' is at :9 (line 37 says 'your telemetry') - citation nit. Code backs the 'no': grpc_server.py:5-12,110 imports/registers only TraceServiceServicer; v1 routers (:10-29,:65-90) have no metrics/logs router; repo-wide grep finds no MetricsService, LogsService, ExportMetrics, ExportLogs, v1/metrics, v1/logs, metrics_service_pb2 or logs_service_pb2; models.py has no metric/log-record table, and experiment_logs (:2046-2094) is experiment-job execution logging (TASK/EVAL/EXPERIMENT, FK experiment_jobs). Project.py:1614+ defines span/trace-derived time series; metrics.mdx:13 'Traces ... are automatically indexed for metrics'; Prometheus defaults to false (config.py:323-326) and serves on 9090 (prometheus.py:184)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,304 @@
+{
+  "contender": "conductor-oss/conductor",
+  "revision": {
+    "contender": "conductor-oss/conductor",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "conductor-oss/conductor",
+        "tag": "v3.32.5",
+        "commit": "49f972398e533441ba851e2b578a8b96d748a770",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.32.5",
+    "commit": "49f972398e533441ba851e2b578a8b96d748a770",
+    "read_at": "2026-10-02T03:02:02+00:00"
+  },
+  "dossier": {
+    "contender": "conductor-oss/conductor",
+    "revision": {
+      "tag": "v3.32.5",
+      "commit": "49f972398e533441ba851e2b578a8b96d748a770",
+      "read_at": "2026-10-02T03:02:02+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Conductor OSS (continuation of Netflix Conductor; Orkes is the primary maintainer) is a server-based durable workflow engine. Workflows are JSON DAGs (SIMPLE, HTTP, INLINE, FORK_JOIN, SWITCH, DO_WHILE, SUB_WORKFLOW, WAIT, HUMAN, plus LLM/MCP/agent task types) executed by one Spring Boot (Java 21) server that persists workflow state, task state and queues in a pluggable backend (SQLite by default; Redis, Postgres, MySQL, Cassandra optional). System tasks run inside the server JVM; custom work is done by external workers that poll the REST/gRPC API (the SDKs live in separate repos). This repo also holds a built-in cron scheduler (scheduler/: 6-field Spring cron, per-schedule time zone, catch-up, pause/resume, execution history), a React UI (ui-next/) for definitions, executions, schedules and task queues, and an AI/agent layer (ai/, agentspan/). No built-in task type runs local OS commands or supervises process trees; that would be done in a user-written worker.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Conductor is 'an open-source, durable workflow engine built at Netflix for orchestrating microservices, AI agents, and durable workflows at internet scale', actively maintained by Orkes.",
+          "citation": "README.md:23"
+        },
+        {
+          "claim": "Quickstart: prerequisites Node.js v16+ and Java 21+; `npm install -g @conductor-oss/conductor-cli` then `conductor server start`; open http://localhost:8080, 'your server is running with the built-in ui-next UI'.",
+          "citation": "README.md:31-38"
+        },
+        {
+          "claim": "The CLI caches the server JAR at ~/.conductor-cli/; refresh with `conductor server start latest` or by deleting the cached jar.",
+          "citation": "README.md:40-45"
+        },
+        {
+          "claim": "A first workflow can call an API and parse the response with 'no workers needed' (`conductor workflow create workflow.json`, `conductor workflow start -w hello_workflow --sync`).",
+          "citation": "README.md:49-59"
+        },
+        {
+          "claim": "Docker image (includes ui-next): `docker run -p 5000:5000 -p 8080:8080 conductoross/conductor:next`; UI on 5000, API on 8080.",
+          "citation": "README.md:63-68"
+        },
+        {
+          "claim": "Durable execution: 'Every step is persisted. Survives crashes, restarts, and network failures with configurable retries and timeouts.'",
+          "citation": "README.md:79"
+        },
+        {
+          "claim": "Full replayability: 'Restart from the beginning, rerun from any task, or retry just the failed step — on any workflow, at any time.'",
+          "citation": "README.md:83"
+        },
+        {
+          "claim": "Polyglot workers in Java, Python, Go, JavaScript, C#, Ruby or Rust; 'Workers poll, execute, and report — run them anywhere' (SDKs are in separate repositories).",
+          "citation": "README.md:85, README.md:193-203"
+        },
+        {
+          "claim": "'Self-hosted, no lock-in. Apache 2.0. 5 persistence backends, 6 message brokers. Runs anywhere Docker or a JVM runs.'",
+          "citation": "README.md:86"
+        },
+        {
+          "claim": "Backend configuration table lists 'Redis + ES7 (default)', Redis+ES8, Redis+OpenSearch, Postgres, Postgres+ES7 and MySQL+ES7 config files.",
+          "citation": "README.md:218-225"
+        },
+        {
+          "claim": "Build from source needs Docker Desktop, JDK 21+, Node 18+ and pnpm (UI): `./gradlew build`, optional `./build_ui_next.sh`, then `cd server && ../gradlew bootRun`.",
+          "citation": "README.md:236-249"
+        },
+        {
+          "claim": "'Conductor preserves full execution history indefinitely'; restart, rerun from a task, or retry the failed step 'via API or UI'.",
+          "citation": "README.md:306-310"
+        },
+        {
+          "claim": "Every task supports 'configurable retries, timeouts, and optional/compensating tasks'; SWITCH, DO_WHILE, FORK_JOIN, SUB_WORKFLOW and DYNAMIC tasks are composable.",
+          "citation": "README.md:331-334"
+        },
+        {
+          "claim": "Built-in visual UI lets you inspect 'the input, output, timing, and retry history of every task'; long-running workflows can wait for 'a scheduled timer' with 'no in-memory state to lose'. (The README never mentions the built-in cron scheduler; grep for 'schedul|cron' hits only line 351.)",
+          "citation": "README.md:345, README.md:351"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm CLI + auto-downloaded server JAR (needs Node 16+, Java 21+)",
+          "command": "npm install -g @conductor-oss/conductor-cli\nconductor server start",
+          "citation": "README.md:33-36"
+        },
+        {
+          "method": "Docker image with UI (nginx on 5000, API on 8080)",
+          "command": "docker run -p 5000:5000 -p 8080:8080 conductoross/conductor:next",
+          "citation": "README.md:65-68"
+        },
+        {
+          "method": "Build and run from source (JDK 21+)",
+          "command": "git clone https://github.com/conductor-oss/conductor\ncd conductor\n./gradlew build\ncd server\n../gradlew bootRun",
+          "citation": "README.md:238-248"
+        },
+        {
+          "method": "Download-and-run shell script (checks for Java 21+, downloads conductor-server-<ver>.jar from S3 into ~/.conductor-cli, runs java -jar)",
+          "command": "curl -sSL https://raw.githubusercontent.com/conductor-oss/conductor/main/conductor_server.sh | sh",
+          "citation": "conductor_server.sh:11 (script body lines 14-80)"
+        },
+        {
+          "method": "Docker Compose (Redis + Elasticsearch 7; compose file publishes API on host 8000 and UI on 8127)",
+          "command": "git clone https://github.com/conductor-oss/conductor\ncd conductor\ndocker compose -f docker/docker-compose.yaml up",
+          "citation": "docs/devguide/running/deploy.md:35-39; docker/docker-compose.yaml:18-20"
+        },
+        {
+          "method": "Pre-compiled JAR from Maven Central (docs text is stale: version 3.21.10 and a conductor-core-*-boot.jar file name, whereas the build emits conductor-server-<ver>-boot.jar per .github/workflows/publish_s3.yaml:72)",
+          "command": "export CONDUCTOR_VER=3.21.10\nexport REPO_URL=https://repo1.maven.org/maven2/org/conductoross/conductor-server\ncurl $REPO_URL/$CONDUCTOR_VER/conductor-core-$CONDUCTOR_VER-boot.jar --output conductor-core-$CONDUCTOR_VER-boot.jar\njava -jar conductor-core-$CONDUCTOR_VER-boot.jar",
+          "citation": "docs/devguide/running/source.md:52-58"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Docker images are published for linux/amd64 and linux/arm64 (.github/workflows/publish.yml:104); CI runs on ubuntu-latest (.github/workflows/ci.yml:69); server/build.gradle:113-118 bundles Netty epoll natives for linux-x86_64 and linux-aarch_64; JDK 21 is required (build.gradle:46-52).",
+        "wsl2": "unknown - no WSL/Windows-subsystem statement in README, docs or scripts (grep); README.md:182-188 documents Windows installers only for the separate Conductor Skills. The server is a Java 21 jar / Linux Docker image, so behaviour would depend on the host JDK or Docker, which upstream does not state.",
+        "macos_arm64": "yes (by upstream claim only; not exercised in CI) - README.md:86 says 'Runs anywhere Docker or a JVM runs' and README.md:31-38 gives no OS restriction; the server is a platform-neutral Spring Boot jar (server/build.gradle:132-139) and the Docker image has a linux/arm64 variant for Apple-silicon Docker (publish.yml:104). Every CI job uses ubuntu-latest (ci.yml:69,134,214); there is no macOS job.",
+        "gpu": "no - not applicable: no GPU/CUDA references in source or docs (grep); LLM tasks call remote provider APIs or an Ollama HTTP endpoint (server/src/main/resources/application.properties:282-283)."
+      },
+      "integrations": {
+        "cli": "Conductor CLI is a Go program in a separate repo (ROADMAP.md:46; AGENTS.md:145-146), installed with `npm install -g @conductor-oss/conductor-cli` (README.md:34); its source is not in this clone, so flags and behaviour were not verified. Documented commands: `conductor server start|stop`, `conductor workflow create|start`, `conductor task list|get` (docs/quickstart/index.md:19-20,80,86,385; docs/devguide/how-tos/Workers/scaling-workers.md:25-29). In-repo launchers: conductor_server.sh and docker/server/bin/startup.sh.",
+        "mcp": "No MCP server in this repo. Conductor acts as an MCP client through the LIST_MCP_TOOLS and CALL_MCP_TOOL system tasks (ai/src/main/java/org/conductoross/conductor/ai/tasks/worker/MCPWorkers.java:53), transports STREAMABLE_HTTP and SSE only (ai/.../mcp/MCPService.java:462-466). Docs say workflows can be exposed as MCP tools 'via the MCP Gateway' (docs/devguide/ai/mcp-guide.md:125-127, docs/devguide/faq.md:81) but no gateway implementation was found in the source tree; ui-next/public/context.js:19-31 lists GATEWAY_ENABLED=false under 'Enterprise Features - DISABLED for OSS'.",
+        "sdk_or_api": "HTTP API: Spring MVC REST controllers under /api (rest/src/main/java/com/netflix/conductor/rest/controllers/WorkflowResource.java, TaskResource.java, MetadataResource.java, EventResource.java; scheduler API at scheduler/core/.../rest/SchedulerResource.java:52 -> /api/scheduler). OpenAPI/Swagger UI at /swagger-ui/index.html and /api-docs (server/.../Conductor.java:85-87; application.properties:15). Optional gRPC server (grpc-server module, only when conductor.grpc-server.enabled=true: grpc-server/.../GrpcConfiguration.java:26). SDKs for Java, Python, JavaScript, Go, C#, Ruby, Rust live in separate repos (README.md:193-203); this repo has only the Java gRPC client module (grpc-client/). Workers poll GET /api/tasks/poll/{type} and POST /api/tasks (TaskResource.java:66,91).",
+        "claude_code_or_codex": "Documented via the separate 'Conductor Skills' repo (conductor-oss/conductor-skills), not in this clone: Claude Code `/plugin marketplace add conductor-oss/conductor-skills` and `/plugin install conductor@conductor-skills` (README.md:166-171); `curl -sSL https://conductor-oss.github.io/conductor-skills/install.sh | bash -s -- --all` auto-detects installed agents including Claude Code and Codex CLI (global ~/.codex/AGENTS.md) (README.md:173-179; docs/devguide/how-tos/conductor-skills.md:9,253-268). The installer is fetched from github.io at install time and was not inspected. This repo also contains CLAUDE.md, AGENTS.md and .claude/agents/docs-writer.md, which are contributor instructions for agents editing the repo, not an end-user integration. The embedded agentspan runtime includes a Claude Agent SDK normalizer (agentspan/.../runtime/normalizer/ClaudeAgentSdkNormalizer.java), active only when conductor.integrations.ai.enabled=true."
+      },
+      "telemetry_and_network": "Server: no telemetry, phone-home or update-check code found (grep of src/main for telemetry/phone-home/usage-report terms; no hard-coded external hosts in server/src/main). README has no telemetry statement. Metrics are pull-only: Prometheus enabled by default with /actuator health,info,prometheus exposed (server/src/main/resources/application.properties:170-173); OTLP, Datadog, CloudWatch, Azure Monitor, StatsD etc. default to disabled (:175-196). Default required services: none - SQLite file c123.db in the working directory, in-JVM lock, SQLite queue and index (application.properties:16-20; docker/server/bin/startup.sh:29); Redis, Elasticsearch/OpenSearch, Postgres, Kafka etc. are optional. Accounts: none; LLM tasks use provider API keys read from environment variables (application.properties:233-283) and egress only when such tasks run; MCP/OpenAPI-discovery outbound is default-deny until conductor.ai.outbound.allowed-origins is set (application.properties:202-207); the HTTP system task has no URL allow-list in http-task/. UI (browser side): Monaco editor is loaded from https://cdn.jsdelivr.net at runtime (ui-next/src/monacoLoader.ts:21-25). Google Tag Manager, gtag, HubSpot (ui-next/src/components/App.tsx:68-104), GrowthBook with cdn.growthbook.io (ui-next/src/growthbook/growthbookInstance.ts:11-21) and Heap (ui-next/src/utils/tracker.tsx:4-14) code paths exist but are gated by the PLAYGROUND feature flag, which is false in the shipped runtime config (ui-next/public/context.js:38; LogRocket is a no-op stub in OSS: ui-next/src/utils/logrocket.ts:9-10); the flag can be flipped through localStorage, REACT_APP_FEATURE_PLAYGROUND or window.conductor (ui-next/src/utils/flags.ts:103-125). The Docker nginx CSP allow-lists googletagmanager, pendo, assets.orkes.io and cdn.jsdelivr.net script sources (docker/server/nginx/nginx.conf:10). Download paths: conductor_server.sh (and, per README.md:40-45, the CLI) fetch conductor-server-<ver>.jar from https://conductor-server.s3.us-east-2.amazonaws.com into ~/.conductor-cli with no checksum or signature check (conductor_server.sh:29,57-76); the quickstart sample workflow calls an Orkes-hosted test API (docs/quickstart/workflow.json:11)."
+    },
+    "code": {
+      "languages": [
+        "Java 21 (server, ~all modules)",
+        "Groovy (Spock tests, Gradle)",
+        "TypeScript/React (ui-next, Vite)",
+        "JavaScript/React (legacy ui/, CRA)",
+        "SQL (Flyway migrations per backend)",
+        "Protobuf (grpc/)",
+        "Shell (docker, e2e, conductor_server.sh)",
+        "Python (test fixtures only: ai/src/test/resources/a2a/*.py)"
+      ],
+      "entry_points": [
+        {
+          "path": "server/src/main/java/com/netflix/conductor/Conductor.java",
+          "what": "Spring Boot main class (main() at line 53; bootJar mainClass in server/build.gradle:133); run as java -jar conductor-server-<ver>-boot.jar; optional CONDUCTOR_CONFIG_FILE properties override (lines 108-126)."
+        },
+        {
+          "path": "server/src/main/resources/application.properties",
+          "what": "Bundled defaults: SQLite db/queue/index (c123.db), local_only lock, scheduler enabled, AI integration enabled, Prometheus metrics (lines 14-27, 170-173, 201)."
+        },
+        {
+          "path": "docker/server/bin/startup.sh",
+          "what": "Container entrypoint: starts nginx (UI on 5000), cd /app/libs, then java -jar conductor-server.jar, with -DCONDUCTOR_CONFIG_FILE=/app/config/$CONFIG_PROP when CONFIG_PROP is set."
+        },
+        {
+          "path": "conductor_server.sh",
+          "what": "POSIX sh launcher: requires Java 21+, downloads conductor-server-<ver>.jar from S3 to ~/.conductor-cli, runs it with --server.port."
+        },
+        {
+          "path": "rest/src/main/java/com/netflix/conductor/rest/controllers/WorkflowResource.java",
+          "what": "REST /api/workflow: start, sync execute, search, pause/resume, rerun/restart/retry, terminate, remove (lines 73-472); siblings TaskResource (poll/update/logs), MetadataResource, EventResource."
+        },
+        {
+          "path": "scheduler/core/src/main/java/io/orkes/conductor/scheduler/rest/SchedulerResource.java",
+          "what": "REST /api/scheduler: schedule CRUD, PUT pause/resume, nextFewSchedules preview, search/executions history; engine is service/SchedulerService.java."
+        },
+        {
+          "path": "ui-next/index.html",
+          "what": "Vite UI entry (loads /context.js runtime flags, then src/main.tsx at line 114); built output is embedded into server/src/main/resources/static at release time."
+        },
+        {
+          "path": "grpc-server/src/main/java/com/netflix/conductor/grpc/server/GRPCServer.java",
+          "what": "Optional gRPC API; only active with conductor.grpc-server.enabled=true (GrpcConfiguration.java:26)."
+        }
+      ],
+      "architecture": "Gradle multi-module build (settings.gradle:14-81). common/ holds the model classes (WorkflowDef, TaskDef, Task...). core/ is the engine: core/execution/WorkflowExecutorOps.java (start/decide/terminate/retry/rerun/restart), DeciderService.java (state machine, retries, timeouts), core/execution/tasks/* (system tasks, SystemTaskRegistry, SystemTaskWorker), core/execution/mapper/* (task-type mappers), core/reconciliation/WorkflowSweeper (re-evaluates running workflows), core/events/* (event handlers, GraalJS ScriptEvaluator), core/dal/ExecutionDAOFacade; DAO interfaces live in core. Pluggable backends: sqlite-persistence (default), postgres-, mysql-, redis-, cassandra-persistence; indexing es7/es8/os-persistence-v2/v3/sqlite; locking redis-lock or in-JVM LocalOnlyLock; event queues amqp/nats/nats-streaming/kafka-event-queue/awssqs-event-queue; payload storage awss3/azureblob/gcs/file/postgres. rest/ = Spring MVC controllers; grpc/grpc-server/grpc-client optional. scheduler/core (+ scheduler/{sqlite,postgres,mysql,redis,cassandra}-persistence) is the cron scheduler: SchedulerService polls the queue 'conductor_system_scheduler' (every 100 ms by default, first poll after 15 s), starts workflows through WorkflowService with injected _scheduledTime/_executedTime/_executionId inputs, and keeps POLLED/EXECUTED/FAILED execution rows. http-task, json-jq-task, kafka add system tasks; ai/ (LLM, vector DB, MCP client, A2A) and agentspan/ (embedded agent runtime) activate with conductor.integrations.ai.enabled. server/ assembles everything into one Spring Boot fat jar. SIMPLE-task workers are external processes that poll /api/tasks/poll/{type}; each task type needs a registered TaskDef (docs/documentation/configuration/taskdef.md:7; docs/devguide/faq.md:129-131). UI: ui-next/ (React 18, Vite, MUI, XState) with routes for /executions, /execution/:id, /workflowDef, /taskDef, /scheduleDef, /schedulerExecs, /taskQueue (ui-next/src/routes/routes.tsx:95-185); legacy ui/ (CRA) is still in the tree. Test support: test-harness/, e2e/, test-util/.",
+      "packaging_and_release": "Gradle 8.14.3 wrapper (gradle/wrapper/gradle-wrapper.properties:3); group org.conductoross, artifacts named conductor-<module> (build.gradle:55; settings.gradle:81). The server artifact is a Spring Boot fat jar conductor-server-<version>-boot.jar (server/build.gradle:132-147). Releases run on GitHub release events: publish.yml publishes all modules to Maven Central through the Sonatype OSSRH staging API with in-memory PGP signing from secrets (publish.yml:35-44; deploy.gradle:52-74,127-129) and, in a second job, builds ui-next into the jar and pushes multi-arch (linux/amd64, linux/arm64) images conductoross/conductor:<ver> and orkesio/orkes-conductor-community[-standalone]:<ver>, plus :latest for non-prereleases (publish.yml:46-114); publish_build.yaml pushes the same Docker tags again (lines 85-100); publish_s3.yaml uploads conductor-server-<ver>.jar and conductor-server-latest.jar to an S3 bucket named in secrets (lines 57-79); publish-next.yaml (manual) pushes :next and conductor-server-next.jar. Runtime image is debian:stable-slim + openjdk-21-jre-headless + nginx with no USER or VOLUME (docker/server/Dockerfile:61-89). No checksums, SBOM, provenance attestation or image signing were found (grep of .github); only the Maven Central PGP signatures. UI assets are not committed: ui-next is built and copied to server/src/main/resources/static at release time (publish.yml:68-77; build_ui_next.sh:7-16). gradle.properties:4 still says 3.30.2-SNAPSHOT at tag v3.32.5 (workflows override with -Pversion). The Gradle wrapper jar is validated in CI (ci.yml:80-81) but gradle-wrapper.properties has no distributionSha256Sum.",
+      "tests_and_ci": "Frameworks: JUnit 5 (useJUnitPlatform) with JUnit 4 vintage engine, Spock 2.4 on Groovy 4 (build.gradle:125-129,158-160; core/build.gradle:72-75), Testcontainers 1.21.4 (dependencies.gradle:75; AGENTS.md:56-58), Jacoco coverage (build.gradle:44,169-175), Spotless with google-java-format AOSP (build.gradle:221-232); UI uses Vitest and Playwright (ui-next/package.json:32-43). Approximate file counts under src/test: ~500 Java (core ~98, ai ~86, e2e ~44, test-harness 28, rest 12, persistence/ES/OpenSearch/scheduler modules the remainder), ~65 Groovy specs (mostly test-harness/src/test/groovy), ~90 UI test files (~80 Vitest *.test.ts(x) + 12 Playwright specs in ui-next/e2e). Test locations: */src/test/{java,groovy}, test-harness/, e2e/ (live-server suites via e2e/run_tests-*.sh), ui-next/e2e/. Many tests need Docker. Workflows in .github/workflows: ci.yml (push to main, PRs, manual, nightly 02:00 UTC: `./gradlew build -x test`; unit tests, where persistence-module tests (including sqlite and scheduler-sqlite) run only if those paths changed or on nightly/manual (lines 173-195); test-harness integration tests; agentspan-e2e on nightly/manual with live LLM keys on main; e2e matrix with redis-es8 always and postgres, mysql, redis-os3 on nightly/manual; ui-next typecheck+vitest+build when UI paths change), ui-next-ci.yml (prettier, eslint, tsc, vitest, build; mocked Playwright in Docker), ui-next-integration-ci.yml (Playwright against a Docker-built server, OPENAI_API_KEY secret, 50% coverage floor), playwright-e2e.yml (dispatches tests to the private repo orkes-io/conductor-ui), llm-media-integration.yml (weekly paid live-provider tests), update-ui-snapshots.yml, release_draft.yml, generate_gh_pages.yml (mkdocs), publish*.yml (release), debug-docker-credentials.yml and deprecate-standalone.yml (Docker Hub admin). All jobs run on ubuntu-latest; no macOS or Windows job.",
+      "dependencies": "Build: Java toolchain 21 (build.gradle:46-52), Spring Boot 3.5.14 BOM (build.gradle:11,24). 51 build.gradle manifests (root, 44 modules, 6 scheduler modules) with 776 direct dependency declarations in total (implementation/api/runtimeOnly/compileOnly/annotationProcessor/test*): server 63, test-harness 53, core 36, test-util 31, ai 30, workflow-event-listener 26, scheduler/core 24, postgres-persistence 23, mysql-persistence 22, root 20, the rest under 20 each. Versions are centralised in dependencies.gradle (rev* properties) and springboot-bom-overrides.gradle (CVE-driven overrides). Notable runtime dependencies: GraalVM polyglot/js/python 25.0.2 plus truffle-runtime (core/build.gradle:49-58), sqlite-jdbc 3.49.0.0 and Flyway, Jedis, Postgres/MySQL drivers, Elasticsearch 7/8 and OpenSearch clients, Kafka/NATS/AMQP/SQS clients, Spring AI 1.1.6, MCP SDK 1.0.0, PDFBox, MongoDB/Pinecone/pgvector clients (ai/build.gradle:20-52), Micrometer registries 1.14.6, and a pre-release artifact io.orkes.queues:orkes-conductor-queues:2.0.0.rc3 (dependencies.gradle:66; used by redis-persistence/build.gradle:21 and server/build.gradle:106). ui-next/package.json: 49 dependencies, 62 devDependencies, 22 peerDependencies (pnpm-lock.yaml); legacy ui/package.json: 44 dependencies, 11 devDependencies (both yarn.lock and package-lock.json present). requirements.txt: 3 (mkdocs, mkdocs-material, mkdocs-macros-plugin). Hard pins and version floors are catalogued in AGENTS.md:76-122 (protobuf 3.x and GraalVM versions locked together, jettison strictly 1.5.4, etc.).",
+      "security_policy": "SECURITY.md: report via GitHub private security advisory (https://github.com/conductor-oss/conductor/security/advisories/new, SECURITY.md:5-7); only 3.x.x is listed as supported, 2.x and 1.x are not (SECURITY.md:9-15)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:31-38 - `npm install -g @conductor-oss/conductor-cli` + `conductor server start` gives a server and 'built-in ui-next UI' at http://localhost:8080 (Java 21+, Node 16+).",
+        "verified": "partial",
+        "evidence": "Java 21 is enforced by build.gradle:46-52 and conductor_server.sh:20-24. The server can serve a UI at / (rest/src/main/java/org/conductoross/conductor/SpaInterceptor.java:24-29, conductor.enable.ui.serving defaults true) but the committed tree has no server/src/main/resources/static; assets are embedded only by build_ui_next.sh:14-16 or the release workflows (publish_s3.yaml:57-61). The CLI is a separate repo (ROADMAP.md:46), so the npm package and its JAR download cannot be checked here; the 7-language SDK claim (README.md:85,193-203) points at separate repos and is likewise not checkable from this clone."
+      },
+      {
+        "claim": "README.md:79,83,306-310 - every step is persisted, survives crashes/restarts; restart/rerun/retry work at any time; 'full execution history indefinitely'.",
+        "verified": "partial",
+        "evidence": "Default storage is a SQLite file DB (server/src/main/resources/application.properties:16-20; sqlite-persistence/.../V1__initial_schema.sql:76-89,119-134). Restart/rerun/retry endpoints exist (WorkflowResource.java:271,279,291). Crash recovery: response-timeout handling (DeciderService.java:897-953) and un-acked queue messages returning to the queue after 60 s (SqliteQueueDAO.java:303-380). The default workflow status listener is a stub, so nothing is deleted automatically (ConductorCoreConfiguration.java:80-87), but DELETE /api/workflow/{id}/remove (WorkflowResource.java:225) and the optional 'archive' listener (ArchivingWorkflowListenerConfiguration.java:25) remove history, and the scheduler's own execution rows are pruned to 5 per schedule (SchedulerProperties.java:38-39; SqliteSchedulerArchivalDAO.java:197-227). 'Indefinitely' holds only while nothing deletes records."
+      },
+      {
+        "claim": "README.md:49-59 - a workflow can call an API and parse the response with 'no workers needed'.",
+        "verified": "yes",
+        "evidence": "docs/quickstart/workflow.json uses HTTP + INLINE tasks, which are WorkflowSystemTask classes executed in the server JVM (http-task/.../HttpTask.java:48; core/.../tasks/Inline.java:47; docs/devguide/concepts/workers.md:8). The system-task list (docs/documentation/configuration/workflowdef/systemtasks/index.md:11-21) has no task that runs OS commands; grep for ProcessBuilder/Runtime.exec in src/main finds none, the JS sandbox sets allowCreateProcess(false) (core/.../ScriptEvaluator.java:176-190) and the FAQ says 'Conductor does not run the workers' (docs/devguide/faq.md:133-136). Running an existing command therefore needs a SIMPLE-task worker."
+      },
+      {
+        "claim": "README.md:333 - 'every task supports configurable retries, timeouts, and optional/compensating tasks'.",
+        "verified": "partial",
+        "evidence": "The retry engine (DeciderService.java:562-700) supports FIXED, LINEAR_BACKOFF and EXPONENTIAL_BACKOFF with max-delay cap, jitter and totalTimeoutSeconds, driven by TaskDef (defaults retryCount=3, retryDelaySeconds=60: TaskDef.java:65,89). Control-flow types (SWITCH, FORK, JOIN, EXCLUSIVE_JOIN, DO_WHILE, DECISION) are 'built-in' and never retried (TaskType.java:93-102; DeciderService.java:581-583); if no TaskDef resolves, expected retries is 0 (DeciderService.java:575-580); ROADMAP.md:22 lists retry/polling for the HTTP task as Planned."
+      },
+      {
+        "claim": "docs/documentation/configuration/taskdef.md:26 and docs/devguide/architecture/tasklifecycle.md:180 - responseTimeoutSeconds defaults to 600 s.",
+        "verified": "no",
+        "evidence": "Code default is ONE_HOUR = 3600 s (common/.../tasks/TaskDef.java:53,96; AsyncSystemTaskExecutor.java:280 also says 'default TaskDef#ONE_HOUR'). Code wins: a crashed worker's IN_PROGRESS task is only timed out after this window unless the TaskDef overrides it (DeciderService.java:928-953)."
+      },
+      {
+        "claim": "README.md:220 lists 'Redis + ES7 (default)'; docs/devguide/running/source.md:6 says the default configuration is in-memory and all data is lost when the server stops.",
+        "verified": "no",
+        "evidence": "The bundled config defaults db, queue and indexing to SQLite at jdbc:sqlite:c123.db (relative to the working directory) with a local_only lock (server/src/main/resources/application.properties:16-20); docker/server/bin/startup.sh:29 says that with no CONFIG_PROP it uses 'built-in defaults (SQLite, no external dependencies required)'. Redis+ES7 is only what docker/docker-compose.yaml:6 selects via config-redis.properties. docs/devguide/running/deploy.md:97 correctly lists SQLite as the default but 'Local development only'."
+      },
+      {
+        "claim": "docs/devguide/faq.md:138-141 - 'Conductor itself does not provide any scheduling mechanism.'",
+        "verified": "no",
+        "evidence": "A built-in cron scheduler exists: scheduler/core (SchedulerService.java:69; SchedulerResource.java:52 -> /api/scheduler), enabled in server/src/main/resources/application.properties:27, documented in docs/devguide/how-tos/Workflows/scheduling-workflows.md:7 and docs/documentation/api/scheduler.md, with UI pages for schedules and scheduler executions (ui-next/src/routes/routes.tsx:99,155-163; ui-next/public/context.js:11)."
+      },
+      {
+        "claim": "docs/devguide/how-tos/Workflows/scheduling-workflows.md:184 and scheduler/examples/README.md:12 - conductor.scheduler.enabled defaults to true.",
+        "verified": "partial",
+        "evidence": "Code default is off: SchedulerConditions.java:24-29 uses matchIfMissing=false and SqliteSchedulerConfiguration.java:38-39 evaluates '${conductor.scheduler.enabled:false}'. It is on in the shipped distribution only because the bundled application.properties:27 sets true (docker/server/config/*.properties do not override it). The scheduler DAO module must match conductor.db.type (SqliteSchedulerConfiguration.java:29-40)."
+      },
+      {
+        "claim": "docs/devguide/how-tos/Workflows/scheduling-workflows.md:195-196 and docs/devguide/cookbook/workflow-scheduling.md:286 - the scheduler fires on every cron tick regardless of whether the previous run finished.",
+        "verified": "yes",
+        "evidence": "SchedulerService.handleSchedules (lines 554-704) checks only deleted/paused/due state before calling workflowService.startWorkflow (line 661); there is no running-instance check. IdempotencyStrategy values FAIL/RETURN_EXISTING/FAIL_ON_RUNNING are passed through (SchedulerService.java:1032-1033) but no OSS code enforces them for generic starts (grep of src/main: only the agent-start path WorkflowExecutorOps.java:1845-1860 and SUB_WORKFLOW starts SubWorkflow.java:138-203). Per-task concurrentExecLimit is enforced with SQLite (SqliteExecutionDAO.java:211-252) but rate limiting is a no-op there (:201-209)."
+      },
+      {
+        "claim": "scheduler/examples/README.md - pause/resume are plain GET calls (lines 80,93,121-131), `jitter-max-ms` defaults to 0 (line 171), and ../scripts/ holds four load-test scripts (lines 329-331).",
+        "verified": "no",
+        "evidence": "Controllers use PUT for pause/resume (SchedulerResource.java:121,130; SchedulerBulkResource.java:49,55), matching docs/documentation/api/scheduler.md but not the examples README. The real property is maxScheduleJitterMs with default 1000 (SchedulerProperties.java:40), not jitter-max-ms=0. scheduler/scripts/ does not exist in the tree (only scheduler/examples/* is present). Code wins; GET /api/scheduler/admin/pause|resume do exist as GET (SchedulerResource.java:162,169) and affect only the local server instance."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Scheduler dispatch latency, one live run of an every-minute schedule driving an INLINE-task workflow",
+        "metric": "actual dispatch time minus scheduled cron slot",
+        "value": "about 837 ms (scheduledAt 2026-02-19T23:22:00.000Z, triggeredAt 23:22:00.837Z), attributed by the authors to poll overhead; single observation, no hardware or configuration stated",
+        "source": "scheduler/examples/README.md:293-299",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: nothing in the server executes or supervises OS commands. System tasks run in-JVM (docs/documentation/configuration/workflowdef/systemtasks/index.md:7-21), JS evaluation forbids process creation (core/.../ScriptEvaluator.java:176-190), MCP transports are HTTP/SSE only (ai/.../mcp/MCPService.java:462-466), and the FAQ states Conductor does not run workers (docs/devguide/faq.md:133-136). Running existing commands means writing and hosting a polling worker with an SDK from a separate repo (README.md:193-203); bounding process trees, signal handling and kill-on-cancel are entirely the worker's job and outside this repo.",
+      "Cancellation and recovery are server-side bookkeeping: terminate marks non-terminal tasks CANCELED and removes queue entries (WorkflowExecutorOps.java:757-769,1500-1552); a worker mid-command is not signalled (TaskResource.java:66-300 has no push/cancel endpoint) and its later result is ignored (WorkflowExecutorOps.java:944-971; metric task_update_conflict, docs/documentation/metrics/server.md:30). Only embedded annotated system tasks get a best-effort cancel hook (AnnotatedWorkflowSystemTask.java:154-179). Crashed-worker detection relies on responseTimeoutSeconds, 3600 s by default in code (TaskDef.java:96) although docs say 600; delivery is at-least-once, so commands must be idempotent (docs/architecture/durable-execution.md:39-40).",
+      "Scheduler semantics: runs overlap with no guard and idempotency strategies are not enforced (SchedulerService.java:554-704,1032-1033); catch-up fires missed slots in a burst (docs/devguide/cookbook/workflow-scheduling.md:120-121); first poll waits 15 s after start and dispatch jitter is up to 1 s (SchedulerProperties.java:40-41); the workflow is started before the execution record and next-run time are saved (SchedulerService.java:660-691), so a crash in between could re-fire a slot after un-acked messages return in 60 s (SqliteQueueDAO.java:303-380) - an inference from code order, not tested; scheduler history is trimmed to 5 rows per schedule only after 5000 archived records accumulate (SchedulerService.java:279-282; SchedulerProperties.java:35-39); cron is 6-field Spring syntax only (docs/devguide/how-tos/Workflows/scheduling-workflows.md:20-38).",
+      "Local persistence: upstream labels SQLite and the local_only lock 'local development only / not for production' (docs/devguide/running/deploy.md:97,288). The DB file c123.db is created relative to the working directory (application.properties:16), i.e. /app/libs inside the container (docker/server/bin/startup.sh:24) with no VOLUME in docker/server/Dockerfile. No default retention: the stub listener keeps every workflow and task row (ConductorCoreConfiguration.java:80-87), so history grows until deleted through the API. The SQLite DAO has a no-op rate limiter (SqliteExecutionDAO.java:201-209) and depends on a retry-on-SQLITE_BUSY template (SqliteConfiguration.java:191-205).",
+      "Security: no authentication or authorization in OSS - 'All API endpoints are open' (docs/documentation/api/index.md:27), no web security filter anywhere in src/main (only spring-security-core in scheduler/core/build.gradle:11), UI auth flags off (ui-next/public/context.js:5-8). No server.address is configured (grep), so Spring Boot's default all-interface bind applies; /actuator (health, info, prometheus), Swagger UI and the AI/agent REST controllers are exposed by default (application.properties:171-173,201). The HTTP task has no URL allow/deny list, unlike AI outbound (application.properties:202-207). The container runs as root with nginx and the JVM together (no USER in docker/server/Dockerfile). Auth/RBAC are enterprise features (docs/devguide/ai/a2a-integration.md:537; docs/devguide/running/hosted.md:7).",
+      "Footprint and platform: needs JDK 21+ (build.gradle:46-52; README.md:31). The default server bundles the whole AI/agent stack (Spring AI, MCP SDK, PDFBox, vector-DB and cloud SDKs: server/build.gradle:19-126; ai/build.gradle:20-52) and GraalVM js+python (core/build.gradle:49-58), with AI integration enabled by default (application.properties:201). No memory/CPU sizing guidance beyond JVM heap tuning (docs/devguide/running/deploy.md:635). CI runs on ubuntu-latest only (ci.yml:69), so macOS arm64 and WSL2 are not CI-exercised; sqlite and scheduler-sqlite tests are skipped on PRs that do not touch them (ci.yml:173-195).",
+      "Network and supply chain: the browser UI loads Monaco from cdn.jsdelivr.net at runtime (ui-next/src/monacoLoader.ts:21-25); GTM/HubSpot/GrowthBook/Heap code exists behind a default-false PLAYGROUND flag that can be flipped client-side (ui-next/public/context.js:38; ui-next/src/utils/flags.ts:103-125), and the Docker nginx CSP allow-lists googletagmanager, pendo and assets.orkes.io (docker/server/nginx/nginx.conf:10). The CLI/script path downloads an unsigned JAR from S3 without checksum verification (conductor_server.sh:29,57-76), install docs also show curl-pipe-shell (README.md:179); only Maven Central artifacts are PGP-signed, with no SBOM/attestation/checksums for Docker or S3 jars (publish.yml:42-44; deploy.gradle:63-74); publish.yml and publish_build.yaml both push the same Docker tags on release (publish.yml:99-114; publish_build.yaml:93-100).",
+      "Maintenance and drift: single-vendor-led open-core project (Orkes primary maintainer: README.md:23,291) with enterprise hook methods inside OSS code (SchedulerService.java:138-165; ui-next/public/context.js:19-31). Docs disagree with code on several defaults that matter here (SQLite vs in-memory, responseTimeoutSeconds, scheduler enabled, pause/resume verbs, stale JAR name and version 3.21.10 in docs/devguide/running/source.md:52-58; gradle.properties:4 still 3.30.2-SNAPSHOT at tag 3.32.5), and the README never mentions the cron scheduler. Dependencies include a release-candidate artifact, io.orkes.queues:orkes-conductor-queues:2.0.0.rc3 (dependencies.gradle:66), and many hard pins (AGENTS.md:76-122). The clone is shallow, so commit cadence could not be assessed."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "conductor-oss/conductor",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npm CLI + auto-downloaded server JAR (needs Node 16+, Java 21+): `npm install -g @conductor-oss/conductor-cli` then `conductor server start`",
+          "citation": "README.md:33-36",
+          "holds": true,
+          "note": "README.md:34-35 have exactly these two commands. The Node.js v16+ / Java 21+ prerequisites are on README.md:31, and the CLI caching and downloading the server JAR into ~/.conductor-cli/ is on README.md:40-44. Both lines are just outside the cited range, but in the same section. The CLI itself lives in a separate repo, so only the documented behaviour could be checked, not the npm package."
+        },
+        {
+          "field": "license",
+          "statement": "Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-201 is the standard Apache License 2.0 text and the only license file in the tree (glob for LICENSE/COPYING/NOTICE). It agrees with README.md:17 and :86, ui/package.json:101 (\"Apache-2.0\") and the Apache-2.0 headers in source files, including agentspan/ (e.g. ClaudeAgentSdkNormalizer.java:1-12). The appendix line 'Copyright {yyyy} Orkes, Inc.' (LICENSE:189) is an unfilled template placeholder and does not change the SPDX id."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - Docker images published for linux/amd64 and linux/arm64; CI runs on ubuntu-latest; server bundles Netty epoll natives for linux-x86_64 and linux-aarch_64; JDK 21 required.",
+          "citation": ".github/workflows/publish.yml:104; .github/workflows/ci.yml:69; server/build.gradle:113-118; build.gradle:46-52",
+          "holds": true,
+          "note": "publish.yml:104 is `platforms: linux/arm64,linux/amd64` in the publish-docker job (release events). ci.yml:69 is `runs-on: ubuntu-latest` for the build job. server/build.gradle:117-118 add netty-transport-native-epoll with linux-x86_64 and linux-aarch_64 classifiers, and the comment at 113-116 explains the arm64 startup fix. build.gradle:46-50 set the Java 21 toolchain, and :52-53 set source/target 21."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "REST controllers under /api (scheduler at /api/scheduler); Swagger UI at /swagger-ui/index.html and /api-docs; gRPC server only when conductor.grpc-server.enabled=true; SDKs in separate repos, only grpc-client/ in this repo; workers poll GET /api/tasks/poll/{type} and POST /api/tasks.",
+          "citation": "rest/.../TaskResource.java:66,91; scheduler/core/.../SchedulerResource.java:52; server/.../Conductor.java:85-87; application.properties:15; grpc-server/.../GrpcConfiguration.java:26; README.md:193-203",
+          "holds": true,
+          "note": "RequestMappingConstants.java:17,23 define API_PREFIX \"/api/\" and TASKS \"/api/tasks\". TaskResource.java:55, :66 and :91 are @RequestMapping(TASKS), @GetMapping(\"/poll/{tasktype}\") and @PostMapping. SchedulerResource.java:52 is @RequestMapping(\"/api/scheduler\"). application.properties:15 sets springdoc.api-docs.path=/api-docs. GrpcConfiguration.java:26 is @ConditionalOnProperty(name=\"conductor.grpc-server.enabled\", havingValue=\"true\"). README.md:193-203 list the 7 SDKs in separate repos. settings.gradle:45 shows grpc-client as the only client module, and conductor-clients/ and polyglot-clients/ hold only README link lists. Minor: Conductor.java:85-87 only logs the Swagger URL at startup; the UI itself comes from springdoc-openapi-starter-webmvc-ui (server/build.gradle:108)."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "README.md:49-59 - a workflow can call an API and parse the response with 'no workers needed' (verified: yes); no built-in task runs OS commands, so running a command needs a SIMPLE-task worker.",
+          "citation": "docs/quickstart/workflow.json; http-task/.../HttpTask.java:48; core/.../tasks/Inline.java:47; docs/devguide/concepts/workers.md:8; docs/documentation/configuration/workflowdef/systemtasks/index.md:11-21; core/.../events/ScriptEvaluator.java:176-190; docs/devguide/faq.md:133-136",
+          "holds": true,
+          "note": "workflow.json:8 and :19 use HTTP and INLINE tasks. HttpTask.java:48 and Inline.java:47 both extend WorkflowSystemTask, and workers.md:8 says system-task workers run inside Conductor's JVM. systemtasks/index.md:11-21 lists HTTP, INLINE, EVENT, WAIT, HUMAN, KAFKA_PUBLISH, JSON_JQ_TRANSFORM, NOOP and JDBC; none runs OS commands. A grep of **/src/main for ProcessBuilder( and Runtime.getRuntime().exec finds nothing. ScriptEvaluator.java:176-178 deny Runtime, ProcessBuilder and Process, and :189 sets allowCreateProcess(false). faq.md:135 says 'Conductor does not run the workers.' Gap in the evidence (not in the claim): INLINE's python evaluator (core/.../evaluators/PythonEvaluator.java:32) builds a bare Context.newBuilder(\"python\").build(). It relies on GraalVM's polyglot defaults (process creation off unless allowAllAccess) rather than explicit flags; the cited evidence covers only the JS sandbox."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

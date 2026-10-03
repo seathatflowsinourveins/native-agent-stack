@@ -1,0 +1,353 @@
+{
+  "contender": "assafelovic/gpt-researcher",
+  "revision": {
+    "contender": "assafelovic/gpt-researcher",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "assafelovic/gpt-researcher",
+        "tag": "v3.7.0",
+        "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.7.0",
+    "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+    "read_at": "2026-10-02T03:01:56+00:00"
+  },
+  "dossier": {
+    "contender": "assafelovic/gpt-researcher",
+    "revision": {
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "GPT Researcher is an open-source Python library and FastAPI/WebSocket service (plus static and NextJS frontends, a repo-root CLI, LangGraph and AG2 multi-agent examples, and a LangChain 'deepagents' example) that takes a query, has an LLM plan sub-queries, retrieves and scrapes web pages or local documents (optionally through MCP tools), filters the context, and has an LLM write a markdown report with in-text hyperlink citations and a reference list (README.md:25-27; gpt_researcher/agent.py:37-51,343-504). It is a research/report generator, not a general task worker: this tree contains no code-writing or code-executing agent, no sandbox, no checkpointed or resumable run state, and no OpenAI Agents SDK / Claude Agent SDK / Codex SDK integration; the only agent-harness integrations are LangGraph, AG2 and LangChain deepagents (multi_agents/, deep_agents/agent.py:6-7). LLMs are reached through LangChain chat-model classes chosen by a 'provider:model' string (27 provider names including openai and anthropic; gpt_researcher/llm_provider/generic/base.py:13-41,146-164); defaults are OpenAI gpt-5.4 / gpt-5.4-mini and Tavily search (gpt_researcher/config/variables/default.py:4-10). The repo also ships first-party benchmark artifacts (deep_agents/benchmark_results/, evals/).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "\"GPT Researcher the first open deep research agent designed for both web and local research on any given task.\"",
+          "citation": "README.md:25"
+        },
+        {
+          "claim": "\"The agent produces detailed, factual, and unbiased research reports with citations\"; offers customization for tailor-made, domain-specific research agents; parallelized agent work for speed and reliability.",
+          "citation": "README.md:27"
+        },
+        {
+          "claim": "Planner/execution/publisher architecture: the planner generates research questions, execution agents gather information (a crawler agent per question; summarize and source-track each resource), and the publisher aggregates a final report.",
+          "citation": "README.md:56-67"
+        },
+        {
+          "claim": "Feature list: reports from web and local documents; \"Generate detailed reports exceeding 2,000 words\"; \"Aggregate over 20 sources for objective conclusions\"; JavaScript-enabled scraping; \"Maintains memory and context throughout research\"; export to PDF/Word.",
+          "citation": "README.md:76-85"
+        },
+        {
+          "claim": "Claude Skill: `npx skills add assafelovic/gpt-researcher`; \"Once installed, Claude can leverage GPT Researcher's deep research capabilities directly within your conversations.\"",
+          "citation": "README.md:44-52"
+        },
+        {
+          "claim": "Setup: Python 3.12 or later; git clone; export OPENAI_API_KEY and TAVILY_API_KEY (or .env); optional OPENAI_BASE_URL for OpenAI-compatible APIs; `pip install -r requirements.txt` then `python -m uvicorn main:app --reload`; UI at http://localhost:8000.",
+          "citation": "README.md:99-134"
+        },
+        {
+          "claim": "PyPI package: `pip install gpt-researcher`; `GPTResearcher(query=...)`, then `await researcher.conduct_research()` and `await researcher.write_report()`.",
+          "citation": "README.md:138-157"
+        },
+        {
+          "claim": "MCP: GPT Researcher is an MCP client (`RETRIEVER=tavily,mcp`, `mcp_configs=[...]`) for GitHub, databases and custom APIs; the MCP server was moved to the separate repo assafelovic/gptr-mcp.",
+          "citation": "README.md:159-192, 289-301"
+        },
+        {
+          "claim": "Deep Research: recursive tree-like exploration with configurable depth and breadth, concurrent processing, smart context management; \"Takes ~5 minutes per deep research\"; \"Costs ~$0.4 per research (using `o3-mini` on \"high\" reasoning effort)\".",
+          "citation": "README.md:214-224"
+        },
+        {
+          "claim": "Context filtering: Jev (TypeSafe; needs TYPESAFE_API_KEY) is the default when a key is set; otherwise, or if a Jev call fails, local keyword (BM25) ranking; on 28 research tasks 73% relevant passages (Jev) vs 51% (keyword) vs 46% (embeddings); Jev 15 wins / 10 ties / 3 losses vs embeddings.",
+          "citation": "README.md:226-248"
+        },
+        {
+          "claim": "Docker: `docker-compose up --build` starts the Python server on localhost:8000 and the React app on localhost:3000.",
+          "citation": "README.md:250-271"
+        },
+        {
+          "claim": "Local-document research via DOC_PATH for PDF, plain text, CSV, Excel, Markdown, PowerPoint and Word; `report_source` 'local' in the pip package.",
+          "citation": "README.md:274-286"
+        },
+        {
+          "claim": "Multi-agent assistant built with LangGraph and AG2 (5-6 page reports in PDF/Docx/Markdown); optional LangSmith tracing via LANGCHAIN_TRACING_V2 / LANGCHAIN_API_KEY.",
+          "citation": "README.md:304-324"
+        },
+        {
+          "claim": "Disclaimer: experimental application provided \"as-is\" under the Apache 2 license; \"NOT a recommendation to use in academic or research papers\"; \"We do not aim to eliminate biases\".",
+          "citation": "README.md:352-359"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip from source (README)",
+          "command": "git clone https://github.com/assafelovic/gpt-researcher.git && cd gpt-researcher && pip install -r requirements.txt && python -m uvicorn main:app --reload",
+          "citation": "README.md:99-132"
+        },
+        {
+          "method": "PyPI package",
+          "command": "pip install gpt-researcher",
+          "citation": "README.md:138-142"
+        },
+        {
+          "method": "Docker Compose",
+          "command": "docker-compose up --build   (or: docker compose up --build)",
+          "citation": "README.md:258-265; docs/docs/gpt-researcher/getting-started/linux-deployment.md:165"
+        },
+        {
+          "method": "Poetry (docs getting-started page)",
+          "command": "poetry install && poetry shell && python -m uvicorn main:app --reload",
+          "citation": "docs/docs/gpt-researcher/getting-started/getting-started.md:89-105"
+        },
+        {
+          "method": "Claude Skill via skills CLI",
+          "command": "npx skills add assafelovic/gpt-researcher",
+          "citation": "README.md:48-50"
+        },
+        {
+          "method": "Deep Agents example",
+          "command": "pip install -r requirements.txt && pip install -r deep_agents/requirements.txt && python deep_agents/main.py",
+          "citation": "deep_agents/README.md:114-127"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - the unit suite runs on ubuntu-latest for Python 3.12/3.13/3.14 (.github/workflows/tests.yml:23,28,88,93) and the Docker image is Debian bookworm based (Dockerfile:3); the workflow does not state the CPU architecture",
+        "wsl2": "unknown - no mention of WSL/WSL2 in README, docs, code or workflows (searched)",
+        "macos_arm64": "unknown - README gives only generic Python/pip steps (README.md:99-132), CI has no macOS job (tests.yml:23,88 are ubuntu-latest) and CPU architecture is never mentioned; the author's benchmark artifacts record a macOS-style path (deep_agents/benchmark_results/hybrid_2026-07-05_14-29-57.json:6) but that is not a support statement",
+        "gpu": "no - not required or used: no CUDA/torch/GPU references in code, docs, Dockerfile or manifests (searched); inference goes to hosted APIs by default (gpt_researcher/config/variables/default.py:4-10) and local models only via external Ollama/vLLM endpoints (gpt_researcher/llm_provider/generic/base.py:194-204,299-306)"
+      },
+      "integrations": {
+        "cli": "`python cli.py \"<query>\" --report_type <research_report|detailed_report|resource_report|outline_report|custom_report|subtopic_report|deep> [--tone ...] [--query_domains a.com,b.com] [--report_source web|local|hybrid|azure|langchain_documents|langchain_vectorstore|static] [--no-pdf] [--no-docx]` - repo-root argparse script (cli.py:4-8,31-135), writes markdown with YAML front-matter (task_id, sources_count, total_cost_usd) plus PDF/DOCX into ./outputs (cli.py:209-245,332-357); documented at docs/docs/gpt-researcher/getting-started/cli.md:26 but not in README; not a packaged console script (no [project.scripts]/console_scripts anywhere in the tree).",
+        "mcp": "Client only in this tree: gpt_researcher/mcp/client.py, mcp/tool_selector.py, mcp/research.py, retrievers/mcp/retriever.py; enabled with RETRIEVER=tavily,mcp or GPTResearcher(mcp_configs=..., mcp_strategy=fast|deep|disabled) (README.md:159-192; gpt_researcher/agent.py:80-82,295-321). Needs langchain-mcp-adapters (requirements.txt:62; not in pyproject.toml dependencies) or MCP is silently disabled (gpt_researcher/mcp/__init__.py:35-38). The MCP server (tools deep_research, quick_search, write_report, get_research_sources, get_research_context) lives in the separate repo assafelovic/gptr-mcp (README.md:289-301; docs/docs/gpt-researcher/mcp-server/getting-started.md:15-30) and was not inspected. .mcp.json:3-8 launches `uvx gpt-researcher`, but no console-script or MCP server definition exists in this tree.",
+        "sdk_or_api": "Python SDK: `from gpt_researcher import GPTResearcher` (gpt_researcher/__init__.py:1-3); async conduct_research(), write_report(), quick_search(); accessors get_source_urls(), get_research_sources(), get_research_context(), get_costs() (gpt_researcher/agent.py:343-461,463-504,531-582,684-698,745-775); documented at README.md:138-157. HTTP/WebSocket: FastAPI app backend/server/app.py:97 - POST /report/ (required fields task, report_type, report_source, tone, repo_name, branch_name; generate_in_background uses in-process BackgroundTasks; app.py:53-61,371-381), /api/reports CRUD (app.py:183-252), /api/chat (app.py:421-463), GET /.well-known/agent-discovery.json (app.py:162-172), WebSocket /ws with text commands 'start {json}', 'chat {json}', 'human_feedback' (backend/server/server_utils.py:335-407). No authentication (SECURITY.md:20-24; backend/server/agent_discovery.py:26).",
+        "claude_code_or_codex": "Claude: .claude/SKILL.md plus .claude/references/*.md is a developer-guidance skill for working on the GPT Researcher codebase (.claude/SKILL.md:3; docs/docs/gpt-researcher/gptr/claude-skill.md:19-27); README installs it with `npx skills add assafelovic/gpt-researcher` (README.md:44-52); it contains no tool or script that runs a research task. docs/docs/gpt-researcher/gptr/ai-development.md covers using Claude Code to contribute to the repo. Codex: .codex-plugin/plugin.json (mcpServers -> ./.mcp.json, skills -> ./skills/) and skills/gpt-researcher/SKILL.md, a 12-line stub pointing at the GitHub repo; .github/workflows/plugin-quality-gate.yml scans these on PRs. Claude Desktop MCP guide documents the separate gptr-mcp repo (docs/docs/gpt-researcher/mcp-server/claude-integration.md:7,29)."
+      },
+      "telemetry_and_network": "No project-owned telemetry or phone-home found in the Python code (searched for posthog/sentry/mixpanel/analytics etc.). Opt-in tracing only: LangSmith when LANGCHAIN_TRACING_V2/LANGCHAIN_API_KEY are set (README.md:313-324; .env.example:54-60), and multi_agents/main.py:42-44 and deep_agents/main.py:12-13 switch tracing on automatically whenever LANGCHAIN_API_KEY is present; `langsmith` is a hard dependency (pyproject.toml:97). Optional Monocle tracing (extra `monocle`) with exporters file/console/okahu/s3/blob/gcs (multi_agents/main.py:12-35; .env.example:62-66; pyproject.toml:205-210). The optional NextJS frontend renders next-plausible PlausibleProvider (domain localhost:3000) and @next/third-parties GoogleAnalytics with NEXT_PUBLIC_GA_MEASUREMENT_ID in the page head (frontend/nextjs/app/layout.tsx:3-4,65-66; docker-compose.yml:33); the effect of those two libraries (third-party analytics scripts) is library behavior not visible in this tree; a trackResearchQuery hook that would send query text to GA exists but is never called (frontend/nextjs/hooks/useAnalytics.ts:22-32; components/Task/ResearchForm.tsx:26). Required network services/accounts: an LLM API (default OpenAI gpt-5.4 family, OPENAI_API_KEY; config/variables/default.py:8-10) and a search API (default Tavily, POST https://api.tavily.com/search with TAVILY_API_KEY; retrievers/tavily/tavily_search.py:40,47-62; .env.example:1-2); research also fetches arbitrary web pages, with an SSRF guard that rejects non-http(s) and private/loopback/link-local/metadata addresses unless ALLOW_PRIVATE_URLS=true (utils/url_security.py:35-116; scraper/scraper.py:203; .env.example:87-92). An embeddings provider is needed only when CONTEXT_FILTER=embeddings (context/select.py:86-97). Optional third party: when TYPESAFE_API_KEY is set, the default 'auto' filter POSTs each ~1,000-character scraped chunk plus the research question to https://api.typesafe.ai/v1/systemone (context/jev_filter.py:32,84-101,144; context/select.py:44-46); without a key nothing is sent and local keyword ranking runs (context/select.py:99-101). tiktoken downloads its BPE tables over the network on first use (.github/workflows/tests.yml:110-115; utils/costs.py:93,330-336). Missing LLM-provider packages and the tavily_extract/firecrawl scraper packages are pip-installed at runtime (llm_provider/generic/base.py:407-425; scraper/scraper.py:160-192). Backend CORS defaults allow http://localhost:3000, http://127.0.0.1:3000 and https://app.gptr.dev with credentials (backend/server/app.py:99-120). No account with the project itself is required."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "TypeScript",
+        "JavaScript",
+        "HTML/CSS",
+        "HCL (Terraform)",
+        "Dockerfile"
+      ],
+      "entry_points": [
+        {
+          "path": "main.py",
+          "what": "ASGI entry (`main:app` imports backend.server.app) and `python main.py` uvicorn launcher on 0.0.0.0:8000 (main.py:31-37); used by the README and the Dockerfile CMD (Dockerfile:64)."
+        },
+        {
+          "path": "backend/server/app.py",
+          "what": "FastAPI app: REST (/report/, /api/reports, /api/chat, /files, /upload), WebSocket /ws, agent-discovery document; no authentication (app.py:97,371-419; Procfile:1 runs backend.server.app:app)."
+        },
+        {
+          "path": "cli.py",
+          "what": "Repo-root argparse CLI `python cli.py \"<query>\" --report_type ...` writing markdown/PDF/DOCX to ./outputs (cli.py:4-8,359-362); not a packaged console script."
+        },
+        {
+          "path": "gpt_researcher/agent.py",
+          "what": "Library entry `from gpt_researcher import GPTResearcher` (gpt_researcher/__init__.py:1-3): async conduct_research()/write_report()/quick_search()."
+        },
+        {
+          "path": "multi_agents/main.py",
+          "what": "LangGraph multi-agent runner (ChiefEditorAgent) driven by multi_agents/task.json; langgraph.json:7 exposes multi_agents/agent.py:graph; AG2 variant in multi_agents/ag2/main.py."
+        },
+        {
+          "path": "deep_agents/main.py",
+          "what": "LangChain deepagents chief-editor + researcher-subagent example driven by deep_agents/task.json; benchmark scripts alongside (drb_generate.py, hybrid_benchmark.py, report_benchmark.py)."
+        },
+        {
+          "path": "backend/run_server.py",
+          "what": "Dev launcher: uvicorn 'server.app:app' with reload on 0.0.0.0:8000 (backend/run_server.py:16-27)."
+        },
+        {
+          "path": "evals/simple_evals/run_eval.py",
+          "what": "Eval runners: simple_evals (SimpleQA), evals/quality_eval/run_eval.py, evals/hallucination_eval/run_eval.py, evals/context_filter/{collect,replay,judge}.py (evals/README.md:15-26)."
+        }
+      ],
+      "architecture": "Library core gpt_researcher/: agent.py (GPTResearcher: conduct_research -> write_report, quick_search, cost tracking, source accessors) drives skills/ (researcher.py ResearchConductor plans sub-queries via actions/query_processing.py, runs retrievers per sub-query, scrapes and filters context; writer.py ReportGenerator; deep_research.py recursive breadth/depth research; browser.py scraper pool; curator.py; image_generator.py), actions/ (agent_creator.py role selection, retriever.py factory plus 'gpt_researcher.retrievers' entry-point plugins, markdown_processing.py add_references), retrievers/ (about 20 search backends; Tavily default via raw HTTP, plus duckduckgo, bing, brave, google, serper, serpapi, searx, exa, arxiv, openalex, semantic_scholar, pubmed_central, custom, mcp), scraper/ (bs default, selenium browser, nodriver, firecrawl, tavily_extract, pymupdf, arxiv), context/ (select.py CONTEXT_FILTER auto|jev|keyword|embeddings|none; jev_filter.py hosted TypeSafe API; lexical.py BM25 fallback; compression.py embeddings), document/ (local, online, Azure loaders), mcp/ (MCP client; LLM picks up to 3 tools; one tool-calling round with no allow/deny list), llm_provider/generic/base.py + utils/llm.py (LangChain provider factory; create_chat_completion with up to 10 attempts), utils/costs.py, utils/url_security.py (SSRF guard), utils/workers.py (the only 'worker' concept: scraper ThreadPoolExecutor + semaphore + global rate limiter), config/ (env > JSON > defaults). Service layer backend/ (server/app.py FastAPI REST + /ws, websocket_manager.py, report_store.py JSON-file store, chat/chat.py, report_type/ basic/detailed/deep, utils.py PDF/DOCX/MD export); main.py mounts it. multi_agents/ is a LangGraph ChiefEditorAgent pipeline (browser -> planner -> human review -> parallel researcher -> writer -> fact_checker -> visualizer -> publisher; bounded revision loops; compiled without a checkpointer, agents/orchestrator.py:5,159-171) with an AG2 variant. deep_agents/ is a LangChain deepagents chief-editor + researcher-subagent example whose tools wrap GPTResearcher (agent.py, tools.py) over a path-confined FilesystemBackend(virtual_mode=True) (agent.py:88), plus benchmark scripts and benchmark_results/. evals/ holds simple_evals (SimpleQA), quality_eval (citation faithfulness, source diversity/authority, unsupported-claim rate), hallucination_eval and context_filter. Also frontend/ (static + nextjs), docs/ (Docusaurus), terraform/ (maintainers' AWS deploy), and agent-packaging files .claude/, .codex-plugin/, .mcp.json, skills/. No sandbox, job queue, checkpoint store or coding agent exists in the tree.",
+      "packaging_and_release": "Artifacts: PyPI distribution name gpt-researcher, version 0.16.0 in pyproject.toml:3,25 and setup.py:3, while the checked-out git tag is v3.7.0 (.git/packed-refs:2), so tag and package version disagree. Two build definitions coexist: a poetry-core backend (pyproject.toml:9-11; PEP 621 [project] with 140 dependencies) and a setuptools setup.py whose install_requires is requirements.txt minus lines containing selenium/webdriver/fastapi/uvicorn/jinja2/gpt-researcher/langgraph (setup.py:5-20,45); which of them produces the PyPI upload cannot be determined because no workflow publishes to PyPI. Container: Dockerfile (python:3.14-slim-bookworm, Chromium, Firefox, geckodriver, pip install of requirements.txt and multi_agents/requirements.txt, uvicorn CMD; Dockerfile:3-64), plus Dockerfile.fullstack and backend/Dockerfile (not read); docker-compose.yml builds locally (pull_policy: build, docker-compose.yml:3). Workflows in .github/workflows: build.yml builds an image on every push to master and pushes it to the maintainers' AWS ECR via an OIDC role, then dispatches deploy.yml (Terraform apply -auto-approve) (build.yml:4-7,51-91; deploy.yml:199-201). No workflow uploads to PyPI, Docker Hub or GitHub Releases; no checksums, signatures, SBOM or provenance attestations (search of .github for attest/sigstore/cosign/sha256/checksum/pypi/twine found nothing); no CHANGELOG or release-notes file in the tree.",
+      "tests_and_ci": "Frameworks: pytest with pytest-asyncio (asyncio_mode auto), pytest-timeout, pytest-forked (pyproject.toml:13-18,176-181). tests/ holds 135 pytest-collected test_*.py files (147 .py files in total, including conftest.py, __init__.py and about 10 hyphen-named or script-style files such as tests/test-your-llm.py, tests/report-types.py, tests/vector-store.py that python_files='test_*.py' does not match); subdirectories tests/backend, tests/chat, tests/retrievers, tests/skills. tests/conftest.py:21-36 implements an opt-in network kill-switch (GPTR_BLOCK_NETWORK=1, loopback allowed). Workflows: tests.yml ('Tests'; on pull_request and push to main/master; GPTR_BLOCK_NETWORK=1 at :14) runs three jobs: imports (py3.12/3.13/3.14; pip install -e .; imports the library, every gpt_researcher submodule and the ASGI app; :21-64), collect (pytest --collect-only; :69-83) and unit (needs both; py3.12-3.14; installs WeasyPrint system libs; warms the tiktoken cache; `pytest tests/ --forked --timeout=60 -p no:warnings`, deselecting test_researcher_logging.py, test_logging_output.py and test_mcp.py; :85-138) - a comment says the suite leaks global state across modules, hence --forked (:125-129) - so live/integration scripts are not run in CI. llm-costs.yml: tokentoll cost analysis on PRs (SHA-pinned action, continue-on-error for forks). plugin-quality-gate.yml: HOL Codex plugin scanner on PRs touching .codex-plugin/, skills/ or .mcp.json (min_score 80, fail_on_severity high). build.yml: Docker build + push to AWS ECR on push to master, then deploy.yml. docker-build.yml (named 'GPTR tests'): manual workflow_dispatch only, runs the docker-compose 'test' profile (tests/report-types.py, tests/vector-store.py; docker-compose.yml:47-62). No lint, formatter or type-check workflow or config (no ruff/flake8/mypy/pre-commit files found). .github/dependabot.yml: weekly pip and docker updates only (no npm).",
+      "dependencies": "pyproject.toml: 140 entries in [project].dependencies (requires-python >=3.12; lower-bounded with >= only; includes langchain>=1.0.0, langgraph, langsmith, litellm, openai, mcp>=1.9.1,<2.0.0, fastapi, uvicorn, unstructured, pymupdf, weasyprint on non-win32); optional extras: test (4), requirements-txt (21; includes ag2, langchain-anthropic, langchain-google-genai, playwright, selenium, scrapy, firecrawl, exa_py), monocle (1); dependency-group dev (5 type stubs) (pyproject.toml:31-219). requirements.txt: 47 requirement lines (adds tavily-python, ddgs, google-genai, python-pptx, pandas, langchain-mcp-adapters, which pyproject.toml does not list). backend/requirements.txt: 21; multi_agents/requirements.txt: 7 lines (json5 duplicated); multi_agents/ag2/requirements.txt: 1; deep_agents/requirements.txt: 4 (deepagents>=0.7.8, langchain-openai, python-dotenv, tavily-python); evals/{simple_evals,quality_eval,hallucination_eval}/requirements.txt: 2 each. JavaScript: frontend/nextjs/package.json 25 dependencies + 34 devDependencies (includes next-plausible, react-ga4, @next/third-parties); docs/package.json 16; docs/npm/package.json 1 (ws); docs/discord-bot/package.json 6; multi_agents/package.json 1. No poetry.lock/uv.lock/Pipfile at the repo root. langchain-anthropic (needed for Claude) is only in the optional 'requirements-txt' extra and is otherwise pip-installed at runtime on first use (pyproject.toml:189; llm_provider/generic/base.py:160-164,407-425).",
+      "security_policy": "SECURITY.md: report privately via GitHub private vulnerability reporting or email assaf.elovic@gmail.com, acknowledgement 'within a few business days' (SECURITY.md:3-12). Threat model: the backend is 'not a hardened, multi-tenant service' and ships without authentication by design; missing auth, SSRF/local-file access via user-supplied URLs, and RCE via user-supplied MCP command/args are declared out of scope (SECURITY.md:20-45). In scope: XSS/unsafe rendering of scraped or LLM content, DoS from untrusted content such as decompression bombs, reachable dependency vulnerabilities, path traversal/injection from normal research inputs (SECURITY.md:47-60). Security fixes only on the latest release on master (SECURITY.md:62-65)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Install as Claude Skill: 'Once installed, Claude can leverage GPT Researcher's deep research capabilities directly within your conversations' (README.md:44-52).",
+        "verified": "partial",
+        "evidence": "A skill exists, but its content is developer guidance for extending/debugging the codebase: .claude/SKILL.md:3 ('Use this skill when helping developers understand, extend, debug, or integrate with GPT Researcher') and docs/docs/gpt-researcher/gptr/claude-skill.md:21-27 (architecture, component signatures, integration patterns, config and API reference). Nothing in the skill executes a research run; the other skill file skills/gpt-researcher/SKILL.md:1-12 is a stub ('Use GPT Researcher from Codex via MCP'). Docs also point to a .claude/skills/ directory with REFERENCE.md (docs/docs/gpt-researcher/gptr/ai-development.md:12,140-141) that does not exist in the tree (it has .claude/SKILL.md and .claude/references/). The skills CLI was not run, so which file it installs is unverified."
+      },
+      {
+        "claim": ".codex-plugin/plugin.json:4 'Autonomous deep research from Codex via MCP'; .mcp.json runs `uvx gpt-researcher`.",
+        "verified": "no",
+        "evidence": "No MCP server and no executable entry point exists in the tree: searches for FastMCP, mcp.server, console_scripts, [project.scripts], [tool.poetry.scripts] and gui_scripts find nothing; pyproject.toml and setup.py declare no scripts (only the 'gpt_researcher.retrievers' plugin entry-point group is consumed, gpt_researcher/actions/retriever.py:13,141). README.md:289-301 says the MCP server moved to the separate gptr-mcp repo. So `uvx gpt-researcher` (.mcp.json:3-8) has no in-tree executable to launch; the published PyPI artifact was not inspected. The plugin-quality-gate workflow only scans manifests (.github/workflows/plugin-quality-gate.yml:14-20)."
+      },
+      {
+        "claim": "'The agent produces detailed, factual, and unbiased research reports with citations' (README.md:27).",
+        "verified": "partial",
+        "evidence": "Citations are requested from the LLM by prompt (gpt_researcher/prompts.py:277-312: in-text markdown hyperlinks, a reference list, 'Do NOT cite sources that do not appear in the provided information'); DetailedReport appends a deterministic sorted list of all visited URLs (gpt_researcher/actions/markdown_processing.py:101-127; backend/report_type/detailed_report/detailed_report.py:200), i.e. visited, not necessarily cited, URLs. No pipeline step verifies that a cited URL supports a claim; the multi-agent FactCheckerAgent is one LLM pass over the draft (multi_agents/agents/fact_checker.py:20-32). Programmatic evidence accessors exist: get_source_urls() and get_research_sources() (gpt_researcher/agent.py:684-698,745-751), populated by gpt_researcher/skills/browser.py:58. The project's own FACT run verified 56.0% of citations (deep_agents/benchmark_results/drb/gptr-deepagent_fact_result.txt:3). README.md:356-359 says it does not aim to eliminate bias and README.md:354 says it is not a recommendation for academic/research papers."
+      },
+      {
+        "claim": "Deep Research: recursive tree-like exploration with configurable depth and breadth and concurrent processing (README.md:214-224).",
+        "verified": "yes",
+        "evidence": "gpt_researcher/skills/deep_research.py:250-263 reads breadth/depth/concurrency from config; :386-584 deep_research() generates `breadth` queries, runs one GPTResearcher per query under asyncio.Semaphore(concurrency) (:432-490), then recurses per result with breadth//2 (min 2) and depth-1 (:540-560), accumulating learnings, per-learning source-URL citations, visited URLs and context, trimmed to 25,000 words (:18,219-237,575). Defaults breadth 3 / depth 2 / concurrency 4 (gpt_researcher/config/variables/default.py:40-42). Failed branches are dropped and descent stops if all fail (deep_research.py:485-490,502-520). The skill has no wall-clock or cost ceiling."
+      },
+      {
+        "claim": "'Takes ~5 minutes per deep research' and 'Costs ~$0.4 per research (using o3-mini on high reasoning effort)' (README.md:221-222; docs/docs/gpt-researcher/gptr/deep_research.md:5).",
+        "verified": "not_checkable",
+        "evidence": "No measurement artifact for this figure exists in the repo. Cost tracking exists (gpt_researcher/agent.py:785-806; gpt_researcher/utils/costs.py:265-316) but defaults are now gpt-5.4 / gpt-5.4-mini rather than o3-mini (gpt_researcher/config/variables/default.py:8-10), and costs for models without a pricing-table entry use default per-token rates or token estimates (costs.py:257-262,306-316)."
+      },
+      {
+        "claim": "'Generate detailed reports exceeding 2,000 words' and 'Aggregate over 20 sources' (README.md:79-80).",
+        "verified": "partial",
+        "evidence": "Default TOTAL_WORDS is 1200 (gpt_researcher/config/variables/default.py:24); prompts ask for 'at least {total_words} words' (gpt_researcher/prompts.py:298,385,412) and report_generation.py:250-258 passes total_words=cfg.total_words for every report type including deep, overriding the deep-research prompt's own default of 2000 (prompts.py:424). Sources: MAX_SEARCH_RESULTS_PER_QUERY=5 (default.py:22), 3 planned sub-queries (MAX_ITERATIONS=3; default.py:26; gpt_researcher/actions/query_processing.py:113; prompts.py:246-248) plus the original query for non-subtopic reports (gpt_researcher/skills/researcher.py:369-371), so about 20 search results at most before URL de-duplication (plus an initial-results pass, researcher.py:387-391). Both numbers are configurable; neither is a guaranteed floor."
+      },
+      {
+        "claim": "Jev is the default context filter when a key is set, with a local keyword (BM25) fallback and no API key or embeddings required by default (README.md:226-248).",
+        "verified": "yes",
+        "evidence": "gpt_researcher/context/select.py:38-46 resolves 'auto' to jev only if TYPESAFE_API_KEY is set, else keyword; :79-84 a JevError (missing key or API failure; context/jev_filter.py:56-57,73-74,119) falls back to keyword; :7,99-101 the keyword path is local with no API, model or embeddings; embeddings are built lazily only in embeddings mode (gpt_researcher/agent.py:177-179,283-289; select.py:86-97). Default CONTEXT_FILTER is 'auto' (default.py:7). The README table matches evals/context_filter/README.md:74-110 (precision 0.73 Jev / 0.51 bm25_wide / 0.46 embeddings; 15-10-3 and 14-8-6 head-to-heads); it is a first-party 28-question study with a single judge family (evals/context_filter/README.md:145-153)."
+      },
+      {
+        "claim": "DeepResearch Bench: deep agent with GPT Researcher tools vs raw Tavily search - RACE 0.512 vs 0.503, effective citations per report 35.2 vs 18.6 (+89%), citation precision 56.0% vs 53.9% (deep_agents/README.md:23-31,173-182).",
+        "verified": "partial",
+        "evidence": "The aggregates match the tracked raw outputs (deep_agents/benchmark_results/drb/gptr-deepagent_race_result.txt:5 = 0.5124 vs baseline-tavily-deepagent_race_result.txt:5 = 0.5028; gptr-deepagent_fact_result.txt:1-3 = 62.9 total / 35.2 valid / 0.5596 vs baseline 34.5 / 18.6 / 0.5391). Caveats: only 10 tasks (deep_agents/BENCHMARK.md:7-9); the harness was locally patched to use OpenAI judges (GPT-5.5 for RACE, GPT-5.4-mini for FACT) instead of the stock Gemini judge (BENCHMARK.md:25-29,119-121,142-144); the benchmarked agent is deep_agents/benchmark.py:114-121 (flat create_deep_agent with quick_search + deep_research), not the shipped chief-editor/researcher-subagent example (deep_agents/agent.py:63-89); the per-task wins (7/10) and '0/10 reports with zero verifiable citations' have no per-task artifact in benchmark_results/drb/ (four aggregate .txt files only); the comparison to OpenAI Deep Research (~40) cites the public leaderboard (BENCHMARK.md:44-46), not verifiable here."
+      },
+      {
+        "claim": "MCP client support (RETRIEVER=tavily,mcp; mcp_configs) and the MCP server living in a separate repo (README.md:159-192, 289-301).",
+        "verified": "yes",
+        "evidence": "Client implemented in-tree: gpt_researcher/mcp/client.py:20-192 (MultiServerMCPClient wrapper; stdio/websocket/streamable_http), mcp/tool_selector.py:37-125, mcp/research.py:34-156, retrievers/mcp/retriever.py:27-199; GPTResearcher(mcp_configs=..., mcp_strategy=...) adds the 'mcp' retriever (gpt_researcher/agent.py:80-82,171-174,295-321); strategies fast/deep/disabled (gpt_researcher/skills/researcher.py:311-362). Caveats: langchain-mcp-adapters is in requirements.txt:62 but not in pyproject.toml dependencies, and when missing MCP is disabled with a warning while research continues (mcp/__init__.py:35-38; mcp/client.py:129-131); tool use is one LLM call with up to 3 LLM-selected tools executed once, with no allow/deny list (mcp/research.py:66-113; retrievers/mcp/retriever.py:147); MCP_ALLOWED_ROOT_PATHS is declared (default.py:47) but never enforced; the LLM's own text is appended as a result with href 'mcp://llm_analysis' (mcp/research.py:138-144). No MCP server code exists in the tree (searched), so the 'moved' statement is accurate but the server was not inspected."
+      },
+      {
+        "claim": "Docs list 'GPT-6 Sol' among 'models you can configure in GPT Researcher' (docs/docs/gpt-researcher/gptr/config.md:14,25).",
+        "verified": "partial",
+        "evidence": "Any 'provider:model' string for a supported provider is accepted (gpt_researcher/config/config.py:204-222; gpt_researcher/llm_provider/generic/base.py:146-160), so an arbitrary model ID can be configured. But nothing in code mentions a GPT-6 model (search for gpt-6/GPT-6/Sol finds only config.md:25; no 'GPT-6.1' string anywhere), and per-model parameter handling is a hard-coded list ending at gpt-5.5 / claude-opus-4-7 (base.py:43-90): an unlisted ID gets temperature=0.4 and no reasoning_effort unless LLM_KWARGS/llm_kwargs override it (gpt_researcher/utils/llm.py:86-110). The table is Vectara leaderboard data, not a GPT Researcher test (config.md:12-14,44)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "DeepResearch Bench RACE report quality, 10 topic-stratified English tasks, deep agent (gpt-5.4) with GPT Researcher tools vs raw Tavily search; locally patched harness with OpenAI judge (GPT-5.5)",
+        "metric": "RACE overall score (0-1)",
+        "value": "GPT Researcher agent 0.5124 vs raw-search baseline 0.5028 (comprehensiveness 0.5054 vs 0.4921; insight 0.5115 vs 0.5030; instruction following 0.5196 vs 0.5088; readability 0.5188 vs 0.5160); README rounds to 0.512 vs 0.503",
+        "source": "deep_agents/benchmark_results/drb/gptr-deepagent_race_result.txt:1-5; deep_agents/benchmark_results/drb/baseline-tavily-deepagent_race_result.txt:1-5; deep_agents/BENCHMARK.md:25-39",
+        "independent": false
+      },
+      {
+        "what": "DeepResearch Bench FACT citation verification, same 10-task run (FACT judge GPT-5.4-mini; FACT re-fetches each cited URL)",
+        "metric": "citations per report (total / verified) and valid rate",
+        "value": "GPT Researcher agent 62.9 total, 35.2 verified, valid rate 0.5596 vs baseline 34.5 total, 18.6 verified, valid rate 0.5391; project reports per-task wins 7/10 vs 3/10 (no per-task artifact in repo) and cites public-leaderboard figures of ~40 for OpenAI Deep Research and ~5-15 for plain LLM+search (not verifiable here)",
+        "source": "deep_agents/benchmark_results/drb/gptr-deepagent_fact_result.txt:1-3; deep_agents/benchmark_results/drb/baseline-tavily-deepagent_fact_result.txt:1-3; deep_agents/BENCHMARK.md:37-46,155-158",
+        "independent": false
+      },
+      {
+        "what": "Hybrid (local + web) due-diligence task over a 27-file fictional corpus, 3 published runs, gpt-5.4, graded by gpt-5.4 per fact checkpoint",
+        "metric": "internal-fact coverage",
+        "value": "GPT Researcher hybrid 0.812 / 0.875 / 0.938 (mean 0.875, max 0.938); raw search 0.0 in all runs; raw search + file tools 0.875 / 0.438 / 0.562 (mean 0.625) - the file-tools arm beat GPT Researcher in run 1 (0.875 vs 0.812); public-web fact coverage varied 0.25-0.75 per arm",
+        "source": "deep_agents/benchmark_results/hybrid_2026-07-05_14-29-57.json:8-25; deep_agents/benchmark_results/hybrid_2026-07-05_14-37-31.json:8-25; deep_agents/benchmark_results/hybrid_2026-07-05_14-43-50.json:8-25; deep_agents/BENCHMARK.md:80-115",
+        "independent": false
+      },
+      {
+        "what": "SimpleQA 30-question sample (seed 42), deep agent gpt-5.4, grader gpt-5.4-mini; GPT Researcher agent vs raw Tavily baseline",
+        "metric": "correct_rate",
+        "value": "0.833 vs 0.833 in the two runs the docs cite (GPT Researcher run 14-19-50; baseline run 14-40-49 - separate runs); earlier same-day runs: GPT Researcher 0.633 (13-07-09) and 0.700 (13-55-24), baseline 0.767 (13-07-09)",
+        "source": "deep_agents/benchmark_results/simpleqa_2026-07-04_14-19-50_n30.json:17; deep_agents/benchmark_results/simpleqa_2026-07-04_14-40-49_n30.json:17; deep_agents/benchmark_results/simpleqa_2026-07-04_13-07-09_n30.json:16,364; deep_agents/benchmark_results/simpleqa_2026-07-04_13-55-24_n30.json:17; deep_agents/BENCHMARK.md:63-68",
+        "independent": false
+      },
+      {
+        "what": "Blind pairwise LLM-judge report comparison, 8 topics, judge gpt-5.4, sides randomized; run predates core fixes #1861",
+        "metric": "win counts GPT Researcher agent vs baseline (plus hard metrics)",
+        "value": "overall 5-3; comprehensiveness 4-4; citation_quality 2-6; factual_grounding 3-5; unique cited URLs 24.5 vs 19.5; avg latency 122.7s vs 60.5s; GPT Researcher internal cost $0.6505 total (README/BENCHMARK report only the 5-of-8 overall result)",
+        "source": "deep_agents/benchmark_results/reports_2026-07-04_14-33-21_n8.json:9-47; deep_agents/BENCHMARK.md:70-78",
+        "independent": false
+      },
+      {
+        "what": "Context-filter replay benchmark on 28 research tasks (20 SimpleQA + 8 open-ended), writer gpt-5.4, judges gpt-5.4 / gpt-5.4-mini; same scraped pages replayed through each filter",
+        "metric": "context precision; pairwise vs embeddings (W/T/L); total cost per report",
+        "value": "Jev 0.73 precision, 15/10/3, $0.115; keyword (bm25_wide) 0.51, 14/8/6, $0.116; embeddings 0.46, $0.117; no filter 13/11/4 vs embeddings, $0.192; SimpleQA 18-20 of 20 for every strategy (authors call it saturated); authors describe it as directional evidence with one judge family",
+        "source": "evals/context_filter/README.md:54-110,145-153; README.md:230-239",
+        "independent": false
+      },
+      {
+        "what": "Vectara Hallucination Leaderboard (HHEM-2.3 summarization faithfulness) rows for models configurable in GPT Researcher, 'data as of September 22, 2026', copied into the project docs; measures the models, not GPT Researcher",
+        "metric": "hallucination rate / factual consistency / answer rate",
+        "value": "GPT-6 Sol 6.5% / 93.5% / 100.0%; GPT-5.4 7.0%; GPT-5.5 9.3%; Claude Haiku 4.5 9.8%; Claude Sonnet 4.6 10.6%; Claude Opus 4.7 12.0% (hallucination rate); the project notes the benchmark measures faithfulness to sources, not reasoning or writing quality",
+        "source": "docs/docs/gpt-researcher/gptr/config.md:12-44 (leaderboard https://github.com/vectara/hallucination-leaderboard is referenced, not fetched; values not re-verified)",
+        "independent": true
+      },
+      {
+        "what": "GPT Researcher SimpleQA run on 100 random problems, 2025-02-22 (gpt-4o-family models per the log; older pipeline and models than the current defaults); raw terminal capture committed to the repo",
+        "metric": "correct count, accuracy, F1, cost",
+        "value": "CORRECT 92, INCORRECT 7, NOT_ATTEMPTED 1; accuracy 0.929; F1 0.925; total cost $9.5968 ($0.096 per query)",
+        "source": "evals/simple_evals/logs/SimpleQA Eval 100 Problems 2-22-25.txt:157602-157626 (models at :11,:18); evals/README.md:139-168",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap versus an isolated, resumable worker: no sandbox or coding agent exists in the tree (only a Chrome --no-sandbox flag, gpt_researcher/scraper/browser/browser.py:122); the sole isolation is the example's path-confined deepagents FilesystemBackend (deep_agents/agent.py:88) and whatever container the operator runs. A WebSocket disconnect cancels the running task (backend/server/server_utils.py:406-408); background reports are in-process FastAPI BackgroundTasks with no job-status endpoint, only GET /report/{id} serving the DOCX once written (backend/server/app.py:174-179,371-381); LangGraph is compiled without a checkpointer (multi_agents/agents/orchestrator.py:5,159-171); the 'human_feedback' WebSocket command is a TODO stub (server_utils.py:189-192); persistence is a JSON report store and per-run JSON logs (backend/server/report_store.py:7-57; server_utils.py:41-87). No OpenAI Agents SDK / Claude Agent SDK / Codex SDK integration; the only harness SDKs are LangGraph, AG2 and LangChain deepagents.",
+      "Security posture: the backend has no authentication by design and takes client-supplied MCP command/args/env, source URLs and file uploads over REST/WebSocket (SECURITY.md:20-41; backend/server/server_utils.py:410-424; gpt_researcher/mcp/client.py:94-108); the maintainers classify RCE/SSRF through these as out of scope (SECURITY.md:37-41). MCP_ALLOWED_ROOT_PATHS is declared but never enforced (gpt_researcher/config/variables/default.py:47; config/config.py:55-61 only re-assigns it) and MCP tool use is bounded only by an LLM choosing at most 3 tools (gpt_researcher/mcp/tool_selector.py:37-55). docker-compose runs the API as root with restart: always, published on 8000 (docker-compose.yml:21-24) although the Dockerfile creates a non-root user (Dockerfile:51-59); default CORS allows credentials from https://app.gptr.dev (backend/server/app.py:99-120); the selenium Chrome scraper disables Chrome's sandbox (browser.py:122).",
+      "Runtime and build supply chain is loose: missing LLM-provider packages are pip-installed at runtime with `pip install -U` (gpt_researcher/llm_provider/generic/base.py:407-425) as are the tavily_extract/firecrawl scraper packages (gpt_researcher/scraper/scraper.py:160-192); the Dockerfile downloads geckodriver by URL without a checksum and installs unpinned requirements with --upgrade (Dockerfile:15-20,33-35); docker-build.yml curls a docker-compose 1.29.2 binary without verification (.github/workflows/docker-build.yml:41); there is no poetry.lock/uv.lock at the repo root and nearly all Python requirements are lower-bounded only; most CI actions are tag-pinned (e.g. hol-codex-plugin-scanner-action@v1, plugin-quality-gate.yml:16) with only tokentoll SHA-pinned (llm-costs.yml:21).",
+      "Release and licensing metadata are inconsistent and unautomated: git tag v3.7.0 vs package version 0.16.0 (pyproject.toml:3,25; setup.py:3); a poetry-core build (140 dependencies) and a setuptools setup.py (requirements.txt-derived, excluding fastapi/uvicorn/jinja2/langgraph) coexist with different dependency sets - e.g. pyproject.toml lists duckduckgo-search while the DuckDuckGo retriever imports ddgs and check_pkg only raises ImportError (gpt_researcher/retrievers/duckduckgo/duckduckgo.py:31-32; retrievers/utils.py:44-59), and langchain-mcp-adapters/tavily-python/google-genai appear only in requirements.txt:24,62; no workflow publishes to PyPI or produces checksums, signatures or attestations (build.yml pushes only to the maintainers' AWS ECR, :51-65); the published 0.16.0 release reportedly crashed on import on Python <3.14 (tests/test_package_imports.py:1-7; .github/workflows/tests.yml:18-20). License conflict: LICENSE and README say Apache-2.0 (LICENSE:1-3; README.md:354) while pyproject.toml:6,28, setup.py:33-35 and frontend/nextjs/package.json:102 say MIT; the LICENSE appendix keeps the unfilled 'Copyright [yyyy] [name of copyright owner]' placeholder (LICENSE:189) and there is no NOTICE file.",
+      "Model-support coupling: per-model behavior is a hard-coded list ending at gpt-5.5 and claude-opus-4-7 (gpt_researcher/llm_provider/generic/base.py:43-90), so an unlisted model ID (e.g. a GPT-6-series ID; the string appears in code nowhere, only docs config.md:25) gets temperature=0.4 and no reasoning_effort unless LLM_KWARGS overrides it (gpt_researcher/utils/llm.py:86-110); cost figures for unpriced models are estimates (utils/costs.py:257-262,306-316); Claude needs langchain-anthropic, available only via an optional extra or runtime pip install (pyproject.toml:189); docs still show claude-2.1 / claude-3-opus examples (docs/docs/gpt-researcher/llms/llms.md:170-180); the multi-agent path takes its provider from SMART_LLM but its model name from STRATEGIC_LLM/task.json, so mixed-provider setups can mismatch (multi_agents/main.py:58-65; multi_agents/agents/utils/llms.py:20-26).",
+      "Evidence quality for evaluation use: citations are prompt-driven and not verified in the pipeline (gpt_researcher/prompts.py:277-312; multi_agents/agents/fact_checker.py:20-32); the project's own FACT run verified 56.0% of citations (deep_agents/benchmark_results/drb/gptr-deepagent_fact_result.txt:3); get_source_urls() returns visited URLs, not cited ones (gpt_researcher/agent.py:745-751); a DuckDuckGo bug once shipped reports with zero verifiable citations (gpt_researcher/retrievers/duckduckgo/duckduckgo.py:5-19); POST /report/ omits raw research_sources from its response (backend/server/app.py:356-360); the README itself disclaims suitability for academic/research papers and bias elimination (README.md:354-359); the repo's hallucination-eval artifact has n=2 and a record flagged is_hallucination: true whose reasoning says no hallucination was found (evals/hallucination_eval/results/aggregate_results.json:2-19).",
+      "All published performance numbers are first-party, small-sample and LLM-judged: DeepResearch Bench on 10 tasks with a locally patched harness using OpenAI judges instead of the stock Gemini judge (deep_agents/BENCHMARK.md:7-9,25-29,119-121); the benchmarked agent differs from the shipped example (deep_agents/benchmark.py:114-121 vs deep_agents/agent.py:63-89); per-task wins are not in the tracked artifacts; SimpleQA 'parity' compares two different runs while earlier runs scored lower for GPT Researcher (deep_agents/benchmark_results/simpleqa_2026-07-04_13-07-09_n30.json:364; simpleqa_2026-07-04_13-55-24_n30.json:17); the head-to-head shows the baseline ahead on citation_quality 6-2 and factual_grounding 5-3 (reports_2026-07-04_14-33-21_n8.json:16-25); the context-filter study uses 28 questions and one judge family (evals/context_filter/README.md:145-150). Third-party egress in optional parts: the NextJS UI loads Plausible and Google Analytics components (frontend/nextjs/app/layout.tsx:65-66); setting TYPESAFE_API_KEY sends each scraped ~1,000-character chunk plus the question to api.typesafe.ai (gpt_researcher/context/jev_filter.py:32,84-101,144); runners auto-enable LangSmith tracing when LANGCHAIN_API_KEY is set (multi_agents/main.py:42-44; deep_agents/main.py:12-13)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "assafelovic/gpt-researcher",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip from source (README))",
+          "statement": "git clone https://github.com/assafelovic/gpt-researcher.git && cd gpt-researcher && pip install -r requirements.txt && python -m uvicorn main:app --reload",
+          "citation": "README.md:99-132",
+          "holds": true,
+          "note": "README.md:99 asks for Python 3.12 or later; :103-104 clone and cd; :130-131 `pip install -r requirements.txt` and `python -m uvicorn main:app --reload`. The target exists: main.py:31 runs `from backend.server.app import app`, and requirements.txt is present (fastapi/uvicorn at :5-6). Not executed. Minor and outside the statement: the requirements.txt:2 comment says 'Python 3.10+', while README and pyproject.toml:30 say >=3.12."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0, file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is the Apache License, Version 2.0 text, and README.md:354 also says 'Apache 2 license'. Caveats, all already disclosed in the dossier's risks and all confirmed: package metadata declares MIT (pyproject.toml:6 `license = \"MIT\"`, :28 `license = { text = \"MIT\" }`; setup.py:33 license=\"MIT\", :35 MIT classifier; frontend/nextjs/package.json:102); the appendix placeholder 'Copyright [yyyy] [name of copyright owner]' is unfilled (LICENSE:189); there is no NOTICE file in the tree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - the unit suite runs on ubuntu-latest for Python 3.12/3.13/3.14 and the Docker image is Debian bookworm based; the workflow does not state the CPU architecture",
+          "citation": ".github/workflows/tests.yml:23,28,88,93; Dockerfile:3",
+          "holds": true,
+          "note": "tests.yml:23 `runs-on: ubuntu-latest` and :28 matrix [3.12, 3.13, 3.14] (imports job); :93 has the same matrix for the unit job. Dockerfile:3 is `FROM python:3.14-slim-bookworm`. No architecture is stated in the workflow. Citation drift: the unit job's `runs-on: ubuntu-latest` is at tests.yml:87; line 88 is `timeout-minutes: 30`. The substance is unaffected. Dockerfile:8,15 also choose amd64/arm64 builds (not cited)."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Client only in this tree (mcp/client.py, tool_selector.py, research.py, retrievers/mcp/retriever.py); enabled with RETRIEVER=tavily,mcp or GPTResearcher(mcp_configs=..., mcp_strategy=fast|deep|disabled); needs langchain-mcp-adapters (requirements.txt:62; not in pyproject.toml) or MCP is silently disabled; server lives in separate gptr-mcp repo; .mcp.json:3-8 launches `uvx gpt-researcher` but no console-script or MCP server definition exists in this tree",
+          "citation": "README.md:159-192, 289-301; gpt_researcher/agent.py:80-82,295-321; requirements.txt:62; gpt_researcher/mcp/__init__.py:35-38; docs/docs/gpt-researcher/mcp-server/getting-started.md:15-30; .mcp.json:3-8",
+          "holds": true,
+          "note": "All four client files exist. agent.py:80-82 takes mcp_configs/mcp_max_iterations/mcp_strategy, :295-321 appends 'mcp' to cfg.retrievers, and :217-281 resolve fast/deep/disabled. requirements.txt:62 lists langchain-mcp-adapters>=0.1.0; pyproject.toml [project].dependencies does not (only mcp>=1.9.1 at :105). .mcp.json:3-8 runs `uvx gpt-researcher`. A repo-wide search finds no console_scripts, [project.scripts], [tool.poetry.scripts], FastMCP or mcp.server. getting-started.md:20-26 lists the five tools; README.md:291 points to gptr-mcp. Wording problem: 'silently' is too strong. The cited mcp/__init__.py:36 logs a WARNING, and so does retrievers/mcp/__init__.py:24. Then actions/retriever.py:191 (`get_retriever(r) or get_default_retriever()`) replaces the None MCP retriever with Tavily without further notice. No exception is raised, but the logs do show a warning."
+        },
+        {
+          "field": "claim_checks[2] (README.md:27 'detailed, factual, and unbiased research reports with citations' -> verified: partial)",
+          "statement": "Citations are requested from the LLM by prompt; DetailedReport appends a deterministic sorted list of all visited (not necessarily cited) URLs; no pipeline step verifies that a cited URL supports a claim; FactCheckerAgent is one LLM pass; get_source_urls()/get_research_sources() exist (populated by browser.py:58); project's own FACT run verified 56.0% of citations; README disclaims bias elimination and academic use",
+          "citation": "gpt_researcher/prompts.py:277-312; gpt_researcher/actions/markdown_processing.py:101-127; backend/report_type/detailed_report/detailed_report.py:200; multi_agents/agents/fact_checker.py:20-32; gpt_researcher/agent.py:684-698,745-751; gpt_researcher/skills/browser.py:58; deep_agents/benchmark_results/drb/gptr-deepagent_fact_result.txt:3; README.md:354-359",
+          "holds": true,
+          "note": "prompts.py:309-311 require in-text hyperlink citations, say 'Do NOT cite sources that do not appear in the provided information', and ask for a reference list. markdown_processing.py:122 appends sorted(visited_urls), and detailed_report.py:200-201 applies it to the conclusion. fact_checker.py:31 is a single call_model over the draft. agent.py:690 returns research_sources (filled at browser.py:58) and :751 returns list(visited_urls). fact_result.txt:3 shows valid_rate 0.5596. README.md:354 says it is not a recommendation for academic papers; :358 says it does not aim to eliminate biases. Searching gpt_researcher/ and backend/ for citation or source verification finds nothing. 'partial' is a fair verdict."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking: in readme.platforms.linux_x86_64 change '.github/workflows/tests.yml:23,28,88,93' to '.github/workflows/tests.yml:23,28,87,93', and in readme.platforms.macos_arm64 change 'tests.yml:23,88 are ubuntu-latest' to 'tests.yml:23,87 are ubuntu-latest'. Line 87 is the unit job's `runs-on: ubuntu-latest`; line 88 is `timeout-minutes: 30`.",
+        "Non-blocking: in readme.integrations.mcp replace 'or MCP is silently disabled (gpt_researcher/mcp/__init__.py:35-38)' with 'or MCP is disabled with only a logged warning (gpt_researcher/mcp/__init__.py:35-38; gpt_researcher/retrievers/mcp/__init__.py:22-27), and a requested mcp retriever falls back to the default Tavily retriever without further notice (gpt_researcher/actions/retriever.py:118-121,191)'."
+      ]
+    }
+  ]
+}

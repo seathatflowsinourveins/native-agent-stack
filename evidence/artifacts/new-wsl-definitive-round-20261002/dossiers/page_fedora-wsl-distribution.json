@@ -1,0 +1,202 @@
+{
+  "contender": "page:fedora-wsl-distribution",
+  "revision": {
+    "contender": "page:fedora-wsl-distribution",
+    "kind": "pages",
+    "pages": [
+      "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+      "https://docs.fedoraproject.org/en-US/cloud/wsl/",
+      "https://docs.fedoraproject.org/en-US/releases/lifecycle/"
+    ],
+    "tag": null,
+    "commit": null,
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "page:fedora-wsl-distribution",
+    "revision": {
+      "tag": null,
+      "commit": null,
+      "read_at": "2026-10-02T03:02:33+00:00"
+    },
+    "license": {
+      "spdx": null,
+      "file": null
+    },
+    "purpose": "Fedora (WSL distribution): Fedora Linux as a downloadable WSL image. The only readable source is Microsoft's WSL manifest distributions/DistributionInfo.json (master ref). Its ModernDistributions.Fedora group lists FedoraLinux-44 (Default true within the group) and FedoraLinux-43 as .wsl images for x86_64 and aarch64 on download.fedoraproject.org, each with a SHA-256. The image listed for an x86_64 host is Fedora-WSL-Base-44-1.7.x86_64.wsl, SHA-256 2e5b153ba4b639952bf546be577fc19b832fe8944caa7de342b32f10da7d319a. Both Fedora docs pages (WSL guide, release lifecycle) returned an Anubis 'Access Denied' page and were not readable. The working directory holds no README or source, only .round-meta.json. Facts on install steps, systemd, GPU, Python/Node/Rust packages, support-window length and license are therefore not covered by any page opened.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "[manifest, not a README] ModernDistributions has a 'Fedora' group with two entries: Name 'FedoraLinux-44' (FriendlyName 'Fedora Linux 44', Default true) and Name 'FedoraLinux-43' (FriendlyName 'Fedora Linux 43', Default false).",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+        },
+        {
+          "claim": "[manifest] FedoraLinux-44 x86_64 image: https://download.fedoraproject.org/pub/fedora/linux/releases/44/Container/x86_64/images/Fedora-WSL-Base-44-1.7.x86_64.wsl with Sha256 2e5b153ba4b639952bf546be577fc19b832fe8944caa7de342b32f10da7d319a.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+        },
+        {
+          "claim": "[manifest] FedoraLinux-44 aarch64 image: https://download.fedoraproject.org/pub/fedora/linux/releases/44/Container/aarch64/images/Fedora-WSL-Base-44-1.7.aarch64.wsl with Sha256 1a3220262dc918b07d08410278205fb35e92c28a53455382028eea1a980476ee.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+        },
+        {
+          "claim": "[manifest] FedoraLinux-43 x86_64 image: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Container/x86_64/images/Fedora-WSL-Base-43-1.6.x86_64.wsl with Sha256 220780af9cf225e9645313b4c7b0457a26a38a53285eb203b2ab6188d54d5b82.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+        },
+        {
+          "claim": "[manifest] FedoraLinux-43 aarch64 image: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Container/aarch64/images/Fedora-WSL-Base-43-1.6.aarch64.wsl with Sha256 7eef7a83260218d8c878b3c7bbdaf11772103145184d0c65df27557f4cd49548.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+        },
+        {
+          "claim": "[manifest] The file's top-level 'Default' key is 'Ubuntu'. Fedora's 'Default: true' applies only within its own group.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+        },
+        {
+          "claim": "[manifest] Fedora does not appear in the legacy top-level 'Distributions' array. It exists only under 'ModernDistributions'.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+        },
+        {
+          "claim": "[manifest] The Fedora entries carry only Name, FriendlyName, Default, Amd64Url{Url,Sha256} and Arm64Url{Url,Sha256}. There is no signature, key, version/date or support-end field.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+        }
+      ],
+      "install": [],
+      "platforms": {
+        "linux_x86_64": "yes - Amd64Url points to Fedora-WSL-Base-44-1.7.x86_64.wsl (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). It is a WSL image, not a bare-metal Linux installer.",
+        "wsl2": "unknown - the manifest says nothing about WSL1/WSL2 or a minimum WSL version, and the Fedora WSL guide (https://docs.fedoraproject.org/en-US/cloud/wsl/) returned 'Access Denied: error code 9e4edb5b6b850c41'.",
+        "macos_arm64": "no - the only artifacts are .wsl images (x86_64 and aarch64) for Windows Subsystem for Linux. No macOS artifact is listed (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json).",
+        "gpu": "unknown - the manifest never mentions GPU, NVIDIA or CUDA, and the Fedora WSL guide was unreadable (https://docs.fedoraproject.org/en-US/cloud/wsl/ returned Access Denied)."
+      },
+      "integrations": {
+        "cli": "none found - no command is documented in the readable pages. The entry Name 'FedoraLinux-44' is an identifier only (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). The Fedora WSL guide that might document commands returned Access Denied.",
+        "mcp": "none found",
+        "sdk_or_api": "none found - only the static JSON manifest at https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json. No SDK or documented HTTP API.",
+        "claude_code_or_codex": "none found"
+      },
+      "telemetry_and_network": "No telemetry or phone-home statement appears in any readable page. The manifest shows the Fedora images are fetched from download.fedoraproject.org over HTTPS, at /pub/fedora/linux/releases/{44,43}/Container/{x86_64,aarch64}/images/ (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). It mentions no account or login. docs.fedoraproject.org sits behind Anubis (version 1.26.0-2.fc44). Both Fedora docs pages returned 'Access Denied: error code 9e4edb5b6b850c41' to the fetch tool on repeated attempts (https://docs.fedoraproject.org/en-US/cloud/wsl/ and https://docs.fedoraproject.org/en-US/releases/lifecycle/). Any telemetry, account or network statements in those pages are unknown."
+    },
+    "code": {
+      "languages": [
+        "JSON"
+      ],
+      "entry_points": [
+        {
+          "path": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+          "what": "WSL distribution manifest in the microsoft/WSL repo. The Fedora entries are under ModernDistributions.Fedora (FedoraLinux-44, FedoraLinux-43)."
+        }
+      ],
+      "architecture": "No source tree: the working directory contains only .round-meta.json (page list and read time, .round-meta.json:1-12). The project is an entry in one data file, distributions/DistributionInfo.json of microsoft/WSL, read from the master ref by URL. Layout as read: top-level keys ModernDistributions (group name -> array of entries, each with Name, FriendlyName, Default, Amd64Url{Url,Sha256}, Arm64Url{Url,Sha256}), Default ('Ubuntu') and Distributions (legacy array of Store-style entries with StoreAppId/PackageFamilyName, no Fedora). Fedora artifacts are .wsl files named Fedora-WSL-Base-<release>-<build>.<arch>.wsl under download.fedoraproject.org/pub/fedora/linux/releases/<release>/Container/<arch>/images/. The file was read through WebFetch, a model-mediated extraction, so exact line numbers are unavailable and citations use the URL.",
+      "packaging_and_release": "Fedora images are published as .wsl files at download.fedoraproject.org: Fedora-WSL-Base-44-1.7 and Fedora-WSL-Base-43-1.6, each for x86_64 and aarch64 (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). The manifest gives one SHA-256 per image. The Fedora entries hold no signature, GPG key, attestation or release-workflow reference. Fedora's own checksum/signature files and release workflows were not in any readable page.",
+      "tests_and_ci": "none found - no source tree or CI workflow files in the working directory. The microsoft/WSL and Fedora build/CI configuration are not part of the pages that could be read.",
+      "dependencies": "none - no dependency manifest. The subject is a static JSON data file with no direct dependencies.",
+      "security_policy": "none - no SECURITY.md or equivalent in the working directory, which holds only .round-meta.json."
+    },
+    "claim_checks": [
+      {
+        "claim": "The manifest lists Fedora Linux 44 (Default within its group) and 43, each with x86_64 and aarch64 .wsl images and a SHA-256.",
+        "verified": "yes",
+        "evidence": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json - the two entries were read in several separate extractions, with consistent URLs, build ids (44-1.7, 43-1.6) and 64-hex hashes. No README text was readable, so README-vs-code conflicts could not be assessed."
+      },
+      {
+        "claim": "Installable from a vendor image whose checksum can be verified.",
+        "verified": "partial",
+        "evidence": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json - each Fedora image has a published SHA-256, and the image host is download.fedoraproject.org. No signature is published, and no image was downloaded and hashed (only the listed pages could be opened)."
+      },
+      {
+        "claim": "The SHA-256 in the manifest equals the hash of the file actually served by download.fedoraproject.org (and Fedora's own checksum files).",
+        "verified": "not_checkable",
+        "evidence": "Fetching the .wsl images or Fedora CHECKSUM files was outside the listed pages. One chunked re-read of the FedoraLinux-43 x86_64 hash came back garbled (39 characters) and was discarded. Three plain re-reads agree on 220780af9cf225e9645313b4c7b0457a26a38a53285eb203b2ab6188d54d5b82 (64 characters)."
+      },
+      {
+        "claim": "The manifest supplies a signature or attestation for the images beyond the SHA-256.",
+        "verified": "no",
+        "evidence": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json - the Fedora entries contain only Url and Sha256 per architecture."
+      },
+      {
+        "claim": "The image works as a WSL2 instance on WSL 2.7.13 with a 6.18 kernel.",
+        "verified": "not_checkable",
+        "evidence": "The manifest states no WSL version or WSL1/WSL2 information. The Fedora WSL guide (https://docs.fedoraproject.org/en-US/cloud/wsl/) returned 'Access Denied: error code 9e4edb5b6b850c41'."
+      },
+      {
+        "claim": "systemd (user services) is available in the Fedora WSL image.",
+        "verified": "not_checkable",
+        "evidence": "Not in the manifest (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). The Fedora WSL guide (https://docs.fedoraproject.org/en-US/cloud/wsl/) was blocked."
+      },
+      {
+        "claim": "Current toolchains (Python 3.13, Node 24, Rust) are available for Fedora 44/43.",
+        "verified": "not_checkable",
+        "evidence": "The manifest holds no package information, and no readable page covers Fedora package contents."
+      },
+      {
+        "claim": "NVIDIA GPU (RTX 4090) access works through WSL with the Fedora image.",
+        "verified": "not_checkable",
+        "evidence": "The manifest never mentions GPU/NVIDIA/CUDA. The Fedora WSL guide (https://docs.fedoraproject.org/en-US/cloud/wsl/) returned Access Denied."
+      },
+      {
+        "claim": "Fedora 44 or 43 has long-term security support.",
+        "verified": "not_checkable",
+        "evidence": "https://docs.fedoraproject.org/en-US/releases/lifecycle/ returned 'Access Denied: error code 9e4edb5b6b850c41' (Anubis 1.26.0-2.fc44). The manifest has no support-end or EOL field."
+      },
+      {
+        "claim": "Fedora is the default distribution in the WSL manifest.",
+        "verified": "no",
+        "evidence": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json - the top-level Default is 'Ubuntu'. Fedora's 'Default: true' applies only within the Fedora group."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Fedora's own docs were not read: https://docs.fedoraproject.org/en-US/cloud/wsl/ and https://docs.fedoraproject.org/en-US/releases/lifecycle/ both returned Anubis 'Access Denied: error code 9e4edb5b6b850c41' on repeated attempts. Install steps, systemd, NVIDIA GPU, Python/Node/Rust packaging and the support-window length are unverified from the listed sources.",
+      "No support-window data is available: the manifest lists only releases 44 and 43 with no EOL or support-end field (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json), and the lifecycle page was blocked. 'Long-term security support' cannot be established from the readable sources.",
+      "The manifest is read from the moving 'master' ref with no tag or commit pinned (.round-meta.json:9-10). Build ids (44-1.7, 43-1.6) and SHA-256 values can change with any manifest update. The values here are as read on 2026-10-02 (.round-meta.json:11).",
+      "The manifest content came through a model-mediated fetch, not a byte-exact download. One re-read of a hash was garbled, one lookup mislabelled an architecture, and one response contradicted the group ordering (so no ordering is reported). The four URL/hash pairs were consistent across repeated reads but should be re-checked against the raw file before use.",
+      "Integrity rests on a bare SHA-256 per image in a GitHub-hosted JSON file. The Fedora entries have no signature, GPG key or attestation field, and the hash was not compared with the served image or with Fedora's own checksum files.",
+      "Compatibility with the host's WSL 2.7.13 is unverified. Fedora appears only under ModernDistributions, not in the legacy Distributions array, and the file states no minimum WSL version or WSL1/WSL2 information.",
+      "The manifest's top-level Default is 'Ubuntu', so Fedora is the default only within its own group (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json).",
+      "License could not be determined: the working directory has no LICENSE or README and no readable page states a license for the manifest or the Fedora image (license fields left null)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "page:fedora-wsl-distribution",
+      "checks": [
+        {
+          "field": "readme.claims[1] (install method; same artifact as purpose and packaging_and_release)",
+          "statement": "FedoraLinux-44 x86_64 image: https://download.fedoraproject.org/pub/fedora/linux/releases/44/Container/x86_64/images/Fedora-WSL-Base-44-1.7.x86_64.wsl with Sha256 2e5b153ba4b639952bf546be577fc19b832fe8944caa7de342b32f10da7d319a.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json — ModernDistributions.Fedora[0].Amd64Url (WebFetch, no line numbers)",
+          "holds": true,
+          "note": "Three separate extractions gave this exact Url and Sha256 (64 hex characters), matching the dossier character for character. readme.install is empty, which fits the cited pages: the manifest has no 'install' or 'wsl --' text and no free text at all, and the Fedora WSL guide still returns the Anubis 'Access Denied: error code 9e4edb5b6b850c41.' page. Caveat: WebFetch reads through a model, not byte-exact, and no image was downloaded or hashed."
+        },
+        {
+          "field": "license",
+          "statement": "spdx null, file null. The working directory has no LICENSE or README, and no readable page states a license for the manifest or the Fedora image.",
+          "citation": ".round-meta.json:1-12; https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json; https://docs.fedoraproject.org/en-US/cloud/wsl/; https://docs.fedoraproject.org/en-US/releases/lifecycle/",
+          "holds": true,
+          "note": "Glob shows the working directory holds only .round-meta.json. The manifest has no 'license' substring and no License key. Both Fedora docs pages returned only 'Access Denied: error code 9e4edb5b6b850c41.' with no footer license text. The null license fields are correct for the readable sources."
+        },
+        {
+          "field": "readme.platforms.wsl2",
+          "statement": "unknown - the manifest says nothing about WSL1/WSL2 or a minimum WSL version, and the Fedora WSL guide (https://docs.fedoraproject.org/en-US/cloud/wsl/) returned 'Access Denied: error code 9e4edb5b6b850c41'.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (full key list); https://docs.fedoraproject.org/en-US/cloud/wsl/",
+          "holds": true,
+          "note": "The manifest's full key set is ModernDistributions, the group names, Name, FriendlyName, Default, Amd64Url, Arm64Url, Url, Sha256, Distributions, StoreAppId, Amd64, Arm64, Amd64PackageUrl and Arm64PackageUrl, PackageFamilyName. None of these is a WSL-version field, and none of 'WSL1', 'WSL2', 'Version' or 'kernel' appears in the file. The Fedora WSL guide returned exactly 'Access Denied: error code 9e4edb5b6b850c41.' today too. 'unknown' is correct."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "none found - no command is documented in the readable pages. The entry Name 'FedoraLinux-44' is an identifier only. The Fedora WSL guide that might document commands returned Access Denied.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json — ModernDistributions.Fedora[0].Name; https://docs.fedoraproject.org/en-US/cloud/wsl/",
+          "holds": true,
+          "note": "The manifest contains no 'command', 'install' or 'wsl --' text and no comments or descriptions. 'FedoraLinux-44' appears only as a Name data value, and the guide is still blocked. 'Identifier only' describes what the cited page shows. The manifest does not say how WSL consumes the Name, so that question is open rather than answered."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "The manifest lists Fedora Linux 44 (Default within its group) and 43, each with x86_64 and aarch64 .wsl images and a SHA-256. (verified: yes)",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json — ModernDistributions.Fedora[0..1]",
+          "holds": true,
+          "note": "The Fedora group has FedoraLinux-44 (FriendlyName 'Fedora Linux 44', Default true) and FedoraLinux-43 (FriendlyName 'Fedora Linux 43', Default false). Each has Amd64Url and Arm64Url {Url, Sha256} pointing to Fedora-WSL-Base-44-1.7 and 43-1.6 .wsl files on download.fedoraproject.org. All four hashes match the dossier: 2e5b153b…319a, 1a322026…76ee, 220780af…5b82, 7eef7a83…9548. The top-level Default is 'Ubuntu', and Fedora is not in the legacy Distributions array, as the dossier says."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

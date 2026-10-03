@@ -1,0 +1,290 @@
+{
+  "contender": "anthropics/claude-agent-sdk-python",
+  "revision": {
+    "contender": "anthropics/claude-agent-sdk-python",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "anthropics/claude-agent-sdk-python",
+        "tag": "v0.2.163",
+        "commit": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.2.163",
+    "commit": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+    "read_at": "2026-10-02T03:01:53+00:00"
+  },
+  "dossier": {
+    "contender": "anthropics/claude-agent-sdk-python",
+    "revision": {
+      "tag": "v0.2.163",
+      "commit": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python package claude-agent-sdk 0.2.163 (pyproject.toml:6-7): starts the Claude Code CLI (`claude`) as a child process and drives it over a stream-JSON stdin/stdout control protocol (src/claude_agent_sdk/_internal/transport/subprocess_cli.py:570-795, 873-881). Offers query() and ClaudeSDKClient, in-process custom tools (SDK MCP servers), hook and permission callbacks, subagents, structured output, cost/usage in ResultMessage, and session list/resume/fork helpers with an optional external SessionStore mirror (src/claude_agent_sdk/types.py:1609-1734, 1970-2437). Model calls, tool execution, sandbox, permission evaluation and subagents run inside the CLI, not this package; platform wheels bundle CLI 2.1.286 (src/claude_agent_sdk/_cli_version.py:3). Facts for the stated needs: (1) model choice is documented only for Claude models (types.py:2070-2074); no GPT/OpenAI/'Sol' reference exists in the repo (searched); (2) sandbox is optional, default-off, bash-only, macOS/Linux, forwarded to the CLI via --settings (types.py:904-950; subprocess_cli.py:473-525); (3) bounded access: tools/allowed_tools/disallowed_tools, six permission modes, can_use_tool, hooks, max_turns, max_budget_usd, task_budget (types.py:25-27, 1974-2068, 2430-2437); (4) resumability: resume/continue_conversation/fork_session over CLI transcripts in CLAUDE_CONFIG_DIR (default ~/.claude) plus optional session_store (types.py:2040-2048, 2249-2263, 2403-2428; src/claude_agent_sdk/_internal/sessions.py:122-141); (5) no deep-research harness, citation model, worker pool or orchestrator exists; text blocks keep only `text` (types.py:954-958; _internal/message_parser.py:169-170). The README does not document sandbox, resume/session_store, model selection or authentication.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Python SDK for Claude Agent; full docs are at platform.claude.com/docs/en/agent-sdk/python (external page, not in this repo).",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Install with `pip install claude-agent-sdk`; prerequisite Python 3.10+.",
+          "citation": "README.md:7-13"
+        },
+        {
+          "claim": "The Claude Code CLI is automatically bundled with the package, no separate installation required; the SDK uses the bundled CLI by default. For a system-wide install or specific version, install Claude Code separately or set ClaudeAgentOptions(cli_path=...).",
+          "citation": "README.md:15-18"
+        },
+        {
+          "claim": "query() is an async function for querying Claude Code, returning an AsyncIterator of response messages.",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "By default Claude has the full Claude Code toolset (Read, Write, Edit, Bash, others); allowed_tools is an auto-approve allowlist that does not remove tools, unlisted tools fall through to permission_mode and can_use_tool; disallowed_tools blocks tools.",
+          "citation": "README.md:59"
+        },
+        {
+          "claim": "permission_mode='acceptEdits' auto-accepts file edits; cwd sets the working directory.",
+          "citation": "README.md:61-83"
+        },
+        {
+          "claim": "The system prompt is recorded on a session's first request and reused on resume unless snapshot is False (needs Claude Code CLI 2.1.257+).",
+          "citation": "README.md:87-95"
+        },
+        {
+          "claim": "ClaudeSDKClient supports bidirectional, interactive conversations; unlike query() it additionally enables custom tools and hooks.",
+          "citation": "README.md:99-102"
+        },
+        {
+          "claim": "Custom tools are in-process MCP servers (no subprocess management, 'No IPC overhead for tool calls'); SDK and external stdio MCP servers can be mixed.",
+          "citation": "README.md:104-108, 148-154, 183-197"
+        },
+        {
+          "claim": "Hooks are Python functions the Claude Code application (not Claude) invokes at specific points of the agent loop, for deterministic processing and automated feedback.",
+          "citation": "README.md:199-203"
+        },
+        {
+          "claim": "Error classes include CLINotFoundError, CLIConnectionError, ProcessError, ResultError (terminal error result with subtype, terminal_reason, api_error_status) and CLIJSONDecodeError.",
+          "citation": "README.md:259-287"
+        },
+        {
+          "claim": "Manual release workflow takes version and claude_code_version (e.g. 2.0.0 or latest), builds macOS/Linux/Windows wheels bundling that CLI plus an sdist, publishes to PyPI, creates a release branch and opens a PR to main.",
+          "citation": "README.md:351-373"
+        },
+        {
+          "claim": "scripts/build_wheel.py downloads the Claude Code CLI for the platform, bundles it in the wheel, builds wheel and sdist, and checks with twine.",
+          "citation": "README.md:318-349"
+        },
+        {
+          "claim": "Use of the SDK is governed by Anthropic's Commercial Terms of Service, including for products built on it, except where a component's own LICENSE file says otherwise.",
+          "citation": "README.md:375-377"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip, PyPI platform wheel with bundled Claude Code CLI (Linux and macOS)",
+          "command": "pip install claude-agent-sdk",
+          "citation": "README.md:7-9"
+        },
+        {
+          "method": "Optional separate Claude Code CLI install (Linux/macOS); used only when no bundled CLI exists or via cli_path",
+          "command": "curl -fsSL https://claude.ai/install.sh | bash",
+          "citation": "README.md:17"
+        },
+        {
+          "method": "Build a platform wheel locally with the bundled CLI (contributors)",
+          "command": "pip install build twine\npython scripts/build_wheel.py",
+          "citation": "README.md:322-327"
+        },
+        {
+          "method": "Editable dev install from a source checkout (contributors)",
+          "command": "pip install -e \".[dev]\"",
+          "citation": "e2e-tests/README.md:19-23"
+        },
+        {
+          "method": "Optional OpenTelemetry extra",
+          "command": "pip install claude-agent-sdk[otel]",
+          "citation": "CHANGELOG.md:820"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - wheel manylinux_2_17_x86_64 built on ubuntu-latest (RELEASING.md:9-10; .github/workflows/build-and-publish.yml:21, 78-84); unit, e2e and Docker e2e tests run on ubuntu-latest (.github/workflows/test.yml:11-14, 152-187). manylinux_2_17_aarch64 also built; no musllinux wheel.",
+        "wsl2": "unknown - no doc, workflow or test names WSL2; the only WSL mentions are Windows-side comments about WSL/git-bash wrapper scripts (src/claude_agent_sdk/_internal/transport/subprocess_cli.py:270, 289). A WSL2 distro is Linux, but upstream does not say so.",
+        "macos_arm64": "yes - wheel macosx_11_0_arm64 built on macos-latest (RELEASING.md:12; build-and-publish.yml:21, 78-84); unit and e2e tests run on macos-latest (test.yml:11-14, 91-93). macosx_11_0_x86_64 also built (RELEASING.md:13).",
+        "gpu": "no - nothing in the repo uses or requires a GPU (no GPU/CUDA references); the SDK only spawns the CLI subprocess (subprocess_cli.py:873-881), whose model calls go to a remote API (e2e-tests/README.md:47, 88)."
+      },
+      "integrations": {
+        "cli": "none for the SDK itself - pyproject.toml declares no [project.scripts] (pyproject.toml:1-149). Wheels bundle the separate Claude Code `claude` binary (README.md:15; subprocess_cli.py:341-354), spawned with --output-format stream-json --input-format stream-json (subprocess_cli.py:574, 793). scripts/*.py are release tooling, not packaged (pyproject.toml:62-64).",
+        "mcp": "Host side only: in-process SDK MCP servers via @tool and create_sdk_mcp_server() (src/claude_agent_sdk/__init__.py:251-335, 491-619), bridged to the CLI as mcp_message control requests (_internal/sdk_mcp_bridge.py:1-22; _internal/query.py:656-674); external stdio/SSE/HTTP configs pass through via --mcp-config (types.py:623-668; subprocess_cli.py:667-692). Server-initiated sampling, elicitation, roots, logging and progress are not forwarded (types.py:648-659). No MCP endpoint for outside clients found (no server or listening-socket code under src/).",
+        "sdk_or_api": "Python SDK: query() (src/claude_agent_sdk/query.py:11-132) and ClaudeSDKClient (src/claude_agent_sdk/client.py:26-631), plus a Transport ABC the maintainers warn may change or be removed (_internal/transport/__init__.py:8-14). No HTTP API or server found.",
+        "claude_code_or_codex": "Claude Code: this is its Python SDK - wraps the CLI (README.md:35, 99-100); exposes setting_sources user/project/local (types.py:2297-2307), local plugins (types.py:855-862), skills (types.py:2309-2329), subagents via agents (types.py:107-127, 2291-2295) and hooks. Codex: none found (case-insensitive search for 'codex' returned no matches)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found in the SDK: nothing under src/ uses httpx/requests/urllib/socket (searched). All model traffic comes from the spawned CLI (subprocess_cli.py:873-881); that closed-source binary's own telemetry/update behavior is not checkable here. Accounts: the CLI needs Anthropic credentials - ANTHROPIC_API_KEY, CLAUDE_CODE_OAUTH_TOKEN, ~/.claude/.credentials.json, the macOS Keychain item 'Claude Code-credentials', or an apiKeyHelper in user settings (_internal/session_resume.py:53-55, 326-386; e2e-tests/README.md:7-15); the README does not describe auth. Child env: SDK sets CLAUDE_CODE_ENTRYPOINT=sdk-py, CLAUDE_AGENT_SDK_VERSION, CLAUDE_CODE_SDK_READS_SESSION_STATE=1 (subprocess_cli.py:819-825, 858-861); CLAUDE_AGENT_SDK_CLIENT_APP can tag the User-Agent (types.py:2135-2136). If opentelemetry-api (extra 'otel') is installed and a span is active, W3C trace context is injected into the child env; no exporter is shipped (subprocess_cli.py:827-851). On connect it runs `claude -v` locally (2 s timeout) unless CLAUDE_AGENT_SDK_SKIP_VERSION_CHECK is set (subprocess_cli.py:809-810, 1164-1224). With session_store set, transcripts are copied to the user-supplied backend (types.py:1609-1650). Build/release-time network: claude.ai/install.sh download (scripts/download_cli.py:245-272), pypi.org queries (build-and-publish.yml:165-176)."
+    },
+    "code": {
+      "languages": [
+        "Python (>=3.10)",
+        "Shell (scripts/initial-setup.sh and other dev scripts)",
+        "JavaScript (one CI helper: .github/actions/setup-claude-auth/refresh-identity-token.js)",
+        "YAML (GitHub Actions)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/claude_agent_sdk/query.py",
+          "what": "query(): async generator for one-shot or streaming-input runs (hooks, can_use_tool and SDK MCP servers also work here)"
+        },
+        {
+          "path": "src/claude_agent_sdk/client.py",
+          "what": "ClaudeSDKClient: stateful client (query, receive_response, interrupt, set_permission_mode, set_model, rewind_files, stop_task, get_mcp_status, get_context_usage)"
+        },
+        {
+          "path": "src/claude_agent_sdk/__init__.py",
+          "what": "Public API (__all__ at 622-772): tool, create_sdk_mcp_server, session list/get/rename/tag/delete/fork (+ *_via_store), SessionStore, InMemorySessionStore, option/message types, errors"
+        },
+        {
+          "path": "src/claude_agent_sdk/_internal/transport/subprocess_cli.py",
+          "what": "SubprocessCLITransport: locates and spawns the claude binary, frames its NDJSON stdout; the only shipped transport"
+        },
+        {
+          "path": "src/claude_agent_sdk/_bundled/claude",
+          "what": "Claude Code CLI executable (claude.exe on Windows); exists only inside platform wheels, git-ignored in the repo"
+        },
+        {
+          "path": "src/claude_agent_sdk/testing/session_store_conformance.py",
+          "what": "run_session_store_conformance(): harness for validating SessionStore adapters"
+        },
+        {
+          "path": "scripts/build_wheel.py",
+          "what": "Release tooling CLI (with download_cli.py, update_version.py, update_cli_version.py) that builds platform wheels with the bundled CLI"
+        },
+        {
+          "path": "examples/session_stores/",
+          "what": "Reference SessionStore adapters for S3, Redis and Postgres; 'Not packaged, not maintained as production code'"
+        }
+      ],
+      "architecture": "Thin Python control layer around the closed-source Claude Code CLI; no model-provider code exists in the package. Modules: _internal/transport/subprocess_cli.py - SubprocessCLITransport resolves the CLI (bundled _bundled/claude first, then PATH and fixed paths: 255-354), builds flags (--tools, --allowedTools, --disallowedTools, --model, --max-turns, --max-budget-usd, --permission-mode, --resume=, --settings with merged sandbox JSON, --mcp-config, --session-mirror: 570-795), spawns it with anyio.open_process incl. options.user and merged env (797-915), frames NDJSON stdout (163-221, 1097-1162), reaps children at exit (54-68). _internal/query.py - Query: control protocol (initialize with hooks/agents/skills, can_use_tool and hook_callback handling, mcp_message routing, interrupt/set_model/set_permission_mode/rewind_files/stop_task) and run-end/stdin-close logic (309-363, 577-704, 784-868, 1041-1091). _internal/sdk_mcp_bridge.py + _mcp_compat.py - in-process MCP servers over mcp's in-memory transport (mcp 1.x and 2.x). _internal/message_parser.py + types.py - JSON to dataclasses (messages, blocks, ClaudeAgentOptions, hook/permission/sandbox/session-store types). _internal/client.py (query()) and client.py (ClaudeSDKClient) - wiring. Persistence: the CLI writes JSONL transcripts under CLAUDE_CONFIG_DIR/projects; session_store.py (InMemorySessionStore), transcript_mirror_batcher.py (batched/eager mirroring), session_resume.py (store-backed resume into a temp config dir), sessions.py, session_mutations.py, session_import.py, session_summary.py (list/read/rename/tag/delete/fork/import). Sandbox, permission evaluation, tool execution and subagents run in the CLI; the SDK forwards configuration only. No worker pool, queue or scheduler: each query()/ClaudeSDKClient owns one CLI subprocess.",
+      "packaging_and_release": "Hatchling backend; wheel holds only src/claude_agent_sdk, sdist adds tests, scripts, examples, README, LICENSE (pyproject.toml:1-3, 62-77). SDK 0.2.163 (pyproject.toml:7), bundled CLI pinned 2.1.286 (_cli_version.py:3). Triggers: a push to main with commit message 'chore: bump bundled CLI version to ...' after the Test workflow passes auto-bumps the patch version (.github/workflows/auto-release.yml:3-17, 31-38; RELEASING.md:30-47); or manual 'Publish to PyPI' dispatch with a version after tests (Python 3.10-3.13) and lint (publish.yml:3-9, 12-58, 75-85). Both call build-and-publish.yml: wheels on 5 runners (manylinux_2_17 x86_64/aarch64, macosx_11_0 arm64/x86_64, win_amd64), each fetching the pinned CLI through https://claude.ai/install.sh, bundling it, recompressing with hash-pinned zopfli (build-and-publish.yml:17-37, 78-84; scripts/build_wheel.py:104-143, 466-497; scripts/download_cli.py:245-300; scripts/requirements-recompress.txt:4-8). Publish job: sdist (no CLI), PyPI quota/size pre-flight (wheels over 100 MiB are skipped), twine upload with the static PYPI_API_TOKEN secret, version commit pushed straight to main via SSH deploy key, optional Claude-generated changelog (continue-on-error), tag vX.Y.Z and GitHub Release (build-and-publish.yml:45-273; RELEASING.md:19, 71-77). PRs touching build files run build-wheel-check.yml (5-wheel dry run, platform-tag and bundled-CLI checks, import smoke test: build-wheel-check.yml:5-97). Checksums, signatures, attestations, SBOM: none found - a search for attest/sigstore/cosign/sha256/checksum/provenance/gpg/slsa/sbom hit only the zopfli requirement hashes and unrelated words; the downloaded installer is only shebang-checked (scripts/download_cli.py:124-134) and the CLI binary is not hash-verified.",
+      "tests_and_ci": "pytest with anyio plugin (pyproject.toml:79-85). tests/: 36 test_*.py files plus conftest.py, about 1,079 test functions (grep count), run under asyncio and trio (tests/conftest.py:7-9); cover transport, query/control protocol, client, parsing, SDK MCP bridge, sessions/store/resume/mirroring, build scripts and example adapters (S3/Redis via moto/fakeredis; Postgres and live suites skip without SESSION_STORE_* env vars: examples/session_stores/README.md:30-44). e2e-tests/: 18 test_*.py files, 48 test functions, marked e2e, need real Anthropic API access and spend tokens (e2e-tests/README.md:5-15, 45-51; e2e-tests/conftest.py:19-28). Sandbox settings are covered only by command-construction unit tests (tests/test_transport.py:1807); no e2e test enables the sandbox (e2e-tests/test_tool_permissions.py:75-76 is a comment). mypy strict and ruff configured (pyproject.toml:87-149). Workflows: test.yml (unit on ubuntu/macos/windows, Python 3.13, Codecov; mcp==1.23.0 floor job with mypy; e2e on 3 OSes and in Docker via Dockerfile.test; example scripts; e2e jobs use GitHub OIDC workload identity federation and skip forks), lint.yml (ruff, mypy), publish.yml, build-wheel-check.yml, build-and-publish.yml, auto-release.yml, pypi-quota-check.yml (daily), claude.yml / claude-code-review.yml / claude-issue-triage.yml (Claude-powered repo automation), slack-issue-notification.yml.",
+      "dependencies": "pyproject.toml: 5 direct runtime deps - anyio>=4.0.0, sniffio>=1.0.0, typing_extensions>=4.0.0 (python<3.11 only), mcp>=1.23.0,<3.0.0, jsonschema>=4.20.0 (lines 27-33); extras: dev 5 (pytest, anyio[trio], pytest-cov, mypy, ruff), otel 1 (opentelemetry-api>=1.20.0), examples 5 (boto3, moto[s3], redis, fakeredis, asyncpg) (lines 35-55); build-system 1 (hatchling, lines 1-3). scripts/requirements-recompress.txt: 1 hash-pinned build dep (zopfli==0.4.3). CI installs build, twine, wheel unpinned (build-and-publish.yml:31). No lockfile in the repo. Non-Python payload: the Claude Code CLI binary, pinned 2.1.286 (_cli_version.py:3), fetched at build time.",
+      "security_policy": "none - no SECURITY.md (nor CONTRIBUTING or CODEOWNERS) in this repository; .github/ holds only actions/ and workflows/. Hardening shows up only in code comments, e.g. refusing .bat/.cmd CLI paths on Windows (src/claude_agent_sdk/_internal/transport/subprocess_cli.py:414-448) and equals-form flag binding against flag injection (subprocess_cli.py:642-655)."
+    },
+    "claim_checks": [
+      {
+        "claim": "The Claude Code CLI is automatically bundled; the SDK uses the bundled CLI by default (README.md:15).",
+        "verified": "partial",
+        "evidence": "Code tries the bundled binary first (src/claude_agent_sdk/_internal/transport/subprocess_cli.py:255-260, 341-354), but it exists only in platform wheels: git-ignored (src/claude_agent_sdk/_bundled/.gitignore:1-3) and wheels are built for 5 targets only - manylinux_2_17 x86_64/aarch64, macOS arm64/x86_64, win_amd64 (.github/workflows/build-and-publish.yml:21, 78-84). The sdist has no CLI and an over-100-MiB wheel is dropped in its favor (RELEASING.md:19). Without a bundled CLI the SDK searches PATH and fixed paths, else raises CLINotFoundError (subprocess_cli.py:262-339)."
+      },
+      {
+        "claim": "For a system-wide install or specific version, install Claude Code separately or set cli_path (README.md:15-18).",
+        "verified": "partial",
+        "evidence": "cli_path is honored (src/claude_agent_sdk/types.py:2099-2103; subprocess_cli.py:237-239, 802-803), but a separately installed claude on PATH is consulted only if no bundled binary is found (subprocess_cli.py:257-264), so with a platform wheel it is ignored unless cli_path is set."
+      },
+      {
+        "claim": "Unlike query(), ClaudeSDKClient additionally enables custom tools and hooks (README.md:102).",
+        "verified": "no",
+        "evidence": "query() passes hooks, can_use_tool and SDK MCP servers into the same Query object (src/claude_agent_sdk/_internal/client.py:100-107, 140-156); _configure_can_use_tool is documented as shared by query() and ClaudeSDKClient.connect() (types.py:1926-1935); Query keeps stdin open for one-shot runs that have them (_internal/query.py:1041-1087); an e2e test runs query() with a PreToolUse hook (e2e-tests/test_run_end.py:58-79; CHANGELOG.md:26). Code wins; the real difference is that query() cannot interrupt or take follow-ups (src/claude_agent_sdk/query.py:24-28)."
+      },
+      {
+        "claim": "By default Claude has the full toolset; allowed_tools only auto-approves; disallowed_tools blocks (README.md:59).",
+        "verified": "partial",
+        "evidence": "SDK side matches: allowed_tools = auto-allow (src/claude_agent_sdk/types.py:1985-1994), disallowed_tools = removed from the model's context (types.py:2063-2068), a separate tools option sets the base set (types.py:1974-1983); flags are emitted only when set, so the default adds no restriction (subprocess_cli.py:591-617). The tool list and enforcement live in the closed CLI, not checkable here."
+      },
+      {
+        "claim": "Custom tools are in-process MCP servers running inside your Python application (README.md:106-108).",
+        "verified": "yes",
+        "evidence": "create_sdk_mcp_server builds a regular mcp.server.Server (src/claude_agent_sdk/__init__.py:491-619) served over an in-memory transport (_internal/sdk_mcp_bridge.py:1-22); CLI calls arrive as mcp_message control requests routed in-process (_internal/query.py:656-674, 753-782). Not in README: server-to-client sampling/elicitation/roots/logging/progress are not forwarded (types.py:648-659; sdk_mcp_bridge.py:103-112)."
+      },
+      {
+        "claim": "Hooks are Python functions the Claude Code application invokes at points of the agent loop (README.md:201).",
+        "verified": "yes",
+        "evidence": "Callbacks are registered by id in the initialize request (src/claude_agent_sdk/_internal/query.py:318-337) and run on hook_callback control requests (query.py:640-654); events: PreToolUse, PostToolUse, PostToolUseFailure, UserPromptSubmit, Stop, SubagentStop, PreCompact, Notification, SubagentStart, PermissionRequest (types.py:284-295); matchers on one event run concurrently (types.py:2182-2186)."
+      },
+      {
+        "claim": "Release workflow takes claude_code_version (e.g. latest), creates a release branch and opens a PR to main (README.md:355-369).",
+        "verified": "no",
+        "evidence": "publish.yml has only a version input (.github/workflows/publish.yml:3-9). The CLI version is the pin in _cli_version.py and the build rejects moving tags such as latest when reading it (scripts/build_wheel.py:90-125; scripts/_cli_version_validation.py:18-20). build-and-publish.yml commits the bump and pushes directly to main, then tags and releases - no branch or PR (build-and-publish.yml:231-273); RELEASING.md:5 agrees. README section is stale; code and RELEASING.md win."
+      },
+      {
+        "claim": "Use is governed by Anthropic's Commercial Terms of Service (README.md:377).",
+        "verified": "partial",
+        "evidence": "LICENSE is the MIT license (LICENSE:1-21) and pyproject.toml says license MIT with an MIT classifier (pyproject.toml:11, 18); the README says Commercial Terms govern unless a component's own LICENSE file differs, without saying whether the MIT file is that exception. The repo holds no license text for the bundled CLI binary (src/claude_agent_sdk/_bundled/ contains only .gitignore)."
+      },
+      {
+        "claim": "In-process SDK tools give 'No IPC overhead for tool calls' (README.md:151).",
+        "verified": "partial",
+        "evidence": "They avoid a separate MCP server process, but every call still crosses the SDK-CLI stdio channel as an mcp_message control_request plus control_response (src/claude_agent_sdk/_internal/query.py:656-688; _internal/sdk_mcp_bridge.py:1-22). The repo publishes no measurement of the benefit."
+      },
+      {
+        "claim": "ResultError carries structured fields for a terminal error result (README.md:266-285).",
+        "verified": "yes",
+        "evidence": "ResultError subclasses ProcessError and exposes subtype, errors, result, api_error_status, terminal_reason, session_id, data (src/claude_agent_sdk/_errors.py:56-117); it replaces the generic exit-code error when the CLI already reported an error result (src/claude_agent_sdk/_internal/query.py:268-273)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Model scope: no GPT/OpenAI/'Sol' reference anywhere in the repo (searched). model is documented as a Claude model (src/claude_agent_sdk/types.py:2070-2074), per-agent models are sonnet/opus/haiku/inherit or a full id (types.py:116-117), and usage provider values are Claude-serving providers plus a generic 'gateway' (types.py:1333-1336). All inference goes through the closed-source CLI (not in this repo); options.env is passed to it (types.py:2124-2137) but nothing documents pointing it at a non-Claude model.",
+      "Scope: a client wrapper, not a worker runtime or research harness. No pool, queue, scheduler or remote-worker management; each query()/ClaudeSDKClient owns one CLI child process, with an atexit SIGTERM reaper (src/claude_agent_sdk/_internal/transport/subprocess_cli.py:54-68, 873-882). No citation model: text blocks keep only `text`, and extra block fields and unrecognized block types are dropped by the parser (types.py:954-958; _internal/message_parser.py:168-208). Research would depend on Claude Code web tools that this repo only references (types.py:914, 987-996).",
+      "Sandbox limits: off by default, bash commands only, macOS/Linux; allowUnsandboxedCommands defaults True; enableWeakerNestedSandbox for Docker 'reduces security' (src/claude_agent_sdk/types.py:919-928). Filesystem/network limits for other tools rely on permission rules (types.py:910-917). permission_mode bypassPermissions skips can_use_tool (types.py:1868-1874). Enforcement is in the closed CLI; this repo tests only command construction (tests/test_transport.py:1807) and no e2e enables it. In fresh checkouts the CLI ignores project-scoped permission grants until the workspace is trusted (scripts/trust_workspace.py:4-17).",
+      "Release integrity: wheels embed a closed-source CLI fetched at build time by running https://claude.ai/install.sh with only a shebang check, no checksum or signature verification (scripts/download_cli.py:124-134, 245-272). No signing, attestations, SBOM or provenance in workflows (only zopfli is hash-pinned: scripts/requirements-recompress.txt:4-8). Publishing uses a static PyPI token with twine and a direct push to main via deploy key (.github/workflows/build-and-publish.yml:219-229, 258-261); build/twine/wheel are installed unpinned (line 31).",
+      "Moving target: every bundled-CLI bump auto-releases an SDK patch (RELEASING.md:30-47; most of CHANGELOG.md:3-100 is CLI bumps), so CLI behavior shifts under patch versions. The CLI's default model changed between releases and broke CI (e2e-tests/conftest.py:7-16; CHANGELOG.md:8, 42), so model needs pinning. Classified Alpha (pyproject.toml:16); Transport ABC may change or be removed (src/claude_agent_sdk/_internal/transport/__init__.py:11-14); CI never runs Python 3.14 (.github/workflows/test.yml:22; publish.yml:16).",
+      "Licensing/governance: README says Commercial Terms govern (README.md:377) while LICENSE and pyproject say MIT (LICENSE:1; pyproject.toml:11, 18); no license text for the bundled CLI binary in the repo. No SECURITY.md, CONTRIBUTING or CODEOWNERS exists.",
+      "Persistence caveats: default is local JSONL under CLAUDE_CONFIG_DIR (src/claude_agent_sdk/_internal/sessions.py:122-141). S3/Redis/Postgres adapters are 'Not packaged, not maintained as production code' (examples/session_stores/README.md:3); mirroring is best-effort - a batch is dropped after 3 attempts and surfaced as MirrorErrorMessage (types.py:1631-1650; _internal/transcript_mirror_batcher.py:32-35). session_store cannot combine with enable_file_checkpointing (_internal/session_store_validation.py:40-45); a custom Transport skips store-backed resume and ignores model, cwd, permission mode and tools options (query.py:63-70). Store-backed resume writes a temp config dir holding a copy of .credentials.json (refresh token removed), ~/.claude.json and settings.json, and may read the macOS Keychain (_internal/session_resume.py:167-176, 326-386, 431-454, 495-529).",
+      "Docs/code drift: README's client-vs-query and release-workflow statements contradict the code (see claim_checks); README never mentions sandbox, resume/session_store, model selection or auth. ClaudeAgentOptions.user is documented as 'an optional user identifier associated with the session' (types.py:2189-2190) but is passed to anyio.open_process(user=...) as the child's OS user (subprocess_cli.py:880; tests/test_transport.py:1756-1803). ClaudeSDKClient cannot be shared across async task contexts (client.py:58-64). e2e-tests/README.md cites a nonexistent test_mcp_calculator.py (line 55) and API-key secrets (line 78) while test.yml uses workload identity federation (test.yml:131-150)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "anthropics/claude-agent-sdk-python",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip, PyPI platform wheel with bundled Claude Code CLI (Linux and macOS): `pip install claude-agent-sdk`",
+          "citation": "README.md:7-9",
+          "holds": true,
+          "note": "README.md:7-9 is exactly that command. The package name matches pyproject.toml:6, and the Python 3.10+ prerequisite (README.md:13) matches requires-python >=3.10 (pyproject.toml:10). The bundling statement is at README.md:15. Linux and macOS wheels (x86_64 and arm64/aarch64) are among the 5 built targets (build-and-publish.yml:21, 78-84)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text, word for word, with 'Copyright (c) 2025 Anthropic, PBC'. pyproject.toml:11 (license text MIT) and :18 (OSI MIT classifier) agree. It is the only LICENSE file in the repo. The README's Commercial Terms overlay (README.md:377) is already flagged in the dossier's claim_checks and risks."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - wheel manylinux_2_17_x86_64 built on ubuntu-latest; unit, e2e and Docker e2e tests run on ubuntu-latest; manylinux_2_17_aarch64 also built; no musllinux wheel.",
+          "citation": "RELEASING.md:9-10; .github/workflows/build-and-publish.yml:21, 78-84; .github/workflows/test.yml:11-14, 152-187",
+          "holds": true,
+          "note": "Substance holds. build-and-publish.yml:21 has ubuntu-latest in the wheel matrix, and :81 requires manylinux_2_17_x86_64. scripts/build_wheel.py:174-179 maps Linux x86_64/aarch64 to the manylinux_2_17 tags and has no musllinux branch. test.yml:14 (unit) and :155 (Docker e2e) run on ubuntu-latest. Citation nits: RELEASING.md:9-10 is the table header and separator; the ubuntu-latest -> manylinux_2_17_x86_64 row is line 11. The plain e2e matrix (test.yml:91-93) is not among the cited lines. Not mentioned here: RELEASING.md:19 says a wheel over 100 MiB is left out, and pip then falls back to the CLI-less sdist."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Host side only: in-process SDK MCP servers via @tool and create_sdk_mcp_server(), bridged to the CLI as mcp_message control requests; external stdio/SSE/HTTP configs pass through via --mcp-config; server-initiated sampling, elicitation, roots, logging and progress are not forwarded; no MCP endpoint for outside clients (no server or listening-socket code under src/).",
+          "citation": "src/claude_agent_sdk/__init__.py:251-335, 491-619; src/claude_agent_sdk/_internal/sdk_mcp_bridge.py:1-22; src/claude_agent_sdk/_internal/query.py:656-674; src/claude_agent_sdk/types.py:623-668, 648-659; src/claude_agent_sdk/_internal/transport/subprocess_cli.py:667-692",
+          "holds": true,
+          "note": "Every cited range matches the code. __init__.py:251-335 is the tool() decorator, and :491-619 is create_sdk_mcp_server() returning McpSdkServerConfig(type='sdk', instance=<mcp Server>). sdk_mcp_bridge.py:1-22 describes JSON-RPC over the control channel through mcp's in-memory transport. query.py:656-674 handles subtype 'mcp_message'. types.py:623-668 defines the stdio/sse/http/sdk config union, and :655-657 says sampling, elicitation, roots, logging and progress are not forwarded. subprocess_cli.py:667-692 strips 'instance' from SDK configs and passes external configs as-is in --mcp-config. A grep of src/ for socket/server/listen/uvicorn/aiohttp/http.server/FastMCP/stdio_server/SSE transport found only sandbox docstrings (types.py:873-874) and a comment about the CLI's own messaging socket (types.py:1090)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:15 'CLI is automatically bundled; SDK uses the bundled CLI by default' rated partial: the bundled binary is tried first but exists only in the 5 platform wheels (git-ignored); the sdist has no CLI and an over-100-MiB wheel is dropped in its favor; without a bundled CLI the SDK searches PATH and fixed paths, else raises CLINotFoundError.",
+          "citation": "src/claude_agent_sdk/_internal/transport/subprocess_cli.py:255-260, 341-354, 262-339; src/claude_agent_sdk/_bundled/.gitignore:1-3; .github/workflows/build-and-publish.yml:21, 78-84; RELEASING.md:19",
+          "holds": true,
+          "note": "subprocess_cli.py:255-260 calls _find_bundled_cli() first, and :341-354 looks for _bundled/claude (claude.exe on Windows). _find_cli runs only when cli_path is None (:802-803). The fallback at :262-339 is shutil.which, then fixed paths, then CLINotFoundError. _bundled/.gitignore:1-3 ignores claude and claude.exe, and the directory holds only .gitignore. build-and-publish.yml:21 and :78-84 list exactly the 5 targets. RELEASING.md:19 confirms the CLI-less sdist and the over-100-MiB fallback. The 'partial' rating is justified."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Optional citation fix (not needed to pass): readme.platforms.linux_x86_64 - change 'RELEASING.md:9-10' to 'RELEASING.md:11' (lines 9-10 are the table header and separator; the ubuntu-latest -> manylinux_2_17_x86_64 row is line 11), and add '.github/workflows/test.yml:91-93' as the citation for the non-Docker e2e job on ubuntu-latest.",
+        "Optional citation fix (not needed to pass): readme.platforms.macos_arm64 - change 'RELEASING.md:12' to 'RELEASING.md:13' (macos-latest -> macosx_11_0_arm64) and 'RELEASING.md:13' to 'RELEASING.md:14' (macos-15-intel -> macosx_11_0_x86_64); line 12 is the ubuntu-24.04-arm / manylinux_2_17_aarch64 row."
+      ]
+    }
+  ]
+}

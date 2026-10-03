@@ -1,0 +1,293 @@
+{
+  "contender": "openlit/openlit",
+  "revision": {
+    "contender": "openlit/openlit",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "openlit/openlit",
+        "tag": "openlit-2.1.0",
+        "commit": "9938c66638666ca5d3bcb850350faa82e510924b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "openlit-2.1.0",
+    "commit": "9938c66638666ca5d3bcb850350faa82e510924b",
+    "read_at": "2026-10-02T03:02:41+00:00"
+  },
+  "dossier": {
+    "contender": "openlit/openlit",
+    "revision": {
+      "tag": "openlit-2.1.0",
+      "commit": "9938c66638666ca5d3bcb850350faa82e510924b",
+      "read_at": "2026-10-02T03:02:41+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "OpenLIT is an Apache-2.0, self-hosted AI-observability platform in a monorepo; tag openlit-2.1.0 is the `src/**` server component only (.github/release-tools.json:75-88). The default stack (docker-compose.yml) is a ClickHouse container plus one `openlit` container running a Next.js UI/API, a Go OpAMP server and an OpAMP-supervised upstream otelcol-contrib v0.142.0 (OTLP gRPC :4317 / HTTP :4318 -> ClickHouse). Around it: Python/TypeScript/Go OTel SDKs, a Go `openlit` CLI that installs Claude Code/Cursor/Codex hook plugins and emits OTLP, an eBPF controller, and a GPU/host metrics collector. Facts for the six stated questions (no fit judgement): (1) The only OTLP ingress in the shipped stack is the collector embedded in the `openlit` container (assets/otel-collector-config.yaml:1-8); its processors are only batch/memory_limiter (:9-16,36-49), i.e. no redaction/filter processor; secret scrubbing and capture modes live in the CLI hook emitter (cli/internal/redact/redact.go, cli/internal/otlp/exporter.go) and apply only to hook-emitted spans. (2) Metrics land in ClickHouse otel_metrics_{gauge,sum,histogram,summary,exponential_histogram} (assets/clickhouse-init.sh:88-292). (3) Logs/events land in ClickHouse otel_logs (assets/clickhouse-init.sh:52-86). (4) The OpenLIT UI provides Telemetry Metrics/Logs explorers and SQL-widget dashboards over those tables (docs/latest/openlit/observability/telemetry/overview.mdx:17; docs/latest/openlit/dashboards/overview.mdx:12-13), but its Coding Agents views read only otel_traces (src/client/src/lib/platform/coding-agents/table-details.ts:9). (5) Traces are stored in ClickHouse otel_traces; OpenLIT has OpenGround (one prompt across hosted providers, saved history) and SDK eval_batch over caller-supplied lists; no stored dataset/experiment entity or fixed-workload replay was found. (6) OpenLIT is not a model server; it instruments Ollama/vLLM etc. (README.md:380) and monitors NVIDIA GPUs through a separate collector.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'Open-source observability & evaluation for AI agents' - trace, evaluate, debug and optimize AI applications and coding agents with OpenTelemetry.",
+          "citation": "README.md:5-7"
+        },
+        {
+          "claim": "Start OpenLIT with `git clone https://github.com/openlit/openlit.git`, `cd openlit`, `docker compose up -d`; UI at http://127.0.0.1:3000.",
+          "citation": "README.md:66-77"
+        },
+        {
+          "claim": "Send telemetry by setting OTEL_EXPORTER_OTLP_ENDPOINT (or openlit.init(otlp_endpoint=...)) to http://127.0.0.1:4318.",
+          "citation": "README.md:109-123"
+        },
+        {
+          "claim": "'Observe Claude Code, Cursor & Codex': OpenLIT gives an OpenTelemetry-native view of coding-agent sessions; install the CLI (curl|sh on macOS/Linux), `openlit configure --endpoint http://127.0.0.1:4318`, `openlit coding install --vendor=all|cursor|claude-code|codex`, `openlit doctor`.",
+          "citation": "README.md:129-173"
+        },
+        {
+          "claim": "OpenLIT can capture user prompt, LLM calls, tool calls (file reads/edits, shell, search), sub-agent activity, token usage, cost and code impact; sessions are explored in the Coding Agents dashboard.",
+          "citation": "README.md:175-195"
+        },
+        {
+          "claim": "OpenLIT is built around OpenTelemetry; telemetry can flow through an OpenTelemetry Collector to the OpenLIT backend and/or other OTel backends.",
+          "citation": "README.md:351-370"
+        },
+        {
+          "claim": "Typical deployment: application -> OpenTelemetry Collector -> ClickHouse -> OpenLIT Dashboard.",
+          "citation": "README.md:428-448"
+        },
+        {
+          "claim": "'Self-hosted by default' (Docker or Kubernetes): 'Your telemetry stays under your control.'",
+          "citation": "README.md:452-462"
+        },
+        {
+          "claim": "Automatically evaluate LLM and agent outputs with LLM-as-a-Judge (hallucination, bias, toxicity, safety, ...).",
+          "citation": "README.md:225-233"
+        },
+        {
+          "claim": "Prompt Hub: create, version and retrieve prompts from apps (`openlit.prompts.get`).",
+          "citation": "README.md:306-322"
+        },
+        {
+          "claim": "Rule Engine: runtime rules on trace attributes that control prompts, evaluations, contexts and runtime behaviour.",
+          "citation": "README.md:326-347"
+        },
+        {
+          "claim": "70+ integrations auto-instrumented with one line, including Ollama, vLLM, Anthropic, OpenAI and NVIDIA/AMD/Intel GPU monitoring.",
+          "citation": "README.md:374-396"
+        },
+        {
+          "claim": "OpenTelemetry-native SDKs for Python (`pip install openlit`), TypeScript (`npm install openlit`) and Go.",
+          "citation": "README.md:402-424"
+        },
+        {
+          "claim": "'OpenLIT is licensed under the Apache License 2.0.'",
+          "citation": "README.md:526-530"
+        }
+      ],
+      "install": [
+        {
+          "method": "Docker Compose (server stack: OpenLIT UI + embedded OTel collector + ClickHouse); requires Docker and Docker Compose",
+          "command": "git clone https://github.com/openlit/openlit.git && cd openlit && docker compose up -d",
+          "citation": "README.md:66-71 (prerequisites: docs/latest/openlit/installation.mdx:78-79)"
+        },
+        {
+          "method": "CLI installer (macOS/Linux; installs ~/.openlit/bin/openlit)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/openlit/openlit/main/cli/scripts/install.sh | sh",
+          "citation": "README.md:140"
+        },
+        {
+          "method": "CLI via Homebrew (macOS)",
+          "command": "brew install openlit/openlit/openlit",
+          "citation": "docs/latest/openlit/coding-agents/setup-and-configure.mdx:14"
+        },
+        {
+          "method": "Kubernetes (Helm chart, kept in separate repo openlit/helm; not read)",
+          "command": "helm repo add openlit https://openlit.github.io/helm/ && helm repo update && helm install openlit openlit/openlit",
+          "citation": "docs/latest/openlit/installation.mdx:46-54"
+        },
+        {
+          "method": "Python / TypeScript SDK",
+          "command": "pip install openlit  |  npm install openlit",
+          "citation": "README.md:84,90"
+        },
+        {
+          "method": "GPU metrics collector (Docker, NVIDIA)",
+          "command": "docker run --gpus all --pid=host -e OTEL_SERVICE_NAME=my-app -e OTEL_RESOURCE_ATTRIBUTES=\"deployment.environment=production\" -e OTEL_EXPORTER_OTLP_ENDPOINT=\"http://otel-collector:4317\" ghcr.io/openlit/otel-gpu-collector:latest",
+          "citation": "opentelemetry-gpu-collector/README.md:91-96"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CLI release matrix includes linux/amd64 (.github/workflows/release-cli.yml:42) and install.sh maps x86_64->amd64 (cli/scripts/install.sh:61-66); server image is built for linux/amd64 and linux/arm64/v8 (.github/workflows/release-openlit.yml:108); GPU collector ships linux-amd64 (opentelemetry-gpu-collector/README.md:128).",
+        "wsl2": "unknown - no WSL2 statement for the server, CLI or docs (repo searched). Only trace: the GPU collector's eBPF CUDA discovery lists /usr/lib/wsl/lib/libcuda.so (opentelemetry-gpu-collector/internal/ebpf/discover.go:135,151). Installer targets plain linux/darwin (cli/scripts/install.sh:54-59).",
+        "macos_arm64": "yes - CLI builds darwin/arm64 (.github/workflows/release-cli.yml:45), installer supports darwin + arm64 (cli/scripts/install.sh:54-66), Homebrew documented (docs/latest/openlit/coding-agents/setup-and-configure.mdx:14); server runs as a Docker image that has a linux/arm64/v8 variant (.github/workflows/release-openlit.yml:108). On macOS the GPU collector exports host/process metrics only (opentelemetry-gpu-collector/README.md:42-52); the eBPF controller is Linux-only (openlit-controller/DESIGN.md:42).",
+        "gpu": "yes, monitoring only (not inference) - the separate opentelemetry-gpu-collector reads NVIDIA GPUs via NVML on Linux and Windows (opentelemetry-gpu-collector/README.md:29,46,272) and needs the NVIDIA Container Toolkit under Docker (docs/latest/gpu-collector/quickstart.mdx:49). No RTX 4090/GeForce-specific statement found (repo searched). The OpenLIT server itself uses no GPU."
+      },
+      "integrations": {
+        "cli": "Yes - Go `openlit` CLI (cobra): `coding {hook,install,uninstall,launch}`, `configure`, `doctor`, `version` (cli/cmd/openlit/main.go:74-78; cli/internal/coding/cmd.go:5-8,46-49; cli/internal/configure/configure.go:50-55). The Python SDK also installs an `openlit-instrument` script (sdk/python/pyproject.toml:50-51).",
+        "mcp": "none found - no OpenLIT-provided MCP server in the repo (searched); OpenLIT only instruments MCP servers/clients inside applications (docs/latest/sdk/integrations/mcp.mdx:3,9).",
+        "sdk_or_api": "SDKs: Python `openlit` 1.45.0 (sdk/python/pyproject.toml:2-3), TypeScript `openlit` 1.15.0 (sdk/typescript/package.json:2-3), Go module github.com/openlit/openlit/sdk/go (sdk/go/go.mod:1). HTTP API: OpenAPI 3.0.3 spec at src/client/public/openapi.yaml; every documented endpoint needs an `Authorization: Bearer openlit-...` API key (:6,31-33) and covers telemetry logs/metrics/traces query, Ask Otter, Prompt Hub, Vault, Rule Engine evaluate, evaluation and controller poll (:38-56). OTLP ingest on :4317 gRPC / :4318 HTTP (assets/otel-collector-config.yaml:3-8).",
+        "claude_code_or_codex": "Yes, hook-based. Claude Code: plugin `openlit-cc` (.claude-plugin/marketplace.json:8-14) with hooks SessionStart/UserPromptSubmit/PreToolUse/PostToolUse/Stop/SubagentStop/SessionEnd (cli/internal/coding/install/marketplace/plugins/claude-code/hooks/hooks.json:3-81), registered via `claude plugin marketplace add` + `claude plugin install openlit-cc@openlit --scope user` (cli/internal/coding/install/install_patch.go:73,81). Claude Code's own native OTel exporter (CLAUDE_CODE_ENABLE_TELEMETRY, OTEL_*_EXPORTER=otlp, OTEL_EXPORTER_OTLP_*) is documented only as an optional manual second path (docs/latest/openlit/coding-agents/setup-and-configure.mdx:51-63). Codex: plugin `openlit@openlit` via `codex plugin marketplace add` + `codex plugin add openlit@openlit` (install_patch.go:150,168) with hooks SessionStart/UserPromptSubmit/PreToolUse/PostToolUse/Stop (cli/internal/coding/install/marketplace/plugins/codex/plugins/openlit/hooks/hooks.json:3-60); needs the `codex_hooks` feature and a one-time `/hooks` trust review (setup-and-configure.mdx:93-103; cli/internal/coding/install/install.go:88-94). No Codex native-OTel configuration is documented or handled anywhere in the repo."
+      },
+      "telemetry_and_network": "Server: anonymous product telemetry is ON by default and goes to PostHog (https://us.i.posthog.com): browser events (posthog-js, autocapture off), server events and a daily install snapshot; docker-compose.yml sets TELEMETRY_ENABLED: \"true\"; opt-out only via TELEMETRY_ENABLED=false (no UI toggle) (docker-compose.yml:29; src/client/src/lib/posthog.ts:22-27; src/client/src/constants/posthog.ts:3; src/client/src/components/(playground)/posthog.tsx:10-30; src/client/src/instrumentation.ts:68-79; docs/latest/openlit/developer-resources/anonymous-telemetry.mdx:10-20,33-45). Other outbound calls: pricing JSON from raw.githubusercontent.com (src/client/src/helpers/server/openlit.ts:114-132; SDK default in sdk/python/src/openlit/__helpers.py:476-482; the CLI disables the SDK pricing fetch, cli/internal/otlp/exporter.go:492-495); LLM-as-judge evaluations, Chat and OpenGround call hosted provider APIs with Vault keys only when configured (src/client/src/lib/platform/evaluation/run-evaluation.ts:68-113). Accounts/services: no cloud account required; local NextAuth login with a seeded user user@openlit.io (src/client/prisma/seed.js:14-27) and optional Google/GitHub OAuth (docker-compose.yml:40-43); ClickHouse is required (docker-compose.yml:2-23); image build downloads otelcol-contrib/opampsupervisor from github.com (src/Dockerfile:55-88). CLI: talks only to the configured OTLP endpoint (default http://127.0.0.1:4318, cli/internal/config/config.go:84; non-local http is upgraded to https, :266-273; docs/latest/openlit/coding-agents/overview.mdx:9-10); no other outbound HTTP found in cli/ (searched); `doctor` only TCP-dials the endpoint (cli/internal/doctor/doctor.go:84-96). The CLI reads local identity (~/.claude.json email, ~/.codex/auth.json id_token email claim, git user.email) and stamps email, hostname, cwd, repo URL and branch on spans (cli/internal/coding/identity/identity.go:68-119; cli/internal/otlp/exporter.go:413-423; agent-guides/coding-agents-convention.md:29-52); default content capture is `full` (cli/internal/config/config.go:44-59,94)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (Next.js 14 app in src/client; TypeScript SDK)",
+        "Go 1.25 (CLI, OpAMP server, controller, GPU collector, Go SDK)",
+        "Python >=3.10 (Python SDK)",
+        "C (eBPF: openlit-controller/internal/scanner/bpf/llm_scanner.bpf.c, opentelemetry-gpu-collector/internal/ebpf/bpf/gpuevent.c)",
+        "SQL / YAML / shell (ClickHouse DDL, collector config, installers, entrypoint)"
+      ],
+      "entry_points": [
+        {
+          "path": "docker-compose.yml",
+          "what": "Default deployment: `clickhouse` + `openlit` services; openlit publishes UI :3000 and OTLP :4317/:4318 (docker-compose.yml:2-66)."
+        },
+        {
+          "path": "src/client/scripts/entrypoint.sh",
+          "what": "Container CMD (src/Dockerfile:159): prisma migrate + seed, cron, OpAMP cert generation, then starts opamp-server, opampsupervisor (-> otelcol-contrib) and `node server.js` (:71-178)."
+        },
+        {
+          "path": "cli/cmd/openlit/main.go",
+          "what": "`openlit` CLI root: coding, configure, doctor, version (:74-78)."
+        },
+        {
+          "path": "src/opamp-server/main.go",
+          "what": "Go OpAMP server (:14-30); HTTP API for agents/config registered in src/opamp-server/server/ui.go:37-45."
+        },
+        {
+          "path": "sdk/python/src/openlit/__init__.py",
+          "what": "Python SDK init() (:185), eval()/eval_batch() (:677,713); `openlit-instrument` script -> openlit.cli.main:run (sdk/python/pyproject.toml:50-51)."
+        },
+        {
+          "path": "sdk/typescript/src/index.ts",
+          "what": "TypeScript SDK entry (package.json main dist/index.js plus ./register export, sdk/typescript/package.json:25-36)."
+        },
+        {
+          "path": "openlit-controller/cmd/controller/main.go",
+          "what": "eBPF discovery/instrumentation controller that polls the OpenLIT backend (openlit-controller/DESIGN.md:11-24)."
+        },
+        {
+          "path": "opentelemetry-gpu-collector/cmd/collector/main.go",
+          "what": "GPU + host metrics collector binary (built at .github/workflows/release-gpu-collector.yml:139)."
+        }
+      ],
+      "architecture": "Monorepo with independently released components (.github/release-tools.json:1-89). Server (`src/`, tag openlit-2.1.0): src/Dockerfile builds ONE image containing (a) a Next.js 14 standalone app (src/client: pages src/client/src/app/**, API routes src/client/src/app/api/**, ClickHouse access via @clickhouse/client, SQLite+Prisma metadata in src/client/prisma/schema.prisma), (b) a Go OpAMP server (src/opamp-server/{main.go,server/,certman/,config/}; :4320 OpAMP over TLS, :8080 internal HTTP API for agent list/config) and (c) the OpAMP supervisor launching upstream otelcol-contrib v0.142.0 with assets/otel-collector-config.yaml (OTLP gRPC 4317 / HTTP 4318 -> batch [+memory_limiter for traces/metrics] -> clickhouse exporter, 730h TTL). ClickHouse tables are created by assets/clickhouse-init.sh (otel_traces, otel_logs, five otel_metrics_* tables, openlit_controller_*). UI modules: src/client/src/lib/telemetry-source.ts + lib/platform/connectors/datasource/{clickhouse,grafana (Tempo/Loki),jaeger,prometheus} (per-signal source routing; built-in source is ClickHouse), lib/platform/coding-agents/queries.ts (SQL over otel_traces only), lib/platform/{evaluation,openground,chat,agents,controller,pricing}, Telemetry explorers (app/(playground)/telemetry, app/api/telemetry/*), dashboards (app/api/manage-dashboard/*), Fleet Hub editing the collector's remote config through OpAMP (src/client/src/lib/platform/fleet-hub/index.ts:51-66). CLI (`cli/`): cmd/openlit -> internal/coding/{hook,install,uninstall,launch,identity,git,detect,classify,pricing,sessionstate,tailfile,normalize}; per-vendor adapters hook/{claudecode,codex,cursor} normalize hook JSON (and tail transcripts) into coding_agent.*/gen_ai.* spans; internal/otlp is an sdk/go-based OTLP/HTTP trace+metric emitter with deterministic per-session trace IDs; internal/redact does tier-1/tier-2 regex scrubbing; plugin manifests are embedded from cli/internal/coding/install/marketplace (mirrored from .claude-plugin/ + plugins/ by cli/scripts/sync-plugins.sh). Also sdk/{python,typescript,go} (OTel auto-instrumentation), openlit-controller (Linux eBPF/OBI discovery and instrumentation), opentelemetry-gpu-collector (NVML/sysfs/eBPF-CUDA metrics -> OTLP), docs/ (Mintlify), agent-guides/.",
+      "packaging_and_release": "Releases are admin-triggered through `Release / Packages` (workflow_dispatch on main, repo-admin only) and create per-component tags py-, ts-, go-, cli-, controller-, otel-gpu-collector-, openlit- (.github/workflows/release-packages.yml:3-57; .github/RELEASING.md:3-26). Server (`openlit-X.Y.Z`): multi-arch image ghcr.io/openlit/openlit built from src/Dockerfile (linux/amd64, linux/arm64/v8), signed with `cosign sign --yes` (cosign v2.2.2, `id-token: write`), `provenance: false` (no BuildKit provenance), no SBOM step found (.github/workflows/release-openlit.yml:44,68-70,98-125). CLI (`cli-X.Y.Z`): CGO-free binaries for linux/darwin/windows x amd64/arm64 as .tar.gz/.zip, each with a `.sha256` sidecar, attached to the GitHub Release; install.sh verifies the sidecar but only warns if it is missing; the openlit-cli image is pushed without signing; Homebrew tap bump afterwards (.github/workflows/release-cli.yml:41-47,93-107,129,168-186; release-packages.yml:458-479; cli/scripts/install.sh:93-114). Controller and GPU collector: binaries + SHA256SUMS.txt and cosign-signed multi-arch images (.github/workflows/release-controller.yml:147-157,234-241; release-gpu-collector.yml:172-182,267-274). PyPI via pypa/gh-action-pypi-publish with an API token (release-python.yml:72-78); npm via `npm publish --provenance` (release-typescript.yml:71-74). Docker/cosign actions are pinned to commit SHAs (release-openlit.yml:68,79,82,91,100); actions/checkout etc. use version tags.",
+      "tests_and_ci": "About 519 test files: src/client 337 Jest files (`*.test.ts(x)` under src/client/src/__tests__/), GPU collector 50 Go, Python SDK 44 (sdk/python/tests/test_*.py), TypeScript SDK 44 Jest (sdk/typescript/src/**/__tests__/), controller 20 Go, CLI 18 Go, Go SDK 5, opamp-server 1 (src/opamp-server/server/logger_test.go). Workflows in .github/workflows: ci-openlit.yml (npm ci, prisma generate, tsc typecheck, next lint, Jest with an 80% coverage gate, plus a container build via src/dev-docker-compose.yml; triggers only on src/client/**), ci-cli.yml (go build, `go test -race -count=1 ./...`, windows/darwin cross-compile, embedded plugin-tree drift check), ci-go.yml (sdk/go build+test), ci-typescript.yml (lint, tsc build, Jest on Node 20), ci-python.yml (pylint + `poetry check/build`; the pytest job is commented out because tests need live credentials), ci-controller.yml (eBPF toolchain, `go test -race`, golangci-lint@latest), ci-gpu-collector.yml (go test on amd64+arm64, multi-OS cross-compiles), ci-pricing.yml (jq schema checks of assets/pricing.json), ci-automation.yml (release-engine unit tests + actionlint), security-oss-boundary.yml (CE/enterprise path guard); admin-*.yml handle PR summaries/management and dispatch to the private openlit-enterprise repo. No workflow runs go test for src/opamp-server.",
+      "dependencies": "Direct dependency counts: src/client/package.json 79 dependencies + 21 devDependencies (lines 16-119; Next 14, React 18, Prisma 5 on SQLite, @clickhouse/client, next-auth, Vercel AI SDK + provider SDKs, posthog-js, 8 @openplait/* packages pinned 1.0.0); sdk/python/pyproject.toml 28 packages (27 required + 1 optional extra) plus python ^3.10 (lines 16-48); sdk/typescript/package.json 13 dependencies, 17 devDependencies, 7 optional peer dependencies (lines 59-91,104-135); cli/go.mod 7 direct (+20 indirect); sdk/go/go.mod 7 (+16); src/opamp-server/go.mod 6 (+9); openlit-controller/go.mod 3 (+2); opentelemetry-gpu-collector/go.mod 18 (+27). Pinned external artifacts: otelcol-contrib v0.142.0 and opampsupervisor v0.142.0 (src/Dockerfile:44-46), clickhouse/clickhouse-server:24.4.1 (docker-compose.yml:3), node/golang/alpine base images pinned by digest (src/Dockerfile:2,27,40,93); lockfile src/client/package-lock.json.",
+      "security_policy": "SECURITY.md - report privately via GitHub private vulnerability reporting or developers@openlit.io (subject 'OpenLIT security report'); fixes only for current releases of maintained components (SECURITY.md:5-17)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:66-71,109-113,434-448: `docker compose up -d` brings up OpenLIT with an OTLP endpoint on :4318 (collector -> ClickHouse -> dashboard).",
+        "verified": "yes",
+        "evidence": "docker-compose.yml:25-66 runs ghcr.io/openlit/openlit with 4317/4318 published, plus ClickHouse 24.4.1 (:2-23). The image bundles upstream otelcol-contrib + opampsupervisor (src/Dockerfile:44-46,134-141), started by src/client/scripts/entrypoint.sh:157-178 with assets/otel-collector-config.yaml (OTLP gRPC 4317/HTTP 4318 -> clickhouse exporter, :1-8,18-49). The collector is embedded in the `openlit` container, not a separate service."
+      },
+      {
+        "claim": "README.md:129-133: OpenLIT gives an OpenTelemetry-native view of Claude Code and Codex sessions.",
+        "verified": "partial",
+        "evidence": "Code differs from the README framing: the CLI installs hook plugins and emits its own OTLP/HTTP spans plus four counters via sdk/go (cli/internal/otlp/exporter.go:480-514; cli/internal/otlp/metrics.go:5-16; sdk/go/openlit.go:214-267); `openlit coding install` never enables the vendors' native telemetry (cli/internal/coding/install/install_vendors.go:46-114; CLAUDE_CODE_ENABLE_TELEMETRY appears only in comments under cli/). Claude Code native OTel is an optional manual path (docs/latest/openlit/coding-agents/setup-and-configure.mdx:51-63); Codex has no native-OTel path, only hooks (setup-and-configure.mdx:81-103)."
+      },
+      {
+        "claim": "docs/latest/openlit/coding-agents/privacy-and-governance.mdx:22-25: two redaction tiers run on every export, regardless of capture mode.",
+        "verified": "partial",
+        "evidence": "Implemented client-side in the CLI: tier 1 always, tier 2 only in `full` (cli/internal/redact/redact.go:4-16,105-126,147-154) applied through the emitter's `scrub` (cli/internal/otlp/exporter.go:358-361,403,522). Not in the collector: the shipped pipeline has only batch/memory_limiter (assets/otel-collector-config.yaml:9-16,36-49) and the convention says 'The collector does not redact post-hoc' (agent-guides/coding-agents-convention.md:393). Native vendor OTLP is therefore unscrubbed, and identity/host/terminal resource attributes are set directly via ExtraResourceAttributes (exporter.go:413-423,513), not through `scrub`. Default capture mode is `full` (cli/internal/config/config.go:94)."
+      },
+      {
+        "claim": "agent-guides/coding-agents-convention.md:384: native `claude_code.api_request_body` / `api_response_body` bodies are dropped in minimal/metadata_only modes by a query-layer WHERE filter.",
+        "verified": "no",
+        "evidence": "The strings `api_request_body`, `api_response_body` and `OTEL_LOG_RAW_API_BODIES` occur only on that documentation line; a repo-wide search found no query, collector or CLI code implementing the filter."
+      },
+      {
+        "claim": "agent-guides/coding-agents-convention.md:244-245,282-303: native claude_code.cost.usage / token.usage metrics and claude_code.* events are mapped and coalesced at query time with the hook data.",
+        "verified": "no",
+        "evidence": "All coding-agent SQL reads only otel_traces (src/client/src/lib/platform/coding-agents/table-details.ts:9; queries.ts:812,1139,1222,1432; src/client/src/lib/platform/agents/materialize.ts:782). Native handling is limited to span/resource attributes `session.id`, `user.email` and `service.name='claude-code'` (queries.ts:208-216,296-335; materialize.ts:791-794). No code reads claude_code.cost.usage, claude_code.token.usage or claude_code.api_request from otel_metrics_* / otel_logs; those rows are stored (assets/clickhouse-init.sh:52-292) and visible only through the generic Telemetry Metrics/Logs explorers (docs/latest/openlit/observability/telemetry/metrics.mdx, logs.mdx:8)."
+      },
+      {
+        "claim": "docs/latest/openlit/coding-agents/setup-and-configure.mdx:53-58: Claude Code's native exporter can be pointed at the OpenLIT collector with OTEL_EXPORTER_OTLP_PROTOCOL=grpc and OTEL_EXPORTER_OTLP_ENDPOINT=$OPENLIT_OTLP_ENDPOINT.",
+        "verified": "partial",
+        "evidence": "The collector accepts gRPC :4317 and HTTP :4318 for logs, metrics and traces (assets/otel-collector-config.yaml:3-8,36-49), but the same page defines OPENLIT_OTLP_ENDPOINT as the OTLP/HTTP endpoint (setup-and-configure.mdx:132; default http://localhost:4318, overview.mdx:39), so protocol=grpc against :4318 would mismatch; gRPC is on :4317."
+      },
+      {
+        "claim": "docs/latest/openlit/coding-agents/privacy-and-governance.mdx:39: the CLI 'authenticates to your collector with an org-scoped API key'.",
+        "verified": "partial",
+        "evidence": "The CLI sends `Authorization: Bearer <key>` (cli/internal/config/config.go:499-511; cli/internal/configure/configure.go:51), but the shipped collector config defines no auth extension on its OTLP receivers (assets/otel-collector-config.yaml:1-8) and compose publishes 4317/4318 (docker-compose.yml:59-60). API-key checks exist for the UI/API (src/client/src/app/api/auth/verify-key/route.ts:4-33; src/client/public/openapi.yaml:31-33), not at OTLP ingest, so keys are not validated at ingest by default; the doc itself suggests fronting the endpoint with a validating collector (privacy-and-governance.mdx:39)."
+      },
+      {
+        "claim": "README.md:452-456: self-hosted by default; 'Your telemetry stays under your control.'",
+        "verified": "partial",
+        "evidence": "Data stays in your ClickHouse, but compose enables anonymous product telemetry to PostHog by default (docker-compose.yml:29; src/client/src/lib/posthog.ts:22-27; src/client/src/constants/posthog.ts:3) and SDKs fetch pricing from GitHub unless configured (sdk/python/src/openlit/__helpers.py:476-482). Opt-out is TELEMETRY_ENABLED=false (docs/latest/openlit/developer-resources/anonymous-telemetry.mdx:17-20); the README does not mention it."
+      },
+      {
+        "claim": "docs/latest/openlit/prompts-experiments/openground/overview.mdx:44 and run-a-comparison.mdx:40: OpenGround ships 14 built-in providers and has no custom endpoint/base-URL field.",
+        "verified": "partial",
+        "evidence": "No custom base URL is confirmed: provider factories hard-code hosted base URLs and only Azure reads AZURE_OPENAI_ENDPOINT (src/client/src/lib/platform/openground/ai-sdk-adapter.ts:32-81); evaluations support 11 hosted providers (src/client/src/lib/platform/evaluation/run-evaluation.ts:68-113) and Chat the same hosted set (src/client/src/lib/platform/chat/stream.ts:23-43). The code lists 15 OpenGround providers incl. minimax (ai-sdk-adapter.ts:83-87) versus 14 in the docs."
+      },
+      {
+        "claim": "README.md:225-241,466-485: LLM-as-a-judge evaluation inside a continuous trace -> evaluate -> analyze -> optimize -> manage loop.",
+        "verified": "partial",
+        "evidence": "Traces are stored in ClickHouse otel_traces (assets/clickhouse-init.sh:13-50) and LLM-as-judge evals exist (src/client/src/lib/platform/evaluation/run-evaluation.ts). SDK eval_batch takes a caller-supplied in-memory dataset (sdk/python/src/openlit/__init__.py:713; docs/latest/sdk/features/evaluations.mdx:215-291). No stored dataset/experiment entity or fixed-workload replay was found: `dataset` is a commented-out rule-entity type (src/client/src/types/rule-engine.ts:19-25), the Prisma schema has no dataset/experiment model (src/client/prisma/schema.prisma:11-376), and OpenGround runs one prompt across hosted providers (docs/latest/openlit/prompts-experiments/openground/overview.mdx:6)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Privacy filtering is not in the collector: the shipped OTLP collector has no redaction/filter/transform processor (assets/otel-collector-config.yaml:9-16,36-49). Scrubbing and capture modes exist only in the CLI hook emitter (cli/internal/redact/redact.go; cli/internal/otlp/exporter.go:403,522), so native Claude Code OTLP is not covered, and the documented query-time gating of native bodies is not implemented (agent-guides/coding-agents-convention.md:384,393). Default capture is `full` (cli/internal/config/config.go:94) and email/hostname/cwd/repo URL are stamped on spans (cli/internal/otlp/exporter.go:413-423). A processor can be added by editing the bind-mounted config (docker-compose.yml:66) or via Fleet Hub remote config (src/opamp-server/server/ui.go:40,103-227).",
+      "Native-signal coverage is thin: Coding Agents views read only otel_traces (src/client/src/lib/platform/coding-agents/table-details.ts:9), so native Claude Code metrics/log events are stored but unused by those views; Codex has only the hook path, which needs the `codex_hooks` feature and a manual `/hooks` trust step (docs/latest/openlit/coding-agents/setup-and-configure.mdx:93-103; cli/internal/coding/install/install.go:88-94). The hook emitter has no disk retry queue (spans are dropped if the collector is down) and a 5 s hard timeout (cli/internal/otlp/exporter.go:12-17; cli/internal/coding/hook/hook.go:44-46).",
+      "Insecure defaults in docker-compose.yml: ClickHouse 9000/8123 and OTLP 4317/4318 are published on all host interfaces (:14-16,59-60), the ClickHouse password defaults to `OPENLIT` (:6), OTLP has no auth in the shipped config, the image tag is unpinned `latest` (:26), and every start seeds user@openlit.io with a documented password (src/client/scripts/entrypoint.sh:74-75; src/client/prisma/seed.js:14-27; src/client/README.md:77-78).",
+      "Phone-home is default-on: PostHog analytics (browser, server events, daily install snapshot) is enabled by compose with no UI toggle (docker-compose.yml:29; docs/latest/openlit/developer-resources/anonymous-telemetry.mdx:10,20,33-45); the UI and SDKs also fetch pricing JSON from raw.githubusercontent.com (src/client/src/helpers/server/openlit.ts:114-132; sdk/python/src/openlit/__helpers.py:476-482).",
+      "No local model serving and no stored dataset/replay: OpenLIT is not a model server (it instruments Ollama/vLLM, README.md:380); its evaluations, Chat and OpenGround reach only hosted providers with fixed base URLs and no custom-endpoint field (docs/latest/openlit/prompts-experiments/openground/run-a-comparison.mdx:40; src/client/src/lib/platform/openground/ai-sdk-adapter.ts:32-81; src/client/src/lib/platform/evaluation/run-evaluation.ts:68-113); no dataset/experiment entity or fixed-workload replay (src/client/src/types/rule-engine.ts:19-25). GPU collector docs cover NVIDIA via NVML but name no RTX 4090/GeForce model (opentelemetry-gpu-collector/README.md:29,272).",
+      "Release/supply-chain hygiene: CLI binaries ship only `.sha256` sidecars and install.sh continues with a warning if the checksum cannot be fetched (cli/scripts/install.sh:99-114); the documented install is `curl | sh` (README.md:140); CLI binaries/image are neither signed nor attested (.github/workflows/release-cli.yml:93-135,168-186) and the server image sets `provenance: false` (release-openlit.yml:103) though it is cosign-signed (:118-125); src/Dockerfile downloads otelcol-contrib/opampsupervisor without checksum verification (src/Dockerfile:55-88); a prebuilt Mach-O (macOS) Go executable is present in the tree at src/opamp-server/opamp-server (file header read) although the Dockerfile rebuilds from source (src/Dockerfile:36).",
+      "Maintenance scope and doc/code drift: Dependabot covers only GitHub Actions, src/client npm and sdk/python pip (.github/dependabot.yml:1-18), not the Go modules, sdk/typescript or Docker images; Python SDK pytest is disabled in CI (ci-python.yml:75-95); no workflow tests src/opamp-server; controller lint runs golangci-lint@latest (ci-controller.yml:55). Docs and code diverge (native body gating, gRPC vs HTTP endpoint in the Claude Code example, 14 vs 15 OpenGround providers, a single-container `docker run` of the OpenLIT image in docs/latest/gpu-collector/quickstart.mdx:18-23 versus required ClickHouse in docs/latest/openlit/configuration.mdx:28-35). No published benchmarks or overhead measurements exist; only informal statements (src/client/src/lib/platform/coding-agents/queries.ts:257-262; agent-guides/coding-agents-convention.md:344-345).",
+      "Open-core and versioning scope: enterprise features (RBAC, audit log, billing) live in a private `openlit-enterprise` repo synced from this one (AGENTS.md:5-11; .github/workflows/admin-enterprise-sync.yml:18-34), while the docs say every documented feature is free to self-host (docs/latest/openlit/installation.mdx:84-86). Components are versioned independently (.github/release-tools.json:1-89): tag openlit-2.1.0 covers only `src/**`, and install.sh installs the latest `cli-*` release rather than this commit (cli/scripts/install.sh:74-77). The TypeScript SDK package.json declares `ISC` while its LICENSE file is Apache-2.0 (sdk/typescript/package.json:58; sdk/typescript/LICENSE:1-3)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "openlit/openlit",
+      "checks": [
+        {
+          "field": "readme.install[0] (Docker Compose server stack)",
+          "statement": "Docker Compose (server stack: OpenLIT UI + embedded OTel collector + ClickHouse); requires Docker and Docker Compose — `git clone https://github.com/openlit/openlit.git && cd openlit && docker compose up -d`",
+          "citation": "README.md:66-71 (prerequisites: docs/latest/openlit/installation.mdx:78-79)",
+          "holds": true,
+          "note": "README.md:67-70 contains exactly these commands; installation.mdx:78-79 answers 'What do I need to self-host OpenLIT?' with 'Just Docker and Docker Compose for the quickest path'. Stack composition confirmed: docker-compose.yml:2-23 (clickhouse/clickhouse-server:24.4.1) + :25-73 (openlit; ports 3000/4317/4318 at :58-60; collector config bind-mounted at :66). The image bundles otelcol-contrib + opampsupervisor v0.142.0 (src/Dockerfile:44-45,140-141), launched by src/client/scripts/entrypoint.sh:135-138,157-165 with /etc/otel/otel-collector-config.yaml next to `node server.js` (:178), so the collector really is embedded (this also confirms claim_checks[0]). Caveats, not errors: compose pulls ghcr.io/openlit/openlit:latest (:26) instead of building the checkout, so it runs the newest published server image, not necessarily 2.1.0. The env_file `required: false` key (:54-56) needs a fairly recent Compose v2 (≥2.24 from memory; the repo states no minimum)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0, file: LICENSE",
+          "citation": "LICENSE (also README.md:526-530)",
+          "holds": true,
+          "note": "LICENSE:1-3 is the standard Apache License 2.0 text (appendix filled 'Copyright [2026] [Aman Agarwal]', :189). README.md:528 says 'OpenLIT is licensed under the Apache License 2.0.' release-openlit.yml:113 annotates the server image io.artifacthub.package.license=Apache-2.0. The only other license files are sdk/python/LICENSE and sdk/typescript/LICENSE, both Apache 2.0. Nuance: the two eBPF programs declare SEC(\"license\") = \"Dual MIT/GPL\" (openlit-controller/internal/scanner/bpf/llm_scanner.bpf.c:6; opentelemetry-gpu-collector/internal/ebpf/bpf/gpuevent.c:18), and the generated vmlinux.h is LGPL-2.1 OR BSD-2-Clause. These are kernel-loader declarations in non-server components and don't contradict the project license."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CLI release matrix includes linux/amd64; install.sh maps x86_64->amd64; server image is built for linux/amd64 and linux/arm64/v8; GPU collector ships linux-amd64",
+          "citation": ".github/workflows/release-cli.yml:42; cli/scripts/install.sh:61-66; .github/workflows/release-openlit.yml:108; opentelemetry-gpu-collector/README.md:128",
+          "holds": true,
+          "note": "release-cli.yml:42 `{ os: linux, arch: amd64, ext: \"\" }`. install.sh:63 `x86_64|amd64) arch=amd64 ;;` (Linux accepted at :57). release-openlit.yml:108 `platforms: linux/amd64,linux/arm64/v8`, built from ./src/Dockerfile (:102-104). GPU collector README:128 'Pick the asset matching your platform: linux-amd64 or linux-arm64.' Consistent with src/Dockerfile defaulting TARGETARCH=amd64 (:46,99) and downloading linux_${TARGETARCH} otelcol-contrib (:59)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Yes, hook-based. Claude Code: plugin openlit-cc with SessionStart/UserPromptSubmit/PreToolUse/PostToolUse/Stop/SubagentStop/SessionEnd hooks, registered via `claude plugin marketplace add` + `claude plugin install openlit-cc@openlit --scope user`; native OTel exporter documented only as an optional manual second path. Codex: plugin openlit@openlit via `codex plugin marketplace add` + `codex plugin add openlit@openlit`, hooks SessionStart/UserPromptSubmit/PreToolUse/PostToolUse/Stop; needs codex_hooks + one-time /hooks trust; no Codex native-OTel config in the repo.",
+          "citation": ".claude-plugin/marketplace.json:8-14; cli/internal/coding/install/marketplace/plugins/claude-code/hooks/hooks.json:3-81; cli/internal/coding/install/install_patch.go:73,81,150,168; docs/latest/openlit/coding-agents/setup-and-configure.mdx:51-63,93-103; cli/internal/coding/install/marketplace/plugins/codex/plugins/openlit/hooks/hooks.json:3-60; cli/internal/coding/install/install.go:88-94",
+          "holds": true,
+          "note": "Every cited line matches. marketplace.json:9 name 'openlit-cc' (same in the CLI-embedded copy). CC hooks.json:3-81 lists exactly the 7 events. install_patch.go:73 `plugin marketplace add`, :81 `plugin install openlit-cc@openlit --scope user`, :150 `codex plugin marketplace add`, :168 `codex plugin add openlit@openlit`. Codex hooks.json:3-60 lists the 5 events. install.go:88-94 prints the `/hooks` trust step. mdx:51-63 labels CLAUDE_CODE_ENABLE_TELEMETRY + OTEL_* 'Optional', the only user-docs mention of that variable. Minor precision: mdx:93-103 makes codex_hooks conditional ('If `codex features list` doesn't already enable `codex_hooks`…'; older builds use hooks/plugin_hooks). Searches for Codex native OTel config (a `[otel]` table, otlp-http/otlp-grpc exporter keys, codex near otel/otlp in docs, cli, agent-guides and plugins) found nothing. The only `[otel]` hits are JS array literals in sdk/typescript tests."
+        },
+        {
+          "field": "claim_checks[2] (privacy-and-governance.mdx:22-25 redaction tiers, graded 'partial')",
+          "statement": "Two redaction tiers run on every export regardless of capture mode — partial: implemented client-side in the CLI only (tier 1 always, tier 2 only in `full`) via the emitter's scrub; collector has only batch/memory_limiter and does not redact post-hoc; native vendor OTLP is unscrubbed; identity/host/terminal resource attributes bypass scrub via ExtraResourceAttributes; default capture mode is `full`.",
+          "citation": "cli/internal/redact/redact.go:4-16,105-126,147-154; cli/internal/otlp/exporter.go:358-361,403,413-423,513,522; assets/otel-collector-config.yaml:9-16,36-49; agent-guides/coding-agents-convention.md:393; cli/internal/config/config.go:94",
+          "holds": true,
+          "note": "Doc lines 22-25 say exactly what is quoted. redact.go:4-16 documents tier 1 always-on and tier 2 only when ContentCapture == \"full\"; tier2Patterns :105-112, String() :114-126, ForCapture() :147-154 (anything but 'full' gets tier 1 only). exporter.go:357-361 defines scrub; :403/:522 set it from redact.ForCapture; cli/internal/otlp/attrs.go setters (e.g. :117-218) pass every string span attribute through it. exporter.go:413-423 put gen_ai.user.name, host.name and terminal.type into `extra`, which goes unscrubbed as ExtraResourceAttributes (:513). The collector config has only batch + memory_limiter (:9-16; pipelines :36-49). convention.md:393: 'The collector does not redact post-hoc; the adapter MUST gate at emit time.' config.go:94 `CodingContentCapture: \"full\"`. 'Partial' is the correct grade: the doc's 'every export' is true only for hook-emitted spans."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

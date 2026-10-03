@@ -1,0 +1,309 @@
+{
+  "contender": "getzep/graphiti",
+  "revision": {
+    "contender": "getzep/graphiti",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "getzep/graphiti",
+        "tag": "v0.30.2",
+        "commit": "eaa4128681bc53487138a4bbc22d58336ebe70d2",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.30.2",
+    "commit": "eaa4128681bc53487138a4bbc22d58336ebe70d2",
+    "read_at": "2026-10-02T03:02:08+00:00"
+  },
+  "dossier": {
+    "contender": "getzep/graphiti",
+    "revision": {
+      "tag": "v0.30.2",
+      "commit": "eaa4128681bc53487138a4bbc22d58336ebe70d2",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Graphiti (PyPI package graphiti-core, by Zep/getzep) is a Python framework that ingests 'episodes' (text, chat messages, JSON) through LLM-driven entity and fact extraction into a graph database (Neo4j, FalkorDB, Amazon Neptune; Kuzu deprecated) and maintains a bi-temporal 'context graph': entities with summaries, facts (edges) with valid_at/invalid_at/expired_at, provenance links back to source episodes, optional communities and ordered 'sagas', queried with hybrid BM25 + embedding + graph-traversal search (README.md:37-39, 119-128). The repo also ships an experimental MCP server (mcp_server/, 13 tools; stdio, streamable HTTP; mcp_server/README.md:10) and an unauthenticated FastAPI REST service (server/). It is a library plus services, not a standalone binary: a working memory service needs a graph-database process, the MCP or REST process, and an LLM + embedding provider API (default OpenAI). No Claude Code or Codex integration is shipped.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Graphiti is a framework for building and querying temporal context graphs for AI agents; facts track change over time, keep provenance to source data, and support prescribed and learned ontology.",
+          "citation": "README.md:37-39"
+        },
+        {
+          "claim": "Facts have validity windows; when information changes, old facts are invalidated — not deleted; you can query what is true now or at any point in time.",
+          "citation": "README.md:119-120"
+        },
+        {
+          "claim": "Every entity and relationship traces back to the episodes (raw data) that produced it — full lineage from derived fact to source.",
+          "citation": "README.md:121-122"
+        },
+        {
+          "claim": "Incremental graph construction: new data integrates immediately without batch recomputation.",
+          "citation": "README.md:125-126"
+        },
+        {
+          "claim": "Hybrid retrieval combines semantic embeddings, keyword (BM25) and graph traversal.",
+          "citation": "README.md:127-128"
+        },
+        {
+          "claim": "Graphiti is self-hosted only and you bring your own third-party graph database; user/conversation management, retrieval tuning and developer tools are 'build your own' (Zep is the managed alternative).",
+          "citation": "README.md:99-106"
+        },
+        {
+          "claim": "Requirements: Python 3.10+; Neo4j 5.26 / FalkorDB 1.1.2 / Amazon Neptune (+OpenSearch Serverless) / Kuzu 0.11.2 (deprecated); an OpenAI API key because Graphiti defaults to OpenAI for LLM inference and embedding.",
+          "citation": "README.md:156-161"
+        },
+        {
+          "claim": "Graphiti works best with LLM services that support Structured Output (OpenAI, Anthropic, Gemini); other services may produce incorrect schemas and ingestion failures, especially smaller models.",
+          "citation": "README.md:163-166"
+        },
+        {
+          "claim": "Kuzu is deprecated and will be removed in a future release (upstream unmaintained); new projects should use Neo4j or FalkorDB.",
+          "citation": "README.md:208-211"
+        },
+        {
+          "claim": "The mcp_server directory provides an MCP server: episode management (add, retrieve, delete), entity/relationship management, semantic and hybrid search, group management, graph maintenance; deployable with Docker. The MCP README calls it experimental.",
+          "citation": "README.md:312-324; mcp_server/README.md:10"
+        },
+        {
+          "claim": "MCP server defaults: HTTP transport at /mcp/, FalkorDB in a combined container, OpenAI gpt-5.5 and text-embedding-3-small, group_id defaulting to 'main'; 13 tools including delete_episode (cascading), delete_entity_edge, clear_graph, get_episodes, get_episode_entities.",
+          "citation": "mcp_server/README.md:105-111, 343, 556-575"
+        },
+        {
+          "claim": "The server directory is a FastAPI REST service for the Graphiti API; container zepai/graphiti is published for linux/amd64 and linux/arm64.",
+          "citation": "README.md:328-332; server/README.md:9-15"
+        },
+        {
+          "claim": "Telemetry: anonymous usage statistics (random UUID in ~/.cache/graphiti/telemetry_anon_id; OS, Python version, architecture; Graphiti version; LLM/DB/embedder provider types) are sent via PostHog on Graphiti initialization; opt-out with GRAPHITI_TELEMETRY_ENABLED=false; off under pytest; never collects API keys, graph content, IPs/hostnames or file paths; failures are silent.",
+          "citation": "README.md:620-644, 661-668, 694-699"
+        },
+        {
+          "claim": "Paper 'Zep: A Temporal Knowledge Graph Architecture' (arXiv 2501.13956) describes the architecture (link only; not opened for this dossier).",
+          "citation": "README.md:89"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (PyPI) — core library",
+          "command": "pip install graphiti-core",
+          "citation": "README.md:180-182"
+        },
+        {
+          "method": "uv — core library",
+          "command": "uv add graphiti-core",
+          "citation": "README.md:186-188"
+        },
+        {
+          "method": "pip with FalkorDB extra (embedded 'falkordblite' variant requires Python 3.12+)",
+          "command": "pip install graphiti-core[falkordb]    # embedded: pip install graphiti-core[falkordblite]",
+          "citation": "README.md:192-204"
+        },
+        {
+          "method": "MCP server from source with uv (needs a reachable FalkorDB or Neo4j plus an LLM API key)",
+          "command": "git clone https://github.com/getzep/graphiti.git && cd graphiti/mcp_server && uv sync && uv run main.py",
+          "citation": "mcp_server/README.md:34-36, 60, 88-99, 643"
+        },
+        {
+          "method": "MCP server + FalkorDB via Docker Compose, as documented (the compose files actually live in mcp_server/docker/, not mcp_server/; prebuilt image name zepai/knowledge-graph-mcp at :393)",
+          "command": "docker compose up    # Neo4j variant: docker compose -f docker/docker-compose-neo4j.yml up",
+          "citation": "mcp_server/README.md:62-73, 393, 429-449"
+        },
+        {
+          "method": "REST service + Neo4j via Docker Compose from the repo root (FalkorDB profile available); prebuilt image zepai/graphiti:latest",
+          "command": "docker compose up    # FalkorDB: docker compose --profile falkordb up",
+          "citation": "README.md:290-308; server/README.md:9-30"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes — container images are built for linux/amd64 (and arm64) in .github/workflows/release-mcp-server.yml:136 and .github/workflows/release-server-container.yml:137 (server/README.md:15); all CI jobs run on Ubuntu runners (.github/workflows/unit_tests.yml:14, 54); the README itself names no OS; Python >=3.10 (pyproject.toml:12).",
+        "wsl2": "unknown — no mention of WSL or Windows in README.md, mcp_server/README.md, server/README.md, the docker READMEs, CONTRIBUTING.md or any workflow (searched).",
+        "macos_arm64": "unknown — no macOS support statement and no macOS CI job (the only macOS reference is a CodeQL runner expression for swift, .github/workflows/codeql.yml:30); indirect signals only: images are also published for linux/arm64 (release-mcp-server.yml:136) and the MCP README stdio example uses a macOS-style <private> path (mcp_server/README.md:519-524).",
+        "gpu": "no (not required) — default LLM, embedding and rerank calls go to hosted OpenAI (graphiti_core/graphiti.py:216-227); optional local models (BAAI/bge-reranker-v2-m3 via sentence-transformers, graphiti_core/cross_encoder/bge_reranker_client.py:36; ~2.3 GB download noted at mcp_server/src/services/factories.py:436-438) have no GPU/device settings in the repo (searched)."
+      },
+      "integrations": {
+        "cli": "none found — no [project.scripts] in pyproject.toml, mcp_server/pyproject.toml or server/pyproject.toml; the MCP server is started with `uv run main.py` and argparse flags (mcp_server/src/graphiti_mcp_server.py:1113-1183); tests/evals/eval_cli.py is an evaluation script (tests/evals/eval_cli.py:8-36), not a packaged CLI.",
+        "mcp": "yes (experimental) — mcp_server/ FastMCP server 'Graphiti Agent Memory' (mcp_server/src/graphiti_mcp_server.py:176-179); transports stdio, streamable HTTP at /mcp/ (default) and sse (deprecated) (graphiti_mcp_server.py:1128-1132, 1262-1292); /health route (:1103-1106); 13 tools: add_memory, add_triplet, search_nodes, search_memory_facts, get_episodes, get_entity_edge, get_episode_entities, delete_episode, delete_entity_edge, clear_graph, summarize_saga, build_communities, get_status (graphiti_mcp_server.py:365-1100; mcp_server/README.md:556-575). No authentication layer in mcp_server/src.",
+        "sdk_or_api": "Python SDK: `from graphiti_core import Graphiti` (graphiti_core/__init__.py:1-3; class at graphiti_core/graphiti.py:137 with add_episode, add_episode_bulk, add_triplet, search/search_, retrieve_episodes, remove_episode, build_communities, summarize_saga) plus graphiti.nodes/graphiti.edges namespaces (graphiti.py:243-245). HTTP API: FastAPI service in server/ (server/graph_service/main.py:20): POST /messages (202, queued), POST /entity-node, DELETE /entity-edge/{uuid}, DELETE /group/{group_id}, DELETE /episode/{uuid}, POST /clear, POST /search, GET /entity-edge/{uuid}, GET /episodes/{group_id}, POST /get-memory, GET /healthcheck (server/graph_service/routers/ingest.py:51-111; routers/retrieve.py:17-56; main.py:27-29); no authentication layer; Swagger at /docs (server/README.md:76).",
+        "claude_code_or_codex": "none found — nothing in the repo documents or ships a Claude Code or Codex integration (no hooks, skills, plugins or client configs; searched 'codex', 'claude code', 'claude mcp add'). Documented MCP clients are VS Code/Copilot (mcp_server/README.md:488-503), Cursor (:597-632) and Claude Desktop via mcp-remote (:634-673), plus generic stdio/HTTP JSON snippets (:514-554; mcp_server/config/mcp_config_stdio_example.json). CLAUDE.md and AGENTS.md are contributor guidance for agents working on this repo (CLAUDE.md:3; AGENTS.md:1-26); the only agent-usage instructions for the memory tools are Cursor rules (mcp_server/docs/cursor_rules.md:1-34)."
+      },
+      "telemetry_and_network": "Telemetry is on by default (opt-out). Graphiti.__init__ calls capture_event('graphiti_initialized') (graphiti_core/graphiti.py:247-266); the PostHog client posts to https://us.i.posthog.com with a hard-coded public project key (graphiti_core/telemetry/telemetry.py:18-19, 92-114). distinct_id is a random UUID persisted at ~/.cache/graphiti/telemetry_anon_id (telemetry.py:25-62). Properties sent: $process_person_profile=False, graphiti_version, architecture (platform.machine()) plus llm/embedder/reranker/database provider labels derived from class names (telemetry.py:106-111; graphiti.py:259-264, 283-312). Disabled when GRAPHITI_TELEMETRY_ENABLED is anything other than true/1/yes/on, or when 'pytest' is imported (telemetry.py:29-37); all errors are swallowed (telemetry.py:115-117). README.md:628 says OS name and Python version are also collected; this module does not set them (whether the PostHog SDK adds default properties is not determinable here). The MCP server and REST service construct Graphiti and therefore emit the event; no shipped Dockerfile, compose file or .env example sets the opt-out (searched). posthog>=3.0.0 is a mandatory dependency (pyproject.toml:20). Required network services: a graph database (Neo4j/FalkorDB/Neptune, self-hosted or AWS) and an LLM + embedding provider API — default OpenAI via OPENAI_API_KEY (graphiti.py:216-227; README.md:161, 270-271). Episode text is sent to the LLM for extraction, dedup and summarization, and every search embeds the query through the embedder (graphiti_core/search/search.py:120-150; search_config_recipes.py:111-116, 156-161). The MCP server falls back to downloading the local BAAI/bge-reranker-v2-m3 (~2.3 GB) when the LLM/embedder providers have no native reranker (mcp_server/src/services/factories.py:434-452). No Zep account or endpoint is referenced in the Python code (searched zep_cloud|api.getzep|ZEP_API); the only hard-coded outbound endpoint in graphiti_core is the PostHog host. OpenTelemetry tracing is opt-in with no default exporter (OTEL_TRACING.md:3, 11-33). The LLM response cache is off by default (cache: bool = False, graphiti_core/llm_client/client.py:76) and, if enabled, writes SQLite under ./llm_cache (client.py:35; cache.py:36-37)."
+    },
+    "code": {
+      "languages": [
+        "Python (>=3.10,<4)",
+        "Cypher / RediSearch query strings embedded in Python",
+        "YAML, Dockerfile and shell (deployment and config)",
+        "Jupyter notebooks (examples only)"
+      ],
+      "entry_points": [
+        {
+          "path": "graphiti_core/__init__.py",
+          "what": "Library entry: exports Graphiti (class in graphiti_core/graphiti.py:137) — add_episode, add_episode_bulk, add_triplet, search/search_, retrieve_episodes, remove_episode, build_communities, summarize_saga."
+        },
+        {
+          "path": "mcp_server/main.py",
+          "what": "MCP server launcher: adds src/ to sys.path and calls main() in mcp_server/src/graphiti_mcp_server.py:1299; run as `uv run main.py [--transport stdio|http|sse] [--group-id ...] [--destroy-graph]`."
+        },
+        {
+          "path": "mcp_server/src/graphiti_mcp_server.py",
+          "what": "FastMCP app with 13 @mcp.tool() functions, /health route, argparse config (:1113-1183) and GraphitiService initialization (:190-362)."
+        },
+        {
+          "path": "server/graph_service/main.py",
+          "what": "FastAPI app `app` (:20) with ingest and retrieve routers; run with `uvicorn graph_service.main:app` (Dockerfile:119)."
+        },
+        {
+          "path": "mcp_server/docker/Dockerfile",
+          "what": "Combined FalkorDB + FalkorDB Browser (:3000) + MCP server image; ENTRYPOINT /start-services.sh starts redis-server with the FalkorDB module, optional Browser, then `uv run --no-sync main.py` (:127-193)."
+        },
+        {
+          "path": "mcp_server/docker/Dockerfile.standalone",
+          "what": "MCP-server-only image for an external Neo4j/FalkorDB; CMD `uv run --no-sync main.py` (:137)."
+        },
+        {
+          "path": "Dockerfile",
+          "what": "REST service image (python:3.12-slim, non-root user 'app'); CMD uvicorn on 0.0.0.0:8000 (:2, 50-51, 111-119)."
+        },
+        {
+          "path": "tests/evals/eval_cli.py",
+          "what": "argparse evaluation script wrapping tests/evals/eval_e2e_graph_building.py (LongMemEval oracle data); not packaged."
+        }
+      ],
+      "architecture": "Layered Python library. Orchestrator: graphiti_core/graphiti.py (class Graphiti). add_episode pipeline (:1043-1288): fetch previous episodes -> LLM node extraction/resolution (utils/maintenance/node_operations.py) -> LLM edge extraction, dedup and contradiction handling that sets invalid_at/expired_at (utils/maintenance/edge_operations.py:540-573, 623-847) -> attribute/summary extraction -> bulk write (utils/bulk_utils.py add_nodes_and_edges_bulk); remove_episode at :1824. Data model: graphiti_core/nodes.py (EpisodicNode with raw content, EntityNode, CommunityNode, SagaNode) and edges.py (EntityEdge with fact, valid_at/invalid_at/expired_at and an `episodes` provenance list; episodic MENTIONS, community and saga HAS_EPISODE/NEXT_EPISODE edges). Raw episode content is stored by default (store_raw_episode_content=True, graphiti.py:146). Storage: graphiti_core/driver/ (GraphDriver ABC in driver.py; neo4j_driver.py, falkordb_driver.py, kuzu_driver.py [deprecated], neptune_driver.py; per-backend operations/ packages). Neo4j keeps all groups in one database partitioned by a group_id property (GraphDriver.clone returns self, driver.py:131-133); FalkorDB maps each non-default group_id to its own graph via clone() (falkordb_driver.py:331-344; graphiti.py:1013-1041). Model providers: llm_client/ (OpenAI, Azure OpenAI, Anthropic, Gemini, Groq, GLiNER2, generic OpenAI-compatible; optional SQLite cache), embedder/ (OpenAI, Azure OpenAI, Gemini, Voyage), cross_encoder/ (OpenAI, Gemini, local BGE). Retrieval: search/ (search.py, search_config_recipes.py, search_filters.py with valid_at/invalid_at/created_at/expired_at filters, search_utils.py; BM25 + cosine + BFS with RRF/MMR/node-distance/cross-encoder reranking). Cross-cutting: prompts/, telemetry/telemetry.py (PostHog), tracer.py (opt-in OpenTelemetry), namespaces/ (graphiti.nodes.* / graphiti.edges.* API). Services: mcp_server/src/ (graphiti_mcp_server.py tools; services/factories.py builds LLM/embedder/DB/reranker clients from config; services/queue_service.py in-memory per-group_id asyncio queues; config/schema.py pydantic-settings + YAML with ${VAR:default} expansion — env overrides YAML, CLI flags override both, :293-340; models/ with 10 entity types and 7 edge types, response TypedDicts) and server/graph_service/ (FastAPI: routers/ingest.py with an in-memory asyncio queue worker, routers/retrieve.py, zep_graphiti.py, dto/, config.py).",
+      "packaging_and_release": "Core library: hatchling backend (pyproject.toml:68-70); `uv build`; published to PyPI as graphiti-core on tags v*.*.* via pypa/gh-action-pypi-publish with OIDC `id-token: write` (trusted publishing) after checking tag == pyproject version (.github/workflows/release-graphiti-core.yml:3-5, 10-12, 34-45); actions are pinned by commit SHA. No checksum, signing, SBOM, provenance or attestation steps are configured in any workflow (searched .github for cosign|sigstore|attest|sbom|provenance|checksum|sha256|gpg|slsa: no matches) and no GitHub Release assets are created. Containers (Docker Hub, built with Depot, linux/amd64+arm64, no signing configured): zepai/knowledge-graph-mcp from tags mcp-v*.*.* — 'combined' FalkorDB+MCP (tags X.Y.Z, X.Y.Z-graphiti-<core>, latest) and 'standalone' (…-standalone) (release-mcp-server.yml:3-6, 15, 26-39, 114-145); zepai/graphiti (REST service) built after each stable PyPI release, tags X.Y.Z and latest, pre-releases skipped (release-server-container.yml:3-9, 16, 64-73, 130-150). MCP image builds route installs through Socket Firewall when a secret is present, re-resolve dependencies at build time (`rm -f uv.lock; uv lock`, mcp_server/docker/Dockerfile:81-87) and pin graphiti-core to the latest PyPI version at build time (release-mcp-server.yml:89-106); the base image falkordb/falkordb:latest is unpinned (Dockerfile:5) and the sfw binary is fetched from releases/latest without a checksum (Dockerfile:36-38). No workflow publishes the MCP server to PyPI. Versions at this revision: graphiti-core 0.30.2 (pyproject.toml:4), mcp-server 1.1.0 (mcp_server/pyproject.toml:3), graph-service 0.1.0 (server/pyproject.toml:3).",
+      "tests_and_ci": "pytest with pytest-asyncio (asyncio_mode=auto) and pytest-xdist; marker 'integration' (pytest.ini:1-5). About 62 test files: tests/ has 45 test_*.py/*_test.py files (6 '_int' files need a DB or API keys), mcp_server/tests/ has 16, server/tests/ has 1 (test_live_falkordb_int.py). tests/evals/ is an end-to-end eval harness over the LongMemEval oracle dataset, excluded from CI; no results are recorded in the repo. CI workflows (.github/workflows): unit_tests.yml (job 'unit-tests': no-DB suite with DISABLE_* flags on Python 3.10 and an ignore list; job 'database-integration-tests': Neo4j 5.26-community + FalkorDB containers running 5 files with mock LLMs, :51-115); lint.yml (ruff check/format via pull_request_target, privilege-stripped); typecheck.yml (pyright on graphiti_core and server); mcp-server-tests.yml and server-tests.yml (live end-to-end tests against FalkorDB + real OpenAI; each runs only test_live_falkordb_int.py and self-skips without OPENAI_API_KEY; mcp-server-tests.yml:88); codeql.yml (actions + python, weekly); socket-firewall-connectivity.yml; ai-moderator.yml; cla.yml; three release-*.yml. Dependabot weekly pip updates for /, /server, /mcp_server (.github/dependabot.yml:6-19). CI runs Linux only and Python 3.10 (release job uses 3.11); no macOS/Windows or 3.11-3.13 test jobs. Most older MCP test files call tools with outdated parameter names (e.g. mcp_server/tests/test_comprehensive_integration.py:368 group_id/last_n vs the tool's group_ids/max_episodes at graphiti_mcp_server.py:741-744; :403 episode_uuid vs uuid at :685) and are not run in CI. I did not execute any tests.",
+      "dependencies": "Root pyproject.toml: 7 direct runtime dependencies (pydantic>=2.11.5, neo4j>=5.26.0, openai>=1.91.0, tenacity>=9.0.0, numpy>=1.0.0, python-dotenv>=1.0.1, posthog>=3.0.0; :13-21); 12 optional extras with 17 requirement entries (anthropic, groq, google-genai, kuzu [deprecated], falkordb, falkordblite [+redis<9], voyageai, gliner2, neo4j-opensearch, sentence-transformers, neptune, tracing; :27-41) and a 23-entry dev extra (:42-66); uv.lock at the root. mcp_server/pyproject.toml: 6 direct dependencies (mcp>=1.27.2,<2, openai>=2.41.0, graphiti-core[falkordb]>=0.30.1, pydantic-settings, pyyaml, typing-extensions), extras azure (1) and providers (5), 9-entry dev group; mcp_server/uv.lock pins graphiti-core 0.30.1 from PyPI (uv.lock:833-835), mcp 1.27.2, falkordb 1.2.0, posthog 6.0.0. server/pyproject.toml: 5 direct dependencies (fastapi, graphiti-core>=0.28.2, pydantic-settings, uvicorn, httpx) and a 9-entry dev extra; server/uv.lock. Build backend hatchling.",
+      "security_policy": "SECURITY.md — lists 0.x as supported (SECURITY.md:8-10) and directs reports to GitHub Private Vulnerability Reporting (:13-15). Also .github/secret_scanning.yml (excludes the PostHog public-key file) and CodeQL (.github/workflows/codeql.yml)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Facts have validity windows; old facts are invalidated — not deleted (README.md:119-120).",
+        "verified": "yes",
+        "evidence": "resolve_edge_contradictions sets invalid_at and expired_at on the older edge (graphiti_core/utils/maintenance/edge_operations.py:564-571); a new edge can itself be expired (:820-839); resolved and invalidated edges are saved together (graphiti_core/graphiti.py:1215). Contradiction detection is an LLM judgement (edge_operations.py:726-733). Explicit deletes (MCP delete_*/clear_graph, REST DELETE routes) are hard DETACH DELETEs (graphiti_core/nodes.py:111-167; utils/maintenance/graph_data_operations.py:44)."
+      },
+      {
+        "claim": "Every entity and relationship traces back to the episodes that produced it (README.md:121-122).",
+        "verified": "partial",
+        "evidence": "EntityEdge.episodes is set at extraction (utils/maintenance/edge_operations.py:292-305) and appended on duplicates (:694, :752); EpisodicNode.entity_edges and MENTIONS edges are written in _process_episode_data (graphiti.py:747-760); raw content is stored unless store_raw_episode_content=False (graphiti.py:146, 750-751); MCP get_episode_entities exposes the lookup (graphiti_mcp_server.py:991-1024; graphiti.py:1690-1702). Exception: add_triplet (core and MCP) builds edges against an empty placeholder EpisodicNode that is never saved (graphiti.py:1804-1821), so triplet-added facts have no source episode."
+      },
+      {
+        "claim": "New data integrates immediately without batch recomputation (README.md:125-126).",
+        "verified": "partial",
+        "evidence": "Ingestion is per-episode and incremental, but needs several LLM calls per episode (graphiti.py:1180-1226) and the core docstring recommends running it sequentially in a background queue (graphiti.py:1119-1122). MCP add_memory only enqueues and returns 'queued' (graphiti_mcp_server.py:381-384, 473-494); the queue is an in-memory asyncio.Queue per group_id (mcp_server/src/services/queue_service.py:18-47), processing errors are only logged (:64-70, 179-181) and nothing persists queued work across a restart. REST POST /messages also returns 202 after enqueueing to an in-memory queue (server/graph_service/routers/ingest.py:15, 51-70)."
+      },
+      {
+        "claim": "MCP server offers episode management (add, retrieve, delete), entity/relationship management, search, group management and graph maintenance; documented tool list (README.md:315-321; mcp_server/README.md:556-575).",
+        "verified": "yes",
+        "evidence": "13 @mcp.tool() functions in mcp_server/src/graphiti_mcp_server.py: add_memory :366, search_nodes :502, search_memory_facts :579, delete_entity_edge :659, delete_episode :685, get_entity_edge :714, get_episodes :741, summarize_saga :811, build_communities :864, add_triplet :918, get_episode_entities :992, clear_graph :1028, get_status :1071 — matches the README list. Doc drift: mcp_server/README.md:583-595 shows an `add_episode` tool that does not exist (the tool is add_memory); mcp_server/docs/cursor_rules.md:7 names `search_facts` (tool is search_memory_facts). There is no tool to delete an individual entity node."
+      },
+      {
+        "claim": "delete_episode cascades: entities and facts created solely by the episode are removed, those also supported by other episodes are preserved (mcp_server/README.md:571; graphiti_mcp_server.py:688-690).",
+        "verified": "partial",
+        "evidence": "Graphiti.remove_episode (graphiti.py:1824-1852): nodes are deleted only if exactly one episode MENTIONS them (:1838-1847) — consistent with the claim — but an edge is deleted whenever edge.episodes[0] == episode.uuid (:1831-1835), i.e. when this episode first created it, even if later episodes were appended as supporting it (edge_operations.py:694, 752). The REST route DELETE /episode/{uuid} does not cascade at all (server/graph_service/zep_graphiti.py:73-78 calls EpisodicNode.delete, a single-node DETACH DELETE, graphiti_core/nodes.py:111-167); the MCP code comments on this difference (graphiti_mcp_server.py:703-704)."
+      },
+      {
+        "claim": "Group management: data is organized by group_id and clear_graph clears the given group(s) (mcp_server/README.md:21, 574).",
+        "verified": "partial",
+        "evidence": "By code reading only (not executed). Neo4j: group_id is a property partition (GraphDriver.clone returns self, graphiti_core/driver/driver.py:131-133) and clear_data deletes by group_id property (utils/maintenance/graph_data_operations.py:46-64), so scoping is consistent. FalkorDB (the MCP default, mcp_server/src/config/schema.py:213): each non-default group_id is written to its own graph via driver.clone(database=group_id) (graphiti.py:1036-1041; falkordb_driver.py:331-344), the project's own test docstring says group-scoped reads must be routed to that graph or they query an empty default DB (tests/driver/test_falkordb_ops_routing.py:3-7), and the routing decorator is applied only to retrieve_episodes, build_communities, search and search_ (graphiti.py:959, 1548, 1585, 1661). MCP get_episodes, clear_graph, delete_episode, get_entity_edge, delete_entity_edge and get_episode_entities go through the shared client.driver bound to FALKORDB_DATABASE (default 'default_db') (graphiti_mcp_server.py:242-248, 705, 729, 774, 1014, 1059). The repo's live test asserts these tools work on FalkorDB (mcp_server/tests/test_live_falkordb_int.py:203-261) but for delete/clear it only checks that a 'message' key is present, not that data is gone. Outcome on FalkorDB with a non-default group is therefore unconfirmed."
+      },
+      {
+        "claim": "Telemetry disclosure: collects OS, Python version, architecture, Graphiti version and provider types; opt-out via GRAPHITI_TELEMETRY_ENABLED=false; never collects IP addresses (README.md:625-644, 663-668).",
+        "verified": "partial",
+        "evidence": "Opt-out, default-on, pytest exclusion, local UUID file and silent failure match the code (graphiti_core/telemetry/telemetry.py:22-37, 25-62, 115-117). Properties actually set are $process_person_profile=False, graphiti_version, architecture plus llm/embedder/reranker/database provider labels (telemetry.py:106-111; graphiti.py:259-264); OS name and Python version (README.md:628; mcp_server/README.md:689) are not set by this module, and Kuzu/Neptune databases are labelled 'unknown' (graphiti.py:303-312). 'Never collects IP addresses' is not checkable from the repo: the HTTPS request goes to us.i.posthog.com (telemetry.py:19) and server-side retention is outside the code. No shipped Dockerfile/compose sets the opt-out."
+      },
+      {
+        "claim": "Local-model recipe for the MCP server: openai provider with api_base/api_key under llm: plus embedder provider 'sentence_transformers' (mcp_server/README.md:176-193; features list :25).",
+        "verified": "no",
+        "evidence": "No sentence-transformers embedder exists in graphiti_core/embedder/ (azure_openai, gemini, openai, voyage) and EmbedderFactory handles only openai, azure_openai, gemini and voyage, raising ValueError otherwise (mcp_server/src/services/factories.py:313-410). GraphitiService swallows factory errors with a warning and passes embedder=None (graphiti_mcp_server.py:215-219), after which core falls back to OpenAIEmbedder() (graphiti.py:220-223) — i.e. remote OpenAI embeddings, or a failure at first embed without a key. `api_base` appears only in the README (mcp_server/README.md:184) and `api_key` at llm: level is not a field of LLMConfig (mcp_server/src/config/schema.py:146-163; extras ignored); the effective setting is providers.openai.api_url / OPENAI_API_URL (config/config.yaml:24, 56; factories.py:158-162), while .env.example lists a third name OPENAI_BASE_URL (:18). By code reading; not executed."
+      },
+      {
+        "claim": "Quick start: run `docker compose up` in mcp_server/ to start the combined FalkorDB + MCP server (mcp_server/README.md:58-68, 421-435).",
+        "verified": "no",
+        "evidence": "There is no compose file in mcp_server/; the files are mcp_server/docker/docker-compose.yml, docker-compose-falkordb.yml and docker-compose-neo4j.yml (file listing). mcp_server/docker/README-falkordb-combined.md:34 points to docker/docker-compose-falkordb-combined.yml, which does not exist, and :52 to image zepai/graphiti-falkordb, while the release workflow publishes zepai/knowledge-graph-mcp (.github/workflows/release-mcp-server.yml:15). The repo-root docker-compose.yml defines the REST service + Neo4j instead (docker-compose.yml:1-48). How Compose resolves `docker compose up` from mcp_server/ was not tested. Compose build defaults also still say GRAPHITI_CORE_VERSION 0.29.1 and MCP_SERVER_VERSION 1.0.2 (mcp_server/docker/docker-compose.yml:8-9) against 0.30.2 / 1.1.0."
+      },
+      {
+        "claim": "Graphiti defaults to OpenAI for LLM inference and embedding and needs OPENAI_API_KEY (README.md:161, 270-271).",
+        "verified": "yes",
+        "evidence": "Graphiti.__init__ falls back to OpenAIClient(), OpenAIEmbedder() and OpenAIRerankerClient() when none are supplied (graphiti_core/graphiti.py:216-227). The MCP server defaults to provider openai, model gpt-5.5, embedder text-embedding-3-small (mcp_server/src/config/schema.py:149-150, 178-179; mcp_server/config/config.yaml:15, 50). If MCP LLM/embedder creation fails the error is only logged and core's OpenAI defaults apply (graphiti_mcp_server.py:209-219). Other README drift found: README.md:260-261 says SEMAPHORE_LIMIT defaults to 10, but the core default is 20 (graphiti_core/helpers.py:38); only the MCP server defaults to 10 (graphiti_mcp_server.py:94)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Zep managed retrieval service latency (the commercial product, not the open-source framework); the README gives a figure with no method, dataset or harness in the repo",
+        "metric": "retrieval latency",
+        "value": "sub-200ms at scale (vendor claim, unverified)",
+        "source": "README.md:103",
+        "independent": false
+      },
+      {
+        "what": "Graphiti vs GraphRAG query latency in the README comparison table; no measurement or method attached",
+        "metric": "query latency",
+        "value": "Graphiti 'Typically sub-second latency' vs GraphRAG 'Seconds to tens of seconds' (vendor claim, unverified)",
+        "source": "README.md:147",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No inbound authentication anywhere: the MCP server binds 0.0.0.0:8000 by default (mcp_server/src/config/schema.py:83-84; config/config.yaml:10-11) and mcp_server/src has no auth layer (only outbound provider credentials), yet exposes destructive tools (delete_entity_edge, delete_episode, clear_graph: graphiti_mcp_server.py:659-710, 1028-1067) and a --destroy-graph startup flag (:1179-1183, 1224-1231); the REST service is likewise open and POST /clear wipes the whole graph (server/graph_service/routers/ingest.py:105-111). The combined image starts redis-server with --protected-mode no --bind 0.0.0.0 and no --requirepass (mcp_server/docker/Dockerfile:133-139) and compose publishes 6379, 3000 and 8000 without a host-IP restriction (mcp_server/docker/docker-compose.yml:28-31); the docker README says the default configuration has no password (mcp_server/docker/README.md:77).",
+      "Telemetry is on by default and fires from every Graphiti construction, including the MCP server and REST service; no shipped Dockerfile, compose file or .env example sets GRAPHITI_TELEMETRY_ENABLED=false (searched), posthog is a mandatory dependency (pyproject.toml:20), and the code posts to https://us.i.posthog.com (graphiti_core/telemetry/telemetry.py:19, 92-114). README.md:628 says OS name and Python version are collected but the module sets only architecture and version (telemetry.py:106-111); source-IP retention by the receiver cannot be determined from the repo.",
+      "Content leaves the host: ingestion sends episode text to the configured LLM provider for extraction, dedup, edge resolution and summarization (graphiti.py:1180-1226), and each search embeds the query through the embedder (graphiti_core/search/search.py:120-150; search_config_recipes.py:111-116, 156-161); default provider is OpenAI with OPENAI_API_KEY required (README.md:161, 270-271). The MCP README's local-model recipe does not match the code (no sentence_transformers embedder; api_base/api_key under llm: ignored — see claim_checks), so a 'local' config can silently fall back to OpenAI embeddings. README warns that providers/models without reliable structured output cause ingestion failures (README.md:163-166, 592-610).",
+      "Capture durability and ordering: MCP add_memory acknowledges after enqueueing to an in-memory per-group queue; failures are only logged and queued work is lost if the process exits (mcp_server/src/services/queue_service.py:18-47, 64-73, 179-181; graphiti_mcp_server.py:473-494). The REST worker loop catches only asyncio.CancelledError, so any job exception ends the worker task, and stop() discards pending jobs (server/graph_service/routers/ingest.py:18-35). The 'sequential per group_id' guarantee holds only inside one process: two MCP server processes (e.g. one stdio instance per client) writing the same group are not coordinated, while core docs say episodes should be added sequentially (graphiti.py:1119-1122).",
+      "Deletion and recovery are blunt: all deletes are hard DETACH DELETEs (graphiti_core/nodes.py:111-167; utils/maintenance/graph_data_operations.py:34-64); no soft-delete, undo, export or restore code exists in graphiti_core, mcp_server/src or server (searched), and the docker README says cross-database migration must be done 'using the MCP API' (mcp_server/docker/README.md:159). Documented recovery is file-level tar backup/restore of the Docker volumes (mcp_server/docker/README.md:53-72, 107-132); the combined image sets no --save/--appendonly flags and relies on redis-server defaults (Dockerfile:133-139). delete_episode's cascade only partly matches its description and REST episode delete does not cascade (see claim_checks). Superseded facts are retained and filterable by valid_at/invalid_at (graphiti_mcp_server.py:579-655), which is history rather than a restore mechanism.",
+      "FalkorDB (the MCP default backend) caveats: (a) by code reading, non-default groups live in separate graphs while several MCP tools query the shared default-graph driver (details and citations in the group-scoping claim_check; not executed, and the repo's live test asserts the flow works); (b) AGENTS.md:44-45 documents that the FalkorDB async driver drops connections when Graphiti issues concurrent queries (e.g. inside Graphiti.search) and recommends Neo4j for hybrid search; this caveat is not in the user-facing READMEs.",
+      "Maturity, pinning and doc drift: pre-1.0 (0.30.2; SECURITY.md supports '0.x'); MCP server labelled experimental (mcp_server/README.md:10); Kuzu backend deprecated (README.md:208-211). The MCP server resolves graphiti-core from PyPI (>=0.30.1; lock pins 0.30.1) rather than the in-repo source (mcp_server/pyproject.toml:10; mcp_server/uv.lock:833-835); release images re-resolve dependencies at build time and use unpinned base/tool downloads (mcp_server/docker/Dockerfile:5, 36-38, 81-87); the combined image runs Debian's Python 3.13 (Dockerfile:9) while CI tests Python 3.10 on Ubuntu only (unit_tests.yml:14, 24). Only 1 of 16 MCP test files runs in CI (mcp-server-tests.yml:88). No signatures or attestations are configured for PyPI or Docker releases. Setup docs drift: compose file locations and image names (see claim_checks) and .env.example uses GROUP_ID and MODEL_NAME=gpt-4.1-mini while the config reads GRAPHITI_GROUP_ID and defaults to gpt-5.5 (mcp_server/.env.example:15, 21; config/config.yaml:15, 93).",
+      "Scope fit and governance: no Claude Code/Codex integration, hooks or automatic capture — memory is written only when an agent calls add_memory, guided at most by a Cursor rules file (mcp_server/docs/cursor_rules.md:1-34); the MCP server has no per-client/agent attribution (user_id and episode_id_prefix are declared in mcp_server/src/config/schema.py:262-263 but not read elsewhere in mcp_server/src), so agents sharing a group share one namespace; built-in entity types are Preference, Requirement, Procedure, Location, Event, Organization, Document, Topic, Person, Object with no decision/handoff type (mcp_server/config/config.yaml:96-116; custom types are configurable via config). README says user/thread/message storage and dashboards are 'build your own' in the OSS version (README.md:99-106). Apache-2.0 (LICENSE) but contributions require a Zep CLA (.github/workflows/cla.yml; Zep-CLA.md); licenses of the FalkorDB/Neo4j servers it runs against are not stated in the repo (only a note that Neo4j enterprise features need a license, mcp_server/docker/README.md:139)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "getzep/graphiti",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip, core library)",
+          "statement": "pip (PyPI) — core library: `pip install graphiti-core`",
+          "citation": "README.md:180-182",
+          "holds": true,
+          "note": "README.md:180-182 is a bash code block with exactly `pip install graphiti-core`; `uv add graphiti-core` follows at :186-188. The PyPI name matches pyproject.toml:2 (name = \"graphiti-core\"), version 0.30.2 at :4, consistent with the named revision eaa4128."
+        },
+        {
+          "field": "license",
+          "statement": "Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is 'Apache License, Version 2.0, January 2004', with the full terms and appendix through :201. pyproject.toml:11 also declares license = \"Apache-2.0\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes — container images are built for linux/amd64 (and arm64) in release-mcp-server.yml:136 and release-server-container.yml:137 (server/README.md:15); all CI jobs run on Ubuntu runners (unit_tests.yml:14, 54); the README names no OS; Python >=3.10 (pyproject.toml:12).",
+          "citation": ".github/workflows/release-mcp-server.yml:136; .github/workflows/release-server-container.yml:137; server/README.md:15; .github/workflows/unit_tests.yml:14, 54; pyproject.toml:12",
+          "holds": true,
+          "note": "release-mcp-server.yml:136 and release-server-container.yml:137 both read `platforms: linux/amd64,linux/arm64`. server/README.md:15 says 'Platforms: linux/amd64, linux/arm64'. pyproject.toml:12 says requires-python = \">=3.10,<4\". Every runs-on in .github/workflows is an Ubuntu label. The only non-Ubuntu option is codeql.yml:30's macOS expression for swift, and that matrix contains only actions and python (:45-49). An OS-term search of README.md matches only 'validity windows'. Citation drift: unit_tests.yml:54 is an actions/checkout step; the database-integration-tests job's `runs-on: depot-ubuntu-22.04` is at :52. The claim itself still holds."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes (experimental) — FastMCP server 'Graphiti Agent Memory'; transports stdio, streamable HTTP at /mcp/ (default) and sse (deprecated); /health route; 13 tools (add_memory, add_triplet, search_nodes, search_memory_facts, get_episodes, get_entity_edge, get_episode_entities, delete_episode, delete_entity_edge, clear_graph, summarize_saga, build_communities, get_status); no authentication layer in mcp_server/src.",
+          "citation": "mcp_server/src/graphiti_mcp_server.py:176-179, 1128-1132, 1262-1292, 1103-1106, 365-1100; mcp_server/README.md:556-575",
+          "holds": true,
+          "note": "FastMCP('Graphiti Agent Memory', instructions=...) is at :176-179. --transport choices are sse/stdio/http, with help text 'http (recommended, default) ... sse (deprecated)' at :1128-1132. ServerConfig.transport defaults to 'http' (mcp_server/src/config/schema.py:80). The branches at :1262-1292 call run_stdio_async, run_sse_async and run_streamable_http_async, and the endpoint is logged as /mcp/ (:1279). @mcp.custom_route('/health') is at :1103-1106. There are exactly 13 @mcp.tool() decorators, at :365, 501, 578, 658, 684, 713, 740, 810, 863, 917, 991, 1027 and 1070; their names match the dossier list and mcp_server/README.md:560-575. 'Experimental' appears at mcp_server/README.md:10. Searching mcp_server/src for auth/bearer/token/middleware finds only outbound Azure credential helpers (services/factories.py:192-193, 343-344; utils/utils.py:8-24), and FastMCP is constructed with no auth argument."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Facts have validity windows; old facts are invalidated — not deleted (README.md:119-120). verified: yes, with evidence that contradictions set invalid_at/expired_at, new edges can be expired, resolved and invalidated edges are saved together, contradiction detection is an LLM judgement, and explicit deletes are hard DETACH DELETEs.",
+          "citation": "README.md:119-120; graphiti_core/utils/maintenance/edge_operations.py:564-571, 726-733, 820-839; graphiti_core/graphiti.py:1215; graphiti_core/nodes.py:111-167; graphiti_core/utils/maintenance/graph_data_operations.py:44",
+          "holds": true,
+          "note": "README.md:119-120 contains the quoted text. edge_operations.py:564-571 sets the older edge's invalid_at to the new edge's valid_at, sets expired_at, and appends it to invalidated_edges; :820-839 expires the new edge when it is already invalid or a later-valid candidate exists. The contradiction indices come from the LLM's EdgeDuplicate response (:726-733, read at :755). graphiti.py:1215 builds entity_edges = resolved_edges + invalidated_edges, which is passed through :1229-1232 to add_nodes_and_edges_bulk at :753-758. Invalidated facts are saved, not removed. Explicit deletes are DETACH DELETE (nodes.py:122-126, 157-165; graph_data_operations.py:44), and the per-backend operations packages also use DETACH DELETE (e.g. driver/neo4j/operations/entity_node_ops.py:101)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking citation fix: in readme.platforms.linux_x86_64, change `.github/workflows/unit_tests.yml:14, 54` to `.github/workflows/unit_tests.yml:14, 52`. Line 54 is an actions/checkout step; the database-integration-tests job's `runs-on: depot-ubuntu-22.04` is at line 52."
+      ]
+    }
+  ]
+}

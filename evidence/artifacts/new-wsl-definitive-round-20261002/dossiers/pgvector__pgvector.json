@@ -1,0 +1,297 @@
+{
+  "contender": "pgvector/pgvector",
+  "revision": {
+    "contender": "pgvector/pgvector",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "pgvector/pgvector",
+        "tag": null,
+        "commit": "f37c13f68b57d2c3472b2214fbcff699d6d34876",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "f37c13f68b57d2c3472b2214fbcff699d6d34876",
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "pgvector/pgvector",
+    "revision": {
+      "tag": "v0.8.7",
+      "commit": "f37c13f68b57d2c3472b2214fbcff699d6d34876",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "PostgreSQL",
+      "file": "LICENSE"
+    },
+    "purpose": "PostgreSQL extension written in C (extension name `vector`, version 0.8.7) that adds the `vector`, `halfvec` and `sparsevec` types, Hamming/Jaccard operators for the built-in `bit` type, distance operators and functions (L2, inner product, cosine, L1, Hamming, Jaccard) and two approximate-nearest-neighbor index access methods, HNSW and IVFFlat, to Postgres 13+ (README.md:3-12; vector.control:1-2; sql/vector.sql:33,355,364; src/bitutils.h:7-9). It stores and searches embeddings inside a Postgres server through SQL. Against the stated needs, this repository covers only the 'embedding index and its queries' layer. It contains no embedding generation, no source-code parsing/chunking/ingestion, and no CLI, MCP server, SDK or Claude Code/Codex integration (src/ holds only type, distance and index-AM code, Makefile:7). README.md:775-777 treats vector generation as a client-side concern.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Open-source vector similarity search for Postgres: 'Store your vectors with the rest of your data'. Supports exact and approximate nearest neighbor search; single-precision, half-precision, binary and sparse vectors; L2, inner product, cosine, L1, Hamming and Jaccard distance; 'any language with a Postgres client'.",
+          "citation": "README.md:3-10"
+        },
+        {
+          "claim": "'Plus ACID compliance, point-in-time recovery, JOINs, and all of the other great features of Postgres'. FAQ: 'Yes, pgvector uses the write-ahead log (WAL), which allows for replication and point-in-time recovery.'",
+          "citation": "README.md:12, 823-825"
+        },
+        {
+          "claim": "By default pgvector does exact nearest neighbor search (perfect recall). Adding an HNSW or IVFFlat index switches to approximate search that 'trades some recall for speed' and changes query results. HNSW has the better speed-recall tradeoff but slower builds and more memory, and can be created on an empty table. IVFFlat builds faster and uses less memory but should be created after the table has data.",
+          "citation": "README.md:197-208, 336-342"
+        },
+        {
+          "claim": "Index dimension limits: vector up to 2,000; halfvec up to 4,000; bit up to 64,000; sparsevec up to 1,000 non-zero elements (HNSW only; IVFFlat supports vector, halfvec, bit). The vector type itself allows up to 16,000 dimensions; to index more than 2,000 dimensions use halfvec/half-precision indexing (up to 4,000) or binary quantization (up to 64,000).",
+          "citation": "README.md:250-255, 372-376, 827-829, 960"
+        },
+        {
+          "claim": "With approximate indexes, filtering (WHERE) is applied after the index is scanned: with a filter matching 10% of rows and the default hnsw.ef_search of 40, only 4 rows match on average. Remedies: iterative index scans (since 0.8.0; hnsw.iterative_scan strict_order/relaxed_order, ivfflat.iterative_scan relaxed_order), partial indexes, partitioning, an index on the filter column.",
+          "citation": "README.md:426-466, 478-548"
+        },
+        {
+          "claim": "Multitenancy: sharing an approximate index between tenants means one tenant's vectors can affect recall and speed for others; for isolation use list partitioning or separate tables.",
+          "citation": "README.md:468-476"
+        },
+        {
+          "claim": "Hybrid search: use together with Postgres full-text search; Reciprocal Rank Fusion and cross-encoder examples live in the separate pgvector-python repository.",
+          "citation": "README.md:633-642"
+        },
+        {
+          "claim": "'Use pgvector from any language with a Postgres client. You can even generate and store vectors in one language and query them in another.' About 40 per-language client libraries/examples are linked, all in separate repositories.",
+          "citation": "README.md:775-815"
+        },
+        {
+          "claim": "A column may hold vectors of different dimensions if declared as plain `vector`, but indexes can only be created over rows with the same dimension, using expression plus partial indexes (e.g. per model_id).",
+          "citation": "README.md:831-849"
+        },
+        {
+          "claim": "'NULL vectors are not indexed (as well as zero vectors for cosine distance)', given as a reason for fewer results after adding an HNSW or IVFFlat index.",
+          "citation": "README.md:937, 949"
+        },
+        {
+          "claim": "Install: 'Compile and install the extension (supports Postgres 13+)' via git clone --branch v0.8.7, make, make install; Windows via nmake. Also Docker, Homebrew, PGXN, APT, Yum, pkg (FreeBSD), APK, conda-forge (community-maintained), Postgres.app (Postgres 15+), and many hosted providers (list is a GitHub issue).",
+          "citation": "README.md:20-51, 1150-1270"
+        },
+        {
+          "claim": "Portability: by default pgvector compiles with -march=native on some platforms, which can cause 'Illegal instruction' errors if the extension is run on a different machine; compile for portability with `make OPTFLAGS=\"\"`.",
+          "citation": "README.md:1122-1130"
+        },
+        {
+          "claim": "Docker: `docker pull pgvector/pgvector:pg18-trixie` adds pgvector to the Postgres image (tags for pg13-pg18, bookworm and trixie); if maintenance_work_mem is increased, --shm-size must be at least that size to avoid an error with parallel HNSW index builds.",
+          "citation": "README.md:1152-1189"
+        },
+        {
+          "claim": "Upgrading: reinstall the same way, then run `ALTER EXTENSION vector UPDATE;` in each database; check the version with `SELECT extversion FROM pg_extension WHERE extname = 'vector';`.",
+          "citation": "README.md:1272-1284"
+        }
+      ],
+      "install": [
+        {
+          "method": "Source build (Linux and macOS); set PG_CONFIG if several Postgres installs exist",
+          "command": "cd /tmp\ngit clone --branch v0.8.7 https://github.com/pgvector/pgvector.git\ncd pgvector\nmake\nmake install # may need sudo",
+          "citation": "README.md:20-30 (PG_CONFIG and sudo --preserve-env variant: README.md:1080-1090)"
+        },
+        {
+          "method": "Docker image (adds pgvector to the official Postgres image)",
+          "command": "docker pull pgvector/pgvector:pg18-trixie",
+          "citation": "README.md:1152-1160"
+        },
+        {
+          "method": "Homebrew (only the postgresql@18 and postgresql@17 formulas)",
+          "command": "brew install pgvector",
+          "citation": "README.md:1191-1199"
+        },
+        {
+          "method": "APT (Debian/Ubuntu, after setting up the PostgreSQL APT repository)",
+          "command": "sudo apt install postgresql-18-pgvector",
+          "citation": "README.md:1209-1217"
+        },
+        {
+          "method": "Yum/DNF (RPM, after setting up the PostgreSQL Yum repository)",
+          "command": "sudo yum install pgvector_18   # or: sudo dnf install pgvector_18",
+          "citation": "README.md:1219-1229"
+        },
+        {
+          "method": "PGXN",
+          "command": "pgxn install vector",
+          "citation": "README.md:1201-1206"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - source build documented for Linux (README.md:20-30); CI runs Postgres 20, 19, 17, 15, 13 on x86-64 Ubuntu runners (arm64 runners carry an -arm suffix for 18, 16, 14) (.github/workflows/build.yml:4-26); x86-64 specific runtime CPU dispatch exists (CHANGELOG.md:81; src/halfvec.h:17-34; src/bitutils.c:173-224).",
+        "wsl2": "unknown - WSL/WSL2 is not mentioned in README.md, Makefile, Makefile.win or CI (grep found no match); the Linux make/PGXS path would be the applicable one but is neither documented nor tested for WSL2.",
+        "macos_arm64": "yes - README documents Linux and Mac source install (README.md:20-30) and lists a Homebrew arm64 pg_config path (README.md:1095); Makefile has an explicit Darwin+arm branch (Makefile:17-23); CI job `mac` runs Postgres 18 on macos-26 and Postgres 14 on the explicitly Intel macos-15-intel (.github/workflows/build.yml:46-56). That macos-26 is arm64 is an inference from GitHub runner naming, not stated in the file.",
+        "gpu": "no - CPU-only; grep for GPU/CUDA/OpenCL/Metal/ROCm finds nothing in the repository, and README.md has no GPU option."
+      },
+      "integrations": {
+        "cli": "none found - no CLI binary or script in the repo; interaction is SQL through any Postgres client (README.md:775-777); developer commands are make targets only (README.md:1319-1324; Makefile:63-89).",
+        "mcp": "none found - no MCP mention in README.md or anywhere in the repo (grep).",
+        "sdk_or_api": "SQL API only inside this repo: types, operators, functions and index access methods defined in sql/vector.sql (e.g. sql/vector.sql:33-40, 355, 364). Per-language client libraries are listed (README.md:779-815) but live in separate repositories that were not opened. No HTTP API.",
+        "claude_code_or_codex": "none found - grep of README.md for claude|codex|mcp matches only an OpenAI documentation link (README.md:726); nothing agent-related elsewhere in the repo."
+      },
+      "telemetry_and_network": "README.md contains no telemetry statement. Code: src/ has no socket/HTTP/curl/getaddrinfo/system/popen/fork/dlopen/getenv calls (greps); the only URLs in src/ are comments (e.g. src/hnsw.c:264, src/ivfscan.c:392, src/ivfkmeans.c:21). The extension runs inside the Postgres backend and calls no embedding service; vectors must be produced elsewhere (README.md:775-777), and OpenAI is mentioned only as an example of normalized embeddings (README.md:726). Required services: a running PostgreSQL 13+ server with the extension installed and `CREATE EXTENSION vector` run in each database (README.md:22, 55-59); no account, license server or hosted service is required (hosted Postgres is optional, README.md:1268-1270). Network use is build/install-time only: git clone from GitHub (README.md:24-27), Dockerfile `ADD https://github.com/pgvector/pgvector.git#v0.8.7` plus apt-get (Dockerfile:8-12), and CI downloads a Postgres source tarball with wget (.github/workflows/build.yml:73). Debug macros HNSW_BENCH/IVFFLAT_BENCH only emit elog(INFO) timings when compiled in (src/hnsw.h:89-102; src/ivfflat.h:71-84)."
+    },
+    "code": {
+      "languages": [
+        "C (src/: 19 .c + 8 .h)",
+        "SQL (sql/vector.sql + 41 upgrade scripts; 14 regression tests in test/sql)",
+        "Perl (48 TAP tests in test/t + 2 compat shims in test/perl)",
+        "Makefile (PGXS) and NMAKE (Makefile.win)",
+        "Dockerfile",
+        "YAML (GitHub Actions)"
+      ],
+      "entry_points": [
+        {
+          "path": "vector.control",
+          "what": "Extension control file (default_version 0.8.7, module_pathname $libdir/vector); read by `CREATE EXTENSION vector` (vector.control:1-4)."
+        },
+        {
+          "path": "sql/vector.sql",
+          "what": "Install script: CREATE TYPE vector/halfvec/sparsevec, functions, operators, CREATE ACCESS METHOD ivfflat/hnsw (sql/vector.sql:355,364) and operator classes; copied to sql/vector--0.8.7.sql at build (Makefile:46-49); upgrade scripts sql/vector--X--Y.sql."
+        },
+        {
+          "path": "src/vector.c",
+          "what": "Shared-library entry: PG_MODULE_MAGIC(_EXT) and _PG_init, which calls BitvecInit, HalfvecInit, HnswInit, IvfflatInit (src/vector.c:48-65)."
+        },
+        {
+          "path": "src/hnsw.c",
+          "what": "hnswhandler index-AM handler (src/hnsw.c:266-402) plus hnsw.* GUCs and index reloptions (src/hnsw.c:81-112)."
+        },
+        {
+          "path": "src/ivfflat.c",
+          "what": "ivfflathandler index-AM handler (src/ivfflat.c:183-319) plus ivfflat.* GUCs and reloptions (src/ivfflat.c:38-59)."
+        },
+        {
+          "path": "Makefile",
+          "what": "PGXS build with targets all/install/installcheck (pg_regress), prove_installcheck (TAP), dist, docker, docker-release, docker-release-trixie (Makefile:46-89)."
+        },
+        {
+          "path": "Makefile.win",
+          "what": "NMAKE build for Windows/MSVC; requires PGROOT; targets all/install/installcheck/uninstall/clean (Makefile.win:24-26, 50-82)."
+        },
+        {
+          "path": "Dockerfile",
+          "what": "Builds an image from postgres:$PG_MAJOR-$DEBIAN_CODENAME with pgvector compiled in (OPTFLAGS=\"\") (Dockerfile:3-23)."
+        }
+      ],
+      "architecture": "In-process Postgres extension (shared library `vector`); no daemon, client or network component. (1) Data types: src/vector.c (float4 `vector`, up to 16,000 dims, distance functions, aggregates, casts; FMA target_clones at src/vector.c:42-46), src/halfvec.c + src/halfutils.c (16-bit floats; F16C/AVX runtime dispatch via cpuid, src/halfutils.c:242-300), src/sparsevec.c, src/bitvec.c + src/bitutils.c (Hamming/Jaccard over Postgres `bit`; AVX-512 popcount dispatch, src/bitutils.c:173-224). (2) HNSW access method: src/hnsw.c (handler, GUCs, cost estimate), src/hnswbuild.c (in-memory graph, serial or parallel through dynamic shared memory sized by maintenance_work_mem, falls back to on-disk inserts when memory runs out, pages WAL-logged at the end; design comment src/hnswbuild.c:1-36), src/hnswinsert.c, src/hnswscan.c (scan loop incl. iterative scans), src/hnswutils.c (graph search, neighbor selection, per-type info), src/hnswvacuum.c (RemoveHeapTids -> RepairGraph -> MarkDeleted, driven by hnswbulkdelete at line 778). (3) IVFFlat access method: src/ivfflat.c, src/ivfbuild.c (row sampling, centers, assignment, parallel build), src/ivfkmeans.c (k-means++ / spherical k-means), src/ivfinsert.c, src/ivfscan.c (probe nearest lists, sort, iterative probes), src/ivfutils.c, src/ivfvacuum.c. Index pages are ordinary Postgres relation pages written through GenericXLog (e.g. src/hnswinsert.c:194-258, src/ivfinsert.c:127-162), so durability and replication come from Postgres WAL. SQL surface and operator classes per type/metric are in sql/vector.sql (397-446, 810-866, 894-911, 1180-1212). Built with auto-vectorization/fast-math flags (-ftree-vectorize -fassociative-math -fno-signed-zeros -fno-trapping-math -ffp-contract=fast, Makefile:38) and by default -march=native (Makefile:15).",
+      "packaging_and_release": "No release workflow: .github/workflows/ contains only build.yml (CI). Artifacts: source built with `make` (PGXS) or `nmake /F Makefile.win`; `make dist` zips `git archive` of master for PGXN (Makefile:67-71); Docker images (linux/amd64 + linux/arm64) are built and pushed to pgvector/pgvector on Docker Hub by manual `make docker-release` / `docker-release-trixie` (Makefile:81-89) from a Dockerfile that ADDs the Git tag (Dockerfile:8). No checksums, signatures, SBOM or provenance attestations are produced or referenced in the repo (glob/grep find none; no signing or provenance flags at Makefile:84,89). Distro, Homebrew, conda-forge, APK and FreeBSD packages are third-party (README.md:1191-1262; conda-forge explicitly community-maintained, README.md:1262). The version is hard-coded in Makefile:2, Makefile.win:2, vector.control:2, META.json:5,23, src/vector.c:49, Dockerfile:8 and README.md:26,43. Local ref .git/refs/tags/v0.8.7 resolves to the read commit.",
+      "tests_and_ci": "Frameworks: Postgres pg_regress (test/sql/*.sql vs test/expected/*.out, 14 tests, `make installcheck`; Makefile:10-12) and Perl TAP via `prove` (test/t/001..048_*.pl, 48 tests, `make prove_installcheck`; Makefile:63-65), with Postgres<15 compat shims in test/perl (2 files). About 62 test scripts (78 files under test/). TAP coverage includes WAL replay on a streaming replica (test/t/001_ivfflat_wal.pl, 010_hnsw_wal.pl), vacuum, build/insert/vacuum recall thresholds (e.g. 003, 012, 013, 042, 044), iterative scans, filtering and cost estimates, low-memory builds, and concurrent SELECT+VACUUM via pgbench (046_hnsw_vacuum_scan.pl). Recall tests use synthetic random vectors (e.g. 3 dimensions in test/t/012_hnsw_vector_build_recall.pl:56 and 044_hnsw_iterative_scan_recall.pl:11) and assert minimum recall (e.g. >=0.99, 012:94); they are CI gates, not published benchmarks. CI: .github/workflows/build.yml on push and pull_request (line 2): `ubuntu` (Postgres 13-20, x86-64 and arm64 runners, build with -DUSE_ASSERT_CHECKING -Wall -Wextra -Werror, installcheck + prove_installcheck; lines 4-45), `mac` (PG 18 macos-26, PG 14 macos-15-intel; installcheck, TAP using downloaded Postgres sources, clang scan-build; lines 46-84), `windows` (PG 17 and 14; nmake build + installcheck only, no TAP; lines 85-110), `i386` (debian:12 container with --platform linux/386, PG 15; installcheck + TAP; lines 111-133), `valgrind` (PG 18 via ankane/setup-postgres-valgrind with check-ub; installcheck only; lines 134-145). The git log subject of the read commit is 'Version bump to 0.8.7 [skip ci]' (taken from repository metadata at session start, not a file in the tree), so CI is skipped for that exact commit.",
+      "dependencies": "No language package manifests (glob for package.json, requirements*.txt, Cargo.toml, go.mod, pyproject.toml, CMakeLists.txt etc. finds none) and no vendored third-party libraries in src/. Manifests and direct counts: META.json - 1 declared runtime prerequisite (PostgreSQL >= 13.0.0; META.json:12-18); Dockerfile - 1 base image (postgres:$PG_MAJOR-$DEBIAN_CODENAME, Dockerfile:5) plus 2 build-time apt packages (build-essential, postgresql-server-dev-$PG_MAJOR, Dockerfile:12); .github/workflows/build.yml - 3 third-party actions (actions/checkout@v7, ankane/setup-postgres@v1, ankane/setup-postgres-valgrind@v1; build.yml:28-29, 139) plus libipc-run-perl / cpanm IPC::Run for TAP tests (build.yml:42-45, 70-72). Building needs a C compiler, make and Postgres server headers via pg_config/PGXS (Makefile:51-53; README.md:1100-1110); Windows needs MSVC, nmake and PGROOT (README.md:38; Makefile.win:24-26).",
+      "security_policy": "none - no SECURITY.md or equivalent in the repository (glob for SECURITY* finds nothing; grep of README.md, CHANGELOG.md, META.json and .github for security/vulnerability/CVE/disclosure finds nothing). Security-relevant fixes appear only as changelog lines (e.g. CHANGELOG.md:3, 8, 29)."
+    },
+    "claim_checks": [
+      {
+        "claim": "pgvector uses the write-ahead log (WAL), which allows for replication and point-in-time recovery (README.md:12, 823-825)",
+        "verified": "partial",
+        "evidence": "WAL logging confirmed: index page changes outside builds go through GenericXLog (src/hnswinsert.c:194-339, 493-534, 604-632; src/ivfinsert.c:127-162; src/hnswvacuum.c:68-163, 261-269, 635-717; src/ivfvacuum.c:86-118); HNSW builds fill pages and then WAL-log them with log_newpage_range (src/hnswbuild.c:27-35, 1142-1143); IVFFlat builds use GenericXLog and log the init fork explicitly (src/ivfbuild.c:1059-1061); unlogged tables are handled (src/hnswbuild.c:1166-1176; test/sql/hnsw_vector.sql:81-89). Replication is tested: primary and streaming-replica query results are compared across insert/delete/vacuum cycles (test/t/001_ivfflat_wal.pl:16-97; test/t/010_hnsw_wal.pl:16-97). Point-in-time recovery itself is neither implemented nor tested in this repo (grep of test/ for recovery_target/restore_command/pitr/pg_basebackup finds nothing); it follows from Postgres WAL replay, so only the WAL and replication parts are verified."
+      },
+      {
+        "claim": "Index dimension limits: vector 2,000; halfvec 4,000; bit 64,000; sparsevec 1,000 non-zero elements for HNSW; IVFFlat supports vector, halfvec, bit (README.md:250-255, 372-376, 827-829)",
+        "verified": "yes",
+        "evidence": "HNSW_MAX_DIM and IVFFLAT_MAX_DIM are 2000 and HNSW_MAX_NNZ is 1000 (src/hnsw.h:33-34; src/ivfflat.h:37); halfvec is x2 and bit is x32 (src/hnswutils.c:1405-1441; src/ivfutils.c:415-457); sparsevec nnz>1000 is rejected for hnsw (src/hnswutils.c:1385-1393). Enforced at build (src/hnswbuild.c:711-714; src/ivfbuild.c:366-369) and tested at the boundary: vector(2000) indexes, vector(2001) errors (test/sql/hnsw_vector.sql:116-124). Type caps: 16,000 dims (src/vector.h:11, src/halfvec.h:60), sparsevec 16,000 nnz (src/sparsevec.h:12). No IVFFlat sparsevec opclass exists (sql/vector.sql:1189-1212 are all hnsw)."
+      },
+      {
+        "claim": "HNSW defaults m=16, ef_construction=64, ef_search=40 and IVFFlat probes=1 (README.md:261-262, 272, 380); m is the 'max number of connections per layer'",
+        "verified": "partial",
+        "evidence": "Defaults confirmed: m 16, ef_construction 64, ef_search 40 (src/hnsw.h:54-62; src/hnsw.c:87-95); lists 100, probes 1 (src/ivfflat.h:55-58; src/ivfflat.c:41-47). Code differs from README in two details, and the code takes precedence: layer 0 uses 2*m connections (src/hnsw.h:126-127) while README describes m as per layer, and index build rejects ef_construction < 2*m (src/hnswbuild.c:716-719; test/sql/hnsw_vector.sql:98-99), which README does not document."
+      },
+      {
+        "claim": "Iterative index scans (0.8.0+) make filtered queries return enough rows, with hnsw.max_scan_tuples default 20,000, hnsw.scan_mem_multiplier default 1, ivfflat.max_probes (README.md:478-548); partial indexes scope queries (README.md:456-460)",
+        "verified": "yes",
+        "evidence": "GUCs and defaults: hnsw.iterative_scan off/relaxed_order/strict_order default off, max_scan_tuples 20000, scan_mem_multiplier 1 (src/hnsw.c:28-33, 97-109); ivfflat.iterative_scan off/relaxed_order only and ivfflat.max_probes (src/ivfflat.c:29-33, 49-56). The HNSW loop keeps scanning until max_scan_tuples or the work_mem-based limit (src/hnswscan.c:160-161, 254-292) and strict mode enforces distance order (src/hnswscan.c:318-324); IVFFlat extends probes up to max_probes (src/ivfscan.c:271-274, 403-409). CHANGELOG.md:40 dates the feature to 0.8.0. Recall >=0.99 is asserted under filtering (test/t/044_hnsw_iterative_scan_recall.pl:111-112) and partial-index use is tested (test/t/017_hnsw_filtering.pl:121-126)."
+      },
+      {
+        "claim": "Indexes are used only for ORDER BY distance-operator queries; without an index search is exact (README.md:197-199, 894-902)",
+        "verified": "yes",
+        "evidence": "Both cost estimators return infinite cost when the path has no ORDER BY operator (src/hnsw.c:147-160; src/ivfflat.c:99-112); both AMs set amcanorderbyop=true and amcanorder=false (src/hnsw.c:333-334; src/ivfflat.c:250-251); scans error with 'cannot scan ... index without order' and require an MVCC snapshot (src/hnswscan.c:217-224; src/ivfscan.c:387-394). Queries with a distance filter but no ORDER BY or no LIMIT stay on a sequential scan (test/t/017_hnsw_filtering.pl:89-99). The extension does not itself enforce LIMIT; that is planner cost behavior."
+      },
+      {
+        "claim": "NULL vectors are not indexed, nor are zero vectors for cosine distance (README.md:937, 949)",
+        "verified": "yes",
+        "evidence": "NULLs are skipped on build and insert (src/hnswbuild.c:593-595; src/hnswinsert.c:783-785; src/ivfbuild.c:117-119, 237-239; src/ivfinsert.c:201-203). Zero-norm vectors are skipped only when the opclass has a norm support function, i.e. cosine (src/hnswutils.c:422-425; src/ivfbuild.c:177-180; src/ivfinsert.c:93-97); hnsw vector_cosine_ops declares FUNCTION 2 vector_norm while vector_ip_ops has none (sql/vector.sql:432-441)."
+      },
+      {
+        "claim": "Vectors of different dimensions can share an untyped `vector` column, but indexes need fixed dimensions (README.md:831-849)",
+        "verified": "yes",
+        "evidence": "A typmod of -1 skips the dimension check (src/vector.c:83-89). Index builds fail with 'column does not have dimensions' when atttypmod < 0 (src/hnswbuild.c:705-709; src/ivfbuild.c:360-364), and rows whose dimension differs from the index raise 'expected %d dimensions, not %d' (src/hnswutils.c:1366-1374; src/ivfutils.c:283-301)."
+      },
+      {
+        "claim": "Supports Postgres 13+ (README.md:22)",
+        "verified": "yes",
+        "evidence": "src/bitutils.h:6-9 emits #error 'Requires PostgreSQL 13+' below 130000; META.json:12-18 declares PostgreSQL 13.0.0; CI covers Postgres 13-20 on Linux (.github/workflows/build.yml:11-26), 18 and 14 on macOS (build.yml:52-56) and 17 and 14 on Windows (build.yml:91-95); code has branches up to PG_VERSION_NUM >= 190000 (src/hnsw.h:21, 29). README itself says nothing about 19 or 20."
+      },
+      {
+        "claim": "By default compiles with -march=native on some platforms; use `make OPTFLAGS=\"\"` for portability (README.md:1122-1130)",
+        "verified": "yes",
+        "evidence": "Makefile:14-15 sets OPTFLAGS = -march=native and clears it for macOS arm (Makefile:17-23), ppc64 (Makefile:25-28) and riscv64 (Makefile:30-33); PG_CFLAGS includes OPTFLAGS (Makefile:38); Dockerfile:15 and the valgrind CI job (build.yml:143) build with OPTFLAGS=\"\"."
+      },
+      {
+        "claim": "Use pgvector from any language with a Postgres client; vectors can be generated in one language and queried in another (README.md:10, 775-777)",
+        "verified": "partial",
+        "evidence": "The extension is SQL-only: vector, halfvec and sparsevec define text input/output plus binary RECEIVE/SEND (sql/vector.sql:33-40, 477-484, 942-949), so any Postgres client can read and write them. src/ contains no embedding-model, HTTP or other network code (grep: URLs only in comments) and no CLI, MCP or SDK. The per-language client repositories linked at README.md:779-815 are separate repositories that were not opened, so client availability is not checkable here."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: pgvector is only the vector storage/index/query layer. No embedding generation, repository ingestion/chunking, CLI, MCP server, SDK, or Claude Code/Codex integration exists in this repo (src/ file list and Makefile:7; grep for mcp/claude/codex in README.md matches only an OpenAI docs link at README.md:726). The per-language clients are separate repositories (README.md:779-815) that were not opened. Any end-to-end semantic code search would need other components around it.",
+      "Operational footprint: needs a running PostgreSQL 13+ server, a server-side install (make install into the pg_config directories, possibly sudo; README.md:22-30, 1080-1090) and `CREATE EXTENSION vector` in every database (README.md:55-59). vector.control sets neither `superuser` nor `trusted` (vector.control:1-4), so PostgreSQL's default rule (superuser required to create the extension) presumably applies; that is Postgres behavior, not stated in this repo. State lives in Postgres relations and WAL, not in a standalone local index file.",
+      "Embedding-model coupling: indexes need a fixed-dimension column (src/hnswbuild.c:705-709; src/ivfbuild.c:360-364) and cap at 2,000 dimensions for vector and 4,000 for halfvec (src/hnsw.h:33; src/hnswutils.c:1422-1427; src/ivfutils.c:434-441), although the vector type stores up to 16,000 (src/vector.h:11). Models above the cap cannot be indexed directly (README.md:827-829); mixing models or dimensions needs separate columns/tables or partial+expression indexes (README.md:831-849). HNSW builds also reject ef_construction < 2*m, which README does not document (src/hnswbuild.c:716-719).",
+      "Approximate-search behavior: results differ from exact search once an index exists (README.md:197-199). Filters run after the index scan, so scoped queries (for example one repository via WHERE) can return fewer rows than LIMIT; iterative scans address this but are off by default (README.md:450, 478-480; src/hnsw.c:97-99; src/ivfflat.c:49-51). With the default hnsw.ef_search of 40 an HNSW scan yields about 40 candidates unless iterative scans are on (README.md:933-935; src/hnsw.h:60; src/hnswscan.c:60, 254-257). IVFFlat built on little data warns of low recall (src/ivfbuild.c:472-478). The planner may choose a sequential scan over the vector index for selective filters (test/t/017_hnsw_filtering.pl:41-44).",
+      "Silently unindexed rows: NULL vectors, and zero vectors under cosine opclasses, are never added to HNSW or IVFFlat indexes (README.md:937; src/hnswinsert.c:783-785; src/hnswutils.c:422-425; src/ivfbuild.c:177-180; src/ivfinsert.c:93-97), so rows with failed or empty embeddings cannot be returned by index scans.",
+      "Maintenance and stability: release 0.8.7 is dated 2026-10-01, one day before this read, and six releases shipped between 2026-02-25 and 2026-10-01 (CHANGELOG.md:1-31), several fixing storage-critical bugs: IVFFlat build buffer overflows (CHANGELOG.md:3, 8), a parallel HNSW build overflow (CHANGELOG.md:29), possible HNSW index corruption in vacuuming (CHANGELOG.md:24) and HNSW vacuum errors (CHANGELOG.md:18-19). Each upgrade needs a reinstall plus `ALTER EXTENSION vector UPDATE` per database (README.md:1272-1278). No SECURITY.md or disclosure policy exists in the repo.",
+      "Platform and build: default builds use -march=native (Makefile:14-15), which can raise 'Illegal instruction' on another CPU (README.md:1122-1130). WSL2 is neither mentioned nor tested and there is no GPU path. Windows builds only via nmake and CI runs regression tests there but not the TAP tests (.github/workflows/build.yml:101-108; Makefile.win:68-69). CI covers Postgres 13-20 on Linux (build.yml:11-26) while the Docker tags listed in the README stop at pg18 (README.md:1164-1175). Parallel HNSW builds in Docker need --shm-size at least maintenance_work_mem (README.md:1185-1189; src/hnswbuild.c:961-971).",
+      "Release integrity and supply chain: no release workflow, checksums, signatures or attestations in the repo (only .github/workflows/build.yml). Docker images are pushed by manual `make docker-release*` (Makefile:81-89) from a Dockerfile that fetches source by tag name (Dockerfile:8). CI uses third-party actions pinned by mutable tags (build.yml:28-29, 139). META.json lists a single maintainer (META.json:6-8). APT, Yum, Homebrew, APK, conda-forge and FreeBSD packages are built by third parties (README.md:1191-1262). Licence is the permissive PostgreSQL licence, and LICENSE names only the PostgreSQL Global Development Group and the UC Regents as copyright holders (LICENSE:1-3; META.json:9-11)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "pgvector/pgvector",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Source build (Linux and macOS); set PG_CONFIG if several Postgres installs exist: cd /tmp; git clone --branch v0.8.7 https://github.com/pgvector/pgvector.git; cd pgvector; make; make install # may need sudo",
+          "citation": "README.md:20-30; README.md:1080-1090",
+          "holds": true,
+          "note": "README.md:20-30 has the 'Linux and Mac' heading, 'Compile and install the extension (supports Postgres 13+)' and the five commands word for word, including --branch v0.8.7. README.md:1080-1090 gives `export PG_CONFIG=...` for machines with several Postgres installs and `sudo --preserve-env=PG_CONFIG make install`. The checkout is the named revision: .git/HEAD -> refs/heads/master = refs/tags/v0.8.7 = f37c13f68b57d2c3472b2214fbcff699d6d34876."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: PostgreSQL; file: LICENSE",
+          "citation": "LICENSE:1-20; META.json:9-11",
+          "holds": true,
+          "note": "LICENSE is the standard PostgreSQL Licence text: Portions Copyright 1996-2026 PostgreSQL Global Development Group and 1994 Regents of the University of California, permission to use/copy/modify/distribute without fee or written agreement, and the UC liability and warranty disclaimers. META.json:9-11 declares license \"PostgreSQL\" with the postgresql.org/about/licence URL. The SPDX id `PostgreSQL` is correct."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - source build documented for Linux (README.md:20-30); CI runs Postgres 20, 19, 17, 15, 13 on x86-64 Ubuntu runners (arm64 runners carry an -arm suffix for 18, 16, 14) (.github/workflows/build.yml:4-26); x86-64 specific runtime CPU dispatch exists (CHANGELOG.md:81; src/halfvec.h:17-34; src/bitutils.c:173-224).",
+          "citation": "README.md:20-30; .github/workflows/build.yml:4-45; CHANGELOG.md:81; src/halfvec.h:17-34; src/bitutils.c:173-224",
+          "holds": true,
+          "note": "The build.yml matrix runs 20 and 19 on ubuntu-26.04, 17 on ubuntu-24.04, and 15 and 13 on ubuntu-22.04; 18, 16 and 14 run on ubuntu-26.04-arm, ubuntu-24.04-arm and ubuntu-22.04-arm. Every job runs make, make install, installcheck and prove_installcheck (build.yml:33-45). CHANGELOG.md:81 says 'Added CPU dispatching for distance functions on Linux x86-64'. halfvec.h:19-33 enables USE_DISPATCH only for __x86_64__ (or MSVC _M_AMD64) and target_clones only on glibc. bitutils.c:173-224 holds the cpuid/xgetbv AVX-512 VPOPCNTDQ dispatch. One small point: build.yml never says the unsuffixed runners are x86-64; that comes from GitHub's runner naming. The dossier flags the same kind of inference for macos-26 but not here. This does not change the 'yes'."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "none found - grep of README.md for claude|codex|mcp matches only an OpenAI documentation link (README.md:726); nothing agent-related elsewhere in the repo.",
+          "citation": "README.md:726",
+          "holds": false,
+          "note": "The conclusion is right, but the evidence is false as written. Case-insensitive repo-wide greps for claude, codex, agent, anthropic and 'model context protocol' return nothing, so there is no Claude Code/Codex integration. But a case-insensitive grep of README.md for claude|codex|mcp returns zero matches. README.md:726 links to platform.openai.com/docs/guides/embeddings#which-distance-function-should-i-use, which contains none of the three strings; only a grep for 'openai' finds that line. Across the repo, 'mcp' occurs only inside `memcpy` in src/ (e.g. src/hnswbuild.c:392). The first item in risks repeats the same wrong grep claim."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "Index dimension limits: vector 2,000; halfvec 4,000; bit 64,000; sparsevec 1,000 non-zero elements for HNSW; IVFFlat supports vector, halfvec, bit (verified: yes)",
+          "citation": "README.md:250-255, 372-376, 827-829; src/hnsw.h:33-34; src/ivfflat.h:37; src/hnswutils.c:1385-1393, 1405-1441; src/ivfutils.c:415-457; src/hnswbuild.c:711-714; src/ivfbuild.c:366-369; test/sql/hnsw_vector.sql:116-124; src/vector.h:11; src/halfvec.h:60; src/sparsevec.h:12; sql/vector.sql:1189-1212",
+          "holds": true,
+          "note": "Every citation matches. HNSW_MAX_DIM and IVFFLAT_MAX_DIM are 2000 and HNSW_MAX_NNZ is 1000. In both AMs the type-info structs set maxDimensions to the base limit for vector, x2 for halfvec (4000) and x32 for bit (64000). SparsevecCheckValue rejects nnz > 1000 for hnsw. Builds raise 'column cannot have more than %d dimensions for hnsw/ivfflat index'. The test indexes vector(2000) and expects that error for vector(2001) (test/expected/hnsw_vector.out:217; ivfflat_vector.out:193). The type caps of 16000 (vector.h:11, halfvec.h:60, sparsevec.h:12 SPARSEVEC_MAX_NNZ) match. The only IVFFlat opclasses are for vector, halfvec and bit (sql/vector.sql:406-420, 819-835, 894-895). Every sparsevec opclass is hnsw, apart from the btree one."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "integrations.claude_code_or_codex: replace 'grep of README.md for claude|codex|mcp matches only an OpenAI documentation link (README.md:726)' with 'a case-insensitive grep for claude|codex|mcp finds no match in README.md, and claude/codex match nothing anywhere in the repo (mcp occurs only inside memcpy in src/); OpenAI is mentioned only as an example of normalized embeddings at README.md:726'. Keep the 'none found' conclusion.",
+        "risks[0]: replace '(grep for mcp/claude/codex in README.md matches only an OpenAI docs link at README.md:726)' with a statement that this grep finds no match in README.md. README.md:726 may be cited only as the OpenAI embeddings example, not as a grep hit."
+      ]
+    }
+  ]
+}

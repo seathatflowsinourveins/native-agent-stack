@@ -1,0 +1,290 @@
+{
+  "contender": "benbjohnson/litestream",
+  "revision": {
+    "contender": "benbjohnson/litestream",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "benbjohnson/litestream",
+        "tag": "v0.5.17",
+        "commit": "ccd326c175b583b5e82893a6078f06dcef5fba3f",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.5.17",
+    "commit": "ccd326c175b583b5e82893a6078f06dcef5fba3f",
+    "read_at": "2026-10-02T03:01:57+00:00"
+  },
+  "dossier": {
+    "contender": "benbjohnson/litestream",
+    "revision": {
+      "tag": "v0.5.17",
+      "commit": "ccd326c175b583b5e82893a6078f06dcef5fba3f",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Litestream is a Go daemon/CLI that replicates SQLite databases for disaster recovery. It monitors each database's WAL, writes changes as immutable LTX files, compacts them through levels (L0 raw, L1 30s, L2 5m, L3 1h, L9 snapshots; compaction_level.go:9-19) and uploads them to one replica destination per database: local file path, S3/S3-compatible, GCS, Azure Blob, SFTP, WebDAV, NATS JetStream or Alibaba OSS (cmd/litestream/main.go:1378-1413). `litestream restore` rebuilds a SQLite file from the replica (latest state, a TXID or a timestamp) into an explicitly chosen output path, from either a config entry or a bare replica URL (cmd/litestream/restore.go:25-116). Scope per the code: SQLite databases only. The command set (databases, info, list, ltx, register, replicate, reset, restore, start, status, stop, sync, unregister, version; main.go:250-265) contains no language-runtime or CLI-tool installer and no dotfile/config-sync function. Client-side (age) encryption config is rejected in this version (main.go:1356-1363); S3 server-side encryption options exist (s3/replica_client.go:118-126).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Litestream is a standalone disaster recovery tool for SQLite.",
+          "citation": "README.md:8"
+        },
+        {
+          "claim": "It runs as a background process and safely replicates changes incrementally to another file or S3.",
+          "citation": "README.md:8-10"
+        },
+        {
+          "claim": "Litestream only communicates with SQLite through the SQLite API so it will not corrupt your database.",
+          "citation": "README.md:10-11"
+        },
+        {
+          "claim": "Status badge: beta.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Installation instructions and documentation are on the Litestream web site (litestream.io); the README itself contains no install commands.",
+          "citation": "README.md:15-16"
+        },
+        {
+          "claim": "When replication begins, Litestream creates an internal `_litestream_lock` table in the source SQLite database; it is used to acquire SQLite's write lock around WAL checkpoints; the writes occur in rolled-back transactions so no rows are left.",
+          "citation": "README.md:24-29"
+        },
+        {
+          "claim": "The table is part of the source database, so the source schema backup and restored databases also contain it; a database under Litestream should not be expected to remain byte-identical to its pre-Litestream state.",
+          "citation": "README.md:31-35"
+        },
+        {
+          "claim": "Do not drop `_litestream_lock` while Litestream is running; restarting Litestream recreates the missing table automatically.",
+          "citation": "README.md:37-39"
+        },
+        {
+          "claim": "Report security vulnerabilities privately through GitHub private vulnerability reporting, not public issues; see SECURITY.md.",
+          "citation": "README.md:49-53"
+        },
+        {
+          "claim": "Bug reports, fixes and patches are welcome; see CONTRIBUTING.md.",
+          "citation": "README.md:44"
+        },
+        {
+          "claim": "The README (69 lines, read in full) makes no statements about encryption, supported platforms, telemetry/network requirements, MCP, or restore usage; those facts below come from code and docs.",
+          "citation": "README.md:1-69"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (macOS and Linux), from the release-notes header in the GoReleaser config",
+          "command": "brew tap benbjohnson/litestream && brew install litestream",
+          "citation": ".goreleaser.yml:134-138"
+        },
+        {
+          "method": "Debian/Ubuntu package (.deb attached to the GitHub release)",
+          "command": "sudo dpkg -i litestream-*.deb",
+          "citation": ".goreleaser.yml:140-144"
+        },
+        {
+          "method": "RPM package (.rpm attached to the GitHub release)",
+          "command": "sudo rpm -i litestream-*.rpm",
+          "citation": ".goreleaser.yml:146-150"
+        },
+        {
+          "method": "Binary archive (tar.gz named litestream-VERSION-linux-x86_64 / darwin-arm64 etc.) from the GitHub release",
+          "command": "No command given; text: Download the appropriate archive for your platform, extract, and move to your PATH.",
+          "citation": ".goreleaser.yml:34-49,152-153"
+        },
+        {
+          "method": "Docker image litestream/litestream (Debian 'default' target and hardened scratch '-scratch' target; linux/amd64 and linux/arm64)",
+          "command": "No verbatim docker command in repo; image name litestream/litestream is published by the release workflow",
+          "citation": ".github/workflows/release.docker.yml:14-84; Dockerfile:31-57; README.md:5"
+        },
+        {
+          "method": "Build from source (Go 1.25.0 per go.mod; pure-Go build, CGO_ENABLED=0 used for releases)",
+          "command": "go build ./cmd/litestream   (or: make build)",
+          "citation": "CONTRIBUTING.md:105; Makefile:5-8; go.mod:3-5; .goreleaser.yml:13-14"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - GoReleaser builds linux/amd64 with CGO_ENABLED=0 (.goreleaser.yml:13-22); release notes list Linux amd64 as supported (.goreleaser.yml:130); Go unit/integration tests run on ubuntu-latest (.github/workflows/commit.yml:149-178).",
+        "wsl2": "unknown - no mention of WSL/WSL2 anywhere in the repository (search for 'wsl' returned no matches); the Linux binary is neither documented nor tested under WSL2.",
+        "macos_arm64": "yes - GoReleaser builds darwin/arm64 (.goreleaser.yml:17,21,31-32); release notes list macOS arm64 as supported (.goreleaser.yml:130); Homebrew formula defined (.goreleaser.yml:82-100). Caveats: CI runs the Go test suite only on ubuntu-latest, macOS runners only build/verify the VFS extension (.github/workflows/commit.yml:33-47; release.yml:143-212); macOS signing/notarization jobs are commented out (release.yml:214-260; .goreleaser.yml:173-187).",
+        "gpu": "no - no GPU use; searches for GPU/CUDA in the repository returned no matches (not applicable)."
+      },
+      "integrations": {
+        "cli": "yes - `litestream` binary with commands databases, info, list, ltx, register, replicate, reset, restore, start, status, stop, sync, unregister, version (cmd/litestream/main.go:142-238,242-266); `-json` output contract documented in docs/CLI_JSON_OUTPUT.md:1-15.",
+        "mcp": "yes, built in but not mentioned in README - Streamable-HTTP MCP server started when config key `mcp-addr` is set (cmd/litestream/main.go:315-316; cmd/litestream/replicate.go:182-189); tools litestream_info, _databases, _restore, _ltx, _version, _status, _reset (cmd/litestream/mcp.go:39-45); each tool shells out to `litestream` found on PATH (mcp.go:96,235); no authentication in code (mcp.go:52-64); Makefile has `fly mcp wrap/proxy` targets using a bearer token (Makefile:71-75).",
+        "sdk_or_api": "Go library (module github.com/benbjohnson/litestream: NewDB, NewReplicaWithClient, NewStore, Replica.Restore) with examples in _examples/library/; its README says the library API is 'not considered stable' (_examples/library/README.md:6-10). Unix-socket HTTP control API, disabled by default (server.go:17-31,74-90; docs/ARCHITECTURE.md:212-257). Prometheus /metrics when `addr` is set (replicate.go:351-367). SQLite VFS extension (read, experimental write; docs/VFS.md:1-26) packaged for pip/npm/gem (.goreleaser.yml:166-171).",
+        "claude_code_or_codex": "No Claude Code/Codex integration for operating Litestream beyond the MCP server. The repo carries contributor-facing assistant files: CLAUDE.md, .claude/agents/*.md, .claude/commands/*.md, .claude/settings.json, AGENTS.md, GEMINI.md and skills/litestream/SKILL.md (an Agent Skill for working on the Litestream source code) (CLAUDE.md:18-38; skills/litestream/SKILL.md:1-16)."
+      },
+      "telemetry_and_network": "README says nothing about telemetry or network needs (README.md:1-69). Code: (1) No telemetry/analytics/update-check/phone-home code found (searches for telemetry, analytics, sentry, posthog, update check matched only the Azure SDK ApplicationID 'litestream' User-Agent option, abs/replica_client.go:139-141, and the S3 client prefixing User-Agent 'litestream', s3/replica_client.go:924-933). (2) Network use is only to the configured replica backend; `file` replicas need no network (cmd/litestream/main.go:1379-1382); S3/GCS/Azure/SFTP/WebDAV/NATS/OSS need their service plus credentials; with no AWS keys set the SDK default chain may query instance/ECS/web-identity credential sources (s3/replica_client.go:421-445). (3) Optional outbound call: `heartbeat-url` HTTP GET to a user-set URL, only when configured and all databases synced (heartbeat.go:45-66; store.go:711-743; replicate.go:270-276). (4) Optional listeners, all off by default: Unix control socket (server.go:24-31), Prometheus /metrics when `addr` is set (replicate.go:351-367), MCP HTTP server when `mcp-addr` is set (replicate.go:182-189). (5) No Litestream account, licence or hosted service is required; cloud backends need provider credentials supplied by config keys (main.go:1127-1128,1150-1160), env AWS_*/LITESTREAM_* (main.go:2051-2065; s3/replica_client.go:230-240; abs/replica_client.go:145-155), SDK default chains (AWS shared credentials/instance roles s3/replica_client.go:421-445; GCS ADC gs/replica_client.go:86; Azure DefaultAzureCredential abs/replica_client.go:192), an SSH key file (sftp/replica_client.go:143-154) or credentials embedded in sftp/webdav/abs URLs (main.go:1822-1830,1885-1891). Config files expand $VAR / ${VAR} unless -no-expand-env is given (main.go:640-647,2105-2108); the shipped etc/litestream.yml has credentials commented out (etc/litestream.yml:1-3). No code that persists credentials was found; local state is a per-database metadata directory with suffix '-litestream' (litestream.go:20,87-90)."
+    },
+    "code": {
+      "languages": [
+        "Go (145 files: 70 non-test, 75 *_test.go)",
+        "C (src/litestream-vfs.c VFS loadable-extension glue; packages/python/litestream_vfs/noop.c)",
+        "JavaScript (.github/scripts/*.js with 2 *.test.js files; packages/npm/litestream-vfs/index.js)",
+        "Python (packages/python packaging; etc/s3_mock.py)",
+        "Ruby (packages/ruby gem)",
+        "Shell and PowerShell (test scripts; etc/build.ps1)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/litestream/main.go",
+          "what": "`litestream` CLI/daemon main: command dispatch (main.go:125-239), YAML config schema, defaults and validation (main.go:270-714), replica-client construction for file/s3/gs/abs/sftp/webdav/nats/oss (main.go:1350-1418)."
+        },
+        {
+          "path": "cmd/litestream/replicate.go",
+          "what": "`replicate` daemon: loads config or CLI args, opens the Store, optionally starts control socket, Prometheus metrics, MCP server, directory watchers, an -exec subprocess or -once mode (replicate.go:178-433)."
+        },
+        {
+          "path": "cmd/litestream/restore.go",
+          "what": "`restore` command: -o, -txid, -timestamp, -dry-run, -force, -json, -f follow mode, -integrity-check none|quick|full, replica URL or config-entry source (restore.go:25-168)."
+        },
+        {
+          "path": "cmd/litestream/mcp.go",
+          "what": "MCP Streamable-HTTP server exposing 7 tools that shell out to the litestream binary (mcp.go:25-64)."
+        },
+        {
+          "path": "cmd/litestream-vfs/main.go",
+          "what": "SQLite loadable VFS extension (c-archive, build tags vfs / SQLITE3VFS_LOADABLE_EXT) reading replicas directly; marked Experimental in release notes (main.go:1-60; Makefile:13-62; .goreleaser.yml:155)."
+        },
+        {
+          "path": "cmd/litestream-test/main.go",
+          "what": "Test helper binary with populate, load, shrink, validate, version subcommands used by integration tests and CI (main.go:53-66)."
+        },
+        {
+          "path": "_examples/library/basic/main.go",
+          "what": "Go library example (file replica); sibling _examples/library/s3/main.go shows restore-on-startup with S3."
+        },
+        {
+          "path": "litestream.go, db.go, replica.go, store.go (root package)",
+          "what": "Importable Go library package github.com/benbjohnson/litestream (DB, Replica, Store, RestoreOptions at db.go:3311-3345)."
+        }
+      ],
+      "architecture": "Root package: db.go (DB: opens SQLite via modernc.org/sqlite, forces WAL mode, creates _litestream_seq/_litestream_lock tables, monitors WAL, checkpoints, writes LTX files; db.go:1046-1099), replica.go (Replica: uploads LTX, Restore, CalcRestorePlan, follow mode, RestoreV3 for v0.3.x-format replicas, integrity check, level validation), store.go (Store: multi-DB coordination, compaction levels, snapshots, retention, heartbeat, validation), compactor.go and compaction_level.go (merge LTX files via ltx.NewCompactor; default levels L1 30s/L2 5m/L3 1h, snapshot level 9), replica_client.go and replica_url.go (ReplicaClient interface and URL-scheme factories), server.go (Unix-socket HTTP control API plus pprof), heartbeat.go, leaser.go + s3/leaser.go (S3 conditional-write lease interface; not referenced from db.go, replica.go, store.go or cmd/litestream), v3.go and wal_reader.go, vfs.go and vfs_config.go (VFS). Backends are one package each with a replica_client.go: file/, s3/, gs/, abs/, oss/, sftp/, webdav/, nats/ (plus mock/ and internal/ for logging, locks and resumable readers). cmd/litestream holds the CLI and all config parsing. Depends on github.com/superfly/ltx for the LTX format and modernc.org/sqlite (pure-Go SQLite) (go.mod:30,35; AGENTS.md:3). Dedup/verification as implemented: compaction keeps the newest version of each page when merging LTX files (docs/LTX_FORMAT.md:137; compactor.go:158-167); no content-defined or cross-file chunk deduplication code was found. Direct restore path: CalcRestorePlan then ltx compactor into a .tmp file then atomic rename (replica.go:686-765).",
+      "packaging_and_release": "Release triggers: push of tag v* or manual dispatch (release.yml:3-12). GoReleaser builds ./cmd/litestream for linux/darwin/windows x amd64/arm64/arm(v6,v7) except windows/arm and darwin/arm, CGO_ENABLED=0 (.goreleaser.yml:9-32); tar.gz archives (zip on Windows) bundling etc/litestream.yml, etc/litestream.service, README.md, LICENSE (:34-54); .deb/.rpm via nfpm (:56-80); Homebrew formula pushed to benbjohnson/homebrew-litestream (:82-100); SHA-256 checksums.txt (:101-103); SBOMs for archives via Syft (:189-190; release.yml:42-45). Signing: the goreleaser `signs:` block is commented out (.goreleaser.yml:173-187); the GPG import step is gated on env.GPG_PRIVATE_KEY, which no workflow/job env defines (release.yml:47-53); macOS and Windows signing jobs are commented out (release.yml:214-291); no cosign/attestation steps found in any workflow. Docker: release.docker.yml builds litestream/litestream for linux/amd64+arm64 (Debian default and '-scratch' hardened non-root image, Dockerfile:31-57) with provenance: true and sbom: true (release.docker.yml:49-50,78-79). VFS extension: per-platform tar.gz plus .sha256 for linux amd64/arm64 and darwin amd64/arm64 uploaded to the release (release.yml:65-212), then published as PyPI wheels (release.yml:293-371), npm packages (:373-442) and RubyGems (:444-517). Release gating policy: zero open 'stability' issues, green nightly, LTX behavioral gate (CONTRIBUTING.md:128-142).",
+      "tests_and_ci": "Go stdlib testing (testify imported in 7 files, go.mod:63). 75 *_test.go files with 601 func Test* across 73 files: root package (db, replica, store, server, compactor, heartbeat, v3, replica_url, restore_fuzz, vfs*), cmd/litestream (CLI/config), cmd/litestream-vfs (build tag vfs; chaos/stress/soak tags), s3, gs, oss, nats, webdav, file, internal, _examples/library, and tests/integration (18 test files; tags integration, soak, docker, aws, long, profile). abs/ and sftp/ have no package-level test files. Also 2 JS test files for workflow scripts (.github/scripts/*.test.js) and 17 shell scripts in cmd/litestream-test/scripts/. Workflows (.github/workflows): commit.yml (push to main and PRs: pre-commit lint with goimports/go vet/staticcheck [.pre-commit-config.yaml:11-20], JS script tests, VFS build checks on macOS and Linux, Windows cross-build, Docker smoke tests incl. non-root/no-shell checks, `go test -v` for ., internal, abs, file, gs, nats, s3, sftp, cmd/litestream and _examples/library plus a 386 WAL-ordering test [commit.yml:149-178], LTX behavioral gate, moto S3 mock, MinIO, NATS, SFTP, WebDAV integration, and S3/GCS/Azure/R2 integration on main using secrets); integration-tests.yml (PR path-filtered quick integration tests; manual quick/all/long); upgrade-tests.yml (TestUpgrade); nightly-stability.yml (weekday and Saturday cron: `go test -race -count=3 ./...`, LTX behavioral soak per load profile, snapshot regression); pre-release-checklist.yml and manual-integration-tests.yml (manual race tests and cloud-provider integration); pr-metrics.yml (binary size, dependency diff, non-blocking govulncheck, toolchain freshness); release.yml, release.docker.yml; stale-issues.yml. Gaps observed: all Go test jobs run on ubuntu-latest (macOS runners only build the VFS); no workflow runs `-tags vfs` tests (Makefile:64-65 vfs-test is not invoked); ./oss and ./webdav unit tests are not in commit.yml's package list (nightly ./... covers them); soak tests are documented as not run in CI (tests/integration/README.md:343-354).",
+      "dependencies": "Go module github.com/benbjohnson/litestream, go 1.25.0 with toolchain go1.25.14 (go.mod:1-5). go.mod holds 119 requirements across 5 require blocks: 37 without an '// indirect' marker (direct) and 82 marked '// indirect' (grep counts). Direct ones include modernc.org/sqlite (pure-Go SQLite), github.com/superfly/ltx (LTX format library; not vendored, not read), AWS SDK v2 (config, credentials, s3, s3/manager, smithy-go), cloud.google.com/go/storage and google.golang.org/api, Azure azcore/azidentity/azblob, nats.go, pkg/sftp, studio-b12/gowebdav, alibabacloud-oss-go-sdk-v2, mark3labs/mcp-go, prometheus/client_golang, golang.org/x/crypto (+x509roots/fallback), yaml.v2, fsnotify, psanford/sqlite3vfs, lz4, testify. fake-gcs-server is only imported by gs/replica_client_test.go; mattn/go-sqlite3 is imported only by tests/integration, cmd/litestream-vfs tests and cmd/litestream-test (not by the litestream binary). Other manifests: packages/npm/litestream-vfs/package.json (0 dependencies, 4 optionalDependencies), 4 platform package.json files (0 deps), packages/python/setup.py (no install_requires), packages/ruby/litestream-vfs.gemspec (no runtime deps). No dependabot/renovate configuration in the repo (.github/dependabot.yml absent).",
+      "security_policy": "SECURITY.md: report privately via GitHub private vulnerability reporting; asks for description, reproduction steps, impact and suggested fix; best-effort acknowledgement with no stated SLA (SECURITY.md:5-26)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:8-10 - replicates changes incrementally 'to another file or S3'.",
+        "verified": "partial",
+        "evidence": "Code supports eight replica types: file, s3, gs, abs, sftp, webdav, nats, oss (cmd/litestream/main.go:1378-1413), so the README understates scope; exactly one replica per database is enforced (main.go:786-796). Incremental LTX files per sync are written at db.go:2141-2158 and compacted per compaction_level.go:9-19."
+      },
+      {
+        "claim": "README.md:10-11 - Litestream only communicates with SQLite through the SQLite API so it will not corrupt the database.",
+        "verified": "partial",
+        "evidence": "The SQLite API (modernc.org/sqlite via database/sql) is used for PRAGMAs, bookkeeping tables, checkpoints and the long-running read transaction (db.go:1046-1099, 2596-2602). The code also opens the -wal file directly and reads it with os.Open/ReadAt (db.go:1866, 2044, 2308, 2373) and reads the main DB file through its own long-lived file descriptor (db.go:1059, 2324, 2382). The 'will not corrupt' guarantee cannot be checked statically; the repo has integration/soak/race test jobs (commit.yml:180-204, nightly-stability.yml:38-113)."
+      },
+      {
+        "claim": "README.md:24-29 - an internal `_litestream_lock` table is created in the source DB and its writes are rolled back.",
+        "verified": "partial",
+        "evidence": "Matches for the lock table: CREATE TABLE IF NOT EXISTS _litestream_lock (db.go:1089-1093) and inserts only inside a transaction that is rolled back (db.go:2596-2602, 2626). README omits that Litestream also forces `PRAGMA journal_mode = wal` (db.go:1077) and creates `_litestream_seq`, which is persistently upserted by autocommit statements (db.go:1085, 1567-1570)."
+      },
+      {
+        "claim": "README.md:31-39 - restored databases also contain the lock table; not byte-identical to pre-Litestream state; restarting recreates a dropped table.",
+        "verified": "yes",
+        "evidence": "Restore rebuilds the whole database from LTX page data (replica.go:738-753), so schema objects including `_litestream_lock` are carried (inferred from code; no test read). Restart recreation: DB.init runs CREATE TABLE IF NOT EXISTS (db.go:1091) and is called when the sync executor is created (db.go:1930-1938). Non-identical bytes are consistent with init adding WAL mode and two tables (db.go:1077, 1085, 1091)."
+      },
+      {
+        "claim": "Not a README claim - config schema exposes `age: identities/recipients`, implying client-side encryption of replicas (cmd/litestream/main.go:1182-1186).",
+        "verified": "no",
+        "evidence": "The settings are rejected at startup: 'age encryption is not currently supported, if you need encryption please revert back to Litestream v0.3.x' because the feature was removed in the LTX refactor and would otherwise write plaintext (main.go:1356-1363); covered by cmd/litestream/main_test.go:574-626. Non-test Go code mentions encryption only in this rejection and in S3 SSE-C/SSE-KMS support (s3/replica_client.go:118-126, 527-556, 696-701, 872-881)."
+      },
+      {
+        "claim": "docs/LTX_FORMAT.md:26,256-294 - LTX files are 'Checksummed: Integrity verification built-in' (CRC-64).",
+        "verified": "partial",
+        "evidence": "Checksum logic lives in the external module github.com/superfly/ltx (go.mod:30), which was not opened. Every LTX writer in this repo sets ltx.HeaderFlagNoChecksum (db.go:2148, 2869; compactor.go:165; replica.go:746; vfs.go:791); the docs only list the constant (docs/LTX_FORMAT.md:82). In-repo checks: periodic `validation.interval` and `verify-compaction` only test TXID contiguity and log warnings (replica.go:1782-1846; store.go:863-927; compactor.go:194-233); post-restore PRAGMA quick_check/integrity_check is opt-in, default none (restore.go:41,76-85; replica.go:1332-1366)."
+      },
+      {
+        "claim": "README.md:15-16 - installation instructions are on the litestream.io web site.",
+        "verified": "not_checkable",
+        "evidence": "The site is outside the working directory and was not opened. In-repo install text exists only in the GoReleaser release-notes header (.goreleaser.yml:132-153)."
+      },
+      {
+        "claim": "README.md:3 - status is beta.",
+        "verified": "yes",
+        "evidence": "Consistent with the repo: tag v0.5.17 (.git/packed-refs:2), library API 'not considered stable' (_examples/library/README.md:6-8), VFS extension labelled Experimental (.goreleaser.yml:155)."
+      },
+      {
+        "claim": "README.md:49-53 - security issues are reported privately; see SECURITY.md.",
+        "verified": "yes",
+        "evidence": "SECURITY.md exists and describes the same GitHub private-vulnerability-reporting path (SECURITY.md:5-11)."
+      },
+      {
+        "claim": "CONTRIBUTING.md:92-93 and docs/VFS.md:40 - build needs Go 1.24+ (VFS doc: Go 1.21+) with CGO enabled.",
+        "verified": "no",
+        "evidence": "Code differs: go.mod requires go 1.25.0 with toolchain go1.25.14 (go.mod:3-5); release binaries build with CGO_ENABLED=0 (.goreleaser.yml:13-14) and AGENTS.md:3 states pure-Go, no CGO required. CGO remains required for the VFS extension (Makefile:31-35). Code taken as authoritative."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Idle CPU usage of `litestream replicate` to S3 after the S3 transport fix (PR #993) versus v0.5.6, measured with tests/cpu-usage/test-cpu-usage.sh",
+        "metric": "average idle CPU percent",
+        "value": "~0.0067% with the fix vs ~0.7% for v0.5.6 (described as a 99% improvement)",
+        "source": "tests/cpu-usage/README.md:50-57",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No client-side encryption in this version: `age` config is rejected at startup (cmd/litestream/main.go:1356-1363; test cmd/litestream/main_test.go:574-626). Only provider-side S3 SSE-C/SSE-KMS exists (s3/replica_client.go:118-126, 527-556, 872-881), so Litestream itself applies no encryption for file/GCS/Azure/SFTP/WebDAV/NATS/OSS replicas.",
+      "Scope is SQLite databases only with exactly one replica destination per database (main.go:786-796, 1050-1066; AGENTS.md:15). No code was found for installing language runtimes/CLI tools from a manifest or for dotfile/config transfer (command list main.go:250-265); backups are not general application-state archives, and cross-file or content-defined deduplication code was not found (only page-level merge during compaction, docs/LTX_FORMAT.md:137).",
+      "Enabling replication changes the source database: forces `PRAGMA journal_mode = wal`, creates `_litestream_seq` (persistently updated) and `_litestream_lock` tables (db.go:1077, 1085, 1091, 1567-1570); README discloses only `_litestream_lock` (README.md:24-35).",
+      "Verification is limited and mostly opt-in: restore integrity check defaults to `none` (restore.go:41); periodic validation checks only TXID contiguity (store.go:863-927); LTX checksum behaviour sits in the external superfly/ltx module while all in-repo LTX writers set ltx.HeaderFlagNoChecksum (db.go:2148, 2869; compactor.go:165).",
+      "Default history window is short: snapshot retention 24h and L0 retention 5m (store.go:60-72; etc/litestream.yml:52-60), and Litestream deletes expired remote files itself unless `retention.enabled: false` (etc/litestream.yml:62-65; store.go:113-116), bounding point-in-time restore.",
+      "Network surfaces and insecure-by-option settings: the MCP HTTP server (when `mcp-addr` is set) has no authentication in code and exposes restore (caller-chosen output path, replica URL, config path) and reset tools (cmd/litestream/mcp.go:52-64,183-241,322-346); the metrics listener passes a nil handler (http.DefaultServeMux) while net/http/pprof is imported, so pprof handlers are reachable there (replicate.go:11,361-366; inferred from Go semantics, not run); SFTP skips host-key verification when `host-key` is unset, warning only (sftp/replica_client.go:130-133); `skip-verify` disables TLS verification for S3 (s3/replica_client.go:406-408).",
+      "Release integrity: archives ship SHA-256 checksums.txt and SBOMs (.goreleaser.yml:101-103,189-190) but signing is disabled: `signs:` commented out (.goreleaser.yml:173-187), GPG step gated on an env var no workflow defines (release.yml:47-53), macOS/Windows signing jobs commented out (release.yml:214-291); no cosign/attestation steps found; Docker images set provenance/sbom (release.docker.yml:49-50,78-79); no dependabot/renovate config.",
+      "Maintenance and coverage: beta status (README.md:3); library API unstable (_examples/library/README.md:6-8); maintainers generally decline large external feature contributions (CONTRIBUTING.md:20-22); Go tests run only on Linux runners and no workflow runs -tags vfs tests (commit.yml:33-47,149-178); abs/ and sftp/ have no package test files; Windows is 'NOT an officially supported platform' (.goreleaser.yml:128); docs drift on build prerequisites (CONTRIBUTING.md:92-93 vs go.mod:3-5)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "benbjohnson/litestream",
+      "checks": [
+        {
+          "field": "readme.install[0] (Homebrew)",
+          "statement": "Homebrew (macOS and Linux), from the release-notes header in the GoReleaser config: brew tap benbjohnson/litestream && brew install litestream",
+          "citation": ".goreleaser.yml:134-138",
+          "holds": true,
+          "note": "Lines 134-138 sit inside release.header (:125). They read '### Homebrew (macOS and Linux)', then `brew tap benbjohnson/litestream` and `brew install litestream` on separate lines. The dossier joins the two with &&, which is equivalent. The tap matches the brews block, which pushes the formula to benbjohnson/homebrew-litestream (:82-100)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-202 is the unmodified Apache License 2.0 text; the appendix template is left unfilled, which is standard. It is the only LICENSE, COPYING or NOTICE file in the tree. Packaging metadata agrees: nfpms 'Apache 2.0' (.goreleaser.yml:61) and brews 'Apache-2.0' (:86)."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - GoReleaser builds darwin/arm64; release notes list macOS arm64 as supported; Homebrew formula defined. Caveats: Go tests run only on ubuntu-latest, and macOS runners only build/verify the VFS extension. macOS signing/notarization is commented out.",
+          "citation": ".goreleaser.yml:17,21,31-32,82-100,130,173-187; .github/workflows/commit.yml:33-47; release.yml:143-212,214-260",
+          "holds": true,
+          "note": ".goreleaser.yml lists darwin at :17 and arm64 at :21. The ignore at :31-32 drops only darwin/arm (32-bit). :130 says 'macOS (amd64, arm64)' and :82-100 is the brews block. Searching runs-on across all workflows finds only two macOS runners. commit.yml:35 (macos-latest) runs `make vfs` and a `file` check (:43-47). release.yml:145 (macos-15) runs the VFS build matrix (:143-212). Every Go test job runs on ubuntu. The macos-sign job is fully commented out (release.yml:214-260), and so is the goreleaser signs: block (:173-187)."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Yes, built in but not mentioned in README. A Streamable-HTTP MCP server starts when config key mcp-addr is set and has 7 tools (info, databases, restore, ltx, version, status, reset). Each tool shells out to `litestream` on PATH. The code has no authentication. Makefile has fly mcp wrap/proxy targets with a bearer token.",
+          "citation": "cmd/litestream/main.go:315-316; cmd/litestream/replicate.go:182-189; cmd/litestream/mcp.go:39-45,52-64,96,235; Makefile:71-75; README.md:1-69",
+          "holds": true,
+          "note": "main.go:316 has MCPAddr `yaml:\"mcp-addr\"`. replicate.go:183-188 calls NewMCP and Start only when MCPAddr != \"\", so only the replicate daemon starts it. mcp.go:39-45 registers seven tools, named at :84, 106, 184, 245, 260, 297 and 323. mcp.go:48 uses server.NewStreamableHTTPServer, wrapped only by httplog.Logger. Start (:52-64) is a plain http.Server with no auth. Every handler runs exec.CommandContext(ctx, \"litestream\", ...), which uses PATH lookup (:96, :235 and others). Makefile:71-75 has fly mcp wrap/proxy with --bearer-token. The README (69 lines, read in full) never mentions MCP."
+        },
+        {
+          "field": "claim_checks[4] (age encryption)",
+          "statement": "The config schema exposes `age: identities/recipients`, but verified = no: the settings are rejected at startup ('age encryption is not currently supported, if you need encryption please revert back to Litestream v0.3.x') because the feature was removed in the LTX refactor and would otherwise write plaintext. A test covers this. Non-test Go code mentions encryption only in this rejection and in S3 SSE-C/SSE-KMS support.",
+          "citation": "cmd/litestream/main.go:1182-1186,1356-1363; cmd/litestream/main_test.go:574-626; s3/replica_client.go:118-126,527-556,696-701,872-881",
+          "holds": true,
+          "note": "main.go:1183-1186 defines Age.Identities and Age.Recipients under yaml 'age'. main.go:1361-1362 rejects either one with the quoted error, and the comment at :1356-1360 gives the plaintext rationale. The check runs at startup via NewDBFromConfig (main.go:805). Global age settings are copied to each replica by SetDefaults (main.go:1330-1336), so they are rejected too. main_test.go:574-626 is TestNewReplicaFromConfig_AgeEncryption; its RejectBoth subtest actually ends at :631, which is a trivial range trim. Grepping non-test Go for 'encrypt' finds only s3/replica_client.go (SSE-C/SSE-KMS) and cmd/litestream/main.go (S3 SSE keys at :1141/:1146, plus the age plumbing and rejection). All cited s3 ranges line up."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

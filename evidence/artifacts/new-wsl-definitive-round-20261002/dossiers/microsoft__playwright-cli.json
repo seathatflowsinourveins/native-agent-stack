@@ -1,0 +1,267 @@
+{
+  "contender": "microsoft/playwright-cli",
+  "revision": {
+    "contender": "microsoft/playwright-cli",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "microsoft/playwright-cli",
+        "tag": "v0.1.22",
+        "commit": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.1.22",
+    "commit": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+    "read_at": "2026-10-02T03:02:24+00:00"
+  },
+  "dossier": {
+    "contender": "microsoft/playwright-cli",
+    "revision": {
+      "tag": "v0.1.22",
+      "commit": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+      "read_at": "2026-10-02T03:02:24+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Node.js command-line front end (`playwright-cli`, npm package `@playwright/cli`) through which coding agents drive a Playwright-controlled browser with shell commands (open/goto, snapshot, click/fill/type, tabs, screenshot, pdf, cookies/storage state, eval/run-code), each returning compact text (README.md:7, 134-236, 322-331). This repository is only a thin launcher plus bundled agent-skill docs; the command implementation lives in the exact-pinned pre-release `playwright-core` dependency (playwright-cli.js:23, package.json:24-27), which is NOT in this checkout (no node_modules), so command behaviour could not be read in code. Fact relevant to the retrieval need: no documented command fetches a URL and returns extracted main text with author/date metadata; text comes from a driven browser via accessibility-tree snapshots (header shows `Page URL` and `Page Title`), `find`, `eval`/`run-code`, `pdf` and `screenshot` (README.md:157-160, 194-199, 267-268, 325-331).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Positioned as the best fit for coding agents: 'This package provides CLI interface into Playwright. If you are using coding agents, that is the best fit.'",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "CLI + SKILLs is more token-efficient than MCP because it avoids loading large tool schemas and verbose accessibility trees into model context; MCP is kept for persistent-state / introspective / long-running loops.",
+          "citation": "README.md:9, 11"
+        },
+        {
+          "claim": "Key feature: 'Token-efficient. Does not force page data into LLM.' (no measurements given)",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Requirements: Node.js 18 or newer; Claude Code, GitHub Copilot, or any other coding agent.",
+          "citation": "README.md:18-19"
+        },
+        {
+          "claim": "Headless by default; pass `--headed` to `open` to see the browser.",
+          "citation": "README.md:69-72"
+        },
+        {
+          "claim": "Sessions: browser profile is kept in memory by default (cookies/storage survive between CLI calls until the browser closes); `--persistent` saves the profile to disk; named sessions via `-s=<name>` or PLAYWRIGHT_CLI_SESSION; a headless session shuts itself down after an hour without commands (`open --idle-timeout=<ms>`, 0 disables); `list`, `close-all`, `kill-all` manage sessions.",
+          "citation": "README.md:77-108"
+        },
+        {
+          "claim": "Interaction commands usable as shell steps: open/goto, type, click, dblclick, fill (with --submit), drag, drop, hover, select, upload, check/uncheck, press, dialog-accept/dismiss, snapshot, find, eval, resize; `run-code` runs an arbitrary Playwright snippet from a string or file.",
+          "citation": "README.md:137-163, 177, 267-268"
+        },
+        {
+          "claim": "Screenshots (`screenshot [ref] --filename --hires`), PDF (`pdf --filename=page.pdf`) and tab management (`tab-list`, `tab-new [url]`, `tab-close [index]`, `tab-select <index>`).",
+          "citation": "README.md:194-208"
+        },
+        {
+          "claim": "Sign-in / state handling: `state-save`/`state-load`, cookie-*, localstorage-*, sessionstorage-* commands.",
+          "citation": "README.md:213-235"
+        },
+        {
+          "claim": "After each command the CLI provides a snapshot of current browser state (Page URL, Page Title, link to a timestamped .yml snapshot file); `snapshot --depth=N`, `snapshot <ref>`, `--filename`, and `find <text>` / `find --regex` limit or search the output.",
+          "citation": "README.md:154-159, 322-358"
+        },
+        {
+          "claim": "Can attach to an existing browser through the Playwright extension or CDP (`attach --extension=chrome`, `--cdp=chrome`, `--cdp=<url>`) and `detach` without closing it.",
+          "citation": "README.md:309-312"
+        },
+        {
+          "claim": "WebMCP: pages may register tools (`webmcp-list`, `webmcp-call`); tool names, descriptions, schemas, annotations and results 'come from the page and are untrusted input, not instructions'.",
+          "citation": "README.md:289-300"
+        },
+        {
+          "claim": "Bounding controls: network allowedOrigins/blockedOrigins; default action timeout 5000 ms and navigation timeout 60000 ms; config auto-loaded from `.playwright/cli.config.json`. The env table says the origin lists 'do not serve as a security boundary' and 'do not affect redirects'.",
+          "citation": "README.md:412-418, 517-527, 534-544, 567, 569"
+        },
+        {
+          "claim": "File access: uploads restricted to workspace roots unless allowUnrestrictedFileAccess is set; navigation to file:// URLs is blocked by default.",
+          "citation": "README.md:546-550, 568"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global install (README gives the same command for every OS; no Linux- or macOS-specific method)",
+          "command": "npm install -g @playwright/cli@latest",
+          "citation": "README.md:25-27 (repeated at README.md:407 and skills/playwright-cli/SKILL.md:411)"
+        },
+        {
+          "method": "Install the agent skill into the current project (after the CLI is installed)",
+          "command": "playwright-cli install --skills",
+          "citation": "README.md:34-36"
+        },
+        {
+          "method": "Use a project-local Playwright instead of a global install",
+          "command": "npx --no-install playwright --version   # if present, run commands as: npx playwright cli <command>",
+          "citation": "README.md:398-405"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes (CI evidence only) - the test suite runs on `ubuntu-latest` (.github/workflows/ci.yml:14, 25-26). README states no OS or CPU-architecture support list and never names x86_64.",
+        "wsl2": "unknown - WSL is not mentioned in README, skill docs or CI workflows.",
+        "macos_arm64": "unknown - no macOS/arm64 statement anywhere; CI matrix has a runner labelled `macos-15` (.github/workflows/ci.yml:14) but the repo does not state that runner's CPU architecture.",
+        "gpu": "unknown - GPU is never mentioned; the browser runs headless by default (README.md:69)."
+      },
+      "integrations": {
+        "cli": "`playwright-cli` binary (package.json:28-30); command reference README.md:134-318; global `-s=<name>` session flag (README.md:81-82, 388) and `--config` (README.md:415). The machine-oriented `--raw` and `--json` output flags are documented only in the skill, not README (skills/playwright-cli/SKILL.md:247-263). Alternative invocation `npx playwright cli` via a project-local playwright (README.md:398-405).",
+        "mcp": "No MCP server in this repo (package.json:28-30 exposes only `playwright-cli`). README positions the CLI as an alternative to the separate Playwright MCP project (README.md:11), but its config/env tables are written in MCP terms (`PLAYWRIGHT_MCP_*`, README.md:564-601). `webmcp-list`/`webmcp-call` make the CLI a client of page-provided WebMCP tools, not a server (README.md:289-300).",
+        "sdk_or_api": "none found - package.json has no `main`/`exports`/`types` (package.json:1-31) and README documents no programmatic or HTTP API. Nearest programmatic surface is the `run-code`/`eval` commands that run Playwright snippets (README.md:160, 267-268; skills/playwright-cli/references/running-code.md:1-26).",
+        "claude_code_or_codex": "Claude Code: `playwright-cli install --skills` writes a skill to `.claude/skills/playwright-cli` (README.md:32-36; skillCheck.js:30; tests/integration.spec.ts:81); SKILL.md has Claude-style frontmatter incl. `allowed-tools: Bash(playwright-cli:*) Bash(npx playwright:*) Bash(npx --no-install playwright:*)` (skills/playwright-cli/SKILL.md:1-5). README also names GitHub Copilot (README.md:19, 32) but the repo contains no Copilot-specific path. Codex: not mentioned by name (search found no hit); an alternate target `.agents/skills/playwright-cli` installed with `playwright-cli install --skills=agents` appears only in skillCheck.js:31 and is undocumented in README. Contributor-only files: CLAUDE.md (commit conventions) and .claude/skills/dev/* (maintainer workflows), neither shipped (.npmignore:1-6)."
+      },
+      "telemetry_and_network": "Repo code makes one outbound request, an update check: GET https://registry.npmjs.org/@playwright/cli/latest with a 1.5 s abort timeout (playwright-cli.js:58-74), at most once per 24 h (playwright-cli.js:30, 43-47), skipped when env `CI` or `NO_UPDATE_NOTIFIER` is set (playwright-cli.js:40-41); it is awaited before the requested command runs (playwright-cli.js:35-36), adds no custom headers or body (playwright-cli.js:63), and the result is only compared with the local version and printed to stderr (playwright-cli.js:54-55, 81-87). The timestamp is written before the request (playwright-cli.js:47) to `cli-update-check.json` in playwright-core's `registry.defaultRegistryDirectory()` (playwright-cli.js:89-92, 108-115; exact location not in this repo, test only shows it lands under HOME/XDG_CACHE_HOME/LOCALAPPDATA, tests/integration.spec.ts:107-138). In the same gated branch it reads `.claude/skills/playwright-cli/SKILL.md` and `.agents/skills/playwright-cli/SKILL.md` under the cwd and prints a drift warning (playwright-cli.js:49-51; skillCheck.js:27-33, 56-77). README does not mention the update check or its opt-out variables. No telemetry or analytics code exists in this repo (search for telemetry/analytics found none); whether playwright-core (absent from checkout) sends telemetry cannot be determined here. No account, API key or hosted service is mentioned in README or skill docs; `attach --extension` needs the 'Playwright MCP Bridge' browser extension (README.md:309, 580). Otherwise network use is whatever the driven browser requests (optional origin filters, README.md:517-527). README documents no browser-download step or its network needs. Skill docs also tell agents to upload screenshots/videos to GitHub with `gh ... --attach` (skills/playwright-cli/SKILL.md:467-476; skills/playwright-cli/references/pr-attachments.md:1-36), an agent-driven outbound upload using the user's gh credentials."
+    },
+    "code": {
+      "languages": [
+        "JavaScript (CommonJS, Node.js)",
+        "TypeScript (tests and Playwright config only)"
+      ],
+      "entry_points": [
+        {
+          "path": "playwright-cli.js",
+          "what": "npm `bin` entry `playwright-cli` (package.json:28-30), shebang script; main() runs the daily update/skill check then `program({ embedderVersion })` from playwright-core (playwright-cli.js:32-37)."
+        },
+        {
+          "path": "skillCheck.js",
+          "what": "Exports checkInstalledSkills() and frame(); warns when the .claude/.agents skill copies differ from the one bundled in playwright-core (skillCheck.js:22-79)."
+        },
+        {
+          "path": "playwright-core/lib/tools/cli-client/program (external, not in checkout)",
+          "what": "The actual CLI parser/dispatcher called at playwright-cli.js:23,36; `playwright-core/lib/coreBundle` supplies `tools.compareSemver` and `registry.defaultRegistryDirectory` (playwright-cli.js:24-25, 54, 90)."
+        },
+        {
+          "path": "npx playwright cli",
+          "what": "Alternative invocation through a project-local `playwright` install (README.md:398-405); the `playwright` package declares bin `playwright` -> cli.js (package-lock.json:60-62)."
+        },
+        {
+          "path": "scripts/update.js",
+          "what": "Maintainer script: runs `node playwright-cli.js install --skills`, then copies the generated .claude/skills/playwright-cli into skills/playwright-cli (scripts/update.js:13-37)."
+        },
+        {
+          "path": "skills/playwright-cli/SKILL.md",
+          "what": "Agent skill (Claude-style frontmatter with `allowed-tools`) plus 10 reference docs under skills/playwright-cli/references/; shipped in the npm tarball (.npmignore:6). No MCP server entry point exists in this repo."
+        }
+      ],
+      "architecture": "Thin launcher; no browser-automation logic in this repo. playwright-cli.js (115 lines) runs checkForUpdates() (daily npm-registry check plus skill-drift check from skillCheck.js, 79 lines) and then calls `program({ embedderVersion })` from `playwright-core/lib/tools/cli-client/program`; it also imports `tools` and `registry` from `playwright-core/lib/coreBundle` (playwright-cli.js:23-26, 34-37). Argument parsing, the background daemon processes that keep sessions alive between invocations (skills/playwright-cli/references/session-management.md:44; README.md:77-79; '`src/tools/cli-daemon`' named at .claude/skills/dev/release.md:26), snapshot generation and the `install --skills` logic all live in the pinned playwright-core alpha (package.json:24-27), which is absent from the checkout; the imports are deep paths into internal `lib/`, not a documented API. skillCheck.js compares installed skills under cwd with the copy bundled inside playwright-core (`lib/tools/skills/playwright-cli/SKILL.md`), not with this repo's skills/ directory (skillCheck.js:22-33). skills/playwright-cli/ (SKILL.md + 10 reference docs) is regenerated from playwright-core by scripts/update.js (scripts/update.js:16-34; .claude/skills/dev/roll.md:13-20). The repo's two pointers to upstream source differ: CONTRIBUTING.md:3 -> microsoft/playwright `packages/playwright/src/mcp/terminal`; release.md:26 -> `src/tools/cli-client|cli-daemon|mcp`.",
+      "packaging_and_release": "npm-only distribution: package `@playwright/cli` v0.1.22 (package.json:2-3), bin `playwright-cli` (package.json:28-30); `.npmignore` whitelists README.md, LICENSE, playwright-cli.js, skillCheck.js and skills/** (.npmignore:1-6). Tag v0.1.22 is present in the clone (.git/packed-refs:2). No standalone binaries, containers, GitHub release assets, checksum files, SBOM or signature files are produced by any workflow in the repo. Two publish paths: (1) .github/workflows/publish.yml - on a published GitHub Release (job guarded by `github.event_name == 'release'`), Node 24, `npm ci` then `npm publish`, with `id-token: write` 'Required for OIDC npm publishing' (publish.yml:4-5, 9-21); no `--provenance` flag or attestation step is present and package.json has no publishConfig. (2) .azure-pipelines/publish.yml - manual only (`trigger: none`, `pr: none`, lines 6-8), 1ES official template (17-19), builds with `npm pack` (105-106) and publishes through `EsrpRelease@11` with `signcertname: 'ESRP-Release-Sign'` (123-141): `latest` from `v*` tags whose name must equal the package.json version (83-89), `next` alpha (`<ver>-alpha-<epoch>000`) from main (90-93). Release procedure is a 'chore: mark v<version>' commit whose PR body is the release notes (.claude/skills/dev/release.md:3-8, 65-76). package-lock.json carries sha512 integrity hashes for dependencies (package-lock.json:29, 45, 55, 70, 82). The repo does not say which of the two paths published v0.1.22.",
+      "tests_and_ci": "Framework: @playwright/test (tests/integration.spec.ts:20; playwright.config.ts:17-25; `npm test` = `playwright test`, package.json:18). One spec file, tests/integration.spec.ts, 4 tests (lines 64, 76, 94, 107) that spawn `node playwright-cli.js`: open a data: URL with --persistent then delete-data; skill-drift warning; CRLF tolerance; update-check cache file. None drives snapshot, click/fill, tabs, screenshot, pdf or state commands (CLI tests live in the Playwright monorepo: CONTRIBUTING.md:3, 28). Tests 2-4 run with the update notifier enabled and so hit the real registry (tests/integration.spec.ts:84-92, 107-122). CI: .github/workflows/ci.yml - on push/PR to main; matrix ubuntu-latest / macos-15 / windows-latest, fail-fast off; Node 20; `npm ci` + `npm run test` (ci.yml:3-26). No lint, type-check, coverage, CodeQL/security-scan or browser-install step. Playwright config: fullyParallel, 2 workers and forbidOnly in CI (playwright.config.ts:21-23). Actions are pinned to commit SHAs (ci.yml:17, 19); Dependabot covers GitHub Actions only, weekly with 7-day cooldown (.github/dependabot.yml:1-11); npm pins are rolled by hand (.claude/skills/dev/roll.md:5-20). Other workflows: publish.yml (npm publish on release) and .azure-pipelines/publish.yml (manual ESRP release).",
+      "dependencies": "package.json: 2 runtime deps - `playwright` and `playwright-core`, both exact-pinned to pre-release 1.64.0-alpha-1790635538000 (package.json:24-27); 2 dev deps - `@playwright/test` (same pin) and `@types/node` ^25.2.1 (package.json:20-23). package-lock.json (lockfileVersion 3) resolves 5 packages besides the root (package-lock.json:26-85); the runtime closure is playwright -> playwright-core with no further transitive deps listed (package-lock.json:52-78); `@types/node` -> `undici-types` are dev-only (42-51, 79-85). Licences in the lockfile: Apache-2.0 (playwright, playwright-core, @playwright/test) and MIT (@types/node, undici-types) (package-lock.json:31, 47, 56, 71, 84). The ms-epoch in the pin decodes to about 2026-09-28 22:45 UTC (my conversion; convention at .claude/skills/dev/release.md:15). No other manifests (no pyproject/Cargo/go.mod).",
+      "security_policy": "SECURITY.md is the standard Microsoft block: do not report vulnerabilities through public GitHub issues; reporting guidance is delegated to https://aka.ms/SECURITY.md (SECURITY.md:3-12; link not fetched). No repo-specific policy, supported-versions table or disclosure timeline."
+    },
+    "claim_checks": [
+      {
+        "claim": "Requirements: Node.js 18 or newer (README.md:18)",
+        "verified": "partial",
+        "evidence": "package.json:10-12 declares engines.node >=18, matching README. But the pinned runtime deps `playwright` and `playwright-core` (and dev dep @playwright/test) declare engines.node >=20 (package-lock.json:63-65, 75-77, 38-40), CI only tests Node 20 (.github/workflows/ci.yml:18-21) and publishing uses Node 24 (publish.yml:18). Dependency metadata and CI point to an effective floor of Node 20; Node 18 is untested in this repo."
+      },
+      {
+        "claim": "Install with `npm install -g @playwright/cli@latest` (README.md:26)",
+        "verified": "yes",
+        "evidence": "Package name is `@playwright/cli` and bin `playwright-cli` -> playwright-cli.js (package.json:2, 28-30); published by `npm publish` on GitHub Release (.github/workflows/publish.yml:9, 21) and by ESRP from `v*` tags with dist-tag `latest` (.azure-pipelines/publish.yml:83-89). Whether `@latest` currently resolves to v0.1.22 is not checkable offline."
+      },
+      {
+        "claim": "`playwright-cli install --skills` installs skills that Claude Code, GitHub Copilot and others will use (README.md:32-36)",
+        "verified": "partial",
+        "evidence": "The effect on `.claude/skills/playwright-cli/SKILL.md` is asserted by tests/integration.spec.ts:76-82 and relied on by scripts/update.js:16-20; skillCheck.js:30-31 also knows `.agents/skills/playwright-cli` (`--skills=agents`, not in README). The install logic itself is in playwright-core (absent). No Copilot-specific install path exists in repo code (README is the only place 'copilot' appears), so the Copilot part is unverified."
+      },
+      {
+        "claim": "'Token-efficient. Does not force page data into LLM.' (README.md:15)",
+        "verified": "not_checkable",
+        "evidence": "Output formatting is produced by playwright-core, not in the checkout, and no measurements exist. In-repo docs describe bounding options (`snapshot --depth`, `find`, `--filename`, `--raw`: README.md:154-159, 345-358; skills/playwright-cli/SKILL.md:247-258). README is internally inconsistent on default output: the example links a snapshot file (README.md:325-331, 337-338) while the config schema says outputMode defaults to 'stdout' (README.md:506)."
+      },
+      {
+        "claim": "Headless by default; `--headed` shows the browser (README.md:69)",
+        "verified": "not_checkable",
+        "evidence": "No launch code in this repo. The only in-repo launch is the integration test `open data:text/html,hello --persistent` without --headed (tests/integration.spec.ts:65), which is consistent with headless but proves nothing about it. README.md:582 repeats 'headless by default'."
+      },
+      {
+        "claim": "In-memory profile by default, `--persistent` saves to disk, named sessions isolate state (README.md:77-100)",
+        "verified": "partial",
+        "evidence": "tests/integration.spec.ts:64-74 exercise `open --persistent` and `delete-data` (exit 0, output 'Deleted user data for'). In-memory default, `-s=` isolation and PLAYWRIGHT_CLI_SESSION are not tested or implemented in this repo. README describes `close` as 'close the page' (README.md:139) and as 'close the browser' (README.md:316); session-management.md:37 says it stops the browser."
+      },
+      {
+        "claim": "A headless session shuts down after an hour without commands; `--idle-timeout=<ms>` changes it (README.md:98-100)",
+        "verified": "not_checkable",
+        "evidence": "No daemon or timer code in this repo (search for 'idle' in *.js/*.ts finds nothing); the same statement is repeated in skills/playwright-cli/references/session-management.md:52."
+      },
+      {
+        "claim": "Shell commands exist for forms, tabs, screenshots, PDF and sign-in state (README.md:137-163, 194-208, 213-235)",
+        "verified": "not_checkable",
+        "evidence": "Commands are implemented in playwright-core (absent from the checkout); the same list is repeated in skills/playwright-cli/SKILL.md:26-147 and none of the commands is exercised by tests/integration.spec.ts:64-138. Ambiguity for PDF: README lists `pdf` as a plain command (README.md:197-198) while the env table lists `pdf` among 'additional capabilities to enable' (PLAYWRIGHT_MCP_CAPS, README.md:572); whether the CLI gates it is not determinable here."
+      },
+      {
+        "claim": "Network origin allow/block lists, timeouts and file-access restrictions bound what the browser and agent can reach (README.md:517-527, 534-550, 567-569)",
+        "verified": "not_checkable",
+        "evidence": "No enforcement code in this repo. README itself says the origin lists 'do not serve as a security boundary' and 'do not affect redirects' (README.md:567, 569). Defaults quoted (5000 ms action, 60000 ms navigation; file:// blocked) cannot be confirmed here."
+      },
+      {
+        "claim": "'Configuration via env' table (README.md:561-601) configures the CLI",
+        "verified": "not_checkable",
+        "evidence": "All variables are `PLAYWRIGHT_MCP_*` and one row says 'this server' / 'Playwright MCP Bridge' (README.md:566, 580), i.e. wording carried over from the MCP server; whether the CLI honours them is determined in playwright-core. The only env vars read by code in this repo are `NO_UPDATE_NOTIFIER`, `CI` and `PLAYWRIGHT_CLI_INSTALLATION_FOR_TEST` (playwright-cli.js:40, 90), none of which appear in README; `PLAYWRIGHT_CLI_SESSION` (README.md:90) is documented but handled outside this repo."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: no documented fetch-and-extract command (no main-text/markdown/author/date extraction; a repo-wide search for readability/markdown/extract/article finds nothing relevant). Text retrieval means driving a browser: accessibility-tree snapshots, `find`, `eval`/`run-code`, `pdf`, `screenshot` (README.md:157-160, 194-199, 267-268, 322-358). A `run-code` snippet may call `fetch` (skills/playwright-cli/references/running-code.md:24-26) but that is user-written code.",
+      "Implementation is outside this repo and pinned to a pre-release: playwright-cli.js deep-imports internal paths of `playwright-core` (playwright-cli.js:23-24); `playwright`, `playwright-core` and `@playwright/test` are exact-pinned to `1.64.0-alpha-1790635538000` (package.json:21, 25-26), rolled by hand (.claude/skills/dev/roll.md:5-12). Package version is 0.x (package.json:3) and README states no stability policy. Command behaviour could not be verified from this checkout (no node_modules).",
+      "Thin in-repo tests: one spec file with 4 tests (open/delete-data, skill-drift warning, CRLF tolerance, update-check cache; tests/integration.spec.ts:64-138); none exercise snapshot, click/fill, tabs, screenshot, pdf or state commands, which are tested in the Playwright monorepo (CONTRIBUTING.md:3, 28). CI has no lint, type-check, coverage or security-scan job and no browser-install step (.github/workflows/ci.yml:23-26).",
+      "Platform/docs mismatch: README and package.json say Node.js 18+ (README.md:18; package.json:10-12) while the pinned playwright/playwright-core declare node >=20 (package-lock.json:63-65, 75-77) and CI runs only Node 20 (ci.yml:18-21). macOS arm64, WSL2 and GPU support are not stated anywhere; browser-binary provisioning is not documented (README.md:23-45 covers only npm install and skills).",
+      "Undocumented launcher side effects: a daily GET to registry.npmjs.org awaited before the user's command (1.5 s timeout), a cache file in playwright-core's default registry directory, and reads of `.claude/skills` / `.agents/skills` under the cwd; the opt-out variables `CI` / `NO_UPDATE_NOTIFIER` are not in README (playwright-cli.js:35-36, 40-51, 58-74, 89-115; skillCheck.js:27-33).",
+      "Untrusted content and credential exposure: page content flows into agent context and README flags only WebMCP tool data as untrusted (README.md:291-294); origin lists are 'not a security boundary' and ignore redirects (README.md:567, 569); `eval`/`run-code` execute arbitrary code (README.md:160, 267-268); the skill frontmatter declares wildcards `Bash(playwright-cli:*) Bash(npx playwright:*) Bash(npx --no-install playwright:*)` (skills/playwright-cli/SKILL.md:4), covering every subcommand; `.playwright-cli/` output 'may contain credentials' (.gitignore:8-9); storage-state files hold cookie/localStorage values and docs warn not to commit them (references/storage-state.md:29-57, 271); sign-in examples pass passwords as command arguments (SKILL.md:420-421; references/running-code.md:227-229); the only secret-handling hook is a one-line env row `PLAYWRIGHT_MCP_SECRETS_FILE` (README.md:593).",
+      "Release integrity is thinly documented: the GitHub workflow runs `npm ci` + `npm publish` with OIDC and shows no explicit provenance, attestation, checksum or signature step (.github/workflows/publish.yml:11-21); the Azure/ESRP path is manual-only with an undocumented signing configuration and a single named owner/approver identity (.azure-pipelines/publish.yml:6-8, 123-141); no release assets are built. Dependabot covers GitHub Actions only (.github/dependabot.yml:3).",
+      "Documentation ambiguities that affect scripted use: env table uses `PLAYWRIGHT_MCP_*` names and MCP-server wording (README.md:564-601) and lists `pdf` as an opt-in capability (README.md:572) although `pdf` is a plain command (README.md:197-198); `close` has two meanings (README.md:139, 316); default output destination is stated two ways (README.md:325-331 vs 506); `--raw`/`--json` exist only in the skill doc (skills/playwright-cli/SKILL.md:247-263); CONTRIBUTING.md:3 and release.md:26 name different upstream source paths."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "microsoft/playwright-cli",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npm global install (README gives the same command for every OS; no Linux- or macOS-specific method): `npm install -g @playwright/cli@latest`",
+          "citation": "README.md:25-27 (repeated at README.md:407 and skills/playwright-cli/SKILL.md:411)",
+          "holds": true,
+          "note": "README.md:26 is `npm install -g @playwright/cli@latest` and line 27 is `playwright-cli --help`. The same command appears at README.md:407 and SKILL.md:411. README has no OS-specific install section: a case-insensitive grep for linux/macos/windows/wsl/arch terms matches only 'context windows' at README.md:9. The package name and bin match package.json:2 and 28-30. Checkout is at HEAD b85c7a7, the same commit as tag v0.1.22 (.git/packed-refs:2)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 reads 'Apache License Version 2.0, January 2004'. The file has the full terms through END OF TERMS (176) and the appendix boilerplate with 'Copyright (c) Microsoft Corporation.' (189). package.json:16 and package-lock.json:10 both say \"Apache-2.0\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes (CI evidence only) - the test suite runs on `ubuntu-latest` (.github/workflows/ci.yml:14, 25-26). README states no OS or CPU-architecture support list and never names x86_64.",
+          "citation": ".github/workflows/ci.yml:14, 25-26",
+          "holds": true,
+          "note": "ci.yml:14 has the matrix `os: [ubuntu-latest, macos-15, windows-latest]`, line 15 is `runs-on: ${{ matrix.os }}`, and lines 25-26 run `npm run test`. README Requirements (17-19) list only Node.js 18+ and a coding agent. No x86/x64/amd64/arm64/aarch64 string appears anywhere in the repo outside .git and the lockfile. Caveat that does not block: the repo never says `ubuntu-latest` is x86_64; that comes from knowing GitHub's runners. The dossier refuses the same kind of inference for `macos-15` under macos_arm64, even though GitHub's standard macos-15 label is also an arm64 runner (outside knowledge, not checkable here). The standard is applied inconsistently, but this statement is not wrong."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: `playwright-cli install --skills` writes a skill to `.claude/skills/playwright-cli`; SKILL.md has Claude-style frontmatter incl. `allowed-tools: Bash(playwright-cli:*) Bash(npx playwright:*) Bash(npx --no-install playwright:*)`; README names GitHub Copilot but the repo has no Copilot-specific path; Codex not mentioned; `.agents/skills/playwright-cli` via `install --skills=agents` appears only in skillCheck.js:31 and is undocumented in README; CLAUDE.md and .claude/skills/dev/* are contributor-only and not shipped.",
+          "citation": "README.md:19, 32-36; skillCheck.js:30-31; tests/integration.spec.ts:81; skills/playwright-cli/SKILL.md:1-5; .npmignore:1-6",
+          "holds": true,
+          "note": "skillCheck.js:30 pairs `.claude/skills/playwright-cli` with `playwright-cli install --skills`. integration.spec.ts:77-82 runs `install --skills` and then appends to `.claude/skills/playwright-cli/SKILL.md`; lines 99-100 read that file, so the path must exist. SKILL.md:4 contains the quoted `allowed-tools` line exactly. Case-insensitive greps: 'copilot' appears only at README.md:19 and 32, 'codex' has no hits, and `.agents`/`skills=agents` appears only at skillCheck.js:31. .npmignore ignores `**/*` and re-includes only README.md, LICENSE, playwright-cli.js, skillCheck.js and skills/** (anchored to the root), so CLAUDE.md and .claude/ are not shipped. CLAUDE.md is a commit-convention page, and .claude/skills/dev/SKILL.md covers roll/release maintenance. The install logic itself lives in playwright-core, which is not in this checkout."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Requirements: Node.js 18 or newer (README.md:18), verified 'partial': package.json engines >=18, but the pinned playwright, playwright-core and @playwright/test declare node >=20, CI tests only Node 20, publishing uses Node 24, so the effective floor is Node 20 and Node 18 is untested.",
+          "citation": "README.md:18; package.json:10-12; package-lock.json:38-40, 63-65, 75-77; .github/workflows/ci.yml:18-21; .github/workflows/publish.yml:18",
+          "holds": true,
+          "note": "README.md:18 says 'Node.js 18 or newer'. package.json:11 has `\"node\": \">=18\"`, and the lock root at 22-24 says the same. package-lock.json:39, 64 and 76 each declare `\"node\": \">=20\"` for @playwright/test, playwright and playwright-core. ci.yml:18-21 is 'Use Node.js 20' with `node-version: '20'` and no Node version matrix. publish.yml:18 has `node-version: 24`. Every cited line matches, and 'partial' is the right grade."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

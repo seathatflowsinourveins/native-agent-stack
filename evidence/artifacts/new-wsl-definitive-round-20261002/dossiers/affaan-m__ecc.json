@@ -1,0 +1,355 @@
+{
+  "contender": "affaan-m/ecc",
+  "revision": {
+    "contender": "affaan-m/ecc",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "affaan-m/ECC",
+        "tag": "v2.2.3",
+        "commit": "c05b2d6614f62f6db0047669aa4eefb223d478f9",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.2.3",
+    "commit": "c05b2d6614f62f6db0047669aa4eefb223d478f9",
+    "read_at": "2026-10-02T03:01:54+00:00"
+  },
+  "dossier": {
+    "contender": "affaan-m/ecc",
+    "revision": {
+      "tag": "v2.2.3",
+      "commit": "c05b2d6614f62f6db0047669aa4eefb223d478f9",
+      "read_at": "2026-10-02T03:01:54+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "ECC (formerly 'Everything Claude Code'; old name retired in the HEAD commit) is an MIT-licensed bundle of agent-harness content and tooling, published as npm package ecc-universal 2.2.3, a Claude Code plugin/marketplace entry ecc@ecc and a Codex native plugin. At v2.2.3: 293 SKILL.md skills, 68 agents, 94 slash-command shims, 121 rule files in 22 directories (10 unconditional rules/common files, 111 path-scoped language/framework files), hooks, one default MCP connector, a local Markdown memory vault, and Node.js install/profile tooling (manifest-driven selective install, 'ecc consult', an experimental 'ecc profile' task-context resolver). Content covers engineering (TDD, review, language/framework patterns, build repair), security (security-review and security-scan skills, per-framework security skills, */security.md rules, security-reviewer agent; the AgentShield scanner is a separate npm package) and many non-engineering domains (investor outreach, logistics, video). Claude Code is the primary target; Codex has a native plugin; Cursor, OpenCode, Gemini, Zed and others are capability-limited adapters (README.md:140, 1287-1294).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Skills are the primary workflow surface, 'loaded when the task needs them'; rules are 'always loaded, so install them selectively'; the separation is how ECC adds capability 'without dumping the entire repository into every session'.",
+          "citation": "README.md:1098, 1211-1219"
+        },
+        {
+          "claim": "Catalog: 68 agents, 293 skills, 94 legacy command shims, plus hooks, rules, memory, continuous learning and AgentShield scanning.",
+          "citation": "README.md:142-151"
+        },
+        {
+          "claim": "Claude Code is the 'Stable primary' harness; the plugin 'advertises the installed catalog to the model; use a selective/manual profile when context footprint matters'.",
+          "citation": "README.md:1289"
+        },
+        {
+          "claim": "Codex: supported native marketplace plugin (codex plugin add ecc@ecc); native hooks need explicit trust and do not use Claude hook profiles; the legacy sync script is deprecated; no Claude-style hook parity.",
+          "citation": "README.md:355-363, 1290, 1553"
+        },
+        {
+          "claim": "Cursor, OpenCode, Gemini, Zed, Antigravity, Qwen, Hermes, OpenClaw, Kimi, CodeBuddy, JoyCode are beta/experimental adapters and Copilot is instruction-only; 'full Claude feature parity is not claimed'.",
+          "citation": "README.md:140, 1287-1294"
+        },
+        {
+          "claim": "Rules are selective: Claude Code plugins cannot distribute rules, so copy rules/common plus one language pack (whole directories) into ~/.claude/rules/ecc/.",
+          "citation": "README.md:150, 298-308, 526"
+        },
+        {
+          "claim": "Selective installs: --profile minimal excludes the hook runtime; --skills tdd-workflow,security-review; 'ecc consult' recommends components; hook installs require explicit --enable-hooks or --no-hooks.",
+          "citation": "README.md:425-486"
+        },
+        {
+          "claim": "Claude plugin installs do not auto-enable bundled MCP servers; exactly one default connector (chrome-devtools); keep under 10 MCPs and 80 tools because tool schemas consume context.",
+          "citation": "README.md:577-581, 1773-1776"
+        },
+        {
+          "claim": "Canonical Anthropic skills (claude-api, frontend-design, skill-creator) are intentionally not re-bundled; install them from anthropics/skills.",
+          "citation": "README.md:1549"
+        },
+        {
+          "claim": "Requirements: Node.js >=18; Claude plugin setup also needs Git and Claude Code >=2.1 on PATH. Linux, macOS and Windows+WSL are 'supported core', native Windows 'with limitations'; optional features may need Bash or Python.",
+          "citation": "README.md:164-167, 1276-1283, 1791"
+        },
+        {
+          "claim": "'ECC never uploads diagnostics automatically'; hooks, MCP servers and project instructions are 'executable configuration'; GateGuard gates destructive shell commands; an IOC scanner runs in CI; a version pin 'is not a security audit or an integrity check'.",
+          "citation": "README.md:217, 281, 1827-1833"
+        },
+        {
+          "claim": "Official sources only: GitHub affaan-m/ECC, npm ecc-universal and ecc-agentshield, plugin slug ecc@ecc, ecc.tools; third-party re-uploads and mirrors 'may contain malware'.",
+          "citation": "README.md:67-68, 1813-1819"
+        },
+        {
+          "claim": "Governance: MIT 'forever'; 'a single maintainer ships weekly across 7 harnesses'; ECC Pro (hosted GitHub App for private repos, from $19/seat/mo) and sponsors fund the work.",
+          "citation": "README.md:83, 104, 1998, 2046"
+        },
+        {
+          "claim": "Cost guidance (no method cited): model sonnet ~60% cost reduction; MAX_THINKING_TOKENS 10,000 ~70% cut in hidden thinking cost; subagents on haiku.",
+          "citation": "README.md:1728-1733"
+        }
+      ],
+      "install": [
+        {
+          "method": "Guided setup via npx (Claude Code plugin; also multi-harness)",
+          "command": "npx ecc-universal@2.2.3 setup   |   npx ecc-universal@2.2.3 install --guided",
+          "citation": "README.md:164-174, 226"
+        },
+        {
+          "method": "Claude Code native plugin",
+          "command": "/plugin marketplace add https://github.com/affaan-m/ECC   then   /plugin install ecc@ecc",
+          "citation": "README.md:287-290"
+        },
+        {
+          "method": "Codex native plugin",
+          "command": "codex plugin marketplace add affaan-m/ECC && codex plugin add ecc@ecc && codex plugin list --json",
+          "citation": "README.md:355-357"
+        },
+        {
+          "method": "Low-context install from the npm package (no hook runtime)",
+          "command": "npx ecc-universal@2.2.3 install --profile minimal --target claude",
+          "citation": "README.md:430"
+        },
+        {
+          "method": "Source checkout, explicit skills",
+          "command": "git clone https://github.com/affaan-m/ECC.git && cd ECC && ./install.sh --target claude --skills tdd-workflow,security-review",
+          "citation": "README.md:393-394, 484"
+        },
+        {
+          "method": "Manual copy of rules and individual skills into ~/.claude",
+          "command": "mkdir -p ~/.claude/rules/ecc && cp -R rules/common ~/.claude/rules/ecc/ && cp -R rules/typescript ~/.claude/rules/ecc/ ; mkdir -p ~/.claude/skills && cp -r skills/search-first ~/.claude/skills/",
+          "citation": "README.md:301-306, 502-504"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Linux is 'Supported core' (README.md:1280); CI matrix includes ubuntu-latest (.github/workflows/ci.yml:28). Architecture is not stated in the README; payload is pure Node/Markdown with no native build step (install.sh:26-27). A Linux arm64 Podman acceptance run is also recorded (docs/design/context-profile-delivery.tdd.md:44).",
+        "wsl2": "yes - 'Windows + WSL | Supported core | WSL follows the Linux paths' (README.md:1282). No WSL-specific CI job found (CI uses native windows-latest, ci.yml:28).",
+        "macos_arm64": "yes - macOS is 'Supported core' with one documented limitation (standalone GAN shell path incompatible with system Bash 3.2, issue 2674; README.md:1281); CI includes macos-latest (ci.yml:28); a real macOS arm64 Codex 0.155.1 run and a native macOS arm64 VM acceptance run are recorded (docs/design/context-profile-delivery.tdd.md:75, 86).",
+        "gpu": "no - no GPU requirement; tooling is Node.js/Markdown. GPU appears only as an optional external compute-sponsor/self-hosting note (README.md:759-763) and the separately built 'ecc ito' RFQ bridge (README.md:801-807)."
+      },
+      "integrations": {
+        "cli": "yes - npm bins ecc and ecc-universal (scripts/ecc.js), ecc-install (scripts/install-apply.js), ecc-memory-mcp, ecc-control-pane, ecc-plan-canvas (package.json:466-473). 'ecc' subcommands include setup, install (--guided), plan, catalog, consult, profile, memory, doctor, repair, list-installed, uninstall, feedback, auto-update, status, sessions, ito, nasiko (scripts/ecc.js:10-107); install.sh/install.ps1 wrap scripts/install-apply.js (install.sh:42).",
+        "mcp": "Consumes: one default connector, chrome-devtools, in .mcp.json:2-7 (Codex plugin enables it via .codex-plugin/plugin.json:24; Claude plugin ships mcpServers {} per .claude-plugin/plugin.json:39), plus about 34 opt-in entries in mcp-configs/mcp-servers.json. Provides: opt-in stdio server ecc-memory-mcp (scripts/memory-mcp.mjs) exposing memory_save, memory_search, memory_read, memory_doctor (README.md:1271). No MCP server that serves skills or rules was found.",
+        "sdk_or_api": "No hosted HTTP API or SDK for the OSS tool found. package.json main/exports point to .opencode/dist/index.js, an OpenCode plugin module built by scripts/build-opencode.js (package.json:3-15; README.md:1626-1638); './*' exports expose package files (package.json:13-14). Machine-readable output: ecc.profile-inspection.v1 and ecc.profile-operation.v1 (scripts/profile.js:93; scripts/lib/context-profile-commands.js:164), ecc.consult.v1 (scripts/consult.js:13), installer --json. A separate Python package llm-abstraction (src/llm, pyproject.toml) is not in the npm files list. ECC Pro GitHub App is a separate hosted service (README.md:1998).",
+        "claude_code_or_codex": "Claude Code: plugin ecc@ecc (README.md:287-290; .claude-plugin/plugin.json, marketplace.json) or guided 'npx ecc-universal@2.2.3 setup', which shells out to 'claude plugin marketplace ...' (scripts/lib/claude-plugin-setup.js:516-533); plugin userConfig hooks_enabled (default true) and hook_profile (.claude-plugin/plugin.json:25-38); manual installer writes ~/.claude/rules/ecc, flat ~/.claude/skills and merges hooks into settings.json (scripts/lib/install-targets/claude-home.js; README.md:556-565). Codex: native plugin (.codex-plugin/plugin.json: skills ./skills/, mcpServers ./.mcp.json, hooks ./hooks/codex-hooks.json, which is a SessionStart bootstrap only; .agents/plugins/marketplace.json), $configure-ecc skill, scripts/codex/check-plugin-cache.js, reference .codex/config.toml and .codex/agents roles, deprecated scripts/sync-ecc-to-codex.sh (README.md:350-383). Experimental: 'ecc profile prepare-native/start' builds an isolated Codex home pinned to Codex 0.154.0/0.155.1 (docs/design/context-profile-delivery.md:65-71)."
+      },
+      "telemetry_and_network": "No analytics/telemetry SDK and no ECC-operated phone-home endpoint found in shipped code (searched scripts/ for telemetry/analytics/sentry/posthog and fetch/http/https use). README.md:281, 641 say ECC never uploads diagnostics automatically; 'ecc feedback' only prints GitHub-issue routes (scripts/feedback.js has no network or process calls). Hooks keep data local: session summaries, metrics and learned skills under ~/.claude (README.md:1377-1390, override ECC_AGENT_DATA_HOME), instincts under ~/.local/share/ecc-homunculus (README.md:1466), observations.jsonl with regex secret scrubbing (skills/continuous-learning-v2/hooks/observe.sh:339-359), Bash command log ~/.claude/bash-commands.log with partial redaction (scripts/hooks/post-bash-command-log.js:22-48), skill-run telemetry sink (scripts/hooks/skill-run-tracker.js:5; scripts/lib/skill-evolution/tracker.js:16), MCP health cache (scripts/hooks/mcp-health-check.js:54). Network that does exist: (1) install/update: npx downloads from npm; install.sh runs 'npm install --ignore-scripts' when node_modules is absent (install.sh:28-31); 'ecc auto-update' runs git fetch --all --prune and git pull --ff-only (scripts/auto-update.js:274-275); default MCP runs 'npx -y chrome-devtools-mcp@1.10.1' (.mcp.json:3-6). (2) mcp-health-check probes the user's own configured HTTP MCP servers on mcp__ tool calls (scripts/hooks/mcp-health-check.js:265-289; hooks/hooks.json:72-80). (3) Opt-in provider calls: continuous-learning-v2 observer (disabled by default, skills/continuous-learning-v2/config.json:3-7) runs 'claude --model haiku --print' (agents/observer-loop.sh:399); 'ecc profile run' Auto routing sends task text to 'codex exec -' or 'claude --print' under the user's own auth (docs/design/context-profile-delivery.md:61-63); security-scan skill and command run unpinned 'npx ecc-agentshield' (skills/security-scan/SKILL.md:36-42); 'ecc ito' needs a separately built Ito CLI with device login (README.md:801-807); scripts/lib/nasiko-release.js uses https.get (line 143). scripts/discord/*.mjs are not in the npm files list (package.json:53-465). No account is required for the OSS tooling; optional hosted services are ECC Pro/GitHub App (README.md:1998), Ito, and provider keys. Codex manifest privacyPolicyURL points to GitHub's general privacy statement (.codex-plugin/plugin.json:38). package.json defines no preinstall/postinstall script (welcome is manual, package.json:475)."
+    },
+    "code": {
+      "languages": [
+        "JavaScript (Node.js >=18, CommonJS plus .mjs): installer, CLI, hooks, memory MCP server",
+        "TypeScript: .opencode/ plugin and tools, .pi/extensions",
+        "Bash and PowerShell: install.sh, install.ps1, scripts/sync-ecc-to-codex.sh, continuous-learning-v2 observer scripts",
+        "Python >=3.11: src/llm (llm-abstraction), ecc_dashboard.py, per-skill scripts (taste-*, skill-comply, instinct-cli.py)",
+        "Rust: ecc2/ (ecc-tui alpha)",
+        "Markdown, YAML and JSON: skills, agents, commands, rules, manifests"
+      ],
+      "entry_points": [
+        {
+          "path": "scripts/ecc.js",
+          "what": "Main CLI dispatcher; npm bins ecc and ecc-universal (package.json:466-473); subcommand table at scripts/ecc.js:10-107."
+        },
+        {
+          "path": "install.sh / install.ps1 -> scripts/install-apply.js",
+          "what": "Manifest and legacy installer (ecc-install bin); flags --target, --profile, --modules, --with/--without, --skills, --enable-hooks/--no-hooks, --dry-run, --json, --guided (scripts/install-apply.js:24-68, 237-243)."
+        },
+        {
+          "path": "scripts/setup.js",
+          "what": "Guided Claude Code plugin setup (scope user|project|local, hook preference) via 'claude plugin' commands (scripts/lib/claude-plugin-setup.js:516-533)."
+        },
+        {
+          "path": "scripts/profile.js + scripts/lib/context-profile-commands.js",
+          "what": "'ecc profile': read-only show/preview/explain/carrier, plus experimental set/resolve/run/status/mode/rollback/recover/start/prepare-native/native-* (scripts/profile.js:8, 29-49)."
+        },
+        {
+          "path": "scripts/memory-mcp.mjs",
+          "what": "ecc-memory-mcp stdio MCP server (memory_save/search/read/doctor); opt-in, not enabled by default."
+        },
+        {
+          "path": "hooks/hooks.json, hooks/codex-hooks.json -> scripts/hooks/*",
+          "what": "Hook entry points: Claude Code auto-loads hooks.json from the plugin; the Codex bundle carries a SessionStart bootstrap only. 54 hook scripts in scripts/hooks/."
+        },
+        {
+          "path": ".opencode/dist/index.js (from .opencode/index.ts)",
+          "what": "package.json main/exports: OpenCode plugin module, built by scripts/build-opencode.js on prepack (package.json:504)."
+        },
+        {
+          "path": "ecc2/src/main.rs",
+          "what": "Rust ecc-tui 'ECC 2.0 Alpha' control-plane scaffold; not in the npm files list (ecc2/README.md:1-5)."
+        }
+      ],
+      "architecture": "Content-first repo: the root is the source of truth and adapters map it. skills/ (293 <name>/SKILL.md with YAML frontmatter name+description, CI-validated by scripts/ci/validate-skills.js:9-13), agents/ (68), commands/ (94 shims; retired ones in legacy-command-shims/), rules/ (22 dirs; common is unconditional, language files carry 'paths:' frontmatter), hooks/ (hooks.json, codex-hooks.json, hooks.metadata.json sidecar) implemented in scripts/hooks/ and gated by run-with-flags.js and scripts/lib/hook-flags.js (ECC_HOOK_PROFILE minimal|standard|strict). Node runtime under scripts/: ecc.js dispatcher; manifest-driven installer (manifests/install-modules.json, install-profiles.json, install-components.json resolved by scripts/lib/install-manifests.js; per-harness adapters scripts/lib/install-targets/*.js; install-state ownership with doctor/repair/uninstall in scripts/lib/install-lifecycle.js); consult.js (local component recommender); profile.js plus scripts/lib/context-*.js (lean@1/full@1 profiles in manifests/context-profiles/, registry, BM25+hashed-n-gram retrieval, task resolver capped at 5 candidates, 8 skills and 32,000 bytes in context-selection.js:9-11, managed store, isolated Codex generations); memory.js and memory-mcp.mjs. Harness packaging dirs: .claude-plugin/, .codex-plugin/, .agents/ (Codex marketplace plus a 39-skill subset), .codex/, .cursor/, .opencode/, .pi/ and pi/core/ (generated Pi profile of 123 skills), and others. Side projects: src/llm (Python), ecc2/ (Rust), docker/context-profiles/ (acceptance and eval harness, not published).",
+      "packaging_and_release": "npm package ecc-universal built from an explicit files allowlist (package.json:53-465); prepack builds the OpenCode payload (package.json:504). Plugin/marketplace distribution is by git (marketplace source ./). .github/workflows/release.yml runs on v* tags: release commit must equal origin/main (:34-42); GitHub-verified signed annotated tag and exact-SHA CI/CodeQL gates via scripts/ci/verify-release-gates.js (release.yml:50-55; verify-release-gates.js:15-18, 227-229, which notes GitHub signature validity is not a project-specific signer allow-list); npm ci --ignore-scripts and IOC scan (:57-61); tag/package.json/VERSION/pi-core sync checks (:66-104); npm pack with SHA-256 recorded (:143-147); packed-install lifecycle on ubuntu, macos and windows (:169-196); 'npm publish --provenance' with id-token: write (:203-204, 255) as staged tag, then sha512 integrity re-check and promotion to latest (:257-287); GitHub Release body from docs/releases/<version>/release-notes.md (:289-295; no tarball or checksum file attached by that step). Registry-side presence of the provenance attestation was not checked. .github/workflows/generator-generic-ossf-slsa3-publish.yml runs on release published, packs a tarball and calls slsa-framework/slsa-github-generator generic SLSA3 with upload-assets (:14-18, 49-62, 96-100). reusable-release.yml repeats the release steps for workflow_dispatch/workflow_call. pi/core is generated and committed so GitHub release tarballs contain it (docs/releases/2.2.3/release-notes.md:24-25).",
+      "tests_and_ci": "Custom Node runner tests/run-all.js executes each tests/**/*.test.js (about 325 files across tests/lib, hooks, scripts, ci, docs, commands); some use node:test (docs/design/context-profile-delivery.tdd.md:32). Python: about 21 pytest files (tests/test_*.py, tests/hooks, tests/skills) plus skill-local tests; Rust tests in ecc2 not counted. 'npm test' chains validators (agents, commands, rules, skills, hooks, install manifests, context profiles, personal paths, catalog counts, command registry) then run-all (package.json:501); 'npm run coverage' uses c8 with gates 80 lines/80 functions/79 branches/80 statements (package.json:502); lint is eslint plus markdownlint (:482). Workflows (12 in .github/workflows): ci.yml (test matrix of 3 OS x Node 18/20/22 x npm/pnpm/yarn/bun minus windows+bun = 33 jobs; packed-install lifecycle on 3 OS; validate with 11 validators; pi-core rebuild and offline Pi load test; python-tests with ruff, mypy src and pytest; security with npm audit signatures, npm audit --omit=dev --audit-level=high and IOC scan; coverage; lint), release.yml, reusable-release/test/validate.yml, supply-chain-watch.yml (cron every 6 hours), maintenance.yml (weekly), monthly-metrics.yml, release-announce.yml, discussion-announce.yml, taste-skills.yml and the SLSA generator. CodeQL runs via GitHub default setup (no workflow file) and is required by the release gate. Dependabot is weekly for npm, github-actions, pip (2 dirs) and cargo (.github/dependabot.yml).",
+      "dependencies": "Root package.json: 4 runtime deps (@iarna/toml 2.2.5, ajv 8.20.0, js-yaml 4.3.2, sql.js 1.14.2; package.json:508-513), 8 devDependencies (:525-534), all exact-pinned; overrides/resolutions for fast-uri, markdown-it, js-yaml, @humanfs/node (:538-549); lockfiles package-lock.json and yarn.lock. .opencode/package.json: 0 runtime, 1 peer (@opencode-ai/plugin), 3 dev; pi/core/package.json: 0. pyproject.toml (llm-abstraction, not in npm files): 2 runtime (anthropic, openai) and 7 dev; skills/skill-comply/pyproject.toml: 1 runtime (pyyaml) and 1 dev; skills/taste-application/scripts: requirements.txt 5 (+1 live: fal-client), pyproject ecc-tasteforge 0 required and 5 optional; skills/taste-distillation/scripts/requirements.txt 4 (+1 live). ecc2/Cargo.toml: 21 direct crates, Cargo.lock present. Runtime npx fetches: chrome-devtools-mcp@1.10.1 (.mcp.json) and unpinned ecc-agentshield (security-scan skill).",
+      "security_policy": "SECURITY.md at repo root: supported versions (2.x/rc and 1.10.x supported, 1.9.x critical only, <1.9 unsupported; lines 3-12); private vulnerability reporting via GitHub advisories plus email affaan@ecc.tools (lines 14-22); targets of 48h acknowledgement, 7 days assessment, 14 days critical fix (lines 32-37); scope and out-of-scope lists; official distribution surfaces and a list of unofficial packages (lines 52-74); supply-chain rules including pinned third-party Actions (lines 88-97); secrets-handling and local-MCP-port guidance."
+    },
+    "claim_checks": [
+      {
+        "claim": "Headline catalog counts: 68 agents, 293 skills, 94 command shims (README.md:142).",
+        "verified": "partial",
+        "evidence": "Counted in the tree: skills/*/SKILL.md = 293, agents/*.md = 68, commands/*.md = 94, an exact match with README.md:142 and .claude-plugin/plugin.json:4. Secondary figures drift: README.md:851 says 67 agents (vs 68 at :142 and :827); README.md:1544 says 32 Codex skills but .agents/skills has 39 SKILL.md files; .codex-plugin/plugin.json:28 and .codex-plugin/README.md:16 say 281 skills."
+      },
+      {
+        "claim": "Skills are 'loaded when the task needs them' and the repository is not dumped into every session (README.md:1211-1219).",
+        "verified": "partial",
+        "evidence": "Plugin manifests load whole directories: .claude-plugin/plugin.json:40-45 (skills ./skills/, commands ./commands/) and .codex-plugin/plugin.json:23 (skills ./skills/). There is no per-skill subsetting inside a plugin, and README.md:1289 itself says the plugin 'advertises the installed catalog'. Per-skill body loading is host behavior and was not inspectable here. Only 4 of 293 skills ship Codex agents/openai.yaml and none sets allow_implicit_invocation false."
+      },
+      {
+        "claim": "Rules are 'always-loaded standards you choose by language or project' (README.md:150, 1217).",
+        "verified": "partial",
+        "evidence": "Only the 10 rules/common files (559 lines) lack frontmatter; 111 of the 122 rules/** markdown files declare 'paths:' globs (e.g. rules/typescript/coding-style.md:1-7), so language rules are path-scoped rather than always loaded. But profile and language-argument installs copy the whole rules/ tree for Claude: rules-core has paths ['rules'] (manifests/install-modules.json:5-10) mapped to ~/.claude/rules/ecc (scripts/lib/install-targets/claude-home.js:18-20; tests/lib/install-targets.test.js:163-197); per-language filtering exists only for antigravity legacy mode (scripts/lib/install/plan.js:286-293). Selective rules therefore hold for the manual-copy path (README.md:301-306). Static reading, not executed."
+      },
+      {
+        "claim": "'./install.sh --target claude --skills tdd-workflow,security-review' installs explicit skills (README.md:484).",
+        "verified": "partial",
+        "evidence": "--skills X becomes component skill:X (scripts/lib/install/request.js:58-60). Only skills without an explicit component get a single-skill synthetic module (scripts/lib/install-manifests.js:194-230; tests/lib/selective-install.test.js:759-794 asserts single-skill install for continuous-learning-v2). tdd-workflow and security-review have explicit components (manifests/install-components.json:498-503, 578-584) that map to multi-skill modules: workflow-quality (47 skill dirs, depends on skill-unified-memory; install-modules.json:313-388) and security (19 skill dirs plus the-security-guide.md, depends on workflow-quality; :423-467). Components expand to whole modules plus dependencies (install-manifests.js:460-472, 581-582, 636-698). tests/scripts/install-apply.test.js:820-841 shows '--skills tdd-workflow' still applies operations when the tdd-workflow directory itself is skipped. Only 15 skills have explicit components. Static reading, not executed."
+      },
+      {
+        "claim": "'--profile minimal' is a low-context install (README.md:425-445).",
+        "verified": "partial",
+        "evidence": "manifests/install-profiles.json:4-12 lists rules-core, agents-core, commands-core, platform-configs and workflow-quality, i.e. all 68 agents plus AGENTS.md, all 94 commands, the whole rules/ tree and 47 workflow-quality skills (plus skill-unified-memory by dependency). It omits only hooks-runtime. Smaller than 'full', but not a minimal skill set. .agents is excluded for home installs (scripts/lib/install-targets/helpers.js:33). Static reading, not executed."
+      },
+      {
+        "claim": "Claude plugin installs do not auto-enable bundled MCP servers; exactly one default connector (README.md:577-581).",
+        "verified": "yes",
+        "evidence": ".claude-plugin/plugin.json:39 has mcpServers {}; .mcp.json:2-7 declares only chrome-devtools via 'npx -y chrome-devtools-mcp@1.10.1'. The Codex plugin points at that file (.codex-plugin/plugin.json:24), so Codex installs do get it. docs/MCP-CONNECTOR-POLICY.md:3, 14-18 matches; mcp-configs/mcp-servers.json holds about 34 opt-in entries."
+      },
+      {
+        "claim": "Claude plugin setup requires Git and Claude Code 2.1 or newer on PATH (README.md:164-167, 1791).",
+        "verified": "partial",
+        "evidence": "Git is checked: scripts/lib/claude-plugin-setup.js:179-207 runs 'git --version' and errors if absent. No Claude Code version comparison was found anywhere under scripts/ (searched for 2.1 gates), so the 2.1 minimum is documentation-only. The related rule that plugin.json must not declare 'hooks' is enforced by tests/plugin-manifest.test.js:247."
+      },
+      {
+        "claim": "AgentShield must be an already-installed, reviewed binary; 'Do not substitute an unversioned one-shot download' (README.md:1894).",
+        "verified": "no",
+        "evidence": "Code and docs differ from the README: skills/security-scan/SKILL.md:36-42 offers 'npx ecc-agentshield scan .' (no install needed, unpinned) and commands/security-scan.md:22-26 says to prefer 'npx ecc-agentshield scan'. SECURITY.md:152 also shows unpinned npx. The same skill lists 'npx -y auto-install in MCP configs' as a risk (SKILL.md:157)."
+      },
+      {
+        "claim": "ECC can scope skills per task via Lean/Full context profiles (docs/design/context-profiles.md; no mention in README.md or CHANGELOG.md).",
+        "verified": "partial",
+        "evidence": "Implemented and shipped in the npm files list (package.json:113; scripts/ecc.js:34-36): 'ecc profile resolve --load' returns up to 5 candidates, 8 skills and 32,000 bytes (scripts/lib/context-selection.js:9-11, 120); skills with allowed-tools/tools/agent/hooks metadata or dynamic content are refused (:103-104); only 32 of 293 skills have trigger phrases, hand-seeded (manifests/context-packs/skill-triggers@1.json). Design docs label it a read-only or experimental development slice: no 'released runtime capability' (docs/design/context-profiles.md:3), prompt-advisory, routine interactive turns get no automatic routing (context-profile-delivery.md:59, 63), native activation for non-Codex providers and release defaults remain out of scope (:71, 91). Carrier layouts exist for claude, codex and pi (scripts/lib/context-carriers.js:14-16)."
+      },
+      {
+        "claim": "No automatic uploads or telemetry (README.md:281).",
+        "verified": "yes",
+        "evidence": "No analytics SDK or ECC-owned endpoint found in scripts/; scripts/feedback.js has no network calls; hooks write local files (scripts/hooks/post-bash-command-log.js:48; skill-run-tracker.js:5). Caveats: opt-in observer runs 'claude --print' (skills/continuous-learning-v2/agents/observer-loop.sh:399, disabled by default in config.json:3-7); 'ecc profile run' sends task text to the user's provider (context-profile-delivery.md:61-63); optional Ito, GitHub App and MCP paths contact third parties."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Repository test results recorded for the context-profile (ECC-029) development branch, plus coverage of scripts/lib/context-profile-*.js and context-selection.js",
+        "metric": "tests passed; coverage",
+        "value": "Full runner 4,940 of 4,940 passed; focused node:test 182/182; earlier baseline 4,726 passes, 0 failures; coverage 92.73% lines, 81.74% branches, 96.00% functions (aggregate, 140 tests). The ledger says it describes local development evidence, not a public release.",
+        "source": "docs/design/context-profile-delivery.tdd.md:3, 30-32, 82",
+        "independent": false
+      },
+      {
+        "what": "Complex-task outcome pilot complex-tasks@1: arms full, manual-lean, auto-lean, ecc-legacy, baseline; 3 tasks x 5 arms x 4 repeats = 60 trials (Claude provider)",
+        "metric": "hidden-grader task score",
+        "value": "Saturated: every arm scored 1.000 on every task, so only economics and skill routing differed; no token or cost figures are published in the repo",
+        "source": "docker/context-profiles/complex-eval/DESIGN.md:113-115, 178-182",
+        "independent": false
+      },
+      {
+        "what": "complex-tasks@2 (3 tasks, repeats=2, 30 trials, claude-opus-4-8)",
+        "metric": "outcomes passed",
+        "value": "30/30, described as still saturated",
+        "source": "docker/context-profiles/complex-eval/DESIGN.md:211-218",
+        "independent": false
+      },
+      {
+        "what": "Evidence boundary for context scoping (token savings, routing quality)",
+        "metric": "measured token savings / routing-quality percentage",
+        "value": "None published: 'token savings remain unobserved; there is no certified routing-quality percentage'; the 13-probe/8-task Lean-vs-Full pilot is below the 30/30 gate and reports insufficient-sample. No independent third-party benchmark was found in the repository.",
+        "source": "docs/design/context-profile-delivery.tdd.md:55, 77",
+        "independent": false
+      },
+      {
+        "what": "pi/core curated profile size (Pi harness, not Claude Code/Codex)",
+        "metric": "skills / commands / skill-description characters",
+        "value": "123 skills, 24 prompt commands, 35,006 characters of skill description text",
+        "source": "docs/releases/2.2.3/release-notes.md:12-14; pi/core/README.md:3-5",
+        "independent": false
+      },
+      {
+        "what": "Full vs Lean skill inventory in a packed consumer (Linux arm64, Node 22.23.1, Codex 0.154.0)",
+        "metric": "skills exposed",
+        "value": "Full 292 skills and 583 source resource files; Lean 3 skills; native Codex switch 291 -> 3 -> 291 ECC skills; six provider-owned system skills reported separately",
+        "source": "docs/design/context-profile-delivery.tdd.md:44-50",
+        "independent": false
+      },
+      {
+        "what": "AgentShield (separate repo/package ecc-agentshield) self-reported stats; not checkable in this repo",
+        "metric": "tests / coverage / static-analysis rules",
+        "value": "1282 tests, 98% coverage, 102 rules",
+        "source": "README.md:1889",
+        "independent": false
+      },
+      {
+        "what": "Claude Code cost-setting guidance (no measurement method cited)",
+        "metric": "claimed cost reduction",
+        "value": "sonnet default ~60% cost reduction; MAX_THINKING_TOKENS 31,999 -> 10,000 ~70% cut in hidden thinking cost; haiku subagents ~80% cheaper",
+        "source": "README.md:1728-1733; docs/token-optimization.md:29-31",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Whole-catalog exposure on plugin installs: the Claude plugin loads skills/ and commands/ wholesale (.claude-plugin/plugin.json:40-45) and the Codex plugin loads skills/ (.codex-plugin/plugin.json:23), so all 293 skills (plus 94 commands and 68 agents on Claude) are advertised; README.md:1289 concedes this. Per-task scoping is an experimental 'ecc profile' feature not mentioned in README/CHANGELOG, prompt-advisory, with no measured token savings (docs/design/context-profiles.md:3; context-profile-delivery.md:59, 63; context-profile-delivery.tdd.md:55).",
+      "Selective-install granularity gaps (static reading): '--skills tdd-workflow' or 'security-review' expands to whole modules (47 and 19 skill dirs plus dependencies); profile and language-argument installs copy all 122 rules files for Claude; '--profile minimal' still installs all agents, commands and rules (manifests/install-modules.json:5-10, 313-467; scripts/lib/install-manifests.js:194-230, 460-472; scripts/lib/install/plan.js:286-293).",
+      "Executable hook automation is on by default in the plugin path (hooks_enabled default true, .claude-plugin/plugin.json:26-31): Node hooks fire on PreToolUse for every tool, Stop and SessionEnd, with an async observer and local logging of Bash commands and tool I/O under ~/.claude with regex-only redaction (hooks/hooks.json:3-246; scripts/hooks/post-bash-command-log.js:22-48; skills/continuous-learning-v2/hooks/observe.sh:339-359). README.md:1833 calls hooks 'executable configuration'. Codex hook bundle is SessionStart only and needs explicit trust (hooks/codex-hooks.json).",
+      "Runtime download and supply-chain surface: default MCP uses 'npx -y chrome-devtools-mcp@1.10.1' (.mcp.json), the security-scan skill/command run unpinned 'npx ecc-agentshield' against the README's own guidance (README.md:1894; skills/security-scan/SKILL.md:36-42), 'ecc auto-update' does git pull (scripts/auto-update.js:274-275), and README.md:217 says a version pin is not an audit. Impersonation is acknowledged: unofficial packages reuse ECC metadata (SECURITY.md:67-72). The release gate checks GitHub-verified tag signatures, not an authorized-signer list (scripts/ci/verify-release-gates.js:227-229).",
+      "Maintenance concentration and drift: README says 'a single maintainer ships weekly' (README.md:104) and CODEOWNERS is '* @affaan-m' (.github/CODEOWNERS:1); releases 2.2.0 (2026-08-25), 2.2.2 (2026-09-15), 2.2.3 (2026-10-01) (CHANGELOG.md:3, 17, 59); CHANGELOG has no 2.2.1 entry. Very large surface (about 4,200 files, 325 JS test files) with count drift (README.md:851 vs 142; :1544 says 32 vs 39 Codex skills; .codex-plugin says 281 vs 293). The shallow clone does not allow commit-history analysis.",
+      "Platform limits: macOS Bash 3.2 incompatibility in the GAN shell path (issue 2674) and native-Windows defects in continuous-learning v2 observer and memory-vault writes (issues 2489, 2626) (README.md:1281-1283); optional features need Bash/Python; Codex lacks hook parity (README.md:1553); the isolated-Codex profile adapter admits only Codex 0.154.0 and 0.155.1 (docs/design/context-profile-delivery.md:67); Cursor/OpenCode are beta and others experimental (README.md:1291-1294).",
+      "Scope and commercial content: 293 skills span many non-engineering domains (investor outreach, customs, energy procurement, video editing); installer output and docs carry sponsor/compute copy (scripts/install-apply.js:70-71, 146; package.json:475); 'ecc ito' needs an unpublished CLI and an Ito account (README.md:801-807); ECC Pro and the GitHub App are separate paid hosted offerings (README.md:83, 1998). Bundled side projects (src/llm Python, ecc2 Rust alpha with 21 crates) are outside the skills use case.",
+      "Licensing and provenance: a single MIT LICENSE (copyright Affaan Mustafa, LICENSE:1-21) and no NOTICE or third-party file. A minority of skills carry origin 'community', named contributors or 'direct-port adaptation' in frontmatter; only some give inline upstream attribution (skills/react-performance/SKILL.md:10, 573 cites Vercel Labs MIT; skills/postgres-patterns/SKILL.md:148 cites Supabase), and docs/skill-adaptation-policy.md:11 tells contributors to remove upstream branding."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "affaan-m/ecc",
+      "checks": [
+        {
+          "field": "readme.install[0] (Guided setup via npx)",
+          "statement": "npx ecc-universal@2.2.3 setup | npx ecc-universal@2.2.3 install --guided: guided Claude Code plugin setup, plus a multi-harness wizard",
+          "citation": "README.md:164-174, 226 (also package.json:2-3, 472; scripts/ecc.js:10-21; scripts/install-apply.js:238)",
+          "holds": true,
+          "note": "README.md:169-174 gives 'npx ecc-universal@2.2.3 setup' as the recommended path; :164-167 lists Node >=18, Git and Claude Code >=2.1; :221 says this wizard configures the Claude Code plugin; :226-229 gives 'install --guided' for any mix of Claude Code, Codex and Kimi Code. In the code, package ecc-universal 2.2.3 (package.json:2-3) has bin ecc-universal -> scripts/ecc.js (:472); ecc.js:10-21 routes setup to setup.js and install to install-apply.js; install-apply.js:238 handles --guided; setup.js and install-guided.js are in the files list (package.json:140, 152). Read statically, not executed; I did not check that 2.2.3 is published on npm."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT; file LICENSE",
+          "citation": "LICENSE:1-21; package.json:44; .claude-plugin/plugin.json:11; .codex-plugin/plugin.json:12; .claude-plugin/marketplace.json:22",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text, Copyright (c) 2026 Affaan Mustafa. package.json and both plugin manifests declare MIT. pi/core/LICENSE and skills/taste-application/scripts/LICENSE are identical MIT copies. Caveat the dossier misses: 8 shipped skills declare 'license: Apache-2.0' in frontmatter (carrier-relationship-management, customs-trade-compliance, energy-procurement, inventory-demand-planning, logistics-exception-management, production-scheduling, quality-nonconformance, returns-reverse-logistics; e.g. skills/customs-trade-compliance/SKILL.md:4). All are in the npm files list (package.json:185-336), their docs/ja-JP and docs/zh-CN translations ship too, and no Apache-2.0 license text is included. The project license is MIT, but the bundle is not uniformly MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: Linux is 'Supported core'; CI includes ubuntu-latest; no architecture stated in the README; no native build step; a Linux arm64 Podman run is recorded",
+          "citation": "README.md:1280; .github/workflows/ci.yml:28; install.sh:26-27; docs/design/context-profile-delivery.tdd.md:44",
+          "holds": true,
+          "note": "README.md:1280 reads 'Linux | Supported core'. ci.yml:28 matrix is [ubuntu-latest, windows-latest, macos-latest]. A grep for x86/x64/amd64/arm64/aarch64 in README.md finds nothing, and the npm files list has no native binaries, ecc2/ or src/. tdd.md:44 records the 'Linux arm64, Node 22.23.1, Codex 0.154.0' packed run. Wording nit: install.sh:26-27 says the deps are pure JS with no native build step, not that the payload is pure Node/Markdown. The package also ships interpreted Bash/PowerShell/Python helpers (install.sh, install.ps1, skills/*/scripts/*.py and *.sh). These are architecture-independent, so 'yes' stands. Not run on x86_64 here."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: plugin ecc@ecc, or guided setup that shells out to 'claude plugin marketplace ...'; userConfig hooks_enabled (default true) and hook_profile; the manual installer writes ~/.claude/rules/ecc and flat ~/.claude/skills and merges hooks into settings.json. Codex: native plugin (skills ./skills/, mcpServers ./.mcp.json, SessionStart-only hooks), $configure-ecc, check-plugin-cache.js, .codex reference config, deprecated sync script. Experimental prepare-native/start is pinned to Codex 0.154.0/0.155.1.",
+          "citation": "README.md:287-290, 350-383, 556-565; scripts/lib/claude-plugin-setup.js:516-533; .claude-plugin/plugin.json:25-38; scripts/lib/install-targets/claude-home.js; .codex-plugin/plugin.json; hooks/codex-hooks.json; .agents/plugins/marketplace.json; docs/design/context-profile-delivery.md:65-71",
+          "holds": true,
+          "note": "All sub-claims check out. The marketplace is 'ecc' with plugin 'ecc' (.claude-plugin/marketplace.json:2, 12). claude-plugin-setup.js:516-533 runs 'plugin marketplace update|add ... --scope' and 'list --json' through runClaude, whose default command is 'claude' (:213-214). plugin.json:25-38 has hooks_enabled default true and hook_profile default 'standard'. claude-home.js:18-41 maps rules to ~/.claude/rules/ecc and skills to flat ~/.claude/skills/<name>; helpers.js:170-181 merges hooks.json into settings.json (merge-hook-ids). .codex-plugin/plugin.json:23-25 points skills at ./skills/, mcpServers at ./.mcp.json and hooks at ./hooks/codex-hooks.json, which has only SessionStart. .agents/plugins/marketplace.json serves plugin 'ecc' from './'. skills/configure-ecc, scripts/codex/check-plugin-cache.js, .codex/config.toml and .codex/agents/*.toml exist. README.md:363 calls the sync script deprecated. context-profile-delivery.md:67 allowlists Codex 0.154.0 or 0.155.1, and scripts/profile.js:29 labels these commands experimental."
+        },
+        {
+          "field": "claim_checks[9] (No automatic uploads or telemetry)",
+          "statement": "verified: yes. No analytics SDK or ECC-owned endpoint in scripts/; feedback.js makes no network calls; hooks write local files. Caveats: opt-in observer runs 'claude --print', 'ecc profile run' sends task text to the user's provider, and optional Ito/GitHub App/MCP paths contact third parties.",
+          "citation": "README.md:281; scripts/feedback.js; scripts/hooks/post-bash-command-log.js:48; scripts/hooks/skill-run-tracker.js:5; skills/continuous-learning-v2/agents/observer-loop.sh:399; skills/continuous-learning-v2/config.json:3-7; docs/design/context-profile-delivery.md:61-63",
+          "holds": true,
+          "note": "README.md:281 says ECC never uploads diagnostics automatically. A grep of scripts/ for analytics SDKs (posthog, sentry, mixpanel, amplitude, segment, datadog, opentelemetry) finds none. The http/https/fetch call sites are local 127.0.0.1 servers (plan-canvas, dashboard, control pane), the user-configured MCP probe (mcp-health-check), opt-in nasiko downloads from registry.nasiko.dev, a manual/CI advisory fetcher, and Discord bots that are not in the npm files list. feedback.js and lib/feedback-links.js have no requires or network calls. post-bash-command-log.js:48 appends to ~/.claude, and tracker.js:29 writes ~/.claude/state/skill-runs.jsonl (mode 0600). observer-loop.sh:399 runs 'claude --model haiku --print', and config.json:4 has enabled false. delivery.md:61 says task text is sent to the configured provider. One unlisted automatic network path, which is a download rather than an upload: the default-profile Stop hook (hooks/hooks.json:181, 'standard,strict') runs 'npx tsc --noEmit' without --no-install (stop-format-typecheck.js:116-117), so it may fetch from npm when TypeScript is not installed locally."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking, license: add that 8 shipped skills declare 'license: Apache-2.0' in frontmatter (skills/{carrier-relationship-management,customs-trade-compliance,energy-procurement,inventory-demand-planning,logistics-exception-management,production-scheduling,quality-nonconformance,returns-reverse-logistics}/SKILL.md:4, all in package.json files at :185-336, with ja-JP/zh-CN translations under docs/) and that no Apache-2.0 license text ships. In risks, replace 'a single MIT LICENSE' with 'MIT LICENSE at root, with identical copies in pi/core/LICENSE and skills/taste-application/scripts/LICENSE'.",
+        "Non-blocking, readme.platforms.linux_x86_64: replace 'payload is pure Node/Markdown with no native build step (install.sh:26-27)' with 'dependencies are pure JS with no native build step (install.sh:26-27); the payload also ships interpreted Bash/PowerShell/Python helpers, and none are architecture-specific'.",
+        "Non-blocking, readme.telemetry_and_network: add to the list of network paths that the default 'standard' Stop hook runs 'npx tsc --noEmit' without --no-install (hooks/hooks.json:181; scripts/hooks/stop-format-typecheck.js:116-117), so it may fetch from the npm registry when TypeScript is not installed locally."
+      ]
+    }
+  ]
+}

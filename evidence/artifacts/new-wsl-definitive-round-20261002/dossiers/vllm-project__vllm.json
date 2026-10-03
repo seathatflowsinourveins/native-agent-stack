@@ -1,0 +1,337 @@
+{
+  "contender": "vllm-project/vllm",
+  "revision": {
+    "contender": "vllm-project/vllm",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "vllm-project/vllm",
+        "tag": "v0.30.0",
+        "commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.30.0",
+    "commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+    "read_at": "2026-10-02T03:03:03+00:00"
+  },
+  "dossier": {
+    "contender": "vllm-project/vllm",
+    "revision": {
+      "tag": "v0.30.0",
+      "commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "vLLM is a Python library and HTTP/gRPC server for LLM inference and serving (README.md:24), with C++/CUDA kernels (csrc/) and an optional Rust frontend (rust/). `vllm serve` hosts ONE model per process and exposes OpenAI-compatible endpoints (completions, chat, responses, embeddings, audio), Anthropic Messages (/v1/messages), Cohere-style embed/rerank, pooling/score endpoints and a Prometheus /metrics endpoint (docs/serving/online_serving/README.md:5-93; docs/getting_started/quickstart.md:206). Facts bearing on the stated needs: (a) OTLP collector / privacy filter: none in this repo. Nothing receives or filters OTLP; vLLM only EXPORTS OTLP traces, and only when --otlp-traces-endpoint is set (vllm/tracing/otel.py:94-102). (b) Metrics store: none; metrics are exposed for Prometheus pull (vllm/entrypoints/serve/instrumentator/metrics.py:56-82). (c) Events/logs store: none; logs go to stdout by default (vllm/envs.py:43) and no OTLP logs exporter exists. (d) Dashboards: no built-in UI; only example Grafana/Perses dashboards and a Prometheus+Grafana docker-compose (examples/observability/dashboards/README.md:8-39; examples/observability/prometheus_grafana/docker-compose.yaml:4-19). (e) Trace/dataset/experiment store: none; `vllm bench serve|throughput|latency|sweep` replays datasets and can save JSON results (docs/benchmarking/cli.md:61-86,194-222), and traces can be exported to an external backend such as Jaeger (examples/observability/opentelemetry/README.md:5-37). (f) Local model server: yes, that is its function; documented Claude Code and Codex configurations exist (docs/serving/integrations/claude_code.md; docs/serving/integrations/codex.md); default builds include CUDA SM 8.9 (CMakeLists.txt:116-132). (g) Semantic code search: none; there is no indexer, chunker, vector store or query layer. It can serve embedding models (/v1/embeddings, /v2/embed, /pooling: vllm/entrypoints/pooling/embed/api_router.py:28-47; vllm/entrypoints/pooling/pooling/api_router.py:27-39), and its RAG docs use an external Milvus through LangChain/LlamaIndex (docs/deployment/frameworks/retrieval_augmented_generation.md:7-8).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "vLLM is a fast and easy-to-use library for LLM inference and serving.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "OpenAI-compatible API server, plus Anthropic Messages API and gRPC support",
+          "citation": "README.md:49"
+        },
+        {
+          "claim": "Tool calling and reasoning parsers; structured outputs using xgrammar or guidance",
+          "citation": "README.md:47-48"
+        },
+        {
+          "claim": "Support for NVIDIA GPUs, AMD GPUs, Intel GPUs, and x86/ARM/PowerPC CPUs; hardware plugins such as Google TPUs, Intel Gaudi, IBM Spyre, Huawei Ascend, Rebellions NPU, Apple Silicon, MetaX GPU",
+          "citation": "README.md:51"
+        },
+        {
+          "claim": "Quantization: FP8, MXFP8/MXFP4, NVFP4, INT8, INT4, GPTQ/AWQ, GGUF, compressed-tensors, ModelOpt, TorchAO, and more",
+          "citation": "README.md:34"
+        },
+        {
+          "claim": "Continuous batching of incoming requests, chunked prefill, prefix caching",
+          "citation": "README.md:32"
+        },
+        {
+          "claim": "Speculative decoding including n-gram, suffix, EAGLE, DFlash",
+          "citation": "README.md:37"
+        },
+        {
+          "claim": "Embedding and retrieval models (e.g., E5-Mistral, GTE, ColBERT)",
+          "citation": "README.md:59"
+        },
+        {
+          "claim": "vLLM seamlessly supports 200+ model architectures on Hugging Face",
+          "citation": "README.md:53"
+        },
+        {
+          "claim": "Install vLLM with uv (recommended) or pip (`uv pip install vllm`), or build from source for development",
+          "citation": "README.md:66-72"
+        },
+        {
+          "claim": "For security disclosures, use GitHub Security Advisories",
+          "citation": "README.md:104"
+        },
+        {
+          "claim": "ABSENCE: the README says nothing about usage-data collection/telemetry, OTLP/observability, or Claude Code/Codex; those appear only in docs/",
+          "citation": "README.md:1-111"
+        }
+      ],
+      "install": [
+        {
+          "method": "PyPI via uv (README)",
+          "command": "uv pip install vllm",
+          "citation": "README.md:66-70"
+        },
+        {
+          "method": "uv venv + automatic PyTorch backend selection (NVIDIA CUDA docs)",
+          "command": "uv venv --python 3.12 --seed\nsource .venv/bin/activate\nuv pip install vllm --torch-backend=auto",
+          "citation": "docs/getting_started/quickstart.md:24-28; docs/getting_started/installation/gpu.cuda.inc.md:24-26"
+        },
+        {
+          "method": "Official Docker image (NVIDIA)",
+          "command": "docker run --runtime nvidia --gpus all -v ~/.cache/huggingface:/root/.cache/huggingface --env \"HF_TOKEN=$HF_TOKEN\" -p 8000:8000 --ipc=host vllm/vllm-openai:latest --model Qwen/Qwen3-0.6B",
+          "citation": "docs/getting_started/installation/gpu.cuda.inc.md:268-276"
+        },
+        {
+          "method": "Specific CUDA-variant wheel from GitHub Releases (documented command resolves releases/latest, not a pinned tag)",
+          "command": "export VLLM_VERSION=$(curl -s https://api.github.com/repos/vllm-project/vllm/releases/latest | jq -r .tag_name | sed 's/^v//')\nexport CUDA_VERSION=130 # or other\nexport CPU_ARCH=$(uname -m) # x86_64 or aarch64\nuv pip install \"https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/vllm-${VLLM_VERSION}+cu${CUDA_VERSION}-cp38-abi3-manylinux_2_28_${CPU_ARCH}.whl\" --extra-index-url \"https://download.pytorch.org/whl/cu${CUDA_VERSION}\"",
+          "citation": "docs/getting_started/installation/gpu.cuda.inc.md:41-47"
+        },
+        {
+          "method": "Source build, Python-only with precompiled kernels (full compile alternative: `uv pip install -e . --torch-backend=auto`, gpu.cuda.inc.md:153-157)",
+          "command": "git clone https://github.com/vllm-project/vllm.git\ncd vllm\nVLLM_USE_PRECOMPILED=1 uv pip install --editable . --torch-backend=auto",
+          "citation": "docs/getting_started/installation/gpu.cuda.inc.md:93-97"
+        },
+        {
+          "method": "macOS Apple Silicon CPU backend, build from source (experimental)",
+          "command": "git clone https://github.com/vllm-project/vllm.git\ncd vllm\nuv pip install -r requirements/cpu.txt\nuv pip install -e .",
+          "citation": "docs/getting_started/installation/cpu.apple.inc.md:35-40"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - docs: OS Linux, Python 3.10-3.13 (docs/getting_started/installation/gpu.md:27-28; pyproject.toml:35 allows <3.15); pre-built abi3 wheels cp38-abi3-manylinux_2_28_x86_64 (docs/getting_started/installation/gpu.cuda.inc.md:46); Docker image vllm/vllm-openai (gpu.cuda.inc.md:265-276); release pipeline builds x86_64 CUDA 13.0/12.9 and CPU wheels (.buildkite/release-pipeline.yaml:44-56,139-165).",
+        "wsl2": "yes (not first-class) - no native Windows; docs say use WSL with a Linux distribution (docs/getting_started/installation/gpu.md:31); setup.py:88-90 says 'Linux platform (including WSL)'; code special-cases WSL2: pinned memory off by default, opt in with VLLM_WSL2_ENABLE_PIN_MEMORY=1 (vllm/platforms/cuda.py:307-327; vllm/envs.py:2066-2071), multiprocessing forced to spawn (vllm/utils/system_utils.py:153-154), pinned-memory warning for CPU offload + CUDA graphs (vllm/platforms/cuda.py:357-376). No WSL job found in .github/ or .buildkite/.",
+        "macos_arm64": "yes, CPU backend only and experimental - 'experimental support for macOS with Apple Silicon', build from source, FP32/FP16 (docs/getting_started/installation/cpu.apple.inc.md:4-6); VLLM_TARGET_DEVICE forced to cpu on macOS (setup.py:85-87); GPU acceleration is the separate community plugin vllm-metal (docs/getting_started/installation/gpu.apple.inc.md:4-9). CI: daily smoke test on macos-15 (required) and macos-26 (non-blocking) (.github/workflows/macos-smoke-test.yml:17-27). Docs say no pre-built Apple wheels (cpu.apple.inc.md:28) but the release pipeline builds a macOS arm64 CPU wheel (.buildkite/release-pipeline.yaml:96-133).",
+        "gpu": "yes - NVIDIA CUDA compute capability >= 7.5 (docs/getting_started/installation/gpu.cuda.inc.md:9); default builds include SM 8.9 (Ada; docs/features/quantization/README.md:79 maps Ada to SM 8.9): CMakeLists.txt:116-132, docker/Dockerfile:293, .buildkite/release-pipeline.yaml:10; FP8 W8A8 needs CC >= 8.9 (docs/features/quantization/llm_compressor/fp8.md:16). The only in-code RTX 4090 mention is a shared-memory table in vendored flash-linear-attention (vllm/third_party/flash_linear_attention/ops/utils.py:179-183). Also AMD ROCm, Intel XPU, TPU via separate vllm-tpu (docs/getting_started/quickstart.md:77-86). Caveats: default wheels/images target CUDA 13.0 (vllm/envs.py:90; docker/Dockerfile:25), which needs R580+ drivers (gpu.cuda.inc.md:327); CUDA forward-compat libs are unsupported on GeForce (vllm/env_override.py:58-60); no GeForce/RTX runner in .buildkite (CI GPUs: L4, A100, H100, H200, B200, AMD MI-series)."
+      },
+      "integrations": {
+        "cli": "yes - `vllm` console script (pyproject.toml:43-44) with subcommands serve, chat, complete, launch, bench, collect-env, run-batch (vllm/entrypoints/cli/main.py:55-62; docs/cli/README.md:12). Separate Rust binary `vllm-rs` (rust/src/cmd/src/main.rs:85-218), opt-in via VLLM_USE_RUST_FRONTEND=1 (vllm/envs.py:1394-1402), and a Rust `vllm-bench` client (rust/src/bench/README.md:3-10).",
+        "mcp": "No MCP server found. vLLM is an MCP CLIENT for tool servers: `--tool-server host:port[,...]|demo` feeds the Responses API through an SSE MCP client (vllm/entrypoints/launchers/cli_args.py:120-126; vllm/entrypoints/mcp/tool_server.py:20-30,104-120; docs/usage/security.md:292-296). `mcp>=2.0.0,<3.0.0` is a hard dependency (requirements/common.txt:54).",
+        "sdk_or_api": "Python SDK: `from vllm import LLM, SamplingParams, PoolingParams, AsyncLLMEngine, ...` (vllm/__init__.py:16-28,76-101; docs/getting_started/quickstart.md:112-142). HTTP: OpenAI-compatible /v1/completions, /v1/chat/completions, /v1/responses (+retrieve/cancel), /v1/embeddings, /v1/audio/*, /v1/models (docs/serving/online_serving/openai_compatible_server.md:16-35; vllm/entrypoints/openai/responses/api_router.py:48-117); Anthropic /v1/messages and /v1/messages/count_tokens (vllm/entrypoints/anthropic/api_router.py:51-119); Cohere-style /v2/embed, /v2/rerank (docs/serving/online_serving/README.md:30-37); /pooling, /classify, /score (README.md:39-55; vllm/entrypoints/pooling/pooling/api_router.py:27-39); /metrics, /health, /version, /load (README.md:80-93). Optional gRPC via `--grpc` needs `pip install vllm[grpc]` (vllm/entrypoints/launchers/grpc_server.py:27-40; setup.py:1537-1538). Default bind: all interfaces, port 8000 (vllm/entrypoints/launchers/cli_args.py:260-262; vllm/entrypoints/launchers/launcher.py:275).",
+        "claude_code_or_codex": "Documented, both via the HTTP API only (no plugin, hook or MCP server). Claude Code: ANTHROPIC_BASE_URL=http://localhost:8000 plus ANTHROPIC_API_KEY/ANTHROPIC_AUTH_TOKEN (any value) and ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU}_MODEL=<served-model-name>, then run `claude`; vLLM must run with --enable-auto-tool-choice and a --tool-call-parser; served model names containing '/' do not work (docs/serving/integrations/claude_code.md:13,25-33,39-58,80). Codex: ~/.codex/config.toml with model_provider='vllm', [model_providers.vllm] base_url='http://localhost:8000/v1', wire_api='responses', env_key VLLM_API_KEY (any value) (docs/serving/integrations/codex.md:38-61). Code support: the Anthropic handler drops Claude Code's x-anthropic-billing-header system block so prefix caching keeps working (vllm/entrypoints/anthropic/serving.py:237-241,259-271); Responses router at vllm/entrypoints/openai/responses/api_router.py:48-77. Neither page covers Claude Code/Codex telemetry (OTLP): vLLM neither receives nor forwards it. AGENTS.md/CLAUDE.md are instructions for AI agents contributing to vLLM's own source, not a runtime integration (AGENTS.md:1-4; CLAUDE.md:1)."
+      },
+      "telemetry_and_network": "(1) Outbound usage telemetry is ON by default: vLLM POSTs a usage record to https://stats.vllm.ai at startup and every 600 s (vllm/envs.py:812-814; vllm/usage/usage_lib.py:166-173,248-271), started from rank 0 of the GPU/XPU worker (vllm/v1/worker/gpu_worker.py:490-492; vllm/v1/worker/xpu_worker.py:198). Fields: random uuid, cloud-provider guess, CPU model/count/family, RAM, platform string, GPU count/type/memory, CUDA/XPU runtime, model architecture class name, vLLM version, 5 env-var values, plus engine knobs such as dtype, TP/DP/PP sizes, max_model_len, quantization, attention backend, spec-decode method (usage_lib.py:129-151,232-235; vllm/v1/utils.py:730-771); no prompt/response field appears in the code. A copy is appended to ~/.config/vllm/usage_stats.json (usage_lib.py:273-278). Opt-out: VLLM_NO_USAGE_STATS=1, DO_NOT_TRACK=1 or VLLM_DO_NOT_TRACK=1 (only the literal value 1 counts), or an empty ~/.config/vllm/do_not_track file (vllm/envs.py:815-823; usage_lib.py:50-68; docs/usage/usage_stats.md:52-61). The main docker/Dockerfile does not set it; only docker/Dockerfile.ppc64le sets VLLM_NO_USAGE_STATS=1 (docker/Dockerfile.ppc64le:86). (2) Model/tokenizer downloads from Hugging Face Hub unless HF_HUB_OFFLINE is set (vllm/engine/arg_utils.py:841; vllm/model_executor/model_loader/weight_utils.py:178,376,440,487); HF_TOKEN only for gated models (docs/getting_started/installation/gpu.cuda.inc.md:269-274). No vLLM account is required. (3) If the flashinfer-cubin package is absent (it is dropped from published wheel metadata, setup.py:1323-1327), vllm/utils/flashinfer.py:563-588 does an HTTP GET (5 s timeout) to an NVIDIA artifactory (flashinfer.py:77-80) when TRTLLM-attention support is evaluated (flashinfer.py:603-604). (4) Install/build-time network: PyPI, PyTorch indices, https://flashinfer.ai/whl/ (requirements/cuda.txt:16), wheels.vllm.ai/GitHub for precompiled builds, CUTLASS fetched from GitHub in source builds (gpu.cuda.inc.md:204). (5) Tracing is opt-in: OTLP trace export only when --otlp-traces-endpoint is set (gRPC by default with insecure=True; http/protobuf via OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) (vllm/config/observability.py:36-37; vllm/tracing/otel.py:94-102); spans carry request id, token counts, latencies and temperature/top_p/max_tokens/n, not prompt text (vllm/v1/engine/output_processor.py:806-842). Metrics are Prometheus pull at /metrics (vllm/entrypoints/serve/instrumentator/metrics.py:56-82). No OTLP receiver, OTLP metrics/logs exporter, or other phone-home beyond (1)-(3) was found; the Rust frontend only installs a stderr log subscriber (rust/src/tracing/src/lib.rs:31-47). (6) Prompt/response content is logged only with --enable-log-requests (DEBUG shows prompt text/token ids) and --enable-log-outputs, both default off (vllm/engine/arg_utils.py:3012-3020; vllm/entrypoints/launchers/cli_args.py:150-153). (7) The server listens on all interfaces, port 8000, by default (vllm/entrypoints/launchers/launcher.py:275,287). The Swagger /docs page needs internet unless --enable-offline-docs (docs/serving/online_serving/README.md:95-101)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "C++/CUDA",
+        "Rust",
+        "CMake",
+        "Shell",
+        "Protocol Buffers",
+        "Dockerfile/YAML (CI)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:43-44",
+          "what": "console script `vllm` -> vllm.entrypoints.cli.main:main (vllm/entrypoints/cli/main.py:39-108); subcommands serve, chat, complete, launch, bench, collect-env, run-batch"
+        },
+        {
+          "path": "vllm/entrypoints/cli/serve.py:46-61",
+          "what": "`vllm serve` (ServeSubcommand) -> launchers/api_server/entry.py:163-176 run_server -> uvicorn/FastAPI; --grpc branch needs vllm[grpc]; Rust frontend when VLLM_USE_RUST_FRONTEND=1"
+        },
+        {
+          "path": "vllm/entrypoints/launchers/api_server/routers.py:12-74",
+          "what": "registers API routers by supported task (generate, pooling, transcription/realtime, scale-out) and dev routes when VLLM_SERVER_DEV_MODE=1"
+        },
+        {
+          "path": "vllm/__init__.py:16-28",
+          "what": "Python SDK lazy exports: LLM (offline API), AsyncLLMEngine, SamplingParams, PoolingParams"
+        },
+        {
+          "path": "vllm/entrypoints/anthropic/api_router.py:51-119",
+          "what": "POST /v1/messages and /v1/messages/count_tokens (Anthropic Messages API)"
+        },
+        {
+          "path": "vllm/entrypoints/pooling/embed/api_router.py:28-60",
+          "what": "POST /v1/embeddings and /v2/embed (embedding models)"
+        },
+        {
+          "path": "rust/src/cmd/src/main.rs:85-218",
+          "what": "`vllm-rs` binary: serve (managed Python headless engine + Rust frontend), frontend, bench serve, render"
+        },
+        {
+          "path": "vllm/tracing/otel.py:60-91",
+          "what": "init_otel_tracer: OTLP trace exporter setup, invoked by AsyncLLM/LLMEngine only when --otlp-traces-endpoint is set (vllm/v1/engine/async_llm.py:125-127)"
+        }
+      ],
+      "architecture": "Python package vllm/ (2,479 .py files), C++/CUDA csrc/ (308 files, built via CMakeLists.txt and cmake/), Rust workspace rust/ (16 crates, 329 .rs files). Process model: API-server process(es) -> engine-core process(es) over ZMQ -> one GPU worker per GPU (docs/design/arch_overview.md:67-117). Key modules: vllm/entrypoints/ (cli/, launchers/api_server, openai/, anthropic/, cohere/, pooling/, serve/instrumentator (metrics, health), speech_to_text/, scale_out/, mcp/); vllm/v1/engine/ (async_llm.py, core.py, core_client.py, output_processor.py); vllm/v1/core/ (sched/scheduler.py, kv_cache_manager.py, block_pool.py); vllm/v1/worker/ (gpu_worker.py, gpu_model_runner.py, cpu_worker.py); vllm/v1/executor/, vllm/v1/attention/, vllm/v1/spec_decode/, vllm/v1/kv_offload/, vllm/v1/metrics/ (Prometheus loggers, stat-logger plugins); vllm/model_executor/ (models/registry.py, layers/quantization/); vllm/compilation/ (torch.compile passes); vllm/config/ (pydantic configs incl. observability.py); vllm/platforms/ (cuda.py, rocm.py, cpu.py, xpu.py, tpu.py, zen_cpu.py); vllm/tool_parsers/ and vllm/reasoning/ (per-model parsers); vllm/tracing/ (OTel traces); vllm/usage/usage_lib.py (usage telemetry); vllm/plugins/ (entry-point groups general, platform, io_processor, stat_logger, endpoint: docs/design/plugin_system.md:46-56); vllm/benchmarks/ (`vllm bench`). Rust: rust/src/{cmd,server,chat,parser,tokenizer,engine-core-client,metrics,llm,managed-engine,bench,mock-engine,tracing} plus rust/proto/*.proto.",
+      "packaging_and_release": "Build: setuptools + setuptools-scm (git-derived version) + CMake extensions + setuptools-rust (pyproject.toml:1-14; setup.py:1505-1551); abi3 wheels built with --py-limited-api=cp38 (docker/Dockerfile:655); `vllm-rs` binary shipped inside the wheel (setup.py:1469-1474). Artifacts: PyPI wheels (default variant = CUDA 13.0, no local-version suffix: vllm/envs.py:90; setup.py:1263-1272; docker/Dockerfile:668), additional CUDA 12.9 / CPU / XPU / macOS arm64 CPU wheels staged to S3 and wheel indices (.buildkite/release-pipeline.yaml:27-209), Docker Hub images vllm/vllm-openai and variants pushed as user vllmbot via DOCKERHUB_TOKEN (release-pipeline.yaml:1128-1169), crates.io crate vllm-proto via OIDC trusted publishing (.github/workflows/proto-crate.yml:50-70), Buf schema pushes (.github/workflows/buf.yml:39-57). Process: release builds run on Buildkite, triggered by RC tags; the final vX.Y.Z tag does not trigger a build (RELEASE.md:21-24); cadence goal ~2 weeks (RELEASE.md:7). PyPI upload is a manual-gated Buildkite step using twine and a PYPI_TOKEN secret, labelled 'experimental, use with caution' (release-pipeline.yaml:1171-1189; .buildkite/scripts/upload-release-wheels-pypi.sh:31-38,78-79); only wheels without '+' in the filename go to PyPI (upload-release-wheels-pypi.sh:71-72). Integrity: no cosign/sigstore/GPG signing, SLSA provenance or PyPI attestations found (grep over .buildkite, .github, docker, tools, docs/contributing; only apt GPG-key handling in docker/Dockerfile); sha256sum is used for build-cache keys and macOS wheel transfer checks (docker/Dockerfile:659; release-pipeline.yaml:106,125-129). Release builds can assert a clean tagged checkout via GIT_REPO_CHECK -> tools/check_repo.sh (docker/Dockerfile:627-629; tools/check_repo.sh:4-14) and enforce a 500 MB wheel size (docker/Dockerfile:668-679). Docs link GitHub Release wheel assets (docs/getting_started/installation/gpu.cuda.inc.md:46) but no workflow uploading them was found in the repo.",
+      "tests_and_ci": "pytest (pyproject.toml:107-118 markers). About 1,566 test_*.py files under tests/ (1,876 .py files incl. conftest/helpers; 37 conftest.py), e.g. tests/entrypoints/{anthropic,openai/responses,pooling/embed}, tests/tracing, tests/v1/tracing, tests/kernels, tests/models, tests/distributed, tests/evals. Rust: 195 .rs files contain #[test]/#[cfg(test)] blocks (expect-test snapshots, cargo nextest preferred: rust/AGENTS.md:31-37). CI: 12 GitHub Actions workflows in .github/workflows/ (pre-commit [ruff, typos, clang-format, markdownlint, actionlint, shellcheck, mypy 3.10-3.13, SPDX/header, cargo fmt/sort checks per .pre-commit-config.yaml], macos-smoke-test [daily; builds CPU wheel, serves Qwen3-0.6B with dummy weights, hits /health and /v1/completions], buf, proto-crate [semver check + publish], run-ci-command [triggers Buildkite from PR comments], plus labeling/PR-bot/stale/approval workflows; most gated on github.repository_owner == vllm-project). The real test suites run on Buildkite: .buildkite/test_areas/*.yaml (36 files; GPUs L4, A100, H100, H200, B200 and AMD MI250/MI300/MI355), .buildkite/hardware_tests/ (AMD, Ascend NPU, CPU, GH200, Intel), .buildkite/image_build/, ci_config.yaml; .buildkite/test-pipeline.yaml is a deprecated stub. Relevant jobs: Metrics/Tracing (.buildkite/test_areas/misc.yaml:355-383), anthropic and responses entrypoints (.buildkite/test_areas/entrypoints.yaml:130-157), Rust frontend cargo/E2E (rust_frontend_cargo.yaml, rust_frontend.yaml). No RTX 4090/GeForce or WSL2 job found. Dependabot covers GitHub Actions and pip (.github/dependabot.yml).",
+      "dependencies": "Python (setup.py:1293-1345 feeds install_requires): requirements/common.txt = 58 direct requirements (fastapi[standard], starlette, pydantic, transformers>=5.10.4, huggingface_hub, openai, anthropic, mcp, prometheus_client, opentelemetry-sdk/api/exporter-otlp/semantic-conventions-ai, pyzmq, xgrammar, llguidance, protobuf, python-json-logger, ...); requirements/cuda.txt adds 18 (torch==2.13.0, torchaudio, torchvision, flashinfer-python==0.6.18.post1, flashinfer-cubin [dropped from wheel metadata], nvidia-cutlass-dsl, tilelang, numba, ...; extra index https://flashinfer.ai/whl/); cpu.txt adds 9; rocm.txt 19; xpu.txt 17; tpu.txt 11; kv_connectors.txt 4. Build: pyproject.toml [build-system].requires = 9 (torch == 2.13.0 pinned), requirements/build/cuda.txt 12, build/rust.txt 4. Tests: requirements/test/cuda.in ~60 direct, requirements/test/cuda.txt ~369 pins; docs.in 14; lint.txt 1. setup.py declares 15 optional extras (zen, bench, tensorizer, fastsafetensors, instanttensor, runai, audio, video, deepstream, flashinfer, b12x, helion, grpc, otel, extra-quant) (setup.py:1511-1548). Rust: rust/Cargo.toml = 16 member crates, 120 workspace dependencies (107 external + 13 path crates), rust/Cargo.lock present, git dependencies llm-multimodal and oss-harmony (rust/Cargo.toml:64,70). CUTLASS is fetched at build time (docs/getting_started/installation/gpu.cuda.inc.md:204).",
+      "security_policy": "SECURITY.md: private reporting via GitHub Security Advisories, severity tiers, embargo for CRITICAL/HIGH, CVE after fix merge, prenotification group (SECURITY.md:3-76). Threat model: docs/usage/security.md; vulnerability management team: docs/contributing/vulnerability_management.md."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:49 - OpenAI-compatible API server, plus Anthropic Messages API and gRPC support",
+        "verified": "yes",
+        "evidence": "Anthropic: POST /v1/messages and /v1/messages/count_tokens (vllm/entrypoints/anthropic/api_router.py:51-119), tested in CI (.buildkite/test_areas/entrypoints.yaml:130-136). gRPC exists but is optional: import fails unless vllm[grpc] (smg-grpc-servicer) is installed (vllm/entrypoints/launchers/grpc_server.py:27-40; setup.py:1537-1538), and docs call it insecure by default (docs/usage/security.md:352-356)."
+      },
+      {
+        "claim": "docs/serving/integrations/claude_code.md:13,64 - vLLM implements the Anthropic Messages API; Claude Code's per-request attribution hash in the system prompt (which defeats prefix caching) is handled automatically in vLLM > 0.17.1",
+        "verified": "yes",
+        "evidence": "vllm/entrypoints/anthropic/serving.py:237-241 skips system text blocks starting with x-anthropic-billing-header; inline system messages are stripped the same way (:259-271); unit tests at tests/entrypoints/anthropic/test_anthropic_messages_conversion.py:424-443."
+      },
+      {
+        "claim": "docs/serving/integrations/codex.md:13 - vLLM implements the OpenAI Responses API that Codex uses",
+        "verified": "yes",
+        "evidence": "POST /v1/responses, GET /v1/responses/{id}, POST /v1/responses/{id}/cancel (vllm/entrypoints/openai/responses/api_router.py:48-117); non-gpt-oss models use the tool/reasoning-parser path (vllm/entrypoints/openai/responses/serving.py:131-132,161); 19 test files in tests/entrypoints/openai/responses/ run in CI (.buildkite/test_areas/entrypoints.yaml:147-157). Caveats: text-generation models only (docs/serving/online_serving/openai_compatible_server.md:28-29); the Codex page's prose names Qwen/Qwen3-27B but its command serves Qwen/Qwen3.6-27B with --tensor-parallel-size 8 (codex.md:27-30)."
+      },
+      {
+        "claim": "README.md:34 - Quantization list includes GGUF",
+        "verified": "partial",
+        "evidence": "GGUF support moved to the out-of-tree vllm-gguf-plugin, which must be installed separately and is called 'highly experimental and under-optimized' (docs/features/quantization/gguf.md:3-13; setup.py:1547 extra 'extra-quant'). vllm/model_executor/layers/quantization/ contains no gguf module (directory listing)."
+      },
+      {
+        "claim": "README.md:51 - Support for NVIDIA GPUs (relevant: Ada / SM 8.9, RTX 4090 class)",
+        "verified": "yes",
+        "evidence": "CUDA_SUPPORTED_ARCHS includes 8.9 for every CUDA toolchain branch (CMakeLists.txt:116-132); Docker default arch list includes 8.9 (docker/Dockerfile:293); release builds include 8.9 (.buildkite/release-pipeline.yaml:10); FP8 W8A8 supported on CC >= 8.9 (docs/features/quantization/llm_compressor/fp8.md:16). Not validated on consumer GPUs in CI: no 4090/GeForce runner in .buildkite (CI devices are L4, A100, H100, H200, B200, AMD MI-series)."
+      },
+      {
+        "claim": "docs/getting_started/installation/gpu.cuda.inc.md:4,39,53 - binaries are CUDA 12.9 and the default nightly variant is cu129; gpu.md:28 - Python 3.10-3.13",
+        "verified": "no",
+        "evidence": "Code differs from docs: VLLM_MAIN_CUDA_VERSION defaults to 13.0 (vllm/envs.py:90,606-607); Dockerfile defaults to CUDA 13.0.3 (docker/Dockerfile:25; docker/versions.json:4-6); the ungated release wheel group is CUDA 13.0 and 12.9 is an optional 'additional' group (.buildkite/release-pipeline.yaml:27-68); only suffix-less wheels go to PyPI (upload-release-wheels-pypi.sh:71-72) and the Dockerfile calls the CUDA 13 wheel the one uploaded to PyPI (docker/Dockerfile:668); pyproject.toml allows Python <3.15 and lists 3.14 (pyproject.toml:23-35). Code taken as authoritative: expect a CUDA 13.0 default wheel/image."
+      },
+      {
+        "claim": "docs/usage/usage_stats.md:3,52-61 - anonymous usage data is collected by default; opt out via VLLM_NO_USAGE_STATS, DO_NOT_TRACK or ~/.config/vllm/do_not_track",
+        "verified": "yes",
+        "evidence": "Enabled unless an opt-out is set (vllm/usage/usage_lib.py:50-68); data POSTed to https://stats.vllm.ai at start and every 600 s (vllm/envs.py:812-814; usage_lib.py:248-271). Precision: only the literal value '1' disables via env (vllm/envs.py:815-823). The docs' sample JSON is 'as of v0.4.0'; current code sends more fields (vllm/v1/utils.py:730-771). README.md does not mention any of this."
+      },
+      {
+        "claim": "examples/observability/opentelemetry/README.md:3 - OpenTelemetry packages are bundled with vLLM; docs/usage/metrics.md:3-5 - Prometheus /metrics endpoint",
+        "verified": "yes",
+        "evidence": "opentelemetry-sdk/api/exporter-otlp/semantic-conventions-ai are hard dependencies (requirements/common.txt:55-58); /metrics is mounted (vllm/entrypoints/serve/instrumentator/metrics.py:56-82). Scope: OTLP is trace-only (vllm/tracing/otel.py:21-26,94-102), enabled only with --otlp-traces-endpoint (vllm/config/observability.py:36-37); no OTLP metrics/logs exporter or receiver found; the Rust frontend rejects --otlp-traces-endpoint as unsupported (rust/src/cmd/src/cli/unsupported.rs:320-326). Tracing tests run in CI (.buildkite/test_areas/misc.yaml:355-383)."
+      },
+      {
+        "claim": "README.md:59 - Embedding and retrieval models (E5-Mistral, GTE, ColBERT)",
+        "verified": "yes",
+        "evidence": "Registry entries GteModel, GteNewModel, BertModel, HF_ColBERT, ColBERT* (vllm/model_executor/models/registry.py:222-232,275-277); E5-Mistral listed (docs/models/pooling_models/embed.md:49); ColBERT (docs/models/pooling_models/token_embed.md:48-51); endpoints /v1/embeddings, /v2/embed, /pooling (embed/api_router.py:28-47; pooling/api_router.py:27-39). Scope: inference only - no vector index/store or code-search component exists in vllm/ or rust/ (grep for vector-store names found only unrelated GPU vector.store calls)."
+      },
+      {
+        "claim": "docs/getting_started/quickstart.md:206 - by default the server starts at http://localhost:8000 and hosts one model at a time",
+        "verified": "partial",
+        "evidence": "One model per instance is confirmed (docs/usage/faq.md:3-5; vllm/config/model.py:135-137). The default is not loopback-only: host defaults to None and the socket binds '' i.e. all interfaces (vllm/entrypoints/launchers/cli_args.py:260-262; vllm/entrypoints/launchers/launcher.py:275,287); use --host or --uds (cli_args.py:260-276) to restrict."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "`vllm bench serve` sample output: Hermes-3-Llama-3.1-8B, ShareGPT, 10 prompts; hardware not stated (illustrative)",
+        "metric": "request throughput; output token throughput; mean TTFT; mean TPOT",
+        "value": "1.73 req/s; 382.89 tok/s; 71.54 ms; 7.91 ms",
+        "source": "docs/benchmarking/cli.md:91-111",
+        "independent": false
+      },
+      {
+        "what": "`vllm bench throughput` (offline) sample output: Hermes-3-Llama-3.1-8B, sonnet dataset, 10 prompts; hardware not stated",
+        "metric": "requests/s; total tokens/s; output tokens/s",
+        "value": "7.15; 4656.00; 1072.15",
+        "source": "docs/benchmarking/cli.md:733-747",
+        "independent": false
+      },
+      {
+        "what": "Offline throughput with n-gram speculative decoding: Meta-Llama-3-8B-Instruct, InstructCoder, 2048 prompts; hardware not stated",
+        "metric": "requests/s; total tokens/s; output tokens/s",
+        "value": "104.77; 23836.22; 10477.10",
+        "source": "docs/benchmarking/cli.md:769-790",
+        "independent": false
+      },
+      {
+        "what": "FP8 W8A8 quantization effect (claim, no method or hardware given)",
+        "metric": "model memory reduction; throughput improvement",
+        "value": "2x lower memory; up to 1.6x throughput",
+        "source": "docs/features/quantization/llm_compressor/fp8.md:6",
+        "independent": false
+      },
+      {
+        "what": "Batch-level data parallelism for multimodal encoders vs TP (claim)",
+        "metric": "throughput/TTFT improvement",
+        "value": "around 10% at tensor_parallel_size=8; a further 40% for Conv3D vision encoders",
+        "source": "docs/configuration/optimization.md:234-237",
+        "independent": false
+      },
+      {
+        "what": "llm-d (separate CNCF Sandbox project built on vLLM) results quoted in vLLM docs: prefix-aware routing vs round-robin (Llama 3.1 70B, AMD MI300X); prefill/decode disaggregation (GPT-OSS, NVIDIA B200); hierarchical KV offloading vs GPU-only (NVIDIA H100)",
+        "metric": "output throughput / TTFT / tokens/s",
+        "value": "3x throughput and 2x faster TTFT; up to 70% higher tokens/s; 13.9x throughput",
+        "source": "docs/deployment/integrations/llm-d.md:21-27",
+        "independent": false
+      },
+      {
+        "what": "Rust vllm-bench client vs Python `vllm bench serve` client (measures the benchmark client, not the server)",
+        "metric": "client startup time; peak client memory at 1400 concurrency",
+        "value": "~7 ms vs multi-second; <100 MB",
+        "source": "rust/src/bench/README.md:22-29",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Network/security defaults: `vllm serve` binds all interfaces on port 8000 (host default None -> '' bind) with no auth unless --api-key, and CORS allows all origins (vllm/entrypoints/launchers/cli_args.py:260-262,291; vllm/entrypoints/launchers/launcher.py:275,287). --api-key covers only /v1, /v2, /inference (and /cohere) prefixes; /invocations, /pooling, /classify, /score, /rerank, /tokenize, /detokenize, /health, /version, /load stay open (docs/usage/security.md:146-218). gRPC, torch.distributed and KV-transfer ports are unauthenticated by design (security.md:5-44,352-372); VLLM_SERVER_DEV_MODE and endpoint plugins can expose arbitrary RPC (security.md:226-237,339-350). Mitigations: --host, --uds, reverse proxy (security.md:272-278).",
+      "Default-on outbound telemetry to https://stats.vllm.ai (startup + every 10 min); opt-out works only for the literal value 1 or a do_not_track file; the main Docker image does not set it (vllm/usage/usage_lib.py:50-68,248-271; vllm/envs.py:812-823; only docker/Dockerfile.ppc64le:86 sets it). Extra unprompted GET to an NVIDIA artifactory when flashinfer-cubin is absent (vllm/utils/flashinfer.py:563-588) and Hugging Face Hub access unless HF_HUB_OFFLINE (vllm/engine/arg_utils.py:841).",
+      "Observability scope is narrow for an OTLP-based pipeline: OTLP export is traces only (no metrics/logs), the gRPC exporter hard-codes insecure=True, spans exist only with --otlp-traces-endpoint, and the Rust frontend rejects that flag (vllm/tracing/otel.py:21-26,94-102; vllm/config/observability.py:36-39; rust/src/cmd/src/cli/unsupported.rs:320-326). Prompt/response text can enter logs with --enable-log-requests (DEBUG) or --enable-log-outputs (vllm/engine/arg_utils.py:3012-3020; vllm/entrypoints/launchers/cli_args.py:150-153), so privacy filtering would have to happen downstream.",
+      "Hardware/platform fit: default wheel/image targets CUDA 13.0, which needs R580+ drivers, while install docs still say CUDA 12.9 (vllm/envs.py:90; docker/Dockerfile:25; docs/getting_started/installation/gpu.cuda.inc.md:4,327); CUDA forward-compat libs are unsupported on GeForce (vllm/env_override.py:58-60); no GeForce/RTX 4090 or WSL2 job in CI and release performance validation covers only H100 and MI300x (RELEASE.md:45-49; .buildkite/test_areas device list); WSL2 needs special handling (vllm/platforms/cuda.py:307-327).",
+      "Operational scope: one model per server process (docs/usage/faq.md:3-5; vllm/config/model.py:135-137), so a chat/coding model plus an embedding model means two instances on two ports (docs/deployment/frameworks/retrieval_augmented_generation.md:25-36); gpu_memory_utilization defaults to 0.92 per instance, so co-hosting needs explicit fractions (vllm/config/cache.py:103-110); at least 2+N physical CPU cores and a busy-loop engine process (docs/configuration/optimization.md:426-441); tool calling needs per-model parser flags (docs/serving/integrations/claude_code.md:33).",
+      "Supply chain/release hygiene: no artifact signing, SLSA provenance or PyPI attestations found (grep of .buildkite, .github, docker, tools, docs/contributing); PyPI upload is a manual Buildkite step with a long-lived PYPI_TOKEN, labelled 'experimental, use with caution' (.buildkite/release-pipeline.yaml:1174; .buildkite/scripts/upload-release-wheels-pypi.sh:31-38,78-79); GitHub-release asset upload not found in repo although docs link to it (docs/getting_started/installation/gpu.cuda.inc.md:46; RELEASE.md:24). Heavy pinned stack: torch==2.13.0 in build and runtime, flashinfer from an extra index (pyproject.toml:10; requirements/cuda.txt:7,16-18). Cache directories are loaded without integrity checks, including code-executing formats (docs/usage/security.md:374-378).",
+      "Maintenance/API churn: releases roughly every 2 weeks with minor-version breaking changes; back-compat guaranteed only for a limited number of minors (RELEASE.md:7,15; docs/contributing/deprecation_policy.md:13-19); deprecation shims already present (vllm/entrypoints/openai/api_server.py:24-30; vllm/entrypoints/grpc_server.py:7-13); experimental/early features: GGUF moved out-of-tree and 'highly experimental' (docs/features/quantization/gguf.md:3-7), macOS CPU 'experimental' (docs/getting_started/installation/cpu.apple.inc.md:4), Rust frontend 'very early stage' with unsupported flags (rust/AGENTS.md:3; rust/src/cmd/src/cli/unsupported.rs:14-35).",
+      "Scope/licensing/evidence gaps: the repo has no OTLP collector, metrics/log store, dashboard app, experiment/dataset store or code-search index (see purpose); Apache-2.0 overall (LICENSE; pyproject.toml:19-20) with bundled third-party code under other terms (MIT: vllm/third_party/flash_linear_attention/LICENSE:1-3; NVIDIA BSD-style header: vllm/third_party/pynvml.py:6-32); docs note optional deps are kept out of images to avoid license issues (docs/getting_started/installation/gpu.cuda.inc.md:297-298); published performance numbers are project-authored, hardware is often unspecified, and no independent third-party benchmark is cited in the repo."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "vllm-project/vllm",
+      "checks": [
+        {
+          "field": "readme.install[1] (uv venv + automatic PyTorch backend selection, NVIDIA CUDA docs)",
+          "statement": "uv venv --python 3.12 --seed; source .venv/bin/activate; uv pip install vllm --torch-backend=auto",
+          "citation": "docs/getting_started/quickstart.md:24-28; docs/getting_started/installation/gpu.cuda.inc.md:24-26",
+          "holds": true,
+          "note": "quickstart.md:24-28 has all three commands word for word under the 'NVIDIA CUDA' tab. gpu.cuda.inc.md:24-26 shows `uv pip install vllm --torch-backend=auto`, and :34 says --torch-backend=auto picks the PyTorch index from the installed driver. The README form `uv pip install vllm` (README.md:66-70) also matches. The checkout is tag v0.30.0 = ced6857afa0ea7b2e3f0846a62e1394e90f15607 (.git/HEAD, .git/packed-refs:2)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-3; pyproject.toml:19-20",
+          "holds": true,
+          "note": "LICENSE is the full Apache License 2.0 text. pyproject.toml declares license = \"Apache-2.0\" and license-files = [\"LICENSE\"], and source files carry SPDX-License-Identifier: Apache-2.0. Bundled third-party code under other terms (MIT, NVIDIA BSD-style) is already covered in the dossier's risks."
+        },
+        {
+          "field": "readme.platforms.gpu",
+          "statement": "NVIDIA CUDA compute capability >= 7.5; default builds include SM 8.9 (Ada); FP8 W8A8 needs CC >= 8.9; only in-code RTX 4090 mention is in vendored flash-linear-attention; default wheels/images target CUDA 13.0 needing R580+ drivers; CUDA forward-compat unsupported on GeForce; no GeForce/RTX runner in .buildkite (CI GPUs: L4, A100, H100, H200, B200, AMD MI-series)",
+          "citation": "docs/getting_started/installation/gpu.cuda.inc.md:9,327; CMakeLists.txt:116-132; docker/Dockerfile:25,293; .buildkite/release-pipeline.yaml:10; docs/features/quantization/README.md:79; docs/features/quantization/llm_compressor/fp8.md:16; vllm/envs.py:90,606-607; vllm/env_override.py:58-60; vllm/third_party/flash_linear_attention/ops/utils.py:179-183; docs/getting_started/quickstart.md:77-86",
+          "holds": true,
+          "note": "Every cited line matches. 8.9 is in all four CUDA_SUPPORTED_ARCHS branches, in Dockerfile torch_cuda_arch_list='7.5 8.0 8.6 8.9 9.0 10.0 11.0 12.0' and in CUDA_ARCH_X86. ARG CUDA_VERSION=13.0.3, and VLLM_MAIN_CUDA_VERSION defaults to '13.0'. setup.py:1268-1272 adds a +cuXXX suffix to every other CUDA build, so the unsuffixed (PyPI) wheel is CUDA 13 (Dockerfile:668). gpu.cuda.inc.md:327 says 'CUDA 13 requires an R580 or newer driver'. env_override.py:58-60 says GeForce/RTX get Error 803 with compat libs. The quantization README maps Ada to SM 8.9, and fp8.md:16 gives CC >= 8.9 for FP8. A grep of .buildkite and .github for geforce/rtx/4090/l40/wsl finds nothing. Minor imprecisions that don't change the conclusion: (1) the CI GPU list leaves out the optional DGX Spark (GB10) nightly jobs (.buildkite/test_areas/kernels.yaml:412, lm_eval.yaml:521) and GH200 (.buildkite/hardware_tests/gh200.yaml:6); (2) 'only in-code RTX 4090 mention' is true for vllm/, but tests/kernels/helion/test_utils.py:18 also has the string, in a GPU-name test. The dossier also doesn't point out that the L4 CI runners are Ada/SM 8.9."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Documented, both via HTTP API only (no plugin/hook/MCP server): Claude Code via ANTHROPIC_BASE_URL=http://localhost:8000, ANTHROPIC_API_KEY/AUTH_TOKEN (any value), ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU}_MODEL, requires --enable-auto-tool-choice + --tool-call-parser, no '/' in served model names; Codex via ~/.codex/config.toml (model_provider='vllm', base_url http://localhost:8000/v1, wire_api='responses', env_key VLLM_API_KEY); Anthropic handler drops x-anthropic-billing-header; Responses router; AGENTS.md/CLAUDE.md are contributor instructions",
+          "citation": "docs/serving/integrations/claude_code.md:13,25-33,39-58,80; docs/serving/integrations/codex.md:38-61; vllm/entrypoints/anthropic/serving.py:237-241,259-271; vllm/entrypoints/openai/responses/api_router.py:48-77; AGENTS.md:1-4; CLAUDE.md:1",
+          "holds": true,
+          "note": "The env-var block, dummy key/token (lines 54-55), tool-calling flags (30, 33) and no-'/' limit (80) all match. The Codex TOML fields match codex.md:40-61 (env_key may be any value, line 59). serving.py skips system text blocks starting with 'x-anthropic-billing-header' both top-level (237-241) and inline (_extract_system_text, 259-271), with a comment citing prefix caching. POST /v1/responses is at api_router.py:48-77. AGENTS.md is guidance for AI-assisted contributions, and CLAUDE.md is just '@AGENTS.md'. Grepping vllm/ for claude|codex finds only serving.py:237 and a tool-result normalization comment at chat_utils.py:2048. MCP matches are client-side (MCPToolServer, server labels). Neither doc page mentions telemetry, and no OTLP receiver routes exist in vllm/ or rust/."
+        },
+        {
+          "field": "claim_checks[6] (docs/usage/usage_stats.md usage-data collection)",
+          "statement": "Anonymous usage data is collected by default (verified: yes): POSTed to https://stats.vllm.ai at start and every 600 s; opt out via VLLM_NO_USAGE_STATS, DO_NOT_TRACK (or VLLM_DO_NOT_TRACK) with literal value '1' only, or ~/.config/vllm/do_not_track; docs sample is 'as of v0.4.0' while code sends more fields; README silent",
+          "citation": "docs/usage/usage_stats.md:3,11,52-61; vllm/usage/usage_lib.py:50-68,248-271; vllm/envs.py:812-823; vllm/v1/utils.py:730-771; vllm/v1/worker/gpu_worker.py:490-492",
+          "holds": true,
+          "note": "is_usage_stats_enabled() returns True unless an opt-out is set. report_usage_stats() runs on rank 0 at GPU-worker init and starts a daemon thread. That thread appends to usage_stats.json, POSTs to VLLM_USAGE_STATS_SERVER (default https://stats.vllm.ai), then sleeps 600 s and repeats. VLLM_NO_USAGE_STATS and VLLM_DO_NOT_TRACK/DO_NOT_TRACK are compared with == '1'. usage_stats.md:11 says 'as of v0.4.0', and v1/utils.py:733-770 adds DP/PP size, max_model_len, attention_backend, spec_decode_method and more. README.md has no telemetry mention. Extra precision the dossier doesn't state: a non-'1' VLLM_DO_NOT_TRACK value masks DO_NOT_TRACK=1 (envs.py:816-823), and the do_not_track path follows VLLM_CONFIG_ROOT/XDG_CONFIG_HOME (envs.py:335-339,686-691)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+{
+  "contender": "sgl-project/sglang",
+  "revision": {
+    "contender": "sgl-project/sglang",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "sgl-project/sglang",
+        "tag": "v0.5.21",
+        "commit": "e00930c5489053f26d86b179cee0d087f846acbb",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.5.21",
+    "commit": "e00930c5489053f26d86b179cee0d087f846acbb",
+    "read_at": "2026-10-02T03:02:52+00:00"
+  },
+  "dossier": {
+    "contender": "sgl-project/sglang",
+    "revision": {
+      "tag": "v0.5.21",
+      "commit": "e00930c5489053f26d86b179cee0d087f846acbb",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "SGLang is an open-source serving engine for large language, multimodal and diffusion models. `sglang serve` or `python -m sglang.launch_server` starts a FastAPI/uvicorn server (default 127.0.0.1:30000) with OpenAI-, Anthropic- and Ollama-compatible HTTP APIs plus a native /generate API; `sglang.Engine` runs the same runtime in-process (README.md:65-66; python/sglang/srt/entrypoints/http_server.py:1769-2082; python/sglang/srt/arg_groups/fields/serving.py:65-66). Against the six listed needs, the repo supplies facts only for the last one (local model server): it is an NVIDIA CUDA 13 build, and the RTX 4090 (sm_89) is inside the documented 'sm80 and above' range but is not named in the README or the LLM cookbook. For the other five needs SGLang is an emitter, not a pipeline component: it can export OTLP traces (opt-in) and expose Prometheus metrics for scraping. It has no OTLP receiver, no OTLP metrics/logs exporter, no privacy-filter processor, no metrics/logs store, no general dashboard tool (only an example Grafana dashboard for its own metrics) and no trace/dataset/experiment store. It does ship a load-generating benchmark client with replayable dataset loaders (python/sglang/benchmark/).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "SGLang is 'a high-performance serving framework for large language models and multimodal models', delivering low-latency, high-throughput inference 'from a single GPU to large distributed clusters'.",
+          "citation": "README.md:65-66"
+        },
+        {
+          "claim": "Core features listed: RadixAttention prefix caching, zero-overhead CPU scheduler, prefill-decode disaggregation, speculative decoding, continuous batching, paged attention, TP/PP/EP/DP parallelism, structured outputs, chunked prefill, quantization (FP4/FP8/INT4/AWQ/GPTQ), multi-LoRA batching.",
+          "citation": "README.md:69"
+        },
+        {
+          "claim": "Broad model support (language, embedding, reward and diffusion models); 'Compatible with most Hugging Face models and OpenAI APIs'.",
+          "citation": "README.md:70"
+        },
+        {
+          "claim": "Hardware support: NVIDIA GPUs (GB200/B300/H100/A100/Spark/5090), AMD GPUs (MI355/MI300), Intel Xeon CPUs, Google TPUs, Ascend NPUs 'and more'. The RTX 4090 is not named.",
+          "citation": "README.md:71"
+        },
+        {
+          "claim": "Getting started is by link only (Install, Quick Start, Cookbook with 'the deployment command we recommend for each supported model', Backend/Frontend tutorials); the README itself contains no install command.",
+          "citation": "README.md:75-81"
+        },
+        {
+          "claim": "Performance is documented by link to release blogs; the README contains no measurements of its own.",
+          "citation": "README.md:83-84"
+        },
+        {
+          "claim": "News items assert performance results: 'Unlocking 25x Inference Performance with SGLang on NVIDIA GB300 NVL72' and 'Reaching 500 TPS in two weeks' for GLM5.2 NVFP4 agentic workloads (linked blogs not opened).",
+          "citation": "README.md:28,32"
+        },
+        {
+          "claim": "SGLang is hosted under the non-profit open-source organization LMSYS.",
+          "citation": "README.md:89"
+        },
+        {
+          "claim": "Design and code reused from Guidance, vLLM, LightLLM, FlashInfer, Outlines and LMQL.",
+          "citation": "README.md:99"
+        },
+        {
+          "claim": "The README makes no statement about telemetry or network behaviour, OTLP, MCP, Anthropic/Claude Code/Codex compatibility, platform support beyond the hardware list, or security reporting (absence of claims).",
+          "citation": "README.md:1-100"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip or uv from PyPI (Linux, CUDA 13; Python 3.10+)",
+          "command": "pip install --upgrade pip && pip install uv && uv pip install --prerelease=allow sglang",
+          "citation": "docs/docs/get-started/install.mdx:22-26 (CUDA 13 requirement :33-35; Python :15)"
+        },
+        {
+          "method": "Nightly wheel from the SGLang wheel index",
+          "command": "pip install --upgrade pip && pip install uv && uv pip install --prerelease=allow --index-strategy unsafe-best-match --extra-index-url https://docs.sglang.ai/whl/cu130/ sglang",
+          "citation": "docs/docs/get-started/install.mdx:42-46"
+        },
+        {
+          "method": "From source (Linux, CUDA); docs pin v0.5.18, and the build needs cargo unless SGLANG_BUILD_RUST_EXTS=none",
+          "command": "git clone -b v0.5.18 https://github.com/sgl-project/sglang.git && cd sglang && pip install --upgrade pip && pip install -e \"python\"",
+          "citation": "docs/docs/get-started/install.mdx:55-63; python/setup.py:56-88,209-214"
+        },
+        {
+          "method": "Docker (CUDA 13 image; latest and dev are mutable tags; a smaller latest-runtime variant is documented)",
+          "command": "docker run --gpus all --shm-size 32g -p 30000:30000 -v ~/.cache/huggingface:/root/.cache/huggingface --env \"HF_TOKEN=<secret>\" --ipc=host lmsysorg/sglang:latest python3 -m sglang.launch_server --model-path meta-llama/Llama-3.1-8B-Instruct --host 0.0.0.0 --port 30000",
+          "citation": "docs/docs/get-started/install.mdx:75-100"
+        },
+        {
+          "method": "docker compose (copy docker/compose.yaml locally; it sets privileged: true and network_mode: host)",
+          "command": "docker compose up -d",
+          "citation": "docs/docs/get-started/install.mdx:123-133; docker/compose.yaml:1-35"
+        },
+        {
+          "method": "macOS Apple Silicon (MLX backend), from source only; replaces python/pyproject.toml with pyproject_other.toml",
+          "command": "git clone https://github.com/sgl-project/sglang.git && cd sglang && uv venv -p 3.12 sglang-metal && source sglang-metal/bin/activate && uv pip install --upgrade pip && rm -f python/pyproject.toml && mv python/pyproject_other.toml python/pyproject.toml && uv pip install -e \"python[all_mps]\"  # then: SGLANG_USE_MLX=1 python -m sglang.launch_server --model MODEL_ID_OR_PATH --disable-cuda-graph --host 0.0.0.0",
+          "citation": "docs/docs/hardware-platforms/apple_metal.mdx:37-66"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - primary target. Docs call Linux recommended and require NVIDIA CUDA 13 (docs/docs/get-started/quickstart.mdx:20-22; docs/docs/get-started/install.mdx:33-35). CI builds PyPI wheels for x86_64 on Python 3.10-3.13 (.github/workflows/release-pypi.yml:17-25) and amd64 Docker images on nvidia/cuda:13.0.3-cudnn-devel-ubuntu24.04 (docker/Dockerfile:1-2; .github/workflows/_docker-build-and-publish.yml:106-128).",
+        "wsl2": "unknown - no WSL2 install or support statement for the LLM server in the README or docs, and no Windows/WSL workflow in .github. Only incidental mentions: a MiniMax-H3 diffusion cookbook hint 'on Windows run under WSL2' (docs/src/snippets/configs/MiniMaxAI/minimax-h3.jsx:175) and an AMD ROCm env var for WSL (docker/rocm-gfx1151.Dockerfile:44).",
+        "macos_arm64": "yes, with caveats - separate MLX backend, source install only: Apple Silicon, macOS 14+, torch 2.13.x, MLX 0.32.0+; requires swapping python/pyproject.toml for python/pyproject_other.toml and installing extra all_mps (docs/docs/hardware-platforms/apple_metal.mdx:7-55; python/pyproject_other.toml:180-188,221). CI: .github/workflows/pr-test-mlx.yml:75,128. No CUDA on macOS; the default python/pyproject.toml pins CUDA 13 packages (:24-103).",
+        "gpu": "yes for NVIDIA CUDA 13 only (docs/docs/get-started/install.mdx:33-35). RTX 4090 (Ada, sm_89, 24 GB) is within the documented 'sm80 and above, e.g., A10, A100, L4, L40S, H100' (docs/docs/get-started/quickstart.mdx:21) but is not named in README.md:71 or any LLM cookbook page (the autoregressive cookbook names H200, RTX PRO 6000, RTX 5090, DGX Spark; the 4090 appears only in diffusion cookbooks). Code evidence for sm_89: AOT kernel gencode compute_89, on by default on x86_64 (python/sglang/kernels/aot/CMakeLists.txt:99-107,196-200); CUTLASS Sm89 FP8 GEMM (python/sglang/kernels/aot/csrc/gemm/fp8_gemm_kernel.cu:90); INT8 dispatch for RTX 4090 (.../int8_gemm_kernel.cu:282); memory-tier defaults naming 4090 (python/sglang/srt/arg_groups/memory_hook.py:100-116); two fused-MoE configs for NVIDIA_GeForce_RTX_4090 (python/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_1_0/). CUDA CI runners are 5090/H100/H200/B200/B300/GB300/H20 only (scripts/ci/runner_configs.yml:21-30), so no sm_89 runner. No minimum NVIDIA driver is stated in the repo."
+      },
+      "integrations": {
+        "cli": "yes - console scripts `sglang` (serve | generate | version) and `killall_sglang` (python/pyproject.toml:213-215; python/sglang/cli/main.py:20-57); `python -m sglang.launch_server` (python/sglang/launch_server.py:70-86); benchmark CLI `python -m sglang.benchmark.serving` (python/sglang/bench_serving.py:1-22 is a deprecated shim).",
+        "mcp": "none found as a server - SGLang does not expose itself over MCP. Client side only: Python MCPToolServer for GPT-OSS/Responses tools via mcp.client.sse (python/sglang/srt/entrypoints/openai/tool_server.py:8-12,87) and a native MCP client in the separate Rust gateway (sgl-model-gateway/README.md:37,251-263; sgl-model-gateway/Cargo.toml:95-102).",
+        "sdk_or_api": "yes - HTTP API (python/sglang/srt/entrypoints/http_server.py): OpenAI-compatible /v1/completions, /v1/chat/completions, /v1/embeddings, /v1/models, /v1/responses (:1769-1971); Anthropic-compatible POST /v1/messages and /v1/messages/count_tokens (:2065-2082); Ollama-compatible /api/chat, /api/generate, /api/tags, /api/show (:2036-2059); native /generate (:910-915); /health; Prometheus /metrics with --enable-metrics. Optional native gRPC via --grpc-port (python/sglang/srt/arg_groups/fields/serving.py:79-85). Python SDK: sglang.Engine (offline, no HTTP; python/sglang/__init__.py:68; docs/docs/get-started/quickstart.mdx:250-274) and the frontend language sglang.lang (python/sglang/__init__.py:25-64). Optional --api-key accepts only an Authorization Bearer header and exempts /health, /ready, /metrics (python/sglang/srt/utils/auth.py:98-117).",
+        "claude_code_or_codex": "Claude Code: yes, documented - docs/docs/basic_usage/anthropic_api.mdx:182-253 (ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN, CLAUDE_CODE_ATTRIBUTION_HEADER=0 required for prefix-cache reuse; the recommended env set also includes CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1, which that page describes as dropping autoupdater/telemetry/error-reporting traffic and says nothing about Claude Code OTLP export). The endpoint is registered unconditionally (python/sglang/srt/entrypoints/http_server.py:350-353,2065); tool calls need --tool-call-parser (anthropic_api.mdx:51-54,266-269); tests: test/registered/unit/entrypoints/anthropic/test_serving.py and test/registered/openai_server/function_call/test_anthropic_tool_use.py. Codex: none found - no doc or code mention; a /v1/responses endpoint exists (http_server.py:1971) but is not documented for Codex."
+      },
+      "telemetry_and_network": "No phone-home, usage-statistics, analytics or crash-reporting code found: grepping python/sglang/srt for telemetry|analytics|sentry|posthog|mixpanel|usage_stats|do_not_track returns only OpenTelemetry tracing code and OpenAI-style continuous_usage_stats fields (e.g. python/sglang/srt/entrypoints/openai/utils.py:258-264). The only hard-coded third-party service in the server is https://api.exa.ai for the optional GPT-OSS web_search tool, used only with a user-supplied EXA_API_KEY (python/sglang/srt/entrypoints/search/exa_client.py:11; python/sglang/srt/environ.py:750-753). Model, tokenizer and config files are downloaded at launch from Hugging Face Hub via huggingface_hub, which honours HF_HUB_OFFLINE (python/sglang/srt/model_loader/weight_utils.py:324-331,663-687), or from ModelScope when SGLANG_USE_MODELSCOPE is set (python/sglang/srt/environ.py:291); HF_TOKEN is needed only for gated models (docs/docs/get-started/install.mdx:72). No account is required to run. The benchmark tool can fetch Mooncake trace files from raw.githubusercontent.com (python/sglang/benchmark/datasets/common.py:14-17), and the frontend Crusoe backend has a default hosted URL (python/sglang/lang/backend/crusoe.py:7), both only when selected. Requests that carry media URLs make the server fetch them from any host unless --allowed-media-domains is set (python/sglang/srt/arg_groups/fields/mm.py:82-87). OTLP: SGLang emits OTLP traces only, opt-in via --enable-trace (default off), endpoint default localhost:4317, gRPC exporter hard-coded insecure=True, http/protobuf selectable with OTEL_EXPORTER_OTLP_TRACES_PROTOCOL; needs the tracing extra (python/sglang/srt/arg_groups/fields/observability.py:164-172; python/sglang/srt/observability/trace.py:233-285; python/pyproject.toml:148-153). Span attributes are token counts, sampling parameters, request id, model name, finish reason, latencies and host machine-id/pid; no prompt or completion text found (python/sglang/srt/managers/tokenizer_manager.py:3721-3788; trace.py:189-206,399-405). There is no OTLP metrics or logs exporter and no OTLP receiver in python/sglang, so it cannot be the local OTLP collector or privacy filter for Claude Code or Codex telemetry; the Rust gateway likewise only exports traces (sgl-model-gateway/Cargo.toml:64-67). Metrics: Prometheus pull endpoint /metrics only with --enable-metrics (default off; python/sglang/srt/entrypoints/http_server.py:296-297), unauthenticated even when --api-key is set (python/sglang/srt/utils/auth.py:98-106). Logging: request contents are not logged by default (--log-requests off; observability.py:36-39; docs/docs/advanced_features/observability.mdx:17); opt-in --log-requests, --export-metrics-to-file, request dump and --crash-dump-folder write request data to local files. Example stack in examples/monitoring/: Prometheus scraping 127.0.0.1:30000 (prometheus.yaml:6-10) with a Prometheus-only Grafana datasource (grafana/datasources/datasource.yaml:1-8), and an OpenTelemetry Collector plus Jaeger compose (tracing_compose.yaml:1-21) whose collector config has only a batch processor, no filtering or redaction, exports traces to Jaeger and /tmp/otel_trace.json, and routes metrics and logs pipelines only to the same Jaeger OTLP endpoint (opentelemetry.yaml:8-38)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "Rust",
+        "CUDA/C++",
+        "Go (gateway bindings)",
+        "Shell/YAML/Dockerfile",
+        "JavaScript/JSX/MDX (docs)"
+      ],
+      "entry_points": [
+        {
+          "path": "python/sglang/cli/main.py",
+          "what": "`sglang` console script (serve | generate | version), registered in python/pyproject.toml:213-215 together with `killall_sglang` (python/sglang/cli/killall.py)."
+        },
+        {
+          "path": "python/sglang/cli/serve.py",
+          "what": "`sglang serve <model>` dispatcher with a backend registry ('llm' and 'diffusion'), auto-detected from the model path."
+        },
+        {
+          "path": "python/sglang/launch_server.py",
+          "what": "`python -m sglang.launch_server`; run_server() picks HTTP (default), legacy SMG gRPC, Ray or encoder-only mode (lines 17-67)."
+        },
+        {
+          "path": "python/sglang/srt/entrypoints/http_server.py",
+          "what": "FastAPI app and launch_server(): OpenAI /v1/*, Anthropic /v1/messages, Ollama /api/*, /generate, /health, admin and weight-update routes, Prometheus and API-key middleware."
+        },
+        {
+          "path": "python/sglang/srt/entrypoints/engine.py",
+          "what": "In-process `sglang.Engine` (offline API, no HTTP), exported lazily from python/sglang/__init__.py:68."
+        },
+        {
+          "path": "python/sglang/benchmark/serving.py",
+          "what": "Benchmark / load-generator CLI (`python -m sglang.benchmark.serving`); python/sglang/bench_serving.py is a deprecated shim."
+        },
+        {
+          "path": "sgl-model-gateway/src/main.rs",
+          "what": "Separate Rust model gateway/router binaries sgl-model-gateway, smg, amg (sgl-model-gateway/Cargo.toml:24-34); Python launcher sglang_router.launch_router is referenced in docs/docs/references/production_request_trace.mdx:36."
+        },
+        {
+          "path": "python/sglang/multimodal_gen/",
+          "what": "Diffusion runtime reached through `sglang serve` / `sglang generate` (python/sglang/cli/serve.py:111-131; python/sglang/cli/generate.py); needs the `diffusion` extra."
+        }
+      ],
+      "architecture": "Multi-process Python runtime ('srt'). Entrypoints (python/sglang/srt/entrypoints/: http_server.py, openai/, anthropic/, ollama/, grpc_server.py, engine.py) feed TokenizerManager (srt/managers/tokenizer_manager.py), then Scheduler processes (srt/managers/scheduler.py; ZMQ over ipc:// temp sockets on a single node, srt/server_args.py:686-717), then ModelRunner (srt/model_executor/model_runner.py) with model code (srt/models/), attention backends (srt/layers/attention/: flashinfer, triton, fa3, trtllm ...), quantization (srt/layers/quantization/) and KV/prefix caches (srt/mem_cache/radix_cache.py, hicache); output goes through DetokenizerManager (srt/managers/detokenizer_manager.py). Feature packages: srt/speculative/ (EAGLE, DFlash, ngram), srt/disaggregation/ (prefill/decode, encoder), srt/lora/, srt/constrained/ (xgrammar, llguidance, outlines), srt/function_call/ and srt/parser/ (tool and reasoning parsers), srt/multimodal/, srt/observability/ (Prometheus collector, OTLP trace.py, request logging in srt/utils/request_logger.py). Configuration lives in srt/server_args.py, srt/arg_groups/ and srt/environ.py (SGLANG_* variables). Kernels: python/sglang/kernels/aot (CUDA, shipped as the separate sglang-kernel wheel), kernels/jit, kernels/ops (Triton). Rust crates in rust/ (sglang-grpc, sglang-mm, sglang-renderer, sglang-server, sglang-radix-tree) are built as PyO3 extensions by python/setup.py; the Rust HTTP frontend is opt-in (SGLANG_RUST_SERVER, default off; srt/environ.py:1829). Also: frontend DSL python/sglang/lang/, diffusion runtime python/sglang/multimodal_gen/, separate Rust gateway sgl-model-gateway/, benchmarks python/sglang/benchmark/, docs and cookbook in docs/ (Mintlify).",
+      "packaging_and_release": "PyPI wheel `sglang`: .github/workflows/release-pypi.yml runs on tag push v[0-9]+.* or manual dispatch (:2-12); matrix Python 3.10-3.13 x x86_64/aarch64 on self-hosted build nodes (:17-25); installs protoc and Rust (:47-53); `python3 -m build --wheel` (:71); auditwheel repair via scripts/release/prepare_sglang_wheel.py (:77-80); wheels only (no sdist) uploaded with twine and a PYPI_TOKEN secret from the prod environment (:88-114). Version comes from git tags via setuptools-scm (python/pyproject.toml:255-260). Tags are created by workflow_dispatch in release-tag.yml. Docker: release-docker.yml and _docker-build-and-publish.yml build linux/amd64 and linux/arm64 from docker/Dockerfile (CUDA 13.0.3, --no-cache), push by digest and merge manifests tagged v{version}, latest, v{version}-cu130, latest-cu130 (release-docker.yml:50-53; _docker-build-and-publish.yml:106-256). Kernel wheel sglang-kernel 0.4.7 (python/sglang/kernels/aot/python/sgl_kernel/version.py:1): release-whl-kernel.yml builds cu130 x86_64/aarch64, ROCm and MUSA wheels, uploads cu130 to PyPI by token and publishes to the sgl-project/whl release and index (:35-166). No signing, attestation, SBOM or published checksum step appears in any workflow (grep of .github for cosign|sigstore|attest|slsa|sbom|checksum found only a sanitizer sha256 check in release-whl-deepgemm.yml:200 and `provenance: false` in NPU Docker workflows). Nightly wheels come from the SGLang wheel index (docs/docs/get-started/install.mdx:40). docs/docs/developer_guide/release_process.mdx:9-18 describes `bash upload_pypi.sh`, which does not exist (python/upload_pypi.sh absent).",
+      "tests_and_ci": "Frameworks: unittest and pytest (test/pytest.ini sets asyncio_mode=auto; test/README.md:18-35). Layout: test/registered/ (about 2,088 test_*.py files, 813 of them under test/registered/unit/) is auto-discovered by test/run_suite.py through register_*_ci calls; test/manual/ (about 247 test_*.py) is non-CI; about 343 more test_*.py sit under python/ (kernel and multimodal_gen tests); sgl-model-gateway/tests has 57 .rs files. Roughly 2,340 test_*.py files under test/. CI (.github/workflows): pr-test.yml (PRs plus cron twice daily; staged base-a, base-b, base-c, test/README.md:8-10), pr-test-extra.yml, pr-test-sgl-kernel.yml, pr-test-jit-kernel.yml, pr-test-multimodal-gen.yml, pr-test-rust*.yml, pr-test-amd*.yml, pr-test-npu.yml, pr-test-xpu.yml, pr-test-xeon.yml, pr-test-musa.yml, pr-test-mlx.yml (macos-26 plus self-hosted macOS ARM64), nightly-*.yml, lint.yml (pre-commit, lychee, Mintlify broken-links). CUDA runner labels: 1-gpu-5090, 1-gpu-h100, 2/4-gpu-h100, 8-gpu-h200, b200, b300, gb300, h20 (scripts/ci/runner_configs.yml:21-30); no RTX 4090 or other sm_89 runner. Maintainers may bypass flaky CI (.github/MAINTAINER.md:5,38).",
+      "dependencies": "python/pyproject.toml: 77 direct runtime dependencies (28 exact-pinned with ==, including torch==2.13.0, transformers==5.12.1, flashinfer_python[cu13]==0.6.18, openai==2.6.1, xgrammar==0.2.7, sglang-kernel==0.4.7; several CUDA-13 specific such as cuda-python>=13.0, nvidia-cutlass-dsl[cu13], humming-kernels[cu13], nvshmem4py-cu13) plus 5 build-system requires (:1-9, :24-103); extras: tracing 4, diffusion 20, diffusion-qvg 2, test 23, ray 1, http2 1, fastokens 1, checkpoint-engine 1, runai 1, dev, all (:110-201). No Python lock file or requirements file for runtime. Platform variants python/pyproject_{cpu,npu,xpu,other}.toml and python/sglang/kernels/aot/pyproject*.toml were not counted. rust/Cargo.toml: workspace with 14 shared dependencies (:24-38); rust/Cargo.lock and rust/sglang-radix-tree/Cargo.lock are committed. sgl-model-gateway/Cargo.toml: 76 direct dependencies, 12 dev, 2 build (:36-147) with no committed Cargo.lock (.gitignore:232-235). Go modules under sgl-model-gateway/bindings/golang/ were not read.",
+      "security_policy": "none - no SECURITY.md or vulnerability-reporting instructions anywhere in the checkout (globs for SECURITY* and .github/SECURITY* found nothing; grep for security policy, vulnerability reporting and security@ found nothing). The only contact is an enterprise e-mail in README.md:93-94."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:70 - 'Compatible with most Hugging Face models and OpenAI APIs'.",
+        "verified": "partial",
+        "evidence": "OpenAI-compatible routes are implemented (python/sglang/srt/entrypoints/http_server.py:1769-1971: /v1/completions, /v1/chat/completions, /v1/embeddings, /v1/responses; /v1/models at :1898). Anthropic (:2065-2082) and Ollama (:2036-2059) routes also exist but are not in the README. 'Most Hugging Face models' is not checkable from code; trust_remote_code defaults to False (python/sglang/srt/arg_groups/fields/model.py:98-101)."
+      },
+      {
+        "claim": "README.md:69 - quantization (FP4/FP8/INT4/AWQ/GPTQ).",
+        "verified": "partial",
+        "evidence": "On CUDA the registry has fp8, awq, awq_marlin, gptq_marlin, modelopt_fp4, bitsandbytes, gguf (python/sglang/srt/layers/quantization/__init__.py:62-90). Plain 'gptq' is registered only for NPU/CPU/XPU (:105-135) and the docs say it was 'Removed on NVIDIA and AMD GPUs - use gptq_marlin' (docs/docs/advanced_features/quantization.mdx:95-100). Native FP4 needs SM100+; on SM80-SM90 (incl. RTX 4090) NVFP4 uses a Marlin W4A16 fallback (quantization.mdx:158-162,301-308); ModelOpt FP8 is listed as Hopper/SM90+ (:151-155)."
+      },
+      {
+        "claim": "README.md:71 - extensive hardware support (NVIDIA GB200/B300/H100/A100/Spark/5090, AMD, Intel Xeon, TPU, Ascend, more).",
+        "verified": "partial",
+        "evidence": "Per-platform docs exist (docs/docs/hardware-platforms/{amd_gpu,cpu_server,tpu,xpu,nvidia_jetson,apple_metal,mthreads_gpu}.mdx and ascend-npus/) and workflows exist for AMD, NPU, XPU, Xeon, MUSA and MLX. CUDA CI runners are only 5090/H100/H200/B200/B300/GB300/H20 (scripts/ci/runner_configs.yml:21-30), so A100 and Ada (RTX 4090) have no CI runner even though sm_80 and sm_89 code is compiled (python/sglang/kernels/aot/CMakeLists.txt:196-200)."
+      },
+      {
+        "claim": "README.md:69 - RadixAttention, PD disaggregation, speculative decoding, structured outputs, multi-LoRA.",
+        "verified": "yes",
+        "evidence": "Modules exist: python/sglang/srt/mem_cache/radix_cache.py, srt/disaggregation/{prefill,decode}.py, srt/speculative/ (EAGLE, DFlash, ngram), srt/constrained/{xgrammar,llguidance,outlines}_backend.py, srt/lora/lora_manager.py, srt/managers/scheduler.py. Runtime behaviour was not exercised."
+      },
+      {
+        "claim": "README.md:76 and the docs install page - install with `uv pip install --prerelease=allow sglang`, or from source.",
+        "verified": "partial",
+        "evidence": "The wheel path matches python/pyproject.toml (CUDA-13 pins, :24-103). The source-install section says `git clone -b v0.5.18` although this revision is v0.5.21 (docs/docs/get-started/install.mdx:57) and lists only 'Python 3.10 or higher' as prerequisite (:15). An editable or source install runs `cargo metadata` and fails without a Rust toolchain unless SGLANG_BUILD_RUST_EXTS=none (python/setup.py:56-88,209-214)."
+      },
+      {
+        "claim": "docs/docs/basic_usage/anthropic_api.mdx:10 - the /v1/messages endpoint is registered on every server with no extra flag, and Claude Code can be pointed at it.",
+        "verified": "yes",
+        "evidence": "AnthropicServing is built unconditionally (python/sglang/srt/entrypoints/http_server.py:350-353) and /v1/messages and /v1/messages/count_tokens are registered at :2065-2082; python/sglang/srt/entrypoints/anthropic/serving.py:1-5,206-227 converts the request to the OpenAI chat path (streaming and non-streaming). Tests: test/registered/unit/entrypoints/anthropic/test_serving.py, test/registered/openai_server/function_call/test_anthropic_tool_use.py. Note --api-key auth accepts only an Authorization Bearer header (python/sglang/srt/utils/auth.py:108-117)."
+      },
+      {
+        "claim": "docs/docs/advanced_features/observability.mdx:17 - 'By default, SGLang does not log any request contents'.",
+        "verified": "partial",
+        "evidence": "log_requests defaults to False (python/sglang/srt/arg_groups/fields/observability.py:36-39) and RequestLogger returns early (python/sglang/srt/utils/request_logger.py:94-95,165-166). But other opt-in features persist request data: --export-metrics-to-file serializes request fields except image/video/audio data and input_embeds, and its skip-list comes from the request logger, which is empty when --log-requests is off (python/sglang/srt/observability/request_metrics_exporter.py:16-62; request_logger.py:193-233; python/sglang/srt/managers/tokenizer_manager.py:705-709). Request dump and --crash-dump-folder write requests to pickle files (docs/docs/advanced_features/observability.mdx:27-47). Code read only, not run."
+      },
+      {
+        "claim": "docs/docs/references/production_request_trace.mdx:6 - request traces are exported to an OpenTelemetry Collector via --enable-trace and --otlp-traces-endpoint.",
+        "verified": "yes",
+        "evidence": "python/sglang/srt/observability/trace.py:43-64,233-285 builds OTLPSpanExporter (gRPC with insecure=True, or http/protobuf) behind BatchSpanProcessor; defaults enable_trace=False and otlp_traces_endpoint='localhost:4317' (python/sglang/srt/arg_groups/fields/observability.py:164-172). Spans only: no OTLP metric or log exporter exists in python/sglang and nothing receives OTLP. Span attributes are token counts, sampling params, request id, model name, finish reason, latencies and host machine-id/pid; no prompt or completion text found (python/sglang/srt/managers/tokenizer_manager.py:3721-3788; trace.py:189-206,399-405)."
+      },
+      {
+        "claim": "docs/docs/references/production_metrics.mdx:6-8,182-188 and examples/monitoring/README.md:31-35 - Prometheus metrics with a pre-built Grafana dashboard; login admin/admin.",
+        "verified": "partial",
+        "evidence": "/metrics exists only with --enable-metrics (python/sglang/srt/entrypoints/http_server.py:296-297; default False, observability.py:70) and is exempt from --api-key (python/sglang/srt/utils/auth.py:98-106). examples/monitoring/prometheus.yaml:6-10 scrapes 127.0.0.1:30000 (pull; no OTLP) and the Grafana datasource is Prometheus only (grafana/datasources/datasource.yaml:1-8). The compose file uses unpinned latest images on host networking and sets GF_AUTH_ANONYMOUS_ENABLED=true with Viewer role (examples/monitoring/docker-compose.yaml:3-26), while the docs describe an admin/admin login."
+      },
+      {
+        "claim": "docs quickstart.mdx:21 vs install.mdx:33,233 - GPU requirement 'sm80 and above', CUDA 13, FlashInfer 'sm75 and above'.",
+        "verified": "partial",
+        "evidence": "The docs give different floors (docs/docs/get-started/quickstart.mdx:21 'sm80 and above, e.g., A10, A100, L4, L40S, H100'; install.mdx:233 'FlashInfer ... only supports sm75 and above'). python/pyproject.toml pins CUDA-13 builds (:32-34,42,55,58). AOT kernels are compiled for sm_80 and sm_89 on x86_64 by default (python/sglang/kernels/aot/CMakeLists.txt:99-107,196-200). On Ada the default attention backend is flashinfer, else triton (docs/docs/advanced_features/attention_backend.mdx:548). No minimum NVIDIA driver is stated; a SageMaker note says the default AMI's drivers are incompatible with the CUDA 13 images (docs/docs/basic_usage/aws_sagemaker.mdx:137-138)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "MiniCPM5-2B (BF16) on one RTX 5090 32 GB, python3 -m sglang.bench_serving, random 1024/1024, image lmsysorg/sglang:dev @ 30705c004c",
+        "metric": "mean TTFT / mean TPOT / total (in+out) tokens per second per GPU",
+        "value": "concurrency 1: TTFT 34 ms, TPOT 4.0 ms, 496 tok/s; concurrency 128: TPOT 11.8 ms, 19,280 tok/s (TTFT not captured)",
+        "source": "docs/src/snippets/configs/openbmb/minicpm5-2b-benchmarks.jsx:3-37",
+        "independent": false
+      },
+      {
+        "what": "Qwen3.8-27B recipes on SGLang v0.5.19 across RTX 5090, RTX PRO 6000 and DGX Spark: 202 cells, full 1319-question GSM8K, ISL 8192 / OSL 1024, concurrency 1",
+        "metric": "GSM8K accuracy",
+        "value": "93.18-95.15% across all cells (throughput and acceptance length were not re-taken in that sweep)",
+        "source": "docs/cookbook/autoregressive/Qwen/Qwen3.8-27B.mdx:59-66",
+        "independent": false
+      },
+      {
+        "what": "Qwen3.8-27B on RTX 5090 32 GB with DFlash2 speculative decoding, bf16 state",
+        "metric": "median TPOT / accept length",
+        "value": "4.92 ms median TPOT at accept length 4.29 (stated as the best result on that card)",
+        "source": "docs/cookbook/autoregressive/Qwen/Qwen3.8-27B.mdx:315-316",
+        "independent": false
+      },
+      {
+        "what": "Qwen3.8-27B speculative (EAGLE) decode, fp32 vs bf16 GDN state (card not stated for these figures; surrounding text discusses 32 GB cards)",
+        "metric": "tokens per second per user",
+        "value": "NVFP4+EAGLE 152.9 (fp32) vs 144.5 (bf16); FP8+EAGLE 106.3 (fp32) vs 116.1 (bf16)",
+        "source": "docs/cookbook/autoregressive/Qwen/Qwen3.8-27B.mdx:331-332",
+        "independent": false
+      },
+      {
+        "what": "MiniMax-H3 text-to-video+audio (a diffusion model, not an LLM) on one RTX 4090 D 24 GB, 1344x768, 107 frames, 20 steps, DiT and text-encoder layerwise offload",
+        "metric": "timed end-to-end seconds",
+        "value": "BF16+FlashAttention 405.6 s; kitchen_int8+FA 303.3 s; kitchen_int8+Sage-to-Sol hybrid 163.8 s (GPU peak about 18 GB)",
+        "source": "docs/cookbook/diffusion/MiniMax/MiniMax-H3.mdx:2104-2118",
+        "independent": false
+      },
+      {
+        "what": "Same MiniMax-H3 setup on the RTX 4090 D, 50-step run",
+        "metric": "end-to-end seconds",
+        "value": "BF16+FA 1008.6 s; kitchen_int8+FA 718.5 s; kitchen_int8+FA+Spectrum 285.3 s (3.53x, PSNR mean 27.4 dB)",
+        "source": "docs/cookbook/diffusion/MiniMax/MiniMax-H3.mdx:2126-2132",
+        "independent": false
+      },
+      {
+        "what": "README news headlines about performance (linked LMSYS blogs not opened): GB300 NVL72 inference and GLM5.2 NVFP4 agentic serving",
+        "metric": "claimed speedup / throughput",
+        "value": "'25x' (GB300 NVL72); '500 TPS' (GLM5.2 NVFP4)",
+        "source": "README.md:28,32",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Platform fit: the only supported NVIDIA path is CUDA 13 (docs/docs/get-started/install.mdx:33-35; docker/Dockerfile:1-2; the CUDA 12 lane was retired after 0.5.19). RTX 4090 (sm_89) is not named in the README or any LLM cookbook page (it appears only in diffusion cookbooks), CUDA CI has no sm_89 runner (scripts/ci/runner_configs.yml:21-30), no minimum NVIDIA driver is documented, WSL2 is undocumented for the LLM server and untested (no Windows/WSL workflow), and macOS needs a separate MLX source install that swaps pyproject files (docs/docs/hardware-platforms/apple_metal.mdx:37-55).",
+      "Install weight and drift: 77 direct runtime dependencies, 28 exact-pinned (torch==2.13.0, transformers==5.12.1, flashinfer_python[cu13]==0.6.18, openai==2.6.1, xgrammar==0.2.7, sglang-kernel==0.4.7; python/pyproject.toml:24-103) and no Python lock file, so sharing an environment with other tools is likely to conflict. Source installs need cargo, and protoc for the gRPC extension (python/setup.py:56-88; .github/workflows/release-pypi.yml:47-53), which the install page does not mention; the install page still pins v0.5.18 (install.mdx:57); latest and dev Docker tags are mutable (install.mdx:75).",
+      "Network exposure and auth defaults: the server binds 127.0.0.1 by default (python/sglang/srt/arg_groups/fields/serving.py:65), but the documented docker run and compose examples use --host 0.0.0.0, publish port 30000 and set no API key (docs/docs/get-started/install.mdx:79-86; docker/compose.yaml:19-22), and compose adds privileged: true and host networking (docker/compose.yaml:10-11). --api-key is Bearer-only and /health, /ready, /metrics stay unauthenticated (python/sglang/srt/utils/auth.py:98-117). Management routes (weight updates, cache flush, profiling, logging configuration, LoRA load/unload: http_server.py:988-1756) are ADMIN_OPTIONAL, i.e. open when no key is configured (auth.py:128-143). --allowed-media-domains is empty by default, so client-supplied media URLs are fetched from any domain (python/sglang/srt/arg_groups/fields/mm.py:82-87; python/sglang/srt/utils/common.py:1620-1631).",
+      "Privacy plumbing: SGLang is not a collector or filter. The example collector config has only a batch processor (examples/monitoring/opentelemetry.yaml:8-9), listens on 0.0.0.0:4317/4318 with those ports published (examples/monitoring/tracing_compose.yaml:7-9) and uses unpinned images. SGLang's gRPC OTLP exporter is hard-coded insecure=True (python/sglang/srt/observability/trace.py:283) and spans carry the host machine-id (trace.py:189-206,399-405). --export-metrics-to-file appears able to write request parameters, including prompt fields, when --log-requests is off (python/sglang/srt/observability/request_metrics_exporter.py:40-62; python/sglang/srt/utils/request_logger.py:193-233) - code read only, not run.",
+      "Scope and evidence gaps: no OTLP receiver, no OTLP metrics/logs export, no metrics/logs store and no experiment/dataset store; observability is Prometheus pull plus trace export only (python/sglang/srt/observability/trace.py; examples/monitoring/prometheus.yaml:6-10). Every performance number in the checkout is project-reported (see benchmarks); none is independent, and none is an LLM measurement on an RTX 4090 (closest: RTX 5090 numbers; the 4090 numbers are for a diffusion model).",
+      "Release integrity: PyPI wheels (wheels only, no sdist) are uploaded with a long-lived PYPI_TOKEN secret from self-hosted build nodes, and no signing, attestation, SBOM or published checksum step appears in any workflow (.github/workflows/release-pypi.yml:88-114; grep of .github found only a sanitizer sha256 check at release-whl-deepgemm.yml:200 and `provenance: false` in NPU Docker workflows). The Docker publish job runs the third-party action jlumbroso/free-disk-space@main, not pinned to a SHA (.github/workflows/_docker-build-and-publish.yml:80-81); the kernel release uses softprops/action-gh-release@v2 with a PAT (release-whl-kernel.yml:142-147). The base image nvidia/cuda:13.0.3-cudnn-devel-ubuntu24.04 is referenced by tag, not digest (docker/Dockerfile:1-2).",
+      "Maintenance and governance: fast-moving (docs still reference 0.5.18 and 0.5.19 while the tag is 0.5.21; CUDA 12 dropped; install.mdx:33-35,57,105); docs drift (docs/docs/developer_guide/release_process.mdx:9-18 describes `bash upload_pypi.sh`, a file that does not exist, while releases are tag-triggered); maintainers may bypass branch protection and flaky CI (.github/MAINTAINER.md:5,38); no SECURITY.md or disclosure process in the checkout.",
+      "Licensing: root licence is Apache-2.0 (LICENSE; python/pyproject.toml:17-21). Vendored subtrees carry other permissive licences: MIT (DeepSeek, python/sglang/kernels/jit/csrc/deep_select/vendor/LICENSE) and BSD-3-Clause (python/sglang/kernels/ops/attention/flash_attn/cute/LICENSE). The Docker image is built on an NVIDIA CUDA/cuDNN base (docker/Dockerfile:1-2) whose terms were not reviewed, and model weights carry their own licences (not part of this repo; not reviewed)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "sgl-project/sglang",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip or uv from PyPI)",
+          "statement": "pip or uv from PyPI (Linux, CUDA 13; Python 3.10+): pip install --upgrade pip && pip install uv && uv pip install --prerelease=allow sglang",
+          "citation": "docs/docs/get-started/install.mdx:22-26 (CUDA 13 requirement :33-35; Python :15)",
+          "holds": true,
+          "note": "install.mdx:23-25 has exactly these three commands (the dossier joins them with &&). :15 says 'Python 3.10 or higher'. :33-35 says 'SGLang requires CUDA 13' and retires the cu129 lane after 0.5.19. 'Linux' is not on the cited lines but is backed: .github/workflows/release-pypi.yml:19-20,73-80,114 builds only manylinux x86_64/aarch64 wheels for Python 3.10-3.13 and uploads wheels only. docs/docs/get-started/quickstart.mdx:22 says 'OS: Linux (recommended)'."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-3,189-201",
+          "holds": true,
+          "note": "LICENSE is the full Apache License 2.0 text with the appendix notice 'Copyright 2023-2024 SGLang Team'. python/pyproject.toml:17-21 points license at that file and carries the classifier 'License :: OSI Approved :: Apache Software License'."
+        },
+        {
+          "field": "platforms.gpu",
+          "statement": "yes for NVIDIA CUDA 13 only; RTX 4090 (sm_89) is within the documented 'sm80 and above' but is not named in README.md:71 or any LLM cookbook page (4090 only in diffusion cookbooks); sm_89 code evidence (AOT gencode, Sm89 FP8 GEMM, INT8 dispatch, memory tiers, two 4090 MoE configs); CUDA CI runners have no sm_89; no minimum NVIDIA driver stated",
+          "citation": "docs/docs/get-started/install.mdx:33-35; docs/docs/get-started/quickstart.mdx:21; README.md:71; python/sglang/kernels/aot/CMakeLists.txt:99-107,196-200; python/sglang/kernels/aot/csrc/gemm/fp8_gemm_kernel.cu:90; python/sglang/kernels/aot/csrc/gemm/int8_gemm_kernel.cu:282; python/sglang/srt/arg_groups/memory_hook.py:100-116; scripts/ci/runner_configs.yml:21-30",
+          "holds": true,
+          "note": "Every cited line matches. CUDA 13 is required (install.mdx:33). quickstart.mdx:21 reads 'sm80 and above, e.g., A10, A100, L4, L40S, H100'. README.md:71 lists GB200/B300/H100/A100/Spark/5090, not the 4090. CMakeLists.txt adds compute_89 when ENABLE_BELOW_SM90, which is ON by default except on aarch64. fp8_gemm_kernel.cu:90 uses ArchTag Sm89. int8_gemm_kernel.cu:282 names the RTX 4090. memory_hook.py:101 has '# A10, 4090, 5090'. Both NVIDIA_GeForce_RTX_4090 fp8_w8a8 configs exist under triton_3_1_0/. '4090' appears only in diffusion docs and cookbooks, never in docs/cookbook/autoregressive, which does name H200, RTX PRO 6000, RTX 5090 and DGX Spark. No workflow runs-on label is an sm_89 GPU. Two small imprecisions don't change the finding: (1) .github/workflows/nightly-72-gpu-gb200.yml:223,276 also uses a 72-gpu-gb200 runner (not sm_89) that runner_configs.yml doesn't list; (2) two kernel-extension import errors say 'Ensure CUDA Driver >= 12.4' (python/sglang/kernels/aot/python/sgl_kernel/spatial.py:12; flash_mla.py:14), but no general minimum NVIDIA driver is documented."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Claude Code: yes, documented (anthropic_api.mdx:182-253; ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN, CLAUDE_CODE_ATTRIBUTION_HEADER=0; endpoint registered unconditionally; tool calls need --tool-call-parser; tests). Codex: none found - no doc or code mention; a /v1/responses endpoint exists (http_server.py:1971) but is not documented for Codex.",
+          "citation": "docs/docs/basic_usage/anthropic_api.mdx:51-54,182-253,266-269; python/sglang/srt/entrypoints/http_server.py:350-353,1971,2065-2082",
+          "holds": false,
+          "note": "The Claude Code half holds. anthropic_api.mdx:188-196 exports ANTHROPIC_BASE_URL and ANTHROPIC_AUTH_TOKEN. :193 and :232-245 make CLAUDE_CODE_ATTRIBUTION_HEADER=0 required for prefix-cache reuse. :192 and :250-252 say CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC covers only autoupdater/telemetry/error reporting, and the page never mentions OTLP. AnthropicServing is built unconditionally (http_server.py:350-353). /v1/messages and /v1/messages/count_tokens are at :2065-2082. The tool-call-parser caveat is at :51-54 and :266-269. Both cited test files exist. The Codex half is wrong as written: there are code mentions bearing directly on Codex use. test/registered/unit/entrypoints/openai/test_responses_protocol.py:108-126 builds a /v1/responses request with {type:'namespace', name:'codex', tools:[apply_patch, shell]}, and test_serving_responses.py:1077 does the same. python/sglang/srt/entrypoints/openai/protocol.py:1722-1749 accepts 'namespace' tools with inner tools so 'clients aren't rejected'. But serving_responses.py:1181-1192 forwards only function and custom tools to the model, so tools inside a namespace are dropped. README.md:96 also mentions OpenAI Codex, but only as a contributor sponsorship, not an integration."
+        },
+        {
+          "field": "claim_checks[7] (docs/docs/references/production_request_trace.mdx:6)",
+          "statement": "Request traces are exported to an OpenTelemetry Collector via --enable-trace and --otlp-traces-endpoint: verified yes; spans only, no OTLP metric or log exporter in python/sglang, nothing receives OTLP; span attributes are counts, sampling params, request id, model, finish reason, latencies and host machine-id/pid, no prompt or completion text.",
+          "citation": "docs/docs/references/production_request_trace.mdx:6; python/sglang/srt/observability/trace.py:43-64,189-206,233-285,399-405; python/sglang/srt/arg_groups/fields/observability.py:164-172; python/sglang/srt/managers/tokenizer_manager.py:3721-3788",
+          "holds": true,
+          "note": "The doc line says exactly this. http_server.py:300-306 calls process_tracing_init(otlp_traces_endpoint) only when enable_trace is set. trace.py:245-250 wraps a BatchSpanProcessor around get_otlp_span_exporter. :272-285 picks GRPCSpanExporter(insecure=True), or the HTTP exporter when OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/protobuf. Defaults are enable_trace=False and otlp_traces_endpoint='localhost:4317' (observability.py:164,169-172). Span attributes are token counts, request id, sampling params, model name and finish reason (tokenizer_manager.py:3737-3783), plus host_id from /etc/machine-id and pid (trace.py:189-206,399-405). No text is attached. python/sglang has no OTLPMetricExporter, OTLPLogExporter, MeterProvider or LoggerProvider. One overstatement: 'nothing receives OTLP' is literally false. python/sglang/test/otel_collector.py is an in-memory, traces-only OTLP receiver for test assertions (gRPC on 127.0.0.1, HTTP fallback /v1/traces), and it ships in the wheel because python/pyproject.toml:231-241 excludes only top-level tests*. It is a test fixture, not a usable collector or filter, so the verified conclusion stands."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "integrations.claude_code_or_codex (the statement that does not hold): replace 'Codex: none found - no doc or code mention; a /v1/responses endpoint exists (http_server.py:1971) but is not documented for Codex.' with: 'Codex: no documented integration. /v1/responses (python/sglang/srt/entrypoints/http_server.py:1971) accepts Codex-shaped requests: unwired tool types, including type \"namespace\" with inner tools, pass validation \"so clients aren't rejected\" (python/sglang/srt/entrypoints/openai/protocol.py:1722-1749), and unit tests send a \"codex\" namespace containing apply_patch and shell (test/registered/unit/entrypoints/openai/test_responses_protocol.py:108-126; test/registered/unit/entrypoints/openai/test_serving_responses.py:1064-1081). However, only function and custom tools are forwarded to the model (python/sglang/srt/entrypoints/openai/serving_responses.py:1181-1192), so tools inside a namespace are silently dropped. There is no Codex doc and no end-to-end Codex test. Other Codex mentions are not integrations (README.md:96 contributor sponsorship; scripts/playground/launch_pr_babysitters.sh; kernel comments).'",
+        "claim_checks[7] evidence ('nothing receives OTLP'), telemetry_and_network ('no OTLP receiver in python/sglang') and purpose ('It has no OTLP receiver'): qualify to 'the server runtime has no OTLP receiver; the only one in the package is the test fixture sglang.test.otel_collector.LightweightOtlpCollector (python/sglang/test/otel_collector.py:1-14,58-84,131-170), an in-memory, traces-only collector for test assertions, bound to 127.0.0.1, that forwards nothing. It ships in the wheel because python/pyproject.toml:231-241 excludes only top-level tests*.'",
+        "Minor, platforms.gpu wording (does not affect the verdict): change 'CUDA CI runners are 5090/H100/H200/B200/B300/GB300/H20 only (scripts/ci/runner_configs.yml:21-30)' to also list the nightly 72-gpu-gb200 runner (.github/workflows/nightly-72-gpu-gb200.yml:223,276); there is still no sm_89 runner. Change 'No minimum NVIDIA driver is stated in the repo' to 'No general minimum NVIDIA driver is documented; only import-error hints \"Ensure CUDA Driver >= 12.4\" for two kernel extensions (python/sglang/kernels/aot/python/sgl_kernel/spatial.py:12; python/sglang/kernels/aot/python/sgl_kernel/flash_mla.py:14), a lower floor than the CUDA 13 requirement at docs/docs/get-started/install.mdx:33 implies.'"
+      ]
+    }
+  ]
+}

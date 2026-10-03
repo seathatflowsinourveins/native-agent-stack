@@ -1,0 +1,292 @@
+{
+  "contender": "openai/codex-plugin-cc",
+  "revision": {
+    "contender": "openai/codex-plugin-cc",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "openai/codex-plugin-cc",
+        "tag": "v1.0.6",
+        "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.0.6",
+    "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+    "read_at": "2026-10-02T03:02:29+00:00"
+  },
+  "dossier": {
+    "contender": "openai/codex-plugin-cc",
+    "revision": {
+      "tag": "v1.0.6",
+      "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Claude Code plugin by OpenAI (marketplace 'openai-codex', plugin 'codex', v1.0.6) that lets Claude Code hand code review and delegated tasks to the user's locally installed OpenAI Codex CLI via the Codex app-server protocol: slash commands /codex:review, /codex:adversarial-review, /codex:rescue, /codex:transfer, /codex:status, /codex:result, /codex:cancel, /codex:setup, a codex:codex-rescue subagent, and an optional Stop-hook review gate (README.md:3-14, 227-237; .claude-plugin/marketplace.json:2-20). Facts relevant to the Git/GitHub needs: (1) Git is the only VCS it touches, through the git CLI (rev-parse, diff, status, log, merge-base, ls-files, show-ref, symbolic-ref) to choose a review target (working tree vs branch against a base) and build review context (plugins/codex/scripts/lib/git.mjs:69-347); review commands fail outside a Git repository (git.mjs:78-88, 136). (2) It does not create, list, merge or clean up worktrees; the only worktree mention is a nested-repo test fixture under .claude/worktrees (tests/git.test.mjs:125-132). (3) It makes no GitHub calls: no gh, no GitHub API, no PR/check/review automation, and no mention-triggered or other GitHub-side agent workflow; the sole workflow is the repo's own PR test CI (.github/workflows/pull-request-ci.yml:1-35). (4) It provides no structural, syntax-aware or entity-level diffs: reviewers receive plain line diffs with external diff drivers disabled (git diff --binary --no-ext-diff --submodule=diff, git.mjs:232-233, 279). The README is silent on worktrees, GitHub and structural diffs.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Use Codex from inside Claude Code for code reviews or to delegate tasks to Codex.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Commands offered: /codex:review (normal read-only review), /codex:adversarial-review (steerable challenge review), /codex:rescue, /codex:transfer, /codex:status, /codex:result, /codex:cancel.",
+          "citation": "README.md:12-14"
+        },
+        {
+          "claim": "Requires a ChatGPT subscription (incl. Free) or OpenAI API key (usage counts toward Codex usage limits) and Node.js 18.18 or later.",
+          "citation": "README.md:18-20"
+        },
+        {
+          "claim": "/codex:review gives the same quality of code review as running /review inside Codex directly.",
+          "citation": "README.md:79"
+        },
+        {
+          "claim": "/codex:review reviews current uncommitted changes or the branch against a base like main (--base <ref>); supports --wait and --background; is not steerable and takes no focus text.",
+          "citation": "README.md:84-89"
+        },
+        {
+          "claim": "/codex:review and /codex:adversarial-review are read-only and will not change code.",
+          "citation": "README.md:99, 124"
+        },
+        {
+          "claim": "/codex:adversarial-review is steerable (accepts focus text), uses the same target selection as /codex:review including --base, and supports --wait/--background.",
+          "citation": "README.md:103-108"
+        },
+        {
+          "claim": "/codex:rescue hands a task to Codex through the codex:codex-rescue subagent; supports --background, --wait, --resume, --fresh, --model, --effort; 'spark' maps to gpt-5.3-codex-spark; the plugin can offer to continue the latest rescue thread for this repo.",
+          "citation": "README.md:126-162"
+        },
+        {
+          "claim": "/codex:transfer creates a persistent Codex thread from the current Claude Code session via Codex's external-agent session importer and prints a codex resume command; the source must be under ~/.claude/projects.",
+          "citation": "README.md:165-178"
+        },
+        {
+          "claim": "Optional review gate: a Stop hook runs a targeted Codex review of Claude's response and blocks the stop if issues are found; README warns it can create a long-running Claude/Codex loop and drain usage limits.",
+          "citation": "README.md:227-237"
+        },
+        {
+          "claim": "The plugin wraps the Codex app server, uses the global codex binary and applies the same Codex configuration (user-level ~/.codex/config.toml; project-level .codex/config.toml only when the project is trusted).",
+          "citation": "README.md:269-286"
+        },
+        {
+          "claim": "No separate Codex runtime: it delegates to the local Codex CLI and app server and uses the same local authentication state, checkout and machine-local environment.",
+          "citation": "README.md:302-310"
+        },
+        {
+          "claim": "Existing Codex sign-in, API key and base URL setup still apply (set openai_base_url in the Codex config to change the built-in OpenAI provider endpoint).",
+          "citation": "README.md:316-320"
+        },
+        {
+          "claim": "Install is via the Claude Code plugin marketplace; /codex:setup checks readiness and can offer to install Codex through npm.",
+          "citation": "README.md:24-48"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code plugin marketplace: add the marketplace (README gives no OS-specific variants; same steps for Linux and macOS)",
+          "command": "/plugin marketplace add openai/codex-plugin-cc",
+          "citation": "README.md:24-28"
+        },
+        {
+          "method": "Claude Code plugin: install",
+          "command": "/plugin install codex@openai-codex",
+          "citation": "README.md:30-34"
+        },
+        {
+          "method": "Claude Code: reload plugins",
+          "command": "/reload-plugins",
+          "citation": "README.md:36-40"
+        },
+        {
+          "method": "Readiness check inside Claude Code (can offer to npm-install Codex)",
+          "command": "/codex:setup",
+          "citation": "README.md:42-48"
+        },
+        {
+          "method": "Codex CLI prerequisite, manual npm install (alternative to letting /codex:setup install it)",
+          "command": "npm install -g @openai/codex",
+          "citation": "README.md:50-54"
+        },
+        {
+          "method": "Codex login when installed but not logged in",
+          "command": "!codex login",
+          "citation": "README.md:56-60"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs npm ci, npm test and npm run build on ubuntu-latest (.github/workflows/pull-request-ci.yml:12-35); code is plain Node.js ESM with no native modules (package.json:18-21). README gives no OS list and the workflow does not state a CPU architecture.",
+        "wsl2": "unknown - WSL is not mentioned in README or code (grep for 'wsl' found nothing) and is not tested. Inference only: a Linux userland under WSL2 would take the same non-win32 code paths as Linux (plugins/codex/scripts/lib/broker-endpoint.mjs:10-17).",
+        "macos_arm64": "unknown - README gives no OS list, CI has no macOS job (.github/workflows/pull-request-ci.yml:12) and the code has no darwin-specific branch (only win32 branches: plugins/codex/scripts/lib/process.mjs:66, plugins/codex/scripts/lib/app-server.mjs:194, plugins/codex/scripts/lib/broker-endpoint.mjs:11). 'darwin' appears only as a unit-test parameter (tests/broker-endpoint.test.mjs:7); README.md:175 shows a macOS-style transcript path (-Users-me-repo) but that is not a support statement.",
+        "gpu": "no - not used or required by the plugin: no GPU code in the repo; inference runs in whatever backend the user's Codex config selects (OpenAI by default; Ollama and LM Studio are recognised provider ids, plugins/codex/scripts/lib/codex.mjs:758-762)."
+      },
+      "integrations": {
+        "cli": "Companion CLI node plugins/codex/scripts/codex-companion.mjs <setup|review|adversarial-review|task|transfer|status|result|cancel> with --json on most subcommands (usage text plugins/codex/scripts/codex-companion.mjs:75-89; dispatch :1024-1067; internal subcommands task-worker and task-resume-candidate :1049-1059). Invoked by the slash commands through ${CLAUDE_PLUGIN_ROOT} (plugins/codex/commands/review.md:45); not exposed as an npm bin (package.json:4 private: true, no bin field).",
+        "mcp": "none found - no MCP server and no .mcp.json; 'mcp' appears only as Codex-protocol item types (plugins/codex/scripts/lib/codex.mjs:252, 283) and an empty mcpServers list in the session-transfer payload (codex.mjs:691).",
+        "sdk_or_api": "none found - no main/exports/bin in package.json (package.json:1-22) and no HTTP API. The project is a client of the Codex app-server JSON-RPC (JSONL over stdio to a spawned codex app-server, plugins/codex/scripts/lib/app-server.mjs:183-276) and runs a private local broker that re-serves that protocol on a Unix socket / Windows named pipe (plugins/codex/scripts/app-server-broker.mjs:118-247; plugins/codex/scripts/lib/broker-endpoint.mjs:10-17).",
+        "claude_code_or_codex": "Claude Code plugin: marketplace manifest (.claude-plugin/marketplace.json:1-21), plugin manifest (plugins/codex/.claude-plugin/plugin.json:1-8), 8 slash commands (plugins/codex/commands/*.md; list asserted in tests/commands.test.mjs:73-85), subagent codex:codex-rescue (plugins/codex/agents/codex-rescue.md:1-9), 3 internal skills (plugins/codex/skills/*/SKILL.md), hooks SessionStart/SessionEnd/Stop (plugins/codex/hooks/hooks.json:4-36). Codex side: reviews via review/start (plugins/codex/scripts/lib/codex.mjs:1026), tasks via turn/start (codex.mjs:1136), Claude-to-Codex session import via externalAgentConfig/import (codex.mjs:724, 1070), hand-back with codex resume <id> (README.md:290)."
+      },
+      "telemetry_and_network": "README has no telemetry statement; it says usage counts toward Codex usage limits (README.md:19) and that the plugin 'uses your local Codex CLI authentication' (README.md:298); network access is whatever the local codex CLI/app-server does (README.md:269, 304). Code: no telemetry/analytics/crash-reporting code (greps for telemetry, analytics, sentry, statsig, segment, otel found none) and no HTTP/WebSocket/DNS/TLS client in the plugin (no fetch, node:http(s), undici); the only listener is the local broker socket (plugins/codex/scripts/app-server-broker.mjs:246) and endpoints are unix:/pipe: paths only (plugins/codex/scripts/lib/broker-endpoint.mjs:10-41). Processes the plugin spawns: codex app-server (plugins/codex/scripts/lib/app-server.mjs:190), git with shell:false (plugins/codex/scripts/lib/git.mjs:11-17), node/npm --version and codex --version probes (plugins/codex/scripts/codex-companion.mjs:184-185; plugins/codex/scripts/lib/codex.mjs:887-892), its own node workers/broker (codex-companion.mjs:673; plugins/codex/scripts/lib/broker-lifecycle.mjs:61), and taskkill on Windows (plugins/codex/scripts/lib/process.mjs:67). Accounts/services: requires a working Codex login - ChatGPT or OpenAI API key (README.md:18, 298-300) - or a Codex-configured provider that does not require OpenAI auth (plugins/codex/scripts/lib/codex.mjs:758-762, 849-857; README.md:320). The plugin identifies itself to the local Codex app-server as client 'Claude Code'/'Codex Plugin' with the plugin version (plugins/codex/scripts/lib/app-server.mjs:25-30) and tags threads with serviceName claude_code_codex_plugin (codex.mjs:47, 69); whether Codex forwards these to OpenAI is outside this repo. Data handed to the Codex backend: for /codex:review only a target, uncommittedChanges or baseBranch, with the diff gathered by Codex (plugins/codex/scripts/codex-companion.mjs:259-269; codex.mjs:1026); for /codex:adversarial-review an inline diff, untracked text files up to 24 KiB, or a summary (plugins/codex/scripts/lib/git.mjs:7-9, 300-347); for the stop gate Claude's last reply (plugins/codex/scripts/stop-review-gate-hook.mjs:48-57); for /codex:transfer the Claude transcript path passed to Codex's importer (codex.mjs:681-699). /codex:setup may run npm install -g @openai/codex only after the user picks 'Install Codex' (plugins/codex/commands/setup.md:13-23); CI also installs it (.github/workflows/pull-request-ci.yml:28-29)."
+    },
+    "code": {
+      "languages": [
+        "JavaScript (Node.js ESM .mjs; all runtime and test code)",
+        "TypeScript (only plugins/codex/scripts/lib/app-server-protocol.d.ts and tsconfig.app-server.json, for type-checking)",
+        "Markdown (slash commands, subagent, skills, prompt templates)",
+        "JSON (manifests, hooks, review output schema)"
+      ],
+      "entry_points": [
+        {
+          "path": "plugins/codex/scripts/codex-companion.mjs",
+          "what": "Companion CLI dispatcher: setup, review, adversarial-review, task, transfer, status, result, cancel plus internal task-worker and task-resume-candidate (main at :1024-1067)."
+        },
+        {
+          "path": "plugins/codex/scripts/app-server-broker.mjs",
+          "what": "Optional per-workspace shared codex app-server broker (serve --endpoint ...), listening on a Unix socket / Windows named pipe (:48-52, 246)."
+        },
+        {
+          "path": "plugins/codex/scripts/session-lifecycle-hook.mjs",
+          "what": "Claude Code SessionStart/SessionEnd hook: exports session id, transcript path and plugin-data env into CLAUDE_ENV_FILE; at end tears down broker and session jobs (:77-114)."
+        },
+        {
+          "path": "plugins/codex/scripts/stop-review-gate-hook.mjs",
+          "what": "Claude Code Stop hook implementing the optional review gate (main at :142-176)."
+        },
+        {
+          "path": "plugins/codex/commands/",
+          "what": "Eight slash-command definitions: adversarial-review, cancel, rescue, result, review, setup, status, transfer (list asserted in tests/commands.test.mjs:73-85)."
+        },
+        {
+          "path": "plugins/codex/agents/codex-rescue.md",
+          "what": "codex:codex-rescue subagent (model sonnet, tools Bash), a thin forwarder to the companion task command (:1-9)."
+        },
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "what": "Marketplace manifest: name openai-codex, plugin codex, source ./plugins/codex (:2, 12, 18)."
+        },
+        {
+          "path": "scripts/bump-version.mjs",
+          "what": "Maintainer script that sets or checks version across package.json, package-lock.json, plugin.json and marketplace.json (:8-73)."
+        }
+      ],
+      "architecture": "Three layers. (1) Claude Code surface in plugins/codex/: 8 slash commands (commands/*.md), the codex:codex-rescue subagent (agents/codex-rescue.md), 3 internal skills (skills/codex-cli-runtime, codex-result-handling, gpt-5-4-prompting), hooks (hooks/hooks.json), prompt templates (prompts/adversarial-review.md, prompts/stop-review-gate.md) and the review output JSON schema (schemas/review-output.schema.json). (2) Companion runtime: scripts/codex-companion.mjs dispatches subcommands and uses scripts/lib/: git.mjs (review target resolution and diff context via the git CLI, shell:false; inline diff only for at most 2 files and 256 KiB, otherwise a summary the model must expand with read-only git, :8-9, 300-347), codex.mjs (Codex app-server requests thread/start, thread/resume, turn/start, review/start, turn/interrupt, thread/list, account/read, config/read, externalAgentConfig/import; turn-event capture, progress, auth status), app-server.mjs (JSONL JSON-RPC client with two transports: a spawned codex app-server over stdio, or the broker over a Unix socket / named pipe, :183-354), state.mjs + tracked-jobs.mjs + job-control.mjs + render.mjs (per-workspace job state and logs under CLAUDE_PLUGIN_DATA or os.tmpdir()/codex-companion, max 50 jobs, status/result/cancel output; render functions imported at codex-companion.mjs:56-65), plus args.mjs, prompts.mjs, fs.mjs, process.mjs, workspace.mjs and claude-session-transfer.mjs. (3) Hooks: session-lifecycle-hook.mjs and stop-review-gate-hook.mjs (runs a read-only task review of Claude's last turn when the gate is enabled). The broker (app-server-broker.mjs) is started lazily on first use, serves one active request/stream at a time and answers 'busy' (-32001) to others, after which the client falls back to a direct spawn (app-server-broker.mjs:170-182; codex.mjs:613-642; app-server.mjs:343-346; broker-lifecycle.mjs:113-171). task --background spawns a detached task-worker node process (codex-companion.mjs:671-710). Git use is limited to inspection commands (no worktree, branch-creation, push or GitHub commands). Inference, untested: state is keyed by the git toplevel of the working directory, so separate worktrees would get separate job state (workspace.mjs:3-9; state.mjs:29-44).",
+      "packaging_and_release": "Distributed as source through the Claude Code plugin marketplace: .claude-plugin/marketplace.json:2,18 (name openai-codex, plugin source ./plugins/codex) plus plugins/codex/.claude-plugin/plugin.json. Not published to npm (package.json:4 private: true; no bin/main/exports). No build artifact: npm run build is a noEmit type-check (tsconfig.app-server.json:8) and plugins/codex/.generated/ is git-ignored (.gitignore:150). No release workflow, checksums, signatures or attestations exist: the only workflow is .github/workflows/pull-request-ci.yml (pull_request trigger only, :3-4). Release tag v1.0.6 exists (.git/packed-refs:2). Version metadata is kept in sync by scripts/bump-version.mjs across package.json, package-lock.json, plugin.json and marketplace.json (bump-version.mjs:8-73; package.json:12-13), but CI does not run check-version, and plugins/codex/CHANGELOG.md lists only 1.0.0 (:3-5) while the version is 1.0.6 (package.json:3).",
+      "tests_and_ci": "Node's built-in test runner (node --test tests/*.test.mjs, package.json:16). tests/ holds 8 test files (broker-endpoint, bump-version, commands, git, process, render, runtime, state) plus 2 helper modules (helpers.mjs, fake-codex-fixture.mjs): 91 test() cases in total (runtime 61, git 11, commands 8, state 3, others 2 each). Runtime tests drive the companion against a fake codex executable (tests/fake-codex-fixture.mjs:7-10), not the real Codex/OpenAI backend; git tests build temp repos with real git (tests/helpers.mjs:26-32); commands.test.mjs asserts on the prose of command/agent/skill markdown and the README. One CI workflow, .github/workflows/pull-request-ci.yml: on pull_request, ubuntu-latest, 10-minute timeout, permissions contents: read, actions pinned by commit SHA (:6-7, 13, 17, 20), Node 22 only (:21-23), npm ci, npm install -g @openai/codex (unpinned, :28-29), npm test, npm run build. npm run build is tsc -p tsconfig.app-server.json with noEmit and strict:false over 4 .mjs files plus protocol .d.ts and generated types, after a prebuild that runs codex app-server generate-ts (package.json:14-15; tsconfig.app-server.json:8-9, 15-22). No lint/format step, no coverage, no macOS/Windows jobs, no Node-version matrix.",
+      "dependencies": "Single manifest, root package.json: 0 runtime dependencies; 2 devDependencies (@types/node ^25.5.0, typescript ^6.0.2) (package.json:18-21); package-lock.json records 3 installed packages (@types/node, typescript, transitive undici-types) (package-lock.json:19-49). No other package manifests. External runtime requirements not captured in a manifest: node >=18.18.0 (package.json:8-10), git on PATH (plugins/codex/scripts/lib/git.mjs:78-88), and the OpenAI codex CLI with app-server support (plugins/codex/scripts/lib/codex.mjs:886-904; README.md:53).",
+      "security_policy": "none - no SECURITY.md or other security-policy file in this repository (Glob for SECURITY*, CONTRIBUTING*, CODEOWNERS* found nothing; .github contains only workflows/pull-request-ci.yml). Hardening visible in code: git is run with shell:false (plugins/codex/scripts/lib/git.mjs:11-17) with a regression test for special-character branch names (tests/git.test.mjs:41-68); CI uses permissions: contents: read and SHA-pinned actions (.github/workflows/pull-request-ci.yml:6-7, 17, 20)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:86-89: /codex:review covers current uncommitted changes or the branch compared to a base like main via --base <ref>.",
+        "verified": "yes",
+        "evidence": "resolveReviewTarget picks working-tree when the repo is dirty, otherwise a branch diff against the detected default branch (origin/HEAD, then main/master/trunk), and --base forces branch mode (plugins/codex/scripts/lib/git.mjs:94-116, 135-191); the native review target is uncommittedChanges or baseBranch (plugins/codex/scripts/codex-companion.mjs:259-269). For /codex:review the diff itself is gathered inside Codex via review/start (plugins/codex/scripts/lib/codex.mjs:1026-1030), which is outside this repo."
+      },
+      {
+        "claim": "README.md:99,124: the review commands are read-only and will not perform any changes.",
+        "verified": "partial",
+        "evidence": "The plugin starts review threads with sandbox read-only and approvalPolicy never (plugins/codex/scripts/lib/codex.mjs:63-72, 1010-1015; adversarial path sandbox read-only at plugins/codex/scripts/codex-companion.mjs:414) and the command files forbid fixes (plugins/codex/commands/review.md:13-16). Enforcement of the sandbox is by the Codex CLI, which is not in this repo."
+      },
+      {
+        "claim": "README.md:79: /codex:review gives the same quality of code review as /review inside Codex.",
+        "verified": "not_checkable",
+        "evidence": "/codex:review forwards to Codex's built-in reviewer through review/start (plugins/codex/scripts/codex-companion.mjs:368-374; plugins/codex/scripts/lib/codex.mjs:1026), so review quality is determined by the Codex binary; the repo contains no comparison data or benchmarks (README.md:135 is the only 'faster or cheaper' wording and is not a measurement)."
+      },
+      {
+        "claim": "README.md:89,107-108: /codex:review takes no focus text; /codex:adversarial-review takes focus text and uses the same target selection (--base, working-tree, branch).",
+        "verified": "yes",
+        "evidence": "validateNativeReviewRequest throws when focus text is given (plugins/codex/scripts/codex-companion.mjs:271-276; test tests/runtime.test.mjs:972-990); adversarial review passes focus text into the prompt template (codex-companion.mjs:241-250; plugins/codex/prompts/adversarial-review.md:6-10) and reuses resolveReviewTarget, which accepts only auto|working-tree|branch (plugins/codex/scripts/lib/git.mjs:141, 160-164; test tests/runtime.test.mjs:1013-1030)."
+      },
+      {
+        "claim": "README.md:126-140: /codex:rescue supports --background, --wait, --resume, --fresh, and can offer to continue the latest rescue thread for this repo.",
+        "verified": "partial",
+        "evidence": "task implements --background (detached task-worker), --resume/--resume-last and --fresh (plugins/codex/scripts/codex-companion.mjs:671-710, 762-805); --wait is only a Claude-side routing flag (plugins/codex/commands/rescue.md:14-19). Differences from README: resume candidates are filtered to the current Claude session, not the whole repo (codex-companion.mjs:298-304, 928-961; test tests/runtime.test.mjs:573), and the subagent defaults to write-capable runs (workspace-write sandbox) unless read-only is requested (plugins/codex/agents/codex-rescue.md:34; codex-companion.mjs:491), which the README does not state."
+      },
+      {
+        "claim": "README.md:182: /codex:status shows running and recent Codex jobs for the current repository.",
+        "verified": "partial",
+        "evidence": "State is stored per git toplevel (plugins/codex/scripts/lib/state.mjs:29-44), but without a job id the list is also filtered to the current Claude session whenever CODEX_COMPANION_SESSION_ID is set (plugins/codex/scripts/lib/job-control.mjs:15-25, 216; set by the SessionStart hook, plugins/codex/scripts/session-lifecycle-hook.mjs:78). plugins/codex/commands/status.md:11 says 'in this session' and tests/runtime.test.mjs:1163 asserts session scoping. Code differs from README here."
+      },
+      {
+        "claim": "README.md:234: with the review gate enabled a Stop hook runs a targeted Codex review of Claude's response and blocks the stop if issues are found.",
+        "verified": "yes",
+        "evidence": "Stop hook registered with a 900 s timeout (plugins/codex/hooks/hooks.json:26-36); it is a no-op unless config.stopReviewGate is set (plugins/codex/scripts/stop-review-gate-hook.mjs:154-157), otherwise it runs codex-companion task with the stop-gate prompt and blocks on a BLOCK answer, unexpected output, timeout or task failure (stop-review-gate-hook.mjs:69-139, 166-173; plugins/codex/prompts/stop-review-gate.md:14-26) but not when Codex is unavailable (stop-review-gate-hook.mjs:159-164). Default is off (plugins/codex/scripts/lib/state.mjs:19-27); toggled by /codex:setup (plugins/codex/scripts/codex-companion.mjs:229-235)."
+      },
+      {
+        "claim": "README.md:304: no separate Codex runtime; the plugin delegates through the local Codex CLI and app server.",
+        "verified": "yes",
+        "evidence": "It spawns the local codex app-server over stdio (plugins/codex/scripts/lib/app-server.mjs:183-196); the optional broker is another node process connected to the same local app-server (plugins/codex/scripts/app-server-broker.mjs:68; plugins/codex/scripts/lib/broker-lifecycle.mjs:59-70). The plugin has no HTTP/WebSocket client (grep for fetch, node:http(s), undici, WebSocket found none; the only listener is the local socket, app-server-broker.mjs:246)."
+      },
+      {
+        "claim": "README.md:16-20: requirements are a ChatGPT subscription or OpenAI API key and Node.js 18.18 or later.",
+        "verified": "partial",
+        "evidence": "Node >=18.18.0 is declared (package.json:8-10) but CI tests only Node 22 (.github/workflows/pull-request-ci.yml:19-23). Auth handling recognises ChatGPT and API-key accounts and also providers that need no OpenAI auth (plugins/codex/scripts/lib/codex.mjs:817-866); the Free-tier statement is not checkable here. The README requirements omit git, which review commands require (plugins/codex/scripts/lib/git.mjs:78-88), and the separately installed codex CLI is documented only under Install (README.md:50-54)."
+      },
+      {
+        "claim": "README.md:165-178: /codex:transfer imports the Claude session via Codex's session importer; the source must be under ~/.claude/projects; older Codex versions must be upgraded.",
+        "verified": "yes",
+        "evidence": "Source must be a .jsonl file inside ~/.claude/projects (plugins/codex/scripts/lib/claude-session-transfer.mjs:8, 20-44); the import uses externalAgentConfig/import and reads Codex's import ledger for the thread id (plugins/codex/scripts/lib/codex.mjs:661-699, 724, 1058-1093); a JSON-RPC -32601 error yields an upgrade message (codex.mjs:1072-1076); tests at tests/runtime.test.mjs:196-330."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope gap against the Git/GitHub needs: the repo has no worktree management, no gh/GitHub-API or PR/check/review automation, no GitHub-side or mention-triggered review workflow, and no structural or entity-level diffs (greps for worktree, github/gh/pull request, difftastic/tree-sitter/structural/entity found no feature code, only tests/git.test.mjs:125 and the workflow name at .github/workflows/pull-request-ci.yml:1). Reviewer input is plain line diffs with --no-ext-diff (plugins/codex/scripts/lib/git.mjs:232-233, 279).",
+      "Hard runtime dependency on a separately installed OpenAI Codex CLI whose app-server protocol this repo does not pin: it spawns codex app-server (plugins/codex/scripts/lib/app-server.mjs:190), build-time types come from whatever Codex is installed (package.json:14), CI installs the latest @openai/codex unpinned (.github/workflows/pull-request-ci.yml:28-29), the code carries shims for older Codex versions (plugins/codex/scripts/lib/codex.mjs:735-746, 1072-1076), and runtime tests use a fake codex rather than the real binary (tests/fake-codex-fixture.mjs:7-10).",
+      "Vendor/account coupling and data egress: work executes in the Codex backend (OpenAI by default) under the user's ChatGPT or API-key login (README.md:18, 298-300); adversarial-review embeds diff text and untracked text files up to 24 KiB in the prompt (plugins/codex/scripts/lib/git.mjs:7, 225-260, 300-347), the stop gate sends Claude's last reply (plugins/codex/scripts/stop-review-gate-hook.mjs:48-57), and /codex:transfer hands the Claude transcript path to Codex's importer (plugins/codex/scripts/lib/codex.mjs:681-699). The Codex CLI's own license and terms are not described in this repo.",
+      "Write-capable by default for rescue: the codex:codex-rescue subagent adds --write unless read-only is requested (plugins/codex/agents/codex-rescue.md:34; plugins/codex/skills/codex-cli-runtime/SKILL.md:24, 39), which becomes a workspace-write sandbox with approval policy never (plugins/codex/scripts/codex-companion.mjs:491; plugins/codex/scripts/lib/codex.mjs:63-72) in the user's live checkout; no worktree or branch isolation exists in the code, and the README does not state the write default (README.md:126-163).",
+      "Review-gate loop and cost: when enabled, every Stop runs a full Codex task (plugins/codex/scripts/stop-review-gate-hook.mjs:98-128) under a 900-second hook timeout (plugins/codex/hooks/hooks.json:32; stop-review-gate-hook.mjs:16); the README itself warns of long-running loops and fast usage drain (README.md:236-237). Default is off (plugins/codex/scripts/lib/state.mjs:19-27).",
+      "Limited diff context in plugin-built prompts: adversarial-review inlines the diff only for at most 2 changed files and 256 KiB, otherwise it sends a summary and asks the model to inspect with read-only git (plugins/codex/scripts/lib/git.mjs:8-9, 292-298, 300-347); untracked files over 24 KiB, binary files and directories are skipped (git.mjs:205-220). For /codex:review the diff is gathered inside Codex and cannot be inspected from this repo (plugins/codex/scripts/codex-companion.mjs:259-269; plugins/codex/scripts/lib/codex.mjs:1026-1030).",
+      "Maintenance and process signals at this revision: CHANGELOG lists only 1.0.0 while the version is 1.0.6 (plugins/codex/CHANGELOG.md:3-5; package.json:3); no security policy and no release workflow or attestations (.github has only pull-request-ci.yml); CI covers ubuntu-latest and Node 22 only although engines is >=18.18 and the code has Windows branches (.github/workflows/pull-request-ci.yml:12, 19-23; package.json:8-10; plugins/codex/scripts/lib/process.mjs:66; plugins/codex/scripts/lib/app-server.mjs:194); check-version is not run in CI (pull-request-ci.yml:25-35); the README states no supported-OS list (README.md:16-20).",
+      "Local surface: job records, logs and full rendered results (including Codex output and reasoning summaries) are written under CLAUDE_PLUGIN_DATA or os.tmpdir()/codex-companion with default file modes and up to 50 jobs kept (plugins/codex/scripts/lib/state.mjs:10, 13, 41-43, 55, 114, 169; plugins/codex/scripts/lib/tracked-jobs.mjs:44-49, 158-168); a per-workspace broker process and socket live in a temp dir until SessionEnd (plugins/codex/scripts/lib/broker-lifecycle.mjs:15-17, 131-171; plugins/codex/scripts/session-lifecycle-hook.mjs:83-114). Command files interpolate raw slash-command arguments into shell command lines (plugins/codex/commands/status.md:8 and review.md:45 in double quotes; unquoted in setup.md:10), relying on Claude Code's substitution with no escaping layer in this repo (the Node side only re-tokenizes, codex-companion.mjs:130-139)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "openai/codex-plugin-cc",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Claude Code plugin marketplace: add the marketplace (README gives no OS-specific variants; same steps for Linux and macOS) — `/plugin marketplace add openai/codex-plugin-cc`",
+          "citation": "README.md:24-28",
+          "holds": true,
+          "note": "README.md:24 reads 'Add the marketplace in Claude Code:' and line 27 has the exact command `/plugin marketplace add openai/codex-plugin-cc`. The README has no OS-specific install variants anywhere. The next step (README.md:33, `/plugin install codex@openai-codex`) matches the marketplace name `openai-codex` and plugin name `codex` in .claude-plugin/marketplace.json:2,12, so the install chain is consistent."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-201",
+          "holds": true,
+          "note": "LICENSE is the Apache License, Version 2.0 text (header at lines 1-3, terms in sections 1-9, standard unfilled appendix at 178-201). package.json:7 declares \"license\": \"Apache-2.0\", and plugins/codex/LICENSE:1-3 has the same Apache 2.0 header. Root and plugin NOTICE files also exist; they do not affect the SPDX identification."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs npm ci, npm test and npm run build on ubuntu-latest; code is plain Node.js ESM with no native modules. README gives no OS list and the workflow does not state a CPU architecture.",
+          "citation": ".github/workflows/pull-request-ci.yml:12-35; package.json:18-21",
+          "holds": true,
+          "note": "pull-request-ci.yml:12 has `runs-on: ubuntu-latest`, :26 `npm ci`, :32 `npm test`, :35 `npm run build`; the trigger is pull_request only (:3-4). package.json:18-21 lists only 2 devDependencies (@types/node, typescript) and there is no dependencies block. A repo grep for native-addon markers (.node, dlopen, createRequire, node-gyp, napi) found none. The 'ESM' part rests on package.json:5 (\"type\": \"module\"), just outside the cited range but true. As the dossier says, the workflow names no CPU architecture, so x86_64 is an inference from ubuntu-latest."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code plugin: marketplace manifest, plugin manifest, 8 slash commands (list asserted in tests), subagent codex:codex-rescue, 3 internal skills, hooks SessionStart/SessionEnd/Stop. Codex side: reviews via review/start, tasks via turn/start, Claude-to-Codex session import via externalAgentConfig/import, hand-back with codex resume <id>.",
+          "citation": ".claude-plugin/marketplace.json:1-21; plugins/codex/.claude-plugin/plugin.json:1-8; tests/commands.test.mjs:73-85; plugins/codex/agents/codex-rescue.md:1-9; plugins/codex/skills/*/SKILL.md; plugins/codex/hooks/hooks.json:4-36; plugins/codex/scripts/lib/codex.mjs:724,1026,1070,1136; README.md:290",
+          "holds": true,
+          "note": "Both manifests are at the cited ranges. plugins/codex/commands/ holds exactly 8 .md files, matching the sorted list asserted at tests/commands.test.mjs:75-84. codex-rescue.md:1-9 is the subagent frontmatter (name codex-rescue, model sonnet, tools Bash), and README.md:65 confirms the namespaced name codex:codex-rescue. All 3 SKILL.md files have `user-invocable: false` and 'Internal' descriptions (line 4 of each). hooks.json:4-36 registers SessionStart, SessionEnd and Stop. codex.mjs:1026 is `client.request(\"review/start\", ...)`, :1136 is `turn/start`, :724 is `externalAgentConfig/import`, and :1070 calls the wrapper that sends it. README.md:290 documents `codex resume`."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:86-89: /codex:review covers current uncommitted changes or the branch compared to a base like main via --base <ref>. (verified: yes)",
+          "citation": "README.md:86-89; plugins/codex/scripts/lib/git.mjs:94-116,135-191; plugins/codex/scripts/codex-companion.mjs:259-269; plugins/codex/scripts/lib/codex.mjs:1026-1030",
+          "holds": true,
+          "note": "README.md:86-89 says what the claim says. In git.mjs, `--base` forces branch mode (:143-150), a dirty tree (staged, unstaged or untracked) gives working-tree mode (:176-181), and otherwise it falls back to detectDefaultBranch (:184-190). That function tries origin/HEAD first, then main/master/trunk, checking local before origin/ (:94-116). codex-companion.mjs:259-269 maps the modes to `uncommittedChanges` / `baseBranch`. executeReviewRun (codex-companion.mjs:358-374) chains resolveReviewTarget, then validateNativeReviewRequest, then runAppServerReview. codex.mjs:1026-1030 sends only threadId, delivery and target, so the diff is gathered inside Codex, as the dossier states. The 'yes' verdict is correct."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

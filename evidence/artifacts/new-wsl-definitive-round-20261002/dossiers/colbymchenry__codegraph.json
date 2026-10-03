@@ -1,0 +1,385 @@
+{
+  "contender": "colbymchenry/codegraph",
+  "revision": {
+    "contender": "colbymchenry/codegraph",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "colbymchenry/codegraph",
+        "tag": "v1.6.1",
+        "commit": "f4ddf508516332419ea3c95702810765936cf679",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.6.1",
+    "commit": "f4ddf508516332419ea3c95702810765936cf679",
+    "read_at": "2026-10-02T03:02:03+00:00"
+  },
+  "dossier": {
+    "contender": "colbymchenry/codegraph",
+    "revision": {
+      "tag": "v1.6.1",
+      "commit": "f4ddf508516332419ea3c95702810765936cf679",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "CodeGraph (npm @colbymchenry/codegraph) is a local-first code-intelligence library, CLI and stdio MCP server. It parses a repo with tree-sitter (native Rust kernel for 20 language ids, WASM grammars for the rest), stores symbols/edges/files in a per-project SQLite+FTS5 DB (.codegraph/codegraph.db), resolves cross-file references with import, name-matching and framework heuristics, and returns verbatim symbol source plus call paths and a blast-radius summary to coding agents. It is a structural graph index, not a language-server client: the code has no LSP client, no edit/rename tool and no post-edit diagnostics (src/mcp/tools.ts:1552-1568; src/mcp/server-instructions.ts:72-77; AGENTS.md:9).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "CodeGraph hands the agent the exact code it needs in one call: a pre-built graph of every symbol, call edge and dependency, returning relevant source, call paths (incl. dynamic-dispatch hops) and blast radius.",
+          "citation": "README.md:192"
+        },
+        {
+          "claim": "As an MCP server it exposes a single tool, codegraph_explore; node/search/callers/callees/impact/files/status stay functional but unlisted unless CODEGRAPH_MCP_TOOLS re-enables them.",
+          "citation": "README.md:583-589"
+        },
+        {
+          "claim": "codegraph_explore returns the relevant symbols' verbatim source grouped by file plus call paths and a blast-radius summary; naming a file or symbol returns its current line-numbered source like Read.",
+          "citation": "README.md:587"
+        },
+        {
+          "claim": "Extraction runs in a native Rust kernel with compiled-in tree-sitter grammars for 20 languages (others and per-file fallbacks use the portable engine), stored in local SQLite+FTS5, then references are resolved (calls, imports, inheritance, framework patterns).",
+          "citation": "README.md:261; README.md:514-518"
+        },
+        {
+          "claim": "Impact analysis: trace callers, callees and impact radius of a symbol; CLI has callers, callees, impact, affected, query, node, files.",
+          "citation": "README.md:279; README.md:526-549"
+        },
+        {
+          "claim": "Auto-sync is on by default via a native-event watcher ('The index is never stale'), 2000ms default debounce, a per-file staleness banner, and connect-time catch-up.",
+          "citation": "README.md:127; README.md:287-307"
+        },
+        {
+          "claim": "codegraph install auto-configures Claude Code, Cursor, Codex CLI, opencode, Hermes, Gemini CLI, Antigravity, Kiro and GitHub Copilot: MCP server config, a marker-fenced section in CLAUDE.md/AGENTS.md/GEMINI.md, and Claude auto-allow permissions; it does not index code.",
+          "citation": "README.md:108; README.md:391-398"
+        },
+        {
+          "claim": "Manual Claude Code setup: mcpServers.codegraph stdio entry (codegraph serve --mcp, alwaysLoad true) in ~/.claude.json, optional allow of mcp__codegraph__* in ~/.claude/settings.json.",
+          "citation": "README.md:444-471"
+        },
+        {
+          "claim": "Supported Agents section says the MCP server delivers its own guidance 'so no instructions file is written'.",
+          "citation": "README.md:792-794"
+        },
+        {
+          "claim": "Every listed language gets 'full structural extraction and cross-file resolution'; Objective-C is 'Partial support'.",
+          "citation": "README.md:145; README.md:806-843 (ObjC at 822)"
+        },
+        {
+          "claim": "Measured cross-file 'fair coverage' per language on one benchmark repo each (TS/JS 95.8%, Python 100%, Go 96.6%, Rust 86.7%, Java 93.3%, C# 85.2%, Liquid 73.8%); framework routing 74-100%.",
+          "citation": "README.md:845-874"
+        },
+        {
+          "claim": "'100% Local - No data leaves your machine. No API keys. No external services.' while a separate section says anonymous usage statistics are collected (off via codegraph telemetry off, CODEGRAPH_TELEMETRY=0 or DO_NOT_TRACK=1).",
+          "citation": "README.md:11; README.md:284; README.md:733-748"
+        },
+        {
+          "claim": "Every release ships a self-contained build (bundled Node runtime) for Windows, macOS and Linux on x64 and arm64.",
+          "citation": "README.md:777-788"
+        },
+        {
+          "claim": "Releases are built by the public Release workflow; npm uses OIDC trusted publishing with provenance; GitHub Release bundles and SHA256SUMS carry signed attestations (SLSA v1.0 Build Level 2); pre-July-2026 releases have none.",
+          "citation": "README.md:750-775"
+        }
+      ],
+      "install": [
+        {
+          "method": "Standalone bundle (macOS/Linux, no Node required)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh",
+          "citation": "README.md:81"
+        },
+        {
+          "method": "npm global",
+          "command": "npm i -g @colbymchenry/codegraph",
+          "citation": "README.md:91"
+        },
+        {
+          "method": "npx one-shot installer",
+          "command": "npx @colbymchenry/codegraph",
+          "citation": "README.md:388 (also README.md:108)"
+        },
+        {
+          "method": "Wire agents (required after CLI install; does not index)",
+          "command": "codegraph install",
+          "citation": "README.md:105; non-interactive forms README.md:402-410"
+        },
+        {
+          "method": "Per-project index (required before tools answer)",
+          "command": "cd your-project && codegraph init",
+          "citation": "README.md:112-115"
+        },
+        {
+          "method": "Upgrade",
+          "command": "codegraph upgrade",
+          "citation": "README.md:5; README.md:96"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:786 (Linux x64/arm64 via shell installer or npm); install.sh:44-49 maps x86_64 to linux-x64; release.yml:49-50 builds the linux-x64 kernel on ubuntu-22.04 and release.yml:199 the linux-x64 bundle (bundled Node v24.16.0, scripts/build-bundle.sh:24). No musl/Alpine target is listed (scripts/build-bundle.sh:13-15). No CI job runs the full test suite on Linux. The only automated tests are the 17 __tests__/kernel-*.test.ts contract/parity suites, run on ubuntu-latest against the linux-x64 kernel by the manually dispatched release workflow (release.yml:23-24,72,179-195). Full-suite Linux validation is manual via Docker (AGENTS.md:192-198).",
+        "wsl2": "yes, with documented caveats - no WSL2 row in README.md:782-786; WSL2 appears only in Troubleshooting. On /mnt/<drive> projects the shared-daemon socket is unreliable (falls back to in-process serving or CODEGRAPH_NO_DAEMON=1, README.md:891), SQLite WAL may not enable (README.md:882-886), and WSL keeps its own .codegraph-wsl index separate from Windows (README.md:895; src/db/wsl-shared-index.ts:1-15; src/directory.ts:20,97-101). serve --no-watch exists for slow /mnt drives (src/bin/codegraph.ts:2158). No WSL2 CI.",
+        "macos_arm64": "yes - README.md:785 (macOS x64/arm64); install.sh:34-48 maps Darwin/arm64 to darwin-arm64; release.yml:47-48 builds the aarch64-apple-darwin kernel on macos-14 and release.yml:199 the darwin-arm64 bundle. Maintainer dev machine and default test target is macOS (AGENTS.md:190), but the 2026-09 audit says macOS was unavailable for its runs (docs/benchmarks/regression-audit-2026-09.md:99-100,216-217). Bundles are not notarized (BUNDLING.md:67-70).",
+        "gpu": "no - not applicable. No GPU, embedding or ML-inference code or dependency found; src/mcp/tools.ts:3877 says ranking is 'deterministic, no embeddings'; runtime deps are listed in package.json:44-55 and codegraph-kernel/Cargo.toml:12-63. Work runs on CPU (Rust kernel + worker threads)."
+      },
+      "integrations": {
+        "cli": "yes - 'codegraph' (commander): install, uninstall, init, uninit, index, sync, status, unlock, query, explore, context, node, files, callers, callees, impact, affected, daemon, telemetry, upgrade, version (README.md:526-549; src/bin/codegraph.ts:789-2879). Hidden: serve, prompt-hook. ui/web refused unless CODEGRAPH_UI=1 (src/bin/viewer-gate.ts:5-11). No CLI command edits source files.",
+        "mcp": "yes - stdio server 'codegraph serve --mcp' (src/bin/codegraph.ts:2154-2189), runs direct, via proxy, or as a detached per-project daemon over a Unix socket/named pipe (src/mcp/index.ts:17-35; src/mcp/daemon.ts:249-251). Default listed tool: codegraph_explore only (src/mcp/tools.ts:1850); eight tools are defined (search, callers, callees, impact, node, explore, status, files; tools.ts:1581-1759) and all carry readOnlyHint true (tools.ts:1552-1568). No tool performs symbol-level edits, renames or diagnostics, and none queries a language server. Capabilities advertised: tools only (src/mcp/session.ts:252-257).",
+        "sdk_or_api": "Library: yes - package exports the CodeGraph class (init/open/indexAll/sync/searchNodes/getCallers/getCallees/getImpactRadius/buildContext/watch) (README.md:595-636; package.json:9-10; src/index.ts:489-2360); needs Node 22.5+ for node:sqlite (README.md:632-634). HTTP API: none for the product; a read-only JSON API exists only inside the gated codegraph ui viewer bound to 127.0.0.1 (src/ui-server/index.ts:451; src/ui-server/constants.ts:21; AGENTS.md:91-92).",
+        "claude_code_or_codex": "Claude Code: MCP entry in ~/.claude.json (user) or ./.mcp.json (project) with alwaysLoad true, allow-rule mcp__codegraph__* in settings.json, a marker-fenced CodeGraph block in CLAUDE.md, and an opt-in default-yes UserPromptSubmit hook running 'codegraph prompt-hook' that injects codegraph_explore output on how/where/trace prompts (src/installer/targets/claude.ts:124-172,457-498; src/installer/index.ts:208-231; src/bin/codegraph.ts:1455-1609). The hook is not mentioned in README.md. No LSP wiring, no PostToolUse/diagnostics hook and no Claude Code plugin manifest found; pre-0.8 PostToolUse mark-dirty hooks are only stripped (claude.ts:305-323). .claude/skills in the repo are contributor dev skills, not shipped (package.json:14-18). Codex CLI: [mcp_servers.codegraph] in $CODEX_HOME/config.toml or ~/.codex plus a marker block in AGENTS.md; local installs apply only in trusted projects (src/installer/targets/codex.ts:1-30,115-126)."
+      },
+      "telemetry_and_network": "Telemetry is default-ON (precedence DO_NOT_TRACK > CODEGRAPH_TELEMETRY > stored choice > default on: src/telemetry/index.ts:183-206). Daily-aggregated anonymous events (install, index, usage_rollup, uninstall; random machine UUID, version, OS/arch, Node major, CI flag, language names, coarse file-count buckets, tool/command names, MCP client name/version) POST to https://telemetry.getcodegraph.com/v1/events (src/telemetry/index.ts:30; TELEMETRY.md:43-71,99-107), stored in Cloudflare D1 for 90 days (TELEMETRY.md:111-125); ingest source in telemetry-worker/. A first-run stderr notice is printed (src/telemetry/index.ts:396-418); the installer asks, default yes (src/installer/index.ts:185-206). Opt out: codegraph telemetry off, CODEGRAPH_TELEMETRY=0, DO_NOT_TRACK=1 (README.md:741-745). Separately the MCP server checks GitHub for a newer release at most daily (off via CODEGRAPH_NO_UPDATE_CHECK=1 or DO_NOT_TRACK; TELEMETRY.md:38-41; src/upgrade/update-check.ts:19-28,89-91; src/upgrade/index.ts:238-259). The interactive installer/upgrade can offer an opt-in email waitlist submit to https://getcodegraph.com/api/waitlist, never under --yes (src/installer/beta-signup.ts:19,80-96,125-169; installer/index.ts:271-280). install.sh and codegraph upgrade download from GitHub Releases (install.sh:60-76; src/upgrade/index.ts:541-565). No accounts, API keys or LLM calls found; indexing and queries are local SQLite. Viewer binds 127.0.0.1 only (src/ui-server/index.ts:451). README.md:284 says 'No external services', which the code qualifies (see claim_checks)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (~250 files in src/)",
+        "Rust (codegraph-kernel, 26 .rs files)",
+        "Svelte/TypeScript (ui/ viewer)",
+        "Astro (site/ docs)",
+        "SQL (src/db/schema.sql)",
+        "Shell/PowerShell/Node scripts",
+        "C (vendored tree-sitter grammars)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/bin/codegraph.ts (dist/bin/codegraph.js)",
+          "what": "CLI binary; package.json bin (package.json:11-13)"
+        },
+        {
+          "path": "src/mcp/index.ts (MCPServer)",
+          "what": "stdio MCP server started by 'codegraph serve --mcp' (src/bin/codegraph.ts:2154-2189)"
+        },
+        {
+          "path": "src/mcp/daemon.ts, src/mcp/proxy.ts",
+          "what": "detached shared per-project daemon and stdio-to-socket proxy (src/mcp/index.ts:17-35)"
+        },
+        {
+          "path": "src/index.ts",
+          "what": "library entry exporting the CodeGraph class (package.json:9-10)"
+        },
+        {
+          "path": "src/bin/codegraph.ts prompt-hook",
+          "what": "hidden Claude Code UserPromptSubmit hook command (src/bin/codegraph.ts:1455-1609)"
+        },
+        {
+          "path": "install.sh, install.ps1, scripts/npm-shim.js",
+          "what": "bundle installers and npm launcher shim"
+        },
+        {
+          "path": "codegraph-kernel/src/lib.rs",
+          "what": "napi cdylib built as codegraph-kernel.node (codegraph-kernel/Cargo.toml:9-10)"
+        }
+      ],
+      "architecture": "Pipeline: file discovery/watching (src/sync/watcher.ts, src/extraction/index.ts honoring .gitignore and codegraph.json) -> extraction: native Rust kernel (codegraph-kernel/src/*.rs, routed per language by DEFAULT_ROUTED in src/extraction/kernel/index.ts:37-113, per-file fallback to web-tree-sitter WASM on parse errors, kill switch CODEGRAPH_KERNEL=0) plus per-language extractors in src/extraction/languages/ and standalone Svelte/Vue/Astro/Liquid/Razor/MyBatis/DFM/CFML extractors, 29 vendored .wasm grammars in src/extraction/wasm/ -> SQLite via node:sqlite with WAL and FTS5 (src/db/) -> ReferenceResolver (src/resolution/index.ts: import-resolver, name-matcher with a 'fuzzy' strategy and 0-1 confidence per src/resolution/types.ts:42-45, ~30 framework/router modules in src/resolution/frameworks/, whole-graph synthesizers such as callback-synthesizer.ts and tier-synthesizer.ts emitting provenance 'heuristic' edges) -> graph queries (src/graph/traversal.ts callers/callees/impact; named-symbol-flow.ts) -> ContextBuilder (src/context/) -> MCP tools (src/mcp/tools.ts, >7,800 lines; session.ts, engine.ts, query-pool.ts workers) and CLI. Source text is read from disk at query time behind path-containment checks (src/utils.ts:101-163). Installer targets in src/installer/targets/ (antigravity, claude, codex, copilot-cli, copilot-jetbrains, copilot-vscode, cursor, gemini, hermes, kiro, opencode). Gated browser viewer in ui/ + src/ui-server/. Telemetry client src/telemetry/, ingest worker telemetry-worker/. Edge.provenance enum includes 'scip' (src/types.ts:227; src/extraction/kernel/layout.ts:112) but no SCIP/LSP ingestion code was found.",
+      "packaging_and_release": "Artifacts: six self-contained bundles codegraph-{darwin-arm64,darwin-x64,linux-x64,linux-arm64,win32-x64,win32-arm64} (.tar.gz Unix, .zip Windows) holding an official Node runtime (default v24.16.0, downloaded from nodejs.org at build time with no checksum check: scripts/build-bundle.sh:24,36-56), compiled app + prod deps (npm ci --omit=dev --ignore-scripts: :77) and the Rust kernel .node when a prebuild exists (:80-98). .github/workflows/release.yml is manual (workflow_dispatch, :23-24): builds kernel prebuilds on macos-14, ubuntu-22.04, ubuntu-22.04-arm, windows-latest (:42-69), runs only __tests__/kernel-*.test.ts on linux-x64 (:179-195), builds all bundles (:197-202), writes SHA256SUMS (:204-209), attests bundles + SHA256SUMS with actions/attest-build-provenance@v4 (:211-221), creates the GitHub Release (:237-247) and publishes the npm shim plus per-platform optionalDependency packages via OIDC trusted publishing with --provenance (:18-22,249-271). install.sh extracts the downloaded tarball without verifying SHA256SUMS or attestations (install.sh:72-82); the npm shim verifies SHA256SUMS only on its self-heal fallback download and skips when absent (scripts/npm-shim.js:203-228). No macOS notarization/Windows Authenticode; Homebrew/Scoop are TODO (BUNDLING.md:58,67-70). BUNDLING.md:65 and AGENTS.md:268 still say NPM_TOKEN is required, contradicting the workflow. Latest release 1.6.1 dated 2026-09-29 (CHANGELOG.md:16).",
+      "tests_and_ci": "Vitest ^2.1.9, two projects: engine (node) and ui (jsdom) (vitest.config.mts:10-14; vitest.workspace.mts:27-62). About 318 *.test.ts files under __tests__/ (315 top-level + 3 in __tests__/integration/), plus __tests__/evaluation/ run by npm run eval and not part of npm test (AGENTS.md:178), and 29 #[test]/#[cfg(test)] hits in 7 Rust files of codegraph-kernel. Tests use real SQLite and temp dirs with no DB mocking (AGENTS.md:182). CI: .github/workflows has only release.yml (manual; runs just the kernel parity tests before packaging) and deploy-site.yml (Astro docs deploy on push to main touching site/**). No workflow runs npm test on pushes or pull requests; cross-platform validation is manual (macOS local, Linux via Docker, Windows via a VM; AGENTS.md:190-214). The repo's 2026-09 audit reports the monolithic extraction suite's worker is SIGKILLed near 1.6-1.7 GB RSS, 'no claim of a full green monolithic suite', and reviewer-reported 4,636 pass/3 fail vs 4,600/18 before repairs (docs/benchmarks/regression-audit-2026-09.md:66-75,87-93).",
+      "dependencies": "Root package.json: 10 runtime deps (@clack/prompts, commander, fast-string-width, fast-wrap-ansi, ignore, jsonc-parser, picomatch, sisteransi, tree-sitter-wasms, web-tree-sitter) and 7 devDeps; workspace 'ui' (package.json:19-21,44-64). ui/package.json (private): 1 dep (@xyflow/svelte), 1 peer (svelte), 8 dev. site/package.json: 5 deps. telemetry-worker/package.json: 0 deps, 2 dev. telemetry-dashboard/package.json: 0 deps, 3 dev. codegraph-kernel/Cargo.toml: 20 [dependencies] (napi, napi-derive, tree-sitter 0.25, sha2, regex, 14 tree-sitter-* grammar crates, tree-sitter-language) + libc on unix + 2 build-deps (napi-build, cc); vendored C grammars for kotlin/lua/scala/dart; 29 prebuilt grammar .wasm files committed in src/extraction/wasm/. Lockfiles: package-lock.json, codegraph-kernel/Cargo.lock, site/ and telemetry-*/package-lock.json. Engines field >=20.0.0 <25.0.0 (package.json:65-67) although node:sqlite needs Node >=22.5 (README.md:632-634; AGENTS.md:79); bundles ship Node 24.",
+      "security_policy": "none - no SECURITY.md, CONTRIBUTING or CODEOWNERS in the repo; only GitHub issues are linked (README.md:909). In-code measures: refusal of sensitive system/home dirs as roots (src/utils.ts:43-47,175-204), symlink-aware containment for content-serving reads (src/utils.ts:101-163), config-file values never returned (src/utils.ts:55-66), viewer loopback/Host checks (src/ui-server/security.ts:8-44), read-only tool annotations (src/mcp/tools.ts:1552-1568)."
+    },
+    "claim_checks": [
+      {
+        "claim": "MCP exposes a single tool, codegraph_explore (README.md:583)",
+        "verified": "yes",
+        "evidence": "DEFAULT_MCP_TOOLS = new Set(['explore']) (src/mcp/tools.ts:1850); getTools() lists only it unless CODEGRAPH_MCP_TOOLS is set (tools.ts:2083-2110; getStaticTools 1830-1837). Eight tools are defined (tools.ts:1581-1759). With no allowlist the de-listed tools stay callable (isToolAllowed returns true, tools.ts:2092-2095); with an allowlist, other calls return 'disabled via CODEGRAPH_MCP_TOOLS' (tools.ts:2665-2668). Stale comment at tools.ts:2105 still says 'default 4-tool surface'."
+      },
+      {
+        "claim": "README positions CodeGraph as a tree-sitter graph served over MCP and makes no language-server, symbol-edit or post-edit-diagnostics claim (README.md:514-520, 583-591); 'Semantic Code Intelligence' appears at README.md:9",
+        "verified": "yes",
+        "evidence": "Code agrees: no LSP client in src/ (searches for language server, textDocument/, pyright, tsserver, gopls, clangd hit only comments and the LSP-style rootUri parameter at src/mcp/session.ts:220-231). All eight MCP tools carry readOnlyHint true and none writes to the workspace (src/mcp/tools.ts:1552-1568); the only fs writes under src/mcp are lock/pid/registry files and an opt-in CODEGRAPH_EXPLORE_DEBUG log (src/mcp/explore-diagnostics.ts:11-32). Server instructions say 'No live correctness validation - that's still the TypeScript compiler / test suite / linter's job' (src/mcp/server-instructions.ts:77) and matching is lexical, not by meaning (server-instructions.ts:60); ranking uses graph random-walk, 'no embeddings' (tools.ts:3868-3882). 'scip' exists only as a reserved provenance enum value (src/types.ts:227; src/extraction/kernel/layout.ts:112)."
+      },
+      {
+        "claim": "CodeGraph hands the agent the exact code it needs in one call, with call paths and blast radius (README.md:192, 587)",
+        "verified": "partial",
+        "evidence": "Symbol source is read from disk at query time behind path-containment checks (src/mcp/tools.ts:5496-5504,7804-7806; src/utils.ts:128-163) and symbol extents come from tree-sitter nodes (src/types.ts:133-162), so definition text is exact. Reference/call edges are inferred: resolver strategies include 'fuzzy' with 0-1 confidence (src/resolution/types.ts:42-45), synthesized hops are provenance 'heuristic' (AGENTS.md:159; src/types.ts:227), and server instructions admit 'Cross-file resolution is best-effort name matching; ambiguous calls may return multiple candidates' (src/mcp/server-instructions.ts:76). Output is size-capped, with truncation declared in the answer (CHANGELOG.md:66,125). Callers/impact traverse calls, references, imports, instantiates and navigates edges (src/graph/traversal.ts:311)."
+      },
+      {
+        "claim": "Auto-sync keeps the index current: 'The index is never stale' (README.md:127)",
+        "verified": "partial",
+        "evidence": "Watcher debounce defaults to 2000ms with a 300ms quick window for at most 2 pending files (src/sync/watcher.ts:72-73,382,954-967; env clamp 100ms-60s at src/mcp/engine.ts:444-463). Responses carry a staleness banner for pending files and 'auto-sync DISABLED/RECOVERING' banners (src/mcp/tools.ts:1413,1451,1461); server instructions say 'Index lags file writes by ~1 second' (src/mcp/server-instructions.ts:75). README.md:305-307 itself says manual sync is needed when the watcher is disabled (serve --no-watch, CODEGRAPH_NO_DAEMON, WSL /mnt)."
+      },
+      {
+        "claim": "'100% Local - No data leaves your machine. No API keys. No external services.' (README.md:284)",
+        "verified": "partial",
+        "evidence": "Indexing and querying are local (SQLite; no network in extraction). But anonymous telemetry is default-on and POSTs to telemetry.getcodegraph.com (src/telemetry/index.ts:30,205), the MCP server polls GitHub daily for updates (src/upgrade/update-check.ts:19-28), and the installer can send an email to getcodegraph.com if the user opts in (src/installer/beta-signup.ts:19,86). README.md:733-748 and TELEMETRY.md document telemetry separately."
+      },
+      {
+        "claim": "Installer writes a marker-fenced CodeGraph section into CLAUDE.md/AGENTS.md (README.md:395) versus 'no instructions file is written' (README.md:792-794)",
+        "verified": "partial",
+        "evidence": "Code writes the block (src/installer/targets/claude.ts:169; src/installer/targets/codex.ts:123; text at src/installer/instructions-template.ts:42-51), so README.md:792-794 and AGENTS.md:110 are stale; code preferred. README never mentions the Claude Code UserPromptSubmit hook the installer also writes (opt-in prompt default-yes; --yes turns it on): src/installer/index.ts:208-231; src/installer/targets/claude.ts:457-498."
+      },
+      {
+        "claim": "20 languages parse in the native Rust kernel with per-file fallback (README.md:261)",
+        "verified": "yes",
+        "evidence": "DEFAULT_ROUTED lists 20 language ids (src/extraction/kernel/index.ts:37-113); erroring files defer to WASM (index.ts:31-35); CODEGRAPH_KERNEL=0 kill switch (index.ts:12-14); bundles include the .node only when a prebuild exists (scripts/build-bundle.sh:80-98); the kernel matrix is required and parity suites gate release (release.yml:32-41,179-195). Byte-identical parity not independently re-run."
+      },
+      {
+        "claim": "Verified releases: OIDC npm provenance and signed attestations for bundles and SHA256SUMS (README.md:750-775)",
+        "verified": "partial",
+        "evidence": "Present in release.yml:18-22,211-221,249-271. Gaps: install.sh does not verify checksums or attestations (install.sh:72-82); the npm shim's check is best-effort on fallback only (scripts/npm-shim.js:203-228); the bundled Node is fetched without checksum verification (scripts/build-bundle.sh:36-56); no notarization (BUNDLING.md:67-70). The 'SLSA v1.0 Build Level 2' label is not checkable from the repo."
+      },
+      {
+        "claim": "Benchmark: 88% fewer tool calls, 53% faster, 62% fewer tokens, 44% cheaper over 7 repos (Opus 4.8, median of 4) (README.md:202-216)",
+        "verified": "not_checkable",
+        "evidence": "Recomputed mean reductions from the README per-repo table match the headline (about 87.6% calls, 52.6% time, 61.5% tokens, 43.5% cost) and the harness is in-repo (scripts/agent-eval/bench-readme.sh, parse-bench-readme.mjs), but runs need paid LLM sessions and raw logs are not in the repo (kept under /tmp per docs/benchmarks/residual-context-occupancy.md:178). The maintainer's own Sonnet-5 3-turn run measured smaller gains (docs/benchmarks/residual-context-occupancy.md:243-286)."
+      },
+      {
+        "claim": "Published coverage table and speed claims, incl. '2-7x faster than the fastest competing indexer across a 31-repo, 30-language benchmark' (README.md:263-267, 845-874)",
+        "verified": "not_checkable",
+        "evidence": "No script or data for the coverage measurement is in the repo (a /tmp/faircov.cjs is referenced only at docs/design/template-markup-parser.md:134); the competitor is unnamed and a grep for the 31-repo benchmark finds only the README line (README.md:267). Coverage measures share of files with a resolved cross-file dependent, not reference precision."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Maintainer A/B, agent with vs without CodeGraph, Claude Opus 4.8 headless, 7 repos (VS Code, Excalidraw, Django, Tokio, OkHttp, Gin, Alamofire), median of 4 runs/arm, CLI blocked in both arms, run 2026-08-05",
+        "metric": "mean change with CodeGraph: tool calls, time, tokens, cost; file reads",
+        "value": "88% fewer tool calls, 53% faster, 62% fewer tokens, 44% cheaper; median file reads 0 vs 2-19 per repo; e.g. VS Code 2 vs 28 calls, 58s vs 2m10s, $0.53 vs $1.80; Django cost only 13% lower, Gin about even",
+        "source": "README.md:202-233 (method README.md:238-253)",
+        "independent": false
+      },
+      {
+        "what": "Residual retrieval context left in the window after multi-turn sessions, same 7 repos (Sonnet-5, 3 turns, 56 sessions)",
+        "metric": "tokens still resident, CodeGraph vs file-reading agent",
+        "value": "CodeGraph residual about 80% higher on average (README) / 82% (doc), higher on 7 of 7 repos; VS Code 67k vs 18k tokens; fixed schema+instructions overhead +546 tokens",
+        "source": "README.md:198; docs/benchmarks/residual-context-occupancy.md:196-241",
+        "independent": false
+      },
+      {
+        "what": "Maintainer re-run, Sonnet-5, 3-turn sessions, 7 repos, 2026-08-05",
+        "metric": "savings with CodeGraph",
+        "value": "cost 24%, tokens 56%, time 20%, tool calls 84%; Django costs 17% more; 4 of 28 with-arm sessions still used Read",
+        "source": "docs/benchmarks/residual-context-occupancy.md:243-286",
+        "independent": false
+      },
+      {
+        "what": "Older A/B on codegraph 0.9.4 (2026-05-24): 37 language x size cells, Claude Opus, one run per arm",
+        "metric": "file reads, tool calls, cost, duration",
+        "value": "reads 159 to 38 (-76%); tool calls 189 vs 321 (-41%); total cost $15.4 with vs $13.8 without; mean duration 38s vs 48s",
+        "source": "docs/benchmarks/codegraph-ab-matrix.md:11-24,84-87",
+        "independent": false
+      },
+      {
+        "what": "Per-language cross-file 'fair coverage' (files with at least one resolved cross-file dependent) on one repo each",
+        "metric": "coverage %",
+        "value": "TS/JS 95.8% (this repo), Python/requests 100%, Go/gin 96.6%, Rust/ripgrep 86.7%, Java/gson 93.3%, C#/MediatR 85.2%, C/redis 92.2%, Swift/Alamofire 95.3%, Lua 84.2%, Liquid 73.8%, Pascal 77.4%; framework routing 74.1-100%",
+        "source": "README.md:845-874 (measurement script not in repo)",
+        "independent": false
+      },
+      {
+        "what": "Indexing and sync speed claims on large repos",
+        "metric": "wall time",
+        "value": "Swift compiler repo (27k files) about 100s fresh index, about 4s one-file re-sync; Linux kernel (70k files, 2M symbols, 6.4M relationships) under 12 min on a 2-core/6GB VPS; lone save syncs after 300ms; '2-7x faster than the fastest competing indexer' on a 31-repo benchmark (unnamed, no data in repo)",
+        "source": "README.md:263-267",
+        "independent": false
+      },
+      {
+        "what": "Repo audit of release 1.6.0 vs main, source-grounded call paths on Express, Gin, Django, Excalidraw",
+        "metric": "paths passing; suite results",
+        "value": "11/12 on release, 9/12 on pre-repair main, 11/12 after repair; reviewer-reported full suite 4,636 pass/3 fail vs 4,600/18 before repairs (reviewer unidentified, described as a user-supplied Claude review)",
+        "source": "docs/benchmarks/regression-audit-2026-09.md:58-62,87-93",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: not a language-server tool. References are tree-sitter plus name-matching with a 'fuzzy' strategy and 'heuristic' synthesized edges, and the project says cross-file resolution is best-effort and ambiguous calls may return multiple candidates (src/resolution/types.ts:45; src/types.ts:227; src/mcp/server-instructions.ts:76). All MCP tools are read-only; there are no symbol-level edits, renames, LSP navigation or post-edit diagnostics (src/mcp/tools.ts:1552-1568; server-instructions.ts:77).",
+      "Trust and context footprint: agent guidance tells the model not to re-verify with grep and to treat returned source as already read (src/mcp/server-instructions.ts:64-66), yet the index can lag edits by the 2s debounce (src/sync/watcher.ts:382) and bounded answers can be truncated (CHANGELOG.md:125). The README admits about 80% more resident retrieval context than a file-reading agent (README.md:198).",
+      "Privacy/network: telemetry is default-on (src/telemetry/index.ts:205) and POSTs to telemetry.getcodegraph.com; a daily GitHub update check runs from the MCP server (src/upgrade/update-check.ts:19-28); the installer can submit an email to getcodegraph.com on opt-in (src/installer/beta-signup.ts:19). README.md:284 'No external services' is therefore only true of indexing and querying. Opt-outs exist (DO_NOT_TRACK=1, CODEGRAPH_TELEMETRY=0, CODEGRAPH_NO_UPDATE_CHECK=1).",
+      "Installer footprint: edits ~/.claude.json or ./.mcp.json, settings.json (allow mcp__codegraph__*), CLAUDE.md/AGENTS.md, and adds a Claude Code UserPromptSubmit hook that runs codegraph on prompts, a hook the README never mentions (src/installer/targets/claude.ts:124-172,457-498; src/installer/index.ts:208-231). It may also install git post-commit/merge/checkout hooks when the watcher is off (src/installer/index.ts:654-722). Per-project detached daemons outlive sessions until idle (src/mcp/index.ts:22-30). codegraph uninstall reverses agent configs (README.md:133-139).",
+      "Supply chain: install.sh performs no checksum or attestation verification (install.sh:72-82); the bundled Node runtime is downloaded without checksum (scripts/build-bundle.sh:36-56); no notarization/Authenticode (BUNDLING.md:67-70); 29 prebuilt grammar .wasm blobs are committed (src/extraction/wasm/); 1 MB source-file cap and vendored C grammars add review surface. Release is a manual workflow_dispatch run with an admin-owned PAT (release.yml:23-24,77-92); BUNDLING.md:65 and AGENTS.md:268 still cite an NPM_TOKEN the workflow does not use.",
+      "Maintenance/QA: no PR or push CI runs the test suite (only release.yml, which runs just kernel parity tests, and deploy-site.yml: release.yml:179-195). The repo's own 2026-09 audit found five correctness regressions in release 1.6.0 and a monolithic-suite worker killed near 1.6-1.7 GB RSS with no full-green claim; macOS was unavailable for it (docs/benchmarks/regression-audit-2026-09.md:12-24,66-75,99-100). No SECURITY.md. Copyright is held by one individual (LICENSE:3).",
+      "Platform/runtime limits: Node engines >=20 <25 with a hard exit on 25+ (package.json:65-67; AGENTS.md:58) while node:sqlite needs 22.5+ for library use (README.md:632); WSL2 /mnt projects have unreliable daemon sockets and cannot share a Windows index (README.md:891,895); network/9p filesystems may lack WAL (README.md:882-886); very large repos can grow the WAL up to a 2 GB soft threshold (README.md:897); Objective-C is only partial (README.md:822); 14 of the supported languages (ArkTS, Vue, Svelte, Astro, Liquid, Pascal, ObjC, CFML, COBOL, VB.NET, Erlang, Solidity, Terraform, Nix) run on the WASM path, not the kernel (src/extraction/kernel/index.ts:37-113).",
+      "Roadmap/licensing scope: repo is MIT, but a hosted 'CodeGraph platform' and a 'CodeGraph Pro' app are teased (README.md:42-46; src/installer/beta-signup.ts:1-12; AGENTS.md:42-48 says the Pro app imports the private ui package); the browser viewer is gated off by default and 'not released yet' (src/bin/viewer-gate.ts:5-11; AGENTS.md:92)."
+    ]
+  },
+  "repaired": true,
+  "verification": [
+    {
+      "contender": "colbymchenry/codegraph",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Standalone bundle (macOS/Linux, no Node required): curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh",
+          "citation": "README.md:81 (context README.md:77,80); install.sh:5-7,34-49,72-82",
+          "holds": true,
+          "note": "README.md:81 is the command word for word, under '# macOS / Linux' and 'No Node.js required' (README.md:77,80). install.sh:5-7 downloads a self-contained bundle that includes its own Node runtime. install.sh:34-49 accepts Darwin/Linux on x86_64/amd64/arm64/aarch64 and points Windows shells to install.ps1. install.sh:72-82 downloads and unpacks codegraph-<target>.tar.gz from GitHub Releases. Minor: the command fetches install.sh from main, not from the v1.6.1 tag."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (spdx MIT), file LICENSE",
+          "citation": "LICENSE:1-21; package.json:43",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text, 'Copyright (c) 2026 Colby Mchenry' (LICENSE:3). package.json:43 declares \"license\": \"MIT\". The licenses of the bundled grammars (codegraph-kernel/grammars/{dart,lua,scala}/LICENSE) are also MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - Linux x64 via shell installer or npm; install.sh maps x86_64 to linux-x64; release.yml builds the linux-x64 kernel on ubuntu-22.04 and the linux-x64 bundle (bundled Node v24.16.0); no musl/Alpine target; No CI job runs tests on Linux (manual Docker validation only, AGENTS.md:192-198).",
+          "citation": "README.md:786; install.sh:44-49; .github/workflows/release.yml:49-50,199; scripts/build-bundle.sh:13-15,24; AGENTS.md:192-198 (also opened release.yml:72,179-195; scripts/build-kernel.sh:41; vitest.workspace.mts:32)",
+          "holds": false,
+          "note": "The 'yes' and its supporting citations check out: README.md:786 lists Linux x64/arm64. install.sh:36,46,49 turn Linux + x86_64 into linux-x64. release.yml:49-50 builds x86_64-unknown-linux-gnu on ubuntu-22.04, which scripts/build-kernel.sh:41 maps to linux-x64. release.yml:199 builds the linux-x64 bundle. build-bundle.sh:24 defaults to Node v24.16.0, and build-bundle.sh:13-15 lists no musl target. The clause 'No CI job runs tests on Linux (manual Docker validation only)' is false. The release job runs on ubuntu-latest (release.yml:72), and its step at release.yml:179-195 runs `CODEGRAPH_KERNEL_EXPECT=1 npx vitest run __tests__/kernel-*.test.ts` against the linux-x64 kernel. That covers 17 suites, which the engine project picks up via vitest.workspace.mts:32. AGENTS.md:192-198 only covers running the full suite by hand in Docker. Linux x64 is in fact the only platform where any automated tests run, and the dossier's own code.tests_and_ci and code.packaging_and_release fields already say so."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes - stdio server 'codegraph serve --mcp', runs direct, via proxy, or as a detached per-project daemon over a Unix socket/named pipe; default listed tool codegraph_explore only; eight tools defined, all readOnlyHint true; no tool edits, renames, diagnoses or queries a language server; capabilities advertised: tools only.",
+          "citation": "src/bin/codegraph.ts:2154-2189; src/mcp/index.ts:17-35; src/mcp/daemon.ts:249-251; src/mcp/tools.ts:1552-1568,1581-1759,1850; src/mcp/session.ts:252-257",
+          "holds": true,
+          "note": "codegraph.ts:2154-2189 defines the hidden `serve` command; --mcp (stdio) starts MCPServer. index.ts:17-35 documents three modes: direct, proxy, and a detached daemon serving over a Unix-domain socket or named pipe. daemon.ts:249-251 is the net.createServer/listen. tools.ts:1850 is `DEFAULT_MCP_TOOLS = new Set(['explore'])`. Eight tools (search, callers, callees, impact, node, explore, status, files) are defined between tools.ts:1581 and 1759, and all eight set `annotations: READ_ONLY_ANNOTATIONS` (readOnlyHint true, tools.ts:1563-1568). session.ts:254 advertises `capabilities: { tools: {} }` only. A grep of src/ for LSP terms (textDocument/, language server, gopls, clangd, pyright, tsserver) finds only comments. The only file writes under src/mcp are lock, pid, socket and registry files plus an opt-in debug log."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "README positions CodeGraph as a tree-sitter graph served over MCP and makes no language-server, symbol-edit or post-edit-diagnostics claim; 'Semantic Code Intelligence' appears at README.md:9 — verified: yes",
+          "citation": "README.md:9,514-520,583-591; src/mcp/session.ts:220-231; src/mcp/tools.ts:1552-1568,3868-3882; src/mcp/explore-diagnostics.ts:11-32; src/mcp/server-instructions.ts:60,77; src/types.ts:227; src/extraction/kernel/layout.ts:112",
+          "holds": true,
+          "note": "'verified: yes' is accurate. README.md:514-520 describes tree-sitter extraction, SQLite+FTS5 storage and reference resolution; README.md:583-591 describes the MCP tools. README.md:9 does say 'Semantic Code Intelligence', and a README grep for LSP, language server, rename, diagnostic or refactor finds nothing. The code evidence matches: session.ts:220-231 only reads the LSP-style rootUri/workspaceFolders fields. server-instructions.ts:60 says matching is lexical, and server-instructions.ts:77 says there is no live correctness validation. explore-diagnostics.ts:11-32 is an opt-in debug log (CODEGRAPH_EXPLORE_DEBUG). tools.ts:3877 says ranking is 'deterministic, no embeddings'. 'scip' appears only as an enum value (types.ts:227, layout.ts:112), with no code that ingests SCIP data."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "readme.platforms.linux_x86_64: replace 'No CI job runs tests on Linux (manual Docker validation only, AGENTS.md:192-198).' with 'No CI job runs the full test suite on Linux. The only automated tests are the 17 __tests__/kernel-*.test.ts contract/parity suites, run on ubuntu-latest against the linux-x64 kernel by the manually dispatched release workflow (release.yml:23-24,72,179-195). Full-suite Linux validation is manual via Docker (AGENTS.md:192-198).'"
+      ]
+    },
+    {
+      "contender": "colbymchenry/codegraph",
+      "checks": [
+        {
+          "field": "readme.install[1] (npm global)",
+          "statement": "npm global install: `npm i -g @colbymchenry/codegraph` (README.md:91)",
+          "citation": "README.md:87-92; package.json:2; scripts/pack-npm.sh:22,109; .github/workflows/release.yml:249-271",
+          "holds": true,
+          "note": "README.md:91 has this exact command, under 'Already have Node? Use npm instead'. The package name is @colbymchenry/codegraph (package.json:2). The release workflow publishes the main shim under that name: pack-npm.sh:22 sets SCOPE=\"@colbymchenry\" and :109 builds `${SCOPE}/codegraph`, published at release.yml:260-271."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT, in the file LICENSE",
+          "citation": "LICENSE:1-21; package.json:43",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text, 'Copyright (c) 2026 Colby Mchenry' (LICENSE:3). package.json:43 declares \"license\": \"MIT\", and the README.md:21 badge agrees."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: Linux x64 is supported via the shell installer or npm. install.sh maps x86_64 to linux-x64. release.yml builds the linux-x64 kernel on ubuntu-22.04 and the linux-x64 bundle, which bundles Node v24.16.0. There is no musl target and no CI job runs the full suite on Linux. The only automated tests are the 17 kernel-*.test.ts suites, run on ubuntu-latest by the manually dispatched release workflow. Full-suite Linux validation is done by hand in Docker.",
+          "citation": "README.md:786; install.sh:44-49; .github/workflows/release.yml:23-24,49-50,72,179-199; scripts/build-bundle.sh:13-15,24; __tests__/kernel-*.test.ts; .github/workflows/deploy-site.yml; scripts/build-kernel.sh:64,67; AGENTS.md:192-198",
+          "holds": true,
+          "note": "Every part checks out. README.md:786 lists 'Linux | x64, arm64 | shell installer or npm'. install.sh:46 maps x86_64|amd64 to x64 and :49 sets target=${os}-${arch}. release.yml:49-50 builds x86_64-unknown-linux-gnu on ubuntu-22.04, and :199 builds linux-x64 without passing a Node version, so the default v24.16.0 at build-bundle.sh:24 applies. build-bundle.sh:13-15 lists only darwin/linux/win32 x64 and arm64, with no musl target. A glob finds exactly 17 __tests__/kernel-*.test.ts files. They run on ubuntu-latest (:72) against the linux-x64 .node (:179-195), and the workflow is triggered only by workflow_dispatch (:23-24). The only other workflow, deploy-site.yml, just builds and deploys the Astro site. build-kernel.sh only runs cargo build, never cargo test. AGENTS.md:192-198 describes manual Docker validation on Linux."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes: stdio server 'codegraph serve --mcp' that runs direct, through a proxy, or as a detached per-project daemon over a Unix socket or named pipe. Only codegraph_explore is listed by default. Eight tools are defined and all carry readOnlyHint true. None edits, renames, gives diagnostics or queries a language server. Only the tools capability is advertised.",
+          "citation": "src/bin/codegraph.ts:2154-2189; src/mcp/index.ts:17-35; src/mcp/daemon.ts:249-251; src/mcp/tools.ts:1563-1568,1579-1792,1850; src/mcp/session.ts:180-192,252-257; src/mcp/proxy.ts:323",
+          "holds": true,
+          "note": "`serve` is a hidden command whose --mcp option starts MCPServer (codegraph.ts:2154-2189). index.ts:17-35 documents the Direct, Proxy and Daemon modes, and daemon.ts:249-251 creates the socket server and listens on its path. tools.ts defines exactly eight tools (codegraph_search, callers, callees, impact, node, explore, status, files at :1581-1759). Each one sets annotations: READ_ONLY_ANNOTATIONS, which has readOnlyHint true (:1563-1568). DEFAULT_MCP_TOOLS = new Set(['explore']) (:1850). The initialize reply has capabilities { tools: {} } (session.ts:254), and the proxy's reply at proxy.ts:323 is the same. resources/list, resources/templates/list and prompts/list return empty lists (session.ts:180-192). A grep finds no textDocument/ or language-server client in src/. The only file writes under src/mcp are lock, pid and registry files plus the debug log."
+        },
+        {
+          "field": "claim_checks[4] ('100% Local', verified: partial)",
+          "statement": "README.md:284 says '100% Local - No data leaves your machine. No API keys. No external services.' The check marks it partial: telemetry is on by default and POSTs to telemetry.getcodegraph.com, the MCP server checks GitHub for updates daily, and the installer can send an email to getcodegraph.com if the user opts in.",
+          "citation": "README.md:284,733-748; src/telemetry/index.ts:30,183-206,542; src/upgrade/update-check.ts:19-28,38,89-91; src/mcp/index.ts:343,351; src/installer/beta-signup.ts:1-12,19,80-96; TELEMETRY.md",
+          "holds": true,
+          "note": "README.md:284 has that exact text, and README.md:733-748 has a separate Telemetry section. TELEMETRY_ENDPOINT is 'https://telemetry.getcodegraph.com/v1/events' (telemetry/index.ts:30). getStatus() falls through to { enabled: true, decidedBy: 'default' } (:205), and the send uses method 'POST' (:542). MCPServer.start() calls getTelemetry().startInterval() and checkForUpdateInBackground() (mcp/index.ts:343,351). The update check queries the latest GitHub release with a 24h TTL (update-check.ts:23-28,38), and CODEGRAPH_NO_UPDATE_CHECK or DO_NOT_TRACK turns it off (:89-91). The beta-signup endpoint is https://getcodegraph.com/api/waitlist (beta-signup.ts:19), and :86-91 POSTs the email only after the user opts in. TELEMETRY.md exists. 'Partial' is the right verdict."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}
