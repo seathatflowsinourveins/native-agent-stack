@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "wsl-retrieval-retirement-20261003",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "qmd"
+  ],
+  "recorded_at_utc": "2026-10-03T02:00:21Z",
+  "evidence_class": "native_cli_integration_controls",
+  "claim": "The historical WSL retrieval fixture's supported run/install entry points are retired while its original records and lock bytes remain inspectable. Eight npm 11.19.0 controls refuse with EBADDEVENGINES. The strengthened exact workflow scans all 50 inventoried inputs in disjoint groups (48 ordinary, one macOS archive, one retired WSL archive): all three primary and three SARIF invocations return 0 under OSV 2.6.0, with zero SARIF results. The unchanged active-copy input under ordinary config and the final archive config with an expired date both return 1 for GHSA-vfj7-8cjw-p6xm. The integrated source/policy suite runs 161 tests, passing with two skips. The lock stays unchanged at its original path. Active QMD remains affected; current-head hosted CI and independent integration review are separate gates.",
+  "limitations": [
+    "Native CLI integration controls and offline artifact checks, not unchanged upstream test suites, model/provider execution, new-host acceptance or a general installation sandbox.",
+    "Preserve the original incomplete20260920 assessment, historical command facts, five failed commands and all original archives/lock byte-for-byte. Missing historical argv/cwd/raw logs remain unresolved. The former future recording aid is archived without historical execution attribution.",
+    "npm controls cover eight supported npm11.19 install/ci/prefix/ignore-scripts combinations only. --force, other package managers and restored historical sources remain outside the guard. Removing package.json alone does not prevent standalone-lock interpretation.",
+    "Original quoted-TOML-date scanner controls returned127 parse errors. Their outputs/configs are retained; one supported unquoted-date correction preceded the successful prospective/expiry controls.",
+    "Prospective scratch configs test native ignore/expiry behavior only. Dedicated configs affect every invocation input; explicit workflow inventory partitions, exact lock hashes, evidence binding and expiry controls enforce scope. Final repository partition/full-scan/current-head CI and review are separate evidence.",
+    "The frozen lock retains braces3.0.3 affected by GHSA-vfj7-8cjw-p6xm/CVE-2026-93687. No patch or active QMD acceptance is claimed; current general QMD use requires separate resolution.",
+    "All output digests bind published sanitized bytes only. Private task paths are role markers; original native output remains outside the checkout. Selected npm debug-log lines observe original argv/cwd with sanitized paths. No exhaustive filesystem audit or kernel trace.",
+    "No OS/security grants, target setup, service/timer operation, credential inspection, broker call or model run occurred. Whole-task provider usage and billing are unknown.",
+    "The earlier final-native-scan-record.json remains historical output for its bound earlier workflow/config. completion-native-record.json records the strengthened partition, shortened 2026-10-17 expiry, fresh active/expired controls and 161-test run; neither is an unchanged upstream test suite. The first completion validation failed on a stale hash row for an already-empty output and is retained, with the corrected diagnosis in publication-correction.md."
+  ],
+  "source_base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "locks": [
+    {
+      "lock": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb"
+    }
+  ],
+  "historical_assessment": "evidence/receipts/wsl-retrieval-20260920.json",
+  "retirement_assessment": "blueprints/convergence-practice/wsl-retrieval/retirement-assessment.json",
+  "native_control_record": "evidence/artifacts/wsl-retrieval-retirement-20261003/controls.json",
+  "evidence_paths": [
+    "blueprints/convergence-practice/wsl-retrieval/retirement-assessment.json",
+    "blueprints/convergence-practice/wsl-retrieval/package-original.json.txt",
+    "blueprints/convergence-practice/wsl-retrieval/run-recording-aid.py.txt",
+    "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/controls.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-runner-controls.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-tests-corrected.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-audit-corrected.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-convergence-corrected.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-controls-red.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-controls-red-2.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-convergence.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-registry-validation.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/independent-source-review.md",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/final-native-scan-record.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-native-record.json",
+    "evidence/artifacts/wsl-retrieval-retirement-20261003/publication-correction.md"
+  ],
+  "primary_sources": [
+    {
+      "repository": "npm/cli",
+      "revision": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+      "url": "https://github.com/npm/cli/blob/v11.19.0/docs/lib/content/configuring-npm/package-json.md#devengines"
+    },
+    {
+      "repository": "npm/cli",
+      "revision": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+      "url": "https://github.com/npm/cli/blob/v11.19.0/lib/base-cmd.js#L201"
+    },
+    {
+      "repository": "google/osv-scanner",
+      "pin": "v2.6.0",
+      "url": "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+      "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108"
+    },
+    {
+      "repository": "github/advisory-database",
+      "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm"
+    }
+  ],
+  "whole_task_provider_usage": null,
+  "current_native_control_record": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-native-record.json"
+}

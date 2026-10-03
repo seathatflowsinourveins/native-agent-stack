@@ -60,8 +60,8 @@ def audit(source, qmd, failed, inventory, root=ROOT):
             (failed, {'run.py': 'run-initial.py.txt'}, 'run-initial.py.txt'),
             (qmd, {}, 'run-qmd-attempt-2.py.txt')]:
         require(receipt['frozen_file_mapping'] == declared_mapping, 'wrong executed runner provenance')
-        # The original QMD receipt had no remapping. Its run.py bytes are now archived.
-        mapping = {'run.py': runner}
+        # Resolve archived bytes without fabricating original receipt mapping fields.
+        mapping = {'run.py': runner, 'package.json': 'package-original.json.txt'}
         require(set(receipt['frozen_inputs']) == REQUIRED_FROZEN_INPUTS, 'required frozen input names changed')
         for name, digest in receipt['frozen_inputs'].items():
             require(hashlib.sha256((root/mapping.get(name, name)).read_bytes()).hexdigest() == digest,
@@ -163,7 +163,53 @@ def audit(source, qmd, failed, inventory, root=ROOT):
             'whole_task_provider_usage': None, 'semantic_rag_or_client_integration': False}
 
 
+def audit_retirement(root=ROOT):
+    """Check current retirement artifacts without qualifying historical execution."""
+    assessment = json.loads((root/'retirement-assessment.json').read_text())
+    archives = {
+        'package-original.json.txt': (174, '7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8'),
+        'run-recording-aid.py.txt': (16427, 'be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12'),
+    }
+    require(set(assessment['archived_artifacts']) == set(archives), 'retirement archive names changed')
+    for name, (size, digest) in archives.items():
+        data = (root/name).read_bytes()
+        require(len(data) == size and hashlib.sha256(data).hexdigest() == digest,
+                'changed retirement artifact: '+name)
+        require(assessment['archived_artifacts'][name]['bytes'] == size
+                and assessment['archived_artifacts'][name]['sha256'] == digest,
+                'retirement archive identity changed: '+name)
+    require(assessment['retained_lock']['path'] == 'package-lock.json'
+            and assessment['retained_lock']['sha256'] == '5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb'
+            and hashlib.sha256((root/'package-lock.json').read_bytes()).hexdigest()
+                == assessment['retained_lock']['sha256'], 'retired lock changed')
+    manifest = json.loads((root/'package.json').read_text())
+    require(manifest.get('private') is True, 'retirement manifest must remain private')
+    require(not any(manifest.get(name) for name in ['dependencies', 'devDependencies',
+            'optionalDependencies', 'peerDependencies', 'bundledDependencies', 'bundleDependencies']),
+            'retirement manifest restores dependencies')
+    require(not manifest.get('scripts'), 'retirement manifest restores lifecycle or replay scripts')
+    require(manifest.get('devEngines', {}).get('runtime')
+            == {'name': 'retired-wsl-retrieval', 'onFail': 'error'},
+            'retirement manifest runtime guard changed')
+    require(set(assessment['current_entrypoints']) == {'run.py', 'package.json'},
+            'retirement entrypoint set changed')
+    for name, identity in assessment['current_entrypoints'].items():
+        require(hashlib.sha256((root/name).read_bytes()).hexdigest() == identity['sha256'],
+                'changed retirement entrypoint: '+name)
+    require(assessment['historical_native_acceptance_established'] is False
+            and assessment['native_npm_guard_acceptance_established'] is False,
+            'offline retirement assessment cannot establish native acceptance')
+    require(assessment['active_qmd_advisory']
+            == {'id': 'GHSA-vfj7-8cjw-p6xm', 'status': 'unresolved'},
+            'active QMD advisory disposition changed')
+    return {'artifacts_consistent': True, 'status': 'retired_historical_source',
+            'native_npm_guard_acceptance_established': False,
+            'active_qmd_advisory_status': 'unresolved'}
+
+
 if __name__ == '__main__':
     load = lambda name: json.loads((ROOT/name).read_text())
-    print(json.dumps(audit(load('source-receipt.json'), load('qmd-receipt.json'),
-                           load('qmd-attempt-1.json'), load('install-inventory.json')), indent=2))
+    result = audit(load('source-receipt.json'), load('qmd-receipt.json'),
+                   load('qmd-attempt-1.json'), load('install-inventory.json'))
+    result['current_retirement_assessment'] = audit_retirement()
+    print(json.dumps(result, indent=2))
