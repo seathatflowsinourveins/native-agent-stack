@@ -20,6 +20,7 @@ import tomllib
 STAGES = ("post_install", "service_health", "after_sign_in")
 RUNTIME_PINS = {"node", "python", "uv"}  # install.sh installs these unconditionally, before any mise tool
 ON_DEMAND = {"mcp-inspector", "base-distribution"}  # the manifest says installs; the plan installs nothing for them (README.md)
+GATE = "interim_acknowledged"  # install.sh's gate of the interim installs (amendment 3 of the manifest's decision rule)
 FUNCTION = re.compile(r"^([A-Za-z0-9_.-]+) ?\(\) ?\{(.*)$")
 PORT_IN_CONFIG = (re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}:(\d{4,5})\b|\[[0-9a-f:]*\]:(\d{4,5})\b|(?<![\w.]):(\d{4,5})\b"),
                   re.compile(r"(?i)\b\w*port\w*\s*[=:]\s*[\"']?(\d{4,5})\b"))
@@ -185,6 +186,19 @@ def main():
             bad("acceptance", f"selected row {slot} has no post-install acceptance")
         if not active and (r["commands"] or r["acceptance"]):
             bad("rows", f"row {slot} is not installed but keeps commands or acceptance")
+
+    # an interim install waits for the acknowledgements of its rule amendment (the wave-2 batch of the layer consensus):
+    # its install function calls the gate before anything else, and the gate reads the owed acknowledgements
+    gated = [r for r in rows if (manifest.get(r["slot"]) or {}).get("interim")]
+    if gated and "acknowledgements_owed" not in install_funcs.get(GATE, ""):
+        bad("interim", f"install.sh has no {GATE} function that reads the wave-2 batch's acknowledgements_owed, the gate "
+                       "every interim install calls first")
+    for r in gated:
+        body = [line.strip() for line in install_funcs.get(r["slot"], "").splitlines()
+                if line.strip() and not line.strip().startswith("#")]
+        if body[:1] != [f'{GATE} {r["slot"]} || return "$?"']:
+            bad("interim", f"row {r['slot']}: its install function in install.sh does not call `{GATE} {r['slot']}` "
+                           "before anything else, so an interim install would run while an acknowledgement is owed")
 
     # commands and acceptance in the scripts are the ones in the JSON; every command has a source URL
     for r in rows:

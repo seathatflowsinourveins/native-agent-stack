@@ -301,8 +301,10 @@ memory-owner() {
   # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: version only; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/cli.rs#L11
-      check memory-owner 'version only' 'ai-memory --version'
+      # Kind: smoke; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/cli.rs#L11 (--version); https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/render_shared.rs#L907 (the seven Codex events install-hooks writes)
+      # The hooks.json line is this project's integration check, not upstream acceptance.
+      check memory-owner smoke 'ai-memory --version
+jq -e '\''[("SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse", "PreCompact", "Stop", "SessionEnd") as $event | any(.hooks[$event][]?.hooks[]?; (.command // "") | contains("ai-memory"))] | all'\'' "${CODEX_HOME:-$HOME/.codex}/hooks.json" >/dev/null'
       ;;
     service_health)
       # Kind: health; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L2712 (/healthz); status: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L2149
@@ -333,12 +335,16 @@ context-supply() {
   # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L78 (verify the install); https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/plugin_cmd.rs#L447 (plugin list --json)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L78 (verify the install); https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/plugin_cmd.rs#L447 (plugin list --json); https://code.claude.com/docs/en/plugins/loading (autoUpdate on the extraKnownMarketplaces or known_marketplaces.json entry, read 2026-10-03)
+      # The last three lines are this project's integration check that marketplace auto-update stays off for context-mode.
       check context-supply smoke 'want=6f0cc6841c687e754059f36714a11233fda1a02b
 sha="$(jq -r '\''[.plugins["context-mode@context-mode"][] | select(.scope == "user") | .gitCommitSha][0]'\'' "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json")"
 [[ "$sha" == "$want" ]] || [[ "$(curl -fsSL "https://api.github.com/repos/mksglu/context-mode/compare/$want...$sha" | jq -r '\''[.files[].filename] | unique | join(",")'\'')" == stats.json ]]
 codex plugin list --json | jq -e '\''any(.installed[]; .pluginId == "context-mode@context-mode" and .enabled)'\'' >/dev/null
-[[ "$(jq -r .version "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169/lib/node_modules/context-mode/package.json")" == 1.0.169 ]]'
+[[ "$(jq -r .version "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169/lib/node_modules/context-mode/package.json")" == 1.0.169 ]]
+config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+jq -e '\''(.extraKnownMarketplaces["context-mode"].autoUpdate // false) == false'\'' "$config_dir/settings.json" >/dev/null
+jq -e '\''(.["context-mode"].autoUpdate // false) == false'\'' "$config_dir/plugins/known_marketplaces.json" >/dev/null'
       ;;
     *) skipped context-supply ;;
   esac

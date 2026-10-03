@@ -1070,10 +1070,132 @@ class Manifest(unittest.TestCase):
              "consensus memory-owner: installed job also owned by serena"),
             ("a second interim on the row", lambda e, b: b["memory-owner"].update(interim={"default": "x"}), "memory-owner",
              "consensus memory-owner: duplicate interim"),
+            # The owner's decision is resolved in the hashed record its relayed_by names (review of 2026-10-03, minor 2).
+            ("a decision relayed in another form",
+             lambda e, b: e["interim"]["authority"].update(relayed_by="the owner, by word of mouth"), "memory-owner",
+             "consensus memory-owner: the owner's decision is relayed by '<records file> owner_decisions[<n>]'"),
+            ("a decision relayed by a file that is not a hashed record",
+             lambda e, b: e["interim"]["authority"].update(relayed_by="other-records.json owner_decisions[0]"),
+             "memory-owner", "consensus memory-owner: the owner's decision is relayed by other-records.json, which is not "
+                             "one of the interim's hashed records"),
+            ("a decision relayed by an entry the record lacks",
+             lambda e, b: e["interim"]["authority"].update(relayed_by="wave2-records.json owner_decisions[9]"),
+             "memory-owner", "consensus memory-owner: wave2-records.json has no owner_decisions[9]"),
+            ("a relayed decision that names neither the slot nor the owner",
+             lambda e, b: e["interim"]["authority"].update(relayed_by="wave2-records.json owner_decisions[1]"),
+             "memory-owner", "consensus memory-owner: wave2-records.json owner_decisions[1] names neither the slot nor "
+                             "ai-memory"),
+            ("a decision dated otherwise than the entry it relays",
+             lambda e, b: e["interim"]["authority"].update(date_utc="2026-10-04"), "memory-owner",
+             "consensus memory-owner: the owner's decision is dated 2026-10-04, and the entry it relays 2026-10-03"),
+            # The browser hold stays: the owner's decision that lifted two holds kept this one, so it names no browser owner.
+            ("an interim on the held browser row",
+             lambda e, b: e["interim"].update(repository="https://github.com/microsoft/playwright-cli"), "playwright-cli",
+             "consensus playwright-cli: wave2-records.json owner_decisions[0] names neither the slot nor playwright-cli"),
         ]
         for name, change, slot, message in cases:
             with self.subTest(case=name):
                 self.assertTrue(attempt(change, slot).startswith(message), attempt(change, slot))
+
+
+class InterimPlanChecks(unittest.TestCase):
+    """The install plan's side of amendment 3, as check_plan.py and install.sh hold it. check_plan.py refuses a plan that
+    does not install a recorded interim, one whose owner is not the interim's, and one whose interim install function does
+    not call the acknowledgement gate first; the gate (install.sh's interim_acknowledged) refuses while an acknowledgement
+    of the layer consensus's wave-2 batch is owed. Each case changes one thing in a scratch copy of the plan."""
+
+    GATE_LINE = '  interim_acknowledged {slot} || return "$?"\n'
+
+    def run_check(self, change_rows=None, change_install=None):
+        """(exit status, output) of check_plan.py over a scratch copy of the plan and the manifest."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            plan_dir = scratch / "plan"
+            shutil.copytree(PLAN, plan_dir, ignore=shutil.ignore_patterns("__pycache__"))
+            manifest = scratch / "definitive-manifest.json"
+            shutil.copy2(ART / "definitive-manifest.json", manifest)
+            if change_rows:
+                for name in ("install-plan.json", "owners.json"):    # the two files list the same rows
+                    data = load(plan_dir / name)
+                    change_rows({row["slot"]: row for row in data["owners"]})
+                    (plan_dir / name).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+            if change_install:
+                path = plan_dir / "install.sh"
+                path.write_text(change_install(path.read_text(encoding="utf-8")), encoding="utf-8")
+            result = subprocess.run([sys.executable, "-B", str(PLAN / "check_plan.py"), "--plan-dir", str(plan_dir),
+                                     "--manifest", str(manifest)], capture_output=True, text=True, timeout=180)
+        return result.returncode, result.stdout + result.stderr
+
+    def test_the_unchanged_copy_passes(self):
+        code, out = self.run_check()
+        self.assertEqual(code, 0, out)
+        self.assertTrue(out.startswith("OK: "), out)
+
+    def test_an_interim_the_plan_does_not_install_is_refused(self):
+        code, out = self.run_check(change_rows=lambda rows: rows["code-search"].update(installed=False))
+        self.assertEqual(code, 1, out)
+        self.assertIn("[manifest] row code-search: the manifest records an interim install, and the plan does not install "
+                      "it", out)
+
+    def test_a_plan_owner_that_is_not_the_interims_is_refused(self):
+        code, out = self.run_check(change_rows=lambda rows: rows["memory-owner"].update(owner="agentmemory 0.9.0"))
+        self.assertEqual(code, 1, out)
+        self.assertIn("[manifest] row memory-owner: owner/repository differ from the manifest's interim's "
+                      "default/repository", out)
+
+    def test_an_interim_install_function_without_the_gate_first_is_refused(self):
+        for slot in ("memory-owner", "code-search", "context-supply"):
+            with self.subTest(slot=slot):
+                line = self.GATE_LINE.format(slot=slot)
+                code, out = self.run_check(change_install=lambda text: text.replace(line, "", 1) if line in text
+                                           else self.fail(f"install.sh has no gate line for {slot}"))
+                self.assertEqual(code, 1, out)
+                self.assertIn(f"[interim] row {slot}: its install function in install.sh does not call "
+                              f"`interim_acknowledged {slot}` before anything else", out)
+
+    def test_an_install_script_without_the_gate_function_is_refused(self):
+        code, out = self.run_check(change_install=lambda text: text.replace("interim_acknowledged() {",
+                                                                            "interim_unused() {", 1))
+        self.assertEqual(code, 1, out)
+        self.assertIn("[interim] install.sh has no interim_acknowledged function that reads the wave-2 batch's "
+                      "acknowledgements_owed", out)
+
+    def run_gate(self, consensus, slot="memory-owner"):
+        """(exit status, stderr) of install.sh's own gate function, cut from the script, with repo_root at a scratch folder
+        whose consensus.json is `consensus` (None: no file)."""
+        if not (shutil.which("bash") and shutil.which("jq")):
+            self.skipTest("bash and jq are needed to run the gate")
+        function = re.search(r"(?ms)^interim_acknowledged\(\) \{.*?^\}$", (PLAN / "install.sh").read_text(encoding="utf-8"))
+        self.assertIsNotNone(function)
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / CONSENSUS_ART.relative_to(ROOT) / "consensus.json"
+            path.parent.mkdir(parents=True)
+            if consensus is not None:
+                path.write_text(json.dumps(consensus), encoding="utf-8")
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", f"{function.group(0)}\ninterim_acknowledged {slot}\n"],
+                                    env={**os.environ, "repo_root": scratch}, capture_output=True, text=True, timeout=60)
+        return result.returncode, result.stderr
+
+    def test_the_gate_refuses_while_an_acknowledgement_is_owed_and_passes_once_none_is(self):
+        code, err = self.run_gate({"wave2": {"acknowledgements_owed": ["claude", "gpt"]}})
+        self.assertEqual(code, 1)
+        self.assertIn("memory-owner: refused: an interim install waits for the acknowledgements of the wave-2 batch still "
+                      "owed by: claude, gpt", err)
+        self.assertEqual(self.run_gate({"wave2": {"acknowledgements_owed": []}}), (0, ""))
+        for broken in ({"wave2": {}}, {"wave2": {"acknowledgements_owed": "claude"}}, None):
+            with self.subTest(consensus=broken):
+                code, err = self.run_gate(broken, slot="code-search")
+                self.assertEqual(code, 1)
+                self.assertIn("code-search: refused: the acknowledgements of the wave-2 batch cannot be read", err)
+
+    def test_the_gate_reads_the_committed_batch(self):
+        owed = load(CONSENSUS_ART / "consensus.json")["wave2"]["acknowledgements_owed"]
+        if not (shutil.which("bash") and shutil.which("jq")):
+            self.skipTest("bash and jq are needed to run the gate")
+        function = re.search(r"(?ms)^interim_acknowledged\(\) \{.*?^\}$", (PLAN / "install.sh").read_text(encoding="utf-8"))
+        result = subprocess.run(["bash", "-euo", "pipefail", "-c", f"{function.group(0)}\ninterim_acknowledged context-supply\n"],
+                                env={**os.environ, "repo_root": str(ROOT)}, capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 1 if owed else 0, result.stderr)
 
 
 class SkillAuthoringAcceptance(unittest.TestCase):

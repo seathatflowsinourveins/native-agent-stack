@@ -12,6 +12,7 @@ Usage: assemble_manifest.py [--check]
 """
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -328,6 +329,36 @@ INTERIM_FIELDS = ("date_utc", "default", "repository", "pin", "label", "decided_
 INTERIM_TEXT = ("date_utc", "default", "repository", "pin", "label", "decided_by")
 INTERIM_OPTIONAL = ("configuration", "open_acceptance_gates", "sources")
 AUTHORITY_KINDS = {"owner_decision": ("date_utc", "decision", "relayed_by"), "direct_consensus": ("acknowledgements",)}
+# How an owner's decision names the record that relays it: one of the interim's hashed records and an entry of its
+# owner_decisions list, e.g. "wave2-records.json owner_decisions[0]".
+RELAYED_BY = re.compile(r"(?P<name>[A-Za-z0-9._-]+\.json) owner_decisions\[(?P<index>[0-9]+)\]")
+
+
+def relayed_decision(sid, interim, authority):
+    """The owner's decision an interim's authority relays, resolved in the hashed record it names: the entry must be dated
+    as the authority is and name the slot or the owner (the last part of the interim's repository), so the record, not
+    the batch's own text, says what the owner decided (a hold the owner kept cannot gain an interim this way)."""
+    match = RELAYED_BY.fullmatch(authority["relayed_by"].strip())
+    if not match:
+        raise ValueError(f"consensus {sid}: the owner's decision is relayed by '<records file> owner_decisions[<n>]', not "
+                         f"{authority['relayed_by']!r}")
+    refs = [ref for ref in interim["records"] if isinstance(ref, dict) and Path(str(ref.get("path"))).name == match["name"]]
+    if not refs:
+        raise ValueError(f"consensus {sid}: the owner's decision is relayed by {match['name']}, which is not one of the "
+                         "interim's hashed records")
+    decisions = json.loads((ROOT / refs[0]["path"]).read_text(encoding="utf-8")).get("owner_decisions")
+    index = int(match["index"])
+    if not isinstance(decisions, list) or index >= len(decisions) or not isinstance(decisions[index], dict):
+        raise ValueError(f"consensus {sid}: {match['name']} has no owner_decisions[{index}]")
+    entry = decisions[index]
+    owner = interim["repository"].rstrip("/").rsplit("/", 1)[-1].lower()
+    text = str(entry.get("decision", "")).lower()
+    if not any(re.search(r"(?<![a-z0-9])" + re.escape(name) + r"(?![a-z0-9])", text) for name in (sid.lower(), owner)):
+        raise ValueError(f"consensus {sid}: {match['name']} owner_decisions[{index}] names neither the slot nor {owner}")
+    if entry.get("date_utc") != authority["date_utc"]:
+        raise ValueError(f"consensus {sid}: the owner's decision is dated {authority['date_utc']}, and the entry it relays "
+                         f"{entry.get('date_utc')}")
+    return entry
 
 
 def acknowledged_families(acknowledgements):
@@ -398,6 +429,8 @@ def apply_interims(rows, by_slot, entries):
             raise ValueError(f"consensus {sid}: an interim names its hashed records")
         for ref in interim["records"]:
             verify_evidence(ref, f"{sid} interim", "consensus")
+        if kind == "owner_decision":
+            relayed_decision(sid, interim, authority)
         owners = [other["slot_id"] for other in rows if other is not row and other["job"] == row["job"] and installs_now(other)]
         if owners:
             raise ValueError(f"consensus {sid}: installed job also owned by {owners[0]}: {row['job']}")

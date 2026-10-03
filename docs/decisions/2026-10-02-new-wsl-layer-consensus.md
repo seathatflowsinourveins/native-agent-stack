@@ -445,11 +445,15 @@ What the assembler holds an interim to: its slot exists and its decided default 
 interim yet; the interim has its date, default, https repository, pin, label, what decides it, its authority, both
 families' reviews and at least one hashed record, which exists with its recorded SHA-256; the authority is the owner's
 dated decision (with the record that relays it) or a direct consensus with both families' acknowledgements; no other
-installed row owns the row's job; and an amendment cannot carry an interim. The batch needs its rule texts and its
-records, and `acknowledgements_owed` must name exactly the families without an acknowledgement. It stops with a message
-and a non-zero exit otherwise. Three readers use the interim: the install plan's checker compares the plan row's owner
-and repository with the interim's and requires the plan to install it; the client configuration treats the interim's
-default as what the slot installs; and the definitive-defaults record lists the interims in a table of their own.
+installed row owns the row's job; and an amendment cannot carry an interim. An owner's decision is resolved in the record
+it names: its `relayed_by` (`<records file> owner_decisions[<n>]`) must point at an entry of one of the interim's hashed
+records, dated as the authority is, that names the slot or the owner (the last part of the interim's repository), so the
+record itself keeps a hold the owner kept, such as the browser's (added 2026-10-03 after the branch review). The batch
+needs its rule texts and its records, and `acknowledgements_owed` must name exactly the families without an
+acknowledgement. It stops with a message and a non-zero exit otherwise. Three readers use the interim: the install plan's
+checker compares the plan row's owner and repository with the interim's, requires the plan to install it and requires its
+install function to call the acknowledgement gate first; the client configuration treats the interim's default as what
+the slot installs; and the definitive-defaults record lists the interims in a table of their own.
 
 ### The three interim installs
 
@@ -503,6 +507,20 @@ lists under `consensus_wave2`. The pull-request comments that acknowledge the ba
 request exists; until then the added row's label and both amendments say that their acknowledgements are owed. For the
 three interim installs the authority is the owner's decision, not a consensus; their labels say so and claim no
 consensus.
+
+The gate (added 2026-10-03 after the branch review; the code-search ruling's change 1: "Until all of that exists, nothing
+is installed"). The rule amendment itself waits for both acknowledgements, so nothing installs or wires an interim while
+`acknowledgements_owed` names a family. It is held where installing happens, not in the assembler, so the records and
+their checks pass while the pull request collects the acknowledgements:
+
+- `evidence/artifacts/new-wsl-install-plan-20261002/install.sh`: the install function of each interim row first calls
+  `interim_acknowledged`, which reads this batch's `acknowledgements_owed` and refuses while it is not empty;
+  `check_plan.py` fails a plan whose interim row's function does not call it first.
+- `tools/adoption/new_wsl_client_config.py --apply` refuses, and writes nothing, while a render wires an interim install
+  and an acknowledgement is owed; its dry run says that a real run would refuse.
+
+Recording both acknowledgements in this batch (which empties `acknowledgements_owed`) opens the gate; tests cover both
+sides.
 
 ### Not established by this batch
 

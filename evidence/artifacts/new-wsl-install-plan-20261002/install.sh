@@ -134,6 +134,22 @@ run_command() {
   # Planned. Thin Bash dispatcher preserves pipeline/heredoc failures independently of caller context.
   bash -euo pipefail -c "$1"
 }
+interim_acknowledged() {
+  # Planned. The gate of amendment 3 of the manifest's decision rule (the wave-2 code-search ruling, change 1: until
+  # both families have acknowledged the rule amendment on the pull request, nothing is installed). An interim row's
+  # install function calls this first; check_plan.py requires the call. It reads the layer consensus's wave-2 batch and
+  # refuses while any acknowledgement is owed (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2).
+  local consensus="$repo_root/evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json" owed
+  owed="$(jq -r '.wave2.acknowledgements_owed | if type == "array" then join(", ") else error("not a list") end' "$consensus")" || {
+    printf '%s: refused: the acknowledgements of the wave-2 batch cannot be read from %s\n' "$1" "$consensus" >&2
+    return 1
+  }
+  if [[ -n "$owed" ]]; then
+    printf '%s: refused: an interim install waits for the acknowledgements of the wave-2 batch still owed by: %s (%s)\n' \
+      "$1" "$owed" "$consensus" >&2
+    return 1
+  fi
+}
 export -f ensure_venv checkout_tag fetch_verified link_grafana docker_repository apt_release_version \
   docker_engine_packages docker_compose_package
 
@@ -257,6 +273,8 @@ playwright-cli() {
 memory-owner() {
   # ai-memory 2.5.2 | release-binary | planned
   # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. An interim install (amendment 3): refused while an acknowledgement of the wave-2 batch is owed.
+  interim_acknowledged memory-owner || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1634 (the release archive and its .sha256 sidecar; the digest is the wave-2 memory dossier's)
   run_command 'fetch_verified https://github.com/akitaonrails/ai-memory/releases/download/v2.5.2/ai-memory-linux-x86_64.tar.gz acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8 "$HOME/.local/opt/ai-memory-2.5.2/ai-memory-linux-x86_64.tar.gz"' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1636 (extract and put ai-memory on PATH; the archive's hooks/ stay beside the binary)
@@ -267,11 +285,16 @@ memory-owner() {
   run_command 'f="$HOME/.config/ai-memory/config.toml"; if grep -qx '\''bind = "127.0.0.1:49374"'\'' "$f"; then sed -i '\''s|^bind = "127.0.0.1:49374"$|bind = "127.0.0.1:29374"\nembedding_provider = "local"|'\'' "$f"; fi; grep -qx '\''bind = "127.0.0.1:29374"'\'' "$f"; grep -qx '\''embedding_provider = "local"'\'' "$f"' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L277 (systemctl --user enable --now; the unit is packaging/systemd/ai-memory-user.service)
   run_command 'mkdir -p "$HOME/.config/systemd/user" && sed '\''s|^ExecStart=/usr/bin/ai-memory |ExecStart=%h/.local/bin/ai-memory |'\'' "$HOME/.local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service" > "$HOME/.config/systemd/user/ai-memory.service" && systemctl --user daemon-reload && systemctl --user enable --now ai-memory.service' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L595 (install-hooks --agent codex --apply; with AI_MEMORY_SERVER_URL set it takes the bare origin, L118-121); https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/install_hooks.rs#L2071 (writes only the Codex hooks.json, with a backup)
+  # Codex's seven hooks, written once by ai-memory's own installer: the exception synthesis X11 allows, since the client configuration writes no ~/.codex/hooks.json.
+  run_command 'AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory install-hooks --agent codex --apply' || return "$?"
 }
 
 code-search() {
   # semble 0.6.1 | uv-tool | planned
   # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. An interim install (amendment 3): refused while an acknowledgement of the wave-2 batch is owed.
+  interim_acknowledged code-search || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L41 (uv tool install semble); https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/docs/installation.md#L44 (the semble[mcp]==X.Y.Z pin)
   run_command 'uv tool install -p 3.13 '\''semble[mcp]==0.6.1'\''' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L285 (SEMBLE_MODEL_NAME may name a local path); https://huggingface.co/docs/huggingface_hub/guides/download (snapshot_download, revision, local_dir)
@@ -281,6 +304,8 @@ code-search() {
 context-supply() {
   # context-mode 1.0.169 | none | planned
   # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. An interim install (amendment 3): refused while an acknowledgement of the wave-2 batch is owed.
+  interim_acknowledged context-supply || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72 (marketplace add); https://code.claude.com/docs/en/discover-plugins (the CLI form, --scope user)
   run_command 'claude plugin marketplace add mksglu/context-mode --scope user' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L73 (plugin install)
