@@ -104,6 +104,17 @@ this unit makes no selection or edits for them. MCP Inspector is explicitly
 marked ignored and outside this wave in the W1b contract, so its pin and receipt
 are not changed.
 
+**Judgment custody.** The complete reviewer outputs behind this record, and the
+repair replies that answered them, are retained under
+`evidence/artifacts/currency-wave-w1b-20261003/judgments/`, sanitized only of
+host paths:
+[move-hold-judges.json](../../evidence/artifacts/currency-wave-w1b-20261003/judgments/move-hold-judges.json)
+(the seven W1-r2 Opus move/hold judges, workflow `wf_0c959be4-2ae`),
+[review-round-findings.json](../../evidence/artifacts/currency-wave-w1b-20261003/judgments/review-round-findings.json)
+(the R645 review-round findings) and
+[repair-round-replies.md](../../evidence/artifacts/currency-wave-w1b-20261003/judgments/repair-round-replies.md)
+(the R645 repair replies).
+
 ## Cooldown, alternatives and overturn condition
 
 The user ended the seven-day cooldown for clean releases on 2026-10-03. The

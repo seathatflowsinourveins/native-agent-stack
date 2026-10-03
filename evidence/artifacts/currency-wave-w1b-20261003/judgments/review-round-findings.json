@@ -1,0 +1,68 @@
+[
+ {
+  "severity": "minor",
+  "where": "docs/decisions/2026-10-03-currency-wave-w1b.md:154-155; evidence/artifacts/currency-wave-w1b-20261003/acceptance.json:4",
+  "problem": "The decision says the required repository acceptance is \"retained in the W1b handoff report\". That report is not in the repository. The in-repo evidence/artifacts/currency-wave-w1b-20261003/acceptance.json is not linked from the decision or from either receipt (git grep for 'acceptance.json' in those three files returns nothing). acceptance.json:4 also says its validate.py run happened before the artifact registered itself and promises a final validate.py run on the head, but that run's output is recorded nowhere.",
+  "fix": "Link acceptance.json from the decision and from each receipt's data block, and replace the 'handoff report' pointer. Record the final validate.py output for head 081e4ae68, or cite that head's CI run."
+ },
+ {
+  "severity": "minor",
+  "where": "evidence/receipts/grafana-1323-qualification-20261003.json:9,30-32; evidence/receipts/agent-browser-0382-qualification-20261003.json:9,30-32; evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json:4,14-19",
+  "problem": "The receipt claims quote the retained raw outputs correctly. I checked each one: /api/health JSON at smoke-fresh.stdout.txt:4; 403 at :43; 36/36/36/36 with errors [] at smoke-queries.stdout.txt:100-104; migration_log 719 at smoke-upgrade.stdout.txt:105,199; both skills-list files are 898 B and byte-identical. But neither receipt nor the decision names these five stdout files or the command that produced each. The receipts cite only qualification_record, metadata_record and integration_commands. skills-list-0.38.1.stdout.txt has no entry in integration-commands.json, whose scope line calls its contents 'W1b actual returned command outputs'; the only skills list entry there is the 0.38.2 run. Its provenance can only be inferred from qualification-record.json:29.",
+  "fix": "Add each stdout path to its receipt's data block with its producing command. Those are the W1-r2 lifecycle.sh fresh, upgrade and queries runs, the W1-r2 0.38.1 control `skills list`, and the W1b 0.38.2 `skills list`. Alternatively add one provenance note to the artifacts directory."
+ },
+ {
+  "severity": "minor",
+  "where": "evidence/receipts/grafana-1323-qualification-20261003.json:12; manifests/evidence.json:3927",
+  "problem": "The limitation 'not tested: browser rendering (the stat/table/Loki visual issues above are unverified here)' was copied from the W1-r2 notes. In the receipt nothing appears above it, so 'above' refers to nothing. The issues it means (#132901, #132502, #132879) appear only in qualification-record.json:44-47.",
+  "fix": "In both copies, name the issues or point to evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json#/facts/release_notes/known_regressions."
+ },
+ {
+  "severity": "minor",
+  "where": "adoption/pins-linux-x86_64.json:223",
+  "problem": "The install_note says \"`npm install --global --prefix tools/agent-browser-0.38.2 agent-browser@0.38.2` exited 0\". The recorded command was different: `env HOME=<QUALIFICATION_ROOT>/agent-browser/home npm install --global --prefix <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.2 --cache <...> --no-audit --no-fund agent-browser@0.38.2` (agent-browser/qualification-record.json:20). The bootstrap's install_npm (adoption/bootstrap-linux.sh:397-420) installs the verified local archive, which was not run either. So the note credits an exit code to a command that was not run as written.",
+  "fix": "Quote the recorded command with role markers, or reword: 'an isolated-prefix npm install of agent-browser@0.38.2 exited 0 (command in the qualification record); the install_npm route was not run'."
+ },
+ {
+  "severity": "minor",
+  "where": "evidence/artifacts/currency-wave-w1b-20261003/review-decisions.json:12,16; docs/decisions/2026-10-03-currency-wave-w1b.md:75-76",
+  "problem": "Both files say each retained W1 hold is a 600-character excerpt. The published copies measure headroom 561, dagu 531 and rtk 530 characters, because <BASE_WORKTREE> and <PRIVATE_PATH> placeholders replaced longer text. The dagu excerpt also ends in '/ho', the cut-off start of a host path that the sanitizer did not catch.",
+  "fix": "Say the sanitized copies are 530 to 600 characters because placeholders replaced host paths, and drop the trailing '/ho'."
+ },
+ {
+  "severity": "minor",
+  "where": "catalogs/landscape/upstream-snapshot.json:6194",
+  "problem": "scoped_refreshes[0].checked_at is 2026-10-03T07:21:55.083556Z. The eight API checks it summarizes ran from 07:15:37.870837 to 07:15:38.637092 (the rows' own checked_at values). 07:21:55 is the receipts' recorded_at_utc, so the field labels a write time as a check time.",
+  "fix": "Set checked_at to 2026-10-03T07:15:38.637092+00:00 (the last check's ended_at), or rename the field to recorded_at."
+ },
+ {
+  "severity": "minor",
+  "where": "docs/lanes.md:26,96; commits 72103108b and 081e4ae68",
+  "problem": "The hot-file protocol (docs/lanes.md:96) puts every shared hot-file edit in the branch's last commit, and docs/lanes.md:26 lists manifests/stack.json as a shared hot file. Here the stack.json edits (version, evidence_ids, source_pin) are in the first commit 72103108b. The last commit 081e4ae68, titled '(hot-file protocol, last commit)', contains only manifests/evidence.json. Because stack.json content changes, the PR is also lane:shared and needs the trading lane's acknowledgement (docs/lanes.md:146-149).",
+  "fix": "At the pre-merge rebase, move the manifests/stack.json hunks into the last commit, label the PR lane:shared, and get the trading lane's acknowledgement for the final head."
+ },
+ {
+  "severity": "minor",
+  "where": "observability/backends/README.md:240 (versus :83-84 and observability/backends/templates/ecosystem-grafana.ini.example:16-19)",
+  "problem": "This defect predates the PR and does not block it. README:240 says 'Grafana anonymous access and sign-up are disabled', but the template enables anonymous access with org_role Viewer and :83 documents that. The PR's CVE-2026-13719 reachability statement (grafana/qualification-record.json:37) correctly depends on anonymous Viewer being enabled, so :240 understates the exposure. Decision :150-152 marks it as an owner follow-up, but the file is foundation-owned (docs/lanes.md:24) and this PR already edits it at :12 and :284.",
+  "fix": "Rewrite :240 as 'Sign-up is disabled; anonymous Viewer access is enabled on loopback (see Install and configure)', in this PR or a tracked follow-up."
+ },
+ {
+  "severity": "minor",
+  "where": "verification record: no file change",
+  "problem": "These are verification gaps and confirmed checks, not defects. NOT RECORDED for head 081e4ae68: validate.py, and the full `python3 -m unittest` suite that the required validate-macos job runs (.github/workflows/adoption-bootstrap.yml:732-740). acceptance.json:47-52 ran 5 test modules (264 tests). PR-body state is not visible from the worktree: the lane label, the trading acknowledgement and a non-empty SOTA sources section. origin/main moved to e88d59e4b (#639), which also touched manifests/evidence.json; a legacy merge-tree showed 0 conflict markers and the hunks do not overlap. agent-browser is in no adoption profile, so CI bootstrap will not exercise install_npm for 0.38.2. W1-r2 alone recorded npm audit signatures, `skills get core`, --help and the config smoke. The live host still runs 13.2.2 (activation is separate), and its database was not checked for UI-created alert rules or shared dashboards, so the 'no payload' reachability holds for repository provisioning only. CONFIRMED LIVE (2026-10-03 07:49Z): the grafana .sha256 sidecar equals pins.json 6107ad27...; the download page lists the same URL and digest; v13.2.3 resolves through annotated tag 5dff8abc to 6193dc03; the release body lists fixes for CVE-2026-13719, -13720 and -81841; the GHSA records give medium severity and descriptions matching the record. agent-browser: npm dist.integrity and shasum match. A streamed tarball of 52,980,321 bytes hashes to sha256 2bb1d6e4..., and its sha512 and sha1 equal integrity and shasum. v0.38.2 resolves to 39a74c70. Reachability matches the config: allow_sign_up=false and anonymous Viewer (ini:15-19); all datasources are proxy access without secureJsonData (datasources.yml:6,15,21); handleGrafanaManagedAlerts false (:26); configure.py:87-89 provisions no alerting. Pin checklist complete: stack rows, snapshot rows (8 checks, all exit 0), audit rows (sets equal), pins files, recipes/README.md:81, docs. Receipts match their manifests/evidence.json index entries field for field, and every changed file's registered sha256 and byte count match. Holds are accurate against upstream: headroom v0.39.1 is still latest, #3828 merged after it, and log_compressor.py L461-487 counts levels over all lines. Dagu v2.18.1 is latest and api.yaml /artifacts declares no permission. RTK v0.51.0 notes include --shell and the search fold. beads #7030 is open as described, and v1.3.1 published plus 7 days gives 2026-10-07T23:37:36Z. agentsview v0.44.0 notes match. The remaining 13.2.2/0.38.1 sites are dated records, ledger-derived rows (docs/new-host-grand-list.md:99, by design), configuration-owner files (adoption/new-wsl-profile.json:3027,3073-3074; docs/new-wsl-handbook.json:8325; docs/new-wsl-handbook.md:1068; the sealed edition catalogs/foundation/new-wsl-architecture-20261001.json:623-627,1697,2123,2375) and trading-owned files (catalogs/us-equities/agents-operations.json:945-974 and .md:69; blueprints/us-equities/gap-resolution.md:25). acceptance.json:94,127 records them as drift rows.",
+  "fix": "Coordinator: supply the PR-head CI result (validate and validate-macos with the full unittest suite), apply the lane:shared label with the trading acknowledgement, confirm the SOTA sources section, and redo the hot-file step on e88d59e4b before merge. Optionally list the configuration-owner and trading pin sites above in the decision so the handoff is explicit."
+ },
+ {
+  "severity": "should-fix",
+  "where": "evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json:37",
+  "problem": "The CVE reachability assessment overstates what the configuration establishes. Line 37 asserts that \u201cthe org holds no Grafana-managed alert rules\u201d; line 38 similarly asserts that the repository has no Editors. The supported upgrade preserves Grafana\u2019s database through configure.py:113\u2013119 and ecosystem-grafana.ini.example:2. Missing alerting provisioning and handleGrafanaManagedAlerts:false do not establish the absence of database-backed rules, and allow_sign_up=false plus anonymous Viewer do not establish the absence of existing Editors. The recorded qualification explicitly uses synthetic databases and leaves the real database unexamined, so these categorical absence claims exceed its evidence.",
+  "fix": "Append a corrected reachability assessment stating that the templates provision no Grafana-managed rules or Editor accounts, and that existing database users, rules, sharing tokens and additional datasources were not inspected. Apply that scope explicitly to all three CVE entries. Preserve the recorded outputs and refresh the registered hash for any corrected artifact."
+ },
+ {
+  "severity": "minor",
+  "where": "observability/backends/pins.json:37; adoption/pins-linux-x86_64.json:222",
+  "problem": "Verification gap only, not a defect: DNS failures prevented independently re-fetching Grafana 13.2.3\u2019s .sha256 sidecar and agent-browser 0.38.2\u2019s npm dist.integrity; GitHub API access also failed. The retained publisher outputs and archive hash records agree with the new pins. The other checklist checks passed within the documented ownership boundary: receipt shape, reciprocal stack/audit links, recorded claim quotations, synchronized pin rows, recipes, and hold summaries. Remaining old-version hits are dated evidence or explicitly excluded configuration-owner files.",
+  "fix": "No repository change is requested for this gap. A reviewer with network access should re-fetch the Grafana sidecar and npm version metadata, then verify the agent-browser tarball\u2019s SHA-512 against dist.integrity and its SHA-256 against the adoption pin."
+ }
+]
