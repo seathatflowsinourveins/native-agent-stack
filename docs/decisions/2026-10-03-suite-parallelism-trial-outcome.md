@@ -252,7 +252,8 @@ which modality, source or candidate class the unit missed. Its seeds below feed 
 
 - **No whole-suite run under the candidate runner before preregistering.** The only parallel preflight ran the
   29-test wrapper module. The plan's whole-suite local preflight never ran, as the preregistration itself recorded
-  (the anti-pattern row of 2026-10-03 in `docs/harness-defaults.md`).
+  (the 2026-10-03 row "Preregistering a hosted whole-suite trial after a preflight of one module" in
+  `docs/harness-defaults.md`).
 - **The hosted behaviour of background steps was never examined.** The plan's search-first comparison named GitHub
   background steps, and the preregistration lists "a background-steps arm" among the open plan items it did not test.
   No hosted job ran one, although GitHub had announced the `background`, `wait`, `wait-all`, `cancel` and `parallel`
@@ -398,9 +399,10 @@ locally first). A new trial needs, in this order:
    every class-level run.
 3. **A diagnostic hosted run that prints the traceback of the L4F error** in
    `tests.test_order_throughput.CapacityRunTests` (a trading-lane test, `docs/lanes.md:51`).
-4. **A whole-suite local preflight under the candidate runner before preregistering** (the anti-pattern row of
-   2026-10-03 in `docs/harness-defaults.md`). The preregistration recorded that this preflight had not run and that no
-   whole-suite parallel run had happened anywhere.
+4. **A whole-suite local preflight under the candidate runner before preregistering** (the 2026-10-03 row
+   "Preregistering a hosted whole-suite trial after a preflight of one module" in `docs/harness-defaults.md`). The
+   preregistration recorded that this preflight had not run and that no whole-suite parallel run had happened
+   anywhere.
 
 ## Evidence class
 
