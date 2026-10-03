@@ -187,6 +187,12 @@ the systems measured; it is not a run of these plan rows' commands.
 - `check_plan.py` checks the dispatch of such rows in both directions: a row that `install.sh` installs only when named
   fails when `accept.sh` checks it in the default run, and a row that `install.sh` installs in the default run fails
   when `accept.sh` skips it there.
+- Two repairs after the pull request's review (2026-10-03). `model_server_answers` in `install.sh`, which both rows run
+  before their first command, accepted any server that answered `ollama ls`; it now also stops the row unless
+  `GET /api/version` reports `0.35.0`, the measured server. The `local-model-server` row's `after_sign_in` check failed
+  every time in step F9, which runs that stage without any model row; it now prints `skipped`, which is not a pass,
+  until the `embedding-model` row's model is in the store. Neither repair changes a command or an acceptance entry of
+  `install-plan.json`.
 
 ### Checks run
 
@@ -220,6 +226,16 @@ the systems measured; it is not a run of these plan rows' commands.
   `bash -n accept.sh` exit 0. `LocalModelAcceptance.test_the_server_smoke_check` checks that the program names the settled
   embedder and no other model and runs it against the stub `curl`: one vector exits 0, no vector and an error answer
   exit 1. With the `jq -e` condition taken out in a scratch run, the no-vector case exited 0.
+- The two review repairs: `check_plan.py` exit 0 with the counts above (no command or acceptance entry changed) and
+  `bash -n` exit 0 on both scripts. `LocalModelAcceptance.test_the_server_smoke_check_waits_for_the_embedding_row` runs
+  `accept.sh --only local-model-server --stage after_sign_in` itself, with a scratch `HOME` and the stub `curl`: without
+  the embedder's manifest in the store it prints `skipped` and exits 0; with it, one vector prints 0 and exits 0, and no
+  vector prints 1 and exits 1. `ModelServerGuard` runs `model_server_answers`, read from `install.sh`, with stub
+  `ollama` and `curl`: version 0.35.0 exits 0; version 0.36.0, an answer without a version, a failed version request and
+  no server exit 1; and it checks that both rows run the guard before their first command. In scratch copies of this
+  folder (our own mutations, not an upstream test), the gate taken out of `accept.sh`, the version condition taken out,
+  the version written as a constant and `embedding-model`'s guard moved after its pull each failed its test; the
+  unmodified copy passed.
 - The `ollama show` table that the service checks read is rendered by a table writer with an empty first column and
   space padding (`cmd/cmd.go:1362-1368`, parameter rows at `:1474-1480`, at v0.35.0); the measurement's record of that
   output squeezes the spaces (`raw/M15-a2-setup.txt` in the private measurement folder, listed by sha256 in that
@@ -233,8 +249,11 @@ the systems measured; it is not a run of these plan rows' commands.
   the two creates, the pull and the digest check have not run under this plan.
 - That the models the rows create carry the manifest digests the measurement recorded. Those digests are in `notes`
   for comparison; no check reads them.
-- That the checks read the real `ollama show` table and the real answers as the stand-ins do. The stubs do not
-  exercise the server.
+- That the checks read the real `ollama show` table and the real answers as the stand-ins do, and that the guard reads
+  a real server's `/api/version` answer as it reads the stub's (the measurement's own calls returned `0.35.0`, SOURCES.md).
+  The stubs do not exercise the server.
+- That acceptance notices a server replaced after the rows were installed: the version guard runs when a row installs,
+  and no acceptance check compares the running server's version.
 - That the server reads the same model store as the user who runs the checks: the post-install checks read
   `${OLLAMA_MODELS:-$HOME/.ollama/models}` and assume the server runs as that user with the same `OLLAMA_MODELS`.
 - GPU residency on the destination, and which distribution's model server holds the card. The measured co-residency

@@ -244,11 +244,13 @@ list for this publication.
   the lifecycle design, with GPU ownership below.
 - The `local-model-server` row's `after_sign_in` smoke check ran upstream's example `ollama run embeddinggemma`, which
   would pull EmbeddingGemma, the embedding arm that lost. It is now one `/api/embed` call to `qwen3-embedding-8k`, which
-  downloads nothing.
+  downloads nothing. Until the `embedding-model` row has created that model, `accept.sh` prints `skipped` for the stage,
+  which is not a pass, so the after-sign-in checks of step F9, which install no model row, do not fail on it.
 - Both rows create their models through the running model server, which the plan does not start, so the default run
-  skips them and `--only` installs each. Their acceptance reads files after the install (the placed Modelfiles, the
-  library manifest's digest, the created models' layers) and, once the server answers, shows each model's own context
-  and makes one short generation or one embedding call.
+  skips them and `--only` installs each. `install.sh` stops either row before anything is downloaded, pulled or created
+  unless that server reports version 0.35.0, the measured one, through `GET /api/version`. Their acceptance reads files
+  after the install (the placed Modelfiles, the library manifest's digest, the created models' layers) and, once the
+  server answers, shows each model's own context and makes one short generation or one embedding call.
 - **GPU ownership is a limitation for the lifecycle design.** One RTX 4090 serves the workstation distribution's model
   services and the destination's model server. The measured co-residency held under condition N, with the workstation's
   two model services stopped. Which distribution's server holds the card, and when, is not decided here, and the plan
@@ -288,7 +290,7 @@ list for this publication.
 - `.gitignore`: two exceptions to its `*.jsonl` rule, so that the per-case and per-query records are committed.
 - `evidence/artifacts/new-wsl-install-plan-20261002/`: the two rows, their Modelfiles, the `local-model-server` row's
   `after_sign_in` check, both scripts, the checker and the README, SOURCES and VALIDATION sections;
-  `tests/test_new_wsl_definitive_defaults.py` (class `LocalModelAcceptance`).
+  `tests/test_new_wsl_definitive_defaults.py` (classes `LocalModelAcceptance` and `ModelServerGuard`).
 - `manifests/evidence.json`: the two receipts, kind `native_model_e2e`.
 
 ## Sources

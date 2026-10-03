@@ -139,6 +139,15 @@ model_server_answers() {
     printf 'The model server does not answer on 127.0.0.1:21434: start it (README.md, "The two local-model rows"), then run this row again.\n' >&2
     return 1
   fi
+  # Planned. Both rows install what was measured on Ollama 0.35.0, so nothing is pulled or created unless the server that
+  # answers reports that version; GET /api/version answers the running server's own version (server/routes.go:2023).
+  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1824
+  local version
+  version="$(curl -fsS http://127.0.0.1:21434/api/version | jq -r '.version')" || version=''
+  if [[ "$version" != 0.35.0 ]]; then
+    printf 'The model server on 127.0.0.1:21434 reports version %s, not 0.35.0, the version both model rows were measured on: run the local-model-server row'\''s Ollama 0.35.0 there, then run this row again.\n' "${version:-unknown}" >&2
+    return 1
+  fi
 }
 export -f ensure_venv checkout_tag fetch_verified link_grafana docker_repository apt_release_version \
   docker_engine_packages docker_compose_package

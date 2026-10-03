@@ -1071,6 +1071,9 @@ class LocalModelAcceptance(unittest.TestCase):
     sha256sum_checks_like_gnu from tests/test_adoption_bootstrap.py: macOS's /sbin/sha256sum prints its usage and
     exits 1), a scratch sha256sum runs `shasum -a 256` in its place, as that module's run_install_pin does. A failed
     case's message carries the program's exit code, stdout and stderr.
+
+    accept.sh itself runs the server row's after_sign_in stage once, with a scratch HOME and the stub curl: until the
+    embedding-model row's model is in the store it prints skipped (step F9 runs that stage without any model row).
     """
 
     PINNED_LIBRARY = "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"
@@ -1203,6 +1206,104 @@ class LocalModelAcceptance(unittest.TestCase):
                 (scratch / "home").mkdir()
                 result = self.run_program(program, scratch, reply=reply)
                 self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def run_accept(self, scratch, reply):
+        """The finished `accept.sh --only local-model-server --stage after_sign_in`, with a scratch HOME and the stub curl."""
+        stub = scratch / "bin"
+        stub.mkdir(exist_ok=True)
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        (stub / "curl").write_text('#!/bin/sh\ncat "$STUB_DIR/reply.json"\n', encoding="utf-8")
+        (stub / "curl").chmod(0o755)
+        dropped = ("OLLAMA_MODELS", "BASH_ENV", "ENV", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "MISE_SHIMS_DIR", "MISE_DATA_DIR")
+        env = {key: value for key, value in os.environ.items() if key not in dropped}
+        env.update(HOME=str(scratch / "home"), STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        return subprocess.run(["bash", str(PLAN / "accept.sh"), "--only", "local-model-server", "--stage", "after_sign_in"],
+                              env=env, capture_output=True, text=True, timeout=60)
+
+    def test_the_server_smoke_check_waits_for_the_embedding_row(self):
+        """Until the embedding-model row has created qwen3-embedding-8k, accept.sh prints skipped for the stage, not a failure.
+
+        Step F9 runs the server row's after_sign_in check without installing a model row (each installs only when named).
+        Once the derived model's manifest is in the store that the embedding row's post_install check reads, the check runs.
+        """
+        if hasattr(os, "geteuid") and os.geteuid() == 0:
+            self.skipTest("accept.sh refuses to run as root")
+        vector = json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]})
+        cases = {
+            "no embedder in the store": (False, vector, "skipped", 0),
+            "the embedder, one vector": (True, vector, "0", 0),
+            "the embedder, no vector": (True, json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), "1", 1),
+        }
+        for name, (created, reply, printed, status) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                if created:
+                    self.store(scratch, "qwen3-embedding-8k", "latest",
+                               json.dumps({"layers": [{"digest": "sha256:" + self.EMBEDDER_LAYER}]}))
+                result = self.run_accept(scratch, reply)
+                self.assertEqual((result.stdout, result.returncode),
+                                 (f"local-model-server | after_sign_in | {printed}\n", status), self.outcome(name, result))
+                if not created:
+                    self.assertIn("install the embedding-model row first", result.stderr, self.outcome(name, result))
+
+
+class ModelServerGuard(unittest.TestCase):
+    """install.sh's guard before either local-model row downloads, pulls or creates anything, run against stand-ins.
+
+    Both rows install what was measured on Ollama 0.35.0, so model_server_answers requires that the server answers
+    `ollama ls` and that GET /api/version reports 0.35.0 (docs/api.md:1821-1843 and server/routes.go:2023 at v0.35.0).
+    The function, read from install.sh as check_plan.py reads it, runs under bash -euo pipefail with stub ollama and curl
+    programs first on PATH. The fixtures are our own: no model server answers.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        for tool in ("bash", "jq"):
+            if shutil.which(tool) is None:
+                raise unittest.SkipTest(f"{tool} is needed to run the guard")
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        install = checker.functions((PLAN / "install.sh").read_text(encoding="utf-8"))
+        cls.guard = install["model_server_answers"]
+        cls.rows = {slot: install[slot] for slot in ("local-generation-model", "embedding-model")}
+
+    def run_guard(self, scratch, listed, reply, curl_exit=0):
+        """The finished guard, with a stub `ollama` whose `ls` succeeds when `listed` and a stub `curl` that prints `reply`."""
+        stub = scratch / "bin"
+        stub.mkdir()
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        (stub / "ollama").write_text(f"#!/bin/sh\nexit {0 if listed else 1}\n", encoding="utf-8")
+        (stub / "curl").write_text(f'#!/bin/sh\n[ {curl_exit} -eq 0 ] || exit {curl_exit}\ncat "$STUB_DIR/reply.json"\n',
+                                   encoding="utf-8")
+        for name in ("ollama", "curl"):
+            (stub / name).chmod(0o755)
+        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV")}
+        env.update(STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        program = f"model_server_answers() {{\n{self.guard}\n}}\nmodel_server_answers"
+        return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
+                              timeout=60)
+
+    def test_both_rows_run_the_guard_before_any_command(self):
+        for slot, body in self.rows.items():
+            lines = [line.strip() for line in body.splitlines() if line.strip() and not line.strip().startswith("#")]
+            with self.subTest(slot=slot):
+                self.assertEqual(lines[:2], ['refresh_path || return "$?"', 'model_server_answers || return "$?"'])
+
+    def test_the_server_must_answer_and_report_the_measured_version(self):
+        cases = {
+            "0.35.0": (True, json.dumps({"version": "0.35.0"}), 0, 0),
+            "another version": (True, json.dumps({"version": "0.36.0"}), 0, 1),
+            "an answer without a version": (True, json.dumps({"error": "not found"}), 0, 1),
+            "the version request fails": (True, "", 7, 1),
+            "no server answers": (False, json.dumps({"version": "0.35.0"}), 0, 1),
+        }
+        for name, (listed, reply, curl_exit, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                result = self.run_guard(Path(scratch), listed, reply, curl_exit)
+                message = f"{name}: exit {result.returncode}\nstdout: {result.stdout!r}\nstderr: {result.stderr!r}"
+                self.assertEqual(result.returncode, want, message)
+                if name == "another version":
+                    self.assertIn("reports version 0.36.0, not 0.35.0", result.stderr, message)
 
 
 if __name__ == "__main__":

@@ -38,6 +38,12 @@ The step scripts and runners name the measurement distribution's own paths (`$HO
 document what ran and are not meant to run elsewhere unchanged. The two statistics are pure standard-library programs and do
 run on the published copies.
 
+One docstring misstates its script's protocol. `scripts/steps/M6-a1b.py` (lines 2-5) repeats A1's docstring from `M6-a1.py`
+(the embedder first), but its code (lines 67-74) loads the arm, then calls the embedder, then sends the long prompt: the
+order of use that amendment 2 states for A1b. Its record shows that order (`raw/M6-a1b.txt`, sha256 `fedf1298…`): for each
+arm, `after_arm_load` lists the arm alone, followed by `after_embedder_call` and `after_long_prompt`. The copy stays
+byte-identical to the file that ran.
+
 ## Reproducing the decision statistics
 
 From this folder, on the published records alone (no model, no network):

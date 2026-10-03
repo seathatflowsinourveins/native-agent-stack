@@ -401,6 +401,13 @@ local-model-server() {
       check local-model-server health 'OLLAMA_HOST=127.0.0.1:21434 ollama ls'
       ;;
     after_sign_in)
+      # The embedding-model row, which installs only when named, creates the model this check calls. Until that model's
+      # manifest is in the store its post_install check reads, this check prints skipped, which is not a pass (README.md).
+      if [[ ! -e "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest" ]]; then
+        printf 'local-model-server: qwen3-embedding-8k is not in the model store; install the embedding-model row first (README.md, "The two local-model rows").\n' >&2
+        skipped local-model-server
+        return
+      fi
       # One embedding call to the settled embedder, which the embedding-model row creates. /api/embed answers 404 for a
       # missing model (GetModel's not-found error, routes.go:981-984 and :3226-3227) and its handler pulls nothing:
       # https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L981-L984
