@@ -113,8 +113,8 @@ The full text is `experiment.json`'s `quality_rule`; `README.md` gives the same 
   hand-over to the other arm), an S run whose step was lost to a runner fault (no `command.txt`, `log.txt` or
   `exit-code.txt` although its test phase started), arm runs that recorded more than one Python version or machine
   (the runtime changed during the run), a sharded run whose records differ from the S baseline while the arm runs ran
-  on more than one runner image, unless that run is ineligible only through steps that never wrote an exit status
-  (the difference may come from the image, not from sharding), a control run that is missing or whose group never
+  on more than one runner image (`meta.json` `runner_image`; the difference may come from the image, which provides
+  the tools and versions that tests gate on, not from sharding), a control run that is missing or whose group never
   started, control steps lost to a runner fault while no other control evidence failed, a controls-check job that
   failed although the compare job's own check passes, an inventory job that failed without a `report.json` that
   records a gate finding (the gate never reported, or its own child interpreter was stopped from outside), or an
@@ -165,9 +165,9 @@ The full text is `experiment.json`'s `quality_rule`; `README.md` gives the same 
    hosted runner; the hosted jobs run no model; hosted behaviour that no run has measured is stated as an
    expectation with the first-run check that settles it (`README.md`, "First-run checklist").
 5. **Self-review and independent review before the first push**: arithmetic, retention, coverage gaps and design
-   holes; five rounds of independent review of this preregistration (evidence reviews in all five, security reviews
+   holes; six rounds of independent review of this preregistration (evidence reviews in all six, security reviews
    in the first two) were resolved before any hosted run (`experiment.json`, `discovery_provenance`; the third to
-   fifth rounds below).
+   sixth rounds below).
 
 ## Alternatives considered
 
@@ -236,7 +236,8 @@ Each line relays only what was read at the cited source; the comparison came fro
 - **A runner fault inside the test phase.** A step lost to a runner fault is handled as `README.md` "Limits" ("Lost
   steps") defines it: a lost S step, or a lost control step while no other recorded control evidence fails, makes the
   OS incomplete, while a shard step that is lost or stopped before its command or exit status makes its run
-  ineligible, flagged when the rule passes over its arm.
+  ineligible, flagged when the rule passes over its arm; while the arm runs ran on more than one runner image, such a
+  run whose records differ from the S baseline makes the OS incomplete instead.
 - **Python runtime and runner image.** Premise verified on 2026-10-03 with GET requests: the actions/runner-images
   release `macos-15-arm64/20260829.0321` (published 2026-09-01) moved the image's cached Python 3.13 from 3.13.14 to
   3.13.15, and an image deployment usually takes 2 to 3 days (actions/runner-images `README.md` at `6d942e63`, line
@@ -247,10 +248,10 @@ Each line relays only what was read at the cited source; the comparison came fro
   arm64 and linux 24.04 x64 (`versions-manifest.json` at `52ee1aa0`). Each job's interpreter check asserts CPython
   3.13.15 before the clock starts. On either OS, arm runs that recorded more than one Python version or machine make
   the OS incomplete. An image with one runtime can still differ in a tool or version that tests gate on, which can
-  flip a test between the S runs and a sharded run on another image: arm runs on more than one runner image are
-  flagged whatever the outcome, and beside a sharded run whose records differ from the S baseline, unless that run is
-  ineligible only through steps that never wrote an exit status, they make the OS incomplete (`README.md`,
-  "Limits"). `validate-macos` takes whatever 3.13 patch its image caches.
+  flip a test between the S runs and a sharded run on another image, or make it hang there until its step's limit
+  stops the step: arm runs on more than one runner image are flagged whatever the outcome, and beside a sharded run
+  whose records differ from the S baseline they make the OS incomplete (`README.md`, "Limits"). `validate-macos`
+  takes whatever 3.13 patch its image caches.
 - **The inventory gate's own child interpreter.** A child stopped from outside (SIGKILL from the out-of-memory killer,
   or SIGTERM, SIGINT or SIGHUP from a runner) is recorded in `report.json` as an execution problem, not a finding, and
   makes the run incomplete; any other failure of a child is a finding, and a failed gate with a finding gives no
@@ -314,7 +315,7 @@ Each line relays only what was read at the cited source; the comparison came fro
 No usage claim. The hosted jobs run deterministic commands and no model; the model usage of the sessions that built
 this trial is not recorded and stays unknown. Evidence classes so far: local integration (the coordinator's preflight,
 the inventory gate at the base, the oracle's dry run on real logs), synthetic fixtures (real local runs of a fixture
-suite and of the controls, on which the oracle's 118 tests pass on CPython 3.13.16 and 3.12.3), a local probe of
+suite and of the controls, on which the oracle's 119 tests pass on CPython 3.13.16 and 3.12.3), a local probe of
 zizmor on planted constructs, and source review (the GitHub documentation, GitHub's workflow schema, the runner
 source, CPython and the alternatives at their pins). Nothing here is native execution on a hosted runner or upstream
 acceptance; the controls, once run, are synthetic fixtures executed on the hosted runner.
@@ -441,12 +442,12 @@ Accepted residual risks:
   failed download fails the job before its test phase (incomplete).
 - Arm runs on different runner images with one runtime are flagged whatever the outcome. An image change can shift
   timing, which n = 3 bounds only loosely (runner noise), and it can flip a test that gates on a tool or version the
-  image provides, which would make a sharded run ineligible through a record mismatch that sharding did not cause
-  and give reject or a hand-over to the other arm; since the fifth review round, such a mismatch beside more than
-  one image makes the OS incomplete instead (`README.md`, "Limits"). Still accepted: a run ineligible only through
-  steps that never wrote an exit status stays the sharded arm's failure (flagged) even if the image caused the stop,
-  and whether two consecutive images differ in a gated tool is unverified. Linux's system python3 is not pinned; the
-  comparison across runs covers it.
+  image provides, or make it hang until its step's limit stops the step, which would make a sharded run ineligible
+  through a record mismatch that sharding did not cause and give reject or a hand-over to the other arm; since the
+  fifth and sixth review rounds, such a mismatch beside more than one image makes the OS incomplete instead, a run
+  with a step that never wrote its exit status included (`README.md`, "Limits"). Still accepted: whether two
+  consecutive images differ in a gated tool is unverified. Linux's system python3 is not pinned; the comparison
+  across runs covers it.
 
 ## Fifth review round (2026-10-03)
 
@@ -457,8 +458,9 @@ predates that round, and one low finding (R5-1, R5-2). This revision, still befo
   runs and be skipped on that of a sharded run; that run was then ineligible through a record mismatch, which could
   give reject or a hand-over to the other arm while the image difference was only flagged. A sharded run whose
   records differ from the S baseline while the arm runs ran on more than one runner image now makes the OS
-  incomplete, unless that run is ineligible only through steps that never wrote an exit status; on one image a
-  record mismatch still makes the run ineligible, and more than one image without a mismatch stays a flag.
+  incomplete, unless that run is ineligible only through steps that never wrote an exit status (the sixth round
+  drops this exception); on one image a record mismatch still makes the run ineligible, and more than one image
+  without a mismatch stays a flag.
   `README.md` rule 5, the `quality_rule`, "Decision" above and `decision_rule` list the condition; "Risks",
   `README.md` "Limits" and `experiment.json` limitation [19] name the mechanism.
 - **R5-2.** `experiment.json`'s entry for the third round names its two tests that pin kept behaviour:
@@ -472,7 +474,33 @@ predates that round, and one low finding (R5-1, R5-2). This revision, still befo
 previous head `d6a8d6ce` with only `test_compare.py` replaced, in its three subtests of the new rule (one sharded arm
 differs, which must not hand over; both arms differ, which must not reject; the other image is an S run's), and
 passes on this one; its two subtests of kept behaviour (every arm run on one image; a step that never wrote its exit
-status, on two images) pass on both, and the other 117 tests pass on both. The protocol sentences are unchanged.
+status, on two images, which the sixth round makes incomplete) pass on both, and the other 117 tests pass on both.
+The protocol sentences are unchanged.
+
+## Sixth review round (2026-10-03)
+
+An evidence delta review before the first push found one high and one low finding, both in the fifth round's change
+(R6-1, R6-2). This revision, still before any hosted run, resolved them:
+
+- **R6-1.** The fifth round's exception left an image-caused path to a rule outcome open: a test that gates on a
+  tool or version of the other image can hang until the shard step's `timeout-minutes` stops the step, which writes
+  no exit status, so the run was ineligible only through that step, and the rule could hand the decision to the
+  other arm or give reject, with only flags. The exception is dropped: a sharded run whose test phase started and
+  whose records differ from the S baseline while the arm runs ran on more than one runner image makes the OS
+  incomplete. On one image such a run stays ineligible, and an arm ineligible only through steps that never wrote an
+  exit status is flagged when the rule passes over it, as preregistered. `README.md` rule 5, the `quality_rule`,
+  "Decision" above and `decision_rule` state the condition in the same words; "Risks", `README.md` "Limits",
+  `experiment.json` limitations [5] and [19] and the residual of the fourth round above say so.
+- **R6-2.** The flag statements (beside a sharded run whose records differ from the S baseline, the runner images
+  also make the OS incomplete) are now true as written, so they are unchanged.
+
+`test_compare.py` has 119 tests after this revision. The fifth round's subtest of a step that never wrote its exit
+status on two images now expects incomplete, and the new test
+`test_a_shard_step_hung_until_its_limit_on_another_runner_image_is_incomplete_not_a_handover` stops a shard step
+inside a hanging test, on two images (incomplete) and on one (ineligible and flagged). On an export of the previous
+head `2ad9627b` with only `test_compare.py` replaced, exactly the two subtests on two images fail
+(`'adopt' != 'incomplete'`), the new test's subtest on one image passes, and the other 117 tests pass on both. The
+protocol sentences are unchanged.
 
 ## SOTA sources
 

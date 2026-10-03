@@ -840,13 +840,12 @@ def partial_reasons(os_name: str, runs: list, needs, controls: dict, min_repeats
                            "during the run (an environment fault)")
     # A sharded run whose records differ from the S baseline while the arm runs ran on more than one runner image
     # (README.md, "Limits"): an image provides tools and versions that tests gate on, so the difference may come from
-    # the image, not from sharding. Not counted: a run whose test phase never started (incomplete above) and a run
-    # ineligible only through steps that never wrote an exit status (rule 5 flags it). compare_with_baseline writes the
-    # differences, so before it (an unusable inventory) there is none.
+    # the image, not from sharding, also when a step never wrote its exit status (a test that hangs on one image until
+    # its step's limit stops the step). Not counted: a run whose test phase never started (incomplete above).
+    # compare_with_baseline writes the differences, so before it (an unusable inventory) there is none.
     images = runner_images(runs)
     differing = sorted(run.name for run in runs if run.arm != SERIAL_ARM and not run.unstarted
-                       and any(DIFFER_RE.match(problem) for problem in run.problems)
-                       and not unfinished_steps(run, inventory))
+                       and any(DIFFER_RE.match(problem) for problem in run.problems))
     if differing and len(images) > 1:
         reasons.append(f"the records of sharded runs {_cap(differing)} differ from the S baseline while the arm runs "
                        f"ran on {len(images)} runner images ({described(images)}): the difference may come from the "
@@ -1198,17 +1197,17 @@ def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, o
                           "phase started but which left no command.txt, log.txt or exit-code.txt (a step lost to a "
                           "runner fault), arm runs that recorded more than one python version or machine (the runtime "
                           "changed during the run), a sharded run whose records differ from the S baseline while the "
-                          "arm runs ran on more than one runner image, unless that run is ineligible only through "
-                          "steps that never wrote an exit status (the difference may come from the image, which "
-                          "provides the tools and versions that tests gate on, not from sharding), a missing control "
-                          "run or one whose parallel group never started, control steps that left no probe, log or "
-                          "exit status although the group started while no other control evidence failed (a runner "
-                          "fault inside the control group), a controls-check job that failed although this job's own "
-                          "check of the same control artifact passed, an inventory job that failed without a "
-                          "report.json that records a gate finding (the gate never reported, or its own child "
-                          "interpreter was stopped from outside), or an inventory job that succeeded although a file "
-                          "of its artifact is absent from this job's download (a partly downloaded artifact set) makes "
-                          "the OS incomplete, which is recorded as such and is never a rule outcome",
+                          "arm runs ran on more than one runner image (meta.json runner_image; the difference may come "
+                          "from the image, which provides the tools and versions that tests gate on, not from "
+                          "sharding), a missing control run or one whose parallel group never started, control steps "
+                          "that left no probe, log or exit status although the group started while no other control "
+                          "evidence failed (a runner fault inside the control group), a controls-check job that "
+                          "failed although this job's own check of the same control artifact passed, an inventory job "
+                          "that failed without a report.json that records a gate finding (the gate never reported, or "
+                          "its own child interpreter was stopped from outside), or an inventory job that succeeded "
+                          "although a file of its artifact is absent from this job's download (a partly downloaded "
+                          "artifact set) makes the OS incomplete, which is recorded as such and is never a rule "
+                          "outcome",
             "no_verdict": "an inventory gate that failed on a finding, an inventory artifact that is present but "
                           "unusable, an ineligible S baseline, or unmeasurable controls (a control step outcome is "
                           "unrecorded, no recorded one is wrong, and every other control expectation holds)",

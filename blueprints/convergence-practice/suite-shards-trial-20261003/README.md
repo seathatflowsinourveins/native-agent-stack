@@ -224,10 +224,9 @@ judge only the steps that ran (`result.json` `controls.<os>.lost_steps`).
    `command.txt`, `log.txt` or `exit-code.txt` (its step lost to a runner fault, "Limits"); arm runs that recorded
    more than one Python version (`meta.json` `python_version`) or machine (`runtime.json` `machine`): the runtime
    changed during the run ("Limits"); a sharded run whose records differ from the S baseline while the arm runs ran on
-   more than one runner image (`meta.json` `runner_image`), unless that run is ineligible only through steps that
-   never wrote an exit status: the difference may come from the image, which provides the tools and versions that
-   tests gate on, not from sharding ("Limits"); a missing control run, or one whose parallel group
-   never started; control steps that left no probe, log or exit status although the group started, when no other
+   more than one runner image (`meta.json` `runner_image`; the difference may come from the image, which provides the
+   tools and versions that tests gate on, not from sharding, "Limits"); a missing control run, or one whose parallel
+   group never started; control steps that left no probe, log or exit status although the group started, when no other
    control evidence failed (a runner fault inside the control group, "Controls"); a `controls-check` job that failed
    although the compare job's own check of the same control artifact passed (the check job failed outside its checks:
    a setup step, the download or the runner); an inventory job that failed without a `report.json` that records a
@@ -393,7 +392,7 @@ reader of the web page but cannot change an exit status, a job result or an arti
   `artipacked` on the action; with the trigger changed to `pull_request_target`, `github-env` also fired on the
   planted write in either place. The unchanged workflow gave no finding. Other audits were not probed, and zizmor
   still warns that its parallel-step support is experimental.
-- **`test_compare.py`**: 118 tests OK on CPython 3.13.16 and the bare 3.12.3 (synthetic fixtures).
+- **`test_compare.py`**: 119 tests OK on CPython 3.13.16 and the bare 3.12.3 (synthetic fixtures).
 
 ## Limits
 
@@ -420,12 +419,15 @@ reader of the web page but cannot change an exit status, a job result or an arti
   step, the control group) had started, so it left none of its files (for the S step `command.txt`, `log.txt` and
   `exit-code.txt`; for a control step its probe, log and exit status). A lost S step makes the OS incomplete, and so
   does a lost control step unless other recorded control evidence fails (rule 5). A shard step that is lost, or
-  stopped before its command or its exit status, makes its run ineligible, not incomplete, so it can hand the
-  decision to the other arm or give reject; `result.json` flags a sharded arm that the rule passed over while it was
-  ineligible only so (`verdicts.<os>.flags`), and the outcome record must address the flag. The asymmetry: a shard
-  step is the candidate itself, which would meet the same fault in production, while S is the baseline and the
-  controls measure the platform for both arms, and a lost S or control step measured nothing. A step that wrote any
-  of its files is judged on them.
+  stopped before its command or its exit status, makes its run ineligible, not incomplete, so on one runner image it
+  can hand the decision to the other arm or give reject; `result.json` flags a sharded arm that the rule passed over
+  while it was ineligible only so (`verdicts.<os>.flags`), and the outcome record must address the flag. While the
+  arm runs ran on more than one runner image, such a run whose records differ from the S baseline makes the OS
+  incomplete instead (rule 5): the loss or stop may come from the image, not from sharding, as when a test that gates
+  on a tool of one image hangs there until its step's limit stops the step. The asymmetry, on one image: a shard step
+  is the candidate itself, which would meet the same fault in production, while S is the baseline and the controls
+  measure the platform for both arms, and a lost S or control step measured nothing. A step that wrote any of its
+  files is judged on them.
 - Python runtime and runner image (premise verified on 2026-10-03 with GET requests): the actions/runner-images release
   `macos-15-arm64/20260829.0321` (published 2026-09-01) moved the image's cached Python 3.13 from 3.13.14 to 3.13.15,
   and an image deployment usually takes 2 to 3 days (actions/runner-images `README.md` at `6d942e63`, line 198), so
@@ -439,16 +441,15 @@ reader of the web page but cannot change an exit status, a job result or an arti
   Linux runs the image's system python3. On either OS, arm runs that recorded more than one Python version or machine
   make the OS incomplete (rule 5), since the runtime changed during the run. An image with the same runtime can
   still differ in the tools and versions that tests gate on (tests that skip unless `shutil.which` finds a tool, for
-  example), so a test can run on one image and be skipped on another: with the S runs on one image and a sharded run
-  on another, that run's records would differ from the S baseline, and the run would be ineligible through a record
-  mismatch that sharding did not cause, giving reject or a hand-over to the other arm. Whether two consecutive images
-  differ in such a tool is unverified. Arm runs on more than one runner image are therefore flagged whatever the
-  outcome (`verdicts.<os>.flags`, `summary.md`), and beside a sharded run whose records differ from the S baseline,
-  unless that run is ineligible only through steps that never wrote an exit status, they make the OS incomplete
-  (rule 5). On one image a record mismatch stays the sharded arm's failure, and more than one image without a
-  mismatch is only the flag. `compare.py` holds no copy of the pin: the workflow's pin, asserted by each job before
-  its clock starts, and the equality across runs are the control. `validate-macos` takes whatever 3.13 patch its
-  image caches.
+  example), so a test can run on one image and be skipped, or hang until its step's limit stops the step, on another:
+  with the S runs on one image and a sharded run on another, that run's records would differ from the S baseline,
+  and the run would be ineligible through a record mismatch that sharding did not cause, giving reject or a
+  hand-over to the other arm. Whether two consecutive images differ in such a tool is unverified. Arm runs on more
+  than one runner image are therefore flagged whatever the outcome (`verdicts.<os>.flags`, `summary.md`), and beside
+  a sharded run whose records differ from the S baseline they make the OS incomplete (rule 5). On one image a record
+  mismatch stays the sharded arm's failure, and more than one image without a mismatch is only the flag. `compare.py`
+  holds no copy of the pin: the workflow's pin, asserted by each job before its clock starts, and the equality across
+  runs are the control. `validate-macos` takes whatever 3.13 patch its image caches.
 - zizmor 1.30.1 calls its parallel-step support experimental (its `docs/usage.md` at v1.30.1, "Parallel steps"); the
   probe above measured four audits inside a group, not all. The shard and control steps carry no expression, action,
   `if:` or `GITHUB_ENV`/`GITHUB_PATH` write inside a group, which `test_compare.py` checks in the trial's compare job
