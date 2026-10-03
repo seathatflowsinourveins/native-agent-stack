@@ -953,7 +953,7 @@ unittest.TestLoader.loadTestsFromTestCase=required_skip
 sys.argv=[target,'--evidence-dir',evidence,'--attempt',attempt]
 runpy.run_path(target,run_name='__main__')
 """
-        result = subprocess.run(["rtk", "proxy", sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
+        result = subprocess.run([sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
                                 capture_output=True, text=True)
         artifact = json.loads((evidence/(attempt+".json")).read_text())
         self.record["sequence"].append({"operation": "required_skip_cli_probe", "expected_exit": 1,
