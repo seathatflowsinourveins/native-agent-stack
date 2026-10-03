@@ -42045,6 +42045,11 @@
       "bytes": 30855
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-native-controls.json",
+      "sha256": "b412d4c5e9e936797de84f5ca721b362fe01bb9c184bba1b0dd03e94416063d0",
+      "bytes": 6888
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-input-read.json",
       "sha256": "35c351f9560fad85de00840e4a310c130434a7df963d8ea93d375a5e31f412cc",
       "bytes": 3027

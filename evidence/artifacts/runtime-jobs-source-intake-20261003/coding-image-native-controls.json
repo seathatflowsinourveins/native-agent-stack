@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "unchanged-native-image-interface-controls",
+  "scope": "Three original Harbor unit controls and source/native-client observations; no image build, pull, container, model, provider, comparative trial or freeze acceptance",
+  "harbor": {
+    "repository": "harbor-framework/harbor",
+    "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+    "source_head_native_exit": 0,
+    "source_diff_before_exit": 0,
+    "source_diff_after_exit": 0,
+    "native_python_import_resolution_exit": 0,
+    "runtime_library_source_location_verified": true,
+    "runtime_source_files": [
+      {"file": "src/harbor/environments/docker/docker.py", "bytes": 54365, "sha256": "8757d3fbc19e58c7ccd14c9b613a0d00dccd1b514375fa0e546ff41ca963a15e"},
+      {"file": "src/harbor/environments/base.py", "bytes": 54148, "sha256": "fc4b18b96dd7885d3cb9eff59fc3d78d8183af95350489e5676f97bf41d9bf97"},
+      {"file": "src/harbor/environments/definition.py", "bytes": 4587, "sha256": "025580b1cbb70e143a8ae623c6c7d1a21860e6d8e6e6a1819f756403760a1dd0"},
+      {"file": "src/harbor/models/job/lock.py", "bytes": 25293, "sha256": "b22ee0fb2941d0455f088a98071d285e88e0a12f6fbfba276b02e5df43f5a4da"}
+    ],
+    "original_test_sources": [
+      {"file": "tests/unit/environments/test_docker.py", "bytes": 88462, "sha256": "27e5b973f70dbdabb204650f3875d6bb01672991651d8f6a96f39acd565e728d"},
+      {"file": "tests/unit/environments/test_environment_definition.py", "bytes": 12216, "sha256": "7b9f5cba3fc599d8cc39600e40872d0ddd15706f8cf6cb3394e3e2fadb476a12"},
+      {"file": "tests/unit/models/test_job_lock.py", "bytes": 33043, "sha256": "52a91ec493565985ee4abfabf6dd65c536464c815a624e3e1a3e9f30a32b3fa0"}
+    ]
+  },
+  "native_test_tool": {
+    "version": "pytest 9.0.2",
+    "version_exit": 0,
+    "version_stdout_sha256": "bb8b35aa5007305d449c04bda5b273b74c780820c632678e27f4aa264c84b123",
+    "help_exit": 0,
+    "help_bytes": 30167,
+    "help_sha256": "bfc76be866334e6365e49d98c072b26dcc25f0854b8cd9f8ce7610725be6c2a4",
+    "invocation": "Existing owned source virtualenv Python -m pytest -q --junitxml=<owned native output> <three original selectors>",
+    "environment_scope": "Existing native pytest environment; full uv dev-group locked installation was not executed for this control"
+  },
+  "selectors": [
+    "tests/unit/environments/test_docker.py::TestStartStaleContainerCleanup::test_start_with_build_runs_down_before_up",
+    "tests/unit/environments/test_environment_definition.py::TestEnvironmentDefinitionHelpers::test_should_use_prebuilt_docker_image",
+    "tests/unit/models/test_job_lock.py::test_extra_docker_compose_lock_changes_with_file_content"
+  ],
+  "collection": {
+    "native_exit": 0,
+    "collected": 3,
+    "stdout_bytes": 1119,
+    "stdout_sha256": "e9445cf5d5617d7fea347dc679473e2ef2250f30bb35a16caabc84133bfe1ae1",
+    "stderr_bytes": 0
+  },
+  "execution": {
+    "native_exit": 0,
+    "passed": 3,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "selected_original_stdout": "============================== 3 passed in 1.86s ===============================",
+    "stdout_bytes": 976,
+    "stdout_sha256": "a60ccd3c40903789267b6a32b026d2427bfc674b04b16bccaa57fd239f0df133",
+    "stderr_bytes": 0,
+    "native_junit_original_read_exit": 0,
+    "junit_bytes": 695,
+    "junit_sha256": "17f311afe9a00511c279985f6f7464033b644707ca45ab7b268236044610616c",
+    "junit_suite_time_seconds": "1.783",
+    "retention": "Original native JUnit output remains in owned private runtime state; sanitized counts and original-byte hash retained here",
+    "accepted_scope": "Build-before-start ordering, prebuilt selection semantics and extra Compose content-lock change controls only; mocks and unit controls do not prove immutable/reproducible built images"
+  },
+  "installed_build_clients": [
+    {
+      "repository": "docker/compose",
+      "version": "5.5.1",
+      "pin": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "version_native_exit": 0,
+      "version_stdout_sha256": "8f77413c3bb9b1bb5560a118567fc0a5ed75360e6fcfcb659839ae01b5a345ab",
+      "release_and_tag_native_exits": [0, 0],
+      "release_published_at": "2026-09-03T15:53:28Z",
+      "release_body_sha256": "094102f8fc6271d39b20e5cc4dd13e84c11811b1fd6a1b007049425d53cc644d"
+    },
+    {
+      "repository": "docker/buildx",
+      "version": "0.37.1",
+      "pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "version_native_exit": 0,
+      "version_stdout_sha256": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+      "release_and_tag_native_exits": [0, 0],
+      "release_published_at": "2026-09-11T15:35:46Z",
+      "release_body_sha256": "003ed435e61ba550022f14e83e7e26dfa395e6b8fbbc688c407df9a36c8995cd",
+      "native_build_help_exit": 0,
+      "native_build_help_sha256": "2442863d8187cb551882204676b52382b90e8e098ca05da2136f9f9a5adeb079",
+      "native_build_help_flags": ["--metadata-file", "--platform", "--no-cache"]
+    }
+  ],
+  "root_original_build_sources": [
+    {"repository": "docker/compose", "file": "pkg/compose/build_bake.go", "bytes": 21071, "sha256": "d70bedb44c898aa09e24ebb0177e4567669e5e3b7db2997c7add70770262b80d"},
+    {"repository": "docker/buildx", "file": "build/build.go", "bytes": 39245, "sha256": "9a940ebd99fad80d7b552f52018b6f12c00076aa0fd667cb39eacbb1ad03feeb"},
+    {"repository": "docker/buildx", "file": "bake/bake.go", "bytes": 51157, "sha256": "b44eb688eefcc9f1f6494c6cf5ba222127724e52563b90184e7f1ff49e53c303"},
+    {"repository": "docker/buildx", "file": "build/opt.go", "bytes": 44333, "sha256": "cb994bd0799557fbc891f5096565b1597686d67201f9b4805df9e3fed7765d76"}
+  ],
+  "source_boundary": "Buildx ReadSourcePolicy reads EXPERIMENTAL_BUILDKIT_SOURCE_POLICY. Compose Bake inherits the process environment but removes its temporary metadata file. Actual Bake selection, policy enforcement, complete immutable inputs, exported/local output identity, platform and container-consumed image remain unobserved.",
+  "native_future_identity_interfaces": {
+    "image_inspect_help_exit": 0,
+    "image_inspect_help_sha256": "5672b00cb768ad8737664fda20ae9a2b14826a06368ad6b646f93badb55840b4",
+    "container_inspect_help_exit": 0,
+    "container_inspect_help_sha256": "bc866c8ec365d565dc690dead12e9a450cc4c0137cf6de07eedd60ef0adda418",
+    "format_flag_present": true,
+    "actual_image_or_container_inspection": false
+  },
+  "failures_preserved": [
+    {"command": "native env uv --version", "exit": 127, "stdout_bytes": 0, "stderr_sha256": "ccd7cacb7dbe4d3610c25183c4676e15a84a50d7805ed07b5887f29cbdb9a9f7", "finding": "uv not found on this native invocation PATH; no claim of global absence. Existing native pytest module was observed and used, with no uv-install claim."}
+  ],
+  "provider_or_model_execution": false,
+  "build_or_pull": false,
+  "default_or_freeze_qualification": false
+}
