@@ -15756,8 +15756,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
-      "sha256": "e90950fe72016e3d4732d6beb36ed0f898e9ccf550e2fa69866b6e3b5730efb2",
-      "bytes": 7563
+      "sha256": "178e133054ea8c3a7564de00ecffde8986360fd448d7bb0899e86632ace21b7a",
+      "bytes": 8593
     },
     {
       "path": "docs/decisions/2026-10-02-mac-claude-resolution.md",
@@ -15901,8 +15901,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "595a97353798afdbaa5153db1393231a0ad0ac38d045e5f3bf1fa37be2bfbe14",
-      "bytes": 96941
+      "sha256": "d3c4d999864ae917c8eb047967e0623c7a5af74d2debf0c7d76955e8d5c6e8f3",
+      "bytes": 96989
     },
     {
       "path": "docs/grand-catalog-handbook.md",

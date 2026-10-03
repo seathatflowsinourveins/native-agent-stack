@@ -1,7 +1,7 @@
 """Tests for the current GitHub automation practice: the "Current practice" section of docs/github-automation.md and
 the dated block of catalogs/foundation/automation.json match the committed main ruleset, the section points at the
-merge guard instead of restating it, and the decision record names every pick and challenger of the three layers it
-covers."""
+merge guard instead of restating it, and the decision record names every pick either model family made for the three
+layers it covers."""
 
 from __future__ import annotations
 
@@ -74,14 +74,14 @@ class ManifestBlockTests(unittest.TestCase):
 
 
 class DecisionRecordTests(unittest.TestCase):
-    # The standing picks and challengers of the final catalog of 2026-10-01 for the three layers the record covers.
+    # The picks either model family made in the final catalog of 2026-10-01 for the three layers the record covers.
     LAYERS = {
         "git-github-automation": ["git", "gh", "Worktrunk", "sem", "difftastic", "claude-code-action"],
         "ci-supply-chain": ["actions/attest", "Syft", "Dependabot", "actionlint", "zizmor", "github/codeql-action"],
         "secrets-credentials": ["betterleaks", "trufflehog"],
     }
 
-    def test_every_pick_and_challenger_is_named_in_its_layer_row(self):
+    def test_every_pick_of_either_family_is_named_in_its_layer_row(self):
         text = RECORD.read_text(encoding="utf-8")
         for layer, names in self.LAYERS.items():
             row = next(line for line in text.splitlines() if line.startswith(f"| {layer} |"))

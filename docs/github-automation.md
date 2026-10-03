@@ -53,7 +53,8 @@ live settings win. Live state read with `gh api` GETs on 2026-10-02: ruleset 237
   request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
   `test_no_workflow_reviews_or_approves_a_pull_request`).
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
-  family made for these layers. The clean-room definitive round announced there decides one pick per slot.
+  family made for these layers; that catalog is the record of the blind GPT half, not an install list. The
+  definitive manifest (#602) decides each slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
     structural-diff comparison shows a gain); one picked difftastic and claude-code-action. difftastic remains the
     selection of record, and claude-code-action stays unadopted (decision M45).
