@@ -25,7 +25,9 @@
   "discovery_provenance": [
     "Coordinator search-first and five bounded Sol/max lifecycle-job workers; workstation Opus/max and GPT Researcher source leads retained, primary sources reread",
     "Native consequential Astra/max and Opus/max reads, with exact main counters reconciled and critique incorporated",
-    "Independent pinned-provider completeness critic found continuation, child-model/effort, SDK-resolution and modality gaps"
+    "Independent pinned-provider completeness critic found continuation, child-model/effort, SDK-resolution and modality gaps",
+    "Unit12 metadata correction: scoped checker rejected invented native_model_run enum; current pinned validator EXECUTION supports model_task_execution. Original failed checker result retained; model evidence unchanged.",
+    "Unit12 aggregate task-list correction: scoped checker found missing task IDs. Added only four separate unit12 declarations from their private frozen source receipts; older task records and every native result unchanged. Actual failed check retained."
   ],
   "license_and_compatibility": "Pinned upstream sources used through native commands in disposable prefixes/containers; licensing remains that of each pinned source. No host default installation, account/config/auth copies or peer-layer change. RTK Git guard failures and TOON BOM defect remain incompatibility gates.",
   "baseline_and_candidate": {
@@ -90,7 +92,11 @@
       "unit10-profile-controls",
       "unit11-native-carrier",
       "unit11-observable-endpoint",
-      "unit11-qmd-readonly-predicates"
+      "unit11-qmd-readonly-predicates",
+      "unit12-qmd-codex-stop",
+      "unit12-opus-prefreeze-failed-read",
+      "unit12-opus-source-repair-timeout",
+      "unit12-native-hook-metadata-hold"
     ],
     "roles": [
       "command-worker",
@@ -232,7 +238,11 @@
     "Independent original-output/hash/inventory integration check on five native Codex sandbox controls (native exits0/1/0/1/1)",
     "Native unchanged Promptfoo Codex carrier: one parent/child synthetic admission case",
     "Native Codex exec Astra/max prospective native call/result boundary judgment through configured20128",
-    "Supported native better-sqlite3 read-only API selected predicate and independent file observation"
+    "Supported native better-sqlite3 read-only API selected predicate and independent file observation",
+    "Supported native Promptfoo one-case QMD Codex functional admission; own native role journals/trace and existing o200k facade",
+    "Native Claude2.1.288 restricted Opus/max read-only source review",
+    "Native Claude2.1.288 restricted Opus/max exact owned source-copy correction; one600s cap",
+    "Supported Codex0.160.0 pure native app-server generate-json-schema --experimental; unchanged pinned source/custody reads"
   ],
   "observations": [
     {
@@ -2590,6 +2600,130 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "unit12-qmd-codex-stop",
+      "task": "unit12-qmd-codex-stop",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 68,
+      "evidence_class": "model_task_execution",
+      "scope": "Complete runtime source but truncated child model-facing forwarding; original D1 zero passages.10 disjoint finalized responses/main+child; cache/reason subsets. CLI/schema only PASS is not quality.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit12-qmd-codex-stop.json",
+          "sha256": "6d46bbce9215eded18a006fa5e3736e127d733dbcf0e497600deff02d470903b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 69033,
+        "cache_creation": 0,
+        "cache_read": 218496,
+        "output": 3816,
+        "reasoning_in_output": 2466,
+        "total": 291345,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit12-opus-prefreeze-failed-read",
+      "task": "unit12-opus-prefreeze-failed-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 69,
+      "evidence_class": "model_task_execution",
+      "scope": "First review all8 reads deniedscope; finalHOLD290/350 words; whole finalized usage24523. Correction separately native600s timeout despite8successfulreads; whole correction usageUNKNOWN, finalized subset7096 retained separately.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit12-prefreeze-source-read-failures.json",
+          "sha256": "7e3c36e3a149dc7ec19866bbbeae24e2b4e1ee06fc3fbfa3d92454d5819301f3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 5197,
+        "cache_read": 8444,
+        "output": 10878,
+        "reasoning_in_output": 9140,
+        "total": 24523,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit12-opus-source-repair-timeout",
+      "task": "unit12-opus-source-repair-timeout",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 70,
+      "evidence_class": "model_task_execution",
+      "scope": "Eight exact rich source Reads completed; native600s124 and final answer/result absent. Whole usageUNKNOWN; known finalized7096 subset only retained in receipt, not zero-filled or thinking-estimate sum.",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit12-prefreeze-source-read-failures.json",
+          "sha256": "7e3c36e3a149dc7ec19866bbbeae24e2b4e1ee06fc3fbfa3d92454d5819301f3"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit12-native-hook-metadata-hold",
+      "task": "unit12-native-hook-metadata-hold",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 71,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pure schema export0/sourcecontract observed; actual native per-case keys/current hashes missing. GateHOLD; no native model or live server/admission/protection.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit12-native-hook-metadata-hold.json",
+          "sha256": "2b072a71a9500dbad97507663399a033ddde9aad10fffaec2d5d1f725570aa95"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -2752,6 +2886,22 @@
     {
       "run_id": "unit11-native-carrier",
       "reason": "NativeCLI0/schemafactsandcounterviews retained; strict registered physical-stream split and OS-execution provenance missing. Contract remainsUNQUALIFIED/HOLD, no historicalregrade/retry/saving/default."
+    },
+    {
+      "run_id": "unit12-qmd-codex-stop",
+      "reason": "Complete runtime source but truncated child model-facing forwarding; original D1 zero passages.10 disjoint finalized responses/main+child; cache/reason subsets. CLI/schema only PASS is not quality."
+    },
+    {
+      "run_id": "unit12-opus-prefreeze-failed-read",
+      "reason": "First review all8 reads deniedscope; finalHOLD290/350 words; whole finalized usage24523. Correction separately native600s timeout despite8successfulreads; whole correction usageUNKNOWN, finalized subset7096 retained separately."
+    },
+    {
+      "run_id": "unit12-opus-source-repair-timeout",
+      "reason": "Eight exact rich source Reads completed; native600s124 and final answer/result absent. Whole usageUNKNOWN; known finalized7096 subset only retained in receipt, not zero-filled or thinking-estimate sum."
+    },
+    {
+      "run_id": "unit12-native-hook-metadata-hold",
+      "reason": "Pure schema export0/sourcecontract observed; actual native per-case keys/current hashes missing. GateHOLD; no native model or live server/admission/protection."
     }
   ],
   "limitations": [
@@ -2792,7 +2942,8 @@
     "Unit10 correction: PR608 comment5969106337 supplied the retrieval-owner handoff at12:21:24Z. The Unit9 pending statement was stale, corrected after exact-head review; the complete named owner record is not yet accessible. Owner snapshot remains a lead, pinned-source/runtime/corpus/client qualification pending; no new retrieval operation.",
     "Unit10 five sandbox controls pass only a distinct model-free harmless-fixture integration. Three expected native negative exits1 remain in original outputs and receipt; observer aggregate success is not native producer exit or unchanged upstream tests. Actual exec/skill/child/MCP/Claude/R2/P2 admission remains unqualified. Astra285466 is separate review overhead, native wire/helpers/invoice unknown.",
     "Unit10 owner record arrived after the location request:13,020bytes/fullSHA15bd8a386e640e9c98827ed6d4c4a18d9ace796889e5a59be7b7ebfab3fbc2cd verified from complete local copy. Earlier inaccessible wording is historical; current runtime/corpus/client admission remains open. Source status wrapper may repair legacy columns; owner current-schema snapshot is a lead, not lifetime no-write proof.",
-    "Unit11 strict carrier remains unqualified; prospective native-call/result boundary accepted only as method. Independent nested role/call/result inventory and each family treatment lifecycle required;56producers prepared UNRUN/UNFROZEN. Selected QMD readonly predicates are dated, not nativeMCP/corpus/lifetime no-write acceptance."
+    "Unit11 strict carrier remains unqualified; prospective native-call/result boundary accepted only as method. Independent nested role/call/result inventory and each family treatment lifecycle required;56producers prepared UNRUN/UNFROZEN. Selected QMD readonly predicates are dated, not nativeMCP/corpus/lifetime no-write acceptance.",
+    "Unit12 QMD D1 child model-visible truncation terminalSTOP despite complete runtime bytes; all retrieval comparisons and Claude admissionlaterUNRUN. Two Opus review failures retained:8sourceReads repair observed but final critique/wholeusage missing. Native Codex hook map corrected privately but returnedkeys/hashes missing; no contextprotection. No candidate/default/install/context-supply amendment."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -2800,7 +2951,7 @@
     "qualification_run_ids": []
   },
   "rollback": "Keep existing native client/profile/defaults. Disposable study state can be removed through owned native cleanup after evidence custody; no peer state is changed.",
-  "next_decision_changing_test": "Resolve native interface/producer binding after bounded Sol repair through Astra/max; separately freeze observable R2 onlywhenclient-specific admission/source/quality/counters qualify. Natural-compaction/same-session-resume P2 and owner-bound retrieval remain separate.",
+  "next_decision_changing_test": "A separately prospective focused retrieval comparison with exact actual native role/call/result source exposure and finalized counters; full code-reference owner corpus handoff; supported actual native hook metadata plus unchanged treatment/lifecycle/compaction quality gates. Preserve all failed prior freezes/runs.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",

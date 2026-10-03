@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Consume architecture-owned retrieval faithfully during long R&D while preserving its index and native model context.",
+  "evidence_class": "local_integration; synthetic functional admission, not unchanged upstream acceptance or a comparison",
+  "status": "TERMINAL_STOP_FIDELITY",
+  "native_invocation": {
+    "client": "Codex0.160.0",
+    "main_and_child_model": "gpt-6.1-sol",
+    "main_and_child_effort": "max",
+    "native_provider_label": "openai",
+    "endpoint_wire_backend_invoice": "UNKNOWN",
+    "scheduler_attempts": 1,
+    "scheduled_retries": 0,
+    "CLI_exit": 0,
+    "started_at": "2026-10-03T14:47:40.064400Z",
+    "completed_at": "2026-10-03T14:50:50.772966Z"
+  },
+  "fixed_task": {
+    "main": "Known original decision URI get control; not original D1 discovery task.",
+    "child": "Original D1 decision lookup: context-supply default, usage meter, comparison metric, interval excluding zero and challenger; exact supporting original passage.",
+    "query": "Typed lexical searches, foundation-docs only, rerank:false; then exact returned URI get.",
+    "index_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+    "source_bytes": 62594,
+    "source_sha256": "19431b3f3bb47ae7f85a2dd5e91b231713e41d518705d55f532e2a494bbee92f"
+  },
+  "actual_results": {
+    "main_get_calls": 1,
+    "child_query_calls": 1,
+    "child_get_calls": 1,
+    "runtime_resource_URI_and_MIME_correct": true,
+    "both_runtime_resource_texts_complete_exact": true,
+    "both_runtime_payload_bytes": 63494,
+    "both_runtime_payload_sha256": "c34d5511e09c5752b7fd3db1bf042163e1bcd9620f78ee49d26936f826dbfeb4",
+    "child_model_visible_truncation_warning_native_reported_original_count": 15839,
+    "same_truncated_parts_in_next_raw_request": true,
+    "child_final_status": "failure",
+    "child_final_passages": 0,
+    "schema_only_assertion_pass": true,
+    "quality_pass": false,
+    "natural_invocation_rate": "UNMEASURED; directed functional operations only"
+  },
+  "native_usage": {
+    "main_finalized_responses": 6,
+    "child_finalized_responses": 4,
+    "main": 164702,
+    "child": 126643,
+    "input_includes_cache": 287529,
+    "cache_read_subset": 218496,
+    "cache_write": 0,
+    "output_includes_reasoning": 3816,
+    "reasoning_subset": 2466,
+    "inclusive_disjoint_total": 291345,
+    "provider_returned_parent_scope": 164702,
+    "every_prefix_and_terminal_reconciled": true,
+    "hidden_helpers_or_attempts_invoice": "UNKNOWN"
+  },
+  "artifact_meter": {
+    "package": "gpt-tokenizer4.0.0",
+    "encoding": "o200k_base",
+    "full_original_source": 13989,
+    "each_full_resource_envelope": 14431,
+    "complete_representations_measured_separately": 78,
+    "overlapping_sum": "NOT_COMPUTED",
+    "native_usage_addition": "NONE",
+    "native_reported15839_is_not_o200k_count": true
+  },
+  "observed_lifecycle": {
+    "snapshots": 80,
+    "seen_owned_process_ids": 10,
+    "all_seen_ids_absent_after_reap": true,
+    "native_post_ps_exit": 1,
+    "post_stdout_bytes": 0,
+    "post_stderr_bytes": 0,
+    "unseen_processes_physical_streams": "UNKNOWN",
+    "all63_frozen_bindings_unchanged": true,
+    "DB_WAL_SHM_bytes_hashes_mtimes_unchanged_after_case": true,
+    "atomic_or_lifetime_no_write": "UNKNOWN"
+  },
+  "corrections_and_failures": [
+    "Runtime QMD resource did not lose bytes; failure occurred in model-visible forwarding.",
+    "Observer fallback compared monotonic time with a wall-clock file timestamp; it is invalid. Actual producer completion ended observation; retain clock gap and do not certify that fallback.",
+    "Initial root projection matched escaped newlines and emitted a whole document fragment privately. Original projection retained; corrected projection selects exact native content.text warning lines; no rerun.",
+    "Pinned source locator is src/mcp/server.ts; historical abbreviated src/mcp.ts was corrected."
+  ],
+  "owner_erratum": {
+    "received_after_STOP": true,
+    "record_bytes": 14162,
+    "record_sha256": "fd78192d2326a83c9b8420b8427d9e09a935f6c84658b6152151a7ca15be79f8",
+    "source_supported_client_boundary": "Native execution output policy selects a bounded output budget; full runtime resource does not prove full model input.",
+    "prospective_recipe": "Bounded line reads or explicitly declared client output budgets require a separately frozen method. No executed rerun or result regrade."
+  },
+  "preserved_status": {
+    "Claude": "UNRUN_FINAL in this admission",
+    "C1_C2_D2_full_comparisons": "UNRUN",
+    "retrieval_adoption": "UNQUALIFIED",
+    "strict_carrier": "UNQUALIFIED",
+    "all56_context_producers": "UNRUN_UNFROZEN",
+    "context_supply_row": "UNCHANGED"
+  },
+  "sources": [
+    {
+      "repository": "tobi/qmd",
+      "revision": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "files": [
+        "src/mcp/server.ts",
+        "src/store.ts"
+      ]
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "files": [
+        "codex-rs/core/src/unified_exec/mod.rs:79,227-228",
+        "codex-rs/core/src/tools/context.rs:482-520",
+        "codex-rs/core/src/config/mod.rs:922"
+      ]
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/codex-sdk.ts"
+    }
+  ],
+  "custody": {
+    "freeze_sha256": "4fd3c8ab9788ef281ca0baf241b0c91b83c78b52ed74b3a4929e0e23de1c7dee",
+    "worker_receipt": {
+      "bytes": 6988,
+      "sha256": "29da1e0d122b08ce54a73a51f296c3799a063545d79740c3907fc90be595c934"
+    },
+    "worker_manifest": {
+      "bytes": 3626,
+      "sha256": "35fd27c5622cbc0617fb3cae03e2ac062b46455e5f497e2eb076e7b589f3d1b1"
+    },
+    "worker_source_bindings": {
+      "bytes": 8263,
+      "sha256": "2afbb89eb3fcb0f03e6a31f7361a851d66ce0de581bee231a769e1b262b3b94e"
+    },
+    "artifact_meters": {
+      "bytes": 36988,
+      "sha256": "c236dcdc1da93a367bd1c3bea5e3a0c845b562a4b9b55bc8b9e3f02d36cf25c8"
+    },
+    "root_original_resource_observation": {
+      "bytes": 2862,
+      "sha256": "3209caef687462f5c4fbec2eb30c14c0b445f957a114466ecfb43263f9289c0b"
+    },
+    "root_counter_reconciliation": {
+      "bytes": 3613,
+      "sha256": "25d53fb6f4abfe28115e11af68225c5dc6a9cc6b8033ba48b26f2a77aee12b14"
+    },
+    "root_pinned_truncation_source_bindings": {
+      "bytes": 2005,
+      "sha256": "ac83ed271e5a2953ab3d9648d758ca01faa14a0ce23903a00a8fba9482c58e0f"
+    }
+  },
+  "completeness_critic": "This failed D1 child plus main get control does not measure native-vs-retrieval cost, C1/C2/D2 quality, Claude consumption, natural selection, current-main corpus coverage or lifetime no-write. Next prospective retrieval sweep must inspect model-facing complete focused results, independently bounded source identity and the architecture-owned C1/C2 corpus handoff. Do not promote corrected recipes into passed trials.",
+  "privacy": "Only sanitized hashes/counters/source locators; no credentials, raw conversations, host paths, active account configuration or native private journals published."
+}

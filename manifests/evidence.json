@@ -15825,6 +15825,11 @@
       "bytes": 5497
     },
     {
+      "path": "docs/decisions/2026-10-03-token-retrieval-truncation-and-hook-admission.md",
+      "sha256": "d149d63704d0560133fcf9d6a54b1a3025a669152a2287ac02cca6baa4dad9da",
+      "bytes": 5432
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -45561,8 +45566,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "db6ca5e97db388788aa5bd2e2a768e9aa4129412c1f9d38c09ac14b9b1ba1ac2",
-      "bytes": 114500
+      "sha256": "1cf15c5f2126fbbcdacb0193d06b3e384e67c330be58ecf9b9ec35c74ab06f57",
+      "bytes": 121442
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -45623,6 +45628,21 @@
       "path": "evidence/artifacts/token-context-20261003/unit11-qmd-readonly-predicates.json",
       "sha256": "7912837aec6cdf471203fe08d0844134955de4ef6e70fd1464e3e4e22093e03f",
       "bytes": 3693
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit12-native-hook-metadata-hold.json",
+      "sha256": "2b072a71a9500dbad97507663399a033ddde9aad10fffaec2d5d1f725570aa95",
+      "bytes": 4283
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit12-prefreeze-source-read-failures.json",
+      "sha256": "7e3c36e3a149dc7ec19866bbbeae24e2b4e1ee06fc3fbfa3d92454d5819301f3",
+      "bytes": 6093
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit12-qmd-codex-stop.json",
+      "sha256": "6d46bbce9215eded18a006fa5e3736e127d733dbcf0e497600deff02d470903b",
+      "bytes": 7141
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",

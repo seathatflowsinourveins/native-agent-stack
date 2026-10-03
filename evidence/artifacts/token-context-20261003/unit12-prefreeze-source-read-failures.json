@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Obtain source-family review of prospective native call/result evidence before cumulative R&D comparison.",
+  "evidence_class": "native_proven / source review; failed review attempts, not task acceptance",
+  "status": "HOLD_RETAINED_FINAL_REVIEW_UNRETURNED",
+  "attempts": [
+    {
+      "client": "ClaudeCode2.1.288",
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "native_tools": [
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "permission_mode": "dontAsk",
+      "MCP_servers": 0,
+      "started_at": "2026-10-03T14:57:53.682766+00:00",
+      "completed_at": "2026-10-03T14:59:43.709321+00:00",
+      "native_exit": 0,
+      "source_reads": 8,
+      "successful_reads": 0,
+      "failed_reads": 8,
+      "finalized_message_groups": 2,
+      "known_finalized_group_usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 5197,
+        "cache_read_input_tokens": 8444,
+        "output_tokens": 10878,
+        "thinking_tokens": 9140,
+        "inclusive_tokens": 24523
+      },
+      "whole_attempt_final_inclusive_usage": 24523,
+      "known_finalized_list_cost_metadata": 0.26084080000000004,
+      "invoice": "UNKNOWN",
+      "final_answer_words": 290,
+      "word_cap": 350,
+      "case_status": "SOURCE_READ_FAIL_RESTRICTED_SCOPE_HOLD",
+      "frozen_inputs": 11,
+      "frozen_binding_changes": [],
+      "freeze_sha256": "b7c0d01ad83a73ae1c40e24dd7c9769290cf9dc7151a54baeba5cd139370fa53",
+      "original_native_stream_sha256": "a00a267d2248df45955d1f8b5ffb054669d0747b6f75b6737bf8406feb82c08e",
+      "original_own_journal_sha256": "543b21c983f74168636a0007dbb6bf64baec583f44e35f282c4fa257a202dcaa"
+    },
+    {
+      "client": "ClaudeCode2.1.288",
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "native_tools": [
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "permission_mode": "dontAsk",
+      "MCP_servers": 0,
+      "started_at": "2026-10-03T15:05:09.629840+00:00",
+      "completed_at": "2026-10-03T15:15:10.006237+00:00",
+      "native_exit": 124,
+      "source_reads": 8,
+      "successful_reads": 8,
+      "failed_reads": 0,
+      "finalized_message_groups": 1,
+      "known_finalized_group_usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 1728,
+        "cache_read_input_tokens": 3933,
+        "output_tokens": 1433,
+        "thinking_tokens": 319,
+        "inclusive_tokens": 7096
+      },
+      "whole_attempt_final_inclusive_usage": "UNKNOWN",
+      "known_finalized_list_cost_metadata": 0.0432786,
+      "invoice": "UNKNOWN",
+      "final_answer_words": "UNKNOWN",
+      "word_cap": 350,
+      "case_status": "NATIVE_TIMEOUT_HOLD_NO_FINAL",
+      "frozen_inputs": 11,
+      "frozen_binding_changes": [],
+      "freeze_sha256": "1a76514562b887a0a8158a168c18ec4f1ee2f1b882ec2b773ed6a3c0a7595c1c",
+      "original_native_stream_sha256": "36a9c617f3bb0ccd9cd65007c79392b8aa3187ae440a2d94d7dcd6e7fff86e70",
+      "original_own_journal_sha256": "4c37d956538736aa9586e9290a9ada362c14222a32a959e0953fb71a611b58bc"
+    }
+  ],
+  "correction": "First root launch scoped all six sources outside --restricted cwd; all eight Reads denied. One separately frozen correction used exact byte-identical source copies inside its own restricted working directory. That correction completed eight source Reads but reached native600-second timeout with no final result/answer. Neither failed attempt is promoted to review acceptance.",
+  "successful_source_read_scope": "Four complete contract files and four exact requested pinned-provider/trace line selections; all six copies and current original hashes match. Successful reading is observed; final critique and judgment remain unreturned.",
+  "source_family_read_before_admission_freeze": true,
+  "partial_overlap_rule": "Repair has only one finalized native tool_use message scope7096. Its whole-attempt inclusive usage is UNKNOWN. Do not sum its interim thinking estimate61800 or overlapping stream/native journal/list-cost views; attempts are retained separately.",
+  "source_review_is_not_user_approval": true,
+  "preserved_status": {
+    "all56_context_producers": "UNRUN_UNFROZEN",
+    "strict_carrier": "UNQUALIFIED",
+    "review_favorable_judgment": "UNRETURNED",
+    "new_tool_default": "NONE"
+  },
+  "sources": [
+    {
+      "client": "ClaudeCode2.1.288",
+      "native_help": "--restricted confines filesystem tools to working directories, including --add-dir; root used owned copies, no bypass.",
+      "executable_sha256": "0298068b686e7fdbaf9402a7a587bb7f49c0b0e084de09f69145a0719207640c"
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/codex-sdk.ts:1860-1872,2421-2431"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/rollout-trace/README.md:157-170,208-210"
+    }
+  ],
+  "custody": {
+    "worker_receipt": {
+      "bytes": 38838,
+      "sha256": "86817f0e2f7cb984244d98c5f6221087561e87dad55f4a44023b4ce8fa54ccbc"
+    },
+    "worker_manifest": {
+      "bytes": 1387,
+      "sha256": "2b18f94612df6723720609ed875692194ccab4b29349f52a8e8bb4cc8af9df5e"
+    },
+    "worker_critic": {
+      "bytes": 2267,
+      "sha256": "2d7394ed2522f3adc8984b6016b47d11a32d2fa0a6c030349dcb784da9a0362e"
+    },
+    "root_failed_read_receipt": {
+      "bytes": 1378,
+      "sha256": "c08fd3684a720b46709285d28fd12caee8695c9c78f6680c0fb796f4b652e61d"
+    }
+  },
+  "completeness_critic": "Successful rich source-read results do not substitute for an unreturned final method critique. Keep bounded source reading, failed review completion and native finalized usage scopes distinct. Actual family-specific admission and source-bound prospective comparison remain separate gates; no infinite review retry or missing-usage zero fill.",
+  "privacy": "Only sanitized hashes/counters/status and pinned source locators; no raw conversations or host/native-auth paths published."
+}
