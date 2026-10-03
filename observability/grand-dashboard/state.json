@@ -147,6 +147,13 @@
     },
     {
       "kind": "gate",
+      "id": "new-wsl-destination-stage1-20261002",
+      "title": "New WSL destination distribution - stage 1 receipt (recipe P1 to F8) and SDK bounded case observations (roles + recovery + lifecycle open)",
+      "state": "stage 1 passed 2026-10-02 (F2 idle F3 rootless owed) / SDK reviewer researcher MCP accepted (bounded) / researcher x2 + Claude task failed (Codex repair passed)",
+      "evidence_ref": "evidence/receipts/wsl-new-distro-stage1-destination-20261002.json"
+    },
+    {
+      "kind": "gate",
       "id": "macos",
       "title": "macOS native acceptance",
       "state": "target host pending",

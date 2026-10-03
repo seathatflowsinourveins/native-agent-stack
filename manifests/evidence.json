@@ -3880,6 +3880,29 @@
         "No production-quality or token-efficiency comparison is claimed, and no unrelated session or authentication store was read."
       ],
       "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
+    },
+    {
+      "id": "wsl-new-distro-stage1-destination-20261002",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd"
+      ],
+      "claim": "P1 printed 'Good signature' by RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092 for 26.04.1 and 24.04.5, P2 printed 'Valid schema', P3 counted 3 hv_storvsc lines with the newest 13436 s old, W2 printed one hash 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 as computed, published and listed for a 418495746-byte image, W4's install and W5's first launch exited 0, and cloud-init made <WSL_USER> (uid 1000) the default user, with 'cloud-init schema --system' printing 'Valid schema user-data'. W5's paired record showed uid 1000 in both distributions, cgroup:[4026532183] and cgroup:[4026532410], both user managers 'active' and systemd-binfmt.service as the new distribution's only failed unit; W7 read 1000:1000, F1 printed 'degraded' with that one unit and its 'Read-only file system' flush message, F2 printed 'yes' and F3 printed '<WSL_USER> socket' and 'running'.",
+      "limitations": [
+        "One run on one Windows host: a new distribution on the existing WSL 3.0.1 kernel and Windows installation, not a new physical machine.",
+        "The claim covers stage 1 and first boot (P1 to F8). F9 to F11, the native sign-ins and the SDK examples ran later on the destination distribution and are recorded in stage_2 and the F9 to F11 fields; persistent service units, restart, backup and restore are not covered.",
+        "Not run on the destination distribution: F2's twelve idle polls (idle_observation) and F3's two rootless-container commands (rootless_container: owed), which the page asks for before F9. The install plan's own docker run hello-world check is a different command and is not F3's proof.",
+        "The rehearsal block cites two earlier runs on throwaway distributions (run 3 before the recipe merged, run 4 with the merged recipe) and their removal by R1; their observations sit beside this run's, not in place of them. The 24.04.5 rollback arm, path B and the uv and Node comparison probes are owed.",
+        "The client configuration ran after the sign-ins: first from an earlier head of pull request 608 (a372ab3b), then at 20:41:44Z from 099ead33b68f with --with-authorization-settings at the owner's request, before that head's last two checks and the Codex read finished; that head merged as #608. The Codex lane records this configuration as owner-reported, separately from independent whole-host acceptance.",
+        "The client-configuration tool's managed PATH block has a reported root-directory defect (the root directory written as an empty PATH entry); its fix, pull request 619, is not merged, and the destination's PATH block has not been read back after it.",
+        "No independent reviewer has inspected the private raw outputs that this receipt quotes; each is bound here by its SHA-256.",
+        "Sanitized: Windows and Linux user names, the computer name, every distribution name, home and profile paths, temporary directories, the checkout path and device ids are replaced by placeholders, and session identifiers are left out; the raw transcript and outputs stay private on the host.",
+        "PowerShell cmdlet lines record 0 or 1 from the $? value the step printed (True or False), and assignments and guards record 0 when their block completed; native commands record their own printed exit code, and an exit marked derived follows from the script's structure and its recorded exit.",
+        "jcodemunch_registration records F11's state only (not installed); a registration would not show that a session or subagent uses jCodeMunch.",
+        "related_observations and addendum_20261003 list another lane's reported results and later changes for traceability; they are not part of this receipt's claim.",
+        "Local integration check of the repository's recipe with actual native returned output; not an upstream test, new-host acceptance, role qualification, or a fresh model or GPU run."
+      ],
+      "path": "evidence/receipts/wsl-new-distro-stage1-destination-20261002.json"
     }
   ],
   "files": [
@@ -47985,6 +48008,11 @@
       "bytes": 891
     },
     {
+      "path": "evidence/receipts/wsl-new-distro-stage1-destination-20261002.json",
+      "sha256": "569eabe879ec3831f95d7bdcfa5480aacddcd6be71b38218ec7fdb943d27fa66",
+      "bytes": 86141
+    },
+    {
       "path": "evidence/receipts/wsl-retrieval-20260920.json",
       "sha256": "02fc96b030e8e8d48c977809a80f1a5d0409523cffb12a79aa0c9f4a9de8a56c",
       "bytes": 2455
@@ -48521,8 +48549,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "e7136a2188ca4e7dcfe57affad586ff45faf297f3d71aab66fa60f92cb61f6bc",
-      "bytes": 19333
+      "sha256": "f71cb5a7b254ecdb2854f08dc1bb54d58311c01551c8fab562a86293f15b2f78",
+      "bytes": 19845
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
