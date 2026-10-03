@@ -15766,8 +15766,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
-      "sha256": "9dd19986428443be40e3a073ef74905595dc97e0cabcd5182afafea9c3790563",
-      "bytes": 19868
+      "sha256": "e3df87042f5e75035df3451a6fd685a8d965c79dac68bb1647ba283195711347",
+      "bytes": 24155
     },
     {
       "path": "docs/direct-results.md",
@@ -45275,14 +45275,29 @@
       "bytes": 9122
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+      "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9",
+      "bytes": 9015
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/harness-source-read.json",
       "sha256": "63dcec9a9dd0051e8333d32a1cfe32e8aa783c5639cb6d5c41058444ef97c60b",
       "bytes": 2739
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/meter-compaction-qualification.json",
+      "sha256": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670",
+      "bytes": 4056
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
       "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b",
       "bytes": 5180
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-calibration.json",
+      "sha256": "56f4d5279102a64e9aae06cd5a98281e73d56a8b946bf8286a86e0c34c73f7b4",
+      "bytes": 7120
     },
     {
       "path": "evidence/artifacts/token-context-20261003/protocol-opus-read.json",
@@ -45291,13 +45306,13 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/protocol.md",
-      "sha256": "906db8a2cbce740fae65d7356ea5a9b849200008d6bef432a9df381f7d41287e",
-      "bytes": 21999
+      "sha256": "0c748cbdaa93326561628ef6e01ffea18a1323382e3725d6d22d06eb8c1c0db1",
+      "bytes": 24691
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "a58f0e909043bebce03ff3753d35931743b963482285c7b4fefb29a702b3c4af",
-      "bytes": 21021
+      "sha256": "8185e41f2e9840b17575af19fa4cc9c18ce10328b07762e1184145d4769f1c70",
+      "bytes": 32609
     },
     {
       "path": "evidence/artifacts/token-context-20261003/rtk-artifact-qualification.json",
@@ -45316,8 +45331,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/source-qualification.md",
-      "sha256": "ebcb6d5a713a41027e2547109231083fac8d71b5b7e4fbff11d9a94ec7e176b9",
-      "bytes": 12589
+      "sha256": "7a3ea0dbb43e2bedf8c97d5432c6ca637239a6b988837282dd8349c51b5da57c",
+      "bytes": 16861
     },
     {
       "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
