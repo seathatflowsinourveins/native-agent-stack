@@ -3887,7 +3887,7 @@
       "component_ids": [
         "codex"
       ],
-      "claim": "Retained coordinator results for the same-host Codex SDK/CLI 0.160.0 pair report strict-hash installation, matching bundled/npm-platform binaries and completed native-account SDK, gateway SDK and gateway CLI marker canaries. Sanitized outputs, native CLI usage, scripts, hashes, mtimes and discriminating replay controls are now retained; missing original SDK invocation/source and process start/end evidence limit this to a compatibility attempt.",
+      "claim": "Retained coordinator results for the same-host Codex SDK/CLI 0.160.0 pair report strict-hash installation, matching bundled/npm-platform binaries and completed native-account SDK, gateway SDK and gateway CLI marker canaries. Sanitized outputs, native CLI usage, scripts, hashes, mtimes and discriminating replay controls are now retained; missing original SDK invocation/source and process start/end evidence limit this to a compatibility attempt. The separate A4 record adds fail-closed Linux package-resolution/executable-tree repairs, offline integration controls and a fresh isolated bootstrap of the shipped Codex pin; it does not upgrade the SDK/gateway canary evidence class.",
       "limitations": [
         "Existing-host compatibility observations and completed marker canaries only; incomplete original command/timing provenance prevents native_cli_e2e acceptance. Not new-host or model-quality acceptance.",
         "Gateway backend model and effort were not read from the call log; configured/requested routes and efforts do not prove backend selection.",
@@ -3896,7 +3896,7 @@
         "Sanitized native canary stdout/stderr, CLI events/last message and their hashes are retained. SDK caller exit codes 0 are coordinator-verified, not fields in the supplied facts. Gateway backend billed usage and monetary cost remain unrecorded.",
         "Original process start/end times and SDK outer executable/cwd are unrecorded. Source mtimes are filesystem observations only. The native heredoc is reconstructed from facts and the retained gateway example, not attested as the original source.",
         "SDK last and total usage snapshots match for each canary and must be counted once; cached input and reasoning output are subsets, not additional tokens.",
-        "No unchanged upstream test suite, shared daemon restart, cleanup/recovery acceptance, package signature or provenance attestation verification is recorded here.",
+        "No unchanged upstream test suite, shared daemon restart, whole-system cleanup/recovery acceptance, package signature or provenance attestation verification is recorded here. The separate A4 bootstrap record retains local migration/publication fault injection and an isolated native installation.",
         "The move is inside the seven-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as the prior 0.159.2 and 0.159.3 moves were (docs/decisions/2026-09-27-model-currency.md).",
         "This repository change records existing coordinator qualification; it performs no new model run or shared-host switch.",
         "The CLI script prints the inner Codex exit but does not propagate it as its own final shell exit; the recorded inner exit 0 is supported by the coordinator facts and completed native events."
@@ -4167,13 +4167,13 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "3b88f15a45c8a8ea72a9d79e461408771fd022a94207bc87df4a8389dcfdc14a",
-      "bytes": 74324
+      "sha256": "487d25bff2a412883e4875f98be230c89ea37bf9737d71dd558da20d8e94f2ad",
+      "bytes": 74740
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "6de83675793823b2f0fc046c123c1082f2b7cbe622daa492ffa01c4c5b9dbb59",
-      "bytes": 81790
+      "sha256": "ef54b618c903cfabcd74538e40e6fa84d81e5b5904c3e6a5e472fc6d942c4474",
+      "bytes": 78067
     },
     {
       "path": "adoption/bootstrap.md",
@@ -4322,8 +4322,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "b5f6b530d2600d8b1668517453c3310781552128f4df57daa98df91d68e2eeca",
-      "bytes": 33703
+      "sha256": "f9b362b7caec258e13fc06d42894ea8a7a8f9dcc5dd6405a130ff41c7627604d",
+      "bytes": 34163
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -15785,6 +15785,11 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
       "bytes": 16881
+    },
+    {
+      "path": "docs/decisions/2026-10-03-linux-bootstrap-security-repair.md",
+      "sha256": "54d81df1c2dfc6bb524ae11742458874cc3b39622f8935fe472ad9c9cb7b2c56",
+      "bytes": 7738
     },
     {
       "path": "docs/direct-results.md",
@@ -42002,6 +42007,71 @@
       "bytes": 2594
     },
     {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/bootstrap.log",
+      "sha256": "d2354220da06487ccd63bb96b2f20f5098a7ced75e1b7a257ef057e5ceeca077",
+      "bytes": 2540
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/initial-regression-failure.log",
+      "sha256": "bb4766ea862584eb2106294b7e7c1fa26e8484ac46b5f1e7271712550f5d0bc1",
+      "bytes": 3377
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/installed-versions.txt",
+      "sha256": "305f8b6ee81b8102f2f8c651fe8fa53cdfc4459501c75a61c9bd5e9822ec0672",
+      "bytes": 1055
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/macos-parity-regression-failure.log",
+      "sha256": "a5f6bbccccc1ec631f2990a4de3cbaf6226ab3e7341c7512c820b69ca9e5b19c",
+      "bytes": 1722
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/native-installation.json",
+      "sha256": "a844e065e1ba31e29b2693681659299227dd07d42ecaf92c2fc438d73252931f",
+      "bytes": 2095
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/platform-tests.log",
+      "sha256": "3ba5edc4d104d18caf0c358404aad3de3a4f394d8a05f732fb58dd6c9a6deaca",
+      "bytes": 19882
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/publication-validation-failure.json",
+      "sha256": "73df23a90b43a188d8dc3f9555ca27a347bd9d3c8734f5afd005da07c0a1f277",
+      "bytes": 501
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/receipt.json",
+      "sha256": "b1af4cec10dea8cdb04880801c1ea49a1cf690be679cc0a36af6ff6c1d302fa0",
+      "bytes": 9703
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/red-controls.log",
+      "sha256": "032453fa92b377922619316ad1c4845e0b4e3fd1cf09f57124a537f7f022971d",
+      "bytes": 3719
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/registry-tests.log",
+      "sha256": "7581cbd4b21705bfbb22f87e01cf8c5cb2ed559c0dd31cf503596abb2ea22d15",
+      "bytes": 101
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/regression-tests.log",
+      "sha256": "99cf9409ef66c0b9d795fde306e2202cc3a210514cc6e8ba7154d53816a39e30",
+      "bytes": 752
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/sanitization.json",
+      "sha256": "ce3623709ade44688c4ec54e1753a717d3f49d48c981ac26b1fe6854cbdf639a",
+      "bytes": 409
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/toolchain.json",
+      "sha256": "73e9c9f7884c2be7a2335047cad41bbd7a41312e118b152f0f1c3f33766f8d75",
+      "bytes": 325
+    },
+    {
       "path": "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
       "sha256": "f833f52d401d124987b19de3cdf48bfe1f1f5f169b20dc3f8a79e101c8dbd82b",
       "bytes": 1088
@@ -42028,8 +42098,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20261003/receipt.json",
-      "sha256": "c8ce0a4ae20c5e21fd2b0000fe99437d2258d891748979e5cd9f9b8a6820329f",
-      "bytes": 18791
+      "sha256": "9ca254b27ad94779733f8a42f402916f3f9e0a51c4a71839ac769ed437cbbb10",
+      "bytes": 19042
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20261003/retained-records.json",
@@ -48068,8 +48138,8 @@
     },
     {
       "path": "evidence/receipts/runtime-sdk-20261003.json",
-      "sha256": "750a976b4a87eb5bf79a89ff41ed8991f6278709396ffaedc76570f65843cd19",
-      "bytes": 4262
+      "sha256": "e5ad4e1e95bf4e621bcecd35bcdd16ec6d55a5e39933414f96cb704559a4093b",
+      "bytes": 4748
     },
     {
       "path": "evidence/receipts/runtime-tools.json",
@@ -49263,13 +49333,23 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "0b5437c06eab8222d7dbc2ff520be5b4ee08901472e74593d8024ec135cf53cc",
-      "bytes": 105543
+      "sha256": "e4e23c487f6376a5a9e711a98f360cd68442920d2deb2e0800cc2130ea45f37a",
+      "bytes": 105903
+    },
+    {
+      "path": "tests/test_adoption_bootstrap_linux_platform.py",
+      "sha256": "d53fd1784ab5416fbfd17f78e226890e03eb242536acf3a0a24eea44d19be0ad",
+      "bytes": 28656
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
       "sha256": "d142da3da63986e61ae07d864074a1f1d509838b4aa82abba0eb64d7a92b8288",
       "bytes": 228055
+    },
+    {
+      "path": "tests/test_adoption_bootstrap_parity.py",
+      "sha256": "45efb2e26dbd8633690404432d1711fc1de7715504cc8bace502321cb5de4bf2",
+      "bytes": 1073
     },
     {
       "path": "tests/test_adoption_contract.py",
