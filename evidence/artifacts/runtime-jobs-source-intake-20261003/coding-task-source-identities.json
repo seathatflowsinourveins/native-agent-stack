@@ -1,0 +1,3824 @@
+{
+  "schema_version": 1,
+  "record_type": "coding-task-source-identities-and-order-proposal",
+  "status": "source-only; not frozen; no task, image, grader or model execution",
+  "freeze_eligible": false,
+  "scope": {
+    "owned_file": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-task-source-identities.json",
+    "protocol_changed": false,
+    "registry_changed": false,
+    "task_files_changed": false,
+    "models_called": 0,
+    "images_built": 0,
+    "services_started": 0
+  },
+  "input_sources": {
+    "protocol": {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "ref": "1695dc686aa28299c184982b316591de2f65514d",
+      "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
+      "bytes": 19639,
+      "sha256": "c54fea783ad25e64531de36a4fd8702350a0c6c36f5ee80a863fcd8279f7ae42",
+      "native_git_show_exit": 0,
+      "strict_json_parse": "passed"
+    },
+    "source_map": {
+      "ref": "1695dc686aa28299c184982b316591de2f65514d",
+      "path": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
+      "bytes": 4792,
+      "sha256": "f37312793dd6b641a31294c5c42269c00212e91fb6a756b74bc67bb64be2a66e"
+    },
+    "shared_execution_contract": {
+      "ref": "1695dc686aa28299c184982b316591de2f65514d",
+      "path": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
+      "sha256": "c71885acf86c83f239fe0fb689b9e16fe83c340fc00bb08f99685969f082cef6"
+    },
+    "source_policy": {
+      "ref": "1695dc686aa28299c184982b316591de2f65514d",
+      "path": "blueprints/runtime-workers/comparisons/coding-source-policy.json",
+      "sha256": "a82998d636ab0f645cdfe426015bbd7c9ae411562f693b55b5f995ca1abe26c2"
+    },
+    "harbor": {
+      "repository": "https://github.com/harbor-framework/harbor",
+      "tag": "v0.23.0",
+      "ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "original_reads": [
+        {
+          "path": "registry.json",
+          "http_status": 200,
+          "bytes": 13654627,
+          "sha256": "da1446bce05eabbd72a25eb9eef5a2f5db94645ce88c28e2497581433b3d2e60",
+          "selected_dataset_count": 1,
+          "dataset_metadata": [
+            {
+              "keys": [
+                "name",
+                "version",
+                "description",
+                "tasks"
+              ],
+              "name": "swebench-verified",
+              "version": "1.0",
+              "tasks_count": 500
+            }
+          ]
+        },
+        {
+          "path": "src/harbor/models/task/config.py",
+          "http_status": 200,
+          "bytes": 36655,
+          "sha256": "d8c62a49acefb8cd6a0be4c4d48dc0f4f52f31f8a8a6728439aad04e1c62e9fb",
+          "selected": [
+            {
+              "line": 220,
+              "text": "    \"\"\"Network policy fields for [agent] and [verifier] phase overrides.\"\"\""
+            },
+            {
+              "line": 225,
+              "text": "        \"as an explicit phase override when set.\","
+            },
+            {
+              "line": 340,
+              "text": "class AgentConfig(PhaseNetworkPolicyConfig):"
+            },
+            {
+              "line": 341,
+              "text": "    timeout_sec: float | None = None"
+            },
+            {
+              "line": 360,
+              "text": "    timeout_sec: float = Field("
+            },
+            {
+              "line": 423,
+              "text": "    build_timeout_sec: float = 600.0  # 10 minutes default"
+            },
+            {
+              "line": 555,
+              "text": "class VerifierEnvironmentMode(str, Enum):"
+            },
+            {
+              "line": 562,
+              "text": "class VerifierConfig(PhaseNetworkPolicyConfig):"
+            },
+            {
+              "line": 563,
+              "text": "    timeout_sec: float = 600.0"
+            },
+            {
+              "line": 726,
+              "text": "class VerifierCollectConfig(BaseModel):"
+            }
+          ]
+        },
+        {
+          "path": "src/harbor/cli/jobs.py",
+          "http_status": 200,
+          "bytes": 102441,
+          "sha256": "dd9cb7dd62b34b195d21e1d017e3a577c2aa226e671568c9c00924e96b1befd5",
+          "selected": [
+            {
+              "line": 418,
+              "text": "            \"override earlier ones. Additive lists append; [] clears them. \""
+            },
+            {
+              "line": 454,
+              "text": "    n_attempts: Annotated["
+            },
+            {
+              "line": 460,
+              "text": "                JobConfig.model_fields['n_attempts'].default"
+            },
+            {
+              "line": 466,
+              "text": "    timeout_multiplier: Annotated["
+            },
+            {
+              "line": 471,
+              "text": "                JobConfig.model_fields['timeout_multiplier'].default"
+            },
+            {
+              "line": 477,
+              "text": "    agent_timeout_multiplier: Annotated["
+            },
+            {
+              "line": 481,
+              "text": "            help=\"Multiplier for agent execution timeout (overrides \""
+            },
+            {
+              "line": 487,
+              "text": "    verifier_timeout_multiplier: Annotated["
+            },
+            {
+              "line": 491,
+              "text": "            help=\"Multiplier for verifier timeout (overrides --timeout-multiplier)\","
+            },
+            {
+              "line": 496,
+              "text": "    agent_setup_timeout_multiplier: Annotated["
+            }
+          ]
+        }
+      ]
+    },
+    "dataset": {
+      "repository": "https://github.com/laude-institute/harbor-datasets",
+      "name": "swebench-verified",
+      "version": "1.0",
+      "registry_git_commit_id": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+      "path": "datasets/swebench-verified",
+      "native_tree_reads": [
+        {
+          "endpoint": "repos/laude-institute/harbor-datasets/git/trees/86723674f04e4209ac479d0fb75d9d9f44b4377e",
+          "exit": 0,
+          "bytes": 1119,
+          "sha256": "faf2467799931b150895534f7b02df91d91e2fc68cc2ce8db2c186f3f5336a28",
+          "tree_sha": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+          "truncated": false
+        },
+        {
+          "endpoint": "repos/laude-institute/harbor-datasets/git/trees/8ce4608f3a361ebb1ed0753b15a5e95eaf71dbdd",
+          "exit": 0,
+          "bytes": 16696,
+          "sha256": "1cf0a2230573bb5c249a7eb1b5f1a76145673d9909e2904194dd5137b85fe474",
+          "tree_sha": "8ce4608f3a361ebb1ed0753b15a5e95eaf71dbdd",
+          "truncated": false
+        },
+        {
+          "endpoint": "repos/laude-institute/harbor-datasets/git/trees/a7a1bf388872b81824b35554c27b5e8a1fc273e9",
+          "exit": 0,
+          "bytes": 116932,
+          "sha256": "62f851068d76e70fa29656181d6f4c2b724f382b4dc7fd85163829d69a0be6ba",
+          "tree_sha": "a7a1bf388872b81824b35554c27b5e8a1fc273e9",
+          "truncated": false
+        }
+      ],
+      "native_untruncated_task_tree_entries": 500
+    }
+  },
+  "selection": {
+    "seed_utf8": "runtime-jobs-coding-sol-ultra-v1\n",
+    "rule": "Four lowest SHA256(seed_utf8 + full task name), independently within each of the six named repositories, from the pinned 500-task registry. No outcomes were used.",
+    "ordered_task_ids": [
+      "django__django-14034",
+      "django__django-15569",
+      "django__django-11211",
+      "django__django-15572",
+      "sympy__sympy-23824",
+      "sympy__sympy-13647",
+      "sympy__sympy-24066",
+      "sympy__sympy-12489",
+      "scikit-learn__scikit-learn-13496",
+      "scikit-learn__scikit-learn-12585",
+      "scikit-learn__scikit-learn-13328",
+      "scikit-learn__scikit-learn-14983",
+      "pytest-dev__pytest-6197",
+      "pytest-dev__pytest-7521",
+      "pytest-dev__pytest-6202",
+      "pytest-dev__pytest-5840",
+      "pydata__xarray-7393",
+      "pydata__xarray-2905",
+      "pydata__xarray-4075",
+      "pydata__xarray-4629",
+      "matplotlib__matplotlib-25122",
+      "matplotlib__matplotlib-24627",
+      "matplotlib__matplotlib-24026",
+      "matplotlib__matplotlib-25332"
+    ],
+    "original_registry_recomputation": {
+      "http_status": 200,
+      "bytes": 13654627,
+      "sha256": "da1446bce05eabbd72a25eb9eef5a2f5db94645ce88c28e2497581433b3d2e60",
+      "task_count": 500,
+      "selected_count": 24,
+      "selected_ids_match_order": true,
+      "repository_pool_counts": {
+        "django__django": 231,
+        "sympy__sympy": 75,
+        "scikit-learn__scikit-learn": 32,
+        "pytest-dev__pytest": 19,
+        "pydata__xarray": 22,
+        "matplotlib__matplotlib": 34
+      },
+      "task_entry_keys": [
+        "name",
+        "git_url",
+        "git_commit_id",
+        "path"
+      ],
+      "first_task_entry": {
+        "name": "django__django-14034",
+        "git_url": "https://github.com/laude-institute/harbor-datasets.git",
+        "git_commit_id": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+        "path": "datasets/swebench-verified/django__django-14034"
+      },
+      "all_selected_same_git_url": true,
+      "all_selected_git_commit_ids": [
+        "86723674f04e4209ac479d0fb75d9d9f44b4377e"
+      ]
+    },
+    "outcomes_used": false,
+    "selected_task_id_gap": false,
+    "maximum_excluded_tasks": 0
+  },
+  "source_observations": {
+    "selected_task_toml_reads": 24,
+    "selected_dockerfile_reads": 24,
+    "all_48_selected_file_reads_http_200": true,
+    "all_24_task_tree_oids_match_source_map": true,
+    "all_24_dockerfile_bytes_sha256_and_from_references_match_source_map": true,
+    "original_source_bytes": "Read and hashed outside the model; full upstream response bodies are not embedded or retained as local raw-source artifacts by this receipt.",
+    "source_only": "HTTP/native-Git browsing verifies bytes and declared configuration, not image builds, enforced runtime deadlines or task success.",
+    "no_absence_inference": true
+  },
+  "tasks": [
+    {
+      "task_id": "django__django-14034",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/django__django-14034/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-14034/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2059,
+        "sha256": "42f8fa6f8b44f70bbf34b4c943eb10f35344776258f96c3a59321755d6c1cf66",
+        "git_blob_oid": "6c72ad9da8b0038630310094576514b7e9ac0515",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.django_1776_django-14034:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/django__django-14034/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-14034/environment/Dockerfile"
+      },
+      "task_index": 1,
+      "path": "datasets/swebench-verified/django__django-14034",
+      "task_tree_oid": "4c5cb0cbeae063509d74b57d5d409911db37fe45",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "django__django-15569",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/django__django-15569/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-15569/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2059,
+        "sha256": "a8c01e05953dd9a5f43f271caca7a48e42c1ed5506e9f87c78d441b2ee6e10c3",
+        "git_blob_oid": "14c978dc61c45c61e26a34be6f79174a470e03c4",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.django_1776_django-15569:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/django__django-15569/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-15569/environment/Dockerfile"
+      },
+      "task_index": 2,
+      "path": "datasets/swebench-verified/django__django-15569",
+      "task_tree_oid": "7a36e93bc0752bba53c5f1d925509625b2c399f2",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "django__django-11211",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/django__django-11211/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-11211/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2059,
+        "sha256": "4687443c0a0c3d6c7acf862515e3e5cee482704078373038a480e86681a70e9b",
+        "git_blob_oid": "31e7ed480c6f09988f35916c572dfae09cb0d649",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.django_1776_django-11211:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/django__django-11211/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-11211/environment/Dockerfile"
+      },
+      "task_index": 3,
+      "path": "datasets/swebench-verified/django__django-11211",
+      "task_tree_oid": "116bb18377531fd78105d3eb6b4ebca185759b07",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "django__django-15572",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/django__django-15572/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-15572/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2059,
+        "sha256": "caac63a7f0120f098732dad2ae6cecc0304e40cb8c5ca24395399ae765f9ec36",
+        "git_blob_oid": "eb6a0b78099437971d45ba08851926438834c4ea",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.django_1776_django-15572:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/django__django-15572/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-15572/environment/Dockerfile"
+      },
+      "task_index": 4,
+      "path": "datasets/swebench-verified/django__django-15572",
+      "task_tree_oid": "b152503a8d4f0c617dbf5f9d82ae4b70623555ac",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "sympy__sympy-23824",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/sympy__sympy-23824/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-23824/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2057,
+        "sha256": "26c475cf205287735a84c0991dea46e44c3f6269eaf9061f323a5c75b72d6ad3",
+        "git_blob_oid": "5ed9854bfc87c0ce0f5c6840816bd5219b54b0cd",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.sympy_1776_sympy-23824:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/sympy__sympy-23824/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-23824/environment/Dockerfile"
+      },
+      "task_index": 5,
+      "path": "datasets/swebench-verified/sympy__sympy-23824",
+      "task_tree_oid": "611be64704f795dfb3b5362c30b8b261041d104b",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "sympy__sympy-13647",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/sympy__sympy-13647/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-13647/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2057,
+        "sha256": "e0d4fe18c75eb4f0e2a468eda6ca29dc68538e37a811ea4e0c1f6d90c4498782",
+        "git_blob_oid": "dd5670f7bafa5cbb425bf8c97481ee06304fd403",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.sympy_1776_sympy-13647:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/sympy__sympy-13647/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-13647/environment/Dockerfile"
+      },
+      "task_index": 6,
+      "path": "datasets/swebench-verified/sympy__sympy-13647",
+      "task_tree_oid": "9213f7cf30dba66b7fc4d7275cf98afcc91ea568",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "sympy__sympy-24066",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/sympy__sympy-24066/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-24066/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2057,
+        "sha256": "2acb163b957d9b3d44bf8648cf73898346b7529fdf108906c95196b3a17d58d1",
+        "git_blob_oid": "c69b3f7bd5e3351ae7faf9ffebe7da47195316c6",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.sympy_1776_sympy-24066:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/sympy__sympy-24066/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-24066/environment/Dockerfile"
+      },
+      "task_index": 7,
+      "path": "datasets/swebench-verified/sympy__sympy-24066",
+      "task_tree_oid": "2584c3b24da156a0377c188d14678a5b6f8e5f7a",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "sympy__sympy-12489",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 411,
+        "sha256": "c062317afc83dc6b0135001faf7fac6818014986409442efee9de6fa0fc7d414",
+        "git_blob_oid": "773bd7f28bce73fe02fbcc53c1d8071e75a80d36",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/sympy__sympy-12489/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-12489/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2057,
+        "sha256": "e983a9aecf2fe2876167433fb075f65cb3375238de22874d9f237b00f3ac1711",
+        "git_blob_oid": "7f0dad855acaac9395f4a84c2d9c18ee9916914b",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.sympy_1776_sympy-12489:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/sympy__sympy-12489/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-12489/environment/Dockerfile"
+      },
+      "task_index": 8,
+      "path": "datasets/swebench-verified/sympy__sympy-12489",
+      "task_tree_oid": "5c7149d8339cf5fb7c937c524b239e9f943bdc90",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-13496",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/scikit-learn__scikit-learn-13496/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-13496/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2071,
+        "sha256": "d7e01da31bae9eea7973e403d405499ea657e1746fcb3860930e532c910fecea",
+        "git_blob_oid": "6f6256f7b9f0d6c99f90b5b0eac2852f76d7f95a",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-13496:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/scikit-learn__scikit-learn-13496/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-13496/environment/Dockerfile"
+      },
+      "task_index": 9,
+      "path": "datasets/swebench-verified/scikit-learn__scikit-learn-13496",
+      "task_tree_oid": "c2fb0eec7f67f3720983985581fea16cb629d291",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-12585",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/scikit-learn__scikit-learn-12585/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-12585/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2071,
+        "sha256": "e3549fa1e3cfcd6fbf25244f0bd53cec3618c04bfac1be476d03d4061fa74ce6",
+        "git_blob_oid": "6b0ec7fff3f4db9d2a6e0f5fbf8191c2765c5377",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-12585:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/scikit-learn__scikit-learn-12585/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-12585/environment/Dockerfile"
+      },
+      "task_index": 10,
+      "path": "datasets/swebench-verified/scikit-learn__scikit-learn-12585",
+      "task_tree_oid": "2a1316990269677186eda45a5402a0d3abbc2a56",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-13328",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/scikit-learn__scikit-learn-13328/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-13328/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2071,
+        "sha256": "da8dd86efef9d9e5cf4aaf13462dc5102a40a985cd48c00af304bf0f53769c41",
+        "git_blob_oid": "58f6e7863a35dcf1b245fd935e58203aeb27b8f8",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-13328:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/scikit-learn__scikit-learn-13328/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-13328/environment/Dockerfile"
+      },
+      "task_index": 11,
+      "path": "datasets/swebench-verified/scikit-learn__scikit-learn-13328",
+      "task_tree_oid": "c07ae25ba249e6169b16df7ab6128b81630546c5",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-14983",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/scikit-learn__scikit-learn-14983/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-14983/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2071,
+        "sha256": "813c57b30986ca711b30bfeda73ba05fea5eadf69e81825a2f8266ba41fed90b",
+        "git_blob_oid": "69e33951e96dfd265585c312c65830d0cf16b2fe",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-14983:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/scikit-learn__scikit-learn-14983/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-14983/environment/Dockerfile"
+      },
+      "task_index": 12,
+      "path": "datasets/swebench-verified/scikit-learn__scikit-learn-14983",
+      "task_tree_oid": "10c83cc9d5c82c4ec0c19d7001752b6ec2cb8354",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "pytest-dev__pytest-6197",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 411,
+        "sha256": "c062317afc83dc6b0135001faf7fac6818014986409442efee9de6fa0fc7d414",
+        "git_blob_oid": "773bd7f28bce73fe02fbcc53c1d8071e75a80d36",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/pytest-dev__pytest-6197/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-6197/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2062,
+        "sha256": "4caf5242507184af7294ac5a9805979443e083468034c0efc3e96810c7977832",
+        "git_blob_oid": "a8aeeb8069ae9cedf73b2a5833a8239b18598dbf",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6197:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/pytest-dev__pytest-6197/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-6197/environment/Dockerfile"
+      },
+      "task_index": 13,
+      "path": "datasets/swebench-verified/pytest-dev__pytest-6197",
+      "task_tree_oid": "34704243c45610bc96b1e68440484a65bc4d9cf4",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "pytest-dev__pytest-7521",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/pytest-dev__pytest-7521/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-7521/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2062,
+        "sha256": "9c085822f132aafcfb855e3ec4732ca14a0e37b14cc4df6b500849cce1c7349f",
+        "git_blob_oid": "49fb55ede96948fa08f94328137375da2efaacc0",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-7521:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/pytest-dev__pytest-7521/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-7521/environment/Dockerfile"
+      },
+      "task_index": 14,
+      "path": "datasets/swebench-verified/pytest-dev__pytest-7521",
+      "task_tree_oid": "f1d602d7db78a30bd07f076cb2d3a1fb60b3e339",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "pytest-dev__pytest-6202",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/pytest-dev__pytest-6202/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-6202/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2062,
+        "sha256": "e5bf66635a44bd164ef5ba58c0353af08a7c7098582741684c3e99994e771ef3",
+        "git_blob_oid": "d348860f5b7394587b21469a73e7c8c6b7b83d30",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6202:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/pytest-dev__pytest-6202/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-6202/environment/Dockerfile"
+      },
+      "task_index": 15,
+      "path": "datasets/swebench-verified/pytest-dev__pytest-6202",
+      "task_tree_oid": "56decff02bd8d0b97f153969c5cadb4a76dce4aa",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "pytest-dev__pytest-5840",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/pytest-dev__pytest-5840/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-5840/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2062,
+        "sha256": "8132442141e01f1bd51434c8c3f01a158dd0b582e9cbcee1707a39bdc70a122f",
+        "git_blob_oid": "2b5e5f9b527cc5a0b5112a1995343bd9c68e4826",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-5840:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/pytest-dev__pytest-5840/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-5840/environment/Dockerfile"
+      },
+      "task_index": 16,
+      "path": "datasets/swebench-verified/pytest-dev__pytest-5840",
+      "task_tree_oid": "f335dd6f8eef63967787ac1d91924d8dad653641",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "pydata__xarray-7393",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/pydata__xarray-7393/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-7393/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2058,
+        "sha256": "88cf1df83a2ba7c2ed7d51cb0aaceda33dfd7c9ede61320f789f8e226beeaae9",
+        "git_blob_oid": "6f02bc9c4bd6967378dbfc0eedb3c3cbfa57b739",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.pydata_1776_xarray-7393:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/pydata__xarray-7393/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-7393/environment/Dockerfile"
+      },
+      "task_index": 17,
+      "path": "datasets/swebench-verified/pydata__xarray-7393",
+      "task_tree_oid": "8662e237408a107cfb39511b10e80963c3214841",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "pydata__xarray-2905",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/pydata__xarray-2905/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-2905/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2058,
+        "sha256": "458848d9788d449f46ff3be85a928588157286b6e6686994e9a5322c2a4577ac",
+        "git_blob_oid": "873fd4da5368d6902405018d4babec40ef8d3bc5",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.pydata_1776_xarray-2905:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/pydata__xarray-2905/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-2905/environment/Dockerfile"
+      },
+      "task_index": 18,
+      "path": "datasets/swebench-verified/pydata__xarray-2905",
+      "task_tree_oid": "785772096de43ffa33e7a72b35205cbccde39200",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "pydata__xarray-4075",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/pydata__xarray-4075/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-4075/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2058,
+        "sha256": "b364335b2d325dd035167b2acc287fdc1fadcb4c6b0db72d913654f6e581f79a",
+        "git_blob_oid": "c372fc3635cec8b19ed217aa8a87bcf394f02078",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.pydata_1776_xarray-4075:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/pydata__xarray-4075/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-4075/environment/Dockerfile"
+      },
+      "task_index": 19,
+      "path": "datasets/swebench-verified/pydata__xarray-4075",
+      "task_tree_oid": "dcd86825570d5a187c6b550dad71c224d4496975",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "pydata__xarray-4629",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/pydata__xarray-4629/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-4629/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2058,
+        "sha256": "50640292483f92d1c0f5888d3db88f440caafb3ff9ca119b60004a2affe07b82",
+        "git_blob_oid": "2dd7302642720bee8c33780435d21085985ecf09",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.pydata_1776_xarray-4629:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/pydata__xarray-4629/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-4629/environment/Dockerfile"
+      },
+      "task_index": 20,
+      "path": "datasets/swebench-verified/pydata__xarray-4629",
+      "task_tree_oid": "048dd3f0868de1b68e5ab5152fe7502a1895f3e1",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "matplotlib__matplotlib-25122",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/matplotlib__matplotlib-25122/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-25122/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2067,
+        "sha256": "990e17d7d76588830dc23e66bdfd35c5e8bf1aea7a5e31c41110bcfd869a1b41",
+        "git_blob_oid": "fdf8d1449547a83c7d6e89672f8d9badb9e2ef7c",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-25122:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/matplotlib__matplotlib-25122/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-25122/environment/Dockerfile"
+      },
+      "task_index": 21,
+      "path": "datasets/swebench-verified/matplotlib__matplotlib-25122",
+      "task_tree_oid": "401720d6e3e13bf14aed66764a3d261304ea361c",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "matplotlib__matplotlib-24627",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/matplotlib__matplotlib-24627/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-24627/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2067,
+        "sha256": "f26f0acbddd8b70c711bd68b9d710b5705e6e194c6b6a42258d561795f79110b",
+        "git_blob_oid": "72639936f13227095fb13e88b9a6be11c7e16d80",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24627:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/matplotlib__matplotlib-24627/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-24627/environment/Dockerfile"
+      },
+      "task_index": 22,
+      "path": "datasets/swebench-verified/matplotlib__matplotlib-24627",
+      "task_tree_oid": "45dbef49427dfa221d942a390b32d6b302ebc843",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "matplotlib__matplotlib-24026",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 417,
+        "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+        "git_blob_oid": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/matplotlib__matplotlib-24026/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-24026/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2067,
+        "sha256": "17e198e83f2ebf895cfbfd73d50d0d2f1a961618867a3926efa9e6ddc60c0b66",
+        "git_blob_oid": "674a6f5b1418e4c37a5a0b3154359184acd1522f",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24026:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/matplotlib__matplotlib-24026/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-24026/environment/Dockerfile"
+      },
+      "task_index": 23,
+      "path": "datasets/swebench-verified/matplotlib__matplotlib-24026",
+      "task_tree_oid": "a1162d23e68156c4ea130df6a04ef53fd122329b",
+      "task_tree_matches_source_map": true
+    },
+    {
+      "task_id": "matplotlib__matplotlib-25332",
+      "task_toml": {
+        "http_status": 200,
+        "bytes": 413,
+        "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+        "git_blob_oid": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+        "native_config": {
+          "agent": {
+            "timeout_sec": 3000
+          },
+          "verifier": {
+            "timeout_sec": 3000
+          },
+          "environment": {
+            "build_timeout_sec": 1800,
+            "cpus": 1,
+            "memory": "4G",
+            "storage": "10G"
+          }
+        },
+        "path": "datasets/swebench-verified/matplotlib__matplotlib-25332/task.toml",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-25332/task.toml"
+      },
+      "dockerfile": {
+        "http_status": 200,
+        "bytes": 2067,
+        "sha256": "0665fcdfa8848454959bcca3160f44fdf8598cd7e0fbe8e830981367f98e83a2",
+        "git_blob_oid": "39e754b687fe2a43b1ac2725c60ef67f3d0e455b",
+        "from_references": [
+          "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-25332:latest"
+        ],
+        "source_map_match": true,
+        "path": "datasets/swebench-verified/matplotlib__matplotlib-25332/environment/Dockerfile",
+        "url": "https://raw.githubusercontent.com/laude-institute/harbor-datasets/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-25332/environment/Dockerfile"
+      },
+      "task_index": 24,
+      "path": "datasets/swebench-verified/matplotlib__matplotlib-25332",
+      "task_tree_oid": "01c1bc4399570f9ea05acb9612a7edd33108ec53",
+      "task_tree_matches_source_map": true
+    }
+  ],
+  "declared_native_budgets": {
+    "task_count": 24,
+    "agent_timeout_seconds": 3000,
+    "verifier_timeout_seconds": 3000,
+    "environment_build_timeout_seconds": 1800,
+    "environment_cpus": 1,
+    "environment_memory": "4G",
+    "environment_storage": "10G",
+    "task_toml_sha256_groups": [
+      "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+      "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba",
+      "c062317afc83dc6b0135001faf7fac6818014986409442efee9de6fa0fc7d414"
+    ]
+  },
+  "modified_setup_source": {
+    "time_setup": {
+      "study_label": "prospective24-SolUltra-900s-agent-3000s-verifier-modified-setup",
+      "native_task_agent_seconds": 3000,
+      "native_task_verifier_seconds": 3000,
+      "proposed_agent_seconds": 900,
+      "proposed_verifier_seconds": 3000,
+      "named_deviation_reason": "Bound exploratory screen's agent time; retain modified-setup label because tighter budget may change outcomes",
+      "native_agent_carrier": "--agent-timeout-multiplier 0.3, after every selected original3000-second budget is bound and effective native deadline observed",
+      "native_verifier_carrier": "--verifier-timeout-multiplier 1.0",
+      "actual_deadline_enforcement_qualified": false,
+      "overhead_bounds": null
+    },
+    "before_freeze_deadline_requirement": [
+      "Named900-second modified setup, all native deadlines and setup/build/grading/cleanup bounds; adequate windows or accepted parallelism/timeout amendment"
+    ],
+    "native_retry_gate": "Freeze every runtime/helper/SDK retry policy; zero independent retries does not establish zero internal retries",
+    "order_fields": {
+      "complete_ordered_attempt_list": null,
+      "ordered_attempt_list_sha256": null
+    }
+  },
+  "order_proposal": {
+    "derivation_status": "source-derived task-major PROPOSAL; global repeat nesting not frozen",
+    "canonical_encoding": "JSON UTF-8, sorted object keys, compact separators, ensure_ascii=False, no trailing newline",
+    "block_count": 48,
+    "planned_arm_attempts": 144,
+    "blocks_sha256": "e8999c8a9948a40fad0564f2b2d1883f5bc4bf867699a1f9e66dd77c4ad6e1cb",
+    "ordered_attempt_rows_sha256": "15a9d3cc72bcd00f53d613eaa0847636573828d45125073a8cbe0b7790be85a4",
+    "first_two_blocks": [
+      {
+        "block_index": 1,
+        "task_index": 1,
+        "task_id": "django__django-14034",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "block_index": 2,
+        "task_index": 1,
+        "task_id": "django__django-14034",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          4,
+          5,
+          6
+        ]
+      }
+    ],
+    "last_block": {
+      "block_index": 48,
+      "task_index": 24,
+      "task_id": "matplotlib__matplotlib-25332",
+      "repeat": 2,
+      "arm_order": [
+        "openhands-sdk",
+        "native-codex",
+        "pi"
+      ],
+      "planned_attempt_indexes": [
+        142,
+        143,
+        144
+      ]
+    },
+    "source_carriers": {
+      "complete_ordered_attempt_list": null,
+      "ordered_attempt_list_sha256": null
+    },
+    "nesting_proposal": "task-major: each selected task repeat1 then repeat2, before the next task",
+    "global_nesting_binding": "UNDERDETERMINED in existing draft; root instructed retain this as a source-derived proposal pending explicit protocol binding and both-family freeze amendment",
+    "protocol_carriers_preserved_null": true,
+    "blocks": [
+      {
+        "block_index": 1,
+        "task_index": 1,
+        "task_id": "django__django-14034",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "block_index": 2,
+        "task_index": 1,
+        "task_id": "django__django-14034",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "block_index": 3,
+        "task_index": 2,
+        "task_id": "django__django-15569",
+        "repeat": 1,
+        "arm_order": [
+          "openhands-sdk",
+          "pi",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "block_index": 4,
+        "task_index": 2,
+        "task_id": "django__django-15569",
+        "repeat": 2,
+        "arm_order": [
+          "native-codex",
+          "pi",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "block_index": 5,
+        "task_index": 3,
+        "task_id": "django__django-11211",
+        "repeat": 1,
+        "arm_order": [
+          "pi",
+          "native-codex",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "block_index": 6,
+        "task_index": 3,
+        "task_id": "django__django-11211",
+        "repeat": 2,
+        "arm_order": [
+          "openhands-sdk",
+          "native-codex",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          16,
+          17,
+          18
+        ]
+      },
+      {
+        "block_index": 7,
+        "task_index": 4,
+        "task_id": "django__django-15572",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "block_index": 8,
+        "task_index": 4,
+        "task_id": "django__django-15572",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          22,
+          23,
+          24
+        ]
+      },
+      {
+        "block_index": 9,
+        "task_index": 5,
+        "task_id": "sympy__sympy-23824",
+        "repeat": 1,
+        "arm_order": [
+          "openhands-sdk",
+          "pi",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          25,
+          26,
+          27
+        ]
+      },
+      {
+        "block_index": 10,
+        "task_index": 5,
+        "task_id": "sympy__sympy-23824",
+        "repeat": 2,
+        "arm_order": [
+          "native-codex",
+          "pi",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "block_index": 11,
+        "task_index": 6,
+        "task_id": "sympy__sympy-13647",
+        "repeat": 1,
+        "arm_order": [
+          "pi",
+          "native-codex",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          31,
+          32,
+          33
+        ]
+      },
+      {
+        "block_index": 12,
+        "task_index": 6,
+        "task_id": "sympy__sympy-13647",
+        "repeat": 2,
+        "arm_order": [
+          "openhands-sdk",
+          "native-codex",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          34,
+          35,
+          36
+        ]
+      },
+      {
+        "block_index": 13,
+        "task_index": 7,
+        "task_id": "sympy__sympy-24066",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          37,
+          38,
+          39
+        ]
+      },
+      {
+        "block_index": 14,
+        "task_index": 7,
+        "task_id": "sympy__sympy-24066",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          40,
+          41,
+          42
+        ]
+      },
+      {
+        "block_index": 15,
+        "task_index": 8,
+        "task_id": "sympy__sympy-12489",
+        "repeat": 1,
+        "arm_order": [
+          "openhands-sdk",
+          "pi",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          43,
+          44,
+          45
+        ]
+      },
+      {
+        "block_index": 16,
+        "task_index": 8,
+        "task_id": "sympy__sympy-12489",
+        "repeat": 2,
+        "arm_order": [
+          "native-codex",
+          "pi",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          46,
+          47,
+          48
+        ]
+      },
+      {
+        "block_index": 17,
+        "task_index": 9,
+        "task_id": "scikit-learn__scikit-learn-13496",
+        "repeat": 1,
+        "arm_order": [
+          "pi",
+          "native-codex",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          49,
+          50,
+          51
+        ]
+      },
+      {
+        "block_index": 18,
+        "task_index": 9,
+        "task_id": "scikit-learn__scikit-learn-13496",
+        "repeat": 2,
+        "arm_order": [
+          "openhands-sdk",
+          "native-codex",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          52,
+          53,
+          54
+        ]
+      },
+      {
+        "block_index": 19,
+        "task_index": 10,
+        "task_id": "scikit-learn__scikit-learn-12585",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          55,
+          56,
+          57
+        ]
+      },
+      {
+        "block_index": 20,
+        "task_index": 10,
+        "task_id": "scikit-learn__scikit-learn-12585",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          58,
+          59,
+          60
+        ]
+      },
+      {
+        "block_index": 21,
+        "task_index": 11,
+        "task_id": "scikit-learn__scikit-learn-13328",
+        "repeat": 1,
+        "arm_order": [
+          "openhands-sdk",
+          "pi",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          61,
+          62,
+          63
+        ]
+      },
+      {
+        "block_index": 22,
+        "task_index": 11,
+        "task_id": "scikit-learn__scikit-learn-13328",
+        "repeat": 2,
+        "arm_order": [
+          "native-codex",
+          "pi",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          64,
+          65,
+          66
+        ]
+      },
+      {
+        "block_index": 23,
+        "task_index": 12,
+        "task_id": "scikit-learn__scikit-learn-14983",
+        "repeat": 1,
+        "arm_order": [
+          "pi",
+          "native-codex",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          67,
+          68,
+          69
+        ]
+      },
+      {
+        "block_index": 24,
+        "task_index": 12,
+        "task_id": "scikit-learn__scikit-learn-14983",
+        "repeat": 2,
+        "arm_order": [
+          "openhands-sdk",
+          "native-codex",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          70,
+          71,
+          72
+        ]
+      },
+      {
+        "block_index": 25,
+        "task_index": 13,
+        "task_id": "pytest-dev__pytest-6197",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          73,
+          74,
+          75
+        ]
+      },
+      {
+        "block_index": 26,
+        "task_index": 13,
+        "task_id": "pytest-dev__pytest-6197",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          76,
+          77,
+          78
+        ]
+      },
+      {
+        "block_index": 27,
+        "task_index": 14,
+        "task_id": "pytest-dev__pytest-7521",
+        "repeat": 1,
+        "arm_order": [
+          "openhands-sdk",
+          "pi",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          79,
+          80,
+          81
+        ]
+      },
+      {
+        "block_index": 28,
+        "task_index": 14,
+        "task_id": "pytest-dev__pytest-7521",
+        "repeat": 2,
+        "arm_order": [
+          "native-codex",
+          "pi",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          82,
+          83,
+          84
+        ]
+      },
+      {
+        "block_index": 29,
+        "task_index": 15,
+        "task_id": "pytest-dev__pytest-6202",
+        "repeat": 1,
+        "arm_order": [
+          "pi",
+          "native-codex",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          85,
+          86,
+          87
+        ]
+      },
+      {
+        "block_index": 30,
+        "task_index": 15,
+        "task_id": "pytest-dev__pytest-6202",
+        "repeat": 2,
+        "arm_order": [
+          "openhands-sdk",
+          "native-codex",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          88,
+          89,
+          90
+        ]
+      },
+      {
+        "block_index": 31,
+        "task_index": 16,
+        "task_id": "pytest-dev__pytest-5840",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          91,
+          92,
+          93
+        ]
+      },
+      {
+        "block_index": 32,
+        "task_index": 16,
+        "task_id": "pytest-dev__pytest-5840",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          94,
+          95,
+          96
+        ]
+      },
+      {
+        "block_index": 33,
+        "task_index": 17,
+        "task_id": "pydata__xarray-7393",
+        "repeat": 1,
+        "arm_order": [
+          "openhands-sdk",
+          "pi",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          97,
+          98,
+          99
+        ]
+      },
+      {
+        "block_index": 34,
+        "task_index": 17,
+        "task_id": "pydata__xarray-7393",
+        "repeat": 2,
+        "arm_order": [
+          "native-codex",
+          "pi",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          100,
+          101,
+          102
+        ]
+      },
+      {
+        "block_index": 35,
+        "task_index": 18,
+        "task_id": "pydata__xarray-2905",
+        "repeat": 1,
+        "arm_order": [
+          "pi",
+          "native-codex",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          103,
+          104,
+          105
+        ]
+      },
+      {
+        "block_index": 36,
+        "task_index": 18,
+        "task_id": "pydata__xarray-2905",
+        "repeat": 2,
+        "arm_order": [
+          "openhands-sdk",
+          "native-codex",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          106,
+          107,
+          108
+        ]
+      },
+      {
+        "block_index": 37,
+        "task_index": 19,
+        "task_id": "pydata__xarray-4075",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          109,
+          110,
+          111
+        ]
+      },
+      {
+        "block_index": 38,
+        "task_index": 19,
+        "task_id": "pydata__xarray-4075",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          112,
+          113,
+          114
+        ]
+      },
+      {
+        "block_index": 39,
+        "task_index": 20,
+        "task_id": "pydata__xarray-4629",
+        "repeat": 1,
+        "arm_order": [
+          "openhands-sdk",
+          "pi",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          115,
+          116,
+          117
+        ]
+      },
+      {
+        "block_index": 40,
+        "task_index": 20,
+        "task_id": "pydata__xarray-4629",
+        "repeat": 2,
+        "arm_order": [
+          "native-codex",
+          "pi",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          118,
+          119,
+          120
+        ]
+      },
+      {
+        "block_index": 41,
+        "task_index": 21,
+        "task_id": "matplotlib__matplotlib-25122",
+        "repeat": 1,
+        "arm_order": [
+          "pi",
+          "native-codex",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          121,
+          122,
+          123
+        ]
+      },
+      {
+        "block_index": 42,
+        "task_index": 21,
+        "task_id": "matplotlib__matplotlib-25122",
+        "repeat": 2,
+        "arm_order": [
+          "openhands-sdk",
+          "native-codex",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          124,
+          125,
+          126
+        ]
+      },
+      {
+        "block_index": 43,
+        "task_index": 22,
+        "task_id": "matplotlib__matplotlib-24627",
+        "repeat": 1,
+        "arm_order": [
+          "native-codex",
+          "openhands-sdk",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          127,
+          128,
+          129
+        ]
+      },
+      {
+        "block_index": 44,
+        "task_index": 22,
+        "task_id": "matplotlib__matplotlib-24627",
+        "repeat": 2,
+        "arm_order": [
+          "pi",
+          "openhands-sdk",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          130,
+          131,
+          132
+        ]
+      },
+      {
+        "block_index": 45,
+        "task_index": 23,
+        "task_id": "matplotlib__matplotlib-24026",
+        "repeat": 1,
+        "arm_order": [
+          "openhands-sdk",
+          "pi",
+          "native-codex"
+        ],
+        "planned_attempt_indexes": [
+          133,
+          134,
+          135
+        ]
+      },
+      {
+        "block_index": 46,
+        "task_index": 23,
+        "task_id": "matplotlib__matplotlib-24026",
+        "repeat": 2,
+        "arm_order": [
+          "native-codex",
+          "pi",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          136,
+          137,
+          138
+        ]
+      },
+      {
+        "block_index": 47,
+        "task_index": 24,
+        "task_id": "matplotlib__matplotlib-25332",
+        "repeat": 1,
+        "arm_order": [
+          "pi",
+          "native-codex",
+          "openhands-sdk"
+        ],
+        "planned_attempt_indexes": [
+          139,
+          140,
+          141
+        ]
+      },
+      {
+        "block_index": 48,
+        "task_index": 24,
+        "task_id": "matplotlib__matplotlib-25332",
+        "repeat": 2,
+        "arm_order": [
+          "openhands-sdk",
+          "native-codex",
+          "pi"
+        ],
+        "planned_attempt_indexes": [
+          142,
+          143,
+          144
+        ]
+      }
+    ],
+    "ordered_attempt_rows": [
+      {
+        "planned_attempt_index": 1,
+        "block_index": 1,
+        "task_id": "django__django-14034",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 2,
+        "block_index": 1,
+        "task_id": "django__django-14034",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 3,
+        "block_index": 1,
+        "task_id": "django__django-14034",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 4,
+        "block_index": 2,
+        "task_id": "django__django-14034",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 5,
+        "block_index": 2,
+        "task_id": "django__django-14034",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 6,
+        "block_index": 2,
+        "task_id": "django__django-14034",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 7,
+        "block_index": 3,
+        "task_id": "django__django-15569",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 8,
+        "block_index": 3,
+        "task_id": "django__django-15569",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 9,
+        "block_index": 3,
+        "task_id": "django__django-15569",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 10,
+        "block_index": 4,
+        "task_id": "django__django-15569",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 11,
+        "block_index": 4,
+        "task_id": "django__django-15569",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 12,
+        "block_index": 4,
+        "task_id": "django__django-15569",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 13,
+        "block_index": 5,
+        "task_id": "django__django-11211",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 14,
+        "block_index": 5,
+        "task_id": "django__django-11211",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 15,
+        "block_index": 5,
+        "task_id": "django__django-11211",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 16,
+        "block_index": 6,
+        "task_id": "django__django-11211",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 17,
+        "block_index": 6,
+        "task_id": "django__django-11211",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 18,
+        "block_index": 6,
+        "task_id": "django__django-11211",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 19,
+        "block_index": 7,
+        "task_id": "django__django-15572",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 20,
+        "block_index": 7,
+        "task_id": "django__django-15572",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 21,
+        "block_index": 7,
+        "task_id": "django__django-15572",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 22,
+        "block_index": 8,
+        "task_id": "django__django-15572",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 23,
+        "block_index": 8,
+        "task_id": "django__django-15572",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 24,
+        "block_index": 8,
+        "task_id": "django__django-15572",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 25,
+        "block_index": 9,
+        "task_id": "sympy__sympy-23824",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 26,
+        "block_index": 9,
+        "task_id": "sympy__sympy-23824",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 27,
+        "block_index": 9,
+        "task_id": "sympy__sympy-23824",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 28,
+        "block_index": 10,
+        "task_id": "sympy__sympy-23824",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 29,
+        "block_index": 10,
+        "task_id": "sympy__sympy-23824",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 30,
+        "block_index": 10,
+        "task_id": "sympy__sympy-23824",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 31,
+        "block_index": 11,
+        "task_id": "sympy__sympy-13647",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 32,
+        "block_index": 11,
+        "task_id": "sympy__sympy-13647",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 33,
+        "block_index": 11,
+        "task_id": "sympy__sympy-13647",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 34,
+        "block_index": 12,
+        "task_id": "sympy__sympy-13647",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 35,
+        "block_index": 12,
+        "task_id": "sympy__sympy-13647",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 36,
+        "block_index": 12,
+        "task_id": "sympy__sympy-13647",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 37,
+        "block_index": 13,
+        "task_id": "sympy__sympy-24066",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 38,
+        "block_index": 13,
+        "task_id": "sympy__sympy-24066",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 39,
+        "block_index": 13,
+        "task_id": "sympy__sympy-24066",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 40,
+        "block_index": 14,
+        "task_id": "sympy__sympy-24066",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 41,
+        "block_index": 14,
+        "task_id": "sympy__sympy-24066",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 42,
+        "block_index": 14,
+        "task_id": "sympy__sympy-24066",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 43,
+        "block_index": 15,
+        "task_id": "sympy__sympy-12489",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 44,
+        "block_index": 15,
+        "task_id": "sympy__sympy-12489",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 45,
+        "block_index": 15,
+        "task_id": "sympy__sympy-12489",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 46,
+        "block_index": 16,
+        "task_id": "sympy__sympy-12489",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 47,
+        "block_index": 16,
+        "task_id": "sympy__sympy-12489",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 48,
+        "block_index": 16,
+        "task_id": "sympy__sympy-12489",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 49,
+        "block_index": 17,
+        "task_id": "scikit-learn__scikit-learn-13496",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 50,
+        "block_index": 17,
+        "task_id": "scikit-learn__scikit-learn-13496",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 51,
+        "block_index": 17,
+        "task_id": "scikit-learn__scikit-learn-13496",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 52,
+        "block_index": 18,
+        "task_id": "scikit-learn__scikit-learn-13496",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 53,
+        "block_index": 18,
+        "task_id": "scikit-learn__scikit-learn-13496",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 54,
+        "block_index": 18,
+        "task_id": "scikit-learn__scikit-learn-13496",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 55,
+        "block_index": 19,
+        "task_id": "scikit-learn__scikit-learn-12585",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 56,
+        "block_index": 19,
+        "task_id": "scikit-learn__scikit-learn-12585",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 57,
+        "block_index": 19,
+        "task_id": "scikit-learn__scikit-learn-12585",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 58,
+        "block_index": 20,
+        "task_id": "scikit-learn__scikit-learn-12585",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 59,
+        "block_index": 20,
+        "task_id": "scikit-learn__scikit-learn-12585",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 60,
+        "block_index": 20,
+        "task_id": "scikit-learn__scikit-learn-12585",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 61,
+        "block_index": 21,
+        "task_id": "scikit-learn__scikit-learn-13328",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 62,
+        "block_index": 21,
+        "task_id": "scikit-learn__scikit-learn-13328",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 63,
+        "block_index": 21,
+        "task_id": "scikit-learn__scikit-learn-13328",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 64,
+        "block_index": 22,
+        "task_id": "scikit-learn__scikit-learn-13328",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 65,
+        "block_index": 22,
+        "task_id": "scikit-learn__scikit-learn-13328",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 66,
+        "block_index": 22,
+        "task_id": "scikit-learn__scikit-learn-13328",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 67,
+        "block_index": 23,
+        "task_id": "scikit-learn__scikit-learn-14983",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 68,
+        "block_index": 23,
+        "task_id": "scikit-learn__scikit-learn-14983",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 69,
+        "block_index": 23,
+        "task_id": "scikit-learn__scikit-learn-14983",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 70,
+        "block_index": 24,
+        "task_id": "scikit-learn__scikit-learn-14983",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 71,
+        "block_index": 24,
+        "task_id": "scikit-learn__scikit-learn-14983",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 72,
+        "block_index": 24,
+        "task_id": "scikit-learn__scikit-learn-14983",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 73,
+        "block_index": 25,
+        "task_id": "pytest-dev__pytest-6197",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 74,
+        "block_index": 25,
+        "task_id": "pytest-dev__pytest-6197",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 75,
+        "block_index": 25,
+        "task_id": "pytest-dev__pytest-6197",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 76,
+        "block_index": 26,
+        "task_id": "pytest-dev__pytest-6197",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 77,
+        "block_index": 26,
+        "task_id": "pytest-dev__pytest-6197",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 78,
+        "block_index": 26,
+        "task_id": "pytest-dev__pytest-6197",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 79,
+        "block_index": 27,
+        "task_id": "pytest-dev__pytest-7521",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 80,
+        "block_index": 27,
+        "task_id": "pytest-dev__pytest-7521",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 81,
+        "block_index": 27,
+        "task_id": "pytest-dev__pytest-7521",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 82,
+        "block_index": 28,
+        "task_id": "pytest-dev__pytest-7521",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 83,
+        "block_index": 28,
+        "task_id": "pytest-dev__pytest-7521",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 84,
+        "block_index": 28,
+        "task_id": "pytest-dev__pytest-7521",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 85,
+        "block_index": 29,
+        "task_id": "pytest-dev__pytest-6202",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 86,
+        "block_index": 29,
+        "task_id": "pytest-dev__pytest-6202",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 87,
+        "block_index": 29,
+        "task_id": "pytest-dev__pytest-6202",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 88,
+        "block_index": 30,
+        "task_id": "pytest-dev__pytest-6202",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 89,
+        "block_index": 30,
+        "task_id": "pytest-dev__pytest-6202",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 90,
+        "block_index": 30,
+        "task_id": "pytest-dev__pytest-6202",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 91,
+        "block_index": 31,
+        "task_id": "pytest-dev__pytest-5840",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 92,
+        "block_index": 31,
+        "task_id": "pytest-dev__pytest-5840",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 93,
+        "block_index": 31,
+        "task_id": "pytest-dev__pytest-5840",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 94,
+        "block_index": 32,
+        "task_id": "pytest-dev__pytest-5840",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 95,
+        "block_index": 32,
+        "task_id": "pytest-dev__pytest-5840",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 96,
+        "block_index": 32,
+        "task_id": "pytest-dev__pytest-5840",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 97,
+        "block_index": 33,
+        "task_id": "pydata__xarray-7393",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 98,
+        "block_index": 33,
+        "task_id": "pydata__xarray-7393",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 99,
+        "block_index": 33,
+        "task_id": "pydata__xarray-7393",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 100,
+        "block_index": 34,
+        "task_id": "pydata__xarray-7393",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 101,
+        "block_index": 34,
+        "task_id": "pydata__xarray-7393",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 102,
+        "block_index": 34,
+        "task_id": "pydata__xarray-7393",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 103,
+        "block_index": 35,
+        "task_id": "pydata__xarray-2905",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 104,
+        "block_index": 35,
+        "task_id": "pydata__xarray-2905",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 105,
+        "block_index": 35,
+        "task_id": "pydata__xarray-2905",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 106,
+        "block_index": 36,
+        "task_id": "pydata__xarray-2905",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 107,
+        "block_index": 36,
+        "task_id": "pydata__xarray-2905",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 108,
+        "block_index": 36,
+        "task_id": "pydata__xarray-2905",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 109,
+        "block_index": 37,
+        "task_id": "pydata__xarray-4075",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 110,
+        "block_index": 37,
+        "task_id": "pydata__xarray-4075",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 111,
+        "block_index": 37,
+        "task_id": "pydata__xarray-4075",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 112,
+        "block_index": 38,
+        "task_id": "pydata__xarray-4075",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 113,
+        "block_index": 38,
+        "task_id": "pydata__xarray-4075",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 114,
+        "block_index": 38,
+        "task_id": "pydata__xarray-4075",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 115,
+        "block_index": 39,
+        "task_id": "pydata__xarray-4629",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 116,
+        "block_index": 39,
+        "task_id": "pydata__xarray-4629",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 117,
+        "block_index": 39,
+        "task_id": "pydata__xarray-4629",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 118,
+        "block_index": 40,
+        "task_id": "pydata__xarray-4629",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 119,
+        "block_index": 40,
+        "task_id": "pydata__xarray-4629",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 120,
+        "block_index": 40,
+        "task_id": "pydata__xarray-4629",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 121,
+        "block_index": 41,
+        "task_id": "matplotlib__matplotlib-25122",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 122,
+        "block_index": 41,
+        "task_id": "matplotlib__matplotlib-25122",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 123,
+        "block_index": 41,
+        "task_id": "matplotlib__matplotlib-25122",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 124,
+        "block_index": 42,
+        "task_id": "matplotlib__matplotlib-25122",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 125,
+        "block_index": 42,
+        "task_id": "matplotlib__matplotlib-25122",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 126,
+        "block_index": 42,
+        "task_id": "matplotlib__matplotlib-25122",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 127,
+        "block_index": 43,
+        "task_id": "matplotlib__matplotlib-24627",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 128,
+        "block_index": 43,
+        "task_id": "matplotlib__matplotlib-24627",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 129,
+        "block_index": 43,
+        "task_id": "matplotlib__matplotlib-24627",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 130,
+        "block_index": 44,
+        "task_id": "matplotlib__matplotlib-24627",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 131,
+        "block_index": 44,
+        "task_id": "matplotlib__matplotlib-24627",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 132,
+        "block_index": 44,
+        "task_id": "matplotlib__matplotlib-24627",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 133,
+        "block_index": 45,
+        "task_id": "matplotlib__matplotlib-24026",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 134,
+        "block_index": 45,
+        "task_id": "matplotlib__matplotlib-24026",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 135,
+        "block_index": 45,
+        "task_id": "matplotlib__matplotlib-24026",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 136,
+        "block_index": 46,
+        "task_id": "matplotlib__matplotlib-24026",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 137,
+        "block_index": 46,
+        "task_id": "matplotlib__matplotlib-24026",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 138,
+        "block_index": 46,
+        "task_id": "matplotlib__matplotlib-24026",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 139,
+        "block_index": 47,
+        "task_id": "matplotlib__matplotlib-25332",
+        "repeat": 1,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 140,
+        "block_index": 47,
+        "task_id": "matplotlib__matplotlib-25332",
+        "repeat": 1,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 141,
+        "block_index": 47,
+        "task_id": "matplotlib__matplotlib-25332",
+        "repeat": 1,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 142,
+        "block_index": 48,
+        "task_id": "matplotlib__matplotlib-25332",
+        "repeat": 2,
+        "arm_id": "openhands-sdk",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 143,
+        "block_index": 48,
+        "task_id": "matplotlib__matplotlib-25332",
+        "repeat": 2,
+        "arm_id": "native-codex",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      },
+      {
+        "planned_attempt_index": 144,
+        "block_index": 48,
+        "task_id": "matplotlib__matplotlib-25332",
+        "repeat": 2,
+        "arm_id": "pi",
+        "phases": [
+          "agent",
+          "unchanged-native-verifier"
+        ]
+      }
+    ]
+  },
+  "attempt_accounting": {
+    "planned_tasks": 24,
+    "repeats_per_task_arm": 2,
+    "arms": 3,
+    "task_repeat_blocks": 48,
+    "planned_valid_arm_attempts": 144,
+    "maximum_invalid_blocks": 2,
+    "maximum_recovery_arm_attempts": 6,
+    "maximum_recorded_arm_attempts_before_abort": 150,
+    "independent_arm_retries": 0,
+    "native_internal_retries": "Separate runtime/helper/SDK scope remains unqualified; not included in arm-attempt count",
+    "on_infrastructure_invalid": "Retain original invalid attempts and recover the whole three-arm task-repeat block under unchanged hashes in a subsequent authorized window; no independent-arm retry",
+    "on_third_invalid_block": "Abort; no winner"
+  },
+  "window_arithmetic": {
+    "concurrent_model_tasks": 1,
+    "per_arm_proposed_agent_seconds": 900,
+    "per_arm_native_verifier_seconds": 3000,
+    "serial_agent_and_verifier_seconds_per_block": 11700,
+    "minutes_per_block_before_overheads": 195,
+    "all_48_blocks_hours_before_overheads": 156,
+    "two_recovery_blocks_hours_before_overheads": 6.5,
+    "supplied_window_hours": 6,
+    "maximum_whole_worst_case_blocks_before_overheads": 1,
+    "one_block_admission_qualified": false,
+    "overhead_bounds": null,
+    "interpretation": "At most one whole worst-case block fits a six-hour window before setup/build/grading-related overhead and cleanup; actual admission requires complete overhead bounds. No total study completion claim."
+  },
+  "remaining_freeze_gates": [
+    "Root must bind explicit global task-repeat nesting and complete ordered task-repeat-arm/phase list plus canonical hash; current protocol list/hash are null.",
+    "Astra/max, Claude and root must accept the exact amended protocol/source/config hashes before freeze.",
+    "Observe native effective 900-second modified agent and 3000-second verifier deadlines; source-only task.toml reads do not prove enforcement.",
+    "Bind setup/build/grading/cleanup bounds and sufficient coordinated windows; serial 195-minute block estimate excludes overhead.",
+    "Resolve platform image manifests/digests and actual built-image identity/source-policy enforcement; every observed Dockerfile FROM uses a mutable latest tag.",
+    "Qualify installed target runtimes, native loaders/extensions, identical enforced isolation/network/tool policy and useful worker roles.",
+    "Qualify the held keyless gateway/model/effort/parallel/no-cache/correlation bindings and complete authoritative usage including failed/internal/helper/grading scopes; unknown remains null.",
+    "Bind native retry policies and whole-block recovery/abort enforcement; source identities do not establish operational recovery."
+  ],
+  "failures_preserved": [
+    {
+      "kind": "invalid_committed_protocol_JSON",
+      "ref": "d8ee66b72b076ab910f05342eeb0c824cf0a8695",
+      "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
+      "native_git_show_exit": 0,
+      "sha256": "032cbd2f6b4aea81f19912ca5292ef724b8e6c211a13cb0ecc714ea63ce2236d",
+      "strict_parse_error": "Extra data: line 290 column 5 (char 19363)",
+      "leading_object_used": "Source leads only; never treated as valid complete JSON",
+      "repair": "Parent-owned exact1695dc686aa28299c184982b316591de2f65514d passes strict parsing; no worker repair to protocol"
+    },
+    {
+      "kind": "task_message_dataset_label_correction",
+      "incorrect_label": "SWEbenchPro",
+      "verified_label": "SWEbench Verified1.0",
+      "verification": "Exact repaired draft sources and held Harbor registry; parent accepted message-only correction; no dataset/path change"
+    },
+    {
+      "kind": "global_order_nesting_gap",
+      "existing_complete_ordered_attempt_list": null,
+      "existing_ordered_attempt_list_sha256": null,
+      "disposition": "Retain task-major ordering only as derived proposal; no protocol edit or freeze"
+    }
+  ],
+  "validation": {
+    "baseline": {
+      "command": "rtk proxy python3 scripts/validate.py",
+      "exit": 0,
+      "stdout_bytes": 161,
+      "stdout_sha256": "50a6d6f8ab7b2d6d786c2abf9fb60daf8728e01a633a722bd720facb01d13a6f",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "{\"components\": 69, \"hashed_files\": 9487, \"profiles\": 4, \"receipts\": 187, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stderr": ""
+    },
+    "post_write": {
+      "command": "rtk proxy python3 scripts/validate.py",
+      "exit": 1,
+      "stdout_bytes": 155,
+      "stdout_sha256": "6eda0a10ffc5cbe3fdb205c197bf04f51a2fe6ebbb97d08f89c82a3c1231dac8",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/coding-task-source-identities.json: evidence file is not hash-listed\n",
+      "stderr": "",
+      "classification": "Expected publication registry gap: sole new owned receipt is not hash-listed; worker does not own registry.",
+      "derived_receipt_checks": {
+        "kind": "locally computed source/arithmetic integrity checks; not upstream native task tests",
+        "canonical_order_hashes_match": true,
+        "input_hashes_match": {
+          "protocol": true,
+          "source_map": true,
+          "source_policy": true,
+          "shared_execution_contract": true
+        },
+        "counts": [
+          24,
+          48,
+          144
+        ]
+      },
+      "receipt_update_failure": {
+        "tool": "apply_patch",
+        "result": "verification failed before mutation",
+        "cause": "Only the first replacement line had an addition prefix; remaining replacement lines were interpreted as context.",
+        "correction": "Prefix every replacement line; verify original file by strict JSON parsing and canonical hash checks after apply_patch."
+      }
+    }
+  },
+  "acceptance_boundary": "All24 original source budgets/tree/Docker identities and seed selection are verified source observations. Native task success, model route, role quality, image readiness, complete usage and freeze remain unmeasured."
+}

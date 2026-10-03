@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "isolated_native_binary_readiness_not_role_acceptance",
+  "source": {
+    "repository": "https://github.com/openai/codex",
+    "tag": "rust-v0.160.0",
+    "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "file": "README.md",
+    "bytes": 3334,
+    "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+    "scope": "Root re-read the pinned original supported Linux archive extraction/rename recipe and native release API. Official CLI documentation was fetched separately; its redirect destination is learn.chatgpt.com/docs/codex/cli."
+  },
+  "official_asset": {
+    "url": "https://github.com/openai/codex/releases/download/rust-v0.160.0/codex-x86_64-unknown-linux-musl.tar.gz",
+    "published_at": "2026-10-01T20:19:13Z",
+    "bytes": 109304578,
+    "sha256": "306865417d4ee7a927785852910a527f41e1e159add390ac5ae3accb67d44a13",
+    "native_download_exit_code": 0,
+    "native_hash_exit_code": 0,
+    "native_size_exit_code": 0,
+    "hash_matches_release_asset_digest": true,
+    "native_member_listing_exit_code": 0,
+    "archive_members": ["codex-x86_64-unknown-linux-musl"],
+    "native_extract_exit_code": 0,
+    "native_rename_exit_code": 0,
+    "binary_sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad"
+  },
+  "native_observations": {
+    "private_binary_version_exit_code": 0,
+    "private_binary_version_output": "codex-cli 0.160.0",
+    "exec_help_exit_code": 0,
+    "installed_client_version_exit_code": 0,
+    "installed_client_version_output": "codex-cli 0.159.3",
+    "carrier_options_observed": ["--config", "--strict-config", "--sandbox", "--ephemeral", "--ignore-user-config", "--ignore-rules", "--json", "--output-schema", "exec review"],
+    "config_boundary": "Native help says --ignore-user-config skips the base user config while authentication still uses its native location. No configuration, authentication file or credential value was agent-read, copied or replaced. No model task or SDK process was started.",
+    "installation_scope": "Owned private binary only; installed workstation client and Claude-owned client configuration were not changed."
+  },
+  "qualification": {
+    "gateway_transport": false,
+    "delivered_effort": false,
+    "native_org_extensions": false,
+    "useful_coding_or_review_task": false,
+    "sdk_role_617": false,
+    "quality_comparison": false,
+    "new_default": false
+  },
+  "usage": {"provider_usage": null, "billing_usd": null, "scope": "Version/help/install observations are not a new model run."}
+}

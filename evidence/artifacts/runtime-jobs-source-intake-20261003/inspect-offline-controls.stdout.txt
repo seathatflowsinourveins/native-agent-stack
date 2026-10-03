@@ -1,0 +1,16 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0
+rootdir: ${SOURCE_CHECKOUT}
+configfile: pyproject.toml
+plugins: mock-3.15.1, dotenv-0.5.2, reportlog-1.0.0, xdist-3.8.0, anyio-4.14.2, syrupy-5.5.3, timeout-2.4.0, cov-7.1.0, textual-snapshot-1.0.0
+collected 8 items
+
+tests/scorer/test_match.py ..ss                                          [ 50%]
+tests/model/test_generate_attempt_timeout.py .s                          [ 75%]
+tests/agent/test_bridge_provider_errors.py ..                            [100%]
+
+=========================== short test summary info ============================
+SKIPPED [1] tests/scorer/test_match.py:113: need --runtrio option to run
+SKIPPED [1] tests/scorer/test_match.py:123: need --runtrio option to run
+SKIPPED [1] tests/model/test_generate_attempt_timeout.py:161: need --runtrio option to run
+========================= 5 passed, 3 skipped in 4.87s =========================

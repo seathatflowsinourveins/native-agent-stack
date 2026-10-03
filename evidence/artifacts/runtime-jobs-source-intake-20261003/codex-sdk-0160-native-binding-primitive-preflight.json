@@ -1,0 +1,694 @@
+{
+  "schema_version": 1,
+  "kind": "codex-sdk-0160-native-binding-primitive-preflight",
+  "recorded_at_utc": "2026-10-03 12:20:39 UTC",
+  "repository_base": "cdbf1872b87bcbaa15bc3f14d157d9a61765ca7b",
+  "evidence_class": "Instrumented native metadata/cache integration observation and unchanged zero-selected upstream Jest control",
+  "status": "metadata_cache_gate_passed_sdk_acceptance_hold",
+  "review": {
+    "reviewer": "Astra",
+    "effort": "max",
+    "reported_by": "coordinator",
+    "trigger": "Earlier native SDK positive suite remained 1 failed and 22 filtered skips after one bounded Sol companion-staging repair. Cause remained unproven.",
+    "previous_object_value_expectation": "REJECT: ordinary object output did not return required metadata values",
+    "correction_acceptance": "SOURCE ONLY: one bounded primitive-string correction, conditional on all declared native gates",
+    "target_exit_acceptance": "SOURCE ONLY: authentic final miss with pending only [1] binds normal code-zero unsignaled target completion through pinned onChildExit",
+    "sdk_acceptance": "HOLD",
+    "new_positive_fixture_acceptance": false
+  },
+  "scope": {
+    "zero_selected_fixture_callbacks": true,
+    "selected_fixture_callbacks": 0,
+    "fixture_timeout_setting_unchanged_ms": 5000,
+    "fixture_timer_observed": false,
+    "observer_deadline_ms": 10000,
+    "corrected_observer_attempts": 1,
+    "old_object_attempt_preserved_separately": true,
+    "provider_or_model_execution": false,
+    "proxy_request_execution": false,
+    "source_or_fixture_changes": false,
+    "launch_flags_changed": false,
+    "node_options_changed": false,
+    "mount_or_network_expansion": false,
+    "custom_shim": false,
+    "full_bubblewrap_acceptance_claim": false
+  },
+  "source_pins": {
+    "codex": {
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "material": "Unchanged SDK TypeScript source"
+    },
+    "node": {
+      "repository": "nodejs/node",
+      "commit": "955266bfdd854cd280dffd47548673914484e4c0",
+      "version": "24.21.0"
+    },
+    "jest": {
+      "repository": "jestjs/jest",
+      "commit": "4e56991693da7cd4c3730dc3579a1dd1403ee630",
+      "version": "29.7.0"
+    },
+    "ts_jest": {
+      "repository": "kulshekhar/ts-jest",
+      "commit": "89a4f9f3d7a9c78b94f6c636a600b181accc1f98",
+      "version": "29.4.4"
+    },
+    "ts_jest_mock_import_meta": {
+      "package": "ts-jest-mock-import-meta",
+      "version": "1.3.1",
+      "official_registry_url": "https://registry.npmjs.org/ts-jest-mock-import-meta/1.3.1",
+      "npm_git_head": "dd0459a41b9e9851d571c1a4cf7783a6da9d8bfd"
+    }
+  },
+  "native_source_identities": [
+    {
+      "source_id": "node_probe",
+      "path": "lib/internal/debugger/inspect_probe.js",
+      "bytes": 40385,
+      "sha256": "a87f17a8fb7e50d3b0a029b4ef46e0b9fd2fd41b933bef88f63f62461750b128"
+    },
+    {
+      "source_id": "jest_runtime_installed",
+      "path": "node_modules/jest-runtime/build/index.js",
+      "bytes": 76254,
+      "sha256": "4afb88009e1b907c4d5b098930834a0f09115ebf5a2fe0551349d5a17bc3ef03"
+    },
+    {
+      "source_id": "jest_transform_installed",
+      "path": "node_modules/@jest/transform/build/ScriptTransformer.js",
+      "bytes": 30828,
+      "sha256": "e07cd7a88714d6600d2d0cf88071f2df5635ece2bab9428bf5ae5b396d8d36ff"
+    },
+    {
+      "source_id": "jest_cli_installed",
+      "path": "node_modules/jest-cli/build/args.js",
+      "bytes": 22761,
+      "sha256": "512ce9ca64e773ea2b2fd04bdb75fbfffbb4794ac6f8e71d9dc786372de84f76"
+    },
+    {
+      "source_id": "node_protocol",
+      "path": "deps/v8/include/js_protocol.pdl",
+      "bytes": 70146,
+      "sha256": "9541b1454d1c352ef852dc0b6321569438271731068c803f980afb65def58982"
+    },
+    {
+      "source_id": "node_debugger_repl",
+      "path": "lib/internal/debugger/inspect_repl.js",
+      "bytes": 38085,
+      "sha256": "44921d05caa0947caa30dcfe4e1c11e707732ba0cdb96746ab2f597525f15e65"
+    },
+    {
+      "source_id": "node_debugger_docs",
+      "path": "doc/api/debugger.md",
+      "bytes": 23168,
+      "sha256": "7491a33d903cbd502687fa9e2eb4ee64f056365625d4f9c9721254b407220753"
+    }
+  ],
+  "primary_sources": [
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect_probe.js#L727",
+      "meaning": "Native evaluation does not request returnByValue; ordinary object metadata is omitted by default output stripping. Explicit bounded primitive string returns a native value."
+    },
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/deps/v8/include/js_protocol.pdl#L1144",
+      "meaning": "RemoteObject.value represents primitive values."
+    },
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect_probe.js#L595",
+      "meaning": "Authentic final miss is emitted on code-zero unsignaled child completion when started, with pending probes."
+    },
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect_probe.js#L711",
+      "meaning": "Hit-limit completion can end earlier and cleanup may kill the child; inspector exit alone is insufficient."
+    },
+    {
+      "url": "https://github.com/jestjs/jest/tree/4e56991693da7cd4c3730dc3579a1dd1403ee630/packages/jest-runtime",
+      "meaning": "First-party runtime source; installed 29.7 compiled runtime bytes are separately pinned above."
+    },
+    {
+      "url": "https://registry.npmjs.org/jest-runtime/-/jest-runtime-29.7.0.tgz",
+      "meaning": "Official installed compiled runtime distribution, byte-verified in the source qualification."
+    },
+    {
+      "url": "https://registry.npmjs.org/@jest/transform/-/transform-29.7.0.tgz",
+      "meaning": "Official installed compiled transformer distribution; source supports native cache checksum/header and map writes."
+    },
+    {
+      "url": "https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript",
+      "meaning": "Unchanged original SDK/test/proxy modules."
+    }
+  ],
+  "target_sources": [
+    {
+      "file_id": 0,
+      "path": "sdk/typescript/src/exec.ts",
+      "bytes": 14203,
+      "sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79",
+      "after_run_matches_frozen_pin": true
+    },
+    {
+      "file_id": 1,
+      "path": "sdk/typescript/src/thread.ts",
+      "bytes": 4971,
+      "sha256": "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c",
+      "after_run_matches_frozen_pin": true
+    },
+    {
+      "file_id": 2,
+      "path": "sdk/typescript/tests/run.test.ts",
+      "bytes": 26283,
+      "sha256": "2ebd05b461504a53c0a9453efb877f3fee06202284fd6dc5ddef035f3be33255",
+      "after_run_matches_frozen_pin": true
+    },
+    {
+      "file_id": 3,
+      "path": "sdk/typescript/tests/responsesProxy.ts",
+      "bytes": 5679,
+      "sha256": "53f86d2a5c313966a9e5c9dd9fc69676755f7dbf50be530558d254571424b0f6",
+      "after_run_matches_frozen_pin": true
+    }
+  ],
+  "protected_namespace": {
+    "reused_existing_contract": true,
+    "private_host_state_excluded": true,
+    "network_isolated": true,
+    "public_runtime_mounts_readonly": true,
+    "writable_state_owned": true,
+    "environment_cleared_by_existing_launcher": true,
+    "external_home_override": false,
+    "external_codex_home_override": false,
+    "owned_bwrap_sha256": "75d6e611c1d41cf3a183a54085d4e83342901b91d058dd2c655692ff13207216",
+    "reused_same_launch_flags": true,
+    "synthetic_user_records_reused": true
+  },
+  "frozen_recipe": {
+    "final": {
+      "name": "frozen-recipe-final.json",
+      "bytes": 44711,
+      "sha256": "3016ed5c03b3c7ed8955839bcf2818f107f5d876042251571d2c5cda6524a6ab",
+      "frozen_before_execution": true
+    },
+    "retained_unexecuted_preparation_revision": {
+      "name": "frozen-recipe.json",
+      "bytes": 44046,
+      "sha256": "440293d2176d99ca1d7471632cba9f7a445effe9cd20148475cbfbd070af336c",
+      "executed": false,
+      "revision": "Explicit typeof-string hash guards tightened before the sole corrected observer attempt."
+    },
+    "native_pattern": "(?!)",
+    "native_test_path": "tests/run.test.ts",
+    "native_cache_fresh": true,
+    "native_selection_flags": [
+      "--runInBand",
+      "--runTestsByPath",
+      "--testNamePattern",
+      "--cacheDirectory",
+      "--json",
+      "--outputFile"
+    ],
+    "inspector_flags": {
+      "json": true,
+      "timeout_ms": 10000,
+      "max_hit_per_probe": 8
+    },
+    "three_source_points": [
+      {
+        "probe_id": 0,
+        "stage": "CJS constructor",
+        "line": 1505
+      },
+      {
+        "probe_id": 1,
+        "stage": "ESM alternative constructor",
+        "line": 516
+      },
+      {
+        "probe_id": 2,
+        "stage": "transform before native cache write",
+        "line": 514
+      }
+    ],
+    "expression_transport": "JSON.stringify of explicit metadata allowlist; every required value validated before serialization",
+    "max_expression_json_utf8_bytes": 2048,
+    "undefined_nonfinite_or_implicit_null_coercion_allowed": false,
+    "cache_read_only_after_native_observer_completion": true
+  },
+  "native_help": {
+    "reused_unchanged_passing_help": true,
+    "new_help_invocation": false,
+    "exit_code": 0,
+    "tool_chunk": "13d889",
+    "supported_flags": [
+      "--testNamePattern",
+      "--cacheDirectory"
+    ],
+    "stdout": {
+      "name": "jest-help.stdout.txt",
+      "bytes": 26122,
+      "sha256": "de13b517f654e55df93dbe8253c32d97d967cafdfd95e1fe934949e13e288cdc"
+    }
+  },
+  "native_observer": {
+    "exit_code": 0,
+    "initial_tool_chunk": "294215",
+    "session_id": 70540,
+    "completion_tool_chunk": "ff85da",
+    "stdout": {
+      "name": "probe-native.stdout.json",
+      "bytes": 16216,
+      "sha256": "b0cfd9e8c9aeb4defd4aaa66eba56b587ac12dd89dc81e2ba9455e8e0f7597ae"
+    },
+    "stderr": {
+      "name": "probe-native.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "terminal_native_event": {
+      "event": "miss",
+      "pending": [
+        1
+      ]
+    },
+    "observed_constructor_path": "CJS VM.Script; vm.SyntheticModule and vm.SourceTextModule unavailable",
+    "cjs_constructor_hits": 4,
+    "esm_alternative_hits": 0,
+    "transform_hits": 4,
+    "required_file_ids_per_active_stage": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "accepted_file_stage_bindings": 8,
+    "native_expression_errors": 0,
+    "native_hit_limit_completion": false,
+    "native_timeout": false
+  },
+  "target_process_status": {
+    "independently_returned_numeric_jest_exit": null,
+    "source_derived_target_exit": 0,
+    "independently_returned_numeric_exit_claim": false,
+    "source_basis": {
+      "path": "lib/internal/debugger/inspect_probe.js",
+      "lines": "595-614",
+      "commit": "955266bfdd854cd280dffd47548673914484e4c0",
+      "sha256": "a87f17a8fb7e50d3b0a029b4ef46e0b9fd2fd41b933bef88f63f62461750b128"
+    },
+    "required_and_observed_terminal": {
+      "event": "miss",
+      "pending": [
+        1
+      ]
+    },
+    "caveat": "The inspector returns its own exit. Pinned source binds this final miss to a started target exiting code 0 without a signal. A hit-limit completed event does not establish that target status."
+  },
+  "native_jest_json": {
+    "numPassedTests": 0,
+    "numFailedTests": 0,
+    "numPendingTests": 23,
+    "numTotalTests": 23,
+    "numRuntimeErrorTestSuites": 0,
+    "success": true,
+    "wasInterrupted": false,
+    "assertion_status_counts": {
+      "pending": 23
+    },
+    "artifact": {
+      "name": "jest-native.json",
+      "bytes": 7438,
+      "sha256": "cc4568cda74df9c71cdc278d54a4b2b4d45bf93c5a9b2da1f3b56d827325b116"
+    },
+    "fixture_suite_status": "skipped",
+    "callback_acceptance": false
+  },
+  "actual_native_metadata": [
+    {
+      "native_probe_id": 0,
+      "hit": 1,
+      "native_location": {
+        "path": "node_modules/jest-runtime/build/index.js",
+        "line": 1505,
+        "column": 7
+      },
+      "remote_type": "string",
+      "native_value_present": true,
+      "value_utf8_bytes": 456,
+      "metadata": {
+        "schema": 1,
+        "file_id": 2,
+        "stage_id": 0,
+        "branch_id": 0,
+        "source_type": "string",
+        "code_type": "string",
+        "source_sha256": "2ebd05b461504a53c0a9453efb877f3fee06202284fd6dc5ddef035f3be33255",
+        "code_sha256": "87f1c95accd7fc5eefe62055607ac72a1ee7750faa64144d1e9f21a7cc9340f0",
+        "wrapper_sha256": "cd26d8cd979527aec4acd35b458b9ddecbafff91d0a2a982963122d1083aeb4c",
+        "wrapper_length": 82,
+        "column_offset_requested": 82,
+        "vm_synthetic_available": false,
+        "vm_source_text_available": false
+      }
+    },
+    {
+      "native_probe_id": 0,
+      "hit": 2,
+      "native_location": {
+        "path": "node_modules/jest-runtime/build/index.js",
+        "line": 1505,
+        "column": 7
+      },
+      "remote_type": "string",
+      "native_value_present": true,
+      "value_utf8_bytes": 456,
+      "metadata": {
+        "schema": 1,
+        "file_id": 3,
+        "stage_id": 0,
+        "branch_id": 0,
+        "source_type": "string",
+        "code_type": "string",
+        "source_sha256": "53f86d2a5c313966a9e5c9dd9fc69676755f7dbf50be530558d254571424b0f6",
+        "code_sha256": "ae48388400e9984ad3d316ed61f3f69de0147536067a2778fcddb8d1e67bd1f8",
+        "wrapper_sha256": "b4ebe66ab3e250919b3775f22700d0e7574e83337da19cd8d07a2d312bf9e11f",
+        "wrapper_length": 82,
+        "column_offset_requested": 82,
+        "vm_synthetic_available": false,
+        "vm_source_text_available": false
+      }
+    },
+    {
+      "native_probe_id": 0,
+      "hit": 3,
+      "native_location": {
+        "path": "node_modules/jest-runtime/build/index.js",
+        "line": 1505,
+        "column": 7
+      },
+      "remote_type": "string",
+      "native_value_present": true,
+      "value_utf8_bytes": 456,
+      "metadata": {
+        "schema": 1,
+        "file_id": 0,
+        "stage_id": 0,
+        "branch_id": 0,
+        "source_type": "string",
+        "code_type": "string",
+        "source_sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79",
+        "code_sha256": "f93de4dc6fec0a6166f1b39b9a291e4b5132d5450a5c67b33e174c30d589bd0d",
+        "wrapper_sha256": "33e12dfd4e31fc5618bceb6a0afb0e414283958ce72f76692e5404854aea258c",
+        "wrapper_length": 82,
+        "column_offset_requested": 82,
+        "vm_synthetic_available": false,
+        "vm_source_text_available": false
+      }
+    },
+    {
+      "native_probe_id": 0,
+      "hit": 4,
+      "native_location": {
+        "path": "node_modules/jest-runtime/build/index.js",
+        "line": 1505,
+        "column": 7
+      },
+      "remote_type": "string",
+      "native_value_present": true,
+      "value_utf8_bytes": 456,
+      "metadata": {
+        "schema": 1,
+        "file_id": 1,
+        "stage_id": 0,
+        "branch_id": 0,
+        "source_type": "string",
+        "code_type": "string",
+        "source_sha256": "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c",
+        "code_sha256": "c4a8b11323ef9adba1bdf7336aceee8a8d50596e1a03792fe93520e21ea6f77e",
+        "wrapper_sha256": "13ca3c4792d516dd00a6ce602fa360f38556979953de189a59464720c80e5ddc",
+        "wrapper_length": 82,
+        "column_offset_requested": 82,
+        "vm_synthetic_available": false,
+        "vm_source_text_available": false
+      }
+    },
+    {
+      "native_probe_id": 2,
+      "hit": 1,
+      "native_location": {
+        "path": "node_modules/@jest/transform/build/ScriptTransformer.js",
+        "line": 514,
+        "column": 5
+      },
+      "remote_type": "string",
+      "native_value_present": true,
+      "value_utf8_bytes": 649,
+      "metadata": {
+        "schema": 1,
+        "file_id": 2,
+        "stage_id": 1,
+        "branch_id": 2,
+        "source_type": "string",
+        "code_type": "string",
+        "source_sha256": "2ebd05b461504a53c0a9453efb877f3fee06202284fd6dc5ddef035f3be33255",
+        "code_sha256": "87f1c95accd7fc5eefe62055607ac72a1ee7750faa64144d1e9f21a7cc9340f0",
+        "map_kind_id": 2,
+        "map_sha256": "47ced8b69acf7ac83936effc09547b0dbbf7c17f43696bfa78cad9184ab8bd08",
+        "inline_map_present": true,
+        "inline_map_sha256": "47ced8b69acf7ac83936effc09547b0dbbf7c17f43696bfa78cad9184ab8bd08",
+        "cache_namespace_owned": true,
+        "cache_path_sha256": "05fe5e5c17dc8dd7df51cb9e9d55be8fcef1b966934637d4a2dbc75f155b7646",
+        "source_map_path_present": true,
+        "source_map_namespace_owned": true
+      }
+    },
+    {
+      "native_probe_id": 2,
+      "hit": 2,
+      "native_location": {
+        "path": "node_modules/@jest/transform/build/ScriptTransformer.js",
+        "line": 514,
+        "column": 5
+      },
+      "remote_type": "string",
+      "native_value_present": true,
+      "value_utf8_bytes": 649,
+      "metadata": {
+        "schema": 1,
+        "file_id": 3,
+        "stage_id": 1,
+        "branch_id": 2,
+        "source_type": "string",
+        "code_type": "string",
+        "source_sha256": "53f86d2a5c313966a9e5c9dd9fc69676755f7dbf50be530558d254571424b0f6",
+        "code_sha256": "ae48388400e9984ad3d316ed61f3f69de0147536067a2778fcddb8d1e67bd1f8",
+        "map_kind_id": 2,
+        "map_sha256": "8b250446fd22c89eaa48e7c384233fcaaab41e051728a5aecb1befd186581a91",
+        "inline_map_present": true,
+        "inline_map_sha256": "8b250446fd22c89eaa48e7c384233fcaaab41e051728a5aecb1befd186581a91",
+        "cache_namespace_owned": true,
+        "cache_path_sha256": "751e009880a454914920114f226c6205e5d45590a9ef77d719e7c1413d18f65c",
+        "source_map_path_present": true,
+        "source_map_namespace_owned": true
+      }
+    },
+    {
+      "native_probe_id": 2,
+      "hit": 3,
+      "native_location": {
+        "path": "node_modules/@jest/transform/build/ScriptTransformer.js",
+        "line": 514,
+        "column": 5
+      },
+      "remote_type": "string",
+      "native_value_present": true,
+      "value_utf8_bytes": 649,
+      "metadata": {
+        "schema": 1,
+        "file_id": 0,
+        "stage_id": 1,
+        "branch_id": 2,
+        "source_type": "string",
+        "code_type": "string",
+        "source_sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79",
+        "code_sha256": "f93de4dc6fec0a6166f1b39b9a291e4b5132d5450a5c67b33e174c30d589bd0d",
+        "map_kind_id": 2,
+        "map_sha256": "b63e01d83279a62584341446c279424a9f3ca3e29a5e1e52681a1c2e0e04bb2e",
+        "inline_map_present": true,
+        "inline_map_sha256": "b63e01d83279a62584341446c279424a9f3ca3e29a5e1e52681a1c2e0e04bb2e",
+        "cache_namespace_owned": true,
+        "cache_path_sha256": "06f7b7bd86aa8c1f246bfdcefe769c8b28905a9ad4ec5263567fa8d94776573c",
+        "source_map_path_present": true,
+        "source_map_namespace_owned": true
+      }
+    },
+    {
+      "native_probe_id": 2,
+      "hit": 4,
+      "native_location": {
+        "path": "node_modules/@jest/transform/build/ScriptTransformer.js",
+        "line": 514,
+        "column": 5
+      },
+      "remote_type": "string",
+      "native_value_present": true,
+      "value_utf8_bytes": 649,
+      "metadata": {
+        "schema": 1,
+        "file_id": 1,
+        "stage_id": 1,
+        "branch_id": 2,
+        "source_type": "string",
+        "code_type": "string",
+        "source_sha256": "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c",
+        "code_sha256": "c4a8b11323ef9adba1bdf7336aceee8a8d50596e1a03792fe93520e21ea6f77e",
+        "map_kind_id": 2,
+        "map_sha256": "ef2d3b0540f0ab7a4243df72be1ca4996f0ff2b3a50bca8fedf2bcb4f82818b8",
+        "inline_map_present": true,
+        "inline_map_sha256": "ef2d3b0540f0ab7a4243df72be1ca4996f0ff2b3a50bca8fedf2bcb4f82818b8",
+        "cache_namespace_owned": true,
+        "cache_path_sha256": "8d1164c44107fc5c7cdb709c8c0ebfdab286227fd06d268d5b349bb3af2f07f7",
+        "source_map_path_present": true,
+        "source_map_namespace_owned": true
+      }
+    }
+  ],
+  "cache_artifact_checks": {
+    "class": "Native upstream Jest generated compiler artifacts",
+    "scope": "Four public original SDK/test/proxy modules",
+    "read_after_observer_completed": true,
+    "total_native_cache_file_count": 20,
+    "checksum_contract": "SHA1(emitted code).hex truncated to 32 characters, LF, emitted code",
+    "whole_cache_hash_is_emitted_code_hash": false,
+    "entries": [
+      {
+        "file_id": 0,
+        "source_bytes": 14203,
+        "code_sha256": "f93de4dc6fec0a6166f1b39b9a291e4b5132d5450a5c67b33e174c30d589bd0d",
+        "whole_cache_bytes": 51704,
+        "whole_cache_sha256": "4b0cd2c8d5a102bec7f9f7d24de77cb40062398e30caa27d99098d127c5ff9f5",
+        "inline_map_bytes": 27872,
+        "inline_map_sha256": "b63e01d83279a62584341446c279424a9f3ca3e29a5e1e52681a1c2e0e04bb2e",
+        "outer_map_bytes": 27872,
+        "outer_map_sha256": "b63e01d83279a62584341446c279424a9f3ca3e29a5e1e52681a1c2e0e04bb2e",
+        "cache_header_valid": true,
+        "source_content_pin_matches": true
+      },
+      {
+        "file_id": 1,
+        "source_bytes": 4971,
+        "code_sha256": "c4a8b11323ef9adba1bdf7336aceee8a8d50596e1a03792fe93520e21ea6f77e",
+        "whole_cache_bytes": 16129,
+        "whole_cache_sha256": "a6097fbbf1ac2fe93fb6b17ea89be38b264433e2a2082c811d7a37531d177a2f",
+        "inline_map_bytes": 8839,
+        "inline_map_sha256": "ef2d3b0540f0ab7a4243df72be1ca4996f0ff2b3a50bca8fedf2bcb4f82818b8",
+        "outer_map_bytes": 8839,
+        "outer_map_sha256": "ef2d3b0540f0ab7a4243df72be1ca4996f0ff2b3a50bca8fedf2bcb4f82818b8",
+        "cache_header_valid": true,
+        "source_content_pin_matches": true
+      },
+      {
+        "file_id": 2,
+        "source_bytes": 26283,
+        "code_sha256": "87f1c95accd7fc5eefe62055607ac72a1ee7750faa64144d1e9f21a7cc9340f0",
+        "whole_cache_bytes": 105678,
+        "whole_cache_sha256": "f9f5db040cef19cadf5a67accd9e4457ef50bac7bbbc23fa54f2417e37025b9e",
+        "inline_map_bytes": 54286,
+        "inline_map_sha256": "47ced8b69acf7ac83936effc09547b0dbbf7c17f43696bfa78cad9184ab8bd08",
+        "outer_map_bytes": 54286,
+        "outer_map_sha256": "47ced8b69acf7ac83936effc09547b0dbbf7c17f43696bfa78cad9184ab8bd08",
+        "cache_header_valid": true,
+        "source_content_pin_matches": true
+      },
+      {
+        "file_id": 3,
+        "source_bytes": 5679,
+        "code_sha256": "ae48388400e9984ad3d316ed61f3f69de0147536067a2778fcddb8d1e67bd1f8",
+        "whole_cache_bytes": 20039,
+        "whole_cache_sha256": "f537faf8ca4bd5c052656b4f95b0db7a1723b31c4cc5fb3f62de85a91dfa0ad7",
+        "inline_map_bytes": 10860,
+        "inline_map_sha256": "8b250446fd22c89eaa48e7c384233fcaaab41e051728a5aecb1befd186581a91",
+        "outer_map_bytes": 10860,
+        "outer_map_sha256": "8b250446fd22c89eaa48e7c384233fcaaab41e051728a5aecb1befd186581a91",
+        "cache_header_valid": true,
+        "source_content_pin_matches": true
+      }
+    ],
+    "exact_source_constructor_transform_cache_code_hashes_match": true,
+    "exact_inline_and_outer_map_hashes_match": true,
+    "sdk_v8_pausable_positions_verified": false
+  },
+  "gate": {
+    "result": "PASS_METADATA_CACHE_ONLY",
+    "observer_native_exit": 0,
+    "independent_numeric_jest_exit": null,
+    "normal_target_exit_source_derived": 0,
+    "jest_zero_passed_zero_failed_23_pending_zero_runtime_errors": true,
+    "all_eight_required_file_stage_bindings": true,
+    "hashes_maps_source_content_pins_and_native_cache_headers_match": true,
+    "inactive_esm_pending_is_only_pending_probe": true,
+    "sdk_acceptance": "HOLD"
+  },
+  "preserved_failures": [
+    {
+      "kind": "Original ordinary-object metadata gate failure",
+      "receipt": "codex-sdk-0160-native-binding-preflight.json",
+      "worker_commit": "94e8b6a64c8d3e101e553d85053cd207d684b61d",
+      "commit_scope": "Historical worker receipt provenance, not an assertion of PR633 ancestry; public history comparison returned404 without an ancestry result",
+      "bytes": 17142,
+      "sha256": "aca0cc66e5fdf573f322a4de74f74e30f3a3cfc74a5ca3d1ec6be6e0972407ba",
+      "native_observer_exit": 0,
+      "required_value_records": 0,
+      "accepted_file_stage_bindings": 0
+    },
+    {
+      "kind": "Post-run formatting guard",
+      "exit_code": 1,
+      "tool_chunk": "1fc654",
+      "failure": "AssertionError before printing when the proposed summary exceeded 3500 bytes",
+      "effect": "No guarded payload printed; narrower summary returned exit 0. No observer, fixture, namespace or launch change or rerun."
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "Ordinary object result would return metadata values",
+      "verdict": "Incorrect; preserved original failure and source verification.",
+      "verification": "Pinned Node evaluateOnCallFrame does not request returnByValue; default probe output strips object previews."
+    },
+    {
+      "claim": "Inspector exit 0 alone establishes target exit 0",
+      "verdict": "Insufficient.",
+      "verification": "Astra accepted exact authentic final miss/pending[1] binding at pinned onChildExit. Separate numeric target exit remains null."
+    },
+    {
+      "claim": "Requested Jest ESM configuration proves the active runtime branch",
+      "verdict": "Incorrect.",
+      "verification": "Native CJS branch observed; both VM capability booleans false. ESM alternative remained the sole inactive pending probe."
+    }
+  ],
+  "artifact_retention": {
+    "exact_frozen_recipe_native_stdout_stderr_jest_json_and_api_tool_return_copies": "Separate private owned readiness directory",
+    "actual_tool_return_copy": {
+      "name": "actual-tool-returns.json",
+      "bytes": 6305,
+      "sha256": "67592fc7a92b30e96b38451ed41892bc5b301f12d45f02c1e3f601dd96127b9a",
+      "attribution": "Copies of original API returns; not a reconstructed numeric target exit artifact"
+    },
+    "public_sanitization": "No expressions, source bodies, environment values, machine paths or conversations; only source pins, hashes, booleans, finite numeric metadata and native result fields.",
+    "stdout_and_stderr_not_rewritten": true,
+    "registration": "Coordinator-owned; pending integration"
+  },
+  "provider_usage": {
+    "gross_input_tokens": null,
+    "cached_read_input_tokens": null,
+    "output_tokens": null,
+    "cache_creation_input_tokens": null
+  },
+  "acceptance_limits": [
+    "Zero-selected control: no positive SDK fixture callback or provider/model turn ran.",
+    "Metadata/cache binding establishes original source to emitted CJS/code/map identity and wrapper/column metadata only.",
+    "Actual SDK pausable V8 locations, SDK return/EOF/cleanup/deadline timeline and common-clock boundaries remain unverified.",
+    "No provider route, Ultra effort, roles, complete usage, quality, cache or compression savings acceptance.",
+    "No full bubblewrap suite acceptance claim or native component adoption.",
+    "SDK positive role acceptance remains HOLD; no further observation or adaptive repair is included."
+  ]
+}

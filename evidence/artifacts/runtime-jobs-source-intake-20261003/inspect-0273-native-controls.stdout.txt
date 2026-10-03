@@ -1,0 +1,29 @@
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- /work/checkout/.venv/bin/python
+cachedir: /tmp/pytest-cache-repaired
+rootdir: /work/checkout
+configfile: pyproject.toml
+plugins: mock-3.15.1, dotenv-0.5.2, reportlog-1.0.0, xdist-3.8.0, anyio-4.14.2, syrupy-5.5.3, timeout-2.4.0, cov-7.1.0, textual-snapshot-1.0.0
+[1mcollecting ... [0mcollected 16 items
+
+tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored[typo_grid] [32mPASSED[0m[32m [  6%][0m
+tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored[wrong_word_answer] [32mPASSED[0m[32m [ 12%][0m
+tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored[markdown_decorated] [32mPASSED[0m[32m [ 18%][0m
+tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored[no_grade_marker_at_all] [32mPASSED[0m[32m [ 25%][0m
+tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored[multi_letter_verdict] [32mPASSED[0m[32m [ 31%][0m
+tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored[adverb_form] [32mPASSED[0m[32m [ 37%][0m
+tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored[multi_letter_prefix_of_I] [32mPASSED[0m[32m [ 43%][0m
+tests/scorer/test_model_graded.py::test_off_menu_verdict_is_unscored[off_menu_alone-binary] [32mPASSED[0m[32m [ 50%][0m
+tests/scorer/test_model_graded.py::test_off_menu_verdict_is_unscored[off_menu_alone-partial] [32mPASSED[0m[32m [ 56%][0m
+tests/scorer/test_model_graded.py::test_off_menu_verdict_is_unscored[off_menu_after_earlier_correct-binary] [32mPASSED[0m[32m [ 62%][0m
+tests/scorer/test_model_graded.py::test_off_menu_verdict_is_unscored[off_menu_after_earlier_correct-partial] [32mPASSED[0m[32m [ 68%][0m
+tests/scorer/test_model_graded.py::test_off_menu_verdict_is_unscored[off_menu_after_earlier_incorrect-binary] [32mPASSED[0m[32m [ 75%][0m
+tests/scorer/test_model_graded.py::test_off_menu_verdict_is_unscored[off_menu_after_earlier_incorrect-partial] [32mPASSED[0m[32m [ 81%][0m
+tests/scorer/test_model_graded.py::test_partial_verdict_is_unscored_without_partial_credit [32mPASSED[0m[32m [ 87%][0m
+tests/model/providers/test_openai.py::test_chat_completions_forwards_config_extra_headers[asyncio] [32mPASSED[0m[32m [ 93%][0m
+tests/model/providers/test_openai.py::test_chat_completions_forwards_config_extra_headers[trio] [33mSKIPPED[0m[32m [100%][0m
+
+------ generated xml file: /logs/inspect273-native-controls-repaired.xml -------
+[36m[1m=========================== short test summary info ============================[0m
+[33mSKIPPED[0m [1] tests/model/providers/test_openai.py:267: need --runtrio option to run
+[32m======================== [32m[1m15 passed[0m, [33m1 skipped[0m[32m in 5.68s[0m[32m =========================[0m

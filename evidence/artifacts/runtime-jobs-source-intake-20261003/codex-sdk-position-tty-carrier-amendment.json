@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "prospective-native-tty-carrier-amendment",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "HOLD pending exact amended-recipe Astra read",
+  "original_preregistration": {
+    "path": "codex-sdk-source-position-pilot-preregister.json",
+    "bytes": 19187,
+    "sha256": "e2885ebcc270cbb1a4977d8c1521ad33348d578a1eeaab2dc294f616afa8f13e"
+  },
+  "preserved_first_failure": "codex-sdk-position-pilot-transport-failure.json",
+  "private_amended_recipe": {
+    "bytes": 33522,
+    "sha256": "ce07b316b304dd4964505b1e5db197fd8d8ca1e0da70b3a055c79a7d19a6833f"
+  },
+  "changes": {
+    "native_exec_tool_tty": true,
+    "native_exec_tool_login": false,
+    "owned_PTY_echo": "Native rtk proxy /usr/bin/stty -echo on this new tool PTY stdin only; success required before supervised launch",
+    "outputs": "Distinct new task-owned FD13/stdout/stderr/Jest JSON/process-snapshot paths; first attempt files unchanged",
+    "scope_wording": "Imports execute module initialization; zero positive fixture callbacks and zero provider turns are the accepted scope"
+  },
+  "unchanged": {
+    "supervised_prefix104_exact": true,
+    "Jest_target_filter_and_flags_except_result_path_exact": true,
+    "nominal_TERM_seconds": 180,
+    "nominal_KILL_grace_seconds": 10,
+    "original_fixture_timeout_ms": 5000,
+    "test_name_pattern": "(?!)",
+    "source_cache_env_mounts_namespaces_models_providers": "Exact protected prefix retained",
+    "Debugger_stages": "Exact expressions/order/gates retained; dependent stages per file then per anchor",
+    "metadata_return_maximum_utf8_bytes": 2048,
+    "all_stop_conditions": true
+  },
+  "native_stty": {
+    "version": "GNU coreutils9.4",
+    "binary_sha256": "d97de2a71a1f040a5213e95ea510470e93ff88cfde3d3fc639bc5e56352cd30f",
+    "version_exit": 0,
+    "version_stdout_bytes": 305,
+    "version_stdout_sha256": "e5eaece9fab04588c11eee02919a8f99044f4d4a3eb3351dc8133edf03a7f1c9",
+    "help_exit": 0,
+    "help_stdout_bytes": 8096,
+    "help_stdout_sha256": "f68255f513a96cb2c4901c7c0a439b047797417f65a5da17413320cc21957c6e",
+    "stderr_bytes": 0
+  },
+  "sources": [
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/repl.js",
+      "bytes": 45940,
+      "sha256": "d8924013575a5f7d856765194c8de4b1bd3a14d715a58bc7a17725e5f1cd7a71",
+      "lines": "284-287",
+      "meaning": "Stock REPL terminal defaults to output.isTTY; direct output file retains nonterminal mode"
+    },
+    {
+      "repository": "coreutils/coreutils",
+      "pin": "9530a14420fc1a267e90d45e8a0d710c3668382d",
+      "file": "src/stty.c",
+      "bytes": 63229,
+      "sha256": "cd1d0ee4122a8ca2d13d06b65871a353aae05c237816c4763e779b84328b88f9",
+      "lines": "321;1410-1444",
+      "meaning": "Reversible ECHO flag applied and checked on own stdin terminal"
+    },
+    {
+      "source": "Installed exec_command/write_stdin tool contract and retained first actual rejected write",
+      "meaning": "Non-TTY stdin was closed; native tool explicitly names tty=true recovery"
+    }
+  ],
+  "review": {
+    "trigger": "First bounded native pilot failed at tool stdin transport; retained exit124 and independent cleanup",
+    "conditional_proposal_result": "Astra/max SOURCE-ACCEPT prospective native PTY carrier only",
+    "exact_frozen_amendment_result": "PENDING",
+    "execution_admitted": false
+  },
+  "execution": null,
+  "actual_positions": null,
+  "actual_cleanup": null,
+  "SDK_positive_role_provider_quality_savings": "HOLD"
+}

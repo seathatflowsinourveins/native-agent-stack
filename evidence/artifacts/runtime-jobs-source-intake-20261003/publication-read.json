@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "class": "source_review_and_local_integration",
+  "review": {
+    "runtime": "native Codex exec via existing keyless OmniRoute",
+    "model": "cx/gpt-6-astra-max",
+    "native_effort": "max",
+    "trigger": "Conflicting native Ultra, gateway and evaluator contracts; corrected source-intake head read",
+    "head": "6240dd47223d3e3c4fe754a85a8ad913c0583681",
+    "base": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+    "exit_code": 0,
+    "answer": {"bytes": 5186, "sha256": "9654420bd16d22437216fdee369883cccd49c8df2191841c0b198e19260905c6"},
+    "verdict": "Accept truthful source-intake publication at the named head; no critical or important committed-delta findings",
+    "scope": "Eight provisional jobs, 32 source/watch entries, 26 repositories, original pin/contracts and source-only boundaries; not defaults, activation, freeze, hosted execution or runtime qualification",
+    "verification_limit": "Review-time validate.py exited1 while the integrator temporarily edited the coding draft in the same working tree. The reviewer subsequently compared all14 committed artifacts against the committed registry: zero mismatches; the final working tree was restored clean. This is not a new whole-repository validation pass.",
+    "correction": "Keep subsequent review checkout immutable; read the owned format repair separately before carrying any acceptance to a new head",
+    "native_usage": {"input_tokens": 826988, "output_tokens": 11694, "cached_input_tokens_subset": 756992, "cache_write_input_tokens": 0, "reasoning_output_tokens_subset": 6825, "billing": null},
+    "usage_scope": "This source read only; distinct from the first review, benchmark trials and token savings. Subsets are not added to input/output totals."
+  },
+  "publication_failure": {
+    "head": "6240dd47223d3e3c4fe754a85a8ad913c0583681",
+    "command": "git push -u origin foundation/runtime-jobs-20261003",
+    "exit_code": 1,
+    "scope": "Native three-test pre-push gate; lockfile/workflow inventory passed; one blueprint adoption-label classification failed. Nothing published; no hook bypass.",
+    "focused_reproduction": {"command": "python3 -B -m unittest tests.test_blind_checkout.RepositoryClassificationTests", "exit_code": 1, "tests": 2, "failures": 1},
+    "original_scalar_value": {"bytes": 542, "sha256": "461bada01ab2c7a6b883dc0df2b5ab080c501bf5894dd924af4b9e213fc57d04"},
+    "attempted_then_restored": "A one-entry DATA_VALUE_SHA256 edit passed two unchanged tests; restored without commit when live classifier custody was found on PR630 at d32c1be7e882498b04c2d23656cefaa235879742."
+  },
+  "owned_repair": {
+    "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
+    "upstream_contract": "native-agent-stack@56473e4b840f0e6940c031801d866e7e9bf29baf tools/sota-convergence/blind_checkout.py:is_label_value: a non-string mapping/rule structure is never a label",
+    "change": "Retain selection key as a structured prospective rule. Preserve baseline, per-task two-repeat quality dominance, five-percent paired token tie threshold, complete counters, no greater median agent time, challenger ordering and native fallback. No adoption verdict or freeze.",
+    "check": {"command": "python3 -B -m unittest tests.test_blind_checkout.RepositoryClassificationTests", "exit_code": 0, "actual_output_excerpt": "Ran 2 tests in 0.185s\n\nOK"},
+    "independent_read": {
+      "head": "a87afb753f07d175124384afb649df15976999ca",
+      "scope": "Bounded Sol/max read-only delta review from6240dd4 in a separate immutable checkout; original classifier/tests/validator unchanged",
+      "verdict": "Accept semantic invariance and matching registration of all five changed artifacts; correct the decision note's adoption-label wording to unclassified string",
+      "classification_command": "python3 -B -m unittest tests.test_blind_checkout.RepositoryClassificationTests",
+      "classification_exit_code": 0,
+      "classification_output_excerpt": "Ran 2 tests in 0.180s\n\nOK",
+      "validation_command": "python3 -B scripts/validate.py",
+      "validation_exit_code": 0,
+      "validation_actual_output": "{\"components\": 69, \"hashed_files\": 9331, \"profiles\": 4, \"receipts\": 186, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "cleanup_observation": "Reviewed head unchanged, porcelain empty, staged and unstaged diff checks exit0",
+      "limits": "No historical private events re-read or billing verification; public usage internal consistency only. No runtime/model/route/adoption acceptance. New protocol/source additions are outside this read.",
+      "usage": null
+    },
+    "prior_review_carry": "Only unchanged original-source/artifact scope; the named Astra head does not accept this delta"
+  },
+  "sanitization": "Original review/event streams retained privately; credentials, native settings, conversations and private locators omitted"
+}

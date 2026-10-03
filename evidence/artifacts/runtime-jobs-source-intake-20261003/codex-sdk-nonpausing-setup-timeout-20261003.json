@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "scope": "ONE admitted offline SDK nonpausing diagnostic; setup supervisor timeout before fixture",
+  "reviewed_repository_head": "be9d47fbb9b6ebe31ac45e97f9816cb8a44fb327",
+  "freeze": {
+    "bytes": 69680,
+    "sha256": "ed22df3a2982b51767dcb3ffa317068fbfe44c608bebe08987dafeaa2221c207",
+    "parent_bytes": 37528,
+    "parent_sha256": "0271eb85b38ab484d67789bc70e1eb53817ce673f8b9a6b7c4159d3371eed106",
+    "unchanged_parent_and_recipe": true,
+    "admission": "Independent consequential read ACCEPT for exactly one offline diagnostic; genuine gates retained",
+    "readonly_preflight": {
+      "bytes": 54404,
+      "sha256": "ba4b6c5d999e42952f8051191db729cdc319c9afcc40870aa0478df5f3ee7d92",
+      "native_commands": 9,
+      "native_command_exits": "0 each",
+      "scope": "Current observations and source/map bindings, not invented frozen binary contracts"
+    }
+  },
+  "execution": {
+    "initial_native_tool_chunk": "ad15d3",
+    "initial_native_session": 86265,
+    "caller_start_clock": "2026-10-03 18:01:05 UTC",
+    "reported_supervisor_exit": 124,
+    "reported_exit_provenance": "Actual write_stdin completion reported124 inside root tool orchestration. The result was not separately serialized before the orchestration threw; preserve the returned error and independently observed GNU stderr separately.",
+    "verbatim_orchestration_error": "Error: native terminal before narrow_possible_breakpoints: 124",
+    "orchestration_cell": "1320",
+    "authentic_final_jest_report": false,
+    "jest_child_exit": null,
+    "fixture_5000ms_timer_armed": "NOT ESTABLISHED; final resume was never sent",
+    "final_resume_records": 0,
+    "independent_root_capture_reader": {
+      "native_exit": 0,
+      "chunk": "9b2397"
+    }
+  },
+  "supervision": {
+    "outer_gnu_seconds": 180,
+    "signal": "TERM",
+    "kill_after_seconds": 10,
+    "original_fixture_milliseconds": 5000,
+    "fixture_deadline_changed": false,
+    "actual_outer_start_and_end_process_timestamps": null,
+    "caller_coordination": "Interactive source-position setup consumed the outer supervisor before final fixture resume; this is not a measured native 5000ms fixture failure"
+  },
+  "captures": {
+    "repl-native.stdout.txt": {
+      "bytes": 8919,
+      "sha256": "c2faebf6f5a4409bd25a133358f9fad1b99ccc4ca58d62614b58a0c439f5a5af"
+    },
+    "repl-native.stderr.txt": {
+      "bytes": 68,
+      "sha256": "8f5ceda9ffa631e0b8fde056fb8e293ef79345ce84c3c02f427495ced000ded8"
+    },
+    "bwrap-native-status.jsonl": {
+      "bytes": 201,
+      "sha256": "1c7ef8af8779590a4c4868c363448d634b1e32c647508d33c606fecefefb9f8a"
+    }
+  },
+  "actual_supervisor_stderr": "/usr/bin/timeout: sending signal TERM to command ‘/usr/bin/env’\n",
+  "actual_metadata": {
+    "count": 37,
+    "stages": {
+      "frozen_nonpausing_conditions": 1,
+      "adapter_breakpoint": 1,
+      "adapter_pause": 1,
+      "adapter_source_binding": 1,
+      "native_event_guards_ready": 1,
+      "sdk_script_resolved": 3,
+      "sdk_script_hash": 3,
+      "map_candidate": 7,
+      "possible_breakpoints": 7,
+      "native_map_calibration": 6,
+      "resolved_nonpausing_position": 6
+    },
+    "root_cached_records": 36,
+    "count_discrepancy": "One actual possible-breakpoints result arrived before timeout; its write_stdin completion reported124 before the root response reader ran. Native original contains37, the cached subset36.",
+    "position_primitive_complete": false,
+    "fresh_sdk_script_bindings": 3,
+    "mapped_anchor_records": 7,
+    "native_roundtrip_anchors": 6,
+    "installed_nonpausing_anchors": 6,
+    "missing_fourth_script_and_remaining_position_gates": true
+  },
+  "namespace_status": {
+    "child_pid": 333669,
+    "pid_namespace": 4026532451,
+    "exit_event_observed": false,
+    "status_bytes": 201,
+    "status_sha256": "1c7ef8af8779590a4c4868c363448d634b1e32c647508d33c606fecefefb9f8a"
+  },
+  "process_observation": {
+    "before": {
+      "bytes": 6498,
+      "sha256": "a51847e988f89861b0108d1560d50a2e6806051ea8c582786c1fc8056fb69c83",
+      "rows": 342,
+      "pair_rows": 1,
+      "namespace_rows": 3,
+      "native_ps_exit": 0,
+      "chunk": "7af2b1",
+      "stderr_bytes": 0
+    },
+    "after": {
+      "bytes": 6232,
+      "sha256": "93994b44762c4573f2f54438bedb42d5e128c8c3187d7aa559fa9caf9e94dc34",
+      "rows": 328,
+      "pair_rows": 0,
+      "namespace_rows": 0,
+      "native_ps_exit": 0,
+      "chunk": "7e94ee",
+      "stderr_bytes": 0
+    },
+    "format": "Complete native ps pid,pidns pairs; every nonempty row exactly two positive decimal values",
+    "visible_owned_pair_and_namespace_absent_after": true,
+    "scope": "Visible owned process endpoint only; not a whole-host guarantee or independent Jest-child exit"
+  },
+  "synthetic_controls": {
+    "classification": "Locally authored bounded recorder controls, not native SDK execution or unchanged upstream tests",
+    "root_and_independent_checks": "All eight frozen conditions return false;64 bounded hits plus one overflow sentinel;newline JSON fixed three fields;backpressure throws",
+    "native_role_acceptance": false
+  },
+  "independent_custody_read": {
+    "status": "CUSTODY CONFIRMED setup_supervisor_timeout before positive fixture",
+    "native_sha256sum_exit": 0,
+    "native_read_only_node_check_exit": 0,
+    "original_capture_hashes_matched": 5,
+    "exact_actual_metadata_count": 37,
+    "target_hit_records": 0,
+    "adapter_removal_records": 0,
+    "final_resume_records": 0,
+    "jest_json_exists": false,
+    "owned_pair_and_namespace_rows_after": 0,
+    "fd13_exit_event_observed": false,
+    "supervisor_124_exit_provenance": "Coordinator-reported original tool completion; not independently regenerated by files. Exact retained GNU TERM stderr corroborates termination.",
+    "verdict_scope": "Failed setup and visible owned process reclamation only; no complete position, native Jest, child exit or source-bug acceptance",
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "max",
+    "actual_delivered_model": null,
+    "actual_delivered_effort": null,
+    "provider_usage": null
+  },
+  "sources": {
+    "codex_fixture": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/tests/run.test.ts#L19",
+    "node_stock_repl": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect_repl.js",
+    "node_event_agents": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect.js#L48",
+    "node_condition_semantics": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/deps/v8/src/debug/debug.cc#L933",
+    "node_condition_exceptions": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/deps/v8/src/inspector/v8-debugger.cc#L734",
+    "jest_adapter_before_runner": "https://github.com/jestjs/jest/blob/4e56991693da7cd4c3730dc3579a1dd1403ee630/packages/jest-circus/src/legacy-code-todo-rewrite/jestAdapter.ts#L85",
+    "jest_timer_before_callback": "https://github.com/jestjs/jest/blob/4e56991693da7cd4c3730dc3579a1dd1403ee630/packages/jest-circus/src/utils.ts#L206",
+    "bubblewrap": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/bubblewrap.c#L619"
+  },
+  "acceptance": {
+    "this_diagnostic": "FAILED setup_supervisor_timeout",
+    "original_5000ms_positive_fixture": "NOT EXECUTED",
+    "positive_sdk_role": "HOLD",
+    "actual_model_or_provider_attempts": 0,
+    "native_script_partial_positions": "Observed partial only",
+    "scoped_visible_process_cleanup": "PASS root original observations",
+    "all_prior_failures_retained": true,
+    "same_freeze_retry": false,
+    "comparisons_and_all_defaults": "HOLD",
+    "usage_and_efficiency": "HOLD"
+  }
+}

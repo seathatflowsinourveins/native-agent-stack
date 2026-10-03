@@ -1,0 +1,1247 @@
+{
+  "schema_version": 1,
+  "kind": "scheduler-native-controls",
+  "class": "unchanged-upstream-tests-with-local-execution-boundary",
+  "scope": {
+    "job": "scheduled-automation",
+    "record_base": "65a0d370ed8c075d922ff60857287e33d3a14788",
+    "branch": "runtime-jobs/scheduler-native-controls-20261003",
+    "observed_date_utc": "2026-10-03",
+    "status": "selected-native-lifecycle-controls-passed",
+    "quality_evaluated": false,
+    "default_selected": false,
+    "freeze_eligible": false,
+    "provider_execution": false,
+    "real_scheduler_or_timer_started": false,
+    "upstream_test_files_changed": false,
+    "local_boundary_is_upstream_test": false,
+    "registry_owner": "root; registration intentionally pending"
+  },
+  "source_contract": {
+    "draft_path": "blueprints/runtime-workers/comparisons/scheduled-automation-draft.json",
+    "draft_bytes": 5609,
+    "draft_sha256": "23e3ea9a14599b87f29931e72cd2399c2c5286b0be4d149f5457fc11a0127ecd",
+    "draft_status": "draft-not-frozen",
+    "acceptance_policy_path": "docs/acceptance-evidence-policy.md",
+    "acceptance_policy_sha256": "38ddfb80673ae86cad110a65a9cc938bb974d65a34bb9638b7a0f96d3e2ef508",
+    "convergence_path": "docs/convergence-architecture.md",
+    "convergence_sha256": "1888656a0c4afcd630cb9fc861b05818de653e438bdb4780eaa91206380b401b"
+  },
+  "upstream_sources": [
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/tests/test_scheduler_completion_atomicity.py",
+      "bytes": 7829,
+      "sha256": "f2208d2ca62c1d8b08713ef90eae3502cef62a94de8a94595df33203660b2770",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/test_scheduler_completion_atomicity.py#L104",
+      "scope": "Once/cron × success/error/timeout/interrupted; eight cases; exactly-once completion accounting."
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/tests/test_scheduled_task_dispatch_race.py",
+      "bytes": 9822,
+      "sha256": "b4c669d385ef77bc39bdb94879210cbaea0707a1470b7443dbe53932e6ec387f",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/test_scheduled_task_dispatch_race.py#L14",
+      "scope": "Two original concurrent-dispatch cases; real file-backed SQLite and fake launch callback."
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/tests/test_scheduled_task_queue.py",
+      "bytes": 39465,
+      "sha256": "0aebcbbac08b11274fe509c504e37a0ac50c1c02eec94f2f1352df25d17b881f",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/test_scheduled_task_queue.py",
+      "scope": "Queued cancellation versus rejection when launching; not active-run cancellation."
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/tests/test_scheduled_task_router_behavior.py",
+      "bytes": 46979,
+      "sha256": "4d6e4027a566ef3ff83a4da3568884b05b69d3edadd07b64c97c5a74475f2f7d",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/test_scheduled_task_router_behavior.py",
+      "scope": "Original terminal-once rearm fixture seeds completed only."
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/tests/conftest.py",
+      "bytes": 6566,
+      "sha256": "88818d586500926444d0576e9b0f43a0124a9d76a138924848bd99e4672daaba",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/conftest.py#L33",
+      "scope": "Unchanged native test mocks, including SubagentExecutor/results; not live model execution."
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/pyproject.toml",
+      "bytes": 5118,
+      "sha256": "293f4ce381f8fde321197ca46216a413f684fb8246c3294bf6579e8420977d85",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/pyproject.toml#L64",
+      "scope": "Native pytest/pytest-asyncio dependencies and workspace."
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/pyproject.toml",
+      "bytes": 4303,
+      "sha256": "235e642dd628d70cccde5d619dfacd4855b2697f74abffd91b8f6cac10fe2ba8",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/pyproject.toml#L107",
+      "scope": "Hatch packages=['deerflow']; correct flat package root for bounded namespace repair."
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/extension-api/pyproject.toml",
+      "bytes": 468,
+      "sha256": "b5341da8f0cce67d3225bbb9c7367551fca6c6e2552d95dcdecae2abd2ab8c55",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/extension-api/pyproject.toml#L14",
+      "scope": "Hatch packages=['deerflow_extension_api']; correct flat package root."
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/uv.lock",
+      "bytes": 892052,
+      "sha256": "3cc643cd34374384c62de7fd8cef49cc4608df01ea11eff85daeea51f5cf0d5f",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/uv.lock",
+      "scope": "Retained frozen environment dependency identity; known pip-check incompatibility retained."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "go.mod",
+      "bytes": 28536,
+      "sha256": "809353cc3f559a63ef3493616b5b01aee229335acd5a2069b0cf6d9186fd8efd",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/go.mod#L3",
+      "scope": "Module github.com/dagucloud/dagu/v2 requires Go1.27.0."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "go.sum",
+      "bytes": 167887,
+      "sha256": "d3c77e1757a4aae2b597e079c3fcbb89154ca440af5bc6a07278b5dbb4b86959",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/go.sum",
+      "scope": "Dependency checksum carrier observed after -mod=readonly native commands."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "Makefile",
+      "bytes": 20494,
+      "sha256": "e988a8b1e8ce387c34868bd73a3616254b8ccaa4591497cb1d3b57cf1aef4896",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/Makefile#L336",
+      "scope": "Native Go build pattern; lines49/165–179 native race/test/conformance commands and DAGU_BIN."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "internal/cmd/start_test.go",
+      "bytes": 17872,
+      "sha256": "ea48bf26ee94fb0cb3da93296e5c8337239481cdc66ebf2a6c13e6226d734684",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/cmd/start_test.go#L505",
+      "scope": "Duplicate run ID original assertions retain attempt/status; this run failed at setup506 before those assertions."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "internal/test/helper.go",
+      "bytes": 36121,
+      "sha256": "e10620b50da754e4efaf9d809226876c918746a48afad3b0f55cffdeb0865d9a",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/test/helper.go#L177",
+      "scope": "Fresh temporary DAGU_HOME; config loader222–224 still requires a home directory; native failure retained."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "internal/test/command.go",
+      "bytes": 3200,
+      "sha256": "5b30fb35c468fe085dadfe7d8ceec66fa6d722473b854829ca7963f50b0c1bbf",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/test/command.go#L65",
+      "scope": "SetupCommand delegates to original Setup."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "conformance/cli/retry_test.go",
+      "bytes": 2977,
+      "sha256": "2ad2053971c468282629fc7502003b4b86501c17315c9819169d4028d8c22377",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/conformance/cli/retry_test.go#L34",
+      "scope": "Unchanged selected-step retry; marker sequence first/second/second; both native child commands intentionally fail."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "conformance/cli/testdata/multi_step_failing.yaml",
+      "bytes": 170,
+      "sha256": "efcdc852c609de518e46a94cdc69bf1dced7bbc115733bdcf4471bad4045a38a",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/conformance/cli/testdata/multi_step_failing.yaml#L1",
+      "scope": "Two shell steps; second appends marker then exits1."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "conformance/harness/runner.go",
+      "bytes": 16606,
+      "sha256": "8ef423e410c5fc83d54105ca9909950ed2a23dc28aced99e9b97bf72760a9d50",
+      "url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/conformance/harness/runner.go#L591",
+      "scope": "Upstream runner injects fresh fixture-local HOME/XDG/DAGU_HOME/auth:none; inherited host auth is not copied."
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "commit": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "path": "demos/bubblewrap-shell.sh",
+      "bytes": 1204,
+      "sha256": "dd2ed261e8a29df26d4ca8e629d57e882b7fdf0f019cb495a26bc1a74ca17c51",
+      "url": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/demos/bubblewrap-shell.sh#L3",
+      "scope": "Maintained private root dirs and synthetic passwd/group --file pattern, lines3–5/30–34; local integration boundary, not upstream suite acceptance."
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "path": "internal/cmn/config/loader.go",
+      "bytes": 80811,
+      "sha256": "0c6e3a06d59bdfd51a695a35cdfb149fc5308c941918217073ad1febd5464e60",
+      "url": "https://raw.githubusercontent.com/dagucloud/dagu/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/cmn/config/loader.go",
+      "scope": "Config loader179–183 obtains HOME before app override1969–1977; getHomeDir2439–2445 calls GoUserHomeDir."
+    },
+    {
+      "repository": "golang/go",
+      "commit": "8af21751f066eced273ca3ce49506b366847c623",
+      "tag": "go1.27.0",
+      "root_commit_binding_verified": true,
+      "path": "src/os/file.go",
+      "bytes": 30343,
+      "sha256": "d77653afbcbec5256b56aee25dce3df3ed001f964c9b245b848a5d378884bcb3",
+      "url": "https://raw.githubusercontent.com/golang/go/8af21751f066eced273ca3ce49506b366847c623/src/os/file.go",
+      "scope": "Go1.27 UserHomeDir605–614 returns nonempty inherited HOME bytes; no existence/NSS lookup needed on this branch."
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "commit": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "path": "bubblewrap.c",
+      "bytes": 113001,
+      "sha256": "3f17ee26057cae9d660801ca8d9ba84722f1bafdcd072d5151ee1c64eeeb15f4",
+      "url": "https://raw.githubusercontent.com/containers/bubblewrap/2a76602a8c71f36c1527cf9fc3417d9149822e0c/bubblewrap.c",
+      "scope": "Native --unsetenv2488–2496 and generated PWD3427; source-qualified HOME inheritance without assignment."
+    }
+  ],
+  "source_acquisition": {
+    "deerflow": {
+      "command": "rtk proxy env -i PATH=/usr/bin:/bin GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 git -C <retained-public-source> archive 345f08be00c8a9495079b732a39b46aa9af1584e backend",
+      "native_exit_code": 0,
+      "tracked_only_backend_archive_bytes": 27228160,
+      "sha256": "401377592f00986c27bd1560c0aade0f6cb0b866c2b62508f5e0cf37534cacd5",
+      "untracked_profiles_and_auth_excluded": true
+    },
+    "dagu": {
+      "url": "https://codeload.github.com/dagucloud/dagu/tar.gz/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "bytes": 18493576,
+      "sha256": "0e641844181210d943efed6afa1b141b30486ac5bd912933e3fd57bc76a5e2e2",
+      "tested_source_file_hashes_rechecked_after_execution": true
+    },
+    "failed_source_or_metadata_reads": [
+      {
+        "source": "https://raw.githubusercontent.com/dagucloud/dagu/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/conformance/cli/main_test.go",
+        "result": "HTTP404; guessed path; no runtime absence inference"
+      },
+      {
+        "source": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-native-controls.json",
+        "result": "ENOENT in owned base checkout; guessed template metadata path only"
+      },
+      {
+        "source": "evidence/artifacts/runtime-jobs-source-intake-20261003/runtime-namespace-readiness.json",
+        "result": "ENOENT in owned base checkout; guessed template metadata path only"
+      }
+    ],
+    "wrapper_before_start_failure": {
+      "stage": "initial DF archive wrapper",
+      "outer_exit_code": 1,
+      "native_command_started": false,
+      "native_exit_code": null,
+      "returned_error": "FileNotFoundError: rtk; cleared PATH removed outer RTK resolution",
+      "correction": "Resolve outer rtk before native env -i; exact tracked-only git archive then returned0.",
+      "separate_stdout_sha256": null,
+      "separate_stderr_sha256": null
+    }
+  },
+  "execution_boundary": {
+    "classification": "Locally authored integration runner invoking unchanged native tests; not a native evaluator or upstream acceptance oracle.",
+    "namespace_recipe": "rtk proxy env -i PATH=/usr/bin:/bin <public-bwrap> --unshare-all --die-with-parent --new-session --clearenv <public-readonly-runtime/source-binds> <owned-cache/fixtures/logs/bin-binds> --file <synthetic-passwd-fd> /etc/passwd --file <synthetic-group-fd> /etc/group --chdir <native-source-cwd> <unchanged-native-command>",
+    "local_helper_bytes": 6972,
+    "local_helper_sha256": "42a4b1065c26f937e5f641c1a5382574c1a543d020fa4cb8ca46c704a65a4804",
+    "earlier_helper_sha256": null,
+    "earlier_helper_identity_limit": "Earlier boundary revisions were not retained; do not infer their hashes from the final helper.",
+    "bwrap_binary": {
+      "bytes": 194848,
+      "sha256": "75d6e611c1d41cf3a183a54085d4e83342901b91d058dd2c655692ff13207216",
+      "reused_public_runtime": true,
+      "full_upstream_bwrap_suite_run": false
+    },
+    "synthetic_passwd": {
+      "bytes": 144,
+      "sha256": "10a05165fa905b3a60e0ea22f6deeb402eca40af4df163fec92ad1d8509f71c5",
+      "uid": 1000,
+      "gid": 1000,
+      "home": "<synthetic-namespace-home>",
+      "host_passwd_not_read": true
+    },
+    "synthetic_group": {
+      "bytes": 35,
+      "sha256": "db94e93d8845a7eb7ee33b806fa88986ced0a23527ef2b3623c3ae97ae38da06",
+      "host_group_not_read": true
+    },
+    "readonly_public_binds": [
+      "/usr/bin",
+      "/usr/lib/x86_64-linux-gnu",
+      "/usr/lib/gcc",
+      "/usr/include",
+      "/lib64/ld-linux-x86-64.so.2",
+      "/opt/python",
+      "/opt/deerflow-venv",
+      "/opt/go",
+      "/work"
+    ],
+    "bounded_compiler_repair_bind": "/usr/libexec/gcc/x86_64-linux-gnu/13",
+    "writable_owned_binds": [
+      "/cache",
+      "/fixtures",
+      "/logs",
+      "/owned-bin"
+    ],
+    "fresh_namespace_dirs": [
+      "<synthetic-namespace-home>",
+      "/etc",
+      "/tmp",
+      "/var/tmp"
+    ],
+    "host_home_or_host_etc_bound": false,
+    "external_HOME_assignment": false,
+    "external_CODEX_HOME_assignment": false,
+    "native_conformance_fixture_HOME_assignment": true,
+    "environment": {
+      "PATH": "/opt/go/bin:/opt/python/bin:/usr/bin:/bin",
+      "TMPDIR": "/tmp",
+      "PYTHONNOUSERSITE": "1",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTHON_DOTENV_DISABLED": "1",
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+      "PYTHONPATH": "/work/deerflow/backend:/work/deerflow/backend/packages/harness:/work/deerflow/backend/packages/extension-api:/opt/deerflow-venv/lib/python3.13/site-packages",
+      "GOCACHE": "/cache/go-build",
+      "GOPATH": "/cache/gopath",
+      "GOENV": "off",
+      "GOTELEMETRY": "off",
+      "GOTOOLCHAIN": "local",
+      "GOMAXPROCS": "2",
+      "GOPROXY_test": "off",
+      "GOSUMDB_test": "off",
+      "GIT_CONFIG_GLOBAL": "/dev/null",
+      "GIT_CONFIG_NOSYSTEM": "1",
+      "GIT_TERMINAL_PROMPT": "0"
+    },
+    "network_policy": {
+      "tests": "--unshare-all; no --share-net, DNS or CA mounts",
+      "dependency_install_only": "--share-net; exact public /etc/resolv.conf and /etc/ssl/certs/ca-certificates.crt readonly; GOPROXY=https://proxy.golang.org; GOSUMDB=sum.golang.org",
+      "provider_or_service_operation": false
+    },
+    "private_artifact_root_locator": "scheduler-native-controls-state; outside checkout; no credential or active-client stores",
+    "public_sanitization": "Private absolute prefixes are replaced by role-based placeholders. Native assertion outputs with namespace /work paths are retained. No raw conversations, tokens, private configuration or auth stores were read/published. The synthetic namespace home literal is masked as <synthetic-namespace-home> to satisfy the publication scanner; raw preflight hashes identify original bytes.",
+    "previous_helper_bytes": 5734,
+    "previous_helper_sha256": "4d0ae53d5e6094d32933e03d3b098ec974a0b0eb7ab7f516d842434ef83bfba0",
+    "native_HOME_inheritance": "Only the authorized duplicate-ID repair mode retains ordinary inherited HOME through strict native unsetenv whitelist; no assignment or host bind."
+  },
+  "dependencies": {
+    "deerflow_environment": {
+      "reused_owned_frozen_venv": true,
+      "installation_rerun_in_this_stage": false,
+      "python_version": "3.13.15",
+      "pytest_version": "9.0.3",
+      "pytest_asyncio_version": "1.3.0",
+      "sqlalchemy_version": "2.0.49",
+      "public_python_binary_bytes": 31375608,
+      "public_python_binary_sha256": "93a93f4c8af5ae6f127fb0310f923d5fab89eb7257a0b801eec2e44b3f199840",
+      "retained_dependency_receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/deerflow-native-readiness.json",
+      "retained_receipt_bytes": 20946,
+      "retained_receipt_sha256": "38fc896da374cd54e973514a67215dcc74a13081136a319af463c27112e7bcb9",
+      "retained_pip_check": {
+        "native_exit_code": 1,
+        "independently_rerun_in_prior_stage": true,
+        "rerun_in_scheduler_stage": false,
+        "command": "rtk env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 PYTHON_DOTENV_DISABLED=1 <installed-uv> --no-config --no-cache pip check --python <owned-deerflow-venv>/bin/python",
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 136,
+          "sha256": "95cd3362dcbaaa12af71990f2abc42fc14ebcf5c76cb1f400eb5972527cdab0d",
+          "returned_text": "Checked 227 packages in 68ms\nFound 1 incompatibility\nThe package `langgraph-sdk` requires `websockets>=14,<16`, but `16.0` is installed\n"
+        },
+        "limit": "Selected test passes do not repair or erase the frozen environment incompatibility."
+      }
+    },
+    "go": {
+      "initial_lookup": "Not found on the bounded observed PATH/public runtime locations; no global absence claim.",
+      "version": "go1.27.0",
+      "matches_dagu_go_mod": true,
+      "official_release_index_url": "https://go.dev/dl/?mode=json&include=all",
+      "release_index_bytes": 2211180,
+      "release_index_sha256": "1ed915f72633d0a72eaa2f462740153db4fe347cb56f7d1e25ec44868568f13e",
+      "newest_observed": "go1.27.1; freshness only; no target move",
+      "archive_url": "https://go.dev/dl/go1.27.0.linux-amd64.tar.gz",
+      "archive_bytes": 70523269,
+      "archive_sha256": "675c26c449cbb18fc24b74650de1eabbae6e16f64326fd85a283fb3b58280685",
+      "official_archive_checksum_verified": true,
+      "native_extract_command": "rtk proxy tar -C <owned-runtime-prefix> -xzf <verified-public-go-archive>",
+      "native_extract_exit_code": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "native_version_command": [
+        "/opt/go/bin/go",
+        "version"
+      ],
+      "native_version_exit_code": 0,
+      "native_version_stdout": "go version go1.27.0 linux/amd64\n",
+      "native_version_stdout_bytes": 32,
+      "native_version_stdout_sha256": "76227025cc0bc2be7067aa45d11e09cacfd49c58f498f4c2e4f6a9872a607bf9",
+      "race_runtime_readme": {
+        "path": "runtime/go/src/runtime/race/README",
+        "bytes": 2414,
+        "sha256": "8e7ca72a2a50b5a8ba85884ad86a0321486e6880b4ebc465cbeffbf9005e27ad"
+      }
+    }
+  },
+  "namespace_preflights": [
+    {
+      "label": "namespace-preflight",
+      "native_exit_code": 0,
+      "duration_seconds": 0.164562,
+      "stdout_bytes": 259,
+      "stdout_sha256": "09e83134dcf78b3c24a3dd41e958034338111cf32d60f6317e65cf871aa7f0d6",
+      "class": "authored-integration-preflight",
+      "sanitized_returned_json": {
+        "uid": 1000,
+        "synthetic_home": "<synthetic-namespace-home>",
+        "HOME_set": false,
+        "CODEX_HOME_set": false,
+        "etc_entries": [
+          "group",
+          "passwd"
+        ],
+        "ambient_auth_paths_visible": false,
+        "python": "3.13.15",
+        "pytest": "9.0.3",
+        "pytest_asyncio": "1.3.0",
+        "sqlalchemy": "2.0.49"
+      }
+    },
+    {
+      "label": "installation-namespace-preflight",
+      "native_exit_code": 0,
+      "duration_seconds": 0.114509,
+      "stdout_bytes": 171,
+      "stdout_sha256": "43b03aa8e04048ec6cb1dc68ac0c7ece729d9a7bdb9f70c6cfed2e0e9d44cb00",
+      "class": "authored-integration-preflight",
+      "sanitized_returned_json": {
+        "HOME_set": false,
+        "CODEX_HOME_set": false,
+        "synthetic_home": "<synthetic-namespace-home>",
+        "etc_entries": [
+          "group",
+          "passwd",
+          "resolv.conf",
+          "ssl"
+        ],
+        "ambient_auth_visible": false
+      }
+    },
+    {
+      "label": "repaired-compiler-namespace-preflight",
+      "native_exit_code": 0,
+      "duration_seconds": 0.114473,
+      "stdout_bytes": 159,
+      "stdout_sha256": "180a10867949beabcc8f99ff2ca472e13274e985a9036d8d1c01db88ae054ae0",
+      "actual_returned_json": {
+        "HOME_set": false,
+        "CODEX_HOME_set": false,
+        "etc_entries": [
+          "group",
+          "passwd"
+        ],
+        "ambient_auth_visible": false,
+        "public_cc1_visible": true,
+        "tmp_entries": []
+      },
+      "class": "authored-integration-preflight"
+    }
+  ],
+  "native_attempts": [
+    {
+      "label": "deerflow-scheduler-controls",
+      "cwd": "/work/deerflow/backend",
+      "network_enabled": false,
+      "native_command": [
+        "/opt/python/bin/python3.13",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "pytest_asyncio.plugin",
+        "-p",
+        "no:cacheprovider",
+        "--junitxml=/logs/deerflow-scheduler-junit.xml",
+        "tests/test_scheduler_completion_atomicity.py::test_completion_before_launch_bookkeeping_is_durable_and_counted_once",
+        "tests/test_scheduled_task_dispatch_race.py::test_two_concurrent_manual_dispatches_launch_exactly_once",
+        "tests/test_scheduled_task_dispatch_race.py::test_scheduled_and_manual_dispatch_launch_exactly_once",
+        "tests/test_scheduled_task_queue.py::test_pause_atomically_cancels_waiting_run_but_rejects_launching_run",
+        "tests/test_scheduled_task_router_behavior.py::test_update_terminal_once_task_with_future_run_at_rearms_it"
+      ],
+      "native_exit_code": 4,
+      "duration_seconds": 2.119392,
+      "timeout": false,
+      "stdout": {
+        "bytes": 3847,
+        "sha256": "29c870c24e30a07376e7576781f4d330f913a24a0c29fcc7ea71cdbfd0a5971e"
+      },
+      "stderr": {
+        "bytes": 862,
+        "sha256": "4d9e44d48a63b9b18d479f9021eb4840b8645b511593f05659c06e5431971aa8"
+      },
+      "result": "Four collection errors; no collectors for the five nodes. ModuleNotFoundError: No module named 'deerflow'.",
+      "fixture_assertions_reached": false,
+      "correction": "Local namespace PYTHONPATH incorrectly assumed packages/*/src. Original flat package pyprojects above support corrected package roots. Upstream source/tests and frozen venv unchanged."
+    },
+    {
+      "label": "deerflow-scheduler-controls-repaired",
+      "cwd": "/work/deerflow/backend",
+      "network_enabled": false,
+      "native_command": [
+        "/opt/python/bin/python3.13",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "pytest_asyncio.plugin",
+        "-p",
+        "no:cacheprovider",
+        "--junitxml=/logs/deerflow-scheduler-repaired-junit.xml",
+        "tests/test_scheduler_completion_atomicity.py::test_completion_before_launch_bookkeeping_is_durable_and_counted_once",
+        "tests/test_scheduled_task_dispatch_race.py::test_two_concurrent_manual_dispatches_launch_exactly_once",
+        "tests/test_scheduled_task_dispatch_race.py::test_scheduled_and_manual_dispatch_launch_exactly_once",
+        "tests/test_scheduled_task_queue.py::test_pause_atomically_cancels_waiting_run_but_rejects_launching_run",
+        "tests/test_scheduled_task_router_behavior.py::test_update_terminal_once_task_with_future_run_at_rearms_it"
+      ],
+      "native_exit_code": 0,
+      "duration_seconds": 8.183975,
+      "timeout": false,
+      "stdout": {
+        "bytes": 99,
+        "sha256": "bd806c9da28ad3948dab00c772111f02692a754a8a2ac11fc33efc7959e53454",
+        "returned_text": "............                                                             [100%]\n12 passed in 6.10s\n"
+      },
+      "stderr": {
+        "bytes": 60,
+        "sha256": "ab9019e334f0288b6eb3777e0c5f2bd69d13b0810a271d3d08d0bb22b6d03d9b",
+        "returned_text": "Cannot read termcap database;\nusing dumb terminal settings.\n"
+      },
+      "native_framework": {
+        "tests": 12,
+        "passed": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reported_seconds": 6.1
+      },
+      "full_suite_run": false,
+      "local_boundary_helper_sha256_at_attempt": null
+    },
+    {
+      "label": "dagu-go-mod-download",
+      "cwd": "/work/dagu",
+      "network_enabled": true,
+      "native_command": [
+        "/opt/go/bin/go",
+        "mod",
+        "download"
+      ],
+      "native_exit_code": 0,
+      "duration_seconds": 31.440306,
+      "timeout": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "Dependency installation only, inside auth-excluding namespace; not native lifecycle acceptance."
+    },
+    {
+      "label": "dagu-build",
+      "cwd": "/work/dagu",
+      "network_enabled": false,
+      "native_command": [
+        "/opt/go/bin/go",
+        "build",
+        "-p=2",
+        "-mod=readonly",
+        "-ldflags=-X main.version=v2.18.1",
+        "-o",
+        "/owned-bin/dagu",
+        "./cmd"
+      ],
+      "native_exit_code": 1,
+      "duration_seconds": 35.950144,
+      "timeout": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 112,
+        "sha256": "1e0daa857470bdb5dcefe47336886abface3a09392f184369bb2c77b3dae7d9c",
+        "returned_text": "# runtime/cgo\ngcc: fatal error: cannot execute 'cc1': execvp: No such file or directory\ncompilation terminated.\n"
+      },
+      "bounded_repair": {
+        "native_locator_command": "rtk proxy env -i PATH=/usr/bin:/bin gcc -print-prog-name=cc1",
+        "native_locator_exit_code": 0,
+        "returned_path": "/usr/libexec/gcc/x86_64-linux-gnu/13/cc1",
+        "native_version_exit_code": 0,
+        "version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "version_probe": {
+          "native_exit_code": 0,
+          "first_line": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+          "stdout_bytes": 246,
+          "stdout_sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048"
+        },
+        "action": "Bind only exact public compiler directory readonly; source/fixtures/native build command unchanged."
+      }
+    },
+    {
+      "label": "dagu-build-repaired",
+      "cwd": "/work/dagu",
+      "network_enabled": false,
+      "native_command": [
+        "/opt/go/bin/go",
+        "build",
+        "-p=2",
+        "-mod=readonly",
+        "-ldflags=-X main.version=v2.18.1",
+        "-o",
+        "/owned-bin/dagu",
+        "./cmd"
+      ],
+      "native_exit_code": 0,
+      "duration_seconds": 108.277834,
+      "timeout": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "binary": {
+        "bytes": 199337074,
+        "sha256": "29e33a61345df69fda8a1f0ff14a522a5da5bc4416890504cedb16b7644fee42"
+      },
+      "scope": "Repaired native build only; no lifecycle or quality implication.",
+      "local_boundary_helper_sha256": "4d0ae53d5e6094d32933e03d3b098ec974a0b0eb7ab7f516d842434ef83bfba0"
+    },
+    {
+      "label": "dagu-duplicate-run-id",
+      "cwd": "/work/dagu",
+      "network_enabled": false,
+      "native_command": [
+        "/opt/go/bin/go",
+        "test",
+        "-json",
+        "-race",
+        "-count=1",
+        "-p=2",
+        "-mod=readonly",
+        "-timeout=3m",
+        "-run",
+        "^TestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt$",
+        "./internal/cmd"
+      ],
+      "native_exit_code": 1,
+      "duration_seconds": 236.95349955558777,
+      "timeout": false,
+      "started_utc": "2026-10-03T09:26:28.360702Z",
+      "ended_utc": "2026-10-03T09:30:25.314202Z",
+      "stdout": {
+        "bytes": 3552,
+        "sha256": "583efbc962f2139abcc4fa75040c2f0d1604ecb0338e46f772c21bf9410d8ba1"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "native_output_event_excerpt": "=== RUN   TestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt\n    helper.go:224: \n        \tError Trace:\t/work/dagu/internal/test/helper.go:224\n        \t            \t\t\t\t/work/dagu/internal/test/command.go:69\n        \t            \t\t\t\t/work/dagu/internal/cmd/start_test.go:506\n        \tError:      \tReceived unexpected error:\n        \t            \tcould not determine home directory: $HOME is not defined\n        \tTest:       \tTestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt\n--- FAIL: TestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt (0.00s)\nFAIL\nFAIL\tgithub.com/dagucloud/dagu/v2/internal/cmd\t0.142s\n",
+      "native_framework": {
+        "tests_run": 1,
+        "passed": 0,
+        "failed": 1,
+        "test_elapsed_seconds": 0,
+        "package_elapsed_seconds": 0.142
+      },
+      "duplicate_id_assertions_reached": false,
+      "result_class": "native-fixture-setup-failure",
+      "further_fixture_fix_or_rerun": false,
+      "escalation": {
+        "trigger": "Native test failure after one bounded namespace compiler repair.",
+        "requested_role": "Astra/max",
+        "dispatched_by": "root",
+        "acceptance": "Astra/max accepted one source-qualified HOME inheritance repair; original native1 retained; unchanged rerun native0 recorded separately."
+      },
+      "local_boundary_helper_sha256": "4d0ae53d5e6094d32933e03d3b098ec974a0b0eb7ab7f516d842434ef83bfba0"
+    },
+    {
+      "label": "dagu-selected-step-retry-wrapper-before-start",
+      "outer_command": "rtk proxy env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 python3 <local-boundary-import-and-run>",
+      "outer_exit_code": 1,
+      "native_command_started": false,
+      "native_exit_code": null,
+      "returned_error": "FileNotFoundError: [Errno 2] No such file or directory: 'rtk'",
+      "stdout_sha256": null,
+      "stderr_sha256": null,
+      "custody_limit": "exec_command returned traceback; separate stdout/stderr were not retained. Empty opened native stream files do not represent a native test.",
+      "correction": "Reissued ordinary outer Python lookup. Native helper still launches rtk proxy env -i into the identical cleared offline namespace; no native fixture or HOME override added."
+    },
+    {
+      "label": "dagu-selected-step-retry",
+      "cwd": "/work/dagu",
+      "network_enabled": false,
+      "native_command": [
+        "/opt/go/bin/go",
+        "test",
+        "-json",
+        "-race",
+        "-count=1",
+        "-p=2",
+        "-mod=readonly",
+        "-parallel=4",
+        "-timeout=3m",
+        "-run",
+        "^TestRetryStepFlagReexecutesOnlyThatStep$",
+        "./conformance/cli"
+      ],
+      "extra_native_environment": {
+        "DAGU_BIN": "/owned-bin/dagu"
+      },
+      "native_exit_code": 0,
+      "duration_seconds": 1.818467378616333,
+      "timeout": false,
+      "started_utc": "2026-10-03T09:38:24.695197Z",
+      "ended_utc": "2026-10-03T09:38:26.513664Z",
+      "stdout": {
+        "bytes": 2264,
+        "sha256": "c61f8af8a4a64da5d9fe549882a92d1ccae0a8fef542d3ec76024c482e0cd038"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "native_output_events": "=== RUN   TestRetryStepFlagReexecutesOnlyThatStep\n=== PAUSE TestRetryStepFlagReexecutesOnlyThatStep\n=== CONT  TestRetryStepFlagReexecutesOnlyThatStep\n--- PASS: TestRetryStepFlagReexecutesOnlyThatStep (0.10s)\nPASS\nok  \tgithub.com/dagucloud/dagu/v2/conformance/cli\t1.111s\n",
+      "native_framework": {
+        "tests_run": 1,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "test_elapsed_seconds": 0.1,
+        "package_elapsed_seconds": 1.112
+      },
+      "original_assertion_contract": "first native start nonzero; marker first\\nsecond\\n; selected-step retry nonzero; final marker first\\nsecond\\nsecond\\n.",
+      "marker_bytes_independently_observed_after_cleanup": false,
+      "assertion_evidence": "Unchanged upstream assert/ExpectFileContent and native framework pass; no locally authored marker scorer.",
+      "scope": "Selected-step failure/retry contract only; no real scheduler/timer, whole-suite or useful-task quality qualification.",
+      "local_boundary_helper_sha256": "4d0ae53d5e6094d32933e03d3b098ec974a0b0eb7ab7f516d842434ef83bfba0"
+    },
+    {
+      "label": "dagu-duplicate-run-id-inherited-home",
+      "cwd": "/work/dagu",
+      "network_enabled": false,
+      "native_command": [
+        "/opt/go/bin/go",
+        "test",
+        "-json",
+        "-race",
+        "-count=1",
+        "-p=2",
+        "-mod=readonly",
+        "-timeout=3m",
+        "-run",
+        "^TestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt$",
+        "./internal/cmd"
+      ],
+      "native_exit_code": 0,
+      "duration_seconds": 7.532895088195801,
+      "timeout": false,
+      "started_utc": "2026-10-03T09:48:00.685Z",
+      "ended_utc": "2026-10-03T09:48:08.218Z",
+      "stdout": {
+        "bytes": 4228,
+        "sha256": "303266ad4892e64080d3744cafaa95b0b2f6a5fe6c56f8f73c87ebe0c2469ad0"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "native_framework": {
+        "tests_run": 1,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "test_elapsed_seconds": 0.03,
+        "package_elapsed_seconds": 1.162
+      },
+      "native_framework_events": [
+        {
+          "Time": "2026-10-03T09:48:07.057108558Z",
+          "Action": "run",
+          "Package": "github.com/dagucloud/dagu/v2/internal/cmd",
+          "Test": "TestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt"
+        },
+        {
+          "Time": "2026-10-03T09:48:07.085800251Z",
+          "Action": "pass",
+          "Package": "github.com/dagucloud/dagu/v2/internal/cmd",
+          "Test": "TestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt",
+          "Elapsed": 0.03
+        },
+        {
+          "Time": "2026-10-03T09:48:08.095772419Z",
+          "Action": "pass",
+          "Package": "github.com/dagucloud/dagu/v2/internal/cmd",
+          "Elapsed": 1.162
+        }
+      ],
+      "original_assertions_reached": true,
+      "observed_contract": "Native duplicate start returns already-exists error; unchanged assertions confirm original AttemptID, NotStarted status and empty status error.",
+      "fixture_source_unchanged": true,
+      "native_command_and_timeout_unchanged": true,
+      "environment_repair": "Only inherited HOME retained byte-for-byte through native --unsetenv whitelist. No HOME assignment, host-home bind, copied auth or fixture source patch.",
+      "local_boundary_helper_sha256": "42a4b1065c26f937e5f641c1a5382574c1a543d020fa4cb8ca46c704a65a4804",
+      "inherited_HOME_value_found_in_native_stdout": false,
+      "parent_process_reaped": true,
+      "native_pid_present_after_wait": false
+    }
+  ],
+  "transport_failure": {
+    "channel": "context-mode MCP",
+    "returned_error": "tool call error: timed out awaiting tools/call after 300s",
+    "native_timeout_inferred": false,
+    "native_process_killed_or_rerun_due_to_transport_timeout": false,
+    "observed_continuation": "Original build native0 recovered from completed artifact; original duplicate test observed still compiling before its actual native1 later appeared.",
+    "original_transport_native_exit_code": null,
+    "later_native_results_observed_separately": true,
+    "long_command_recovery": "Used exec_command yield_time_ms=1000 and write_stdin waits<=60s for the independent retry."
+  },
+  "independent_observations": {
+    "native_junit": {
+      "file": "logs/deerflow-scheduler-repaired-junit.xml",
+      "bytes": 2489,
+      "sha256": "f14c4eb5a71d4c2383b1f1a657275f7bb542d3f562f916e5a063809c2a7f8f54",
+      "method": "Python standard-library XML parser reading native JUnit artifact, separate from helper result fields.",
+      "testsuites": 1,
+      "testcases": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "case_groups": {
+        "atomic_completion": 8,
+        "concurrent_dispatch": 2,
+        "queued_cancellation": 1,
+        "completed_once_rearm": 1
+      }
+    },
+    "native_go_json": {
+      "method": "Decode every original stdout JSON line and count native Go framework run/pass/fail/skip actions, excluding package events from test counts.",
+      "duplicate_id": {
+        "test_runs": 1,
+        "test_pass": 0,
+        "test_fail": 1,
+        "test_skips": 0,
+        "failed_before_assertions": true
+      },
+      "selected_step_retry": {
+        "test_runs": 1,
+        "test_pass": 1,
+        "test_fail": 0,
+        "test_skips": 0
+      },
+      "duplicate_id_repaired": {
+        "test_runs": 1,
+        "test_pass": 1,
+        "test_fail": 0,
+        "test_skips": 0,
+        "original_assertions_reached": true
+      }
+    },
+    "process_cleanup": {
+      "observed_at_utc": "2026-10-03T09:39:24.040915Z",
+      "independent_command": "rtk proxy ps -p <recorded-original-wrapper,bwrap,retry-pids> -o pid=,ppid=,stat=,args=",
+      "native_exit_code": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "original_wrapper_and_namespace_pids_present": false,
+      "per_attempt_boundary_parent_reaped": true,
+      "per_attempt_native_pid_absent_after_wait": true,
+      "scope": "Recorded process identities and fresh namespace, not a general host-process audit."
+    },
+    "fresh_namespace_cleanup_check": {
+      "class": "authored-integration-preflight",
+      "label": "post-controls-cleanup-preflight",
+      "native_exit_code": 0,
+      "duration_seconds": 0.11457109451293945,
+      "network_enabled": false,
+      "parent_reaped": true,
+      "pid_absent_after_wait": true,
+      "stdout_bytes": 168,
+      "stdout_sha256": "5842791b7c00a06a3568637033206a759804703763de35ac73894abaa1cc4b8b",
+      "actual_returned_json": {
+        "HOME_set": false,
+        "CODEX_HOME_set": false,
+        "etc_entries": [
+          "group",
+          "passwd"
+        ],
+        "fresh_tmp_entries": [],
+        "owned_fixture_entries": [],
+        "host_home_auth_visible": false
+      },
+      "independent_owned_fixture_directory_entries": 0
+    },
+    "source_bytes_rechecked": true,
+    "native_marker_contents_after_cleanup": null
+  },
+  "role_evidence": {
+    "deerflow": {
+      "accepted_observation": "12 selected unchanged native cases passed after source-qualified local import-path repair.",
+      "observed": [
+        "Once/cron completion exactly once across success/error/timeout/interruption",
+        "Two concurrent-dispatch coalescing controls",
+        "Queued cancellation and launching rejection",
+        "Completed once task rearm with future run_at"
+      ],
+      "unqualified": [
+        "Failed/cancelled terminal rearm",
+        "Selected-step retry parity",
+        "Active-run cancellation parity",
+        "Useful scheduled work under live model",
+        "Real timer scheduling, service recovery and gateway route/usage"
+      ]
+    },
+    "dagu": {
+      "observed": [
+        "Unchanged selected-step retry test passed; prior successful step not rerun by native assertion contract",
+        "Native source build completed after exact public compiler-directory repair",
+        "Unchanged duplicate-ID assertions passed after Astra/max accepted HOME preservation; original attempt/status retained."
+      ],
+      "failed_or_pending": [
+        "Original duplicate-ID fixture setup native1 preserved before assertions; authorized unchanged rerun native0 recorded separately."
+      ],
+      "unqualified": [
+        "Useful scheduled work under live model",
+        "Real timer/service lifecycle",
+        "Whole conformance suite",
+        "Gateway route/effort/parallel/cache/counters"
+      ]
+    }
+  },
+  "counters_and_usage": {
+    "native_control_counters": {
+      "deerflow_passed": 12,
+      "deerflow_initial_collection_errors": 4,
+      "dagu_selected_step_retry_passed": 1,
+      "dagu_duplicate_fixture_failures": 1,
+      "dagu_duplicate_id_passed": 1,
+      "current_named_control_passes": 14
+    },
+    "provider_usage": null,
+    "uncached_input_tokens": null,
+    "output_tokens": null,
+    "gross_tokens": null,
+    "cached_input_tokens": null,
+    "cost": null,
+    "usage_scope": "No compared-runtime provider operation performed. Fixture/build/dependency commands do not measure useful-task cost or efficiency. Coordinator and Astra source-review usage is outside this receipt and remains unknown.",
+    "unknown_usage_normalized_to_zero": false,
+    "native_internal_fixture_retries": "Dagu original test intentionally issues one start plus one selected-step retry, both nonzero child commands. This is the stock lifecycle control, not study arm retries.",
+    "study_retries_or_comparison_blocks_run": false
+  },
+  "publication_validation": {
+    "baseline": {
+      "input_head": "65a0d370ed8c075d922ff60857287e33d3a14788",
+      "command": "rtk proxy env -i PATH=/usr/bin:/bin PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "native_exit_code": 0,
+      "duration_seconds": 26.980884552001953,
+      "stdout_bytes": 161,
+      "stdout_sha256": "d81ae49af96d3118c9d4872d40586e63ae8645f35be615a543266bf44b489a0f",
+      "returned_stdout": "{\"components\": 69, \"hashed_files\": 9477, \"profiles\": 4, \"receipts\": 187, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n"
+    },
+    "new_receipt_check": {
+      "status": "executed-before-commit; expected registration gap only",
+      "command": [
+        "rtk",
+        "proxy",
+        "env",
+        "-i",
+        "PATH=/usr/bin:/bin",
+        "PYTHONNOUSERSITE=1",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "python3",
+        "scripts/validate.py"
+      ],
+      "native_exit_code": 1,
+      "duration_seconds": 24.874980688095093,
+      "input_receipt_bytes": 56177,
+      "input_receipt_sha256": "6d849e92781aaeff04ee10619f6ed906e4e2790ce01fa055514ba5b8f5b77dd0",
+      "stdout": {
+        "bytes": 151,
+        "sha256": "039d511890071d20ba0cb2011424225e0fb082646e26d0a5ba51f59d141759b3",
+        "retained_private": "validator-sanitized.stdout"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_private": "validator-sanitized.stderr"
+      },
+      "returned_stdout": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/scheduler-native-controls.json: evidence file is not hash-listed\n",
+      "expected_registration_gap": true,
+      "registry_not_owned": true,
+      "publication_home_path_finding_corrected": true,
+      "result_metadata_added_after_this_run": true,
+      "final_precommit_native_output_locator": "scheduler-native-controls-state/logs/validator-final.stdout and .stderr; final artifact metadata outside checkout avoids a circular self-hash."
+    },
+    "failed_checks": [
+      {
+        "stage": "initial receipt before synthetic-home masking",
+        "native_exit_code": 1,
+        "duration_seconds": 24.87819790840149,
+        "input_receipt_bytes": 42810,
+        "input_receipt_sha256": "56ba0b28f45b9c8d7933e435ba31deb2ba106a77d81ebcf4653c4f9431c6e5e0",
+        "stdout_bytes": 275,
+        "stdout_sha256": "77275d3a3563b08cbc6997d485c2acfd1051b9664d075c6a83fb79e28950b28b",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "returned_findings": [
+          "scheduler-native-controls.json: evidence file is not hash-listed",
+          "scheduler-native-controls.json: contains possible personal home path"
+        ],
+        "classification": "Expected owned-file registration gap plus publication sanitizer correction; no upstream/runtime failure.",
+        "correction": "Masked the synthetic namespace-home literal in public fields; kept exact private preflight streams and hashes."
+      }
+    ]
+  },
+  "remaining_gates": [
+    "Root registration of this new evidence file; validate.py does not itself prove native lifecycle truth.",
+    "Freeze common useful tasks, scheduler/lifecycle contracts, complete counters and the shared execution order before any comparison.",
+    "Binding and measured useful-task/provider/time/token comparison remain separate from these unchanged native lifecycle controls."
+  ],
+  "private_root_read_paths": {
+    "metadata_records": "scheduler-native-controls-state/artifacts/{namespace-preflight,installation-namespace-preflight,repaired-compiler-namespace-preflight,post-controls-cleanup-preflight,deerflow-scheduler-controls,deerflow-scheduler-controls-repaired,go-version,dagu-go-mod-download,dagu-build,dagu-build-repaired,dagu-duplicate-run-id,dagu-selected-step-retry,validator-base}.json",
+    "raw_streams": "scheduler-native-controls-state/logs/<same-native-label>.stdout and .stderr",
+    "native_junit": "scheduler-native-controls-state/logs/deerflow-scheduler-repaired-junit.xml",
+    "boundary_source": "scheduler-native-controls-state/namespace_runner.py",
+    "upstream_dagu_source": "scheduler-native-controls-state/sources/dagu/<pinned repository path>",
+    "upstream_deerflow_source": "scheduler-native-controls-state/sources/deerflow/<pinned repository path>",
+    "locator_scope": "Relative to the parent-owned private runtime-jobs preparation root; publication contains no personal absolute prefix.",
+    "home_repair_artifacts": "scheduler-native-controls-state/artifacts/{inherited-home-namespace-preflight,inherited-home-namespace-preflight-corrected,dagu-duplicate-run-id-inherited-home}.json and matching logs .stdout/.stderr"
+  },
+  "publication_recording_corrections": [
+    {
+      "stage": "receipt metadata update",
+      "returned_error": "apply_patch verification failed: invalid patch: multiple operations target the same file",
+      "file_changed": false,
+      "correction": "Use supported Update File hunks; no evidence/source/native command changed."
+    }
+  ],
+  "limits": [
+    "Passing selected unchanged controls qualifies only their native fixture lifecycle assertions, not a default or common-task quality.",
+    "Local namespace/preflight/decoder output is integration and independent-observation evidence; it is not an upstream test suite.",
+    "DF pip-check mismatch, original collection/compiler/test setup failures, two wrapper-before-start failures, the transport timeout, the authored PWD-check failure and initial publication scanner finding remain visible.",
+    "Original Dagu duplicate-ID setup failure reached no application assertions. The separate single source-qualified rerun passed unchanged duplicate-ID assertions; no broad lifecycle claim follows.",
+    "No provider/window use, scheduler service, real timer, active host configuration, sign-in, credential/auth-store read, external HOME/CODEX_HOME reassignment, shared registry change or push occurred.",
+    "Private raw streams and native result records remain outside checkout under the owned artifact prefix; exact stream hashes identify custody. No complete raw installation stdout is invented."
+  ],
+  "inherited_home_repair": {
+    "trigger": "Native duplicate-ID fixture failed before assertions after one bounded compiler namespace repair.",
+    "requested_judgment": "Astra/max",
+    "verdict": "ACCEPT one bounded source-qualified environment repair; original failure retained; no further adaptive repair if native rerun fails.",
+    "root_independent_source_reread": true,
+    "worker_original_sources_rehashed": true,
+    "source_paths": [
+      "dagucloud/dagu@3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7:internal/cmn/config/loader.go179–183,1969–1977,2439–2445",
+      "golang/go@8af21751f066eced273ca3ce49506b366847c623 (go1.27.0):src/os/file.go605–614",
+      "containers/bubblewrap@2a76602a8c71f36c1527cf9fc3417d9149822e0c:bubblewrap.c2488–2496,3427"
+    ],
+    "mechanism": "Repair mode omits outer env-i/native clearenv, then native bwrap unsets every inherited variable name except HOME after strict name validation; public runtime/test variables are set explicitly. Native namespace contains only declared variables, HOME and bwrap-generated PWD.",
+    "external_HOME_assignment": false,
+    "external_CODEX_HOME_assignment": false,
+    "all_environment_inherited_inside_namespace": false,
+    "absent_or_empty_parent_HOME_policy": "HOLD; no model/test call",
+    "home_value_published_printed_or_written": false,
+    "equality_observation": "Authored no-network preflight compares child HOME bytes against parent bytes through anonymous stdin; emits only booleans and variable names. This is an integration observation, not an upstream test.",
+    "local_helper_before": {
+      "bytes": 5734,
+      "sha256": "4d0ae53d5e6094d32933e03d3b098ec974a0b0eb7ab7f516d842434ef83bfba0"
+    },
+    "local_helper_after": {
+      "bytes": 6972,
+      "sha256": "42a4b1065c26f937e5f641c1a5382574c1a543d020fa4cb8ca46c704a65a4804"
+    },
+    "installed_bwrap_help": {
+      "native_exit_code": 0,
+      "stdout_bytes": 5660,
+      "stdout_sha256": "158599c344a0e825888d485846623bfa091cd45358f8c7bc04fcaf615374a9c8",
+      "observed_options": [
+        "--clearenv",
+        "--unsetenv VAR"
+      ]
+    },
+    "preflights": [
+      {
+        "label": "inherited-home-namespace-preflight",
+        "class": "authored-integration-preflight",
+        "native_result": {
+          "exit_code": 1,
+          "timeout": false,
+          "duration_seconds": 0.11494970321655273,
+          "local_boundary_helper_sha256": "42a4b1065c26f937e5f641c1a5382574c1a543d020fa4cb8ca46c704a65a4804",
+          "home_inheritance_mode": "strict-unsetenv-whitelist",
+          "parent_home_present": true,
+          "network_enabled": false,
+          "parent_process_reaped": true,
+          "process_pid_present_after_wait": false,
+          "streams": {
+            "stdout": {
+              "file": "inherited-home-namespace-preflight.stdout",
+              "bytes": 583,
+              "sha256": "af6a8f7c2dce36124d990caf0094449d6f02de0b1fe05b1019f3e193de114183"
+            },
+            "stderr": {
+              "file": "inherited-home-namespace-preflight.stderr",
+              "bytes": 663,
+              "sha256": "b80ff94879f021b986ee36a1509479c8134b33f25895a465898f6a41c72afa6a"
+            }
+          }
+        },
+        "actual_returned_json": {
+          "parent_HOME_present": true,
+          "inherited_HOME_present": true,
+          "HOME_bytes_equal": true,
+          "CODEX_HOME_present": false,
+          "environment_variable_names": [
+            "GIT_CONFIG_GLOBAL",
+            "GIT_CONFIG_NOSYSTEM",
+            "GIT_TERMINAL_PROMPT",
+            "GOCACHE",
+            "GOENV",
+            "GOMAXPROCS",
+            "GOPATH",
+            "GOPROXY",
+            "GOSUMDB",
+            "GOTELEMETRY",
+            "GOTOOLCHAIN",
+            "HOME",
+            "PATH",
+            "PWD",
+            "PYTEST_DISABLE_PLUGIN_AUTOLOAD",
+            "PYTHONDONTWRITEBYTECODE",
+            "PYTHONNOUSERSITE",
+            "PYTHONPATH",
+            "PYTHON_DOTENV_DISABLED",
+            "TMPDIR"
+          ],
+          "unexpected_variable_names": [
+            "PWD"
+          ],
+          "etc_entries": [
+            "group",
+            "passwd"
+          ],
+          "inherited_home_directory_visible": false
+        },
+        "failure": "Local expected-name assertion omitted upstream-generated PWD; HOME equality/auth exclusion already held. Unchanged duplicate test had not yet rerun.",
+        "correction": "Original bubblewrap.c3427 calls xsetenv(PWD,new_cwd,1). Added PWD only to local expected-name list; no namespace/environment/native test change."
+      },
+      {
+        "label": "inherited-home-namespace-preflight-corrected",
+        "class": "authored-integration-preflight",
+        "native_result": {
+          "exit_code": 0,
+          "timeout": false,
+          "duration_seconds": 0.11484408378601074,
+          "local_boundary_helper_sha256": "42a4b1065c26f937e5f641c1a5382574c1a543d020fa4cb8ca46c704a65a4804",
+          "home_inheritance_mode": "strict-unsetenv-whitelist",
+          "parent_home_present": true,
+          "parent_process_reaped": true,
+          "process_pid_present_after_wait": false,
+          "streams": {
+            "stdout": {
+              "file": "inherited-home-namespace-preflight-corrected.stdout",
+              "bytes": 578,
+              "sha256": "b903771921b42c9d2a87613543749ae0fa65825bc8fcd04b64384d1c8f3e3cc6"
+            },
+            "stderr": {
+              "file": "inherited-home-namespace-preflight-corrected.stderr",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        },
+        "actual_returned_json": {
+          "parent_HOME_present": true,
+          "inherited_HOME_present": true,
+          "HOME_bytes_equal": true,
+          "CODEX_HOME_present": false,
+          "environment_variable_names": [
+            "GIT_CONFIG_GLOBAL",
+            "GIT_CONFIG_NOSYSTEM",
+            "GIT_TERMINAL_PROMPT",
+            "GOCACHE",
+            "GOENV",
+            "GOMAXPROCS",
+            "GOPATH",
+            "GOPROXY",
+            "GOSUMDB",
+            "GOTELEMETRY",
+            "GOTOOLCHAIN",
+            "HOME",
+            "PATH",
+            "PWD",
+            "PYTEST_DISABLE_PLUGIN_AUTOLOAD",
+            "PYTHONDONTWRITEBYTECODE",
+            "PYTHONNOUSERSITE",
+            "PYTHONPATH",
+            "PYTHON_DOTENV_DISABLED",
+            "TMPDIR"
+          ],
+          "unexpected_variable_names": [],
+          "etc_entries": [
+            "group",
+            "passwd"
+          ],
+          "inherited_home_directory_visible": false
+        }
+      }
+    ],
+    "rerun_count": 1,
+    "unchanged_duplicate_native_exit_code": 0,
+    "independent_cleanup": {
+      "observed_at_utc": "2026-10-03T09:49:11.620660Z",
+      "command": "rtk proxy ps -p <recorded-repaired-native-pid> -o pid=,ppid=,stat=,args=",
+      "native_exit_code": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "pid_absent": true,
+      "owned_fixture_entries": 0
+    }
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "prefreeze evaluator rebaseline proposal; candidate source and unchanged mock-control qualification",
+  "source_head": "eae4c151839dc30a7b5fec7550ee7643296de294",
+  "status": "PROPOSAL only; both-family amendment reads pending; selected evaluator unchanged",
+  "selected": {
+    "repository": "UKGovernmentBEIS/inspect_ai",
+    "version": "0.3.273",
+    "commit": "9e44f1b77ed7c912bf58baf30db8560937e7ce53"
+  },
+  "candidate": {
+    "repository": "UKGovernmentBEIS/inspect_ai",
+    "version": "0.3.276",
+    "commit": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+    "fresh_version_scope": "Native importlib.metadata from new editable source environment; fresh CLI --version not run",
+    "python": "3.13.15"
+  },
+  "proposal": "After exact-head Codex and Claude prefreeze amendment reads, rebaseline Inspect evaluator source pin to the qualified candidate before a study freeze. No manifest or comparison pin changes occur in this proposal.",
+  "native_controls": {
+    "preregister": "inspect276-python313-control-preregister.json",
+    "native_receipt": "inspect276-python313-native-controls.json",
+    "upstream_install_exit": 0,
+    "upstream_pytest_exit": 0,
+    "unchanged_node_groups": 16,
+    "native_parameter_cases": 63,
+    "passed": 40,
+    "skipped": 23,
+    "failures": 0,
+    "errors": 0,
+    "skip_scope": "Every skip is unchanged native Trio variant requiring separate --runtrio; no full backend parity claim.",
+    "root_independent_read": {
+      "original_files_hash_match": 12,
+      "junit_groups": 16,
+      "cases": 63,
+      "passed": 40,
+      "skipped": 23,
+      "failures": 0,
+      "errors": 0,
+      "actual_return_scope": "Native completion returns cc97f1 and b4a576 retained in rendered observation ledger; native full streams/JUnit independently re-read. Ledger itself is a rendered receipt.",
+      "test_stdout_sha256": "6f4d0946293b696233247d422358480f787ebc42d34ad3f20ff8de34e5a22621",
+      "junit_sha256": "00abdc6c84318c09e13146c09e82b488d70f82e0f0fb1ced2e888a8809cf6ed8"
+    }
+  },
+  "root_primary_reads": {
+    "preregistered_original_files": 14,
+    "production_original_files": 5,
+    "all_http_200_and_hash_match": true,
+    "production": [
+      {
+        "path": "src/inspect_ai/util/_sandbox/local.py",
+        "bytes": 5887,
+        "sha256": "bd07205c19c481367e3726f762acd24a4e7d1a3060a9bc8f4a827623836c57fe",
+        "http_status": 200,
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/util/_sandbox/local.py"
+      },
+      {
+        "path": "src/inspect_ai/tool/_sandbox_tools_utils/sandbox.py",
+        "bytes": 38402,
+        "sha256": "e56b1049ecece390ed581f549770b04d2bd5376dc791e33abac7bee855a62e0a",
+        "http_status": 200,
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/tool/_sandbox_tools_utils/sandbox.py"
+      },
+      {
+        "path": "src/inspect_ai/model/_openai.py",
+        "bytes": 66637,
+        "sha256": "d93c9c48f105e4029b1edc2dc311473913f0b2aa4a3837c761aed0b189b79de4",
+        "http_status": 200,
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/model/_openai.py"
+      },
+      {
+        "path": "src/inspect_ai/scorer/_model.py",
+        "bytes": 25298,
+        "sha256": "75c525f7a869fcf829bd83b66ad2431acae80f2a6fef8f2bfa5c11ec5a0e2817",
+        "http_status": 200,
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/scorer/_model.py"
+      },
+      {
+        "path": "src/inspect_ai/model/_model_output.py",
+        "bytes": 14864,
+        "sha256": "1e90d1ca41ca707c1de3b7393cafa69e322fa507fdd1a1fc80264cebc87fca73",
+        "http_status": 200,
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/model/_model_output.py"
+      }
+    ],
+    "unchanged_parser_and_schema": [
+      {
+        "path": "src/inspect_ai/scorer/_model.py",
+        "reads": [
+          {
+            "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+            "http_status": 200,
+            "bytes": 25298,
+            "sha256": "75c525f7a869fcf829bd83b66ad2431acae80f2a6fef8f2bfa5c11ec5a0e2817"
+          },
+          {
+            "pin": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+            "http_status": 200,
+            "bytes": 25298,
+            "sha256": "75c525f7a869fcf829bd83b66ad2431acae80f2a6fef8f2bfa5c11ec5a0e2817"
+          }
+        ],
+        "unchanged": true
+      },
+      {
+        "path": "src/inspect_ai/model/_model_output.py",
+        "reads": [
+          {
+            "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+            "http_status": 200,
+            "bytes": 14864,
+            "sha256": "1e90d1ca41ca707c1de3b7393cafa69e322fa507fdd1a1fc80264cebc87fca73"
+          },
+          {
+            "pin": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+            "http_status": 200,
+            "bytes": 14864,
+            "sha256": "1e90d1ca41ca707c1de3b7393cafa69e322fa507fdd1a1fc80264cebc87fca73"
+          }
+        ],
+        "unchanged": true
+      },
+      {
+        "path": "tests/scorer/test_model_graded.py",
+        "reads": [
+          {
+            "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+            "http_status": 200,
+            "bytes": 39843,
+            "sha256": "ab5309766c1112aaf92b116722d9ad246a038c5f90795618a11e575c3badf34a"
+          },
+          {
+            "pin": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+            "http_status": 200,
+            "bytes": 39843,
+            "sha256": "ab5309766c1112aaf92b116722d9ad246a038c5f90795618a11e575c3badf34a"
+          }
+        ],
+        "unchanged": true
+      }
+    ]
+  },
+  "source_qualification_scope": {
+    "local_sandbox_user": "Pinned local.py85 rejects unsupported user; unchanged native current-user controls exercised.",
+    "sandbox_tools_user": "Pinned sandbox.py179-198: usable=>root, unusable/ambiguous=>default user; failed probe=>SandboxInjectionError. Native upstream failure/fallback/sample-init controls exercised.",
+    "terminal_policy": "Pinned original native Responses AsyncMock test478-499 checks bio_policy becomes content_filter and model_call.error. No real OpenAI request, measured refusal quality or usage completeness.",
+    "usage_fixture": "Pinned native fixture553-591 supplies gross input150, cache read40, cache write30, output20, total170; Inspect input80 plus read40/write30. This is synthetic schema qualification. Missing cache-write operands stay nullable in original provider evidence.",
+    "scorer": "Three exact original parser/schema/test files byte-identical between selected273 and candidate276; native invalid/off-menu/partial verdict controls remain unscored. New live grader quality is unmeasured."
+  },
+  "root_source_read_failure": {
+    "stage": "root original HTTP source-hash helper",
+    "processor_exit_code": 1,
+    "observed_error": "HTTP Error 404: Not Found",
+    "path_attribution": null,
+    "all_success_rows_unreturned": true,
+    "cause": "Five production paths appended from remembered names before exact path confirmation; no candidate fixture execution or modification in this helper",
+    "correction": "Collect per-source native outcomes independently, re-read exact upstream paths before relay."
+  },
+  "consequential_read": {
+    "requested_role": "Astra/max",
+    "trigger": "Consequential evaluator pin rebaseline before eight-job freeze; original parser consistency and mock-control boundaries",
+    "verdict": "ACCEPT scoped Python3.13/Inspect276 unchanged mock-control compatibility gap; prospective two-family prefreeze rebaseline proposal warranted. Exact two public receipts, all12 private artifact hashes, 16 groups/63 JUnit cases, actual retained completion records and19 original source hashes independently checked. No run/adoption/freeze admission; selected273 remains unchanged.",
+    "actual_delivered_model": null,
+    "provider_usage": null,
+    "remaining_holds": [
+      "Trio/full backend parity",
+      "real sandbox/provider",
+      "GPT grader quality",
+      "complete provider usage",
+      "actual wire effort or model delivery",
+      "token savings"
+    ]
+  },
+  "family_amendment_reads": {
+    "codex_exact_published_head": null,
+    "claude_exact_published_head": null,
+    "manifest_rows_handoff": "Claude lane owns manifest/install-plan/handbook; source proposal only until consensus."
+  },
+  "remaining_holds": [
+    "No comparison task freeze or pool admission.",
+    "No authentic original gross-input/cache-read/output accounting for all gateway inner attempts.",
+    "No provider/model/actual effort/grader quality or token-savings acceptance.",
+    "No selected evaluator pin, installed harness default, or final runtime job promotion."
+  ],
+  "all_eight_measured_defaults": null,
+  "receipt_base_commit": "eae4c151839dc30a7b5fec7550ee7643296de294"
+}

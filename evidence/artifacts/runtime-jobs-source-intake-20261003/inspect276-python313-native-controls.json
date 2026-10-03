@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "kind": "inspect276-python313-native-controls",
+  "repository": "UKGovernmentBEIS/inspect_ai",
+  "source_pin": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+  "candidate_version": "0.3.276",
+  "selected_evaluator": {
+    "version": "0.3.273",
+    "source_pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+    "unchanged": true
+  },
+  "evidence_class": "unchanged scoped upstream native mock controls; candidate readiness only",
+  "preregistration": {
+    "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect276-python313-control-preregister.json",
+    "bytes": 12155,
+    "sha256": "99b4182c756fdc08252f6a9795b8a71cbfedc781bc86fb9a2cfa2e1aec99a86f",
+    "frozen_before_execution": true,
+    "original_custody": "Frozen pre-execution original bytes/hash retained in the unchanged worker source and native recipe; current public path is the explicitly documented identifier-label projection, not a new preregistration.",
+    "public_projection_record": "inspect276-python313-control-preregister.json public_projection; no task/node/argv/deadline/input or native recipe change."
+  },
+  "frozen_private_recipe": {
+    "path": "frozen-native-recipe.json",
+    "bytes": 24912,
+    "sha256": "c6597b883dd3436abc5a7781c70554ff3d1adbe83f9f4be6dba6e3bc21410eec"
+  },
+  "environment": {
+    "distributions": {
+      "anyio": "4.14.2",
+      "inspect-ai": "0.3.276",
+      "openai": "3.14.1",
+      "platformdirs": "4.11.3",
+      "pytest": "9.1.1",
+      "python-dotenv": "1.2.3",
+      "tiktoken": "0.14.0"
+    },
+    "python": "3.13.15"
+  },
+  "native_phases": [
+    {
+      "name": "fresh_namespace_probe",
+      "exit": 0,
+      "tool_return": "c69fb3",
+      "scope": "fresh owned work/etc plus absent HOME/CODEX_HOME override; flags and whitelist bind excluded host auth/config paths; scoped probe, not full isolation-tool acceptance"
+    },
+    {
+      "name": "stock_native_local_source_clone",
+      "exit": 0,
+      "tool_return": "59daf2",
+      "pin": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+      "source_hashes_matched": 14,
+      "warnings": [
+        "native Git templates were not mounted",
+        "source shallow: --local ignored; exact clone pin and all14 retained source files independently matched"
+      ]
+    },
+    {
+      "name": "frozen_uv_sync",
+      "exit": 0,
+      "initial_session": 56220,
+      "completion_tool_return": "cc97f1",
+      "packages_installed": 255,
+      "command": "uv sync --directory <owned-checkout> --frozen --extra dev --python <verified-python3.13> --no-python-downloads --no-config",
+      "warning": "Native hardlink unavailable across isolated mounts; UV fell back to copy."
+    },
+    {
+      "name": "installed_package_metadata",
+      "exit": 0,
+      "tool_return": "cd900d",
+      "scope": "native importlib.metadata, no model constructor; fresh editable Inspect distribution points to the owned namespace checkout",
+      "direct_url_json": {
+        "bytes": 60,
+        "sha256": "c2d1b93a23923c8ce49bc74a2824a268826d58b78ad47d9b398da586cadd3a5d",
+        "editable": true,
+        "namespace_url": "file:///work/checkout"
+      }
+    },
+    {
+      "name": "frozen_unchanged_native_pytest_controls",
+      "exit": 0,
+      "initial_session": 94912,
+      "completion_tool_return": "b4a576",
+      "command": "uv run --directory <owned-checkout> --no-sync --no-env-file --offline --no-config pytest -vv -n 0 --color=no --basetemp=<owned-tmp> -o cache_dir=<owned-tmp> --junitxml=<owned-log> <the16preregisterednodegroups>",
+      "selected_node_groups": 16,
+      "native_collected_cases": 63,
+      "passed": 40,
+      "skipped": 23,
+      "failures": 0,
+      "errors": 0,
+      "native_duration_seconds": 5.98
+    }
+  ],
+  "clock_observations": {
+    "install_started": {
+      "current_time": "2026-10-03 16:04:00 UTC"
+    },
+    "install_completion_observed": {
+      "current_time": "2026-10-03 16:04:55 UTC"
+    },
+    "tests_started": {
+      "current_time": "2026-10-03 16:05:18 UTC"
+    },
+    "tests_completion_observed": {
+      "current_time": "2026-10-03 16:05:37 UTC"
+    }
+  },
+  "native_stdout_summary_verbatim": "======================== 40 passed, 23 skipped in 5.98s ========================\n",
+  "native_stderr_verbatim": "Cannot read termcap database;\nusing dumb terminal settings.\n",
+  "independent_observation": {
+    "method": "Original native JUnit XML read directly, all testcases matched to the frozen node list, raw file hashes independently recomputed and all14 pinned source files rechecked after install/tests.",
+    "read_exit": 0,
+    "tool_returns": [
+      "ce3e9b",
+      "50b76c",
+      "8f51d2"
+    ],
+    "cases": 63,
+    "passed": 40,
+    "skipped": 23,
+    "failures": 0,
+    "errors": 0,
+    "covered_preregistered_groups": 16,
+    "source_files_unchanged": 14
+  },
+  "group_results": {
+    "1": {
+      "passed": 1,
+      "skipped": 1
+    },
+    "2": {
+      "passed": 1,
+      "skipped": 1
+    },
+    "3": {
+      "passed": 1,
+      "skipped": 1
+    },
+    "4": {
+      "passed": 1
+    },
+    "5": {
+      "passed": 1
+    },
+    "6": {
+      "passed": 10,
+      "skipped": 10
+    },
+    "7": {
+      "passed": 1,
+      "skipped": 1
+    },
+    "8": {
+      "passed": 2,
+      "skipped": 2
+    },
+    "9": {
+      "passed": 4,
+      "skipped": 4
+    },
+    "10": {
+      "passed": 1,
+      "skipped": 1
+    },
+    "11": {
+      "passed": 1,
+      "skipped": 1
+    },
+    "12": {
+      "passed": 1,
+      "skipped": 1
+    },
+    "13": {
+      "passed": 1
+    },
+    "14": {
+      "passed": 7
+    },
+    "15": {
+      "passed": 6
+    },
+    "16": {
+      "passed": 1
+    }
+  },
+  "skip_reasons": {
+    "need --runtrio option to run": 23
+  },
+  "retained_original_private_artifacts": [
+    {
+      "path": "frozen-native-recipe.json",
+      "bytes": 24912,
+      "sha256": "c6597b883dd3436abc5a7781c70554ff3d1adbe83f9f4be6dba6e3bc21410eec"
+    },
+    {
+      "path": "namespace_probe.stdout.txt",
+      "bytes": 155,
+      "sha256": "e142eac2098977003ee32cfeba3316c3a5cd8855987b3ca8dcbff8ca89ba7a3b"
+    },
+    {
+      "path": "namespace_probe.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "owned_clone.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "owned_clone.stderr.txt",
+      "bytes": 759,
+      "sha256": "297fa1f3b2894ca2ee6dcd17cdd722cacdc8e65fea1863bfb2f0196ac8b54071"
+    },
+    {
+      "path": "frozen_uv_sync.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "frozen_uv_sync.stderr.txt",
+      "bytes": 7942,
+      "sha256": "5d64bb9e6def01abbdbd77ee321cd5209b8cca0b3318f103c0d571499fa250c9"
+    },
+    {
+      "path": "installed_metadata.stdout.txt",
+      "bytes": 198,
+      "sha256": "6bd492ebb36d9223670d3e80b9a812cd7d63e06b3f233c8ada75c128f17faef6"
+    },
+    {
+      "path": "installed_metadata.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "native_controls.stdout.txt",
+      "bytes": 9607,
+      "sha256": "6f4d0946293b696233247d422358480f787ebc42d34ad3f20ff8de34e5a22621"
+    },
+    {
+      "path": "native_controls.stderr.txt",
+      "bytes": 60,
+      "sha256": "ab9019e334f0288b6eb3777e0c5f2bd69d13b0810a271d3d08d0bb22b6d03d9b"
+    },
+    {
+      "path": "logs/inspect276-python313-native-controls.xml",
+      "bytes": 14021,
+      "sha256": "00abdc6c84318c09e13146c09e82b488d70f82e0f0fb1ced2e888a8809cf6ed8"
+    }
+  ],
+  "native_json_report": {
+    "captured": false,
+    "reason": "The frozen stock invocation requested JUnit. A JSON report was not requested or rerun; this does not establish tool absence."
+  },
+  "source_read_failures_and_corrections": [
+    {
+      "stage": "bounded_source_excerpt",
+      "native_exit": 1,
+      "tool_return": "7400a4",
+      "error": "IndexError: excerpt helper read past the pinned file EOF",
+      "correction": "AST-derived exact function end used for original sample-init fixture body",
+      "verification": {
+        "exit": 0,
+        "tool_return": "3b7cf4"
+      },
+      "fixture_or_install_failure": false
+    },
+    {
+      "stage": "bounded_source_excerpt_output_guard",
+      "native_exit": 1,
+      "tool_return": "a4f762",
+      "error": "AssertionError: source excerpt exceeded the output guard",
+      "correction": "Split the exact original autouse fixture reads into bounded sections",
+      "verification": {
+        "exit": 0,
+        "tool_returns": [
+          "2764a5",
+          "f8524f"
+        ]
+      },
+      "fixture_or_install_failure": false
+    },
+    {
+      "stage": "guessed_test_configuration_path",
+      "native_exit": 1,
+      "tool_return": "33dc3a",
+      "error": "FileNotFoundError for guessed public pytest.ini path",
+      "correction": "Scoped original file discovery and direct pyproject.toml/Makefile reads established the actual native test configuration",
+      "verification": {
+        "exit": 0,
+        "tool_returns": [
+          "8fa293",
+          "a072b4"
+        ]
+      },
+      "fixture_or_install_failure": false
+    }
+  ],
+  "native_install_test_failures": [],
+  "historical_reference_scope": {
+    "prior_273": "Retained .273 Python3.13.15 readiness includes original tokenizer DNS failures and repaired15pass1skip; those failures/repairs are historical, not this run.",
+    "prior_276": "Prior .276 five-control receipt used Python3.14.7 and reported5pass3skip; this fresh Python3.13.15 run covers those unchanged five controls plus11 explicitly frozen additional node groups.",
+    "isolation_tool": "Retained private bubblewrap0.12 build/probe reused. Historical0.9 advisory and incomplete full-suite acceptance remain in the .273 receipt; this task does not adopt bubblewrap as a stack component."
+  },
+  "claim_limits": {
+    "pin_adoption": false,
+    "manifest_or_default_change": false,
+    "live_model_or_provider_requests": false,
+    "docker_or_service_activation": false,
+    "external_home_or_codex_home_override": false,
+    "credentials_or_native_auth_copied": false,
+    "complete_backend_parity": false,
+    "real_grader_quality": false,
+    "QA_grader_acceptance": false,
+    "actual_wire_effort": null,
+    "actual_provider_model_identity": null,
+    "provider_gross_input": null,
+    "provider_cache_read": null,
+    "provider_cache_write": null,
+    "provider_output": null,
+    "savings": null,
+    "counter_test": "The one cache-write fixture constructs150gross/40read/30write/20output/170total and checks Inspect's80input_tokens. Its synthetic values are neither native provider usage nor a complete usage observation.",
+    "refusal_test": "The bio_policy fixture verifies native content-filter/error conversion using AsyncMock. It does not assert a complete refusal usage object or grading quality.",
+    "parser_tests": "Fourteen unchanged model_graded_fact parser cases passed. Shared parser scope does not become a native model_graded_qa or real Astra grader result.",
+    "interpreter_identity": "Executable hash/version bound; no full runtime-tree identity claim."
+  },
+  "sources": [
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/CONTRIBUTING.md#L109",
+      "meaning": "supported uv lockfile workflow and dev extra"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/Makefile#L27",
+      "meaning": "native pytest test entry"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/tests/conftest.py#L36",
+      "meaning": "native asyncio default/Trio skip contract and auto anyio parametrization"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/tests/conftest.py#L210",
+      "meaning": "native ctl server disabled except explicit real_ctl_server marker"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/tests/test_helpers/sandbox.py#L44",
+      "meaning": "CannedSandbox returns per-test policies and does not execute a real sandbox"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/tests/model/providers/test_openai_responses.py#L379",
+      "meaning": "native Responses AsyncMock; no HTTP/provider transport"
+    },
+    {
+      "url": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/bwrap.xml",
+      "meaning": "native explicit mounts, cleared environment and namespace controls"
+    }
+  ],
+  "public_sanitization": "Personal host paths and JUnit hostname omitted. Private exact argv and full original install/test/probe streams retained with hashes; no raw conversations, provider logs, credentials or active client settings copied.",
+  "supporting_original_source_read": {
+    "native_exit": 0,
+    "tool_return": "1fc183",
+    "observed_after_controls": true,
+    "scope": "Original pinned Git blobs independently byte-matched the fresh public checkout; additional source metadata, not an amendment to the frozen test selection.",
+    "files": [
+      {
+        "path": "src/inspect_ai/util/_sandbox/local.py",
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/util/_sandbox/local.py",
+        "bytes": 5887,
+        "sha256": "bd07205c19c481367e3726f762acd24a4e7d1a3060a9bc8f4a827623836c57fe",
+        "git_original_exit": 0
+      },
+      {
+        "path": "src/inspect_ai/tool/_sandbox_tools_utils/sandbox.py",
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/tool/_sandbox_tools_utils/sandbox.py",
+        "bytes": 38402,
+        "sha256": "e56b1049ecece390ed581f549770b04d2bd5376dc791e33abac7bee855a62e0a",
+        "git_original_exit": 0
+      },
+      {
+        "path": "src/inspect_ai/model/_openai.py",
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/model/_openai.py",
+        "bytes": 66637,
+        "sha256": "d93c9c48f105e4029b1edc2dc311473913f0b2aa4a3837c761aed0b189b79de4",
+        "git_original_exit": 0
+      },
+      {
+        "path": "src/inspect_ai/scorer/_model.py",
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/scorer/_model.py",
+        "bytes": 25298,
+        "sha256": "75c525f7a869fcf829bd83b66ad2431acae80f2a6fef8f2bfa5c11ec5a0e2817",
+        "git_original_exit": 0
+      },
+      {
+        "path": "src/inspect_ai/model/_model_output.py",
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/93f7182cf2ce9be22724b05e499cd1358d7ed41d/src/inspect_ai/model/_model_output.py",
+        "bytes": 14864,
+        "sha256": "1e90d1ca41ca707c1de3b7393cafa69e322fa507fdd1a1fc80264cebc87fca73",
+        "git_original_exit": 0
+      }
+    ]
+  }
+}

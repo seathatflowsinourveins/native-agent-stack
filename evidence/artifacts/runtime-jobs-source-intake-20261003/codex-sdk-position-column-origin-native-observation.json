@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "native offline inspector metadata observation; upstream fixture callbacks filtered out",
+  "source_head": "eae4c151839dc30a7b5fec7550ee7643296de294",
+  "status": "ACCEPT bounded actual source-position primitive; positive SDK and provider qualification HOLD",
+  "source_recipe": "codex-sdk-position-column-origin-amendment.json",
+  "recipe_review": {
+    "requested_role": "Astra/max consequential exact-recipe read",
+    "result": "SOURCE-ACCEPT exactly one37528-byte0271eb85 freeze",
+    "actual_delivered_model": null,
+    "provider_usage": null
+  },
+  "original_timeout_ms": 5000,
+  "test_name_pattern": "(?!)",
+  "all_four_prior_failures_preserved": true,
+  "native_command": {
+    "launch_chunk": "f027e2",
+    "session_completed_chunk": "f3c566",
+    "exit_code": 0,
+    "scope": "GNU supervisor/bwrap/stock inspector command completion; not Jest exit"
+  },
+  "native_before_ps": {
+    "chunk": "527bae",
+    "exit_code": 0
+  },
+  "native_after_ps": {
+    "chunk": "aa66d8",
+    "exit_code": 0
+  },
+  "native_result": {
+    "native_artifacts": {
+      "operational-recipe.json": {
+        "bytes": 37528,
+        "sha256": "0271eb85b38ab484d67789bc70e1eb53817ce673f8b9a6b7c4159d3371eed106"
+      },
+      "repl-native.stdout.txt": {
+        "bytes": 9468,
+        "sha256": "5b21c4daf982425dc82efca328544b141a975df6707a5350882a795d32f534e6"
+      },
+      "repl-native.stderr.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "bwrap-native-status.jsonl": {
+        "bytes": 221,
+        "sha256": "9b34d9c29a0f1c8f0497495df8f1e002ea5b056be0174f040aa0e36ba9da1998"
+      }
+    },
+    "metadata_records": 43,
+    "stage_counts": {
+      "adapter_breakpoint": 1,
+      "adapter_pause": 1,
+      "adapter_source_binding": 1,
+      "sdk_script_resolved": 4,
+      "sdk_script_hash": 4,
+      "map_candidate": 8,
+      "possible_breakpoints": 8,
+      "native_map_calibration": 8,
+      "resolved_position": 8
+    },
+    "sdk_script_hashes": [
+      {
+        "stage": "sdk_script_hash",
+        "file_id": 0,
+        "script_id": "1036",
+        "script_source_sha256": "33e12dfd4e31fc5618bceb6a0afb0e414283958ce72f76692e5404854aea258c",
+        "script_source_bytes": 51758
+      },
+      {
+        "stage": "sdk_script_hash",
+        "file_id": 1,
+        "script_id": "1041",
+        "script_source_sha256": "13ca3c4792d516dd00a6ce602fa360f38556979953de189a59464720c80e5ddc",
+        "script_source_bytes": 16183
+      },
+      {
+        "stage": "sdk_script_hash",
+        "file_id": 2,
+        "script_id": "1031",
+        "script_source_sha256": "cd26d8cd979527aec4acd35b458b9ddecbafff91d0a2a982963122d1083aeb4c",
+        "script_source_bytes": 105732
+      },
+      {
+        "stage": "sdk_script_hash",
+        "file_id": 3,
+        "script_id": "1033",
+        "script_source_sha256": "b4ebe66ab3e250919b3775f22700d0e7574e83337da19cd8d07a2d312bf9e11f",
+        "script_source_bytes": 20093
+      }
+    ],
+    "native_calibrations": [
+      {
+        "stage": "native_map_calibration",
+        "file_id": 0,
+        "script_id": "1036",
+        "generated_line": 162,
+        "generated_column": 29,
+        "original_line": 237,
+        "original_column": 23,
+        "source_match": true
+      },
+      {
+        "stage": "native_map_calibration",
+        "file_id": 0,
+        "script_id": "1036",
+        "generated_line": 168,
+        "generated_column": 37,
+        "original_line": 243,
+        "original_column": 31,
+        "source_match": true
+      },
+      {
+        "stage": "native_map_calibration",
+        "file_id": 0,
+        "script_id": "1036",
+        "generated_line": 176,
+        "generated_column": 15,
+        "original_line": 250,
+        "original_column": 9,
+        "source_match": true
+      },
+      {
+        "stage": "native_map_calibration",
+        "file_id": 1,
+        "script_id": "1041",
+        "generated_line": 79,
+        "generated_column": 25,
+        "original_line": 124,
+        "original_column": 21,
+        "source_match": true
+      },
+      {
+        "stage": "native_map_calibration",
+        "file_id": 1,
+        "script_id": "1041",
+        "generated_line": 97,
+        "generated_column": 8,
+        "original_line": 140,
+        "original_column": 4,
+        "source_match": true
+      },
+      {
+        "stage": "native_map_calibration",
+        "file_id": 2,
+        "script_id": "1031",
+        "generated_line": 22,
+        "generated_column": 40,
+        "original_line": 29,
+        "original_column": 34,
+        "source_match": true
+      },
+      {
+        "stage": "native_map_calibration",
+        "file_id": 2,
+        "script_id": "1031",
+        "generated_line": 30,
+        "generated_column": 26,
+        "original_line": 38,
+        "original_column": 6,
+        "source_match": true
+      },
+      {
+        "stage": "native_map_calibration",
+        "file_id": 3,
+        "script_id": "1033",
+        "generated_line": 88,
+        "generated_column": 12,
+        "original_line": 138,
+        "original_column": 6,
+        "source_match": true
+      }
+    ],
+    "resolved_positions": [
+      {
+        "stage": "resolved_position",
+        "file_id": 0,
+        "original_line": 237,
+        "breakpoint_id_sha256": "9a310f172645627f0a4025f0003ecac55eded708ed4a8bc3dd45d9a478b67907",
+        "locations": [
+          {
+            "script_id": "1036",
+            "line": 161,
+            "column": 29
+          }
+        ]
+      },
+      {
+        "stage": "resolved_position",
+        "file_id": 0,
+        "original_line": 243,
+        "breakpoint_id_sha256": "9c8809a8be11a426719ad637304369bc537bf6959fa2263df789b4fce585c88d",
+        "locations": [
+          {
+            "script_id": "1036",
+            "line": 167,
+            "column": 37
+          }
+        ]
+      },
+      {
+        "stage": "resolved_position",
+        "file_id": 0,
+        "original_line": 250,
+        "breakpoint_id_sha256": "f4764e4fdccfcf10e9c34e419ef4b35f94549271fcb0fae79d1b516ffa2f90d1",
+        "locations": [
+          {
+            "script_id": "1036",
+            "line": 175,
+            "column": 15
+          }
+        ]
+      },
+      {
+        "stage": "resolved_position",
+        "file_id": 1,
+        "original_line": 124,
+        "breakpoint_id_sha256": "f974a316ffa837e82702ae4ea3f8855df9f5361d5787c550ed8065eb4d0f967f",
+        "locations": [
+          {
+            "script_id": "1041",
+            "line": 78,
+            "column": 25
+          }
+        ]
+      },
+      {
+        "stage": "resolved_position",
+        "file_id": 1,
+        "original_line": 140,
+        "breakpoint_id_sha256": "8c527bda881f3638fc70d9f8798290d282a60097cc393dd64d5305bef8a57a57",
+        "locations": [
+          {
+            "script_id": "1041",
+            "line": 96,
+            "column": 8
+          }
+        ]
+      },
+      {
+        "stage": "resolved_position",
+        "file_id": 2,
+        "original_line": 29,
+        "breakpoint_id_sha256": "5c9a4fd1f663eea44e3ee98c9bfeab86b10ed0a21805357352685e749230c497",
+        "locations": [
+          {
+            "script_id": "1031",
+            "line": 21,
+            "column": 40
+          }
+        ]
+      },
+      {
+        "stage": "resolved_position",
+        "file_id": 2,
+        "original_line": 38,
+        "breakpoint_id_sha256": "ab67bb36e77a367e0d887d1a213555fe3c7bbce2f2a27cdd00e08c7408f3e81d",
+        "locations": [
+          {
+            "script_id": "1031",
+            "line": 29,
+            "column": 26
+          }
+        ]
+      },
+      {
+        "stage": "resolved_position",
+        "file_id": 3,
+        "original_line": 138,
+        "breakpoint_id_sha256": "0e6027715f998814afa336457ab65ebe25748a0dcb12e6e6517b9bf70285c8c6",
+        "locations": [
+          {
+            "script_id": "1033",
+            "line": 87,
+            "column": 12
+          }
+        ]
+      }
+    ],
+    "cleanup": {
+      "before": {
+        "bytes": 7201,
+        "sha256": "068ecb929dad59fe251c3e7bf24e0652a0c236ab5c857804e72214f8586bbe78",
+        "rows": 379,
+        "complete_two_positive_decimal_fields": true,
+        "owned_pair_rows": 1,
+        "owned_namespace_rows": 3,
+        "stderr_bytes": 0
+      },
+      "after": {
+        "bytes": 7106,
+        "sha256": "085d53c2e030ea4c204e1c51ead0c7f5c38036edb6adbf48c5ecdd7ba3e6d21a",
+        "rows": 374,
+        "complete_two_positive_decimal_fields": true,
+        "owned_pair_rows": 0,
+        "owned_namespace_rows": 0,
+        "stderr_bytes": 0
+      }
+    },
+    "jest_json_exists": false,
+    "status_keys": [
+      [
+        "cgroup-namespace",
+        "child-pid",
+        "ipc-namespace",
+        "mnt-namespace",
+        "net-namespace",
+        "pid-namespace",
+        "uts-namespace"
+      ],
+      [
+        "exit-code"
+      ]
+    ],
+    "positive_tests_executed": 0,
+    "provider_usage": null
+  },
+  "intentional_stop": "Stock kill, observed returned native prompt, then .exit. Target never resumed past adapter pause.",
+  "limits": {
+    "native_jest_exit_code": null,
+    "upstream_positive_sdk_test_acceptance": null,
+    "live_provider_usage": null,
+    "runtime_job_default": null,
+    "model_delivery": null,
+    "quality": null,
+    "token_savings": null,
+    "cleanup": "Complete independently captured visible process endpoint; not an unlimited kernel/process lifecycle guarantee"
+  },
+  "sources": [
+    {
+      "repository": "jestjs/jest",
+      "pin": "4e56991693da7cd4c3730dc3579a1dd1403ee630",
+      "file": "packages/jest-runtime/src/index.ts",
+      "native_exit": 0,
+      "bytes": 79668,
+      "sha256": "95813539b997c94729612a6a57a219c0cfcab74849ccb65204ed8f071e06a440",
+      "expected_match": true,
+      "stderr_bytes": 0
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "src/node_contextify.cc",
+      "native_exit": 0,
+      "bytes": 72206,
+      "sha256": "839b0f41cb8cacd8b000ad17f34bf4a95745c38fbcc11ffccaf1d6b4211d6476",
+      "expected_match": true,
+      "stderr_bytes": 0
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "deps/v8/src/debug/debug-interface.h",
+      "native_exit": 0,
+      "bytes": 22921,
+      "sha256": "4a26adfd50beece22ab405340d802d8c873ee14775c70cd8961dec566465e569",
+      "expected_match": true,
+      "stderr_bytes": 0
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "deps/v8/src/debug/debug-interface.cc",
+      "native_exit": 0,
+      "bytes": 56968,
+      "sha256": "f745b3c0ae71d0900b3c2d0bb8c28f4b323f68e4c22ec0a9b2fb8dceaed9d741",
+      "expected_match": true,
+      "stderr_bytes": 0
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "deps/v8/src/inspector/v8-debugger-agent-impl.cc",
+      "native_exit": 0,
+      "bytes": 96579,
+      "sha256": "3146c84ba00f4ccf073fb8dc6dc3436dd2c453ab5f08d947741466a6d2cc854b",
+      "expected_match": true,
+      "stderr_bytes": 0
+    }
+  ],
+  "independent_result_review": {
+    "requested_role": "Astra/max consequential native-result read",
+    "actual_delivered_model": null,
+    "provider_usage": null,
+    "result": "ACCEPT bounded actual SDK identities and eight native source-position resolutions only",
+    "observed": "Exact recipe/output/status/complete PS hashes; 43 ordered records; four distinct SDK IDs with hash+byte length matching reconstructed wrapper/cache code; all eight original map candidates, native possible locations, roundtrips and false-breakpoint resolutions independently checked; owned namespace3 to0; absent Jest JSON",
+    "remaining_holds": [
+      "positive fixture execution and breakpoint-hit qualification",
+      "native Jest completion/exit",
+      "deadline expiry behavior",
+      "live provider/model/effort/usage or job-default comparison"
+    ]
+  }
+}

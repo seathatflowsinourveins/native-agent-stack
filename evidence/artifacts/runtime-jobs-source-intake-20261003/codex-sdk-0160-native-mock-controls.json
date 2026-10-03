@@ -1,0 +1,500 @@
+{
+  "schema_version": 1,
+  "receipt_id": "runtime-jobs-codex-sdk-0160-native-mock-controls-20261003",
+  "date_utc": "2026-10-03",
+  "base_repository_commit": "65a0d370ed8c075d922ff60857287e33d3a14788",
+  "outcome": "14 mocked child-process controls passed. The first-party local Responses integration had 26 failures and 6 passes; the one authorized companion-staging repair still failed its selected positive control. Further adaptive fixes stopped for Astra/max judgment.",
+  "claim_boundary": ["Stock pinned SDK source was installed with its frozen lock and unchanged upstream commands in private owned state.","The 14 exec controls mock child_process.spawn; they do not run a native model task.","The subsequent fixture uses the actual named Codex CLI with a first-party loopback Responses server and canned SSE; the successful-response path remains unqualified.","Namespace metadata and negative fixture passes do not independently establish loopback connectivity, child startup, successful request registration or successful turn completion.","No full bubblewrap test-suite acceptance, role acceptance, external provider execution, effective Ultra, header/cache wire behavior, quality, default adoption or token savings is claimed."],
+  "upstream": {
+    "repository": "https://github.com/openai/codex",
+    "release_tag": "rust-v0.160.0",
+    "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "source_sdk_package_version": "0.0.0-dev",
+    "source_url_prefix": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/",
+    "source_files": [
+      ["package.json",1242,"0d0a78ff2f703abad442de6e99e127076ad40f85912692a82ec21d968944b368"],
+      ["pnpm-lock.yaml",180148,"a41609fc3fd36a174c97f516fbfa9a276598d441f091366726a4dd5c8262ae81"],
+      ["pnpm-workspace.yaml",545,"adbc41c7c9a71b7bdf4b370bbd75c573e0da2d632ab98bf7d9020cd2df852069"],
+      [".github/workflows/sdk.yml",5829,"dd7d2b266dc56cb8a7b7cbb69e2c80f8ff512f03aa5767e18049ed26b45ee9d0"],
+      ["sdk/typescript/package.json",1934,"bc908b2ca2823217d19e56fc472b895b18a451a57411046b131992b34977b02c"],
+      ["sdk/typescript/jest.config.cjs",838,"c5babef9cbbbf1e3ada6fec43c56415fee9f3e6562fc8db9103f3afba52e4b0c"],
+      ["sdk/typescript/tests/setupCodexHome.ts",746,"7212a09dd1169661746eb9c5f7d90271beb336134648c268804a256e241e1e44"],
+      ["sdk/typescript/tests/exec.test.ts",12767,"b8fdebb70f761b729093555d09328879cf9400db53aa8c47156f21fb7f44f594"],
+      ["sdk/typescript/tests/testCodex.ts",3005,"ea92b150acd8aae5c7fe1231a636b720cbd41690358b198f5506eba0226848fc"],
+      ["sdk/typescript/tests/codexExecSpy.ts",1356,"ded178b232db5673eae501b9993dbf8570527a39dcca8222ecea1fe66bc0d5a2"],
+      ["sdk/typescript/tests/responsesProxy.ts",5679,"53f86d2a5c313966a9e5c9dd9fc69676755f7dbf50be530558d254571424b0f6"],
+      ["sdk/typescript/tests/run.test.ts",26283,"2ebd05b461504a53c0a9453efb877f3fee06202284fd6dc5ddef035f3be33255"],
+      ["sdk/typescript/tests/runStreamed.test.ts",6123,"80592f5f89ee33da8ec6e5676b6dced0af6847aa540795cfd5f3a6f88312fb3e"],
+      ["sdk/typescript/tests/abort.test.ts",4975,"62230174567b219a7157e1475ade2b0a559c82bf1954787af76877064c6b4912"],
+      ["codex-rs/install-context/src/lib.rs",33763,"b7305f28586f61f7a3cc7d3c53c95dacabca05529b1ba3aa4b5e42d306db2ae5"],
+      ["codex-rs/code-mode/src/remote_session.rs",19089,"72a6dbd170132bafd26f0affa0c1c2e347a8c3d8550b1065d1c88e99f0f415a2"],
+      ["codex-rs/code-mode-host/src/main.rs",4137,"dd7c33fb557d8be509a9750eee6c6ec7269b006fa4657f336380e61cacb99f7e"],
+      ["codex-rs/code-mode-host/src/lib.rs",25252,"fd1fe94fed87b69b84e511b22f2d9ee75b0f8c023eb05348b3ab02bc6645daef"],
+      ["codex-rs/core/src/tools/code_mode/mod.rs",19820,"e7aae18f4043e9d5964779c0a20f129b9f43dc21873328aa2bcb893035b4cf75"]
+    ],
+    "tracked_source_status": {
+      "command": "env -i PATH=/usr/bin:/bin GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null git -C <owned-source> status --porcelain=v1 --untracked-files=no",
+      "exit_code": 0,
+      "stdout": "",
+      "meaning": "No tracked source modifications."
+    },
+    "supported_ci": {
+      "path": ".github/workflows/sdk.yml",
+      "install_line": 127,
+      "build_line": 130,
+      "test_line": 136,
+      "companion_staging_lines": [95,118],
+      "command": "pnpm -r --filter ./sdk/typescript run test"
+    },
+    "command_references": ["https://pnpm.io/10.x/installation","https://pnpm.io/10.x/cli/run","https://jestjs.io/docs/29.7/cli"],
+    "source_columns": ["path","bytes","sha256"]
+  },
+  "native_dependencies": {
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "pnpm": "10.34.5",
+    "pnpm_registry_url": "https://registry.npmjs.org/pnpm/10.34.5",
+    "pnpm_tarball": {
+      "bytes": 4862438,
+      "sha256": "ccb5c479cab1b00621325bfe7d4c9a8a8031e7a525d7249e275ecbec81b08db2",
+      "integrity": "sha512-pO4F8vc2WCVb1qiYWcBlpFwopX2u+uLIk6Fo7itzFow3uR6D5X6mdlStA/AwMXRkMOi84442LgQmBfuKvIAZLg==",
+      "package_manager_digest_matches": true
+    },
+    "codex_cli": {
+      "version": "0.160.0",
+      "bytes": 289101384,
+      "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+      "mounted_readonly_as": "/native/codex",
+      "fixture_locator": "CODEX_EXEC_PATH"
+    },
+    "code_mode_host": {
+      "bytes": 74072976,
+      "sha256": "37cab1584302611e9936902219640ab5e7a79fcfccd2504c6e85ea8cb97d0e10",
+      "mounted_readonly_as": "/native/codex-code-mode-host",
+      "package_name": "@openai/codex",
+      "package_version": "0.160.0-linux-x64",
+      "optional_dependency_alias": "@openai/codex-linux-x64",
+      "provenance_url": "https://registry.npmjs.org/-/npm/v1/attestations/@openai%2fcodex@0.160.0-linux-x64",
+      "provenance_source_commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "provenance_limit": "Parsed registry provenance; no independent signature verification or full platform tarball download was performed here."
+    },
+    "prior_production_install_receipt": {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-source-and-native-readiness.json",
+      "worker_commit": "77821801bc720e8ecd369f38ff64fdfc7b4d61f6",
+      "commit_scope": "Historical worker production-install receipt commit; not an ancestor of PR633. Root reread the public packet receipt bytes at cdbf1872b87bcbaa15bc3f14d157d9a61765ca7b and verified the unchanged identity below.",
+      "bytes": 25271,
+      "sha256": "8eb44ebfbb0e07485373d33843b0519fbb4795c266b461189bee38c97ea8258f",
+      "scope": "Production npm package installation/source identity only; this source-based Jest stage is separate."
+    }
+  },
+  "namespace": {
+    "evidence_class": "local readiness and protective filesystem integration, not whole-tool acceptance",
+    "bubblewrap": {
+      "version": "0.12.0",
+      "repository": "https://github.com/containers/bubblewrap",
+      "commit": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "bytes": 194848,
+      "sha256": "75d6e611c1d41cf3a183a54085d4e83342901b91d058dd2c655692ff13207216",
+      "qualification": "Reused private build/version/fresh mount probe; full stock bwrap suite is not accepted.",
+      "prior_limitations": "Prior installed 0.9.0 advisory and bwrap suite exit125/compiler setup failures remain retained in the separate Inspect readiness evidence."
+    },
+    "first_party_stub_reference": {
+      "url": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/demos/bubblewrap-shell.sh",
+      "bytes": 1204,
+      "sha256": "dd2ed261e8a29df26d4ca8e629d57e882b7fdf0f019cb495a26bc1a74ca17c51",
+      "lines": [3,5,30,34],
+      "adaptation": "Native --file FD carrier reused with owned synthetic records; host getent/passwd/group input was not read."
+    },
+    "outer_environment": ["env","-i","PATH=/usr/bin:/bin"],
+    "synthetic_user_additions": ["--dir","<fresh-fixture-home>","--file","11","/etc/passwd","--file","12","/etc/group"],
+    "synthetic_fd_inputs": {
+      "fd11": "<owned-state>/ns-passwd.stub",
+      "fd12": "<owned-state>/ns-group.stub"
+    },
+    "synthetic_carriers": [
+      {
+        "path": "ns-passwd.stub",
+        "bytes": 144,
+        "sha256": "10a05165fa905b3a60e0ea22f6deeb402eca40af4df163fec92ad1d8509f71c5"
+      },
+      {
+        "path": "ns-group.stub",
+        "bytes": 35,
+        "sha256": "db94e93d8845a7eb7ee33b806fa88986ced0a23527ef2b3623c3ae97ae38da06"
+      }
+    ],
+    "acquisition_only_additions": ["--share-net","--ro-bind","/etc/resolv.conf","/etc/resolv.conf","--ro-bind","/etc/ssl/certs","/etc/ssl/certs"],
+    "npm_config_additions": ["--setenv","NPM_CONFIG_USERCONFIG","/state/npm-user-empty.conf","--setenv","NPM_CONFIG_GLOBALCONFIG","/state/npm-global-empty.conf"],
+    "local_proxy_additions": ["--ro-bind","<owned-native-codex>","/native/codex","--setenv","CODEX_EXEC_PATH","/native/codex"],
+    "repair_additions": ["--ro-bind","<owned-official-companion>","/native/codex-code-mode-host"],
+    "external_HOME_or_CODEX_HOME_override": false,
+    "host_home_auth_or_etc_wholesale_bind": false,
+    "initial_probe": {
+      "exit_code": 0,
+      "stdout": {
+        "node": "v24.21.0",
+        "cwd": "/work",
+        "HOME_set": false,
+        "CODEX_HOME_set": false,
+        "home": {
+          "error": "ERR_SYSTEM_ERROR",
+          "message": "A system error occurred: uv_os_homedir returned ENOENT (no such file or directory)"
+        },
+        "home_children": [],
+        "etc_children": [],
+        "net_namespace": "net:[4026533074]"
+      }
+    },
+    "repaired_probe": {
+      "exit_code": 0,
+      "stdout": {
+        "node": "v24.21.0",
+        "cwd": "/work",
+        "uid": 1000,
+        "gid": 1000,
+        "HOME_set": false,
+        "CODEX_HOME_set": false,
+        "home": "<fresh-fixture-home>",
+        "home_children": ["sdkworker"],
+        "etc_children": ["group","passwd"],
+        "net_namespace": "net:[4026533074]"
+      }
+    },
+    "loopback_connectivity_independently_observed": null,
+    "upstream_internal_state": "setupCodexHome.ts creates a fresh fixture-local CODEX_HOME before each test, restores the prior value and removes the directory after each. The unchanged fixture's internal assignment is allowed inside excluded host state; no external HOME/CODEX_HOME override was added.",
+    "common_bwrap_argv_shell": "--unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr/bin /usr/bin --ro-bind /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu --ro-bind /usr/lib/git-core /usr/lib/git-core --symlink usr/bin /bin --symlink usr/lib /lib --ro-bind /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 --ro-bind <public-node-runtime> /node --bind <owned-state> /state --dev /dev --proc /proc --dir /home --dir /etc --dir /tmp --dir /var/tmp --dir /work --setenv PATH /state/pnpm-bootstrap/bin:/node/bin:/usr/bin:/bin --setenv TMPDIR /tmp --setenv GIT_CONFIG_NOSYSTEM 1 --setenv GIT_CONFIG_GLOBAL /dev/null --setenv GIT_TERMINAL_PROMPT 0 --setenv XDG_CONFIG_HOME /work/config --setenv XDG_DATA_HOME /work/data --setenv XDG_CACHE_HOME /work/cache",
+    "owned_empty_npm_config_files": [
+      {
+        "path": "npm-user-empty.conf",
+        "bytes": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+      },
+      {
+        "path": "npm-global-empty.conf",
+        "bytes": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+      }
+    ]
+  },
+  "native_setup": [
+    {
+      "id": "source-clone",
+      "exit_code": 0,
+      "argv": ["git","clone","--depth","1","--branch","rust-v0.160.0","--single-branch","https://github.com/openai/codex.git","/state/codex-source"],
+      "cwd": "/work",
+      "network": "acquisition-only --share-net",
+      "head_observation": {
+        "exit_code": 0,
+        "stdout": "a956835d020762cb2b570053af06f643a11c0ecc"
+      }
+    },
+    {
+      "id": "npm-version-initial",
+      "exit_code": 254,
+      "stderr_verbatim": "Exit prior to config file resolving\ncause\nA system error occurred: uv_os_homedir returned ENOENT (no such file or directory)\n",
+      "condition": "Fresh /etc lacks a user-lookup carrier; native npm configuration failed before version observation."
+    },
+    {
+      "id": "synthetic-user-carrier-repair",
+      "exit_code": 0,
+      "condition": "Pinned first-party --file pattern with owned synthetic UID/GID1000 records; no host identity/auth input.",
+      "followup_npm_version": {
+        "exit_code": 0,
+        "stdout": "11.19.0\n"
+      }
+    },
+    {
+      "id": "pnpm-bootstrap",
+      "exit_code": 0,
+      "argv": ["/node/bin/node","/node/lib/node_modules/npm/bin/npm-cli.js","--userconfig=/state/npm-user-empty.conf","--globalconfig=/state/npm-global-empty.conf","--cache=/state/npm-cache","--prefix=/state/pnpm-bootstrap","--registry=https://registry.npmjs.org","install","--global","pnpm@10.34.5"],
+      "cwd": "/work",
+      "network": "acquisition-only --share-net"
+    },
+    {
+      "id": "pnpm-version",
+      "exit_code": 0,
+      "argv": ["pnpm","--version"],
+      "cwd": "/state/codex-source",
+      "stdout": "10.34.5\n"
+    },
+    {
+      "id": "sdk-frozen-install",
+      "exit_code": 0,
+      "argv": ["pnpm","install","--frozen-lockfile","--store-dir","/state/pnpm-store"],
+      "cwd": "/state/codex-source",
+      "network": "acquisition-only --share-net",
+      "source_and_policy_preserved": true,
+      "upstream_prepare": "Native SDK prepare/build tsup8.5.0 completed.",
+      "limits": "Workspace ignoredBuiltDependencies/strictDepBuilds/trustPolicy and onlyBuiltDependencies were preserved; no script-policy bypass, source edit or custom mock was introduced."
+    }
+  ],
+  "test_phases": {
+    "exec-controls": {
+      "evidence_class": "unchanged upstream tests, scoped selection",
+      "exit_code": 0,
+      "command_argv": ["/state/pnpm-bootstrap/bin/pnpm","-r","--filter","./sdk/typescript","run","test","--runInBand","--runTestsByPath","tests/exec.test.ts","--json","--outputFile=/state/logs/exec-controls-native.json"],
+      "cwd": "/state/codex-source",
+      "network": "private namespace; no --share-net, DNS or CA mounts",
+      "native_cli": "spawn is mocked by unchanged original fixture",
+      "companion_staged": false,
+      "native_counts": {
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "suites": 1,
+        "passed_suites": 1,
+        "failed_suites": 0
+      },
+      "end_time_ms": 1791018728233,
+      "native_jest_seconds": 1.623,
+      "native_json": {
+        "path": "exec-controls-native.json",
+        "bytes": 5509,
+        "sha256": "fcc20e35c8a9033c9a38bf58f3e642fbdfd634d478a0fd511aa467626e42507b"
+      },
+      "suites": [
+        {
+          "path": "sdk/typescript/tests/exec.test.ts",
+          "startTime": 1791018726802,
+          "endTime": 1791018728233,
+          "status": "passed",
+          "exact_test_names": "All14 native names reproduced in the public unchanged native stderr."
+        }
+      ],
+      "start_time_ms": 1791018726613
+    },
+    "local-proxy-controls": {
+      "evidence_class": "unchanged upstream tests, scoped selection",
+      "exit_code": 1,
+      "command_argv": ["/state/pnpm-bootstrap/bin/pnpm","-r","--filter","./sdk/typescript","run","test","--runInBand","--runTestsByPath","tests/run.test.ts","tests/runStreamed.test.ts","tests/abort.test.ts","--json","--outputFile=/state/logs/local-proxy-controls-native.json"],
+      "cwd": "/state/codex-source",
+      "network": "private namespace; no --share-net, DNS or CA mounts",
+      "native_cli": "/native/codex",
+      "companion_staged": false,
+      "native_counts": {
+        "total": 32,
+        "passed": 6,
+        "failed": 26,
+        "pending": 0,
+        "suites": 3,
+        "passed_suites": 0,
+        "failed_suites": 3
+      },
+      "end_time_ms": 1791018944058,
+      "native_jest_seconds": 138.648,
+      "native_json": {
+        "path": "local-proxy-controls-native.json",
+        "bytes": 63103,
+        "sha256": "64d5b3e472bb681d05ecbb54fdd992ad6b126258a5cef92f6ce8d3289782cbf5"
+      },
+      "suites": [
+        {
+          "path": "sdk/typescript/tests/run.test.ts",
+          "startTime": 1791018805600,
+          "endTime": 1791018918585,
+          "status": "failed",
+          "passed": ["Codex throws if working directory is not git and no skipGitRepoCheck is provided","Codex throws ThreadRunError on turn failures"],
+          "failed": ["Codex returns thread events","Codex sends previous items when run is called twice","Codex continues the thread when run is called twice with options","Codex resumes thread by id","Codex passes turn options to exec","Codex passes high modelReasoningEffort to exec","Codex passes persistent modelReasoningEffort to exec","Codex passes networkAccessEnabled to exec","Codex passes webSearchEnabled to exec","Codex passes webSearchMode to exec","Codex passes webSearchEnabled false to exec","Codex passes approvalPolicy to exec","Codex passes CodexOptions config overrides as TOML --config flags","Codex lets thread options override CodexOptions config overrides","Codex passes raw permission maps unchanged while preserving override precedence","Codex passes additionalDirectories as repeated flags","Codex writes output schema to a temporary file and forwards it","Codex combines structured text input segments","Codex forwards images to exec","Codex runs in provided working directory","Codex sets the codex sdk originator header"]
+        },
+        {
+          "path": "sdk/typescript/tests/runStreamed.test.ts",
+          "startTime": 1791018918591,
+          "endTime": 1791018938732,
+          "status": "failed",
+          "passed": [],
+          "failed": ["Codex returns thread events","Codex sends previous items when runStreamed is called twice","Codex resumes thread by id when streaming","Codex applies output schema turn options when streaming"]
+        },
+        {
+          "path": "sdk/typescript/tests/abort.test.ts",
+          "startTime": 1791018938736,
+          "endTime": 1791018944058,
+          "status": "failed",
+          "passed": ["AbortSignal support aborts run() when signal is aborted","AbortSignal support aborts runStreamed() when signal is aborted","AbortSignal support aborts run() when signal is aborted during execution","AbortSignal support aborts runStreamed() when signal is aborted during iteration"],
+          "failed": ["AbortSignal support completes normally when signal is not aborted"]
+        }
+      ],
+      "start_time_ms": 1791018805412
+    },
+    "companion-staging-positive": {
+      "evidence_class": "unchanged upstream tests, scoped selection",
+      "exit_code": 1,
+      "command_argv": ["/state/pnpm-bootstrap/bin/pnpm","-r","--filter","./sdk/typescript","run","test","--runInBand","--runTestsByPath","tests/run.test.ts","--testNamePattern=^Codex returns thread events$","--json","--outputFile=/state/logs/companion-staging-positive-native.json"],
+      "cwd": "/state/codex-source",
+      "network": "private namespace; no --share-net, DNS or CA mounts",
+      "native_cli": "/native/codex",
+      "companion_staged": true,
+      "native_counts": {
+        "total": 23,
+        "passed": 0,
+        "failed": 1,
+        "pending": 22,
+        "suites": 1,
+        "passed_suites": 0,
+        "failed_suites": 1
+      },
+      "end_time_ms": 1791019478387,
+      "native_jest_seconds": 6.792,
+      "native_json": {
+        "path": "companion-staging-positive-native.json",
+        "bytes": 9442,
+        "sha256": "909f3855746f3aa75b6a947fb0d87f9bd1a06ea470991cf164cac72dd6f77075"
+      },
+      "suites": [
+        {
+          "path": "sdk/typescript/tests/run.test.ts",
+          "startTime": 1791019471797,
+          "endTime": 1791019478387,
+          "status": "failed",
+          "selected_name": "Codex returns thread events",
+          "filtered_skips": 22,
+          "skip_scope": "All other unchanged tests/run.test.ts names, selected out by exact testNamePattern; see native JSON."
+        }
+      ],
+      "start_time_ms": 1791019471599
+    }
+  },
+  "failure_and_repair": {
+    "original_failure": "26 native successful-response-path assertions timed out at the unchanged Jest 5000ms limit; six native negative/error/abort assertions passed.",
+    "source_supported_repair": "Upstream SDK CI stages both codex and codex-code-mode-host; pinned InstallContext supports adjacent companion discovery. One readonly official sibling file was added without reinstalling, editing tests/source, changing timeouts or weakening namespace exclusions.",
+    "selected_unchanged_control": "tests/run.test.ts :: Codex returns thread events",
+    "returned_repair_result": "Native exit1, one 5000ms timeout failure, zero passes, 22 name-filtered skips.",
+    "causal_hypothesis_status": "Unproven. Companion staging alone did not resolve the timeout.",
+    "source_paths": [".github/workflows/sdk.yml","codex-rs/install-context/src/lib.rs","codex-rs/code-mode/src/remote_session.rs","codex-rs/code-mode-host/src/main.rs","codex-rs/code-mode-host/src/lib.rs"],
+    "common_failure_assertion_verbatim": "Error: thrown: \"Exceeded timeout of 5000 ms for a test.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"",
+    "original_stderr_timeout_occurrences": 26,
+    "adaptive_test_runs_after_repair_failure": 0,
+    "astra_max_review": {
+      "trigger": "Consequential local transport evidence conflict and first-party positive integration failure unresolved after one bounded Sol source-supported repair.",
+      "status": "Parent reported completed independent Astra/max source/native-failure review: HOLD further repairs; cause remains unproven. This accepts the stop boundary, not SDK positive-integration acceptance.",
+      "unknowns": ["actual child startup/stdio lifecycle","local Responses request registration","independent loopback connectivity","root cause of successful-response-path timeout"],
+      "acceptance_result": "HOLD further repairs. Any next step is separately source-qualified, value-free diagnosis in the same exclusions and unchanged selected fixture; no timeout increase, namespace relaxation or replacement mock."
+    }
+  },
+  "observation_corrections": [
+    {
+      "observation": "Compact native JSON observer indexed splitlines()[0] on empty failureMessages for a passing assertion.",
+      "exit_code": 1,
+      "correction": "Status-aware/empty-safe parsing returned native0; authoritative native Jest JSON was not modified. This was an observation-helper failure, not an upstream test failure."
+    },
+    {
+      "observation": "Source locator guessed codex-rs/core/src/code_mode and codex-rs/utils/executable directories.",
+      "exit_code": 2,
+      "correction": "Original source resolved to core/src/tools/code_mode/mod.rs and install-context/src/lib.rs. No capability absence was inferred."
+    },
+    {
+      "observation": "Scoped source search found no CODEX_CODE_MODE_HOST literal.",
+      "exit_code": 1,
+      "correction": "Exact typed InstallContext discovery source located; no absence claim."
+    },
+    {
+      "observation": "Preliminary CODEX_EXECUTABLE locator lead.",
+      "correction": "Pinned tests/testCodex.ts actually uses CODEX_EXEC_PATH; that exact supported name was used."
+    },
+    {
+      "observation": "During-running local-proxy stdout was a partial237B observation.",
+      "correction": "Final returned stdout526B SHA04a3ad0cdd93b9914ee9762d42862b37b1a207281b661a73da5762c7350c6a40 replaces partial-output identity for this finished execution; failure was retained."
+    },
+    {
+      "observation": "Pre-commit git diff --cached --check flagged a new blank line at EOF in the public output wrapper.",
+      "exit_code": 2,
+      "returned_output": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.stdout.txt:119: new blank line at EOF.\n",
+      "repair": "Two wrapper-only trailing newlines were removed. All three original native stdout streams and full exec/companion stderr remain verbatim; no native SDK test input or result changed.",
+      "prior_public_output_identity": {
+        "bytes": 6332,
+        "sha256": "907fb9da6619a6d9f583a6f639ac0fade71b3a42f0a370e8e34df69f8473549a"
+      }
+    }
+  ],
+  "retained_artifacts": {
+    "native_command_manifest": {
+      "path": "native-command-manifest.json",
+      "bytes": 23555,
+      "sha256": "6859d49df27cc65980a9084cb79f2cd8ba56502403b46402810ff44204937ce5"
+    },
+    "private_log_artifacts": [
+      ["companion-staging-positive.stderr.txt",2292,"7035709bf6d894a202bda31c9db3f8161207ef9ca08ef26d926a72dd9e83bd59"],
+      ["companion-staging-positive.stdout.txt",546,"bba7c39ce9aaf01e79116b2c9268bf57e1577a0562091752766e101ddfa0bb34"],
+      ["exec-controls.stderr.txt",1384,"111297775a012c695251be66632f1f5a884e2908e66e363f0106816a0b84a6ba"],
+      ["exec-controls.stdout.txt",185,"aea7bada13088046aa19d36f18bbc6c9b3c5b477d49e39f8eef69d93af499399"],
+      ["local-proxy-controls.stderr.txt",17089,"8731c3e01451afaffde8d753e50e332aa30ea3a155db7a2702a68a6e7bd4ce1e"],
+      ["local-proxy-controls.stdout.txt",526,"04a3ad0cdd93b9914ee9762d42862b37b1a207281b661a73da5762c7350c6a40"],
+      ["namespace-npm-version.stderr.txt",125,"163773fd350f16eb42985add279c00665985da82c2daaab7e874c5e73814bf6c"],
+      ["namespace-npm-version.stdout.txt",0,"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+      ["namespace-probe.stderr.txt",0,"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+      ["namespace-probe.stdout.txt",277,"9402d2539b2d66ff1905150974a429dd6d07f99e25f1c1c19c48c46e718a8e06"],
+      ["namespace-stub-npm-version.stderr.txt",0,"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+      ["namespace-stub-npm-version.stdout.txt",8,"005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2"],
+      ["namespace-stub-probe.stderr.txt",0,"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+      ["namespace-stub-probe.stdout.txt",220,"1c821fd0172f688574efee37e315d970fba3f11ccfcc5664e5615e22b3daf8ba"],
+      ["pnpm-bootstrap.stderr.txt",209,"e49b794cae6663ada86efea1579a0381251a5d4d1ff9b0cefed3e5622b21317d"],
+      ["pnpm-bootstrap.stdout.txt",86,"237546199430f1316c06dcb9572bbd6da3e99a08ca7626e2ce4221c00eba2831"],
+      ["pnpm-version.stderr.txt",0,"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+      ["pnpm-version.stdout.txt",8,"a82028df3ca327b7e19f23fbc0121aec7763353c7dc0c816422db7f52f6365bc"],
+      ["sdk-pnpm-frozen-install.stderr.txt",0,"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+      ["sdk-pnpm-frozen-install.stdout.txt",16331,"d900a11b2723f6646771ff977e4998fdb61480ef7efbb67e3d21a6f768a75a70"],
+      ["source-clone.stderr.txt",680,"4b1a9cd6cc282d3b746f373a0252714eb5e01f57f71791b9087f2d166b6b27a1"],
+      ["source-clone.stdout.txt",0,"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"]
+    ],
+    "independent_native_json_identities": [
+      {
+        "path": "exec-controls-native.json",
+        "bytes": 5509,
+        "sha256": "fcc20e35c8a9033c9a38bf58f3e642fbdfd634d478a0fd511aa467626e42507b"
+      },
+      {
+        "path": "local-proxy-controls-native.json",
+        "bytes": 63103,
+        "sha256": "64d5b3e472bb681d05ecbb54fdd992ad6b126258a5cef92f6ce8d3289782cbf5"
+      },
+      {
+        "path": "companion-staging-positive-native.json",
+        "bytes": 9442,
+        "sha256": "909f3855746f3aa75b6a947fb0d87f9bd1a06ea470991cf164cac72dd6f77075"
+      }
+    ],
+    "public_output_path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.stdout.txt",
+    "sanitization": "Personal host locators are replaced by owned-state/public-runtime identifiers. Native namespace /state,/native,/work,<fresh-fixture-home> paths are synthetic carriers. Public output retains all three native stdout streams, exec and companion stderr, and labelled bounded local-proxy stderr excerpts; full original stderr and native JSON are separately hash-bound. No raw external model conversation, credential or active client configuration is published.",
+    "private_log_columns": ["path","bytes","sha256"],
+    "public_output_sha256": "b4ef819cae1a771acdc59df8da0f345ed5b0d28e1b20a3510f27b2f2c9e840c3",
+    "public_output_bytes": 6330
+  },
+  "counter_contract": {
+    "authoritative_aggregate_usage": null,
+    "input_tokens": null,
+    "output_tokens": null,
+    "uncached_input_tokens": null,
+    "cache_read_input_tokens": null,
+    "cache_write_input_tokens": null,
+    "cost": null,
+    "token_savings": null,
+    "inference_limit": "Native synthetic fixture usage and SDK missing-cache-to-zero normalization are not complete provider counters. Separate overlapping test/retry counts are never summed into one usage aggregate."
+  },
+  "remaining_gates": ["Maintain Astra/max HOLD on adaptive repairs until independent bounded native diagnostic evidence resolves the material uncertainty.","Independent child startup/stdio/request-registration/loopback observations before any causal claim or further material repair.","Successful unchanged native positive Responses fixture acceptance.","Per-role useful task, terminal result, tool effect, correlation, effective provider/model/Ultra and complete cache/usage acceptance remain unrun.","SDK #617 f7c813a7e5569de95cc14a8fb05722b38ef465b6 historical role receipts do not qualify new0.160 execution.","External provider/model/wire/quality/savings and whole-component acceptance are unqualified."],
+  "repository_validation": {
+    "baseline": {
+      "exit_code": 0,
+      "stdout": "{\"components\": 69, \"hashed_files\": 9477, \"profiles\": 4, \"receipts\": 187, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n"
+    },
+    "integration_boundary": "Only the two owned artifacts may be added. Root alone registers their hashes; expected registration-only failures are not test failures.",
+    "after_owned_files_first": {
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json: evidence file is not hash-listed\nevidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json: contains possible personal home path\nevidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.stdout.txt: evidence file is not hash-listed\n",
+      "repair": "The generic possible-home-path publication filter matched the fresh synthetic fixture-home locator. Only its public presentation was replaced by <fresh-fixture-home>; exact private namespace argv/observations and all native test originals are unchanged."
+    },
+    "independent_artifact_observation": {
+      "exit_code": 0,
+      "scope": "JSON parse, public output hash/bytes, all three exact native stdout regions, full exec/companion stderr, and19 original-source byte/hash matches. Structural observation only."
+    },
+    "after_public_sanitization": {
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json: evidence file is not hash-listed\nevidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.stdout.txt: evidence file is not hash-listed\n",
+      "meaning": "Only the two owned evidence artifacts lack root-owned hash registration. The possible-home-path flag is cleared."
+    }
+  },
+  "test_selection": {
+    "selected_files": ["sdk/typescript/tests/exec.test.ts","sdk/typescript/tests/run.test.ts","sdk/typescript/tests/runStreamed.test.ts","sdk/typescript/tests/abort.test.ts"],
+    "omissions": "All other upstream SDK tests were outside this bounded selection. The repair reselected one original positive case and filtered22 other run.test.ts cases; skipped cases are not passes.",
+    "counting": "Per-attempt counts are retained separately. Repeated fixture attempts and filtered skips are not added to one unique-test or usage total."
+  }
+}

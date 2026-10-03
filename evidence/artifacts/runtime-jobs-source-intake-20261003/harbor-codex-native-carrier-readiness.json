@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "artifact_type": "native_offline_readiness",
+  "date": "2026-10-03",
+  "source_packet_base": "1695dc686aa28299c184982b316591de2f65514d",
+  "status": "bounded_native_controls_observed_comparison_not_admitted",
+  "scope": "Pinned Harbor and isolated Codex installation, native version/help/schema, four unchanged mocked Harbor network controls, and original carrier source. No study, provider request, candidate container, task image build, extension activation, task amendment, freeze or default decision was executed.",
+  "ownership": "One new receipt only; catalog, registry, protocols, frozen task inputs and other owners' files are outside this change.",
+  "runtime_scope": "Owner-authorized private WSL lab. Existing Harbor runtime tool environment was preserved. New exact source checkout, locked dev environment, cache, logs and isolated Codex release binary use a separate owned private prefix. Native executables were addressed by previously qualified absolute locators; RTK wrapped the outer WSL caller only. Public records use role-relative locators and withhold private host paths.",
+  "pins": {
+    "harbor": {
+      "repository": "https://github.com/harbor-framework/harbor",
+      "version": "0.23.0",
+      "tag": "v0.23.0",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729"
+    },
+    "codex": {
+      "repository": "https://github.com/openai/codex",
+      "version": "0.160.0",
+      "tag": "rust-v0.160.0",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc"
+    }
+  },
+  "retained_private_artifacts": {
+    "locator": "OWNED_RUN/logs; exact private locator supplied to the coordinator separately",
+    "raw_native_outputs": "Each clone, locked sync, selected pytest, Codex version/help and Harbor schema operation retains separate stdout/stderr files. Raw private paths are excluded from this public receipt.",
+    "source_snapshots": [
+      "source-before.json",
+      "source-after-sync.json",
+      "source-after-tests.json"
+    ],
+    "source_snapshot_sha256_each": "19cc68f0a0d72059b641d70e5e4ec6a1aa23b4016fb2d9ce7b2d98ec70ed6a86",
+    "source_snapshot_files": [
+      "pyproject.toml",
+      "src/harbor/agents/installed/codex.py",
+      "tests/conftest.py",
+      "tests/unit/environments/test_docker.py",
+      "tests/unit/trial/test_network_policy.py",
+      "uv.lock"
+    ]
+  },
+  "native_observations": {
+    "existing_harbor": {
+      "version_exit": 0,
+      "version_stdout": "0.23.0\n",
+      "version_stdout_sha256": "d1994e4942b06ec398ed7d9fa91ecce4079cd3f85ffe9e04588866291263149c",
+      "run_help_exit": 0,
+      "run_help_stdout_bytes": 34110,
+      "run_help_stdout_sha256": "bae6281eb644de0d4e7dc9ec4eff18ba4fa71398f3b4281d3e8a9c2863003bdc",
+      "selected_help_interfaces": ["--model", "--ak/--agent-kwarg", "--ae/--agent-env", "--allow-agent-host"],
+      "direct_url_native_read_exit": 0,
+      "direct_url_sha256": "a9aa70385eefe7514195bb014a0a38fe03c0c0856a0665ef0998408089e49da1",
+      "direct_url_commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "limit": "Installed public distribution metadata and source identity only; no candidate execution. Initial run-help bytes were processed directly; the receipt retains their hash and selected returned interfaces, not a replay presented as another invocation."
+    },
+    "native_uv": {
+      "version_exit": 0,
+      "version_stdout": "uv 0.12.17 (x86_64-unknown-linux-gnu)\n",
+      "version_stdout_sha256": "dd643ebda7165a77a7fe3c9f445ec1a2cfebe1bfe0329015937763dce919c33d",
+      "sync_help_exit": 0,
+      "sync_help_stdout_sha256": "453a121c64d1987511201fbc1d1672fef905eda51c34d0f836b47e860be3ca1b",
+      "supported_options_observed": ["--locked", "--group", "--python", "--project", "--cache-dir"]
+    },
+    "source_install": {
+      "native_git_version_exit": 0,
+      "native_git_version_stdout": "git version 2.53.0\n",
+      "clone_exit": 0,
+      "fetch_exact_pin_exit": 0,
+      "checkout_exact_pin_exit": 0,
+      "rev_parse_head_exit": 0,
+      "returned_head": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "command": "OWNER_UV --no-config sync --locked --group dev --python OWNER_HARBOR_TOOL_PYTHON --project OWNED_RUN/source",
+      "install_exit": 0,
+      "install_stdout_bytes": 0,
+      "install_stderr_bytes": 12044,
+      "install_stderr_sha256": "2da0e3026c824b5b4b85ad213540a14ca6148839248cee055bf38927dc2f3217",
+      "source_basis": "Original pyproject.toml dev group, unchanged uv.lock, and installed UV sync help. README contains no selected UV/pytest recipe; this is a scoped source observation, not a claim that no other recipe exists.",
+      "isolation": "Fresh source/dev environment and task-specific cache. Existing tool environment untouched. Public Git source fetch used no credential helper or interactive prompt. No HOME or CODEX_HOME reassignment.",
+      "tracked_diff_after_tests_exit": 0,
+      "selected_source_and_lock_hashes_unchanged": true
+    },
+    "network_unit_controls": {
+      "command": "OWNED_RUN/source/.venv/bin/python -m pytest -q <the four exact selectors below>",
+      "selectors": [
+        "tests/unit/trial/test_network_policy.py::TestTrialNetworkPlan::test_allow_environment_hosts_warn_on_public_baseline",
+        "tests/unit/trial/test_network_policy.py::TestTrialNetworkPlan::test_extra_allowed_hosts_warn_on_public_baseline",
+        "tests/unit/environments/test_docker.py::TestComposeEnvVars::test_egress_control_initial_allowlist_env",
+        "tests/unit/environments/test_docker.py::TestDockerNetworkPolicy::test_allowlist_policy_enables_linux_egress_control"
+      ],
+      "native_exit": 0,
+      "collected": 4,
+      "passed": 4,
+      "skipped": 0,
+      "returned_duration_seconds": 1.36,
+      "stdout_bytes": 758,
+      "stdout_sha256": "84288acd42cc6a81fce972defeb9d16802ee4de5b35b4c9fe65175ee7179209d",
+      "stderr_bytes": 0,
+      "returned_output_redaction": "Only the private pytest rootdir is replaced with OWNED_RUN/source below. The stdout hash identifies the actual unredacted returned bytes retained privately.",
+      "returned_stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.13.15, pytest-9.0.2, pluggy-1.6.0\nrootdir: OWNED_RUN/source\nconfigfile: pyproject.toml\nplugins: cov-7.0.0, anyio-4.12.1, langsmith-0.8.8, xdist-3.8.0, asyncio-1.3.0, hypothesis-6.155.0, typeguard-4.4.3\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollected 4 items\n\ntests/unit/trial/test_network_policy.py ..                               [ 50%]\ntests/unit/environments/test_docker.py ..                                [100%]\n\n============================== 4 passed in 1.36s ===============================\n",
+      "fixture_contract": "Original test_docker.py:51-61 autouse fixture patches Docker subprocess.run to CompletedProcess0, seeds the kernel-capability cache, yields, then resets it. The real Docker kernel probe at docker.py:920-950 is not executed by these selected tests. Tests establish planner PUBLIC warnings, allowlist Compose environment serialization and mocked capability selection.",
+      "limit": "Native unchanged unit readiness only. No real Docker kernel probe, container/network lifecycle, allowed gateway connection, denied egress, restored connection, image build or model execution was observed."
+    },
+    "isolated_codex": {
+      "source_install_interface": "Official README manual GitHub release asset download, integrity verification, extract the matching binary and rename codex; no mutable latest installer or global npm/client modification.",
+      "asset_url": "https://github.com/openai/codex/releases/download/rust-v0.160.0/codex-x86_64-unknown-linux-musl.tar.gz",
+      "asset_bytes": 109304578,
+      "release_and_download_sha256": "306865417d4ee7a927785852910a527f41e1e159add390ac5ae3accb67d44a13",
+      "binary_bytes": 289101384,
+      "binary_sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+      "version_exit": 0,
+      "version_stdout": "codex-cli 0.160.0\n",
+      "version_stdout_sha256": "f6464b8cc67af75deb2589fe1dbcde152fc15ffb76a91de1cf0686b4623afb1e",
+      "help_controls": [
+        {"arguments": ["--help"], "exit": 0, "stdout_bytes": 5769, "stdout_sha256": "75c90681ba095160666d9884d1eccce391be95c80da27641a3c8e1481bb02fac"},
+        {"arguments": ["exec", "--help"], "exit": 0, "stdout_bytes": 4031, "stdout_sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e"},
+        {"arguments": ["features", "--help"], "exit": 0, "stdout_bytes": 1061, "stdout_sha256": "dbbe49450f954f7ca9a00f761ef88842a3f24df3d864bbdfe57603f6dc36a804"},
+        {"arguments": ["mcp", "--help"], "exit": 0, "stdout_bytes": 982, "stdout_sha256": "9e7d1a796b488470f391207bc994f268a100d85e7b2224e04b1514b8787bad09"}
+      ],
+      "all_help_stderr_bytes": 0,
+      "limit": "Version and help only in an isolated owner prefix. Native V2 status, config/catalog loading, role loading, container mount/version detection, gateway routing and Responses Lite delivery remain unrun. Existing workstation inventory is separate from this target binary."
+    },
+    "harbor_codex_schema": {
+      "arguments": ["agent", "schema", "codex", "--json"],
+      "native_exit": 0,
+      "stdout_bytes": 1954,
+      "stdout_sha256": "545d0dcf2f13ffa72f53a41fb367b6338920866f69aa454cc6df2538ab6c1669",
+      "stderr_bytes": 0,
+      "selected_returned_schema": {
+        "version": {"default": null, "description": "Agent CLI version to install. Omit for latest."},
+        "config": {"default": null, "description": "Native config file path or inline JSON."},
+        "reasoning_effort": {"default": null, "enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max"]}
+      },
+      "source_contract": "agents.py:116-127 resolves the local built-in class and obtains its option schema. --hub was not passed. No agent instance or trial was launched."
+    }
+  },
+  "source_conditional_carrier": {
+    "native_cli_interface": "harbor run -a codex --ak version=0.160.0 --ak 'config=<native JSON object>' --model cx/gpt-6.1-sol-ultra; this is a prospective supported interface, not an executed candidate command.",
+    "config_contract": "cli/utils.py:111-151 parses --ak JSON values into dicts; installed/base.py:560-586 accepts native config dict/path and enforces capability support; codex.py:1207-1297 validates, merges, serializes and uploads effective native TOML. Native schema independently exposes config.",
+    "effort_carrier": "Put model_reasoning_effort=ultra in the native inline config. Leave the separate Harbor reasoning_effort kwarg unset: its native schema accepts only through max, and codex.py:39-43 defaults it to None with an optional CLI override descriptor.",
+    "catalog_contract": "model_catalog_json points to the unchanged 472512-byte a956 models-manager/models.json inside the fresh candidate container. A local host path or gateway GET /v1/models response is not that native catalog. Native per-file readonly mounts or supported declarative Compose assets are source-supported prospective carriers; none were mounted in this run.",
+    "normal_effort_mapping": "The unchanged gpt-6.1-sol catalog has multi_agent_reasoning_effort=xhigh, includes xhigh/max/ultra support and use_responses_lite=true. protocol/openai_models/reasoning_effort.rs:10-35 resolves ordinary Ultra to a supported catalog multi-agent effort, otherwise max, otherwise last non-Ultra, otherwise medium. core/client.rs:863-880 calls this resolver. Thus catalog-matched Sol native Ultra has source-derived ordinary xhigh, independent of the gateway Ultra alias override; no wire delivery is claimed.",
+    "responses_contract": "core/client.rs:990 uses model_info.slug;995 sets parallel_tool_calls=prompt.parallel_tool_calls && !model_info.use_responses_lite. Source-matched Lite therefore suppresses parallel_tool_calls. Native transport and delivered field remain pending.",
+    "model_string_gate": "Harbor codex.py:1339 strips provider prefixes with self.model_name.split('/')[-1]. cx/gpt-6.1-sol-ultra selects bare gpt-6.1-sol-ultra natively. Static longest-prefix metadata can match the bare Sol slug; this does not establish prefixed native metadata or a successful bare gateway route. Exact delivered cx route/alias binding requires the authorized actual canary.",
+    "auth_injection_contract": "codex.py:1299-1327 has no default auth.json injection. CODEX_AUTH_JSON_PATH and truthy CODEX_FORCE_AUTH_JSON opt in; preserve these unset/false, no host auth mount or copy. Native keyless custom-provider config remains the source-conditional route in the preceding source packet, not a new authentication observation here.",
+    "v2_config_contract": "features.multi_agent_v2=true is an official inline config carrier. features/src/lib.rs:1337-1340 marks it stable but disabled by default. Effective V2 and delivered usage hints remain pending. Deprecated usage_hint_enabled is ignored at feature_configs.rs:274-276; enabling it would not prove hint delivery.",
+    "v2_value_free_status_not_run": "cli/main.rs:1819-1821 features list calls cli/cloud_config.rs::load_config. cloud_config.rs:57-63 initializes the storage loader; cloud-config/bundle_loader.rs:52-54 spawns get_latest and refresh_cache_in_background. cloud-config/service.rs documents backend/on-disk refresh. Offline/no-write neutrality for current native state is unqualified, so no features-list command was executed.",
+    "child_configuration": "Native agents.default_subagent_model and agents.default_subagent_reasoning_effort are supported; agents.<role>.config_file names a role TOML/config layer. child_config.rs:196-237 applies explicit spawn arguments, otherwise configured child defaults, validates reasoning levels using offline model metadata, and uses selected-model default effort when a new model has no effort override. prepare_agent_spawn_config:62-84 applies those overrides before a role layer under its documented V1/V2/full-fork conditions; role.rs:80-86,119-126 can subsequently apply role model/effort. Every declared role therefore needs explicit model/effort binding, not assumed inheritance. Actual child policy and child delivery remain pending.",
+    "collector_preservation": "No blind ephemeral or ignore-user-config flags were added to Harbor. No HOME/CODEX_HOME reassignment, credential copies, custom agent replacement, task Dockerfile patch or verifier change was made."
+  },
+  "network_source_gate": {
+    "public_baseline": "Original PUBLIC task mode ignores extra allowlists and warns; passing --allow-agent-host does not turn an unchanged PUBLIC task into a restricted environment. The selected native warning tests confirm that original planner behavior.",
+    "supported_integration_interfaces": "Native --mounts uses Docker Compose service volume JSON and --extra-docker-compose accepts declarative overlays. These are prospective supported interfaces, not proof of actual mount/network behavior.",
+    "pending": "A preregistered derived allowlist task configuration needs both-family consequence acceptance and original task/verifier/source identities retained. Actual stock Docker gateway-allow, external-deny, restored-allow lifecycle, owner address handoff, immutable source policy, candidate mounts and candidate image prerequisites are unqualified here. No task amendment, overlay/network mutation or container probe was executed."
+  },
+  "org_inventory_correction": {
+    "skills": {"repository": "openai/skills", "commit": "49f948faa9258a0c61caceaf225e179651397431", "path": "README.md", "sha256": "0f6a07580f3c627253e15a58dd0439e135049ec38eb16cf3587f7e50abc6f590", "finding": "Line2 explicitly deprecates the repository and links openai/plugins for current examples; historical skills inventory is not a current bundle activation."},
+    "community_marketplace": {"repository": "openai/community-plugins", "commit": "62844ca1cd865b76c7fed7180fc1ffef16e9167b", "path": "README.md", "sha256": "40a50687be10ff13f693e8c4bce8fd8e2cc7b043b7387891718c0ad1b5584d52", "finding": "Git-backed community marketplace, separate official-directory review, and its own installation source names tonyloehr/community-plugins. Org hosting alone does not establish first-party authorship of all assets."},
+    "current_examples": {"repository": "openai/plugins", "commit": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f", "path": "README.md", "sha256": "b3681ebd15797bdee1d638c6520c7ba10a36e676760ea5c251530f53f843c852", "finding": "Lines3-12 name curated Codex examples, required plugins/<name>/.codex-plugin/plugin.json, optional skills/MCP/apps/agents/commands, and distinct default/API-key marketplaces."},
+    "activation_status": "Inventory only. No extension, skill, plugin or MCP asset was installed, selected into a frozen bundle, loaded, enabled or executed by this readiness run. Exact job-matched native bundle/manifest/loader activation remains a separate arm amendment and source gate."
+  },
+  "original_source_files": [
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "pyproject.toml", "sha256": "00290ec17fb5f4f44ebd1a251dd07fe4f1b6dabb9fed61497cd303a4679e104d", "lines": "9,103-139"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "uv.lock", "sha256": "ce2eed59946e8f0d21494c0115939e8169d1362e46d92d5db377861303192b01", "lines": "unchanged complete lock"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "tests/conftest.py", "sha256": "cb19553a44f85b35da417882435b91ee8c24ef912dc137cd449e8c4849aed1c7", "lines": "18-31"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "tests/unit/trial/test_network_policy.py", "sha256": "fab1164c4d0eeea6325614b44848a1fb03224c5d5ac45b5c98eca990caa2a749", "lines": "372-398"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "tests/unit/environments/test_docker.py", "sha256": "27e5b973f70dbdabb204650f3875d6bb01672991651d8f6a96f39acd565e728d", "lines": "51-61,1297-1330,1522-1544"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "src/harbor/trial/network_policy.py", "sha256": "f8b3978681637a35905640eb8ba52c3b9c8d6f7cc0d49e6572c7c5e9433bf275", "lines": "23-31"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "src/harbor/environments/docker/docker.py", "sha256": "8757d3fbc19e58c7ccd14c9b613a0d00dccd1b514375fa0e546ff41ca963a15e", "lines": "400-403,487-491,920-950"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "src/harbor/agents/installed/codex.py", "sha256": "ee0ca8ec43617f3909d2195afe8f9e7cbd7313a8b3b558b01fde388f65b7c39c", "lines": "39-43,328-382,1207-1339"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "src/harbor/agents/installed/base.py", "sha256": "4ad4d5891db891645dcdb044566cb150502fb7d2ee5fdaef80eabd652d6bf6a9", "lines": "560-586,651"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "src/harbor/cli/jobs.py", "sha256": "dd9cb7dd62b34b195d21e1d017e3a577c2aa226e671568c9c00924e96b1befd5", "lines": "628-630,922-939,1519,1724-1725"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "src/harbor/cli/utils.py", "sha256": "53f8d74575fc30de48368a9f7b034370b70a1a8f7f33fdc324fac49eb3f1158a", "lines": "111-151"},
+    {"repository": "harbor-framework/harbor", "commit": "1e5c5c6db929a10a140d05e606882c671ae20729", "path": "src/harbor/cli/agents.py", "sha256": "e1111c5c1886e53d19f57382b1deb8253e9a0447349dff7756b80c36e257a338", "lines": "84-127"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "README.md", "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7", "lines": "53-65"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/models-manager/models.json", "sha256": "fd219bd9f061278275f528939f82f54d2eb97df4b25c23b022adbe48813d920b", "lines": "complete unchanged catalog; gpt-6.1-sol record"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/models-manager/src/manager.rs", "sha256": "d998bb2768561c761f83a77ce60d3be4b5d1a453e4a7afb10c5f86d314d76a80", "lines": "855-858"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/core/src/config/mod.rs", "sha256": "854f5a6b184714740500b8d3eae2bb04cb88172efccf11d38a74f2f6189c0341", "lines": "2143-2170,3894-3901"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/core/src/client.rs", "sha256": "605ced35cd853fcc4e23f6edd724c96f96f74c736a45e6ea95bf5300f3ab814c", "lines": "863-880,990-995"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/protocol/src/openai_models/reasoning_effort.rs", "sha256": "62089cb92996bb0030d4a219a6ba06b3bcf8f2f45e95ef7204bc8632d07ea08d", "lines": "8-40"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/features/src/lib.rs", "sha256": "124c76d1fbad7b05fd78a62b89a28282c7ecab1de7426ac18696987024ddeae0", "lines": "1337-1340"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/features/src/feature_configs.rs", "sha256": "c1012952a46f1c228ab087d5721ff7a7fe447da01dac31973abe30b9798682eb", "lines": "259-282"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/config/src/config_toml.rs", "sha256": "453b5ed4d49cf3768ce47e1f2fe1987c92d694bba9b52373dcf10f15901ab9d1", "lines": "730-774"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/core/src/agent/child_config.rs", "sha256": "33d4dd6f70e6640af1059398272c48b88e16e0005105fbd1ef13e30456d39a39", "lines": "51-84,196-237"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/core/src/agent/role.rs", "sha256": "0311e6438eda278ac5800327beb035c70d8e531bc69b397f85117907aa2bb31a", "lines": "75-86,119-150"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/agent-roles/src/loader.rs", "sha256": "611e202c2bb4a2bad6c201bd93555d56b6c6c7021e96a294015556fd47b16b38", "lines": "23-58"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/cli/src/main.rs", "sha256": "dc0356a131108ace0f63f7e9f5040b1f0fc19a71057eeeb4108e04623267c502", "lines": "1805-1837"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/cli/src/cloud_config.rs", "sha256": "4e0fee9c789fb2752b01145637cfd01e88a048fff770ba33552d88b91894e939", "lines": "16-72"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/cloud-config/src/bundle_loader.rs", "sha256": "1a546588957d1215f0d1f6d9e6971b50e1f2960f0cb3563f8490d88a533403a3", "lines": "44-76,96-113"},
+    {"repository": "openai/codex", "commit": "a956835d020762cb2b570053af06f643a11c0ecc", "path": "codex-rs/cloud-config/src/service.rs", "sha256": "fcdf3c2a79453f3a299381eda75e350a2a7a92a55c3e0c116d917deaf4814eb6", "lines": "1-5,50-54"}
+  ],
+  "failures_and_corrections": [
+    {"operation": "Initial Harbor version/help through bare wsl.exe", "native_exit_each": 1, "stderr": "rtk: Failed to execute command: wsl.exe: No such file or directory (os error 2)\n", "correction": "Coordinator supplied the installed absolute WSL executable and --cd /tmp; the recovered operations returned0. Caller lookup failures occurred before Harbor."},
+    {"operation": "rtk proxy which wsl.exe", "native_exit": 1, "stdout_bytes": 0, "correction": "No PATH-qualified WSL name was assumed after this value-free lookup failure."},
+    {"operation": "Bounded selected-source processors", "processor_exit_each": 1, "before_print_guard_sizes": [6195, 4120, 3931], "correction": "3500-byte guard prevented oversized stdout. Narrow original-source re-reads returned the selected excerpts and complete-byte hashes; no context indexing/search/cleanup used."},
+    {"operation": "Reasoning helper and Harbor schema AST lookup", "processor_exit_each": 1, "error": "StopIteration", "correction": "resolve_reasoning_effort lives in protocol/src/openai_models/reasoning_effort.rs; native schema handler is schema_cmd. Exact source paths/names were then read. No failed parser was treated as source absence."},
+    {"operation": "Pinned d8ee coding draft JSON parse", "git_show_native_exit": 0, "source_bytes": 19639, "source_sha256": "032cbd2f6b4aea81f19912ca5292ef724b8e6c211a13cb0ecc714ea63ce2236d", "parser_exit": 1, "error": "JSONDecodeError: Extra data: line 290 column 5 (char 19363)", "correction": "Reported to coordinator; this worker did not edit the draft. Coordinator supplied corrected published1695; original corrected blob parsed successfully, SHA c54fea783ad25e64531de36a4fd8702350a0c6c36f5ee80a863fcd8279f7ae42."},
+    {"claim": "Current openai/skills or org-hosted community inventory supplies an already-qualified first-party final bundle", "correction": "Current pinned README explicitly deprecates skills and directs to openai/plugins; community publication and authorship require separate provenance. Inventory and native activation are preserved as separate evidence levels."},
+    {"claim": "Harbor's prefixed model string automatically preserves an identical Codex wire prefix/native metadata", "correction": "Pinned codex.py:1339 strips the prefix. Bare native catalog matching does not qualify exact prefixed wire routing; actual source-conditional gateway canary remains pending."}
+  ],
+  "remaining_gates": [
+    "Actual unchanged native model catalog/per-asset role/plugin carriers mounted inside the fresh Harbor container and exact Codex version skip verified there",
+    "Native effective V2, usage hint, child model/effort and actual Responses Lite/parallel-tool field delivery observed without unsafe standalone features-list assumptions",
+    "Exact bare-versus-cx alias gateway binding, owner address reachability, isolated account/drain receipt and allowed execution window",
+    "Both-family acceptance of the separately proposed allowlist integration amendment; actual allowed/denied/restored native egress lifecycle",
+    "Immutable task image/source-policy enforcement and images installed/build-qualified; no task source mutation",
+    "Task-matched first-party extension bundle pin/manifest/loader and native activation receipt; current inventory alone is insufficient",
+    "Complete authoritative uncached input/output and cache-subset usage, native tool/token/time-bound limitations, whole-block recovery and valid comparison admission"
+  ],
+  "local_publication_checks": {
+    "owned_json_parse": "Native processing succeeded before this metadata append; all declared SHA256 strings have64 characters. Final JSON and staged whitespace are checked again before the owned commit.",
+    "required_validator_exit": 1,
+    "required_validator_returned_stdout": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/harbor-codex-native-carrier-readiness.json: evidence file is not hash-listed\n",
+    "required_validator_stdout_sha256": "db1cb668c6c96b13f58fb6e32dc5b7841ea0ed0fcf4c906f7097286144ff4c70",
+    "required_validator_stderr_bytes": 0,
+    "handoff": "Coordinator owns the evidence registry and will register the final artifact hash during integration. This worker preserves the missing-registration failure and does not edit the registry. No validator pass is claimed."
+  },
+  "evidence_classification": {
+    "upstream_native_tests": "Four unchanged mock unit nodes only, not common-task quality or lifecycle acceptance",
+    "model_or_benchmark_execution": false,
+    "candidate_provider_usage": null,
+    "usage_limit": "This receipt does not measure native source-review/install overhead or claim blank/zero provider usage as a comparison result.",
+    "comparison_freeze": false,
+    "new_default": false,
+    "architecture_acceptance": "No new architecture or both-family freeze acceptance is asserted by this receipt. Earlier source-conditional carrier opinions remain leads until coordinator original review and actual native gates."
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "kind": "unchanged-upstream-offline-control",
+  "status": "passed-one-selected-native-control-not-plugin-activation",
+  "source": {
+    "repository": "https://github.com/openai/plugins",
+    "commit": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+    "plugin": "plugin-eval",
+    "plugin_manifest_version": "0.1.2",
+    "node_package_version": "0.1.0",
+    "first_party_binding": "Native plugin manifest author OpenAI Codex, developer OpenAI and repository openai/plugins; skills-only declaration. Repository ownership alone was not used as attribution.",
+    "original_sources": [
+      {"file": "plugins/plugin-eval/.codex-plugin/plugin.json", "bytes": 1790, "sha256": "72b434478d5008496d17d43b9b847121f47145f71177540ab47893b1559c5aed"},
+      {"file": "plugins/plugin-eval/package.json", "bytes": 816, "sha256": "92d67bf1492c8b4ddb50dadf579777682e3e10af5a7063d48b6753f4a8ac9f99"},
+      {"file": "plugins/plugin-eval/tests/plugin-eval.test.js", "bytes": 33355, "sha256": "f101cce8d62a7c5b74ded546bc40cfb9337c7827477623b84a2b538507150c9d"}
+    ],
+    "root_original_http_reads": "All three originals returned HTTP200. Owned native sparse checkout at the exact commit matches these original hashes."
+  },
+  "native_setup": {
+    "git_clone_exit": 0,
+    "git_fetch_exact_commit_exit": 0,
+    "git_sparse_checkout_exit": 0,
+    "git_detached_checkout_exit": 0,
+    "native_head_exit": 0,
+    "native_head": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+    "node_version_exit": 0,
+    "node_version_returned": "v24.21.0\n",
+    "node_version_stdout_sha256": "f2ec568164f99546161909b0189b57bb5be3e80f8e2ccd8a51a4aed8c4055a04",
+    "node_help_exit": 0,
+    "node_help_stdout_bytes": 25342,
+    "node_help_stdout_sha256": "650068b7faa41ea8c4b59927d92913879467245e9a7a1de3a3f6219377559767",
+    "test_and_name_pattern_flags_observed": true,
+    "dependency_installation": "None required by this unchanged package; native manifest declares Node>=20 and no dependencies."
+  },
+  "unchanged_native_control": {
+    "cwd_role": "OWNED_PINNED_CHECKOUT/plugins/plugin-eval",
+    "command": "rtk node --test --test-name-pattern='collects deterministic TypeScript and Python metrics' tests/plugin-eval.test.js",
+    "source_test_lines": "332-344",
+    "source_assertions": "Two TypeScript and two Python files, one test file in each language, and maximum cyclomatic complexity at least4 in each; unchanged maintained fixture ts-python-sample.",
+    "initial_tool_chunk": "e6c4cf",
+    "final_tool_chunk": "1efb6d",
+    "native_exit": 0,
+    "passed": 1,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "returned_output": "✔ collects deterministic TypeScript and Python metrics (3360.141095ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3445.354618\n",
+    "returned_output_utf8_bytes": 189,
+    "returned_output_sha256": "9b195b7259b39a84f8de47a8d87219318062ade0d1e05883314c9a48d26b1f97",
+    "scope": "One original offline source-metrics unit control executed. Unselected callbacks were not executed. This is not a model benchmark, SWE result, plugin loader/activation observation or comparative default."
+  },
+  "independent_input_and_source_observation": {
+    "source_before_diff_exit": 0,
+    "source_after_diff_exit": 0,
+    "source_after_porcelain_exit": 0,
+    "source_after_porcelain_returned": "",
+    "limit": "Root observed pinned original source identities and clean source before/after execution. There was no independent second execution or claim of complete tool acceptance."
+  },
+  "installation_boundary": {
+    "codex_source_commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "native_plugin_help_exit": 0,
+    "native_plugin_add_help_exit": 0,
+    "native_marketplace_add_help_exit": 0,
+    "native_release_read_exit": 0,
+    "release_body_sha256": "cc1ac8ec35b1ba705cb24ad5223e4bec92f0906dd0f462c46446a64f3d5d7b94",
+    "root_original_policy_file": "codex-rs/core-plugins/src/marketplace_policy.rs",
+    "root_original_policy_sha256": "cc84b65bf3b1c581cb5606c271142ef7b1ec42aa25443129170019821122988a",
+    "native_pin_gap": "Generic --ref marketplace support does not qualify the unchanged openai-curated manifest. Source331-341/456-464 rejects reserved marketplace names from ordinary sources. Supported unchanged pin-preserving install and activation remains unqualified; no manifest rename, manual SHA seed, client configuration change or plugin install was performed.",
+    "worker_followup_scope": "Additional startup-sync/cache/auto-upgrade findings remain source leads until independently reread; not promoted by this unit result."
+  },
+  "provider_usage": null,
+  "coding_quality": null,
+  "runtime_default": null,
+  "freeze_qualification": false,
+  "credentials_and_state": "Native Git and Node operations used owned source and unchanged fixtures. No credential/auth file read or copying, host client configuration edit, sign-in, provider request, marketplace activation or native model run. Private source checkout is outside repository worktrees; receipts retain only sanitized evidence."
+}

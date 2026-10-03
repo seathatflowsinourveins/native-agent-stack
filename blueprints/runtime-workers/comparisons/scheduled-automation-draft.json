@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "study_id": "runtime-jobs-scheduled-automation-20261003",
+  "status": "draft-not-frozen",
+  "freeze_eligible": false,
+  "shared_execution_contract": "shared-execution-contract.json",
+  "routing": {"worker_model": "cx/gpt-6.1-sol-ultra", "consequential_model": "cx/gpt-6-astra-max", "native_effort_mapping": "unqualified", "wire_qualification": "Shared contract; delivered reasoning/parallel fields and correlated counters required"},
+  "scope": "Scheduled useful agent work and bounded failure/recovery; existing host/trading services and timers are excluded",
+  "arms": [
+    {"id": "dagu", "baseline": true, "version": "v2.18.1", "repository": "https://github.com/dagucloud/dagu", "ref": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7", "interface": "Native harness.run Codex payload inside a DAG; first-party Dagu skill and native harness definitions"},
+    {"id": "deerflow", "baseline": false, "version": "v2.1.0", "repository": "https://github.com/bytedance/deer-flow", "ref": "345f08be00c8a9495079b732a39b46aa9af1584e", "interface": "First-party scheduled task/occurrence service and native assistant; scheduler.enabled is source-default false", "extension_contract": "deerflow-extension-api==0.2.1"}
+  ],
+  "native_source_controls": [
+    {"arm": "deerflow", "path": "backend/tests/test_scheduler_completion_atomicity.py", "sha256": "f2208d2ca62c1d8b08713ef90eae3502cef62a94de8a94595df33203660b2770", "node": "test_completion_before_launch_bookkeeping_is_durable_and_counted_once", "scope": "Once/cron success/error/timeout/interruption outcome and exactly-once completion accounting"},
+    {"arm": "deerflow", "path": "backend/tests/test_scheduled_task_dispatch_race.py", "sha256": "b4c669d385ef77bc39bdb94879210cbaea0707a1470b7443dbe53932e6ec387f", "nodes": ["test_two_concurrent_manual_dispatches_launch_exactly_once", "test_scheduled_and_manual_dispatch_launch_exactly_once"], "scope": "Concurrent occurrence coalescing with original barriers/assertions"},
+    {"arm": "deerflow", "path": "backend/tests/test_scheduled_task_router_behavior.py", "sha256": "4d6e4027a566ef3ff83a4da3568884b05b69d3edadd07b64c97c5a74475f2f7d", "node": "test_update_terminal_once_task_with_future_run_at_rearms_it", "scope": "Existing test seeds completed only; failed/cancelled and selected-step retry parity are not established"},
+    {"arm": "deerflow", "path": "backend/tests/test_scheduled_task_queue.py", "sha256": "0aebcbbac08b11274fe509c504e37a0ac50c1c02eec94f2f1352df25d17b881f", "node": "test_pause_atomically_cancels_waiting_run_but_rejects_launching_run", "scope": "Queued cancellation versus rejection once launching; not active-run cancellation parity"},
+    {"arm": "dagu", "path": "conformance/cli/retry_test.go", "sha256": "2ad2053971c468282629fc7502003b4b86501c17315c9819169d4028d8c22377", "node": "TestRetryStepFlagReexecutesOnlyThatStep", "scope": "Same run ID; marker sequence first/second/second; earlier successful step is not rerun"},
+    {"arm": "dagu", "path": "internal/cmd/start_test.go", "sha256": "ea48bf26ee94fb0cb3da93296e5c8337239481cdc66ebf2a6c13e6226d734684", "node": "TestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt", "scope": "Existing-ID rejection preserves attempt/status; not concurrent occurrence coalescing"}
+  ],
+  "useful_task_comparison": {
+    "source": "Reviewer/gatherer frozen protocols' task inputs and upstream graders; exact task IDs pending common worker/output bindings",
+    "repetitions": 2,
+    "retry": 0,
+    "route": "Existing keyless OmniRoute, Sol6.1 requested ultra with separately qualified runtime/native/inference mapping",
+    "runtime_confound": "Dagu's native Codex subprocess and DeerFlow's native assistant are different end-to-end systems. Claim matched worker only after supported identical-worker binding; otherwise freeze the system-comparison scope explicitly.",
+    "effects": "Retain scheduled/admitted/dispatched/completed timestamps, native run IDs, terminal artifacts, duplicate/failure/cancellation observations, and each useful-task quality result",
+    "accounting": "Keep upstream fixture tests separate from GPT tasks; failed/interrupt/child-call usage and time remain once per attempt, unknown counters stay unknown"
+  },
+  "decision_rule": {
+    "quality": "Require every frozen useful-task and declared lifecycle gate; no per-task regression, plus a quality improvement or the predeclared efficiency tie rule",
+    "efficiency_tie": "At least5 percent lower paired median uncached-input-plus-output tokens, complete authoritative original gross-input/cache-read/output operands and no greater paired median agent time",
+    "fallback": "Keep the measured Dagu baseline; source fixtures on different semantics cannot produce a comparative scheduler win"
+  },
+  "required_before_freeze": [
+    "Pinned native binaries/environments and exact original test commands/fixtures; source control skips retained",
+    "Same-task native worker binding or explicit system-comparison scope, upstream quality grader and positive/negative controls",
+    "Exact schedule/timezone/barriers, task/config/extension/image hashes and observable dispatch bounds",
+    "First-party extension useful loading; scheduler enablement only inside owned disposable state",
+    "Duplicate/retry/cancellation semantics reconciled; no OS reboot/durable restore claim from fixture tests",
+    "Claude prefreeze read, consequential read, exclusive GPT-pool window and owned cleanup contract"
+  ],
+  "limits": "No source test, schedule, service, provider or model execution in this draft; requested source versions are distinct from installed Dagu2.16.6."
+}

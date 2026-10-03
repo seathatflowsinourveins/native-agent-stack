@@ -1,0 +1,473 @@
+{
+  "schema_version": 1,
+  "kind": "gptr-supplied-source-sdk-binding",
+  "class": "source_review",
+  "checked_at": "2026-10-03",
+  "scope": {
+    "job": "research-gatherer",
+    "repository": "assafelovic/gpt-researcher",
+    "tag": "v3.7.0",
+    "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+    "record_base": "7d4fc3142cd84a30fc02391ed861fd811a1672a9",
+    "native_sdk_canary_executed": false,
+    "provider_runs_in_this_task": 0,
+    "servers_started_in_this_task": 0,
+    "canary_input_urls_fetched_in_this_task": false,
+    "installed_configuration_or_authentication_stores_read": false,
+    "default_selected": false,
+    "quality_evaluated": false,
+    "own_sdk_role_acceptance": false,
+    "frozen_drb_ii_tasks_used": false
+  },
+  "native_api_recipe": {
+    "classification": "Supported SDK calls assembled from the upstream README and constructor; no source patch, driver, scorer or export adapter.",
+    "async_context_required": true,
+    "import": "from gpt_researcher import GPTResearcher",
+    "constructor_kwargs": {
+      "query": "<unbound-canary-question>",
+      "source_urls": "<three ordered nonempty pinned public URL strings>",
+      "complement_source_urls": false,
+      "report_type": "research_report",
+      "report_source": "web",
+      "report_format": "markdown",
+      "config_path": "<owned-existing-config.json>",
+      "mcp_configs": [],
+      "mcp_strategy": "disabled",
+      "verbose": false
+    },
+    "fresh_defaults": {
+      "document_urls": null,
+      "documents": null,
+      "vector_store": null,
+      "context": null,
+      "visited_urls": null,
+      "websocket": null
+    },
+    "calls_in_order": [
+      "researcher = GPTResearcher(**constructor_kwargs)",
+      "context = await researcher.conduct_research()",
+      "sources = researcher.get_research_sources()",
+      "attempted_urls = researcher.get_source_urls()",
+      "markdown = await researcher.write_report()"
+    ],
+    "config_json_candidate": {
+      "REPORT_SOURCE": "web",
+      "RETRIEVER": "duckduckgo",
+      "SCRAPER": "bs",
+      "CONTEXT_FILTER": "none",
+      "CURATE_SOURCES": false,
+      "MCP_SERVERS": [],
+      "MCP_STRATEGY": "disabled",
+      "IMAGE_GENERATION_ENABLED": false
+    },
+    "config_binding_limits": [
+      "Native Config reads the explicitly named JSON file and environment; environment values can override JSON values. A missing config path falls back to defaults.",
+      "These uppercase settings belong in configuration, not arbitrary SDK **kwargs. Extra kwargs are carried into LLM calls.",
+      "Model/route/effort/header and native retry bindings remain root-owned. No installed or active profile was inspected.",
+      "The intended requested model remains cx/gpt-6.1-sol-ultra for every relevant fast/smart/strategic LLM stage; this receipt does not establish an SDK request or delivered wire shape."
+    ],
+    "source_refs": [
+      "README.md:143-154",
+      "gpt_researcher/agent.py:53-83",
+      "gpt_researcher/agent.py:138-201",
+      "gpt_researcher/config/config.py:63-97",
+      "gpt_researcher/config/config.py:158-178",
+      "gpt_researcher/config/variables/default.py"
+    ]
+  },
+  "source_url_contract": {
+    "nonempty_false_complement": "Normal conductor chooses supplied URLs first and does not enter its ordinary web-search branch. It does not fall back to web search when this scrape yields empty research data.",
+    "nonempty_true_complement": "Additional native web search runs after supplied-source scraping.",
+    "empty_or_null_urls": "The supplied-source branch is false; ordinary report-source processing can perform web search or local/document processing.",
+    "not_an_allowlist": "The list fixes initial scrape inputs, not every HTTP destination or request. Redirects, native retries and scraper-specific re-fetches remain possible.",
+    "source_refs": [
+      "gpt_researcher/skills/researcher.py:145-209",
+      "gpt_researcher/skills/researcher.py:245-261"
+    ]
+  },
+  "workflow_and_context_boundary": {
+    "deep_workflow": "research_report does not instantiate or select the deep report workflow. This is GPTR SDK orchestration, not native Codex Ultra orchestration.",
+    "mcp": "Explicit mcp_strategy=disabled is accepted and takes precedence; mcp_configs=[] does not append MCP configurations. The candidate retriever configuration contains no MCP retriever.",
+    "embedding": "CONTEXT_FILTER=none formats supplied-page context directly; the embedding factory is lazy and is not called by that branch. No shared GPU or embedding API is selected.",
+    "images": "IMAGE_GENERATION_ENABLED=false avoids the optional generated-image workflow. Extracted image URL metadata is distinct from fetching or generating images.",
+    "inherited_state": "Constructor defaults create a fresh visited set/context when omitted. Explicit existing context, visited URLs, documents/vector stores, logging handlers, configuration or process environment can change the boundary.",
+    "file_reads": "The SDK imports code and reads its supplied JSON configuration/environment. Local/hybrid document-loader branches are bypassed by the selected nonempty-URL path; this is not a global filesystem-isolation claim.",
+    "source_refs": [
+      "gpt_researcher/agent.py:153-201",
+      "gpt_researcher/agent.py:235-281",
+      "gpt_researcher/agent.py:362-365",
+      "gpt_researcher/agent.py:398-404",
+      "gpt_researcher/skills/context_manager.py:38-64",
+      "gpt_researcher/context/select.py:63-77",
+      "gpt_researcher/skills/researcher.py:166-205"
+    ]
+  },
+  "observable_native_metadata": {
+    "get_research_sources": {
+      "source": "gpt_researcher/agent.py:684-698",
+      "meaning": "Native scraped-row collection populated by BrowserManager.",
+      "row_fields": [
+        "url",
+        "raw_content",
+        "title",
+        "image_urls"
+      ],
+      "filter": "Scraper.run removes non-dict rows and rows with raw_content=None. Nonempty content and actual source coverage still require observation.",
+      "capture_point": "After conduct_research and before report generation."
+    },
+    "get_source_urls": {
+      "source": "gpt_researcher/agent.py:745-751",
+      "meaning": "Visited/attempted URL set rendered as a list; ordering is not a frozen input order.",
+      "warning": "ResearchConductor adds a URL before scraping; this cannot prove successful loading."
+    },
+    "get_research_context": {
+      "source": "gpt_researcher/agent.py:753-759",
+      "meaning": "Accumulated native context, separately observable from the generated answer."
+    },
+    "report": {
+      "source": "gpt_researcher/agent.py:463-504",
+      "meaning": "Native write_report returns Markdown as a string through writer/generate_report; no export helper, UI or server is required by this API path.",
+      "limit": "Returned Markdown/citations are model output and do not replace scraped-source evidence. Native logging/process side effects are separate."
+    },
+    "get_costs_and_step_costs": {
+      "source": "gpt_researcher/agent.py:761-806",
+      "meaning": "Accumulated dollar estimates and step cost dictionaries.",
+      "limit": "These are not authoritative native/provider token usage, cache, failed-attempt, retry or complete gateway ledger counters."
+    },
+    "complete_sdk_provider_usage": null,
+    "complete_fetch_or_redirect_counters": null,
+    "native_call_or_result_observations": null
+  },
+  "fetch_and_authentication_limits": {
+    "gptr_scraper": "Scraper constructs requests.Session and sets a User-Agent; BeautifulSoup uses session.get(link, timeout=10) with up to two attempts. Native scraper selection can override bs for PDF/arXiv inputs and can re-fetch detected PDF content.",
+    "requests_dependency": {
+      "version": "2.34.2",
+      "upstream_commit": "6e83187b8feb273ed4c6cdab5efd8d54901dfab3",
+      "installed_sessions_bytes_equal_to_upstream": true,
+      "observation_scope": "Static installed package source and exact public upstream source, not any auth/config store or live fetch."
+    },
+    "requests_behavior": "Session.get enables redirects; Session.trust_env defaults true. Initial requests and redirected requests can use netrc lookup; proxy/environment behavior is inherited.",
+    "native_netrc_override": "Requests supports NETRC as an explicit lookup-path selector. When set it selects that path rather than home fallback. Binding to an owned nonsecret path remains a proposed caller control, not an executed qualification.",
+    "hard_fetch_scope_status": "No hard destination allowlist has been demonstrated for this SDK route. Selected text URLs avoid known PDF/arXiv selectors by construction, but redirects/DNS/destination/retry behavior remain unobserved.",
+    "source_refs": [
+      "gpt_researcher/scraper/scraper.py:114-158",
+      "gpt_researcher/scraper/scraper.py:307-340",
+      "gpt_researcher/scraper/beautiful_soup/beautiful_soup.py:58-70",
+      "requests/src/requests/sessions.py:330",
+      "requests/src/requests/sessions.py:492",
+      "requests/src/requests/sessions.py:537-538",
+      "requests/src/requests/sessions.py:655-670",
+      "requests/src/requests/utils.py:231-279"
+    ]
+  },
+  "proposed_canary_inputs": {
+    "status": "Metadata-only candidates; no fetch/model canary and no task freeze.",
+    "purpose": "Useful native Python SDK/source-ingestion smoke about runtime SDK interfaces; distinct from frozen DRB-II task questions and any gatherer quality comparison.",
+    "ordered_urls": [
+      {
+        "id": "gptr-sdk-readme",
+        "repository": "assafelovic/gpt-researcher",
+        "tag": "v3.7.0",
+        "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+        "path": "README.md",
+        "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/README.md",
+        "previously_source_verified_bytes": 19019,
+        "previously_source_verified_sha256": "a626a979f449e5fd0917b23209dbdbc1e7afbea5d2b38bacd4d86dee667929e7",
+        "fetched_in_this_task": false,
+        "root_read_path": "assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4:README.md"
+      },
+      {
+        "id": "agents-model-settings",
+        "repository": "openai/openai-agents-python",
+        "tag": "v0.23.1",
+        "commit": "c4a1d047b22488234b2ba81056e1b9b8db2127a5",
+        "path": "src/agents/model_settings.py",
+        "url": "https://raw.githubusercontent.com/openai/openai-agents-python/c4a1d047b22488234b2ba81056e1b9b8db2127a5/src/agents/model_settings.py",
+        "source_bytes": null,
+        "source_sha256": null,
+        "fetched_in_this_task": false,
+        "pin_and_path_basis": "Held runtime-jobs catalog layers.6.components.2; source bytes require original re-read.",
+        "root_read_path": "openai/openai-agents-python@c4a1d047b22488234b2ba81056e1b9b8db2127a5:src/agents/model_settings.py"
+      },
+      {
+        "id": "langgraph-library-readme",
+        "repository": "langchain-ai/langgraph",
+        "version": "1.2.12",
+        "commit": "49cce0ca852be4cfb567a1cbe0e511ff325a1682",
+        "path": "libs/langgraph/README.md",
+        "url": "https://raw.githubusercontent.com/langchain-ai/langgraph/49cce0ca852be4cfb567a1cbe0e511ff325a1682/libs/langgraph/README.md",
+        "source_bytes": null,
+        "source_sha256": null,
+        "fetched_in_this_task": false,
+        "pin_and_path_basis": "Held runtime-jobs catalog layers.6.components.3; source bytes require original re-read.",
+        "root_read_path": "langchain-ai/langgraph@49cce0ca852be4cfb567a1cbe0e511ff325a1682:libs/langgraph/README.md"
+      }
+    ],
+    "constraints": [
+      "Exactly three ordered, nonempty, literal HTTPS URLs at full commit pins before calling the SDK; do not substitute branch/tag URLs.",
+      "Text SDK/docs paths on raw.githubusercontent.com with no query/fragment and no PDF/arXiv URL selectors. Text scraping compatibility and redirects are not yet observed.",
+      "Question, full source bytes/hashes, response scope and native metadata retention must be bound before the canary; this list does not freeze a benchmark.",
+      "The none context filter is a supported no-embedding mode, not a token/source-size cap. No flat max-source clamp or custom truncation is qualified here."
+    ],
+    "question": null,
+    "ordered_input_contract_sha256": null
+  },
+  "gateway_owner_evidence": {
+    "evidence_class": "Owner-observed gateway request/wire probes, separate from unrun GPTR SDK.",
+    "destination_build_commit": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+    "comments": [
+      {
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966860846",
+        "body_sha256": "90d0d077024c41e7e848595cb3b38c90e56ab580dd9d732ff8e41a23c5ee0c22",
+        "body_bytes": 2984,
+        "original_public_body_independently_read": true
+      },
+      {
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966873323",
+        "body_sha256": "98e864c0fef71ce8e1455da81f1d9f0f3afa5ffdf0d6b2d491d168106ac88834",
+        "body_bytes": 3127,
+        "original_public_body_independently_read": true
+      }
+    ],
+    "observations": {
+      "requested_ultra_delivered_effort": "max",
+      "maximum_gateway_effort_observed": "max",
+      "provider_parallel_tool_calls_field": "absent in the owner-probed shapes, including tested tool-bearing requests; absence is not false and does not prove parallel execution",
+      "responses_correlation_header": "Owner observed random correlation UUIDs instead of the supplied header.",
+      "scope_requirement": "Responses acceptance/counter attribution requires the owner's exclusively reserved quiet 21128 time window, with no other traffic.",
+      "native_codex_responses_lite_shape": "Not exercised by the owner probes."
+    },
+    "own_sdk_wire_shape_observed": false,
+    "own_sdk_role_or_lifecycle_qualified": false,
+    "chat_parallel_equivalence_qualified": false,
+    "complete_own_sdk_usage": null,
+    "limit": "Do not transfer gateway probe acceptance to GPTR SDK delivery, native Codex orchestration, parallel behavior or quality. Prior 20128 effort-clamp findings remain separate."
+  },
+  "primary_sources": [
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "README.md",
+      "sha256": "a626a979f449e5fd0917b23209dbdbc1e7afbea5d2b38bacd4d86dee667929e7",
+      "lines": [
+        143,
+        154
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/README.md"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/agent.py",
+      "sha256": "49c7b6be798b628c32b4d59c3e36055c098910c6f79177ab280e45eea44f3492",
+      "lines": [
+        53,
+        83,
+        138,
+        201,
+        235,
+        281,
+        343,
+        504,
+        684,
+        775
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/agent.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/skills/researcher.py",
+      "sha256": "7b2558a28719e1d23e2d1d0bb66007cf735ff91017a615a245f44833bc809c6e",
+      "lines": [
+        145,
+        261,
+        813,
+        834
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/skills/researcher.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/config/config.py",
+      "sha256": "48ec5ed000d635f906735412f6fbc99e80be42661621d6f7efdd1876e22a9878",
+      "lines": [
+        35,
+        97,
+        148,
+        178
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/config.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/config/variables/default.py",
+      "sha256": "31ad2123102bba1d82af3369664d867839a420b894b32bf538a1ddf875950ee0",
+      "lines": [
+        1,
+        58
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/variables/default.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/scraper/scraper.py",
+      "sha256": "225cb5a6387facc05ba9f488ffe68b67a4e01783c723c7d0e8dd02006dea03d4",
+      "lines": [
+        114,
+        158,
+        207,
+        307,
+        340
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/scraper/scraper.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/scraper/beautiful_soup/beautiful_soup.py",
+      "sha256": "c2561f9c1410c146090898afffff3771711d9e8c5dcbd438790ae2ea35bc282a",
+      "lines": [
+        28,
+        70
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/scraper/beautiful_soup/beautiful_soup.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/skills/context_manager.py",
+      "sha256": "8403bab89ab159af94622cd04d181b43036920a53cdaf30b003ef21ca5bd22ba",
+      "lines": [
+        38,
+        64
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/skills/context_manager.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/context/select.py",
+      "sha256": "4b19c2abecbc5da096aa2eb9bd23fb7e572f65f68b82432c6558efa16e1b0abc",
+      "lines": [
+        63,
+        77
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/context/select.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/skills/writer.py",
+      "sha256": "f7571673ba13cba29dbb6bc22675012b6afbe288cda067dc611772e2e42f9152",
+      "lines": [
+        49,
+        134
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/skills/writer.py"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "tag": "v3.7.0",
+      "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/actions/report_generation.py",
+      "sha256": "2012eea9cae179b9336ce68e95ae936a745995fda1ae06d33d5eae9621aef79b",
+      "lines": [
+        209,
+        326
+      ],
+      "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/actions/report_generation.py"
+    },
+    {
+      "repository": "psf/requests",
+      "tag": "v2.34.2",
+      "commit": "6e83187b8feb273ed4c6cdab5efd8d54901dfab3",
+      "path": "src/requests/sessions.py",
+      "sha256": "96fbb30bbbf06a59a5268d13b57885149756aa3f31695b5c15e41dd7bb2f67a6",
+      "url": "https://github.com/psf/requests/blob/6e83187b8feb273ed4c6cdab5efd8d54901dfab3/src/requests/sessions.py"
+    },
+    {
+      "repository": "psf/requests",
+      "tag": "v2.34.2",
+      "commit": "6e83187b8feb273ed4c6cdab5efd8d54901dfab3",
+      "path": "src/requests/utils.py",
+      "sha256": "657fd02343b2586bbd138a4ec0f03ceeb7610c2712f96ac54f28a708bf7d079c",
+      "url": "https://github.com/psf/requests/blob/6e83187b8feb273ed4c6cdab5efd8d54901dfab3/src/requests/utils.py"
+    }
+  ],
+  "root_source_read_paths": {
+    "gptr_originals": [
+      "README.md",
+      "gpt_researcher/agent.py",
+      "gpt_researcher/skills/researcher.py",
+      "gpt_researcher/config/config.py",
+      "gpt_researcher/config/variables/default.py",
+      "gpt_researcher/scraper/scraper.py",
+      "gpt_researcher/scraper/beautiful_soup/beautiful_soup.py",
+      "gpt_researcher/context/select.py",
+      "gpt_researcher/skills/context_manager.py",
+      "gpt_researcher/skills/writer.py",
+      "gpt_researcher/actions/report_generation.py"
+    ],
+    "native_original_blob_recipe": "rtk proxy git -C <owned-gptr-source> show 0957c301ed06c2a5857b834358c7227c739041d4:<named-path>",
+    "catalog": {
+      "path": "catalogs/foundation/runtime-jobs.json",
+      "commit": "7d4fc3142cd84a30fc02391ed861fd811a1672a9",
+      "sha256": "ed76b04e0d1c6e4da3ff2249499605bdee2ca279ea77418f7666bf1fdd7986a0",
+      "scope": "Only matching held SDK metadata rows consumed; catalog inclusion is not acceptance."
+    }
+  },
+  "source_intake_corrections": [
+    {
+      "failed_path": "blueprints/runtime-workers/comparisons/multi-worker-orchestration-draft.json",
+      "native_git_show_exit": 128,
+      "resolved_path": "blueprints/runtime-workers/comparisons/multi-worker-draft.json"
+    },
+    "Initial catalog selector expected slug-valued repositories; the original uses full HTTPS repository URLs. Corrected selection recovered the held pins.",
+    "Earlier compact source extraction guards stopped outputs of 7442, 7694 and 5538 bytes before emission; focused original reads followed."
+  ],
+  "remaining_gates": [
+    "Bind canary question, full ordered source bytes/hashes and supported scraper/text compatibility.",
+    "Bind an owned existing configuration, cleared environment, native NETRC lookup isolation and filesystem/process state without reading/copying host credentials.",
+    "Observe actual fetch destinations/redirects/retries and at least the independently retained native scraped-source metadata; attempted URLs alone do not pass source loading.",
+    "Bind every native LLM stage to the intended requested model and prove the actual SDK wire fields/retry behavior in a reserved quiet owner window.",
+    "Retain Markdown/source artifacts and one authoritative complete counter aggregate; unknown SDK usage stays null.",
+    "This canary is preparation only. No scorer, DRB-II controls, comparative quality/default or full lifecycle acceptance is frozen here."
+  ],
+  "publication_validation": {
+    "command": "rtk python3 scripts/validate.py",
+    "native_exit_code": 1,
+    "registry_changed": false,
+    "observed_failures": [
+      ".github/workflows/runtime-worker-skills-freshness.yml: SHA-256 mismatch",
+      ".github/workflows/runtime-worker-skills-freshness.yml: byte count mismatch",
+      "blueprints/runtime-workers/comparisons/coding-worker-draft.json: SHA-256 mismatch",
+      "blueprints/runtime-workers/comparisons/coding-worker-draft.json: byte count mismatch",
+      "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-protocol-review-repair.json: evidence file is not hash-listed",
+      "evidence/artifacts/runtime-jobs-source-intake-20261003/deerflow-native-readiness.json: evidence file is not hash-listed",
+      "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-supplied-source-sdk-binding.json: evidence file is not hash-listed",
+      "evidence/artifacts/runtime-jobs-source-intake-20261003/keyless-search-readiness.json: evidence file is not hash-listed"
+    ],
+    "base_snapshot_failure_count": 7,
+    "owned_unregistered_receipt_failure_count": 1,
+    "limit": "The private worktree has only this new receipt beyond its exact base. Shared registry/base fixes and receipt registration belong to the coordinator."
+  },
+  "evidence_policy": "docs/acceptance-evidence-policy.md",
+  "limits": [
+    "Primary source review is distinct from installed execution, owner gateway evidence, useful role qualification and quality evaluation.",
+    "No provider/server/install/container operation or canary source fetch occurred in this task. No raw model conversation, active client configuration, authentication value or private host path is included."
+  ]
+}

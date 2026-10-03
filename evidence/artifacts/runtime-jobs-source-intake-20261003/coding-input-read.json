@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "class": "source_and_registry_input_preparation",
+  "date": "2026-10-03",
+  "input_protocol_head": "66d784cfb87405e20765ab176cbf24c01ec32e14",
+  "source": {
+    "repository": "https://github.com/laude-institute/harbor-datasets",
+    "pin": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+    "path": "datasets/swebench-verified",
+    "pool_tree_oid": "a7a1bf388872b81824b35554c27b5e8a1fc273e9",
+    "pool_entries": 500,
+    "selected_tasks": 24,
+    "source_map": "../../../blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
+    "root_original_verification": "The narrow pool API returned untruncated500 entries. Root fetched all24 original environment/Dockerfile files and compared saved task-tree OIDs, byte counts, SHA256 and exact FROM references; zero mismatches.",
+    "native_pool_api_exit": 0,
+    "source_digest_references": 0
+  },
+  "registry_observation": {
+    "native_command": ["rtk", "docker", "buildx", "imagetools", "inspect", "<from_reference>", "--format", "{{json .Manifest}}"],
+    "native_client_version": "v0.37.1",
+    "native_client_pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+    "version_and_help_exits": [0, 0],
+    "upstream_release_read_exit": 0,
+    "source_file": "https://github.com/docker/buildx/blob/0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a/docs/reference/buildx_imagetools_inspect.md",
+    "source_bytes": 22126,
+    "source_sha256": "e6e5c6f92a4c18c7a39347a17780d99e73357807e78e1a0e77368950ae6d893b",
+    "native_stdout_record": "coding-image-manifests.json",
+    "unique_source_tags": 24,
+    "observed_image_indexes": 24,
+    "observed_linux_amd64_manifests": 24,
+    "native_capture_exits": "All24 returned0; exact stdout retained.",
+    "preliminary_metadata_commands": 25,
+    "preliminary_metadata_exits": "All0; one shape probe plus24 derived-identity observations preceded native stdout custody capture.",
+    "latest_clock_upper_bound_utc": "2026-10-03T05:17:03Z",
+    "clock_scope": "Collection completed before this parent clock read; this is not an original per-command start/end timestamp."
+  },
+  "preserved_source_failure": {
+    "native_command": ["rtk", "gh", "api", "repos/laude-institute/harbor-datasets/git/trees/45dbef49427dfa221d942a390b32d6b302ebc843"],
+    "exit": 1,
+    "stderr": "error connecting to api.github.com\ncheck your internet connection or https://githubstatus.com\n",
+    "recovered_source_batch_exit": 0,
+    "scope": "Worker source-read failure, separate from model trials or verifier failures."
+  },
+  "limits": [
+    "No image was pulled or built; no worker, model or evaluator task was executed.",
+    "Registry manifest identities resolve a preparation gap only; source Dockerfiles still reference mutable latest tags.",
+    "Native unchanged-task digest enforcement, future built-image IDs and actual execution-platform identity remain unqualified.",
+    "The coding protocol remains ineligible for freeze pending runtime/extension/oracle/counter controls, Claude read and allocated window."
+  ]
+}

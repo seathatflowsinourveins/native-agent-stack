@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "native-controller-metadata-failure",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "FAILED: stock REPL breakpoint response formatting reached Node global crypto getter ERR_INVALID_THIS; SDK positions and positive roles HOLD",
+  "preregistration": {
+    "original_public_sha256": "e2885ebcc270cbb1a4977d8c1521ad33348d578a1eeaab2dc294f616afa8f13e",
+    "tty_amendment": "codex-sdk-position-tty-carrier-amendment.json",
+    "private_recipe_bytes": 33522,
+    "private_recipe_sha256": "ce07b316b304dd4964505b1e5db197fd8d8ca1e0da70b3a055c79a7d19a6833f",
+    "source_review": "Astra/max accepted exactly one native TTY retry at the frozen private recipe; compact inline-team judgment is not original provider transport/usage"
+  },
+  "prior_failure_retained": "codex-sdk-position-pilot-transport-failure.json",
+  "native_execution": {
+    "launch_chunk": "cc2170",
+    "initial_return": "running",
+    "tool_session_id": 20018,
+    "constants_input_chunk": "cd41de",
+    "breakpoint_input_chunk": "ed58e6",
+    "controller_inputs_transmitted": 2,
+    "successful_bounded_breakpoint_metadata_records": 0,
+    "target_phase": "Initial Jest entry pause; no cont/adapter pause reached",
+    "error_type": "TypeError",
+    "error_code": "ERR_INVALID_THIS",
+    "error_message": "Value of \"this\" must be of type nullish or must be the global object",
+    "error_frames": [
+      "Object.cryptoThisCheck (node:internal/bootstrap/web/exposed-window-or-worker:114:15)",
+      "get crypto (node:internal/util:640:9)"
+    ],
+    "stop_inputs": [
+      "kill",
+      ".exit"
+    ],
+    "kill_chunk": "b2dd7d",
+    "completion_chunk": "f646c9",
+    "completion_exit_code": 0,
+    "completion_observed_utc": "2026-10-03T14:54:10Z",
+    "nominal_TERM_seconds": 180,
+    "nominal_KILL_grace_seconds": 10,
+    "actual_wall_seconds": null,
+    "bwrap_terminal_command_exit": [
+      0
+    ],
+    "jest_final_json_observed": false,
+    "jest_exit": null,
+    "actual_sdk_script_ids": null,
+    "actual_pausable_positions": null
+  },
+  "scope": {
+    "original_fixture_timeout_ms": 5000,
+    "test_name_pattern": "(?!)",
+    "positive_fixture_callbacks": 0,
+    "provider_turns": "not exercised",
+    "imports": "Controller module imports execute initialization; no positive SDK fixture ran",
+    "intentional_REPL_exit0_is_Jest_completion": false,
+    "no_adaptive_retry": true
+  },
+  "independent_cleanup": {
+    "before_native_exit": 0,
+    "before_chunk": "cbbf0c",
+    "before_phase": "Initial pause after metadata exception; not adapter-phase gate",
+    "before": {
+      "stdout_bytes": 7011,
+      "stdout_sha256": "32a4075fb7e7e27185034f7c8084cedde096658cf1a29717ab0e460976b3083e",
+      "rows": 369,
+      "complete_decimal_fields": true,
+      "owned_pair_count": 1,
+      "owned_namespace_count": 3,
+      "stderr_bytes": 0
+    },
+    "after_native_exit": 0,
+    "after_chunk": "dbcf1f",
+    "after": {
+      "stdout_bytes": 6859,
+      "stdout_sha256": "6954ef88a534c942a4d805cf11dff60a9859484491652913c27e65985f6d3343",
+      "rows": 361,
+      "complete_decimal_fields": true,
+      "owned_pair_count": 0,
+      "owned_namespace_count": 0,
+      "stderr_bytes": 0
+    },
+    "visible_owned_namespace_endpoint": true,
+    "limits": "Visible identity-bound process endpoint only; command/controller0 is distinct from unobserved Jest completion"
+  },
+  "retained_native_outputs": {
+    "repl-native.stdout.txt": {
+      "bytes": 861,
+      "sha256": "f73b881ca28d930fff7fea89860bbc56710052fcaae69959a9838e2c6360479d"
+    },
+    "repl-native.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bwrap-native-status.jsonl": {
+      "bytes": 221,
+      "sha256": "6621fc8e4fb5ec371a37b2416141e3e6804d96ef87d34a20e2688454f5a41d70"
+    }
+  },
+  "original_custody": "Unmodified native files remain in task-owned private TTY attempt directory; receipt publishes sanitized original byte/hash bindings",
+  "cause_status": "Astra and root pinned-source reads confirm the copied host-global crypto descriptor has no setter and rejects the controller receiver. The fulfilled protocol request failed during metadata emission. Minimal binding correction is prospectively frozen separately; no third attempt admitted by this failure receipt.",
+  "primary_sources": [
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "files": [
+        "lib/internal/debugger/inspect_repl.js",
+        "lib/repl.js",
+        "lib/internal/bootstrap/web/exposed-window-or-worker.js",
+        "lib/internal/util.js"
+      ]
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "file": "bubblewrap.c"
+    },
+    {
+      "repository": "procps-ng/procps",
+      "pin": "4ddcef2fd843170c8e2d59a83042978f41037a2b",
+      "file": "src/ps/output.c"
+    }
+  ],
+  "quality_result": null,
+  "provider_usage": null,
+  "token_savings": null
+}

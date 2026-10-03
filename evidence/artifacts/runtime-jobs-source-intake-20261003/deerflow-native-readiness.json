@@ -1,0 +1,471 @@
+{
+  "schema_version": 1,
+  "kind": "native_runtime_readiness_attempts",
+  "class": "foundation-readiness-incomplete",
+  "scope": {
+    "job": "research-gatherer",
+    "runtime": "DeerFlow",
+    "upstream_version": "2.1.0",
+    "upstream_repository": "bytedance/deer-flow",
+    "upstream_commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+    "record_base": "b095cd2e11e7387e1bcfa107558743429714d8b9",
+    "quality_evaluated": false,
+    "default_selected": false,
+    "unchanged_upstream_cli": true,
+    "upstream_test_suite_run": false,
+    "local_preflight_and_decoder_are_upstream_tests": false
+  },
+  "upstream_sources": [
+    {
+      "path": "Makefile",
+      "sha256": "7f88e63a52e5f42a3df2367e6d31da616045e4dace1f429c770b37884810202b",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/Makefile"
+    },
+    {
+      "path": "backend/uv.lock",
+      "sha256": "3cc643cd34374384c62de7fd8cef49cc4608df01ea11eff85daeea51f5cf0d5f",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/uv.lock"
+    },
+    {
+      "path": "backend/packages/harness/deerflow/tui/cli.py",
+      "sha256": "44d6bda79d4111f8f3a0fa0a5212ec0bb744effee1703e17fdf7c5571307acc9",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/tui/cli.py"
+    },
+    {
+      "path": "backend/packages/harness/deerflow/client.py",
+      "sha256": "b711d819593265cd8eed98d9b0784626e38b62a100fa8dd0120dd78e2a11f7ef",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/client.py"
+    },
+    {
+      "path": "backend/packages/harness/deerflow/models/factory.py",
+      "sha256": "1ccd4b57c6f54a90667cf8af5ec92f4b2629915f4ef1c403e8525893e0d13840",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/models/factory.py"
+    },
+    {
+      "path": "backend/packages/harness/deerflow/tools/tools.py",
+      "sha256": "aa3a8653c4476aef2e98e7486bc8f2a8d87c49e239d3915a82d99625e5f69e3d",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/tools/tools.py"
+    },
+    {
+      "path": "backend/packages/harness/deerflow/authz/tool_filter.py",
+      "sha256": "e0529947d6a2a2b9ba95bde2f57b3c3d2ad41e598e7e313e4db66fdada17c183",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/authz/tool_filter.py"
+    },
+    {
+      "path": "backend/packages/harness/deerflow/authz/rbac.py",
+      "sha256": "401836f6d3b6f4c5c9603b960409b9562c3aafdd1c906b0b44edaaa4f383614a",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/authz/rbac.py"
+    },
+    {
+      "path": "config.example.yaml",
+      "sha256": "14a630a2e1d8eb8872a47f3eac9dcc01795820c37c4052583ddbdcac42a5a5f1",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/config.example.yaml"
+    },
+    {
+      "path": "backend/packages/harness/deerflow/sandbox/tools.py",
+      "sha256": "0eb1869fd0fd631c1797e59b483202e6ee97217cd49d83ef89b650c1d59ffbd4",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/sandbox/tools.py"
+    },
+    {
+      "path": "backend/packages/harness/deerflow/tools/builtins/review_skill_package_tool.py",
+      "sha256": "2ebc8914fee175b905c2768e8bb94e7ea6409088b5dc9d547d9d180a8ea7e806",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/tools/builtins/review_skill_package_tool.py"
+    }
+  ],
+  "installation": {
+    "command": "uv sync --frozen",
+    "native_exit_code": 0,
+    "package_count": 227,
+    "observation_source": "coordinator supplied native execution result",
+    "raw_installation_stdout_custody": false,
+    "limit": "No complete installation stdout artifact was retained. The upstream Makefile install recipe uses uv sync --locked; this execution used the native frozen-lock option.",
+    "source_paths": [
+      "Makefile",
+      "backend/uv.lock"
+    ]
+  },
+  "dependency_check": {
+    "command": "rtk env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 PYTHON_DOTENV_DISABLED=1 <installed-uv> --no-config --no-cache pip check --python <owned-deerflow-venv>/bin/python",
+    "native_exit_code": 1,
+    "independently_rerun": true,
+    "installation_changed": false,
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    "stderr": {
+      "bytes": 136,
+      "sha256": "95cd3362dcbaaa12af71990f2abc42fc14ebcf5c76cb1f400eb5972527cdab0d",
+      "text": "Checked 227 packages in 68ms\nFound 1 incompatibility\nThe package `langgraph-sdk` requires `websockets>=14,<16`, but `16.0` is installed\n"
+    },
+    "source_head_exit_code": 0,
+    "source_head": "345f08be00c8a9495079b732a39b46aa9af1584e",
+    "uv_lock_sha256": "3cc643cd34374384c62de7fd8cef49cc4608df01ea11eff85daeea51f5cf0d5f"
+  },
+  "preflights": [
+    {
+      "id": "preflight-1",
+      "native_exit_code": 1,
+      "classification": "local integration preflight using upstream constructors",
+      "observation_source": "coordinator supplied actual returned object and native exit; not rerun by receipt worker",
+      "returned_objects": [
+        {
+          "config_valid": true,
+          "model": "cx/gpt-6.1-sol-ultra",
+          "reasoning_effort": "ultra",
+          "use_responses_api": true,
+          "parallel_requested": true,
+          "sdk_retries": 0,
+          "authorization_enabled": true,
+          "fail_closed": true,
+          "default_role": "guest",
+          "configured_tools": [
+            "web_search",
+            "web_fetch"
+          ],
+          "skills_deferred": false,
+          "memory_enabled": false,
+          "scheduler_enabled": false,
+          "checkpointer": "memory",
+          "mcp_servers": 0
+        }
+      ],
+      "failure": {
+        "class": "AttributeError",
+        "message": "'Completions' object has no attribute 'close'",
+        "stage": "local cleanup after the configuration object was returned"
+      },
+      "command_body_sha256": null
+    },
+    {
+      "id": "preflight-2",
+      "native_exit_code": 0,
+      "classification": "local integration preflight using upstream constructors",
+      "observation_source": "coordinator supplied actual returned objects and native exit; not rerun by receipt worker",
+      "returned_objects": [
+        {
+          "config_valid": true,
+          "model": "cx/gpt-6.1-sol-ultra",
+          "reasoning_effort": "ultra",
+          "use_responses_api": true,
+          "parallel_requested": true,
+          "sdk_retries": 0,
+          "authorization_enabled": true,
+          "fail_closed": true,
+          "default_role": "guest",
+          "configured_tools": [
+            "web_search",
+            "web_fetch"
+          ],
+          "skills_deferred": false,
+          "memory_enabled": false,
+          "scheduler_enabled": false,
+          "checkpointer": "memory",
+          "mcp_servers": 0
+        },
+        {
+          "candidate_tool_names": [
+            "web_search",
+            "web_fetch",
+            "present_files",
+            "ask_clarification",
+            "review_skill_package"
+          ],
+          "authorized_tool_names": [
+            "web_search",
+            "web_fetch"
+          ]
+        }
+      ],
+      "assertion": {
+        "subject": "authorized tool names",
+        "expected": [
+          "web_search",
+          "web_fetch"
+        ],
+        "reported_passed": true
+      },
+      "command_body_sha256": null
+    }
+  ],
+  "preflight_process_boundary": {
+    "native_namespace_flags": [
+      "unshare",
+      "--user",
+      "--map-root-user",
+      "--net"
+    ],
+    "cleared_environment": true,
+    "dotenv_disabled": true,
+    "usersite_disabled": true,
+    "bytecode_disabled": true,
+    "owned_path_variables": [
+      "DEER_FLOW_PROJECT_ROOT",
+      "DEER_FLOW_HOME",
+      "DEER_FLOW_HOST_BASE_DIR",
+      "DEER_FLOW_CONFIG_PATH",
+      "DEER_FLOW_EXTENSIONS_CONFIG_PATH",
+      "DEER_FLOW_SKILLS_PATH"
+    ],
+    "system_HOME_overridden": false,
+    "observation_source": "coordinator native invocation description; exact stdin script was not retained"
+  },
+  "profiles": {
+    "attempt_1": {
+      "sha256": null,
+      "bytes": null,
+      "custody": "original bytes replaced before this independent read; no retained original hash"
+    },
+    "attempt_2": {
+      "sha256": "8f665a73c9a7d207da49b057fa22469436b991c3602d6af5d3865cddf117f1d4",
+      "bytes": 1908,
+      "custody": "current owned config bytes independently hashed; coordinator associates this profile with attempt 2"
+    },
+    "extensions": {
+      "sha256": "18d47d1e7d12ed85225ae4e1744ea7541646d574e1ea879193eaed16ec39f94c",
+      "bytes": 52
+    }
+  },
+  "attempts": [
+    {
+      "id": "attempt-1",
+      "native_exit_code": 0,
+      "exit_observation_source": "coordinator native execution result",
+      "requested_output_flags": [
+        "--print",
+        "--json"
+      ],
+      "effective_native_mode": "print",
+      "requested_recursion_limit": null,
+      "exact_argv_custody": false,
+      "input_question_sha256": null,
+      "profile_sha256": null,
+      "stdout": {
+        "private_locator": "<owned-deerflow-readiness>/native-cli.ndjson",
+        "bytes": 1522,
+        "sha256": "1be57469e9917eaab85eb2ecd44eeccb96a1b8f639860de7886033f791c11478",
+        "raw_custody": "retained privately; no conversation copied into this receipt"
+      },
+      "stderr": {
+        "private_locator": "<owned-deerflow-readiness>/native-cli.stderr",
+        "bytes": 80,
+        "sha256": "774d3735768d1ea183486fd5ac936850eb0378b55ffa71ccf385d2b2a308549f",
+        "raw_custody": "retained privately; no conversation copied into this receipt"
+      },
+      "independent_decoder": {
+        "format": "plain model answer despite .ndjson filename",
+        "valid_json_records": 0,
+        "nonempty_nonjson_lines": 14,
+        "observed_tool_calls": null,
+        "observed_tool_results": null,
+        "observed_search_source_urls": null,
+        "model_answer_url_literal_count": 3,
+        "answer_link_retrieval_provenance": null
+      },
+      "coordinator_reported": {
+        "search_calls": 2,
+        "empty_search_results": 2,
+        "discovered_sources": 0,
+        "answer_explicitly_source_discovery_incomplete": true,
+        "limit": "No tool trace in the retained print output independently verifies these reported search counts."
+      },
+      "native_message_usage": null,
+      "complete_attempt_provider_usage": null,
+      "gateway_retry_usage": null,
+      "elapsed_seconds": null,
+      "outcome": "source-discovery-incomplete; required JSON observation missing; quality unmeasured"
+    },
+    {
+      "id": "attempt-2",
+      "native_exit_code": 1,
+      "exit_observation_source": "coordinator native execution result; retained stderr independently verifies the error class and limit",
+      "requested_output_flags": [
+        "--json"
+      ],
+      "effective_native_mode": "json",
+      "error_reported_recursion_limit": 8,
+      "exact_argv_custody": false,
+      "input_question_sha256": "44295712ff6919f3303147b78dbd680fe4efc4fec45b5e285688323fcf6f9f0a",
+      "profile_sha256": "8f665a73c9a7d207da49b057fa22469436b991c3602d6af5d3865cddf117f1d4",
+      "stdout": {
+        "private_locator": "<owned-deerflow-readiness>/native-cli-2.ndjson",
+        "bytes": 7298,
+        "sha256": "2b4112559313a8393f125b5cbe5baea71addc116d7c8eb0c2af9946d57b70627",
+        "raw_custody": "retained privately; no conversation copied into this receipt"
+      },
+      "stderr": {
+        "private_locator": "<owned-deerflow-readiness>/native-cli-2.stderr",
+        "bytes": 1983,
+        "sha256": "fc0cd28ee16b1997e8c9df172f7fe0c42bd633e94362d95be62ecf337ed7f7a1",
+        "raw_custody": "retained privately; no conversation copied into this receipt"
+      },
+      "independent_decoder": {
+        "valid_json_records": 6,
+        "nonempty_nonjson_lines": 0,
+        "event_types": {
+          "values": 5,
+          "messages-tuple": 1
+        },
+        "unique_requested_tool_calls": 1,
+        "tool_calls_by_name": {
+          "web_search": 1
+        },
+        "unique_tool_call_ids_sha256": [
+          "ae206c15783f09252dbe61f461fe29619593c8cf103cb21bcdf594a1390b8189"
+        ],
+        "emitted_tool_result_messages": 0,
+        "returned_source_urls_from_tool_results": [],
+        "returned_source_url_count": 0,
+        "tool_execution_established": false
+      },
+      "native_message_usage": {
+        "scope": "one returned AI message in the last emitted values snapshot; not complete attempt usage",
+        "unique_response_count": 1,
+        "message_id_sha256": "a2cfac8a927cf4d6283c11771ca632f345c0221e5a0455b93090f83ae76570ef",
+        "input_tokens": 3119,
+        "output_tokens": 248,
+        "total_tokens": 3367,
+        "input_token_details": {
+          "cache_read": 0
+        },
+        "output_token_details": {
+          "reasoning": 213
+        },
+        "detail_counting": "cache_read is an input subset; reasoning is an output subset; neither is added again"
+      },
+      "failure": {
+        "class": "GraphRecursionError",
+        "recursion_limit": 8
+      },
+      "complete_attempt_provider_usage": null,
+      "gateway_retry_usage": null,
+      "elapsed_seconds": null,
+      "outcome": "graph budget exhausted after a requested search; no emitted result or completed report; quality unmeasured"
+    }
+  ],
+  "counter_and_retry_boundary": {
+    "sdk_retries_configured": 0,
+    "sdk_configuration_observation": "coordinator preflight returned sdk_retries:0",
+    "gateway_retries_observed": null,
+    "gateway_account_rotation_observed": null,
+    "failed_or_retried_provider_usage": null,
+    "authoritative_complete_attempt_counter": null,
+    "wire_model_effort_and_parallel_fields": null,
+    "no_cache_delivery_qualified": null,
+    "limit": "A native returned AI usage record does not establish complete gateway/retry/attempt accounting or wire delivery. Missing values remain null."
+  },
+  "corrections": [
+    {
+      "subject": "CLI output selection",
+      "correction": "The stock plan checks --print before --json. Supplying both selected print; the filename suffix did not make the output NDJSON.",
+      "primary_source": "backend/packages/harness/deerflow/tui/cli.py:121"
+    },
+    {
+      "subject": "preflight cleanup",
+      "correction": "Close model.root_client and model.root_async_client; model.client and model.async_client are completion resources, not the root clients.",
+      "verification": "coordinator preflight 1 failed with AttributeError; corrected preflight 2 returned exit 0",
+      "primary_source": "langchain-openai 1.2.1 sdist:langchain_openai/chat_models/base.py:1235"
+    },
+    {
+      "subject": "tool discovery and authorization",
+      "correction": "The native API is get_available_tools. Configured tool omission alone leaves builtin tools. Stock apply_tool_authorization filters configured/builtin/late tools; returned preflight names establish the exact two allowed tools.",
+      "primary_sources": [
+        "backend/packages/harness/deerflow/tools/tools.py:73",
+        "backend/packages/harness/deerflow/client.py:405",
+        "backend/packages/harness/deerflow/authz/tool_filter.py:22"
+      ]
+    },
+    {
+      "subject": "filesystem lead",
+      "correction": "The raw LocalSandbox path mapper alone did not establish file-tool access. Native tool path validation and the stock RBAC filter must be considered together; the web-only profile removes review_skill_package as well.",
+      "status": "source-read qualification; no global filesystem acceptance claimed",
+      "primary_sources": [
+        "backend/packages/harness/deerflow/sandbox/tools.py:904",
+        "backend/packages/harness/deerflow/tools/builtins/review_skill_package_tool.py:118",
+        "backend/packages/harness/deerflow/authz/tool_filter.py:22"
+      ]
+    },
+    {
+      "subject": "attempt 1 source count",
+      "correction": "Three URL literals are visible in the plain answer. Their retrieval provenance is unavailable; reported zero discovered sources and independently decoded answer links are separate."
+    }
+  ],
+  "processing_boundary": {
+    "raw_conversations_processed_outside_model_context": true,
+    "raw_conversations_published": false,
+    "decoder_scope": "JSON framing, type/key metadata, distinct tool/message IDs, structured tool-result URLs and native usage fields only",
+    "private_profile_values_not_published": true,
+    "no_new_provider_runs_by_receipt_worker": true
+  },
+  "remaining_gates": [
+    "Resolve or explicitly qualify the installed dependency incompatibility from maintained upstream sources.",
+    "Retain a complete supported invocation/profile/counter contract before any quality comparison.",
+    "Complete an actual useful report with discovered source evidence and authoritative complete attempt accounting.",
+    "Run the frozen upstream evaluator/control contract before selecting a gatherer default."
+  ],
+  "recording_corrections": {
+    "missing_source_paths": [
+      {
+        "path": "deerflow/config/authz_config.py",
+        "git_show_exit": 128,
+        "resolved_path": "deerflow/config/authorization_config.py"
+      },
+      {
+        "path": "deerflow/config/tool_group_config.py",
+        "git_show_exit": 128,
+        "resolved_path": "deerflow/config/tool_config.py"
+      },
+      {
+        "path": "backend/packages/harness/deerflow/tools/builtins/review_skill_package.py",
+        "git_show_exit": 128,
+        "resolved_path": "backend/packages/harness/deerflow/tools/builtins/review_skill_package_tool.py"
+      }
+    ],
+    "local_processing_failures": [
+      "AST lookup for a nonexistent Jina __init__ stopped with StopIteration; native crawl source was then read.",
+      "AST body extraction for DDGS's doc-only CLI group stopped with IndexError; source selector was corrected.",
+      "Compact-output byte guards stopped oversized extractions before emitting source bytes.",
+      "An initial worktree inventory exceeded the output budget; subsequent inventory processing used compact ctx_execute.",
+      "apply_patch rejected delete/add operations for the same owned receipt path; the authorized JSON receipt was subsequently replaced within the private worktree.",
+      "A receipt refresh and validator were initially dispatched together; final verification was repeated sequentially after all receipt writes."
+    ]
+  },
+  "evidence_policy": "docs/acceptance-evidence-policy.md",
+  "limits": [
+    "Historical native readiness observations, local constructor checks and an independent metadata decoder are distinct evidence levels.",
+    "No unchanged upstream test suite, report-quality evaluator, common-task comparison, complete lifecycle qualification or default selection is claimed.",
+    "The Sol Ultra alias describes the gateway request; native Codex Ultra orchestration is not asserted.",
+    "Coordinator preflight outputs and install/CLI exits are supplied execution observations, not independently rerun model acceptance."
+  ],
+  "dependency_sources": [
+    {
+      "package": "langchain-openai",
+      "version": "1.2.1",
+      "sdist_url": "https://files.pythonhosted.org/packages/9a/0e/d8e16c28aa67106d285e63b8ffc04c5af68341e345ce24a0751dbf2e167e/langchain_openai-1.2.1.tar.gz",
+      "sdist_sha256": "ee4480b787706361b7125fad46930589a624df87aa158c6986ef1fad10d10675",
+      "inner_path": "langchain_openai/chat_models/base.py",
+      "inner_sha256": "ab8a9290d61e570a299e18e731f554c61322daa69e82f7f3071754836d62f960",
+      "installed_inner_bytes_equal": true,
+      "source_lines": [
+        594,
+        596,
+        1235,
+        1236,
+        1253,
+        1257
+      ],
+      "claim": "root_client/root_async_client own the OpenAI SDK clients; client/async_client refer to chat.completions resources."
+    }
+  ],
+  "publication_validation": {
+    "command": "rtk python3 scripts/validate.py",
+    "native_exit_code": 1,
+    "observed_failures": [
+      "evidence/artifacts/runtime-jobs-source-intake-20261003/deerflow-native-readiness.json: evidence file is not hash-listed",
+      "evidence/artifacts/runtime-jobs-source-intake-20261003/keyless-search-readiness.json: evidence file is not hash-listed"
+    ],
+    "registry_changed": false,
+    "limit": "This worker owns only these two receipts. Registration and repository acceptance remain integration work for the coordinator."
+  }
+}
