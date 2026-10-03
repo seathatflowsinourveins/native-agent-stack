@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Source-backed finite native hook metadata qualification supporting cumulative token/context R&D.",
+  "evidence_class": "model_task_execution",
+  "status": "READY_FOR_PROSPECTIVE_NATIVE_RECIPE_SOURCE_JUDGMENT_ONLY",
+  "native_invocation": {
+    "client": "Codex0.160.0",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "provider": "omniroute",
+    "keyless_pool_endpoint": "http://127.0.0.1:20128/v1",
+    "read_only": true,
+    "started_utc": "2026-10-03T16:34:45.751838Z",
+    "closed_utc": "2026-10-03T16:37:08.921880Z",
+    "exit_code": 0,
+    "attempts": 1,
+    "retries": 0
+  },
+  "native_usage": {
+    "input_tokens": 97475,
+    "cached_input_tokens": 86784,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2944,
+    "reasoning_output_tokens": 1794,
+    "total_tokens": 100419,
+    "finalized_response_groups": 5,
+    "all_prefixes_match": true,
+    "count_once": "Finalized five raw responses once; cumulative/event/CLI reconciliation views and cache/reasoning subsets are not added.",
+    "unseen_helpers_wire_backend_invoice": "UNKNOWN"
+  },
+  "source_custody": {
+    "freeze_bindings": 9,
+    "all_frozen_origins_or_exact_excerpt_ranges_match": true,
+    "observed_commands": 10,
+    "observed_command_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "complete_native_source_carriers": 7,
+    "answer_words": 214,
+    "answer_word_cap": 275
+  },
+  "judgment": {
+    "disposition": "Complete unchanged installed SDK0.160 formatter may be reused temporarily as a cited private reference carrier with supported native CLI stdio; no public API claim.",
+    "remaining_conditions": [
+      "Materialize matching native TOML arguments from identical profiles; actual native parsing/effective configuration for exact cwd.",
+      "Only initialize, initialized and hooks/list; real open native stdin/private capture, no adapter or PTY-equivalence substitute.",
+      "Exactly six owned source/event/matcher/command/order definitions; preserve returned native key/currentHash and diagnostics.",
+      "No forbidden thread/turn/trust/config/MCP/daemon request or install/global configuration change."
+    ],
+    "startup_limit": "Normal native AuthManager/cloud configuration/SQLite/plugin activity is not side-effect-free startup or assistant access permission for auth files; cwd does not confine native reads.",
+    "not_approval_or_regrade": "Source judgment is not user approval, actual native metadata admission, context default, full-plugin/protection acceptance or a regrade of R2/P2/TUI/strict-carrier results."
+  },
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "installed_package": "@openai/codex-sdk0.160.0",
+      "file": "dist/index.js",
+      "lines": "317-392",
+      "installed_index_sha256": "d62ed107033bdba802b283c77d875e4bec3deb2704a910bb7e3f95059473b16f",
+      "formatter_reference_sha256": "a6231629761d878af36b8bece6e4172e9efd095dd59d3ec115e5200aeb7d6d7f"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "files": [
+        "codex-rs/app-server/src/request_processors/catalog_processor.rs:614-678",
+        "codex-rs/app-server/src/lib.rs:540-582",
+        "codex-rs/app-server/src/message_processor.rs:540-558",
+        "codex-rs/protocol/src/protocol.rs:1933-1937,2241-2274"
+      ]
+    }
+  ],
+  "custody": {
+    "native_freeze_sha256": "26c00219de0ed77dcea2482cccd523033728ebdd4acc26e2fce31de1eb940343",
+    "native_stdout_sha256": "e7cb4455a2483d81811820c83dc67657bea38a8a851c8ce0f55962d99255ad66",
+    "native_journal_sha256": "39e1454ed8fedb329fc190023a858a79e3b9af989cadba5a515edaac8195dcd6",
+    "answer_sha256": "5cce15dc533a080d1cf60b17918355fb7f3c25aed0ae450a9a58ef041f75768a",
+    "worker_receipt_sha256": "9c26d092459ec42e0e634abe91dc3b04976dc77237e9ffec7d294a365acd8828",
+    "worker_manifest_sha256": "9d46e3093c0602240d9191c8e86ccfc122d8bb2fd28c76f57d821ccdec87d6a3",
+    "root_independent_counter_check_sha256": "10a3b5f2293d3bb386a41d8859ef77733eec1eab8d3d34ae12b0f0e5b1b8a3fb"
+  },
+  "retained_warning": "Inherited standalone_web_search warning; no actual web/MCP/child/write calls observed in selected native records.",
+  "completeness_critic": "Source acceptance leaves native parsing, real open stdin, actual six-definition selection and request boundaries untested. No physical/wire/invisible-helper/lifecycle guarantee, default adoption or user approval follows. Earlier holds/stops remain unchanged.",
+  "privacy": "Private original captures retained; no credentials/auth/environment values, raw conversations, personal paths or active global configuration published."
+}

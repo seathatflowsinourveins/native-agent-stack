@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Keep native retrieval/compression preparation reviewable for complex project work before any original comparison launch",
+  "evidence_class": "local_integration; one synthetic native admission per family, not unchanged upstream acceptance",
+  "status": "SCOPED_READY_B_NATIVE_CALL_RESULT",
+  "registration": {
+    "endpoint": "Prospectively declared native call/result/source/settings/counter endpoint",
+    "fixture": "Harmless fixed four-fact synthetic fixture, shared original bytes",
+    "fixture_bytes": 244,
+    "fixture_sha256": "2b572f4dc2ce3558abe5ed4bf234132dad0f9280f2944c25b44420f4f8709c83",
+    "closed_bindings_unchanged": 40,
+    "directed_main_child_operations_each": 6,
+    "eligible_directed_fixture_probe_operations": 12,
+    "attempted_directed_operations": 12,
+    "successful_allowed_operations": 8,
+    "expected_denial_results": 4,
+    "natural_denial_or_recovery_rate": "NOT_ESTIMATED",
+    "subsequent_trial": "Separate R2 freeze234bindings SHAab39de3dac26d655c66e87bb8574ea8a588ab4b38f7b58de9c7a6e0f626fe7bf, publicly preregistered before firstcase; fixture outcomes are not real producer outcomes."
+  },
+  "preserved_status": {
+    "strict_physical_carrier": "UNQUALIFIED",
+    "original_56_comparisons": "UNRUN/UNFROZEN",
+    "original_q3_q4_producers": "UNRUN",
+    "full_context_mode_plugin_bootstrap": "HOLD",
+    "adoption_default_protection_savings": "NOT_CLAIMED",
+    "temporal_scope": "At native admission closure, before the separately registered subsequent R2 comparison freeze."
+  },
+  "privacy": "Counts, source URLs/pins and private-artifact hashes only; no host paths, native IDs, raw conversations, active client configuration, authentication or credentials.",
+  "native_invocation": {
+    "family": "Claude",
+    "native_cli": "2.1.288",
+    "Claude_Agent_SDK": "0.3.263",
+    "Promptfoo": "0.123.1",
+    "model_main_child": "Opus5.5",
+    "effort_main_child": "max",
+    "native_scheduler_attempts": 1,
+    "start_utc": "2026-10-03T15:27:53.028317Z",
+    "end_utc": "2026-10-03T15:32:54.011428Z",
+    "native_exit": 0,
+    "required_roles_completed": 2
+  },
+  "actual_results": {
+    "both_roles_original_four_facts_source_scratch_fidelity": true,
+    "complete_call_result_links_and_effective_observable_settings": true,
+    "input_write_destinations_absent": true,
+    "outside_canary_content_not_returned": true,
+    "all_native_calls": 15,
+    "directed_calls": 12,
+    "additional_ToolSearch_Agent_StructuredOutput_calls": 3,
+    "all_call_inventory": {
+      "Read": 6,
+      "ctx_index": 2,
+      "ctx_search": 2,
+      "Bash": 2,
+      "ToolSearch": 1,
+      "Agent": 1,
+      "StructuredOutput": 1
+    },
+    "own_native_initialization_Agent_child_custody_and_role_final_records_verified": true,
+    "opaque_API_tools_schema_or_assignment_plaintext": "UNKNOWN; separate serialized init blob unavailable; observable native identity retained"
+  },
+  "native_usage": {
+    "finalized_Opus_request_message_groups_main": 9,
+    "finalized_Opus_request_message_groups_child": 7,
+    "disjoint_Opus_groups": 16,
+    "main_total": 283163,
+    "child_total": 174395,
+    "Opus_total": 457558,
+    "known_Haiku_final_aggregate": 2508,
+    "inclusive_known_native_modelUsage_total": 460066,
+    "ordinary_input": 2519,
+    "cache_creation_input": 59682,
+    "cache_read_input": 364459,
+    "output_includes_thinking": 33406,
+    "thinking_output_subset": 25955,
+    "provider_returned_inclusive_total": 460066,
+    "native_cost_state_and_final_modelUsage_fields_reconciled": true,
+    "group_selector": "Latest finalized usage equals maximal native token-total selector in all16 observed request/message groups.",
+    "count_once": "Inclusive final modelUsage already contains child/helper; main plain usage, journals, provider and Agent trailer are reconciliation views, never extra totals.",
+    "helper_individual_response_IDs_or_callcount": "UNKNOWN"
+  },
+  "observed_lifecycle": {
+    "snapshots": 118,
+    "live_snapshots": 117,
+    "positive_owned_process_ids_count": 12,
+    "positive_source_owned_containers": 18,
+    "owned_hook_containers": 17,
+    "positive_live_MCP_top": true,
+    "successful_native_ready_marker_observations": 115,
+    "marker_absent_after_native_completion": true,
+    "native_MCP_signal_exit_pair": [
+      2,
+      130
+    ],
+    "native_MCP_destroyed_before_manual_cleanup": true,
+    "native_hooks_all_die0_before_manual_cleanup": true,
+    "Tini_status_explanation": "Observed signal2 then die130 is consistent with pinned128+signal behavior; actor/recipient attribution remains UNKNOWN.",
+    "post_admission_manual_cleanup": {
+      "exact_previously_owned_exited_hooks_removed": 17,
+      "native_rm_exit": 0,
+      "admission_regrade": false
+    },
+    "every_short_lived_hook_live_top_and_physical_EOF": "UNKNOWN outside estimand"
+  },
+  "corrections_and_failures": [
+    {
+      "condition": "Original freeze raced final receipt/manifest writes; custody guard failed before launch. No model/observer attempt consumed. Original failure retained; separately closed40 freeze used.",
+      "artifact_sha256": "d992ecafcc9c5c42ef3c870307c01e7c5c86e4376b52daa66da06b978d88ca01"
+    },
+    {
+      "condition": "Seven intermediate directory privacy modes and evaluator state/log isolation required correction before launch. Separate root amendment retained; original closed commands/config bytes unchanged.",
+      "preparation_receipt_sha256": "1bec56d87ade0ec8b5fde806fac0db4f2ff27e563debccacd12610c1ff7e9329",
+      "root_amendment_sha256": "5005ee88ab752d65ba9114f511c9cfbcc2eb90c2e7ac49e6c4a1a0adeaf34e45"
+    },
+    {
+      "condition": "Initial child Read guard assumed structured file metadata; actual own child full carrier matches original-bound parent full read. Failed projection retained, no native retry.",
+      "artifact_sha256": "dc020a74174a19688019f6385e76a10f0718f496cd5d99a23f237cd515390cfb"
+    },
+    {
+      "condition": "Initial hook ownership classifier assumed a fixed workdir; actual frozen Cmd/workdir/image/mounts/labels establish18 owned containers. Original classifier retained.",
+      "artifact_sha256": "8e387686aa6c974ab63b98bb4be8d6940b604707ac0cc63b986d6432c5d9e94c"
+    },
+    {
+      "condition": "Initial root dictionary-identity check incorrectly included SDK-added metadata; every native counter field matches. Original failure retained.",
+      "artifact_sha256": "ea0328c0a57ef6ba1f428a7d540ed135352782ec8b2796b9d15d2d51102cb208"
+    },
+    {
+      "condition": "Post-admission cleanup preparation/projection failed without removal; wrong native inspect rm verb exited1 and retained an unfiltered own-container inspect privately. Correct exact plan rm17 exited0 after closure; admission unchanged.",
+      "first_check_sha256": "67a3e90494839ac1615b9f9f1a8768007c360f492ac6215a1ff2ddbcebc06e19",
+      "wrong_verb_sha256": "b252f0cb68569cf35d10d7403dd21a98a87d20bd80f9400251562eb70f604483",
+      "corrected_cleanup_sha256": "5b30e32ce7a0b8e787f9d7250fc868e0fb7ff6d9fe59873faeb91d34e4afe602"
+    }
+  ],
+  "sources": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/claude-agent-sdk.ts",
+      "lines": "1669,2020\u20132095,2163\u20132228",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/claude-agent-sdk.ts",
+      "retained_source_sha256": "a665f19033beab38c09ce9e3f79a952bebe9190c856919dd6635ff296e73e7f7"
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "revision": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "file": "hooks/core/mcp-ready.mjs",
+      "lines": "31\u201353,70\u2013100",
+      "url": "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/mcp-ready.mjs",
+      "retained_source_sha256": "78a2fe30b55f3e1f34d1106dca6f43deea5b13ed5850c3d9c8cdee93acdc186f"
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "revision": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "file": "src/server.ts",
+      "lines": "4866\u20134890",
+      "url": "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts",
+      "retained_source_sha256": "4a34c4a17b64fa188d2a2c894765f492bf62b624a60c64e666fbaeef760f4a59"
+    },
+    {
+      "repository": "krallin/tini",
+      "revision": "de40ad007797e0dcd8b7126f27bb87401d224240",
+      "file": "src/tini.c",
+      "lines": "526,572\u2013577",
+      "url": "https://github.com/krallin/tini/blob/de40ad007797e0dcd8b7126f27bb87401d224240/src/tini.c",
+      "retained_source_sha256": "48b982967a950c35533df82b2f29eb4a863a6de836306ae76e4f57fbb1abf11f"
+    }
+  ],
+  "custody": {
+    "closed40_freeze_sha256": "8b639bd5fd3e92ce46c257931fe0e797766cc46a2147e0b5cebe3740148657cb",
+    "worker_receipt_sha256": "bda8cd16e4b93fd4ebd2f99d0b2468713caf4ac42c4f2e732dc6963dd469bd49",
+    "worker_manifest_sha256": "96e9f36baeefa417b8730ee8e6664a2d88d9a38f79736d8f366aac0181448117",
+    "worker_usage_sha256": "1f454da8c5c3c9f2b5c39cf168dccfa2a6441b298cdc8d79808be92b72d80fd9",
+    "worker_call_result_source_sha256": "1722a5479fd4710883d0045e850cc37a4f4e4f722871a99decdc2cbf3d818e95",
+    "worker_lifecycle_sha256": "5d4ea931f48818a2d7a1826ed536397aeadee3655a236715be96dfd4283bb898",
+    "worker_scoped_clarification_sha256": "c3bfb0a43db32b17720c62aca3e5e36fdfbd40cac7c3158d2701b6b2cf515005",
+    "root_independent_native_accounting_sha256": "7d45d5ff16938390fc9e4c284c59a06d4fa7659d4c0e4893e44f05d607257e7d",
+    "root_owned_hook_logs_sha256": "a9b234178e492059be264b526d7b423774d75e5b9acdf62e7d90eb8ad34e7784",
+    "native_role_journal_sha256": [
+      "5a651526b8ccdc6245c44a3da8e7bf8195daca33f9acbb98587e486ba0c6f4b3",
+      "9a38906b8fe7fad54b9a878c17b71ffeca7a6e7e63fa8c6153315efcc5d4a644"
+    ]
+  },
+  "completeness_critic": "READY is scoped to the actual native endpoint. Missing hook top/helper IDs/physical EOF do not create new gates. Actual signal2/die130 is retained. Original comparisons and full-plugin/protection/rate claims remain unqualified.",
+  "unknowns_outside_estimand": [
+    "Physical EOF/stream separation and OS execution attribution",
+    "Individual signaling actor/recipients and invisible helper/partial-attempt census",
+    "Hidden input/plaintext/nonforwarding/equivalence and independent wire/backend/invoice",
+    "Original task/resume/full-plugin/protection/savings qualification",
+    "Every short-lived hook live top/PID and raw SDK system-init payload not supplied"
+  ]
+}

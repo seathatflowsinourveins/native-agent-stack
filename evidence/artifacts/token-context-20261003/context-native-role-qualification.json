@@ -1,0 +1,223 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Registered fresh native Context Mode main and one max child per client, fixed four-fact oracle",
+  "north_star_action": "Source-faithful model-native context consumption before long-session measurement",
+  "sources": {
+    "context_mode": "mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40 version1.0.169 Node MCP-only",
+    "promptfoo": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "codex_native": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc CLI0.160.0",
+    "claude_native": "CLI2.1.288/SDK0.3.263 selected native executable and installed primary bytes"
+  },
+  "registration_sha256": "b36a58c628a6f37b93d2d6e8714390e70411cb93fa0abffc5549b6465017840b",
+  "fixture_sha256": "2b572f4dc2ce3558abe5ed4bf234132dad0f9280f2944c25b44420f4f8709c83",
+  "gold_and_source_labels_preserved_both_roles_both_clients": true,
+  "directed_invocations": {
+    "per_role": {
+      "eligible": 2,
+      "attempted": 2,
+      "completed_validated": 2,
+      "rate": 1.0
+    },
+    "per_client": {
+      "eligible": 4,
+      "completed_validated": 4,
+      "rate": 1.0
+    },
+    "tools": [
+      "ctx_index(path=/fixture/four-facts.md,source=own-label)",
+      "ctx_search(all4terms,source=own-label)"
+    ],
+    "scope": "Directed functional opportunity rate only; natural workflow-use rate unmeasured"
+  },
+  "codex": {
+    "evaluator_exit": 0,
+    "roles": {
+      "main": {
+        "native_cli": "0.160.0",
+        "native_model": "gpt-6.1-sol",
+        "native_effort": "max",
+        "unique_responses": 4,
+        "usage": {
+          "input_tokens": 88068,
+          "cached_input_tokens": 64768,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1841,
+          "reasoning_output_tokens": 1079,
+          "total_tokens": 89909
+        },
+        "completed_directed_calls": 2
+      },
+      "child": {
+        "native_cli": "0.160.0",
+        "native_model": "gpt-6.1-sol",
+        "native_effort": "max",
+        "unique_responses": 2,
+        "usage": {
+          "input_tokens": 41431,
+          "cached_input_tokens": 32000,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 825,
+          "reasoning_output_tokens": 516,
+          "total_tokens": 42256
+        },
+        "completed_directed_calls": 2
+      }
+    },
+    "unique_responses": 6,
+    "count_once_total": 132165,
+    "sdk_parent_total": 89909,
+    "excluded_child_total": 42256,
+    "extra_native_calls": {
+      "exec": 2,
+      "spawn": 1,
+      "wait": 1
+    },
+    "bounded_compacted_records": 0,
+    "cost": "UNKNOWN"
+  },
+  "claude": {
+    "evaluator_exit": 0,
+    "roles": {
+      "main": {
+        "native_cli": [
+          "2.1.288"
+        ],
+        "native_models": [
+          "claude-opus-5-5"
+        ],
+        "actual_per_turn_efforts": [
+          "max"
+        ],
+        "unique_request_message_pairs": 4,
+        "changed_streaming_snapshots": 0,
+        "final_chronological_usage": {
+          "input_tokens": 8,
+          "cache_creation_input_tokens": 10781,
+          "cache_read_input_tokens": 26198,
+          "output_tokens": 2799,
+          "thinking_tokens": 1832,
+          "total_tokens": 39786
+        },
+        "completed_directed_calls": 2
+      },
+      "child": {
+        "native_cli": [
+          "2.1.288"
+        ],
+        "native_models": [
+          "claude-opus-5-5"
+        ],
+        "actual_per_turn_efforts": [
+          "max"
+        ],
+        "unique_request_message_pairs": 3,
+        "changed_streaming_snapshots": 2,
+        "final_chronological_usage": {
+          "input_tokens": 6,
+          "cache_creation_input_tokens": 4892,
+          "cache_read_input_tokens": 8505,
+          "output_tokens": 1157,
+          "thinking_tokens": 615,
+          "total_tokens": 14560
+        },
+        "completed_directed_calls": 2
+      }
+    },
+    "whole_query_endpoint": {
+      "count_once": "Latest query modelUsage once; raw main/child/cost-state snapshots reconcile and are never added",
+      "inputTokens": 1274,
+      "cacheCreationInputTokens": 15673,
+      "cacheReadInputTokens": 34703,
+      "outputTokens": 3970,
+      "thinkingTokens_subset": 2447,
+      "totalTokens": 55620,
+      "raw_opus_main_child_total": 54346,
+      "quantified_helper_total": 1274,
+      "helper_model_rows": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 1260,
+          "outputTokens": 14,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.00133,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-haiku-4-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "helper_independent_request_message_id_binding": "NOT ESTABLISHED; quantified query rows remain known",
+      "main_only_result_usage_reconciles": true,
+      "opus_raw_main_child_reconcile": true,
+      "latest_native_cost_state_reconciles": true
+    },
+    "cost": {
+      "native_estimate_usd": 0.1981546,
+      "hasUnknownModelCost": false,
+      "model_row_cost_basis": {
+        "claude-haiku-4-5-20251001": "list",
+        "claude-opus-5-5": "list"
+      },
+      "scope": "Native/list estimate, not invoice"
+    },
+    "extra_native_calls": {
+      "Agent": 1,
+      "StructuredOutput": 1
+    },
+    "native_structured_output_and_gold_equal": true,
+    "child_final_trailer": 5746,
+    "child_whole_usage": 14560,
+    "trailer_already_included_not_additive": true,
+    "bounded_compaction_records": 0
+  },
+  "root_verification": {
+    "registered_input_hashes": 48,
+    "native_packet_artifact_source_hashes": 49,
+    "observer_artifacts": 110,
+    "original_native_prefixes_verified": 4,
+    "own_counters_and_role_calls_independently_recomputed": true,
+    "counter_projection_hashes": [
+      "2263d5ac5851a382783cf4baa4d8678028db1954369ba6d682fa7e6c415db77b",
+      "044234a6eece2a1fb51811c0304e972e158e67a4a91e023495c8f57709fc7783"
+    ],
+    "claude_mcp_verification_sha256": "de4757dcb3a66c19e905af501e433a8964c40b3b946e11f5343e1192823cf22e"
+  },
+  "private_original_hashes": {
+    "codex": {
+      "accounting-conclusions.json": "53a518d603381666eec59892f5481020179f5caf713155642815b5b4656404ba",
+      "artifacts.json": "138080fffb58873b5d2c70b92b397200c4cfd0905803610eebeddccbcb6cc2f3",
+      "source-bindings.json": "3c2f01dd8f57103625494bc9c6a6652b408a43d8bdbf86b3cda96704739e0556"
+    },
+    "claude": {
+      "accounting-conclusions.json": "ec85a4b85c1526ca4fc759add08f4a8ac185dd5a92d74cd2ef8f3082f77a8e7c",
+      "artifacts.json": "0d77e6695bd61280bdcd8ed5c51bf25e51ec6a6156946b1488a427735493a831",
+      "source-bindings.json": "e5215317941f7d5a38b08f9ce581396ab8a574806a12b04f1655f74ff384f3ff"
+    }
+  },
+  "source_policy_correction": {
+    "source": "ccusage/ccusage@d9821088b98aa536c7a385aa1a4579d6fa02269b rust/adapters/claude/src/lib.rs198-212",
+    "policy": "Pinned Rust adapter prefers non-sidechain, then greater usage total, then speed-present tie; not final chronological selection",
+    "scope": "Not evidence of released TypeScript CLI selection; no candidate parser call/test in this unit",
+    "selected_native_audit": "Final chronological and maximum-total selections yield same counters for these bounded streams; native query total unchanged"
+  },
+  "limits": [
+    "Fresh functional invocation and four-fact fidelity, no protection/savings/default/freeze/P2 acceptance",
+    "Node-only MCP integration does not qualify host plugin hooks, readiness or non-JS/multimodal behavior",
+    "Claude live container mounts/process tree missed; inherited Codex MCP absence/general builtin confinement unproven",
+    "Helpers quantitatively known in Claude query aggregate, independent helper request provenance unknown",
+    "Rejected/interrupted/transport retries, actual runtime module/executable byte tracing, backend wire identity and invoice outside observed scope"
+  ],
+  "native_context_window_metadata": {
+    "codex_main": 258400,
+    "codex_child": 258400,
+    "source": "Bound exact native token_count.info.model_context_window in both own prefixes",
+    "claude_primary_model": 1000000,
+    "claude_helper_model": 200000,
+    "claude_source": "Actual provider metadata.modelUsage contextWindow; model usage scope metadata, not measured occupied context"
+  },
+  "root_projection_correction": "Initial token-window projection read the wrong nesting and returned null; original native schema inspected and token_count.info independently verified. No native settings/threshold change."
+}

@@ -1,0 +1,68 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Consequential nativeAstra/max source judgment after the bounded Sol recovery failed",
+  "north_star_action": "Preserve native permission semantics during source-faithful engineering qualification",
+  "native_command": "codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max -c approval_policy=never -s read-only; source-only read",
+  "native_exit": 0,
+  "response_words": 454,
+  "response_word_limit": 650,
+  "verdict": "One distinctly registered source-supported settings relocation justified; runtime functionality remains unaccepted",
+  "allowed_delta": [
+    "New private settings file contains exact original settings plus exact original provider sandbox",
+    "Change absolute settings locator and remove separate provider sandbox only",
+    "Preserve explicit failIfUnavailable:true, no unsandboxed escape and every other permission/task/schema/model/effort/schedule field"
+  ],
+  "source_bindings": [
+    {
+      "source": "Promptfoo provider at34f74d34e140b5e17d23770dfb2340057b1936b8 lines1674-1686",
+      "sha256": "a665f19033beab38c09ce9e3f79a952bebe9190c856919dd6635ff296e73e7f7"
+    },
+    {
+      "source": "Installed @anthropic-ai/claude-agent-sdk0.3.263 sdk.mjs guardOK and sdk.d.ts2032-2050/7629+",
+      "implementation_sha256": "3d690c23ec82b4ba05f7ac8c26e2510f84e112c68ced68053ec40cf7d5dcbfe2"
+    }
+  ],
+  "native_returned_usage": {
+    "input": 227441,
+    "cached_subset": 188544,
+    "output": 9325,
+    "reasoning_subset": 5380,
+    "total": 236766,
+    "scope": "Six unique own native token_usage_record response IDs; exec completion, last-thread and legacy snapshots reconcile and are not added; separate judgment overhead",
+    "billing": "UNKNOWN",
+    "cache_write": 0
+  },
+  "retained_startup_failure": "Original missing OMNIROUTE_API_KEY error before returned model usage; native error supports process-local non-secret placeholder for keyless loopback; no credential read/export or saved profile change",
+  "root_correction": {
+    "incorrect": "absence at checkpoint one proves no compaction capability",
+    "correct": "Bounded zero compacted records does not establish capability absence; P2 remains unmeasured",
+    "original_answer_unchanged": true,
+    "correction_sha256": "482042ffd9524f703b3bd5a02ca823155f25408167e3413ff1523d6918af5d18"
+  },
+  "original_hashes": {
+    "answer": "5f4938ae49fd97184aa8bd95991824f021db5b980cdfd73cffec8ca0f77d6282",
+    "events": "194e2d06f2dbecaca37c7bfc8d006b97a8fe1d42bcce89005219a311dd2ea5ed",
+    "source_bindings": "81309832cdc699a621bee1cf233e766d1b6eb790bfc066917cb8083889a8ef5c"
+  },
+  "limits": [
+    "Source interpretation is not user permission or runtime acceptance",
+    "Selected nativeCLI2.1.288 differs from SDK embedded client-version2.1.263",
+    "No OS/in-process confinement, compaction/protection, saving, default or freeze acceptance"
+  ],
+  "native_accounting": {
+    "unique_completed_responses": 6,
+    "independent_root_prefix_recomputation": true,
+    "worker_selected_checks": 40,
+    "root_checks": {
+      "packet_artifact_hashes": 7,
+      "original_and_primary_binding_hashes": 27,
+      "native_prefixes": 2
+    },
+    "accounting_conclusions_sha256": "45be5ad598fdd872ac026f206751805b24eb26a1cd0415a9181a8904c20a6f83",
+    "source_bindings_sha256": "d0db23049f804aa82f0ac755729ca15110b7bca1861b9fbd1befbe73a0193e70",
+    "artifact_manifest_sha256": "65848186632601212bba758749f70ff040a18df8a62af13e8066fa7cd129fdf9"
+  },
+  "failed_startup_native_usage": null,
+  "root_counter_projection_correction": "An unverified event-tag filter first selected zero records. Reading exact native schemas established token_usage_record and token_count.info nesting; corrected own-prefix recomputation independently reconciles236766. Empty-filter output was not accepted or reinterpreted as zero spend."
+}

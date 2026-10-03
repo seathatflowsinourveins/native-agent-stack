@@ -1,0 +1,76 @@
+{
+  "study": "token-context-20261003",
+  "status": "exploratory qualification; no default activation",
+  "source_pin": "toon-format/toon@a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+  "version": "4.1.1",
+  "upstream_test": {
+    "evidence_class": "native_cli_execution",
+    "command": "CI=1 pnpm run test",
+    "exit_code": 0,
+    "passed": 767,
+    "failed": 0,
+    "files": 16,
+    "split": {
+      "library": 702,
+      "cli": 61,
+      "benchmarks": 4
+    },
+    "lock": "Published source frozen pnpm lock consumed with isolated pnpm11.17",
+    "native_stdout_sha256": "dcbe1daf3c31eced6f41fa5cbf6e6e22d00a3751fd8729dfa30e2f0a45a980f9"
+  },
+  "integration_checks": {
+    "uniform_100_by_11_records": "Canonical JSON semantic equality passed, independent root cmp exit0",
+    "strict_97_of_100_rows": "Decode rejected exit1 as required",
+    "bom_roots": {
+      "inputs": [
+        "U+FEFF followed by 8",
+        "U+FEFF followed by abc",
+        "U+FEFF only"
+      ],
+      "decoded": [
+        8,
+        "abc",
+        {}
+      ],
+      "semantic_equality": false,
+      "native_decode_exit": 0,
+      "semantic_cmp_exit": 1
+    },
+    "unrestricted_json_fidelity": "rejected; unreleased BOM fix is not substituted"
+  },
+  "artifact_counts": {
+    "tokenizer": "gpt-tokenizer4.0.0/o200k_base",
+    "uniform_payload": {
+      "json": 11640,
+      "toon": 8938
+    },
+    "complete_first_question_presentation": {
+      "json": 11742,
+      "toon": 9108
+    },
+    "nested_object": {
+      "json": 10,
+      "toon": 10
+    },
+    "nested_array": {
+      "json": 14,
+      "toon": 20
+    },
+    "primers": {
+      "json": 10,
+      "toon": 80
+    },
+    "overlap_rule": "Payload and complete presentation overlap: never sum their reductions. Actual client request/tool framing and model counters remain unmeasured.",
+    "tool_estimates": "CLI bytes-based counts differ from exact o200k and are not provider savings"
+  },
+  "retained_private_artifacts": {
+    "qualification_packet_sha256": "9641fa7befa7e3608a47c5614b232203ed330611ef857ddcfc1dbadbfd024515",
+    "native_log_hash_index_sha256": "c2b4394a9f631b5b1b6f71de8d5abb594b6c8ab78ece0179d4f4adde3853432f",
+    "source_fixture_hash_index_sha256": "c7f5ccca24b8c92585da2a65509e4f4c0668177fe2e73892cc1e0ead1c7d7469"
+  },
+  "limitations": [
+    "No model calls or native main/child invocation acceptance",
+    "Scope only eligible uniform records, not JSON-wide adoption",
+    "Nested-array expansion control was added during exploratory qualification, before comparative freeze"
+  ]
+}

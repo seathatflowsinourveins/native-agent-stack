@@ -1,0 +1,78 @@
+{
+  "status": "ROOT_QUALIFIED_NARROW_DIRECTED_FUNCTIONAL_AND_NATIVE_MARKER_CLEANUP; COMPARISON_PROTECTION_UNACCEPTED",
+  "scope": "One distinct fresh Claude functional and lifecycle recovery pilot using supported native provider and released container command hooks.",
+  "provenance": {
+    "context_mode_release": "mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40",
+    "native_harness": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "init_source": "krallin/tini@de40ad007797e0dcd8b7126f27bb87401d224240",
+    "counter_projection_source": "ryoppippi/ccusage@d9821088b98aa536c7a385aa1a4579d6fa02269b Rustadapter; sourceprojection only",
+    "native_client": "Claude2.1.288 explicitELF with SDK0.3.263",
+    "private_frozen_registration_sha256": "ce49845b03d0e5605bedc07f096aa785deaa5567f4d3bef16944463f507cb838",
+    "private_receipt_sha256": "23e2d9b8b08cc7883c04088d815e6b964772c7a6a7ac490fc53f5b2bd724bf92",
+    "original_native_output_sha256": "ebc9a23d60b193f77efb427073b60c2bbc6c0ec70b29a69e50ce7ff06d429ff1"
+  },
+  "sole_behavioral_delta": "MCP Docker TINI_KILL_PROCESS_GROUP=1; declared case custody substitutions, unchanged hook behavior and quality/role/limits.",
+  "actual_returned_scope": {
+    "evaluator_exit": 0,
+    "literal_quality": "Bothroles complete originalfourfact gold, without publishingfactvalues.",
+    "roles": "One fresh Opus/max main and one foreground Opus/max child observed in native records.",
+    "directed_calls_per_role": {
+      "native_Read": 1,
+      "ctx_index": 1,
+      "ctx_search": 1
+    },
+    "auxiliary_StructuredOutput": 1,
+    "natural_invocation_or_rate": "UNMEASURED"
+  },
+  "native_lifecycle": {
+    "live_init_npm_shell_Node_ancestry_and_process_groups": "Observed",
+    "readonly_root_network_none_caseonly_mounts": "Observed",
+    "readiness_marker_before": "Observed",
+    "same_marker_absent_after_native_teardown_before_operator_cleanup": true,
+    "native_Docker_terminal": "signal2,exit130,destroy; noEOFonly claim",
+    "individual_process_signal_delivery": "UNKNOWN",
+    "root_operator_cleanup": "Nine positivelyowned exitedhooks removed,nativepostscopeempty; ownedobserverTERM/closure143 separate, no markerrm.",
+    "general_EOF_abort_resource_concurrency_guarantee": "UNQUALIFIED"
+  },
+  "native_usage": {
+    "main_unique_responses": 5,
+    "main_tokens": 64303,
+    "child_unique_responses": 4,
+    "child_tokens": 40022,
+    "disjoint_Opus_tokens": 104325,
+    "final_helper_tokens": 1412,
+    "whole_final_inclusive_tokens": 105737,
+    "alternative_views_not_additive": true,
+    "reasoning_and_cache_subsets_not_doublecounted": true,
+    "helper_raw_response_identity": "UNKNOWN",
+    "wire_invoice": "UNKNOWN",
+    "monetary_savings": "UNMEASURED"
+  },
+  "custody": {
+    "new_frozen_inputs_checked": 27,
+    "original_frozen_inputs_checked": 19,
+    "selected_source_identity_checked": 75,
+    "native_SHAcheck_exits": [
+      0,
+      0,
+      0
+    ],
+    "earlier_pendingcleanup_receipt_preserved": true,
+    "root_wrong_prefix_and_wrong_recipe_index_corrections": "Retained; corrected actualmarker/nativeDockerps used for runtimeclaims."
+  },
+  "limits": {
+    "direct_child_hook_stdin_persisted_role_capture": "UNKNOWN",
+    "native_API_input_schema_exposure": "UNKNOWN",
+    "normal_Read_capture": "Filepathdedup only; nofourvalue compactionprotection inference.",
+    "full_native_plugin_autoload_ownedonly": "HOLD",
+    "original_distinct_marker_failure": "FAIL_UNCHANGED",
+    "original_P1": "STOPPED_MECHANICS_NOT_PASS_UNCHANGED",
+    "P2": "HOLD_NATURAL_COMPACTION_AND_RESUME_UNMEASURED",
+    "no_protection_default_adoption_or_saving_claim": true
+  },
+  "completeness_critic": "Short directed normalRead/MCP/native teardown leaves actual automaticcompaction/resume, childdirecthook, EOF/abort/resource/concurrency and real longsemantic quality unqualified. Root mayselect exactlifecycle-qualified config; later totalconfig comparison and longR&D acceptance require their own source-bound frozencontracts. No padding or forcedthresholds.",
+  "publication_state": "ROOT_SANITIZED_NATIVE_LIFECYCLE_QUALIFICATION",
+  "coordinator_native_counter_verification_sha256": "c5be5b6325d5aeed92bba7bedbec197519e1a0dadb2cf06e89a0ad94188a8838",
+  "coordinator_acceptance_scope": "Exact released-script/Tini configuration qualifies observed fourfact directed role functionality and native marker cleanup. Fullplugin, comparison, natural invokerates/protection/P2/default remain unaccepted.",
+  "worker_source_status": "DRAFT_FOR_ROOT_VERIFICATION; WORKER_ACCEPTANCE_CLAIM_FALSE"
+}

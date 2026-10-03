@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Retain a faithful failed native baseline attempt before any context-supply or long-session protection claim.",
+  "evidence_class": "local integration; actual unchanged registered native first AA case, terminal failure rather than a valid comparison",
+  "status": "TERMINAL_R2_STOP_REQUIRED_CHILD",
+  "native_invocation": {
+    "case": "codex-01",
+    "arm": "A",
+    "client": "Codex0.160.0",
+    "SDK": "0.160.0",
+    "actual_parent_model": "gpt-6.1-sol",
+    "actual_parent_effort": "max",
+    "declared_child_model_effort": "gpt-6.1-sol/max; no completed child proof",
+    "harness": "Promptfoo0.123.1 native CLI",
+    "started_at": "2026-10-03T16:11:49.100161Z",
+    "completed_at": "2026-10-03T16:16:13.476217Z",
+    "scheduler_attempts": 1,
+    "native_spawn_attempts": 1,
+    "CLI_exit": 0,
+    "schema_assertion": "PASS_FORMAT_ONLY",
+    "retry_repair_replacement_or_manual_rescue": false
+  },
+  "actual_failure": {
+    "required_child_role": "FAIL",
+    "sandbox_helper_exit": 101,
+    "native_error_sanitized": "failed to register synthetic bubblewrap mount target <owned scratch>/.git: No space left on device (os error 28)",
+    "native_list_agents": "ONLY_ROOT",
+    "generated_child_trace_identity": "Not evidence of executed/completed child; private identity omitted.",
+    "child_own_journal_request_response_counter_evidence": "NOT_SUPPLIED",
+    "parent_fallback_q3_q4": "Retained original fallback answers; not child role/source custody.",
+    "valid_two_role_estimand": "UNDEFINED_REQUIRED_CHILD_FAILED",
+    "allocation_cause": "Unit16 identifies the registry-marker write; actual helper allocation cause, namespace and backing capacity at failure remain UNKNOWN. Later host capacity snapshot is not causal evidence."
+  },
+  "native_usage": {
+    "scope": "Known finalized parent only; failed child and whole invoice unknown.",
+    "parent_finalized_response_groups": 9,
+    "parent_input_includes_cache": 247496,
+    "parent_cache_read_subset": 211712,
+    "parent_cache_write": 0,
+    "parent_uncached_input_arithmetic": 35784,
+    "parent_output_includes_reasoning": 4837,
+    "parent_reasoning_subset": 3309,
+    "known_disjoint_parent_total": 252333,
+    "provider_returned_parent_scope": 252333,
+    "parent_response_chain_prefix_and_final_comparisons": 229,
+    "all_parent_comparisons_pass": true,
+    "failed_child_usage": "UNKNOWN_NOT_ZERO_IMPUTED",
+    "valid_inclusive_two_role_query_total": "UNQUALIFIED",
+    "invisible_helpers_backend_wire_invoice": "UNKNOWN_OUTSIDE_ESTIMAND",
+    "cache_reasoning_provider_journal_trace_views_added": "NO"
+  },
+  "source_call_and_model_facing_custody": {
+    "parent_model_visible_calls_with_linked_results": 8,
+    "runtime_native_calls": 11,
+    "code_cell_containers": 6,
+    "all9_nested_returned_values_match_observed_plain_or_fulfilled_wrappers": true,
+    "all8_parent_results_match_next_native_request_inputs": true,
+    "parent_first_full_request_and_complete_incremental_chain": true,
+    "observable_parent_profile_checks": 12,
+    "all_parent_profile_checks_pass": true,
+    "frozen_original_source_identities": 2,
+    "parsed_original_source_line_bodies_matching": 551,
+    "selected_jq_metadata_views_matching": 2,
+    "answer_quality": "BLIND_JUDGE_UNRUN_FINAL",
+    "initial_broad_JSON_row_exposure_and_truncation": "RETAINED; no filtered-only exposure claim.",
+    "raw_terminal_formatted_bytes_first_read": 40109,
+    "actual_returned_code_mode_output_bytes_first_read": 24109,
+    "byte_equality_diagnostic": "FAIL_PRESERVED; distinct runtime/returned boundaries, no complete raw model-exposure claim."
+  },
+  "observed_lifecycle_and_custody": {
+    "snapshots": 132,
+    "positively_observed_owned_process_ids": 8,
+    "selected8_absent_after_native_return": true,
+    "native_post_ps_exit": 1,
+    "post_stdout_bytes": 0,
+    "post_stderr_bytes": 0,
+    "operator_cleanup_rescue": "NONE_IN_THIS_CASE",
+    "all234_frozen_SHA_size_bindings_independently_unchanged": true,
+    "unseen_short_helpers_global_absence_physical_streams_OS_actor": "UNKNOWN_OUTSIDE_ESTIMAND"
+  },
+  "terminal_disposition": {
+    "root_stop_recorded_at": "2026-10-03T16:23:25.264587Z",
+    "remaining55": "UNRUN_FINAL",
+    "blind_judge": "UNRUN_FINAL",
+    "valid_comparison_or_native_baseline_win": "NOT_ESTABLISHED",
+    "savings_protection_statistics_default_whole_invoice": "UNQUALIFIED",
+    "P2_natural_compaction_and_same_session_resume": "HOLD_UNMEASURED",
+    "original_P1_and_strict_carrier_failures": "PRESERVED_UNCHANGED",
+    "public_native_stop_handoff": {
+      "comment_id": 5971047784,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5971047784",
+      "native_post_exit": 0
+    }
+  },
+  "corrections_and_failed_checks": [
+    {
+      "correction": "Failed own-journal filename/guard locator retained; corrected UUID-bound local-hour filename. No universal absence claim.",
+      "root_guard_and_counter_artifact": {
+        "bytes": 2619,
+        "sha256": "8ad19d248a6c4d84f7242b471c5dc5677b5fd7e13788fcce7c7a27f8d07ca607"
+      }
+    },
+    {
+      "correction": "Historical B metadata projection treated integer check count as a list and failed; corrected metadata confirms318+173 historical checks. This is not real-task acceptance.",
+      "offline_preparation_binding": {
+        "bytes": 4709,
+        "sha256": "daba4708c4319582799b3fa09efc52376170e1ac14f54932094b385f6e1a1fd1"
+      }
+    },
+    {
+      "correction": "Overlarge private metadata projections retained; bounded projections corrected scope. Original raw-versus-returned byte inequality remains failed. Observed fulfilled wrappers explain the separate returned-value mapping; no native rerun or regrade.",
+      "worker_boundary_diagnostics": {
+        "bytes": 50115,
+        "sha256": "e4c0fb6e16eb86ab8a80718d0bd56f2f8cf3b169fb6e41fc43e02b847656a803"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "version": "0.123.1",
+      "files": [
+        "src/providers/openai/codex-sdk.ts:2421-2447",
+        "src/providers/claude-agent-sdk.ts"
+      ]
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "version": "0.160.0",
+      "files": [
+        "codex-rs/rollout-trace/README.md:157-170,208-210",
+        "codex-rs/protocol/src/protocol.rs:2241-2346,2467-2474"
+      ]
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+      "files": [
+        "docs/token-session-handbook.md",
+        "docs/token-efficiency-stack.json"
+      ],
+      "scope": "Frozen task-source snapshots; catalog claims are dated source material, not current host acceptance."
+    }
+  ],
+  "custody": {
+    "root_live_freeze": {
+      "bytes": 67728,
+      "sha256": "ab39de3dac26d655c66e87bb8574ea8a588ab4b38f7b58de9c7a6e0f626fe7bf"
+    },
+    "root_terminal_stop": {
+      "bytes": 8835,
+      "sha256": "277f8721b080a52dd17e2582fb9e11e75fbffc63c3327c7555aacc0ec09e4d2d"
+    },
+    "root_native_spawn_failure": {
+      "bytes": 4929,
+      "sha256": "c6fe9980e4832d6a6cc1d9ef4f40a690c92d5e523422c2ac511ca195345ec9cc"
+    },
+    "root_parent_counter_prefix": {
+      "bytes": 2619,
+      "sha256": "8ad19d248a6c4d84f7242b471c5dc5677b5fd7e13788fcce7c7a27f8d07ca607"
+    },
+    "root_terminal_custody_and_selected_process_check": {
+      "bytes": 44230,
+      "sha256": "b95898745f5a5835270baee0a45417d74d1832fef54b9febccb0856f34df6e71"
+    },
+    "root_native_public_stop_handoff": {
+      "bytes": 336,
+      "sha256": "2cf3291b27254810e8e07dfbcb52d7d2c19727053db51766cb4e00105ea2f539"
+    },
+    "worker_receipt": {
+      "bytes": 5155,
+      "sha256": "d9c147fdd66aacb78ea87dab09c67c9878e8b89ff312bf9796d5913b6ba12837"
+    },
+    "worker_manifest": {
+      "bytes": 2714,
+      "sha256": "6f31e162cfba89c0a5015c72f5b32aad0fe5591f47507053d7b51788e0466b68"
+    },
+    "worker_parent_prefixes": {
+      "bytes": 65506,
+      "sha256": "91a75e616eadcc2bc3fcd706d4918cfc268d5109a939065586690838e2144992"
+    },
+    "worker_native_call_source_views": {
+      "bytes": 351940,
+      "sha256": "2538e931b7409b2d6880e87a2ae47181fe6ae2c7aa56bc24c816559aa70768fc"
+    },
+    "worker_model_facing_links": {
+      "bytes": 4245,
+      "sha256": "638e711ab107feab4235eb1bda7bd02d0d8c52b2e35a6e0cfd38bb5ff8e86f1a"
+    },
+    "worker_observable_parent_profile": {
+      "bytes": 6723,
+      "sha256": "7e3c75634c1752d04ea01ab0bf9c5715433a75394f6e20d1436ff17cbb725fd6"
+    },
+    "worker_source_bindings": {
+      "bytes": 4401,
+      "sha256": "0742273e22d2523bf7d0c53dec9c9aaa2488c190eed2c8ef02875db331a68fb3"
+    },
+    "worker_critic": {
+      "bytes": 2595,
+      "sha256": "601cf07af649d990a8fe371dc4235344c4d94b571ff2d7ba5b195aad3443d198"
+    },
+    "worker_10_artifact_native_SHA_check": "EXIT0_OUTPUT0; retained original metadata verification, not a new provider run"
+  },
+  "completeness_critic": "The first A case cannot supply the registered two-role baseline or a valid comparison. A generated trace child remained marked running, but the native spawn failure, root-only agent listing and missing own child records prevent promoting that identity into execution, max effort, source recovery or zero-token usage. Parent-authored fallback strings passing the generic JSON schema do not restore native role custody. Count the nine finalized parent responses once and preserve unavailable failed-child usage as UNKNOWN. Source identity and model-facing returned-value links are useful custody evidence; the first raw-versus-returned byte mismatch and broad initial row exposure remain visible limits, not a regrade. Selected owned PIDs disappearing establishes only the bounded observed lifecycle, not a global or helper census. ENOSPC identifies the returned sandbox-helper failure; later host byte/inode availability does not diagnose its synthetic-mount allocation. Source-only unit16 investigates that pinned implementation separately. No candidate performance, baseline win, savings, full invoice total, automatic-compaction/resume quality or P2/default acceptance follows. The north-star next step remains a separately source-qualified finite native path to complete actual role custody and substantial R&D continuity, without modifying this stopped registration.",
+  "privacy": "No private host paths, native UUIDs, raw configs/transcripts, credentials or account data; private originals remain bound by SHA/size."
+}

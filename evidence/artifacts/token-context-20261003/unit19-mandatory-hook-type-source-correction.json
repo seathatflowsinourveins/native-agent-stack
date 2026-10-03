@@ -1,0 +1,112 @@
+{
+  "actual_native_scopes": {
+    "unit18": {
+      "RPC_methods_sent": 0,
+      "failure": "Pre-RPC in-hooks missing-type diagnostic",
+      "native_exit": 1,
+      "not_regraded": true,
+      "status": "CLOSED_STOP_UNCHANGED",
+      "stdout_bytes": 0
+    },
+    "unit19": {
+      "RPC_messages_confirmed_sent": 0,
+      "attempts": 1,
+      "effective_six_hooks_keys_hashes": "UNRUN_FINAL",
+      "former_missing_type_marker_present": false,
+      "metadata_exchange": "UNRUN_FINAL",
+      "native_exit": 0,
+      "retries": 0,
+      "startup_success_limit": "Absence of the former marker only; exit0 is not returned hook metadata or live protection.",
+      "status": "CLOSED_STOP_NATIVE_TOOL_STDIN_CARRIER",
+      "stdin_write_attempts": 1,
+      "stdin_write_outcome": "TOOL_REJECTED_CLOSED_STDIN"
+    }
+  },
+  "correction": {
+    "owned_profile_defect": "Command-handler objects omitted the native required type discriminator.",
+    "required_command_handler_tag": {
+      "field": "type",
+      "value": "command"
+    },
+    "scope": "Only the discriminator for existing command handlers; no claim that other native handler variants are command handlers."
+  },
+  "evidence_levels": [
+    "Pinned primary source inspection",
+    "Previously independently verified owned copied-profile byte restoration",
+    "Two distinct preserved closed native STOPs"
+  ],
+  "limits": {
+    "P2_live_protection": "UNQUALIFIED",
+    "future_native_hook_state_keys": "UNQUALIFIED",
+    "model_usage": null,
+    "native_hook_catalog": "UNRUN_FINAL",
+    "new_native_launch_network_model_calls": false,
+    "shared_harness_defaults_or_original_packet_edits": false,
+    "source_only_type_change_is_live_acceptance": false,
+    "transport_absence": "No universal absence claim",
+    "usage_scope": "UNKNOWN_NOT_ZERO; no root model/thread/turn request is not a complete native-helper census."
+  },
+  "owned_profile_evidence": {
+    "all_frozen_packet_original_and_typed_bindings_match": true,
+    "evidence_source": "Prior independent offline reconciliation; no new native execution",
+    "original_profiles_unchanged": true,
+    "per_profile": 6,
+    "prospective_copied_profiles": 9,
+    "removing_only_inserted_lines_restores_original_bytes": true,
+    "type_lines_inserted": 54
+  },
+  "primary_sources": [
+    {
+      "claim": "HookHandlerConfig is serde-tagged by type; its Command variant uses the command tag.",
+      "locations": {
+        "command_variant_complete": "161-185",
+        "required_command_field": "166",
+        "tagged_enum": "161-165"
+      },
+      "path": "codex-rs/config/src/hook_config.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "sha256": "b7ac42b2a895a00b6aa491eee1d3eb04d8a147ba0e77e016bde42381e067d1c0",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/hook_config.rs#L161-L185"
+    },
+    {
+      "claim": "Maintained generateHookConfig supplies type:command for all six generated command handlers.",
+      "handlers": [
+        "PreToolUse",
+        "PostToolUse",
+        "SessionStart",
+        "PreCompact",
+        "UserPromptSubmit",
+        "Stop"
+      ],
+      "locations": {
+        "command_handler_type_lines": [
+          493,
+          504,
+          515,
+          526,
+          537,
+          548
+        ],
+        "generateHookConfig": "486-555"
+      },
+      "path": "src/adapters/codex/index.ts",
+      "pin": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "repository": "mksglu/context-mode",
+      "sha256": "4e204df7987b941030714e2f5ece7fc8653815e73a5df922595891512f3e888c",
+      "url": "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/adapters/codex/index.ts#L486-L555"
+    }
+  ],
+  "private_artifact_hashes": {
+    "independent_reconciliation_receipt": "979596099dba9706ccffd0ef8776aacad6a38c86e12808a31aed810030932e94",
+    "profile_delta": "a46f76df6e268fa03e1ad0d6e9e84753854151533621d776f66a3368aa321eca",
+    "source_binding": "00aeca34848d0c0d9e57a9764c735076c6e029b1df7ac597dcdd0701e963efa9",
+    "unit18_closed_failure_binding": "f7bcf58182b677e264703424e67a53b070cf7524cec8604500d94ed9289557c1",
+    "unit19_execution_freeze": "871337f34d5a2bada1334be83e77b524e3f9ff87b8cb76e146c0a395d72e2aa7",
+    "unit19_native_completion": "77e069c43e40f0b462ea2a554dcb495506c09a7c865aefbde3b00a2eddf93a4e"
+  },
+  "status": "SOURCE_CORRECTION_CONFIRMED_NATIVE_METADATA_UNRUN_FINAL",
+  "unit": "unit19-mandatory-hook-handler-type-source-correction",
+  "north_star_action": "Qualify native token/context metadata so later cumulative R&D sessions can compare faithful context protection while retaining native usage and client behavior.",
+  "private_source_receipt_sha256": "730a50bb23eb5313a8a6df274877a755d3f2058e737b854becead2febf58b415"
+}

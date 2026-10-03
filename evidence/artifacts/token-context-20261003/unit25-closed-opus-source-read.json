@@ -1,0 +1,63 @@
+{
+  "status": "CLOSED_STOP_NATIVE_OPUS_SOURCE_READ_TIMEOUT",
+  "native_exit": 124,
+  "native_final_result_present": false,
+  "final_answer_present": false,
+  "word_cap": "NOT_APPLICABLE_NO_ANSWER",
+  "frozen_bindings_unchanged": 54,
+  "Read_calls_results_linked": 49,
+  "raw_source_window_equality": 46,
+  "native_LF_views_of_CRLF_sdk_source_windows": 3,
+  "native_version": "2.1.288",
+  "model": "claude-opus-5-5",
+  "native_actual_effort_perTurnEffort": "max",
+  "tools": [
+    "Glob",
+    "Grep",
+    "Read"
+  ],
+  "MCP_servers": 0,
+  "skills": 0,
+  "builtin_plugins_inventory": 3,
+  "agent_definitions_inventory": 5,
+  "child_or_helper_calls_observed": false,
+  "hidden_helper_completeness": "UNKNOWN",
+  "known_finalized_prefix_groups": 13,
+  "known_prefix_disjoint_usage": {
+    "input_tokens": 26,
+    "cache_creation_input_tokens": 150345,
+    "cache_read_input_tokens": 1003783,
+    "output_tokens": 21455
+  },
+  "known_prefix_token_total": 1175609,
+  "thinking_subset_of_output": 14792,
+  "complete_failed_request_usage_cost": "UNKNOWN",
+  "source_review_verdict": "ABSENT",
+  "comparison_producers": "ALL4_UNRUN_UNFROZEN",
+  "no_retry_regrade_adoption_approval": true,
+  "schema_version": 1,
+  "publication_status": "DRAFT_ROOT_OWNS_INTEGRATION",
+  "evidence_scope": "closed failed native source review; prefix-only usage and source-view fidelity, no comparison acceptance",
+  "original_receipt_sha256": "0bcc6bb8cfae7a49f18c134c55563b6b54a3b4f896ded6131a73eb6bf732a1c6",
+  "original_manifest_sha256": "4fc8db52b1677ce218ab7e9348327709a0fe3d7d789e350c8d958880ca006326",
+  "original_sanitized_draft_sha256": "78fec13508faf9769df2b4a63bcdd3766a57aad38a9d3d9f9c6acbcaf0d2a9b9",
+  "original_source_fidelity_sha256": "a015290737ef58ef29be900ac6273a9aee98f11e52ed38eb0ad1fcfab544cb12",
+  "original_prefix_groups_sha256": "41abf0193dafc439b8a7e554fb834b10d94ad380b897676e8be2726269110502",
+  "original_root_completion_sha256": "19555ddf9eea5236966c60595fa064c382feecba9fada48c0812aa25789930b8",
+  "source_pins": [
+    {
+      "repository": "anthropics/claude-code",
+      "pin": "v2.1.288",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.288",
+      "source_scope": "pinned release identity; actual failed read version/tool/usage claims come from closed native receipt, not changelog"
+    }
+  ],
+  "counter_scope": "13 finalized disjoint own-main request/message prefix groups; complete failed-request and hidden helper usage/cost UNKNOWN",
+  "definitions_not_executed_roles": "agent/plugin inventory does not establish child/helper execution or physical absence",
+  "source_view_limit": "46 raw window matches;3 native LF views of CRLF SDK windows retained as source-view correction, not whole-byte rewrite",
+  "new_narrow_source_case": "outside this closed failed receipt; no posthoc replacement or regrade",
+  "adoption_default_saving_or_user_approval": false,
+  "north_star_action": "source-bound document retrieval for substantial engineering and US-equities R&D",
+  "temporal_scope": "At closure of this source unit; subsequent direct owned-home native metadata result is recorded separately in unit26, with roles/continuation/P2 still unqualified.",
+  "prepublication_draft_sha256": "fbe20188f0314767afa74f2b0c8e9ec7eeeb64d931a5215ecd0d4f67cbbc9dcd"
+}

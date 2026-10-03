@@ -1,0 +1,161 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Deterministic private preparation of pinned progressive Forge corpus; no grader/model run",
+  "north_star_action": "Prepare substantial progressive engineering and later native continuity/critical-fact acceptance for complex R&D supporting US-equities historical simulation.",
+  "source_pins": {
+    "runner": "SprocketLab/slop-code-bench@31ceea3add480edb33431e70475c4c70597e6b31",
+    "corpus": "gabeorlanski/scb-problems@38d627ecf668a88f88f8d260f8df8df6116e9b03"
+  },
+  "native_versions": {
+    "uv": "0.12.22",
+    "python": "3.12.3",
+    "pytest_corpus": "9.0.3",
+    "git": "2.53.0"
+  },
+  "native_commands": [
+    {
+      "command": "uv sync --locked --python <existing3.12.3> --no-python-downloads --no-config --keyring-provider disabled",
+      "scope": "Unchanged runner project, private environment/cache",
+      "exit": 0,
+      "installed_packages": 274,
+      "start_utc": "2026-10-03T06:09:26Z",
+      "end_utc": "2026-10-03T06:09:30Z"
+    },
+    {
+      "command": "uv sync --locked --python <existing3.12.3> --no-python-downloads --no-config --keyring-provider disabled",
+      "scope": "Unchanged corpus project, separate private environment/cache",
+      "exit": 0,
+      "installed_packages": 34,
+      "start_utc": "2026-10-03T06:09:45Z",
+      "end_utc": "2026-10-03T06:09:46Z"
+    },
+    {
+      "command": "slop-code utils render-prompts --problem forge -p configs/prompts/just-solve.jinja -e configs/environments/docker-python3.12-uv.yaml -o <owned output>",
+      "scope": "Native renderer; pinned corpus through SCBENCH_PROBLEMS_PATH; environment config renders entrypoint, no container built",
+      "exit": 0
+    }
+  ],
+  "rendered_prompts": [
+    {
+      "checkpoint": 1,
+      "file": "part_1.md",
+      "bytes": 5845,
+      "sha256": "5419794eed7ad76e3b601d95b63de13c87cc257e7b6df357dce28e86a4d79b96"
+    },
+    {
+      "checkpoint": 2,
+      "file": "part_2.md",
+      "bytes": 3150,
+      "sha256": "6963be9e6081cd8a69cd98d32a0b210f3f988e8b747a1f4c26f19a0f904ea152"
+    },
+    {
+      "checkpoint": 3,
+      "file": "part_3.md",
+      "bytes": 3949,
+      "sha256": "5f86127a73c69ce29498763d2574095f8391ee6ba979fac423aa32599c370fb0"
+    },
+    {
+      "checkpoint": 4,
+      "file": "part_4.md",
+      "bytes": 4353,
+      "sha256": "b11ac83915a0773fb4c028b5ed3b2c35f5a89e27b646dc25ecc70f168dc5a9de"
+    },
+    {
+      "checkpoint": 5,
+      "file": "part_5.md",
+      "bytes": 2240,
+      "sha256": "f39d18d0c4a43b071ecd8d6205f7549a40639e46e8eb0ee7433d2f7dfbfe47fe"
+    },
+    {
+      "checkpoint": 6,
+      "file": "part_6.md",
+      "bytes": 6341,
+      "sha256": "df469aa2db1b4941f8e776cd15c1b7cc5acbf8da56128d3e11b6b79fc3f1f2e4"
+    },
+    {
+      "checkpoint": 7,
+      "file": "part_7.md",
+      "bytes": 4363,
+      "sha256": "45cbbb45d5950caf9d868c06844b21ed54eca358584f2d761edb1c246e33ad10"
+    },
+    {
+      "checkpoint": 8,
+      "file": "part_8.md",
+      "bytes": 6312,
+      "sha256": "e6ba5f3f1272a13cfb93861128f0fceb6c26cc814c9a52f0b952ca9dea620295"
+    }
+  ],
+  "rendered_bytes": 36553,
+  "collection": {
+    "command": "pytest --collect-only <unchanged checkpoint tests1..N> --entrypoint=\"python forge.py\" --checkpoint=checkpoint_N",
+    "counts": [
+      40,
+      70,
+      101,
+      142,
+      166,
+      214,
+      251,
+      295
+    ],
+    "exits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "stderr_bytes": 0,
+    "count_once": "Cumulative counts overlap; never summed. No tests or entrypoint executed.",
+    "checkpoint8_stdout_sha256": "62961c4bc4f38ceae6a173787762906282103f4fefea79cf96f5ccd65fb6c392"
+  },
+  "isolation": {
+    "clean_process_environment": true,
+    "native_accounts_and_home_unchanged": true,
+    "private_cache_config_state_credentials_dir_netrc_tmp": true,
+    "dotenv": "Empty owned .env outside pinned checkouts stops native python-dotenv1.1.1 ancestor discovery; source has no disable flag. No inherited provider values read/copied.",
+    "references": "Native renderer reads specs; reference solutions remain outside candidate/model inputs."
+  },
+  "source_custody": {
+    "runner_lock_sha256": "a145f5aca7ad52017b593ad990389397d741626edfc13b070a69a365b4a9d2b8",
+    "corpus_lock_sha256": "4944b7fea1a3724b8b935535aa7b15a3daef2eefe31fd24d7814a78dc681aeeb",
+    "source_and_locks_unchanged": true,
+    "git_status_outputs_bytes": [
+      0,
+      0
+    ],
+    "root_independently_verified_artifact_count": 183,
+    "all_match": true,
+    "private_receipt_sha256": "7d58af00eb53b64561c0c41cb8bca4a783bc8cb28533b466e4c7890abbb553e2",
+    "private_manifest_sha256": "8c4f4d54ed87fd7e211c398f721f4097cfc196be4ed2101e60f978eb9d2447e2",
+    "scoped_process_search_exit": 1,
+    "process_search_output_bytes": 0
+  },
+  "usage": {
+    "model_calls": 0,
+    "native_model_tokens": 0,
+    "qualification_does_not_qualify_provider_metering": true
+  },
+  "limits": [
+    "Runner build-system requires unpinned Hatchling outside project uv.lock; resolved1.32.4 retained. Locked project dependencies are distinct from fully frozen build closure.",
+    "No grader execution, model/native session comparison, compaction, resume, recall or default freeze.",
+    "Eight Easy checkpoints may finish without natural compaction; that outcome cannot satisfy P2.",
+    "This engineering analogue does not qualify equity-research PDF/browser/image/audio/large-MCP preservation.",
+    "Worker author performed fresh recheck, not independent reviewer; coordinator independently verified183hashes."
+  ],
+  "next_source_binding": {
+    "local_grading_recipe": "configs/environments/local-py.yaml@31ceea3add480edb33431e70475c4c70597e6b31",
+    "sha256": "166c9a965e2bb1d3405e8dccdeaa0358dd8bae5e30f87333fbfbb6b7e00d0501",
+    "scope": "Source only; native eval-snapshot without rubric may grade locally; report not CLI exit decides tests; uvx grading dependencies resolve separately."
+  },
+  "independent_sol_max_completeness_read": {
+    "verdict": "ACCEPT model-free preparation/limitations publication only",
+    "private_critic_sha256": "489766baaa9a5eb9bc746a2fa4997cbc93eb0ec7119fb0cd40feb8b7ab25bce6",
+    "checked": "All183hashes, exact source HEADs/status, locks, eight rendered inputs and cumulative collection originals; final295unique native node IDs.",
+    "limits": "No grader execution, compaction/isolation/native protection/default or fully frozen build closure acceptance."
+  }
+}

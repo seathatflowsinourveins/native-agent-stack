@@ -1,0 +1,42 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Consequential judgment after one bounded Sol environment repair failed",
+  "client": "codex0.160.0",
+  "requested_model": "gpt-6-astra",
+  "recorded_turn_context_model": "gpt-6-astra",
+  "backend_resolved_model": null,
+  "effort": "max",
+  "exit_code": 0,
+  "verdict": "accept_bounded_repair",
+  "source_pin": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026",
+  "conditions": [
+    "One final unchanged cargo test --all only; preserve release source/lock/Rust/image and every failure",
+    "Tests and subprocesses UID/GID1000:1000; owned source/cache/temp writable; no permission bypass capabilities",
+    "Both earlier failing tests and successful-healing tests execute/pass; otherwise HOLD without further repair",
+    "No native homes, auth or client configuration mounts"
+  ],
+  "late_observation": "Docker is rootless. Namespace-root ownership preparation affects only disposable study children; actual non-root traversal/write and 0555-create rejection are separate native preflights. Astra read predates this late rootless observation.",
+  "usage": {
+    "input_tokens": 78111,
+    "cached_input_tokens": 59264,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 4091,
+    "reasoning_output_tokens": 3104,
+    "total_tokens": 82202
+  },
+  "accounting": {
+    "exact_response_records": 3,
+    "unique_response_ids": 3,
+    "reconciles_native_exec_completion": true,
+    "reconciles_last_native_thread_total": true,
+    "children": "not exercised",
+    "provider_cost": null
+  },
+  "retained_private_artifacts": {
+    "native_stream_sha256": "f370a3e412465479a9faf417c300e8f2f4ee9a3fae30fd0a11dbbb024088619a",
+    "answer_sha256": "cb2367c0fef392406ee5edde43f724b47dc64d504f896389bc2577b062cf81d0",
+    "native_usage_projection_sha256": "c28f6afa92c3b0d08e136edfd14e4b4afa820efa02adb853c633f87160c7275f"
+  },
+  "limitations": "Research overhead only. A container test pass cannot establish model savings, root/read-only deployment, or host-default acceptance."
+}

@@ -717,6 +717,13 @@
           ],
           "source": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json"
         }
+      },
+      "dated_distribution_qualification": {
+        "date": "2026-10-03",
+        "scope": "Tested distribution only; historical workstation card preserved",
+        "decision": "docs/decisions/2026-10-03-token-native-scoped-defaults.md",
+        "evidence": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
+        "default": "native baseline for tested prerequisite/fidelity/inclusive accounting scopes; no provider-token superiority"
       }
     },
     {
@@ -4355,6 +4362,13 @@
           ],
           "source": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json"
         }
+      },
+      "dated_distribution_qualification": {
+        "date": "2026-10-03",
+        "scope": "Tested distribution only; historical workstation card preserved",
+        "decision": "docs/decisions/2026-10-03-token-native-scoped-defaults.md",
+        "evidence": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
+        "default": "native baseline for tested prerequisite/fidelity/inclusive accounting scopes; no provider-token superiority"
       }
     },
     {
@@ -6339,6 +6353,13 @@
           ],
           "source": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json"
         }
+      },
+      "dated_distribution_qualification": {
+        "date": "2026-10-03",
+        "scope": "Tested distribution only; historical workstation card preserved",
+        "decision": "docs/decisions/2026-10-03-token-native-scoped-defaults.md",
+        "evidence": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
+        "default": "native baseline for tested prerequisite/fidelity/inclusive accounting scopes; no provider-token superiority"
       }
     },
     {

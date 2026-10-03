@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "FAMILY_READ_COMPLETE; WORD_LIMIT_FAIL; PRODUCERS_NOT_FROZEN",
+  "north_star_action": "Bind honest observable token/context comparisons for complex source-grounded R&D.",
+  "native_execution": {
+    "client": "ClaudeCode2.1.288",
+    "model": "Opus5.5",
+    "effort": "max",
+    "native_exit": 0,
+    "actual_Read_calls": 3,
+    "disjoint_request_message_groups": 2,
+    "input": 4,
+    "cache_creation": 6361,
+    "cache_read": 7948,
+    "output": 43457,
+    "thinking_output_subset": 41800,
+    "inclusive_total": 57770,
+    "native_list_cost_usd": 0.9216335999999999,
+    "invoice_wire_query_external_helpers": "UNKNOWN"
+  },
+  "word_contract": {
+    "returned": 557,
+    "limit": 550,
+    "result": "FAIL",
+    "retry_regrade": false
+  },
+  "immutable_inputs": {
+    "count": 6,
+    "hashes_match": true,
+    "root_freeze_sha256": "39c72464c23e574dd493d39252773b1b89b8ef5d6dbc6eae21623f9c93d421d4"
+  },
+  "read_scope": "Only the three bound method inputs; no hashing tool or source/runtime/config bundle granted to the reviewer. Opinion is a lead, not permission/readiness approval.",
+  "method_lead": "Observable assigned-configuration estimand fair once client-specific scalar/statistic, non-circular capture inventory, terminal comparison stop, joint quality gate and carryover/source/tool scope are fixed. Equal unknown labels do not prove hidden equivalence.",
+  "root_response": "One separately bound analysis/admission addendum fixes those conditions before native recovery freeze; preserves original P1STOP and P2HOLD.",
+  "native_view_mismatch": "Assistant output snapshots in native stream total13 and differ from finalized output43457; native journal/final/coststate reconcile57770. Events/content blocks are not response counts. Mismatch retained; no wire-completeness claim.",
+  "bindings_sha256": {
+    "answer": "77a0adfd2b8fafc5e4764769a6bf9268894f958ea0e4ba3212a5ca6eeaf888b5",
+    "finalized_native_journal": "d8a6d3837b15057616be4bab49b6ef1253078a6559e261fe3755e18630c3b0d7",
+    "independent_worker_receipt": "bb3fb475c26e98204f49a2d73ecff080a0af5fa834eeaca29413b34d14eaf32c",
+    "root_counter_verification": "2d18cf7b658462cc662d80206ad6bc4b490a701d00f72e3fb251c0a4cc71a3f2",
+    "addendum": "248373903c42ebb01b1c0f2b2620d68b239e41ff60d09e9ec726094b193677b1"
+  },
+  "sources": [
+    "NativeClaude2.1.288 help; officialinstalledClaudeSDK0.3.263 sdk.d.ts",
+    "ccusage/ccusage@d9821088b98aa536c7a385aa1a4579d6fa02269b rust/adapters/claude/src/lib.rs190-211 maximal-total selection"
+  ],
+  "completeness_critic": "Effective permission/read roots and both client-specific B admission remain unmeasured until separately bound native observations. Producer readiness/protection/P2/invoices remain outside this read."
+}

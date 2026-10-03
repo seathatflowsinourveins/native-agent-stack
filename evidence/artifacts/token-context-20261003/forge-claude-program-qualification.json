@@ -1,0 +1,105 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "One unchanged upstream Forge checkpoint1 grade of a stopped Claude-produced candidate copy",
+  "north_star_action": "Preserve actual engineering correctness gates before measuring context-layer continuity",
+  "sources": {
+    "runner": "SprocketLab/slop-code-bench@31ceea3add480edb33431e70475c4c70597e6b31",
+    "corpus": "gabeorlanski/scb-problems@38d627ecf668a88f88f8d260f8df8df6116e9b03",
+    "spec_sha256": "969c403ae7ce1cd08e93a4c116dd710f92d0db337426f1b95422e0b572d733ab",
+    "tests_sha256": "5d9258955fae6d244215e3727f08945a22d37af191de1dd0b93bba13c4a8065d"
+  },
+  "native_command": "slop-code --quiet eval-snapshot stopped-copy -o private-output -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json",
+  "native_result": {
+    "attempts": 1,
+    "command_sha256": "e21599cd95cd390abadd942c9d4844c86d3d602696fe2cea298775a0df918c80",
+    "start_utc": "2026-10-03T08:45:32Z",
+    "end_utc": "2026-10-03T08:45:48Z",
+    "cli_exit": 0,
+    "cap_seconds": 300,
+    "kill_grace_seconds": 5,
+    "timeout_termination_exercised": false,
+    "native_duration_seconds": 3.8397295475006104,
+    "pytest_exit": 1,
+    "infrastructure_failure": false,
+    "collected": 40,
+    "passed": 36,
+    "failed": 4,
+    "skipped": 0,
+    "pass_counts": {
+      "Core": 3,
+      "Functionality": 19,
+      "Regression": 0,
+      "Error": 14
+    },
+    "total_counts": {
+      "Core": 3,
+      "Functionality": 21,
+      "Regression": 0,
+      "Error": 16
+    },
+    "native_inventory_hash": "6d11f70b39513473a4e6fe500e150a3879af597cce531d9475388f2aa16c1a83",
+    "actual40_ids_exactly_match_prior_inventory": true,
+    "normalized_case_ids_sha256": "aec4b9d90736632c224c7bc3f9a39d3ef288e4be9eef95fe0514857006ee98fb",
+    "returned_and_saved_JSON_equal": true,
+    "native_tests_category_dictionary_and40_report_records_equal": true,
+    "stdout_sha256": "06fc9ac7238f01d8f6895c286afb81bfb5b27866defdf52b5baa05a78882cdd3",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "saved_evaluation_sha256": "7aacdf71406531b4f501cfd7bf128248043094a9e16f3f5c9e5cac10136fa73b",
+    "saved_native_report_sha256": "d8f79d6dee60bf8bbcb64d41b4256cba2435dadc842894dc86f67beaba7d75fd",
+    "failed_ids": [
+      "test_blueprint_list_name_tiebreak_when_created_at_collides",
+      "test_blueprint_list_uuid_tiebreak_when_created_at_and_name_collide",
+      "test_create_rejects_empty_name_string",
+      "test_create_rejects_empty_requirement_sets"
+    ],
+    "strict_oracle": "All40 original native IDs, pytest0/noinfra/nofail/noskip/nomissing; not satisfied."
+  },
+  "snapshot": {
+    "regular_files": 1039,
+    "symlinks": 4,
+    "bytes": 14053608,
+    "inventory_sha256": "3ae173c99bdd8ef79e42e3295ec5a3debabb0ada7ba3b3fda4c53f36f5e1a913",
+    "original_frozen_initial_copy_equal": true,
+    "original_and_frozen_unchanged_after_grade": true,
+    "canonical_grade_separate_from_candidate_owned_tests": true
+  },
+  "oracle_diagnostics": {
+    "two_collision_tests": "The unchanged tests read/rewrite data-dir/blueprints.json before sorting assertions; task contract does not prescribe that filename/storage layout; original FAIL retained",
+    "two_error_detail_tests": "Actual detail uses name: / requirement_sets: whereas unchanged substring assertions require a space without colon; public specification requires descriptive nonempty validation but no exact error-detail literal; original FAIL retained",
+    "source_locations": [
+      "checkpoint_1.md47-58/124-138",
+      "test_checkpoint_1.py125-132/556-595/789-797",
+      "tests/_helpers.py138-184"
+    ],
+    "not_regrade_or_correctness_acceptance": true
+  },
+  "qualified_environment": {
+    "Python": "3.12.3",
+    "pytest": "9.1.1",
+    "dependency_Name_Version_METADATA_matches": 18,
+    "frozen_resolver_acceptance": false,
+    "full_cache_RECORD_identity": false,
+    "native_successful_setup_streams": "Unavailable by upstream capture policy"
+  },
+  "root_verification": {
+    "artifact_hashes": 3879,
+    "all_match": true,
+    "exact_40_case_inventory_preserved": true,
+    "selected_original_spec_and_tests_read": true
+  },
+  "private_packet_hashes": {
+    "receipt": "3ccaffba8fb4d6d88881b1ce969b7387e3167cf080f2c226db28746e96483ba6",
+    "manifest": "fa79ed29a5a4289b31fa953273ba556b79c09d27a7230826642e57927e1f288d",
+    "oracle_diagnostic": "23082b50987445be583f09e60e08a4e094f8530d85d4a1190bd7cbd5cee7ad1f",
+    "checksum_verification": "18be1093712fb094017e7b7afa5c1846762c8536ddfd201dcee228819c3f88b6"
+  },
+  "strict_verdict": "FAIL36/40; native evaluator0 is not pytest0 or all40 acceptance",
+  "count_once": "Model-free deterministic grade only; original model timeout and partial native usage retained separately",
+  "limits": [
+    "No repair, retry, regrade, candidate/source/schema change or LLM judge",
+    "300s bound not exercised; native test duration and16second outer process timestamps are separate observations",
+    "Native model completion, final accounting, effective confinement, later checkpoints, compaction/resume and P1/P2 comparison unqualified"
+  ],
+  "command_description_correction": "Sanitized display initially omitted -o; original retained actual argv used the supported -o output flag. No execution or original command hash changed."
+}

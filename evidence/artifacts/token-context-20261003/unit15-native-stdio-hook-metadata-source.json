@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Bind supported native metadata protocol and startup scope before any P2 hook-context experiment",
+  "evidence_class": "retained installed help/schema/SDK and pinned source review only; offline publication draft",
+  "status": "STDIO_PROTOCOL_SUPPORTED_MATCHING_CONFIGURATION_AND_STARTUP_HOLD",
+  "native_client_revision": {
+    "Codex": "0.160.0",
+    "Codex_SDK": "0.160.0",
+    "source_revision": "a956835d020762cb2b570053af06f643a11c0ecc"
+  },
+  "source_observations": {
+    "native_transport": "App-server stdio with newline-delimited JSON",
+    "prospective_message_methods": [
+      "initialize",
+      "initialized",
+      "hooks/list"
+    ],
+    "prospective_messages": 3,
+    "hooks_list_requires_exact_owned_cwd": true,
+    "complete_native_metadata_type": "HookMetadata",
+    "HookMetadata_fields": [
+      "additionalContextLimit",
+      "currentHash",
+      "displayOrder",
+      "enabled",
+      "eventName",
+      "isManaged",
+      "key",
+      "matcher",
+      "pluginId",
+      "source",
+      "sourcePath",
+      "statusMessage",
+      "timeoutSec",
+      "trustStatus"
+    ],
+    "actual_native_metadata_return": "UNRUN",
+    "hooks_list_handler_scope": "Loads per-cwd configuration and conditionally discovers plugin hooks; selected handler neither executes hooks nor writes trust",
+    "cwd_is_universal_native_file_read_boundary": false,
+    "matching_original_configuration": {
+      "configs": 9,
+      "distinct_working_dirs": 1,
+      "distinct_complete_inline_native_configuration_profiles": 1,
+      "expected_owned_hook_events": 6,
+      "hooks_sources_files_present": 0,
+      "native_trust_state_empty": true,
+      "original_nine_manifest_hashes_match": true
+    },
+    "native_TOML_carrier_and_effective_profile": "HOLD; matching complete native argv/TOML parse remains UNRUN",
+    "maintained_serializer_reference": "Byte-identical unexecuted SDK source excerpt retained; reuse unchosen; no converter authored",
+    "public_pure_serializer_export": "Not found in inspected installed SDK exports/declarations; no universal serializer absence claim",
+    "native_startup_boundaries": [
+      "Normal native AuthManager and cloud configuration handling",
+      "Native SQLite initialization with corruption-recovery path",
+      "Native plugin startup warmups; cache/autoload effects not universally suppressed"
+    ],
+    "native_auth_boundary": "Native client manages normal native authentication; agents read no credentials or auth stores",
+    "actual_server_client_model_hook_daemon_MCP_calls": 0,
+    "SDK_provider_imports": 0,
+    "agent_auth_configuration_environment_store_reads": 0,
+    "native_key_or_trust_hashes_synthesized": 0
+  },
+  "required_unclosed_gates": [
+    "Matching native TOML override carrier and effective-profile binding",
+    "Coordinated native startup/shared-state/SQLite/plugin scope before any launch",
+    "Actual exact owned metadata key/hash/source/trust return; UNRUN"
+  ],
+  "corrections_and_failures": [
+    {
+      "condition": "Nine stages share one cwd/common inline six-event profile, not nine separate hooks-source files. Metadata projection corrected; originals unchanged.",
+      "artifact_sha256": "a1cac2f255495a4d7ab1811bc60791cb1e0bd6bddaa1ee1f89b5a753986b8fee"
+    },
+    {
+      "condition": "Four guessed primary source locators returned404/native22. Correct pinned processors found; no absence inferred. Oversized projections and an out-of-range source excerpt were corrected and retained.",
+      "artifact_sha256": "5a3e4daa176a6aac70e3d93e89ed71e464384bde4bff71dc6f1f77b7cf3cda06"
+    }
+  ],
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/app-server/src/request_processors/catalog_processor.rs",
+      "lines": "72–105,614–678",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server/src/request_processors/catalog_processor.rs",
+      "retained_source_sha256": "70ea2f46a69337c7b3e5ad2b461e5fdb4fffd83458e8387cc8ae8dccdca1efe6"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/app-server/src/request_processors/initialize_processor.rs",
+      "lines": "56–97,153–163,212–229",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server/src/request_processors/initialize_processor.rs",
+      "retained_source_sha256": "4535560b07ab10d1538acd461560a55c1bdf0c9b4049e72775d6b770421f117f"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/app-server/src/lib.rs",
+      "lines": "473–487,540–582,655–671",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server/src/lib.rs",
+      "retained_source_sha256": "1591686b49c80c062d2b1ce48e03eb7c95bb872cc57b41e0ecc016ceb42fd6f2"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/app-server/src/message_processor.rs",
+      "lines": "293–296,540–558,1530–1532",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server/src/message_processor.rs",
+      "retained_source_sha256": "f1a1bb0029e7c2f46de3048cbbc52b55ccca413dacb8ce67c63796372468318f"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/app-server",
+      "evidence": "Official documentation read in original source unit, unpinned and not refetched in this drafting unit"
+    }
+  ],
+  "custody": {
+    "report_sha256": "8dd76414f0fd180ddd2a571121b82997883369c4fe79df1147fb741a321fbe98",
+    "receipt_sha256": "8e6920b258b9bee93c112e66ae2cf75b7241274d8ceca28757b94f781206813b",
+    "source_bindings_sha256": "01da1746e3662cff19802ba9431a6fac966666e028c1a03029308c2a85123f38",
+    "manifest_sha256": "ead42e8b4eaa8463532994e162e6ec0b8b50f96fe192249e2fc9ebeea366d291",
+    "prospective_messages_sha256": "c35dae7e034e7768884ec537844b06cfc47216e6087c06805dfbbeb8bf6e9934",
+    "nine_original_input_bindings_sha256": "a1cac2f255495a4d7ab1811bc60791cb1e0bd6bddaa1ee1f89b5a753986b8fee",
+    "carrier_source_gap_sha256": "fc740187e734d7b92bb66c22ae10d7c4cd19bbc55f4236b16a1d9a78325e13c7",
+    "installed_hooks_list_schema_sha256": "891dd10ef7f78e59631fce05fff2becddb8004b3c0338dbbbd6b4f17ef1fa64f",
+    "installed_help_sha256": "4226dbf080b9d3a620385fba067bd3b8ac3c76654f28c3bd4d92ae20df2b03d2",
+    "installed_SDK_source_sha256": "d62ed107033bdba802b283c77d875e4bec3deb2704a910bb7e3f95059473b16f"
+  },
+  "preserved_status": {
+    "prior_scoped_CLI_TUI_HOLD": "UNCHANGED",
+    "P2_context_protection": "UNQUALIFIED/HOLD_UNMEASURED",
+    "separate_R2_first_case_STOP": "UNCHANGED; remaining55UNRUN_FINAL; not assessed or regraded by these source drafts"
+  },
+  "native_usage_evidence": "NONE_SOURCE_ONLY; no runtime counter or protection evidence",
+  "completeness_critic": "Native stdio closes a missed protocol modality, not the matching-carrier/startup/actual-return gates. It does not regrade the old scoped HOLD or establish context protection.",
+  "privacy": "Source facts, URLs/pins and artifact hashes only. No host paths, native hook-key/hash values, raw commands, environments, user configuration, credentials or conversations."
+}

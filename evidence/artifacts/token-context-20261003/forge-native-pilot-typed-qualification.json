@@ -1,0 +1,106 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Distinct preregistered typed Forge pilot; original failures retained",
+  "north_star_action": "Substantial source-faithful engineering and later native continuity qualification",
+  "preregistration_sha256": "22216b02e9f344f001a05792c6c2dbb3a179aa764717288012a94b48d94d6e9d",
+  "sources": {
+    "promptfoo": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "runner": "SprocketLab/slop-code-bench@31ceea3add480edb33431e70475c4c70597e6b31",
+    "corpus": "gabeorlanski/scb-problems@38d627ecf668a88f88f8d260f8df8df6116e9b03"
+  },
+  "codex": {
+    "evaluator_exit": 0,
+    "schema_pass": true,
+    "program_quality": "FAIL: separate unchanged grader38/40,pytest1",
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "native_cli_version": "0.160.0",
+    "roles": {
+      "main": {
+        "unique_responses": 16,
+        "usage": {
+          "input_tokens": 657299,
+          "cached_input_tokens": 603520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 19975,
+          "reasoning_output_tokens": 7729,
+          "total_tokens": 677274
+        },
+        "commands": 16,
+        "command_exit_codes": {
+          "0": 13,
+          "1": 3
+        }
+      },
+      "forge_engineer": {
+        "unique_responses": 9,
+        "usage": {
+          "input_tokens": 322869,
+          "cached_input_tokens": 290944,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 8809,
+          "reasoning_output_tokens": 3463,
+          "total_tokens": 331678
+        },
+        "commands": 9,
+        "command_exit_codes": {
+          "0": 8,
+          "1": 1
+        }
+      }
+    },
+    "whole_bound_trajectory": {
+      "input_tokens": 980168,
+      "cached_input_tokens": 894464,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 28784,
+      "reasoning_output_tokens": 11192,
+      "total_tokens": 1008952
+    },
+    "unique_responses": 25,
+    "cross_stream_overlap": 0,
+    "parent_sdk_tokens": 677274,
+    "omitted_child_tokens": 331678,
+    "bounded_compacted_records": 0,
+    "unknown_cost": true
+  },
+  "claude": {
+    "native_evaluator_exit": 100,
+    "started_utc": "2026-10-03T07:57:49Z",
+    "completed_utc": "2026-10-03T07:57:51Z",
+    "error": "Error calling Claude Agent SDK: Error: Cannot use both a settings file path and the sandbox option. Include the sandbox configuration in your settings file instead.",
+    "returned_session_id": false,
+    "native_usage": null,
+    "native_cost": null,
+    "harness_zero_counters_are_not_billing_evidence": true,
+    "failure_scope": "Returned error matches selected installed SDK settings/sandbox guard, whose call precedes native process spawning in primary implementation; no returned native session/usage endpoint; no Claude history scan",
+    "requested_model_effort": {
+      "model": "opus",
+      "effort": "max"
+    },
+    "observed_native_model_effort": "UNPROVEN",
+    "helpers_children_retries": "UNKNOWN: no native endpoint captured"
+  },
+  "root_verification": {
+    "packet_artifacts": 8,
+    "attempt_and_source_artifacts": 27,
+    "original_native_prefixes": 2,
+    "exact_counters_independently_recomputed": true,
+    "root_projection_sha256": "2263d5ac5851a382783cf4baa4d8678028db1954369ba6d682fa7e6c415db77b"
+  },
+  "private_original_hashes": {
+    "conclusions": "73c9a6615b788de481b5eafbbfeb48c7ce59f14102a2ec97c66fa79bfa561b93",
+    "source_bindings": "b07130ea6354fb2c822bbc70e29cb859fd435818869db28db9fe46b62bc8ee1c",
+    "artifact_manifest": "507b0534a0717b0b6f69f2f991b8a2e517be73d253cf6904e54e79c4a9cca4a1"
+  },
+  "limits": [
+    "No task-quality/default/adoption verdict from schema pass",
+    "No additive cumulative or legacy snapshots",
+    "No assumption that exact completed-response counters cover rejected/interrupted requests or invisible automatic helpers",
+    "No invoice/provider wire IDs or retry count",
+    "No global/background state absence claim",
+    "No native compaction-quality judgment from bounded zero compacted records"
+  ],
+  "outcome": "Failed qualification; no comparison/default/freeze/protection or context-supply amendment"
+}

@@ -1,0 +1,87 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Read-only Opus/max protocol critique; research overhead, not treatment comparison",
+  "reviewed_head": "7d56af25ba8f8ab266bd2ee96e8d0edf517cf488",
+  "reviewed_protocol_sha256": "2fa8bc1252a179548ac7e5a5465e1fa8db3d98620d78eb5b861e4e512705d881",
+  "client": "Claude Code2.1.288",
+  "requested_model": "opus",
+  "resolved_model": "claude-opus-5-5",
+  "effort": "max",
+  "exit_code": 0,
+  "stderr_bytes": 0,
+  "verdict": "hold",
+  "native_invocation": [
+    "claude",
+    "-p",
+    "--model",
+    "opus",
+    "--effort",
+    "max",
+    "--permission-mode",
+    "dontAsk",
+    "--tools",
+    "Read,Grep,Glob",
+    "--allowedTools",
+    "Read,Grep,Glob",
+    "--setting-sources",
+    "",
+    "--settings",
+    "{\"disableAllHooks\":true,\"autoMemoryEnabled\":false,\"claudeMdExcludes\":[\"**\"]}",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{\"mcpServers\":{}}",
+    "--disable-slash-commands",
+    "--verbose",
+    "--output-format",
+    "stream-json"
+  ],
+  "material_findings": [
+    "Failed attempts were excluded from the previous accepted-only efficiency endpoint; corrected before any comparative trial",
+    "Job-level decision, fixed budget, matched schedule, uncertainty, exposure and state carryover were unbound",
+    "Natural compaction/resume trajectory, main/child/retry/advisor accounting and native SDK/profile parity still need observation",
+    "No extra peer permission gate is inferred: the user already authorized within-layer winner activation"
+  ],
+  "usage": {
+    "ordinary_input_tokens": 4,
+    "cache_creation_input_tokens": 15289,
+    "cache_read_input_tokens": 8412,
+    "output_tokens": 66838,
+    "thinking_tokens_in_output": 63592,
+    "total_disjoint_tokens": 90543
+  },
+  "accounting": {
+    "source": "Identified new session native assistant-message usage and executor iterations",
+    "assistant_entries": 7,
+    "unique_request_and_message_pairs": 2,
+    "deduplication": "Repeated messages shared identical usage; sum each unique request/message pair once",
+    "iteration_types": [
+      "message"
+    ],
+    "reconciles_native_final_usage": true,
+    "reconciles_native_model_usage": true,
+    "children": "not exercised",
+    "advisor": "not exercised",
+    "retries": "not exercised",
+    "compaction": "not exercised",
+    "native_list_price_estimate_usd": 1.4607704,
+    "provider": "firstParty",
+    "cost_basis": "list",
+    "invoice_or_subscription_spend": null
+  },
+  "response_contract": {
+    "requested_max_words": 1000,
+    "observed_words": 1352,
+    "passed": false
+  },
+  "retained_private_artifacts": {
+    "native_stream_sha256": "ca76274b29d5298d123c290011ffc351842be1e090dcf1d832a7bb0920d2a4fc",
+    "native_usage_projection_sha256": "e0dfa16010254c7cba85239986e350f851c84ae8006e29c37999880883e5be94",
+    "answer_sha256": "02dd61fdf2677c40c1c9cdff850c620c92b90e066ce17fbf59c0e353e39c6b03"
+  },
+  "limitations": [
+    "Useful HOLD critique does not freeze the protocol; fully bound revision needs a new read",
+    "Native metadata/argv establish invocation and requested effort; model self-description does not",
+    "Partial fixture/source qualification may proceed without comparative model trials"
+  ]
+}

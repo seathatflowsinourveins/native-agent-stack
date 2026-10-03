@@ -1,0 +1,304 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Fresh main/child native focused-command functional/accounting qualification; excluded RTK comparator stays unrun",
+  "source_pins": {
+    "claude_native_override": "2.1.288",
+    "claude_sdk": "@anthropic-ai/claude-agent-sdk@0.3.263",
+    "codex": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc / native0.160.0",
+    "codex_sdk": "@openai/codex-sdk@0.160.0",
+    "harness": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "source_task_fixture": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026"
+  },
+  "native_execution": {
+    "evaluation_duration_ms": 187676,
+    "exit_code": 0,
+    "exit_evidence": "Coordinator independently observed evaluator exit0; no separate exit-code artifact supplied in this directory",
+    "observed_completed_at": "2026-10-03T05:31:14Z",
+    "runtime_options": {
+      "cache": false,
+      "eventSource": "cli",
+      "maxConcurrency": 1,
+      "maxEvalTimeMs": 1800000,
+      "repeat": 1,
+      "showProgressBar": false,
+      "timeoutMs": 900000
+    },
+    "schema_errors": 0,
+    "schema_failures": 0,
+    "schema_successes": 2,
+    "started_at": "2026-10-03T05:27:11Z",
+    "supported_promptfoo_package_bin": "dist/src/entrypoint.js"
+  },
+  "config_sha256": "2f18ddaf9e9d598dfe9f8de96eb6b05c011b9a83a8a72f382f3df270750c8a66",
+  "preregistration_sha256": "ea04cf6401c6a9bcb646d2fc771b68d70a746582c9f0c6a659f2575b96c67c42",
+  "preregistered_conditions": [
+    {
+      "condition": "Both unchanged deterministic schema grades pass",
+      "evidence": "Two retained native deterministic schema passes.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "All12source-bound C1/C2/C3 native command executions are independently observed in main/child records",
+      "evidence": "All12 source-bound eligible commands independently observed; one additional Codex child skill read is disclosed and counted.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "Each C3 exit128/empty stdout/full diagnostic observed; expected failure is useful validation",
+      "evidence": "All four C3 calls preserve exit128 and full fatal diagnostic. Codex native stdout carrier is nonempty and stderr empty; Claude error strings lack separate stream fields. Empty underlying process stdout and stream separation are not proved; no diagnostic is relabeled into stderr.",
+      "verdict": "UNPROVEN as preregistered"
+    },
+    {
+      "condition": "Native child linkage and requested/recorded max effort observed",
+      "evidence": "Native canonical parent-child bindings and own max-effort model records verified for both clients.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "Exact native parent/child or modelUsage scopes reconcile counted once",
+      "evidence": "Unique bound Codex thread responses and final native Claude aggregate reconcile counted once.",
+      "verdict": "PASS"
+    },
+    {
+      "condition": "Both original source hashes match after execution",
+      "evidence": "Both original immutable source hashes match after execution.",
+      "verdict": "PASS"
+    }
+  ],
+  "overall_declared_contract": "NOT PASS: retained empty-process-stdout/stream-separation prerequisite is unproven despite schema2PASS",
+  "codex": {
+    "main": {
+      "unique_response_count": 4,
+      "compacted_record_count": 0,
+      "effort": "max",
+      "model": "gpt-6.1-sol",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 59904,
+        "input_tokens": 73384,
+        "output_tokens": 1360,
+        "reasoning_output_tokens": 256,
+        "total_tokens": 74744
+      }
+    },
+    "child": {
+      "unique_response_count": 3,
+      "compacted_record_count": 0,
+      "effort": "max",
+      "model": "gpt-6.1-sol",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 60032,
+        "input_tokens": 73996,
+        "output_tokens": 1299,
+        "reasoning_output_tokens": 791,
+        "total_tokens": 75295
+      }
+    },
+    "whole_trajectory_usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 119936,
+      "input_tokens": 147380,
+      "output_tokens": 2659,
+      "reasoning_output_tokens": 1047,
+      "total_tokens": 150039
+    },
+    "sdk_returned_parent_total": 74744,
+    "sdk_excluded_child_total": 75295,
+    "child_payload_session_id": "Parent UUID is retained in payload.session_id; canonical payload.thread_id identifies child scope",
+    "ancestor_replay_scope": "Child file carries parent session_meta and turn_context copies; these are not usage and were not counted."
+  },
+  "claude": {
+    "main": {
+      "unique_request_count": 2,
+      "compaction_iteration_count": 0,
+      "effort": "max",
+      "model": "claude-opus-5-5",
+      "usage": {
+        "cache_creation_input_tokens": 11823,
+        "cache_read_input_tokens": 27185,
+        "input_tokens": 4,
+        "output_tokens": 7004,
+        "thinking_tokens": 5038,
+        "total_tokens": 46016
+      }
+    },
+    "child": {
+      "unique_request_count": 2,
+      "compaction_iteration_count": 0,
+      "effort": "max",
+      "model": "claude-opus-5-5",
+      "usage": {
+        "cache_creation_input_tokens": 5411,
+        "cache_read_input_tokens": 4220,
+        "input_tokens": 4,
+        "output_tokens": 2986,
+        "thinking_tokens": 2325,
+        "total_tokens": 12621
+      }
+    },
+    "whole_native_aggregate": {
+      "cacheCreationInputTokens": 17234,
+      "cacheReadInputTokens": 31405,
+      "inputTokens": 1393,
+      "outputTokens": 10009,
+      "thinkingTokens": 7363,
+      "total_tokens": 60041,
+      "webSearchRequests": 0
+    },
+    "sdk_returned_whole_total": 60041,
+    "opus_parent_plus_child_total": 58637,
+    "known_haiku_tokens": 1404,
+    "helper_call_count_unknown": true,
+    "helper_request_id_independently_bound": false,
+    "agent_result_totalTokens": 7454,
+    "agent_result_totalTokens_scope": "Only final child request; full child is12621 across two unique requests. The trailer is not added to modelUsage.",
+    "estimated_cost_usd": 0.32923199999999997,
+    "cost_scope": "Native list estimate; not provider invoice"
+  },
+  "invocations": {
+    "eligible_command_count": 12,
+    "eligible_commands_per_role": {
+      "claude_child": 3,
+      "claude_main": 3,
+      "codex_child": 3,
+      "codex_main": 3
+    },
+    "observed_total_shell_execution_count": 13,
+    "observed_eligible_command_repeats_or_retry_executions": 0,
+    "exit_scope": "Codex0/0/128 numeric exits are explicit. Claude C1/C2 success is explicit but numeric0 is inferred; Claude C3 numeric128 is explicit in the native error string.",
+    "fidelity": "Native returned strings retained verbatim, including differing trailing newlines. Native channel fields and formatted error carriers remain distinct; no process stream reconstruction.",
+    "additional_command": "One Codex child read of using-superpowers/SKILL.md; included in usage",
+    "eligible_rate": "12/12 observed for directed fixed command opportunities; not natural RTK invocation"
+  },
+  "count_once": {
+    "cached_input_is_subset_for_codex": true,
+    "claude_ordinary_and_cache_buckets_counted_once": true,
+    "claude_whole_total": 60041,
+    "codex_whole_total": 150039,
+    "difference_excluded_codex_child": 75295,
+    "promptfoo_returned_total": 134785,
+    "reasoning_thinking_are_output_subsets": true,
+    "run_whole_total": 210080
+  },
+  "source_fixture_after_checks": [
+    {
+      "name": "Cargo.toml",
+      "bytes": 2512,
+      "before_sha256": "362b34c49755eddcf3f8d48bb80db8db6c2bb26f05a928efa2fd124684d5b29d",
+      "after_sha256": "362b34c49755eddcf3f8d48bb80db8db6c2bb26f05a928efa2fd124684d5b29d",
+      "matches": true
+    },
+    {
+      "name": "tests/fixtures/git/blob_large.txt",
+      "bytes": 10765,
+      "before_sha256": "2235ca9dc4015bb2c758f7919721fafde8b775958cbd069d6d83d27729329fb3",
+      "after_sha256": "2235ca9dc4015bb2c758f7919721fafde8b775958cbd069d6d83d27729329fb3",
+      "matches": true
+    }
+  ],
+  "retained_private_artifacts": {
+    "config.json": "2f18ddaf9e9d598dfe9f8de96eb6b05c011b9a83a8a72f382f3df270750c8a66",
+    "preregistration.json": "ea04cf6401c6a9bcb646d2fc771b68d70a746582c9f0c6a659f2575b96c67c42",
+    "results.json": "3e94451f7abb486c0ae961fbda6d19333e0945a3e498dc5a456579a884afb90e",
+    "eval.stdout": "899f69a82a56329c719e0b40ef20a32b8051066b9ff15838f8aeb6b6c36e4928",
+    "eval.stderr": "a1fd3e4d17c107ea32c866033b6201add96e4502946a079a5eed1e1f40543acd",
+    "started.txt": "e2eb31a5acf69aef5fde10823fb7fabf0757ecc340f81accc58d564e4420e4e3",
+    "observed-completed.txt": "9a91aae4a6bb4c9da5d0db37ccd5632c7bc37bdbab40a0e53cd75c51ccc59ffc",
+    "validate.stdout": "101dfc06d8446db7dfdb302d083739ee86e6bea493794bffc128af33c51de83e",
+    "validate.stderr": "9886eb7e033226c942870ceb8f436d0d16d25bf10a57bf51e8c9ebe91fdb960d",
+    "validate-wrong-entrypoint.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validate-wrong-entrypoint.stderr": "7167f5e037aa882fb13ee7b290100f81b8ffc5ff94fa1cfec354f45fa03eea4a",
+    "accounting-conclusions.json": "b1a1255566b94c4ff44879d9887b6a611923907e1434e34342360e7c0d6552e9",
+    "claude_child-usage-metadata.jsonl": "67e23d3fa4ba13d0d09db9875f349c34d4770405ee7e5d7f1e39efd68f233cb8",
+    "claude_main-usage-metadata.jsonl": "22d0e724930ba4d91338f1519dcb07994f0844bd798304deb5c77aeef0cb37f9",
+    "codex_child-usage-metadata.jsonl": "34c11bf9e4b0d6f27e2408cdd6b64afb8d326f6b90dd71f05a82b9b3d10dde4b",
+    "codex_main-usage-metadata.jsonl": "9822ef2de5633ea8a745b891e6c8752d5de30a390f0604c0b24adbf27110d219",
+    "eligible-command-invocations.jsonl": "458153649019f69df87125174ca8861467bd7064ac92805c253dd2deb7bfcd8c",
+    "extra-command-invocations.json": "3dc0d88087a14136d3461a0f435305dbd108b812df8745e3ff01946e8fb5cb41",
+    "native-result-usage.json": "c1215c08ed3943f4c596ab0afe0b54e0ee9328131cb3d835c86de48a0a8347a0",
+    "source-captures.json": "9d591519389c92e3ae8998511e18edc55181a51e7d66af960cd5fef057d3c154",
+    "artifacts.json": "6db1e28fdd48394b2c25303dcc1c0a6f9851b19d58ffccfbafcdf0c4504e0739"
+  },
+  "native_source_captures": [
+    {
+      "role": "codex_main",
+      "capture_bytes": 102864,
+      "capture_sha256": "d580405c74365fe466b194ac15f9ddfce99d00d736a40a6f626c0b68baddfee2",
+      "complete_lines": 42,
+      "record_type_counts": {
+        "event_msg": 17,
+        "inter_agent_communication_metadata": 1,
+        "response_item": 16,
+        "session_meta": 1,
+        "token_usage_record": 4,
+        "turn_context": 1,
+        "world_state": 2
+      }
+    },
+    {
+      "role": "codex_child",
+      "capture_bytes": 189520,
+      "capture_sha256": "da305e4126026af22dde06d336666c44103cdbb9d9b370c798e41dbb902bec51",
+      "complete_lines": 41,
+      "record_type_counts": {
+        "event_msg": 16,
+        "inter_agent_communication_metadata": 1,
+        "response_item": 15,
+        "session_meta": 2,
+        "token_usage_record": 3,
+        "turn_context": 2,
+        "world_state": 2
+      }
+    },
+    {
+      "role": "claude_main",
+      "capture_bytes": 132634,
+      "capture_sha256": "23422342420d6def154a36a652e37c50fd99ffa199eebb796b3be8ec88afebf2",
+      "complete_lines": 38,
+      "record_type_counts": {
+        "ai-title": 3,
+        "assistant": 6,
+        "atis-latch": 4,
+        "attachment": 13,
+        "cost-state": 1,
+        "last-prompt": 4,
+        "queue-operation": 2,
+        "user": 5
+      }
+    },
+    {
+      "role": "claude_child",
+      "capture_bytes": 45997,
+      "capture_sha256": "93ae103b623f0e71e651265704ada33556d10de00d66fd133e33d1422e20ef05",
+      "complete_lines": 19,
+      "record_type_counts": {
+        "assistant": 6,
+        "attachment": 9,
+        "user": 4
+      }
+    }
+  ],
+  "mistake_and_correction": {
+    "mistake": "Guessed Promptfoo dist/main.js entrypoint failed MODULE_NOT_FOUND before model invocation",
+    "retained_exit": 1,
+    "verification": "Installed package bin and native --help select supported dist/src/entrypoint.js; subsequent native validate exited0. Not a model rerun or measurement."
+  },
+  "limitations": [
+    "No RTK comparator model arm, savings, protection superiority, natural compaction, other command families or full-profile parity is established.",
+    "All12 eligible commands are present, plus one extra Codex child skill read; its model usage is included.",
+    "C3 diagnostic and exit128 are observed, but preregistered empty-process-stdout/stream separation stays UNPROVEN; overall declared contract is NOTPASS.",
+    "Claude success carriers do not supply numeric process exits for C1/C2; inferred0 remains separately labeled.",
+    "Known Haiku1404 is included once in final native aggregate; independent helper request provenance and helper-call count are unknown.",
+    "No explicit API retry/compaction events or eligible-command duplicate executions occur in selected records; backend retries/aborts and background global state are not absence claims.",
+    "Child ancestor metadata replay and Claude partial snapshots are not additive usage.",
+    "One metadata shape inspection printed the fixed Agent qualification prompt/result unnecessarily; retained projections whitelist IDs, counters, commands and status and omit that conversational content."
+  ],
+  "independent_completeness_read": {
+    "verdict": "accept_publication_unit",
+    "role": "Sol6.1/max source critic",
+    "scope": "Independently checked20artifact hashes, arithmetic, both roles and original failed condition; not default/freeze/P2/final-goal acceptance",
+    "reviewed_receipt_sha256": "3fbeb9d91e379b4d78b94d20f79f2a32f409cfdd26a840aa90477d5626bbe544",
+    "next_sweep": "Native stream observability, profile parity, other command families, retries/aborts, helper provenance and compaction continuity"
+  },
+  "native_identifier_custody": "Native session/thread/child identifiers remain only in selected private originals; public roles and returned source hashes bind the sanitized receipt."
+}

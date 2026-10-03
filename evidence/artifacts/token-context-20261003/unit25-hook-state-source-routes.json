@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "publication_status": "DRAFT_ROOT_OWNS_INTEGRATION",
+  "status": "SOURCE_SUPPORTED_D_AND_CONDITIONAL_H_NATIVE_DELIVERY_UNRUN",
+  "evidence_scope": "pinned parser/provider/SDK source closure only",
+  "alternatives": {
+    "native_baseline": "native focused reads, subagents, default compaction and exact-session resume remain comparison baseline; controlled owned-state parity must be declared",
+    "D": "native --config hooks.state=<quoted TOML inline table> preserves returned string keys/hashes and guard; source-supported native CLI shape only",
+    "H": "provider config.cli_env.CODEX_HOME with existing per-arm fixed owned config directory; User-layer state and unchanged SessionFlags handlers; explicit equivalent keyless pool/non-hook configuration"
+  },
+  "sdk_limit": "SDK plain-object flattening emits unquoted nested paths; native dot splitter breaks the native config.toml key. Selected Promptfoo buildCodexOptions forwards object config, not raw SDK configOverrides.",
+  "guard": "copy exact returned key/currentHash into enabled/trusted_hash; no derived keys/hashes, trust bypass or auth copy",
+  "native_selected_metadata_scope": "six enabled unmanaged SessionFlags entries currently untrusted; metadata identity only",
+  "native_state_delivery": "UNRUN",
+  "maintained_role_and_exact_session_continuation_qualification": "UNRUN",
+  "account_config_discovery_local_cache_global_parity": "UNKNOWN_UNCLAIMED",
+  "source_pins": [
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/utils/cli/src/config_override.rs",
+      "lines": "49\u2013101",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/utils/cli/src/config_override.rs#L49"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/config/src/overrides.rs",
+      "lines": "17\u201374",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/overrides.rs#L17"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/config/src/hook_config.rs",
+      "lines": "20\u201332",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/hook_config.rs#L20"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/hooks/src/config_rules.rs",
+      "lines": "15\u201361",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/config_rules.rs#L15"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/hooks/src/engine/discovery.rs",
+      "lines": "664\u2013679,794\u2013820",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/engine/discovery.rs#L664"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/core/src/config/mod.rs",
+      "lines": "951\u2013959,1497\u20131526,4088\u20134093,4931\u20134939",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs#L4931"
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/codex-sdk.ts",
+      "lines": "800\u2013824,1039\u20131050",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts#L800"
+    },
+    {
+      "repository": "openai/codex",
+      "package": "@openai/codex-sdk",
+      "pin": "0.160.0",
+      "package_artifact": "dist/index.js",
+      "lines": "174\u2013185,244\u2013265,317\u2013388",
+      "artifact_sha256": "d62ed107033bdba802b283c77d875e4bec3deb2704a910bb7e3f95059473b16f",
+      "source_scope": "retained unchanged installed package bundle; no guessed TypeScript source locator"
+    }
+  ],
+  "original_source_closure_sha256": "0a5e56cc6acdbc51abdad6a72b8860fec7eadd5b5ef8dfa164ac35325769adab",
+  "original_config_file_addendum_sha256": "b2c305f3ed2d9d66b7b031813f4052d228ba80ebadfcd38c67491a72bd118e88",
+  "original_source_closure_manifest_sha256": "56eaad39e5827429f52523c35839c3cbae315312d70c2703232a3670743aa62d",
+  "original_config_file_addendum_manifest_sha256": "24c28e2b74337d17b8b50f04f71c1acbbdb063216e4b81c711f3ec1913566474",
+  "finite_next_gate": "scoped native metadata must show exact selected identities/definitions/hash and enabled/trusted with clean diagnostics; then maintained main/max-child and exact-ID continuation, under existing user goal; no favorable-vote or physical census gate",
+  "overturn_comparison": "H propagation failure keeps admission HOLD; supported lossless native raw-state delivery through the selected maintained provider would reopen D/H comparison",
+  "P2": "HOLD_UNMEASURED",
+  "adoption_default_saving_or_user_approval": false,
+  "north_star_action": "measured native long-session context protection and critical continuity on real engineering work",
+  "temporal_scope": "At closure of this source unit; subsequent direct owned-home native metadata result is recorded separately in unit26, with roles/continuation/P2 still unqualified.",
+  "prepublication_draft_sha256": "872663d74b5d29ac9b2247da7667ee1148c0ea6a6c4b28c4a3bd606d0b720483"
+}

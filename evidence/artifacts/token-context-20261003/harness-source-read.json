@@ -1,0 +1,49 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "read-only harness-source judgment; not a comparison",
+  "client": "codex 0.160.0",
+  "requested_model": "gpt-6-astra",
+  "recorded_turn_context_model": "gpt-6-astra",
+  "backend_resolved_model": null,
+  "effort": "max",
+  "exit_code": 0,
+  "verdict": "accept_as_harness_candidate",
+  "scope": "Promptfoo 0.123.1 native SDK providers can drive paired runs; returned summaries alone do not establish complete exact usage or native interactive acceptance.",
+  "source_pin": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+  "freeze_blockers": [
+    "Exact task, oracle, pairing, uncertainty and failure contracts",
+    "Observed parent, child, retry and compaction accounting",
+    "Scoped settings preserving native caches, compaction, deferred tools and delegation",
+    "Actual executable/bundle treatment identity and fresh-client acceptance"
+  ],
+  "usage_scope": "This one completed review's main thread; no delegated children. Research overhead, never treatment savings.",
+  "exact_response_records": 9,
+  "unique_response_ids": 9,
+  "usage": {
+    "input_tokens": 467875,
+    "cached_input_tokens": 390528,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 8565,
+    "reasoning_output_tokens": 4763,
+    "total_tokens": 476440
+  },
+  "accounting": {
+    "source": "New session's top-level token_usage_record payload.usage",
+    "counted_once": "Nine unique response IDs; sum each payload.usage once. Do not sum turn_token_usage, thread_token_usage or token_count snapshots.",
+    "reconciles_with_last_thread_total": true,
+    "reconciles_with_exec_completion": true,
+    "cache_and_reasoning_are_subsets": true,
+    "provider_cost": null,
+    "child_coverage": "not exercised",
+    "failed_attempt_coverage": "not exercised",
+    "compaction_coverage": "not exercised"
+  },
+  "retained_private_artifacts": {
+    "native_stream_sha256": "32a26cbf4f79a28dc6afd0777747cedcb261fac13a001b32e012575d2a626715",
+    "native_usage_projection_sha256": "6015b4575050d3b1211f05d6268ffa8c6664d7ad04824ddd69a5ee6d642cf36f",
+    "answer_sha256": "566ca3408724dffd6b46eea1dd73a5770299983a19cb54301ea0eed566c3d444"
+  },
+  "correction": "An initial event_msg-only projection missed exact usage records. Inspection of the identified rollout's type counts found top-level token_usage_record entries. The corrected projection reconciled with native completion; no absence claim remains. A malformed jq aggregate also failed before the corrected query.",
+  "limitations": "Native turn context records the requested model, not an independently observed backend-resolved model. Complete study usage and provider cost remain unknown."
+}

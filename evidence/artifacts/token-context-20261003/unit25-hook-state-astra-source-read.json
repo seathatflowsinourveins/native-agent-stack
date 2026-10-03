@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "scope": "actual source judgment only",
+  "status": "CONDITIONAL_SOURCE_ROUTE_CURRENT_ADMISSION_P2_HOLD",
+  "client_version": "Codex0.160.0",
+  "requested_and_native_configured_model": "gpt-6-astra",
+  "effort": "max",
+  "native_exit": 0,
+  "source_choice": "H: each arm fixed owned CODEX_HOME config-file User-layer state; explicit equivalent keyless pool/non-hook settings; exact native keys/hashes and guard preserved",
+  "native_state_delivery": "UNRUN",
+  "maintained_role_and_exact_session_continuation_qualification": "UNRUN",
+  "natural_compaction_context_protection": "UNMEASURED",
+  "known_main_native_usage": {
+    "input_tokens": 391771,
+    "cached_input_tokens": 322944,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 8898,
+    "reasoning_output_tokens": 5396,
+    "total_tokens": 400669,
+    "uncached_input_tokens": 68827
+  },
+  "known_main_unique_response_groups": 10,
+  "linked_helper_native_usage": null,
+  "whole_source_judgment_native_usage": null,
+  "visible_native_stream_reconnects": 1,
+  "unfinalized_stream_usage": "UNKNOWN",
+  "visible_main_source_read_commands": 15,
+  "immutable_input_bindings": 57,
+  "all_unchanged": true,
+  "answer_words": 210,
+  "answer_cap": 275,
+  "answer_sha256": "7ec1718a297bc53b63f7026402dd4a46e6fdab308adb8757ac8bc4421956b8ab",
+  "source_pins": [
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/utils/cli/src/config_override.rs",
+      "lines": "49\u2013101",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/utils/cli/src/config_override.rs#L49"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/config/src/overrides.rs",
+      "lines": "17\u201374",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/overrides.rs#L17"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/config/src/hook_config.rs",
+      "lines": "20\u201332",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/hook_config.rs#L20"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/hooks/src/config_rules.rs",
+      "lines": "15\u201361",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/config_rules.rs#L15"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/hooks/src/engine/discovery.rs",
+      "lines": "664\u2013679,794\u2013820",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/engine/discovery.rs#L664"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/core/src/config/mod.rs",
+      "lines": "951\u2013959,1497\u20131526,4088\u20134093,4931\u20134939",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs#L4931"
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/codex-sdk.ts",
+      "lines": "800\u2013824,1039\u20131050",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts#L800"
+    },
+    {
+      "repository": "openai/codex",
+      "package": "@openai/codex-sdk",
+      "pin": "0.160.0",
+      "package_artifact": "dist/index.js",
+      "lines": "174\u2013185,244\u2013265,317\u2013388",
+      "artifact_sha256": "d62ed107033bdba802b283c77d875e4bec3deb2704a910bb7e3f95059473b16f",
+      "source_scope": "retained unchanged installed package bundle; no guessed TypeScript source locator"
+    }
+  ],
+  "source_limit": "SDK nested-state flattening unsupported; direct CLI metadata receipt is not Promptfoo model-task admission",
+  "uncertainties": [
+    "actual helper request returned canonical name without native UUID/usage",
+    "native configured model/effort do not establish wire/invoice identity",
+    "account/config/discovery/local cache namespace parity with original distribution unclaimed"
+  ],
+  "historical_failures_retained": [
+    "539 versus566 strict count coherence FAIL",
+    "weak own-equiv oracle",
+    "old stopped P1 and R2 scopes unchanged"
+  ],
+  "adoption_or_default_or_saving_claim": false,
+  "judgment_is_not_user_approval": true,
+  "completeness_critic": "Config-file modality supported conditionally; native state/role/resume/quality execution remains unqualified. No full plugin/global parity, complete physical/helper census or monetary saving claimed.",
+  "north_star_action": "finite native long-session engineering continuity/context protection, with genuine automatic compaction and unchanged independent quality",
+  "original_artifacts_by_sha256": {
+    "completion": "0a4773ade850074bb3d9b101c820306475342292a8c02939973ef67b68fb19b8",
+    "stdout": "98ba04f24fac9becc536955fd4c054bbc422590484322f6040a979061d9a0312",
+    "main_journal": "c39699a1950836d8d2d54adfc10268bb2ead7278659521553b0b88bff4546c8e",
+    "freeze": "d96e398956d3652675da6027eb0fac51b1beaa3510deea21e02c854b0ccec89e"
+  },
+  "source_read_bounded_orchestration": "NOT_FULLY_QUALIFIED_UNPLANNED_HELPER",
+  "source_choice_basis": "Root reread pinned primary fields; conditional source answer is a lead, not execution/user approval",
+  "finite_owned_state_metadata_gate": "May proceed within existing user goal and supported upstream interface; separate source/native qualification, not P2 admission",
+  "outer_attempt_limit_scope": "One outer CLI invocation and no relaunch does not cap native internal requests/reconnects or linked helper usage",
+  "publication_status": "DRAFT_ROOT_OWNS_INTEGRATION",
+  "original_worker_receipt_sha256": "e42a44eaed68ca5786c0b84bb52c0d3cd7e6f888a5f9c93b1a240aad3bcfcc7e",
+  "original_worker_manifest_sha256": "585966111b26c6929ce924811a29daaf6e814b8b629f4ebc4e460cd0ab220d94",
+  "original_response_records_sha256": "241e5a1270220a30603cbca157e30386ae48e7910a3700e797ad8927e06a9ae4",
+  "original_frozen_input_check_sha256": "3817d7e912728caa8eec2ad84b2de1297ad5104c74282f76d6275d6623320a36",
+  "source_choice_authority": "root independently reread pinned primary fields; model verdict is a source lead, not approval",
+  "no_complete_usage_or_cost_claim": true,
+  "new_state_metadata_or_role_trial": "UNRUN; not admitted by this source judgment",
+  "temporal_scope": "At closure of this source unit; subsequent direct owned-home native metadata result is recorded separately in unit26, with roles/continuation/P2 still unqualified.",
+  "prepublication_draft_sha256": "f9164169c805866781d51f1f14cf08a7899ca9aba2b1a91abd689703eab686c5"
+}

@@ -1,0 +1,71 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Consequential judgment of conflicting SDK comments, native implementation and observed resume counters",
+  "north_star_action": "Reliable counted-once evidence for long US-equities research/engineering sessions",
+  "source_pins": [
+    "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "openai/codex@rust-v0.160.0",
+    "@anthropic-ai/claude-agent-sdk@0.3.263"
+  ],
+  "client": "Codex0.160.0",
+  "requested_model": "gpt-6-astra",
+  "recorded_turn_model": "gpt-6-astra",
+  "backend_resolved_model": null,
+  "effort": "max",
+  "route": "Process-local native OmniRoute profile with explicit user-requested keyless loopback pool; saved configuration unchanged",
+  "exit_code": 0,
+  "verdict": "accept_correction",
+  "answer_words": 410,
+  "answer_word_limit": 650,
+  "accepted_contract": [
+    "Deduplicate Codex exact response IDs across bound parent/child streams; thread/compaction snapshots reconcile only",
+    "Use one verified-zero-origin final Claude modelUsage or per-model/category deltas across continuous cumulative segments, reconciled with appended requests and known helper rows",
+    "Resets/nonmonotone/missing rows/crash/aborts remain unknown unless exact native records close declared attempt scope",
+    "Do not add raw request projections to aggregates or sum resumed endpoints",
+    "Preserve both original failed preregistered conditions; fresh420746 plus actual resume38268 equals459014 only within calibration scope"
+  ],
+  "not_accepted": [
+    "P2 natural-compaction protection",
+    "Default adoption or comparative freeze",
+    "Provider invoice cost or backend-resolved identity",
+    "Universal client behavior or cause of Claude counter restoration"
+  ],
+  "startup_failure": {
+    "exit_code": 1,
+    "reason": "Native profile required OMNIROUTE_API_KEY before a model response; installed error permits non-secret placeholder for keyless loopback",
+    "native_reported_usage": null,
+    "provider_billed_usage": null,
+    "repair": "One process-local non-secret placeholder and explicit requested pool URL; no credential/auth read or saved profile/gateway change",
+    "retained_stream_sha256": "c728abd97861ace8752a38ac0bbf528313f729f84f1e1c1078f38071ab303794"
+  },
+  "accounting": {
+    "exact_unique_response_records": 5,
+    "usage": {
+      "input_tokens": 122298,
+      "cached_input_tokens": 91392,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 5168,
+      "reasoning_output_tokens": 2404,
+      "total_tokens": 127466
+    },
+    "reconciles_native_exec_completion": true,
+    "cache_and_reasoning_are_subsets": true,
+    "scope": "This completed consequential main-thread read only; research overhead, not saving",
+    "children": "not exercised",
+    "provider_cost": null
+  },
+  "retained_private_artifacts": {
+    "answer_sha256": "3251179f8b4a524d85ec452bef02930fcc3039cf61376669bae173b1c1c83cd4",
+    "native_stream_sha256": "cf75276801394479a278dea582a68fe51ac35ffc56e6f786db6e0d97dfa8adbd",
+    "native_source_sha256": "72e670092770f4a7e9b7db1f29dc0e1386ef8a846640db18989690cef732c669",
+    "usage_projection_sha256": "895d5bd33cb2f6c45f08f9085859fc916d735eab69d76ab5cb77107a6218996a",
+    "prompt_sha256": "232150000406ccd25a7e6af79ef1ab21629fac610479be2bc30c7478a28c359e"
+  },
+  "completeness_critic": [
+    "Repeated resumes/streaming turns/resets and changing helper/model rows",
+    "Natural compaction, resumed new children, sidechains/advisors",
+    "Billed retries/aborts/crashes/missing endpoints and outside-pipeline helpers",
+    "Raw helper provenance, source-restoration cause and generalization remain unresolved"
+  ]
+}

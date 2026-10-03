@@ -1,0 +1,235 @@
+{
+  "study": "token-context-20261003",
+  "scope": "Selected pinned primary-source continuity landscape; no model, grader, install or default change",
+  "north_star_action": "Source-supported real engineering trajectory for long-session R&D context qualification",
+  "candidate_sources": [
+    {
+      "repository": "Muvon/octobench",
+      "commit": "9aaf2fef9a28e4a31c373be2e4125a26647f056f",
+      "path": "docs/LONGRUN.md",
+      "url": "https://raw.githubusercontent.com/Muvon/octobench/9aaf2fef9a28e4a31c373be2e4125a26647f056f/docs/LONGRUN.md",
+      "sha256": "58476a5c638797a4af0300085b66e3d3411753ea921ac9cd22717e8a9b66be11"
+    },
+    {
+      "repository": "Muvon/octobench",
+      "commit": "9aaf2fef9a28e4a31c373be2e4125a26647f056f",
+      "path": "cases/dev/longrun/cpp/duckdb/sequence.yaml",
+      "url": "https://raw.githubusercontent.com/Muvon/octobench/9aaf2fef9a28e4a31c373be2e4125a26647f056f/cases/dev/longrun/cpp/duckdb/sequence.yaml",
+      "sha256": "dfd602a78e301f43963a3c7c9ecc87ad2186273db7c9786484b0bd7b71ffa8d5"
+    },
+    {
+      "repository": "Muvon/octobench",
+      "commit": "9aaf2fef9a28e4a31c373be2e4125a26647f056f",
+      "path": "providers/codex.py",
+      "url": "https://raw.githubusercontent.com/Muvon/octobench/9aaf2fef9a28e4a31c373be2e4125a26647f056f/providers/codex.py",
+      "sha256": "c4a5b2ffa1403250d58446867619957d92d58d81f76062d750e5b36043bb240d"
+    },
+    {
+      "repository": "Muvon/octobench",
+      "commit": "9aaf2fef9a28e4a31c373be2e4125a26647f056f",
+      "path": "providers/claude.py",
+      "url": "https://raw.githubusercontent.com/Muvon/octobench/9aaf2fef9a28e4a31c373be2e4125a26647f056f/providers/claude.py",
+      "sha256": "774b79bc61344b12be6fbca3aec9761fad83fecbc89b6873c99879a2c3eebbfc"
+    },
+    {
+      "repository": "Muvon/octobench",
+      "commit": "9aaf2fef9a28e4a31c373be2e4125a26647f056f",
+      "path": "cli/longrun.py",
+      "url": "https://raw.githubusercontent.com/Muvon/octobench/9aaf2fef9a28e4a31c373be2e4125a26647f056f/cli/longrun.py",
+      "sha256": "0c917ab45e5a56a60536fa921b2d46b21f5189d00ea2bf91cd013be3e010810f"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "commit": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "path": "circuit_eval/config.yaml",
+      "url": "https://raw.githubusercontent.com/gabeorlanski/scb-problems/38d627ecf668a88f88f8d260f8df8df6116e9b03/circuit_eval/config.yaml",
+      "sha256": "5930e2160c3d614021f138f235c31851c5dea8bfdebac08e82dbc62e0b4df8cd"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "commit": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "path": "circuit_eval/checkpoint_1.md",
+      "url": "https://raw.githubusercontent.com/gabeorlanski/scb-problems/38d627ecf668a88f88f8d260f8df8df6116e9b03/circuit_eval/checkpoint_1.md",
+      "sha256": "5e83257b93e169e269ebc64f4621e712f1903bb5d7784e158755ec0d43112baf"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "commit": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "path": "circuit_eval/checkpoint_8.md",
+      "url": "https://raw.githubusercontent.com/gabeorlanski/scb-problems/38d627ecf668a88f88f8d260f8df8df6116e9b03/circuit_eval/checkpoint_8.md",
+      "sha256": "f091e9e8e5030d1831bdbc8f0ac6ecc8e24c1f2b239ded547c9a97c6323444b1"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "commit": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "path": "circuit_eval/tests/conftest.py",
+      "url": "https://raw.githubusercontent.com/gabeorlanski/scb-problems/38d627ecf668a88f88f8d260f8df8df6116e9b03/circuit_eval/tests/conftest.py",
+      "sha256": "9f371e98841457c088b39578bcf2f48c4e94b0b2904bf5ed0c758b8c01d99a53"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "commit": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "path": "circuit_eval/tests/helpers.py",
+      "url": "https://raw.githubusercontent.com/gabeorlanski/scb-problems/38d627ecf668a88f88f8d260f8df8df6116e9b03/circuit_eval/tests/helpers.py",
+      "sha256": "83bf8b211673b6fc63253817239362db4ba1ea9fa83ff79abff26544edfa7aa7"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "commit": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "path": "circuit_eval/tests/test_checkpoint_1.py",
+      "url": "https://raw.githubusercontent.com/gabeorlanski/scb-problems/38d627ecf668a88f88f8d260f8df8df6116e9b03/circuit_eval/tests/test_checkpoint_1.py",
+      "sha256": "367e3560fcd530ea01ce9ceeade022d6a4d06accfe84a9fce237cf2291d89146"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "commit": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "path": "circuit_eval/tests/test_checkpoint_8.py",
+      "url": "https://raw.githubusercontent.com/gabeorlanski/scb-problems/38d627ecf668a88f88f8d260f8df8df6116e9b03/circuit_eval/tests/test_checkpoint_8.py",
+      "sha256": "efc2788b2072cf87b1a5f95ea22478230b3cfea2ad60ee5d68df3bcc76c2020b"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "tasks/langchain-version-migration/tests/test.sh",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/tasks/langchain-version-migration/tests/test.sh",
+      "sha256": "455c33e681bb6ca2caec6f645f3b901f8bb3c8b777187b42af2d48d4ac86af01"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "tasks/langchain-version-migration/tests/test_outputs.py",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/tasks/langchain-version-migration/tests/test_outputs.py",
+      "sha256": "7ec51c1927474db0eebf4a440fde0b45ff6c2ddbdf390ea877643ff9704ed787"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "tasks/langchain-version-migration/tests/test_hardening_guards.py",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/tasks/langchain-version-migration/tests/test_hardening_guards.py",
+      "sha256": "eee2b59019b5fbb767092c9247a1167d3c57a68d50f7b8f48101d6c8e7062762"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "tasks/langchain-version-migration/tests/Dockerfile",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/tasks/langchain-version-migration/tests/Dockerfile",
+      "sha256": "a549b32256a4dbad2b8903581c7d02c71d55da23ef8b5223f0c7bf94942090d8"
+    },
+    {
+      "repository": "Muvon/octobench",
+      "commit": "9aaf2fef9a28e4a31c373be2e4125a26647f056f",
+      "path": "cases/dev/longrun/cpp/duckdb/setup.sh",
+      "url": "https://raw.githubusercontent.com/Muvon/octobench/9aaf2fef9a28e4a31c373be2e4125a26647f056f/cases/dev/longrun/cpp/duckdb/setup.sh",
+      "sha256": "879f93789f121d4b61499fb21a1df794b0938b4e282eb3fc2a4ffb4e4a28b1d3"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "harbor/src/harbor/trial/trial.py",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/harbor/src/harbor/trial/trial.py",
+      "sha256": "b9723d0a6005e69a06fe842ce9c791250bee6096c0994d5f268446a1a673eb69"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "harbor/src/harbor/agents/installed/codex.py",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/harbor/src/harbor/agents/installed/codex.py",
+      "sha256": "b198b69fed1330046a384bcd89f80acd331898b524e0ed817c1f1fc5a09ee755"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "harbor/src/harbor/agents/installed/claude_code.py",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/harbor/src/harbor/agents/installed/claude_code.py",
+      "sha256": "ecd83757f19c1a89edf92df3c815c3814f2a31b25c4001fa3148d05b28d54715"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "tasks/langchain-version-migration/task.toml",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/tasks/langchain-version-migration/task.toml",
+      "sha256": "5617aa25e834406158c76c328fb813d449c6c626f5cabf00701daeb6ac8a4435"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "tasks/langchain-version-migration/instruction.md",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/tasks/langchain-version-migration/instruction.md",
+      "sha256": "c13870cd8d22bc4b0158a8963736a5bebef40037e768cccfa98c7f9a5bb3a2de"
+    },
+    {
+      "repository": "zli12321/LHTB",
+      "commit": "52381e7d747b03e6f6af1953a4c7ff5dad78112e",
+      "path": "tasks/langchain-version-migration/environment/Dockerfile",
+      "url": "https://raw.githubusercontent.com/zli12321/LHTB/52381e7d747b03e6f6af1953a4c7ff5dad78112e/tasks/langchain-version-migration/environment/Dockerfile",
+      "sha256": "ffe8d83d90b63fe834cec3dec796a8c3a6f215494bab0193ff3da784a420345c"
+    }
+  ],
+  "root_primary_verification": {
+    "source_hashes": 23,
+    "all_match": true,
+    "selected_code_read": [
+      "Octobench longrun.py58-65/147-163/336-345/412-415 and DuckDB setup1-15/sequence1-22",
+      "LHTB verifier56-84 and trial232-241"
+    ],
+    "source_not_execution": true
+  },
+  "trajectory_findings": [
+    {
+      "candidate": "Octobench DuckDB optimizer",
+      "tasks": 15,
+      "sequence_bytes": 24725,
+      "base_commit": "e5d6787a684fd90084704edbc412049760304a8f",
+      "status": "Real cumulative fixes; source implements provider-returned session-ID continuation. Current native scheduling and selected Promptfoo bridge/grader remain unqualified.",
+      "gaps": [
+        "Runner invokes LLM judge",
+        "Runner restores failed-dependency gold source",
+        "Setup writes global Git safe.directory; host execution held",
+        "No1m compaction guarantee; blob bytes not occupied context"
+      ]
+    },
+    {
+      "candidate": "SCB CircuitEval",
+      "tasks": 8,
+      "specification_bytes": 43563,
+      "status": "Source corpus/native grader route matches existing SCB preparation; native reference acceptance and continuation not yet qualified",
+      "gaps": [
+        "Default native SCB adapters reset conversation between checkpoints and resume only retries",
+        "Selected tests alone do not prove every fixture is public-contract faithful"
+      ]
+    },
+    {
+      "candidate": "LHTB LangChain migration",
+      "source_updated": "2026-10-02",
+      "status": "Current strict migration/replay source; compatible fork continuation/deployment unqualified",
+      "gaps": [
+        "Verifier sequentially awards partial credit across18 gates; trial passes only reward>=1.0",
+        "Installed Harbor resume capability is not fork-specific same-conversation-hook acceptance"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "incorrect": "Every LHTB failure emits0",
+      "verified": "test_outputs.py62-82 awards sequential partial credit; trial.py235-240 requires>=1.0 for success"
+    },
+    {
+      "incorrect": "A130-turn Gson sequence was inferred by root from a validation comment",
+      "verified": "Selected longrun.py58-63 names no Gson.130turns describes historical validation observations, not a verified single curriculum; root unsupported lead withdrawn."
+    },
+    {
+      "incorrect": "Claude provider source under src/providers/anthropic/",
+      "verified": "Pinned Promptfoo source is src/providers/claude-agent-sdk.ts; existing source hash matches"
+    }
+  ],
+  "private_packet_hashes": {
+    "report": "d2729ef5c27493e709a12b0e7d52de0d941cafd94679882570f05163debf17e1",
+    "source_manifest": "af50bea977409486e0d34c25d03ed128ce0d48472d84b3db63334c95e955b5c7"
+  },
+  "completeness_critic": [
+    "Selected tasks are code-centric; serial filing/PDF/browser/market-data provenance and large external MCP payload modalities remain missing",
+    "Longer-than15 task curricula are not established by this selected source sweep",
+    "Native window metadata differs across clients; exact compaction/occupancy/resume/role gold remains required"
+  ],
+  "decision": "No P2 trajectory freeze, candidate promotion or context-supply row amendment; the next consequential decision compares source-supported continuity and actual quality gates"
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Qualify faithful native context-window comparison for complex cumulative R&D.",
+  "evidence_class": "native_proven / source_review; consequential judgment only",
+  "trigger": "Unresolved native filesystem interface after one bounded Sol repair.",
+  "native_invocation": {
+    "client": "Codex0.160.0",
+    "requested_and_native_recorded_model": "gpt-6-astra",
+    "requested_and_native_recorded_effort": "max",
+    "native_recorded_provider": "omniroute",
+    "configured_endpoint": "http://127.0.0.1:20128/v1",
+    "sandbox": "read-only",
+    "approval": "never",
+    "scheduled_attempts": 1,
+    "scheduled_retries": 0,
+    "exit": 0,
+    "started_at": "2026-10-03T13:26:30.769014Z",
+    "completed_at": "2026-10-03T13:32:33.956041Z",
+    "wire_endpoint_model_effort": "UNKNOWN"
+  },
+  "answer_contract": {
+    "whitespace_words": 403,
+    "maximum": 550,
+    "pass": true,
+    "frozen_inputs": 23,
+    "all_input_hashes_match": true,
+    "observed_native_read_commands": 28,
+    "all_command_exits": 0
+  },
+  "native_usage": {
+    "scope": "Nine distinct main-session native response IDs. Every prefix, native final and CLI emitted view independently reconcile; overlapping views not added.",
+    "input_includes_cache": 277579,
+    "uncached_input": 49739,
+    "cache_read_subset": 227840,
+    "cache_write": 0,
+    "output_includes_reasoning": 7887,
+    "reasoning_subset": 4795,
+    "disjoint_total": 285466,
+    "invoice_and_external_helpers": "UNKNOWN",
+    "native_or_gateway_unseen_retries": "UNKNOWN"
+  },
+  "judgment": "Supported staged route: full inline TOML model-free sandbox controls, then separately qualify unchanged Promptfoo exec additional-directory carrier. Runtime admission/default/comparison remained HOLD at judgment.",
+  "root_acceptance": "Accept supported finite next sequence after re-reading pinned primary source; no peer/user approval or producer/default certification. Root stage1 result is separate.",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "files": [
+        "codex-rs/utils/cli/src/config_override.rs",
+        "codex-rs/config/src/overrides.rs",
+        "codex-rs/cli/src/lib.rs",
+        "codex-rs/core/src/config/mod.rs",
+        "codex-rs/protocol/src/permissions.rs",
+        "sdk/typescript/src/exec.ts"
+      ]
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/codex-sdk.ts"
+    }
+  ],
+  "native_original_bindings": {
+    "answer_sha256": "592af1a0a2c0ac9e65db13983c95407763516420b870ee1c227aa1b01d077064",
+    "native_journal_sha256": "695ac516c13e8d6b426a38d93ec2d2b8adbde4801a5f477780f6912af664f5aa",
+    "root_input_freeze_sha256": "31dfb86d234a388a13a8ba3f1d23c00d8ff4e13984d7f8e3c20cb91e3f795411",
+    "worker_manifest_sha256": "be49dcfb74e1c5e15d20119aef238252937faf096cff3a65f6383e56b81f5e8e",
+    "root_disjoint_reconciliation_sha256": "d7f7dd2100ef9ae7a5785b6293a6291bab8c9012753eb8d8118328203506c936"
+  },
+  "failures_and_corrections": [
+    "Native standalone_web_search startup warning retained; no source-command failure observed.",
+    "CLI item IDs differ from native journal exec IDs; exact command arrays/exits were reconciled.",
+    "Initial worker metadata filename/schema and environment-assignment projections corrected; originals retained. No credential/auth-store query."
+  ],
+  "completeness_critic": "Bootstrap/skill roots/managed policy/exec-carrier/child/MCP/Claude admission and native long-session continuity remain separate gates. Source semantics cannot certify unseen-input equivalence or provider-original billing.",
+  "privacy": "Sanitized counters and custody hashes only; no native IDs, fact values, raw conversation, host/auth paths or active client configuration."
+}

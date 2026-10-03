@@ -15968,6 +15968,16 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-native-token-hook-metadata-stops.md",
+      "sha256": "71be3a34bda745599f5ad1174610c8be57d098b1f9b5d1451aa07b545549a375",
+      "bytes": 8081
+    },
+    {
+      "path": "docs/decisions/2026-10-03-native-token-owned-state-and-source-reads.md",
+      "sha256": "983437069188d48e04226e9399dcdec7e4c671bbf688ecf72a51e1d85e9f9013",
+      "bytes": 7269
+    },
+    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
@@ -15976,6 +15986,36 @@
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
       "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
       "bytes": 19619
+    },
+    {
+      "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
+      "sha256": "0d2f1b408829c949a4fbde0d55a4a9348e7e9c6eaeaf04bdf2acde380a12a9d6",
+      "bytes": 69738
+    },
+    {
+      "path": "docs/decisions/2026-10-03-token-native-profile-admission.md",
+      "sha256": "9784c24e997b054478a6c86a75e42d6a2c9b532c7df1a02899a8da5fdf30a010",
+      "bytes": 4792
+    },
+    {
+      "path": "docs/decisions/2026-10-03-token-native-scoped-defaults.md",
+      "sha256": "475e2261f253cc81f8780e66fae521c4ffba025dcf7c9f688f9bcbb3c65e3f99",
+      "bytes": 4961
+    },
+    {
+      "path": "docs/decisions/2026-10-03-token-observable-call-result-boundary.md",
+      "sha256": "8c6058f4cfeee250e2e17d98a5e0e4139b77c3b558da7c7cfcaeff7acd2eae0c",
+      "bytes": 5497
+    },
+    {
+      "path": "docs/decisions/2026-10-03-token-retrieval-truncation-and-hook-admission.md",
+      "sha256": "d149d63704d0560133fcf9d6a54b1a3025a669152a2287ac02cca6baa4dad9da",
+      "bytes": 5432
+    },
+    {
+      "path": "docs/decisions/2026-10-03-token-role-admission-and-r2-stop.md",
+      "sha256": "007b4667e20e9cf79816340c7f6ad4c1900dab43ab19c6a1bc1d2bfa6d82154b",
+      "bytes": 6485
     },
     {
       "path": "docs/direct-results.md",
@@ -16339,8 +16379,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "b43af443e3ec7dd81efe16f7adc6ead8fe99a4748bc59a541f8ca8696799b80e",
-      "bytes": 587560
+      "sha256": "79bf6fe0324567656cd1210e2d6afadfdc7f9a3e38d636c548eeefd463a7af86",
+      "bytes": 588988
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -16354,8 +16394,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "7b4e30e942e4d3c49680b8443a3d58603224316b2b44dbe4006deecdd5cf2ed0",
-      "bytes": 39853
+      "sha256": "66ee576ca80d76e3f0fa08c9f1b45734f89980c7f26de906dd3963c190ad56ed",
+      "bytes": 40362
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -45968,6 +46008,426 @@
       "bytes": 9122
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/claude-sdk-settings-astra-read.json",
+      "sha256": "474276e4ddd548cee5f8527c83ec1adb16a2f2c23e6ef5466bb59f61c2111fdb",
+      "bytes": 3914
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/context-container-short-qualification.json",
+      "sha256": "d2d3e1b4cc0005b38bb97bb2d4a193d949f98064203a1fcff44fefd3549c70aa",
+      "bytes": 4130
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/context-continuity-source-qualification.json",
+      "sha256": "2e2799df1628fbb083b5bd1b1eb63e2c0108bb88f543d96872302d0bec6e2a86",
+      "bytes": 12779
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/context-isolation-astra-read.json",
+      "sha256": "c14ccc68f87d002d37af441301598f779df7587dc058af84499e4eac410972c1",
+      "bytes": 4491
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+      "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286",
+      "bytes": 10761
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/context-native-artifact-qualification.json",
+      "sha256": "25823560929d27412580ebbd1349ee70753e9ee1641eeae87d505d7ae34e1b25",
+      "bytes": 22488
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/context-native-lifecycle-qualification.json",
+      "sha256": "6a7f0552e9783b8df082cd2819d95376ecaa0f4284b767af4b1fb2058315dc71",
+      "bytes": 2963
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/context-native-role-qualification.json",
+      "sha256": "af371a3fc3e7759f8e8ebe5f1a1e2799404fff02fd88e35e796a1f4f3fc1a153",
+      "bytes": 8699
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/context-parent-dwell-qualification.json",
+      "sha256": "2c758f93605c428e3bb90604fc8fe4fadab8d3bc466adb00de0f140f8b97ac8b",
+      "bytes": 5049
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-claude-program-qualification.json",
+      "sha256": "1075f028094412250f4befee20876def9b523c71b3715032f936089419dceea4",
+      "bytes": 5372
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-claude-timeout-qualification.json",
+      "sha256": "459e2f01c5ba363bbdde1fb5522fceb558b29904b876c85e8d2532c2133a8e79",
+      "bytes": 4947
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-codex-program-qualification.json",
+      "sha256": "4a8ee25845720b92d5ed0ac4e33357e5c60d7c58d658c3c1ba65a15f77633510",
+      "bytes": 5608
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-local-grader-qualification.json",
+      "sha256": "17db8ce847c844ea4468f55fbc9736f2c516b50691d56c5e2950a0e87c7419cf",
+      "bytes": 4127
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-original-failures.json",
+      "sha256": "1c06312516721f3d1ea8e6faff031475f46fb08d13f4f5c7657ad49fe928586e",
+      "bytes": 5197
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-preparation-qualification.json",
+      "sha256": "80b936a6136a8d5e1875d146a3d3d6f62c1518f68a793b42c664a8d1380a7860",
+      "bytes": 2234
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-typed-qualification.json",
+      "sha256": "f2227989808ef8e4af27c4cc59b050097668570b6850dc58b82d1bbeff7ccb17",
+      "bytes": 4194
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-preparation-qualification.json",
+      "sha256": "c62212b7f3a5a433d45563141ec11fa1df47403cdccfa8752369d67625f62f9b",
+      "bytes": 6497
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/harness-source-read.json",
+      "sha256": "63dcec9a9dd0051e8333d32a1cfe32e8aa783c5639cb6d5c41058444ef97c60b",
+      "bytes": 2739
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/landscape-followup-source-qualification.json",
+      "sha256": "0e9c1685ef85e32f073e76648c6fde75ca9ffdfd2b1db6aaa64d2a01becd0c15",
+      "bytes": 2644
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/meter-artifact-overhead-qualification.json",
+      "sha256": "5867f55bc7e20b8e585aaed32616aa38ae16b5eab7514d734a2c863a0a65397b",
+      "bytes": 10735
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/meter-compaction-qualification.json",
+      "sha256": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670",
+      "bytes": 4056
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/meter-expanded-role-qualification.json",
+      "sha256": "27dc08de2c44998c62f224557f219b1e816920db26e5ad40d28d600e1e39eff7",
+      "bytes": 9808
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/meter-job-verdict-qualification.json",
+      "sha256": "3e1c6c96471da74698942cb9582f1f13eb07ab390c29d3640342b2345f2d9a38",
+      "bytes": 9521
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+      "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b",
+      "bytes": 5180
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-calibration.json",
+      "sha256": "56f4d5279102a64e9aae06cd5a98281e73d56a8b946bf8286a86e0c34c73f7b4",
+      "bytes": 7120
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-command-baseline-qualification.json",
+      "sha256": "6b97431d58e1572fb8e507923e7cfd58a2221fef3fa72698ca9efd163c2204d1",
+      "bytes": 14063
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-command-carrier-qualification.json",
+      "sha256": "8ca5165b5f2d220fb23622adb206fa530dcb04c8a0d0cc459cb49c23759725ca",
+      "bytes": 10571
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-command-schema-qualification.json",
+      "sha256": "5d309dbe703ed1bc270441e9d9c6642f92582130a4fd34b0d0ee4a5fb7393463",
+      "bytes": 9031
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-resume-qualification.json",
+      "sha256": "a9f147289e39f82411183ce5e791de09ee4c6340562f54141e5cccca4c882188",
+      "bytes": 8759
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-sdk-loader-source-qualification.json",
+      "sha256": "5709f16ad37d98e54c83c71f4ba11b6eb4baf6a6acb4e74c33d77a11947e8431",
+      "bytes": 2245
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-sdk-source-pin-correction.json",
+      "sha256": "665e8a1ae3803dbaaa8622fc5b340d792efbfa7ab92dc57a1d0adc84ea152668",
+      "bytes": 1898
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-structured-baseline-qualification.json",
+      "sha256": "ea06789baee978a8aeb5b1a1af6059f1b787f9e9832c2277b00f46f8bad427b3",
+      "bytes": 14986
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/p2-trajectory-astra-read.json",
+      "sha256": "b2960b0c0c08b188e4eee24cf074193380f95d4c06a133753b57f24266f704d5",
+      "bytes": 4515
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/protocol-opus-read.json",
+      "sha256": "b4adf401452c5f8788c3654c700d3ad3b4b9fc136d7b2218ad8809631efea56d",
+      "bytes": 3270
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/protocol.md",
+      "sha256": "5f7c43be035c71578c574eb26c2aa4728e525fed3d15ba1c75a28731fa9a7ead",
+      "bytes": 28623
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
+      "sha256": "e4a5f144f74994a7f5c34ad174df66766d9bffb473cf715b96ad8f4138f8fe2e",
+      "bytes": 153317
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
+      "sha256": "2d5861a2204cfd48189919e0bda935d090c15ae3670f92fe12adb4863b5cfe72",
+      "bytes": 3710
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/retrieval-consumption-qualification.json",
+      "sha256": "56a4d1b6cbb5d74a45551c5106978c7eacf0c7c1e77fbd015f4d4c0b9ff7c853",
+      "bytes": 2833
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/rtk-artifact-qualification.json",
+      "sha256": "04b742c80f1f26d72ab78dd3fdec1c304cb0440b1dcb49b4e14906ce259ebff4",
+      "bytes": 5824
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+      "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9",
+      "bytes": 4938
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/rtk-repair-astra-read.json",
+      "sha256": "f70eabd08db3501b1dc0550dbccdf0e7f06d2f7fe2dc4662c87dcbd1e4ba207b",
+      "bytes": 2077
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/source-qualification.md",
+      "sha256": "98cbda5da2c6810bde6e292bd6dcabb3c8ea01b2c158ad543d10e32632f95c13",
+      "bytes": 18274
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
+      "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c",
+      "bytes": 2544
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit10-native-stage1-admission.json",
+      "sha256": "644241c288ad10bedb4bbd983dca983d230fd51ec528791f0d0656d5368a96d2",
+      "bytes": 6943
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit10-runtime-profile-judgment.json",
+      "sha256": "4be52ff75cb9c6abb44a3c9240b9729a2de6577ce059749e97016a2f6f3584f1",
+      "bytes": 3914
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit11-native-carrier-observation.json",
+      "sha256": "528b079a96b7b035ef42f28cb75f65e1b63cdfc3a9345d4f3e55811618f03690",
+      "bytes": 4481
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit11-observable-endpoint-judgment.json",
+      "sha256": "13b8da1c258d356bfa59dbccfe53ef4f895edeaaaf3ba6ae517b29cb3ea1010f",
+      "bytes": 3148
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit11-qmd-readonly-predicates.json",
+      "sha256": "7912837aec6cdf471203fe08d0844134955de4ef6e70fd1464e3e4e22093e03f",
+      "bytes": 3693
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit12-native-hook-metadata-hold.json",
+      "sha256": "2b072a71a9500dbad97507663399a033ddde9aad10fffaec2d5d1f725570aa95",
+      "bytes": 4283
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit12-prefreeze-source-read-failures.json",
+      "sha256": "7e3c36e3a149dc7ec19866bbbeae24e2b4e1ee06fc3fbfa3d92454d5819301f3",
+      "bytes": 6093
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit12-qmd-codex-stop.json",
+      "sha256": "6d46bbce9215eded18a006fa5e3736e127d733dbcf0e497600deff02d470903b",
+      "bytes": 7141
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit13-claude-b-native-call-result-admission.json",
+      "sha256": "a989e9dedd54d1e7773a526eed8bfd58051bf7ab08652678316fc3e3784935a5",
+      "bytes": 10615
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit13-codex-b-native-call-result-admission.json",
+      "sha256": "a21c657897a9953b7cf08fd8e199f8daf357aa7042fbdf76df382bbb2a36b5b9",
+      "bytes": 9362
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit13-r2-first-aa-stop.json",
+      "sha256": "a07247e6c58b33c397b1a8cddac4ce389b16bbac88708949d0ed88cfc1bb2ce1",
+      "bytes": 10629
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit13-r2-preregistration.json",
+      "sha256": "a284a8235f76028aba888750479c1ac87ad9023b3b3f2d65dbf6a9129c6e5e59",
+      "bytes": 7545
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit14-codex-tui-hook-metadata-source.json",
+      "sha256": "75920a01e5a1af1dd31bbd9c4759d509e1f590ff0f5e2fb1de44b3fdff3dd4ea",
+      "bytes": 5137
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit15-native-stdio-hook-metadata-source.json",
+      "sha256": "987b1f2a55954a6fa4222c33c61e038a7b2175c2a3646a153b27f18e01f5fe8d",
+      "bytes": 7494
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit16-codex-synthetic-mount-enospc-source.json",
+      "sha256": "0f9fe615d1f2a30954b3cf720d55dbc4cd64579129daf2029e0a082d22344343",
+      "bytes": 3977
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit17-native-stdio-carrier-astra-judgment.json",
+      "sha256": "5184cd75cacf94e290d613306416e5663e29783ab32c8a5b9af567b765ca3d40",
+      "bytes": 4820
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit18-native-hook-profile-parse-stop.json",
+      "sha256": "17aec6a6f046b1f1e4d2763aae9921f5b111fadddda765d6b34ee7496c9241c5",
+      "bytes": 2287
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit19-mandatory-hook-type-source-correction.json",
+      "sha256": "7250e9d1088342990a98064da2c2f8ebef52038fd450a2c8a0522d0a9d4f1fb5",
+      "bytes": 4852
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit19-native-tool-stdin-stop.json",
+      "sha256": "e097b23f4eb603ba941f3afec4660a6b95d5390a75adbacb7947955300c2077b",
+      "bytes": 4860
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit20-native-tty-carrier-source.json",
+      "sha256": "007bf294bd1040352818dc4fadcefd24681e907c60991fac2125a141d68df8bf",
+      "bytes": 10087
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit21-native-tty-carrier-astra-judgment.json",
+      "sha256": "3bdeb3a1251ed3015e01136f63d7bfa4fad3d95c7049dfa96c3d3818a00d51fe",
+      "bytes": 3765
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit22-native-pty-operator-timing-stop.json",
+      "sha256": "bfa22348be86ae56b1ecfe5bcbb247f7022c04889324ad06027a1eb73e80d1b4",
+      "bytes": 4004
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit23-native-pty-metadata-acceptance.json",
+      "sha256": "b9edf192556792ea8e1d86815ce9a0380845cd67c4c7674eab737d9c38007cbf",
+      "bytes": 4775
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit25-closed-opus-source-read.json",
+      "sha256": "0d5427fa2b5b376e482d6c2f1078a335e2b8898af0e56fa8a535cb9f94e6f470",
+      "bytes": 3290
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit25-hook-state-astra-source-read.json",
+      "sha256": "4f0c78f5293135fb8eb4d73f62c0fd7a4452761376321d0f6fcd7cdc1546a73d",
+      "bytes": 7068
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit25-hook-state-source-routes.json",
+      "sha256": "d5d25a7c6fb3f9db0c8834eb6ca9f2000cbd07949db18e6a954839195b3ee2a3",
+      "bytes": 5620
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit26-native-owned-home-hook-state.json",
+      "sha256": "667c70a842a99d225a2c1c320bdd0ddbe81d77a329e7e6684259e02b0ea475e4",
+      "bytes": 6385
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit27-narrow-opus-source-read.json",
+      "sha256": "3e9ec32ed02bb9a20f53d60a09be9dbee190c945027294a58c333e95faffa50c",
+      "bytes": 2615
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",
+      "sha256": "f7559e3aebd1460da9ab17a8fa65634fbd61fd60072a28789e19c1baaa2a431c",
+      "bytes": 3286
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit8-completeness-critic.md",
+      "sha256": "c8b78023cd6216bfb49ee4e2acadb62b3a49eaf4d767211eede13fa77f475ed7",
+      "bytes": 4027
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
+      "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6",
+      "bytes": 19909
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-claude-hook-pilot.json",
+      "sha256": "62e366f02b0d8b1cda6830cc0343ee496aae08b6cda9395fb5dde5703707b065",
+      "bytes": 6678
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-cm-group-recovery-pilot.json",
+      "sha256": "599a16357f6dc71e5aee66417e3d8c6239c52a4e77cd0a1f807bc3abc061ad9b",
+      "bytes": 4587
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-codex-trace-pilot.json",
+      "sha256": "66b4e67004906f66163a68c93cd5bf4edd8ad15f6bed139ed0acd83a67dc35df",
+      "bytes": 6294
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-completeness-critic.md",
+      "sha256": "e6eb55249b6266ca90f9f0d723b717d6b370b74894689eca025c7fdef7f0d343",
+      "bytes": 6006
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-native-profile-failures.json",
+      "sha256": "4446bb73180ec78b4ebfb2672b683c70ab08ec1a4d4660581443f600504232a1",
+      "bytes": 3033
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-opus-method-read.json",
+      "sha256": "534f0a9e5778f26d1b00228eb1a8634aa3dae1a50f897ea0b4f08f58a7bc1f5b",
+      "bytes": 2801
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-plugin-event-constraints.json",
+      "sha256": "aa04f3a276ab9ce67acaa0404ef0a34b29cb46660cb67fa26fdca8f3b5f86bea",
+      "bytes": 5350
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-prospective-method-judgment.json",
+      "sha256": "3e549e38c5c69d368186762f85dbca8c64b45df3c0f8bbce07d5988dffd91375",
+      "bytes": 2517
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-retrieval-source-closure.md",
+      "sha256": "e8b02631a89605148a811a707fea76bfd34cafa5df529aec49404b8ff7a10099",
+      "bytes": 2283
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
+      "sha256": "b87819dda1e2f38b020db18d94507d06cac064f8cb2e651a0509bd4cb05fe0ce",
+      "bytes": 6840
+    },
+    {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
       "sha256": "6ee972a67a347a9d49b235cdb2a0a1a66ad38928aa4e35bbd764ca507076ee7f",
       "bytes": 21265
@@ -51787,6 +52247,7 @@
     "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
     "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
     "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
-    "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json"
+    "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
+    "evidence/artifacts/token-context-20261003/qualification-experiment.json"
   ]
 }

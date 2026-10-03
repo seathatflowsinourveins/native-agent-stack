@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Complete actual role custody for measured token/context qualification supporting cumulative R&D.",
+  "evidence_class": "offline_artifact_check",
+  "status": "SOURCE_IDENTIFIED_REGISTRY_WRITE_CAUSE_AND_REMEDY_UNKNOWN",
+  "original_case": "R2 codex-01 first A; CLOSED_STOP unchanged; remaining55 and blind judge UNRUN_FINAL.",
+  "native_failure": {
+    "operation": "fs::write of native synthetic-mount registry PID marker",
+    "helper_exit": 101,
+    "os_error": 28,
+    "native_error_utc": "2026-10-03T16:13:02.836822Z",
+    "logical_mount_target": "Owned scratch/.git, named in panic; not the marker storage path."
+  },
+  "source_findings": {
+    "marker_location": "Canonical native temp_dir / codex-bwrap-synthetic-mount-targets-<euid> / native internal path hash / PID. Exact actual namespace and backing mount UNKNOWN; no registry/internal hash or environment-value inspection.",
+    "ordering": "Registration precedes bwrap child fork/exec; this panic does not reach normal later cleanup.",
+    "marker_bytes": {
+      "synthetic": 10,
+      "existing": 9
+    },
+    "remedy": "No accepted remedy; no native runtime, filesystem, environment or client-layer change."
+  },
+  "historical_resource_observation": {
+    "utc": "2026-10-03T16:21:04Z",
+    "seconds_after_failure_approx": 481,
+    "root_available_bytes": 919274934272,
+    "root_free_inodes": 65250389,
+    "tmp_available_bytes": 5294870528,
+    "tmp_free_inodes": 521930,
+    "limit": "Later selected host df is not contemporaneous helper mount/namespace/quota evidence and does not exclude exhaustion at failure."
+  },
+  "comparison_limit": "Passing B and failed A share client/model/managed permission pattern, but differ in paths, fork mode, timing and task/resource state. This is not causal A/B or an accepted policy/fork remedy.",
+  "upstream_tests": "Selected bwrap mask/registry-order test source inspected only; tests UNRUN and not marker-ENOSPC reproductions.",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "version": "0.160.0",
+      "file": "codex-rs/linux-sandbox/src/linux_run_main.rs",
+      "ranges": [
+        "583-612",
+        "991-1004",
+        "1041-1047",
+        "1352-1377"
+      ],
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/linux-sandbox/src/linux_run_main.rs",
+      "retained_source_sha256": "0dd784f70ff95b16c97dd9e8420c30db2ff39002a57e357c6da686c353464270"
+    }
+  ],
+  "custody": {
+    "source_report_sha256": "5a5b814c81efca99c08ed929f31bea61b6fca2667af0beda11daede85fe36478",
+    "source_receipt_sha256": "d829d2eaea9ea527698a248fa6e6e93438c098dcb1933bdc57f05be17dba51ec",
+    "source_manifest_sha256": "60db0dd30b7e0457411af5257b1d5359654ac3e186eb23206d9b1884765742cd",
+    "source_bindings_sha256": "e2a0a14ea2fb3f61c778d8ded1356bc6de76d34311e505b6c2d9024b98a82c4a",
+    "artifact_checks_passed": 9
+  },
+  "correction": "Root initially implied later host capacity excluded the failure cause. Exact pinned write and timing establish that actual helper backing capacity at failure remains UNKNOWN; public STOP handoff already preserves that distinction.",
+  "owner_handoff": "Architecture/client/lifecycle owner on PR608 comment5971047784; no repair accepted or attempted by token lane.",
+  "completeness_critic": "Actual failing namespace, temporal allocation peak, quotas and native cleanup/caller topology remain unknown. Source diagnosis neither regrades child failure nor authorizes retry, installation, environment/system/client changes, a compressor default or long-session protection. Next source/native capacity observations belong to the client/lifecycle owner.",
+  "privacy": "No credentials/auth/environment values, native registry, personal paths, raw conversations or peer process inspection; source references and compact sanitized metadata only."
+}

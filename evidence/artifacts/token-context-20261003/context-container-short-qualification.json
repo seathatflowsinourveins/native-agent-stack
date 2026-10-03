@@ -1,0 +1,69 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Five short model-free shipped Context Mode stdio containers; bounded lifecycle integration only",
+  "source_pins": {
+    "context_mode": "mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40 (1.0.169)",
+    "stdio_container_reference": "modelcontextprotocol/servers@a40bc270fb5ece62673f8a1196f57116d885c5eb src/filesystem/README.md:215; declared integration inference",
+    "inspector": "modelcontextprotocol/inspector@ae865a19178ddf6f375780a02e9c77c4cf4da184 (2.9.0)",
+    "node_image": "node@sha256:5cbc7caba8c2c0f0bca675d1b61b9f2857e1cf1853c6164ee9dd409501a936e7",
+    "node_dockerfile": "nodejs/docker-node@2428fc80ba1b241329831eaed2647485d98380b2 24/bookworm-slim/Dockerfile"
+  },
+  "native_qualification": {
+    "calls": 4,
+    "containers": 5,
+    "initialize_exit": 0,
+    "initialize_version": "1.0.169",
+    "list_exit": 0,
+    "tools_listed": 11,
+    "index_exit": 0,
+    "indexed_sections": 4,
+    "search_exit": 0,
+    "exact_four_facts_and_labels": true,
+    "search_new_container": true,
+    "synthetic_input_bytes": 244,
+    "search_original_json_bytes": 924,
+    "search_native_text_bytes": 835,
+    "legacy_owned_db_wal_shm_canaries_removed": 3,
+    "disconnects_die_exit_zero_no_kill": 4,
+    "separate_sigterm_die_exit": 0,
+    "all_observed_containers_pids_and_owned_sentinels_absent": true
+  },
+  "actual_isolation": {
+    "read_only_root": true,
+    "network": "none",
+    "default_root_home": "fresh16MiB tmpfs",
+    "owned_bind_mounts": 6,
+    "host_home_auth_socket_corpus_reference_mounts": 0,
+    "host_home_probe": false,
+    "cpu_memory_pid_quotas": "not configured; limits absent",
+    "rootless_daemon_semantics": "not qualified by these observations"
+  },
+  "custody": {
+    "preregistration_sha256": "a481fe2bc5afe74957fdb76fa8ba4010a5c671d4f2ca38e9bad62b81c1f307a7",
+    "private_original_receipt_sha256": "e8a72d92b0a56353e0c1384059dc88aaaeeff7f72d140d7eadf437514db4a55b",
+    "private_artifact_manifest_sha256": "5e38141fe0bbe9c505824b0299ddd86c84c9ca6c74508f6559e17ba858ae87ba",
+    "root_and_independent_hashes_verified": 10176,
+    "events_sha256": "28dca40ae612aec66c0c757334f5a6afe329dfe7a9ada14aac39a1d4cf4fd1b5",
+    "shipped_server_sha256": "dadb1987cb345a3ed4c5af6e648dc3e4250ec87f172f3ca309dc64dba3ffe5f2",
+    "independent_critic_sha256": "e791d71493e6cebb493d56bc28b1c25b2b69d9120588daffcae8aadf10c1e061",
+    "verification_scope": "Historical prior check passed all10176; current2026-10-03 root/independent recheck matches10174 and reports2missing copied npm debuglogs. Original manifest unchanged.",
+    "current_matching_files": 10174,
+    "current_missing_historical_npm_debuglogs": 2,
+    "root_current_manifest_check_exit": 1
+  },
+  "result": "PASS within short mount/persistence/shutdown scope only; no candidate admission",
+  "limits": [
+    "Longest live server25seconds does not exercise30second parent guard. Direct Node PID1/parent0 cannot support long-session inference.",
+    "Shared container tmp/PID namespace would collide readiness and preload identifiers; later native-main/child topology requires independent tmp.",
+    "Captured dependencies were originally non-frozen npm resolution; no new dependency resolution occurred here.",
+    "No native main/child tool invocation, protection, natural compaction/resume, quality/counter/cost comparison, automatic plugin routing or default.",
+    "Four-fact membership is synthetic integration evidence; original byte recovery, large payloads, rendered PDF/browser/image/audio and real research modalities remain unqualified.",
+    "Two historical copied npm debuglogs are absent at current recheck; original prior successful native hash check is retained. No runtime/source byte mismatch or cause established, no restoration or reconstructed logs."
+  ],
+  "provider_usage": null,
+  "provider_savings": null,
+  "corrections": [
+    "Wrong relative-manifest cwd checks failed before correction; originals retained. Count5801 is a selected dependency manifest, distinct from earlier5803. No runtime rerun."
+  ]
+}

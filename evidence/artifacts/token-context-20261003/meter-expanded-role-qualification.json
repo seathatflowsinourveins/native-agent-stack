@@ -1,0 +1,217 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Nine fixed direct ccusage native parser commands on14 usage-only retained-native copies; no new provider run",
+  "north_star_action": "Support accountable main/child complex engineering and continued research while choosing client context tools from source-qualified evidence.",
+  "sources": {
+    "repository": "ccusage/ccusage",
+    "release": "v20.0.26",
+    "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+    "native_artifact": "@ccusage/ccusage-linux-x64@20.0.26",
+    "binary_sha256": "f978214d6d373d2a2e242c5f329b59fcb4181c3fb0cd5b831d6f153ee69b4370",
+    "entrypoint": "direct platform Rust ELF; installed JS launcher byte-equal to pinned apps/ccusage/src/cli.js",
+    "source_route": "native main.rs26\u201337 -> adapter/mod.rs4/6 -> native Rust Claude/Codex adapters; no TypeScript parser or reproducible-build claim"
+  },
+  "preregistration_sha256": "6602e336ef522ec8152762caabc1f56fa72c9788c753c2e2e6295aa3e9bb0db3",
+  "fixed_scope_results": [
+    {
+      "scope": "cm-codex-parent-child",
+      "exit": 0,
+      "native_declared_tokens": 132165,
+      "native_raw_record_tokens": 132165,
+      "candidate_tokens": 132165,
+      "missing_declared_tokens": 0,
+      "status": "PASS_SELECTED_NATIVE_COUNTERS",
+      "raw_disjoint_categories_match": true,
+      "native_list_estimate_usd": null,
+      "candidate_list_estimate_usd": null,
+      "missing_list_estimate_usd": null
+    },
+    {
+      "scope": "cm-claude-parent-child-helper",
+      "exit": 0,
+      "native_declared_tokens": 55620,
+      "native_raw_record_tokens": 54346,
+      "candidate_tokens": 54346,
+      "missing_declared_tokens": 1274,
+      "status": "FAIL_INCLUSIVE_HELPER_SCOPE",
+      "raw_disjoint_categories_match": true,
+      "native_list_estimate_usd": 0.1981546,
+      "candidate_list_estimate_usd": 0.19682460000000002,
+      "missing_list_estimate_usd": 0.00132999999999997
+    },
+    {
+      "scope": "forge-codex-parent-child",
+      "exit": 0,
+      "native_declared_tokens": 1008952,
+      "native_raw_record_tokens": 1008952,
+      "candidate_tokens": 1008952,
+      "missing_declared_tokens": 0,
+      "status": "PASS_SELECTED_NATIVE_COUNTERS",
+      "raw_disjoint_categories_match": true,
+      "native_list_estimate_usd": null,
+      "candidate_list_estimate_usd": null,
+      "missing_list_estimate_usd": null
+    },
+    {
+      "scope": "resume-codex-before",
+      "exit": 0,
+      "native_declared_tokens": 96412,
+      "native_raw_record_tokens": 96412,
+      "candidate_tokens": 96412,
+      "missing_declared_tokens": 0,
+      "status": "PASS_SELECTED_NATIVE_COUNTERS",
+      "raw_disjoint_categories_match": true,
+      "native_list_estimate_usd": null,
+      "candidate_list_estimate_usd": null,
+      "missing_list_estimate_usd": null
+    },
+    {
+      "scope": "resume-codex-after",
+      "exit": 0,
+      "native_declared_tokens": 116496,
+      "native_raw_record_tokens": 116496,
+      "candidate_tokens": 116496,
+      "missing_declared_tokens": 0,
+      "status": "PASS_SELECTED_NATIVE_COUNTERS",
+      "raw_disjoint_categories_match": true,
+      "native_list_estimate_usd": null,
+      "candidate_list_estimate_usd": null,
+      "missing_list_estimate_usd": null
+    },
+    {
+      "scope": "resume-claude-before",
+      "exit": 0,
+      "native_declared_tokens": 44055,
+      "native_raw_record_tokens": 42981,
+      "candidate_tokens": 42981,
+      "missing_declared_tokens": 1074,
+      "status": "FAIL_INCLUSIVE_HELPER_SCOPE",
+      "raw_disjoint_categories_match": true,
+      "native_list_estimate_usd": 0.081637,
+      "candidate_list_estimate_usd": 0.080503,
+      "missing_list_estimate_usd": 0.0011339999999999961
+    },
+    {
+      "scope": "resume-claude-after",
+      "exit": 0,
+      "native_declared_tokens": 62239,
+      "native_raw_record_tokens": 61165,
+      "candidate_tokens": 61165,
+      "missing_declared_tokens": 1074,
+      "status": "FAIL_INCLUSIVE_HELPER_SCOPE",
+      "raw_disjoint_categories_match": true,
+      "native_list_estimate_usd": 0.090787,
+      "candidate_list_estimate_usd": 0.08965300000000001,
+      "missing_list_estimate_usd": 0.0011339999999999961
+    },
+    {
+      "scope": "astra-completed-review",
+      "exit": 0,
+      "native_declared_tokens": 236766,
+      "native_raw_record_tokens": 236766,
+      "candidate_tokens": 236766,
+      "missing_declared_tokens": 0,
+      "status": "PASS_SELECTED_NATIVE_COUNTERS",
+      "raw_disjoint_categories_match": true,
+      "native_list_estimate_usd": null,
+      "candidate_list_estimate_usd": null,
+      "missing_list_estimate_usd": null
+    },
+    {
+      "scope": "astra-startup-failure",
+      "exit": 0,
+      "native_declared_tokens": null,
+      "native_raw_record_tokens": null,
+      "candidate_tokens": 0,
+      "missing_declared_tokens": null,
+      "status": "UNKNOWN_NATIVE_USAGE_FAILURE",
+      "raw_disjoint_categories_match": null,
+      "native_list_estimate_usd": null,
+      "candidate_list_estimate_usd": null,
+      "missing_list_estimate_usd": null
+    }
+  ],
+  "resume": {
+    "codex_parent_only_delta": 20084,
+    "claude_inclusive_native_delta": 18184,
+    "candidate_both_deltas_exact": true,
+    "claude_candidate_estimate_delta_usd": 0.00915,
+    "endpoints_summed": false,
+    "whole_claude_endpoint_gap": "Helper1074 is omitted from both snapshots, so delta matches while both whole-native endpoints underreport.",
+    "original_failed_preregistration_preserved": "Actual installed SDK overrides returned restored cumulative counts contrary to prereg query-only/reset declarations; schema grades did not erase failed accounting conditions."
+  },
+  "cost": {
+    "cm_claude_native_list_estimate_usd": 0.1981546,
+    "cm_claude_candidate_opus_only_estimate_usd": 0.19682460000000002,
+    "cm_claude_known_omitted_helper_estimate_usd": 0.00133,
+    "resume_known_omitted_helper_estimate_usd_each_endpoint": 0.001134,
+    "native_list_estimates_are_known": true,
+    "invoice_is_not_a_prerequisite_for_known_native_estimates": true,
+    "invoice_and_provider_wire_provenance": "UNKNOWN separately",
+    "codex_candidate_cost": "Not tested: preregistered --no-cost counter-only commands, including returned unpriced model labels where present. Absence of cost is not zero cost."
+  },
+  "prior_required_failure_retained": {
+    "scope": "M2 fixed real199 exact native responses with3 natural compaction responses",
+    "native_total_tokens": 25619275,
+    "candidate_total_tokens": 24965459,
+    "missing_tokens": 653816,
+    "missing_exact_compaction_response_totals": [
+      225104,
+      207996,
+      220716
+    ],
+    "causal_limit": "The native meter misses these exact accounting records through its legacy token_count format path. This is not evidence about compaction quality, model use, runtime efficiency or provider-cost reduction.",
+    "criterion": "Protocol says unreconciled declared native meter format loses that scope. Expansion does not repair M2."
+  },
+  "qualified_native_commands": {
+    "count": 9,
+    "all_exit_zero": true,
+    "all_stderr_empty": true,
+    "source_class": "Our fixed-record integration checks; unchanged upstream test evidence reused separately"
+  },
+  "root_verification": {
+    "artifact_hashes": 67,
+    "original_native_prefixes": 14,
+    "all_match": true,
+    "raw_disjoint_record_counts_and_stored_stdout_recomputed": true,
+    "source_dispatch_re_read": true,
+    "helper_inclusive_values": "Prior root native-cost-state/modelUsage observations, distinct from raw Opus projection totals"
+  },
+  "artifact_measurement": {
+    "report_count": 32,
+    "tokenizer": "gpt-tokenizer4.0.0/o200k_base",
+    "report_tokens_in_fixed_order": [
+      257,
+      253,
+      260,
+      254,
+      254,
+      241,
+      253,
+      230,
+      67
+    ],
+    "overlapping_boundaries_not_added": true,
+    "provider_savings_measured": false
+  },
+  "decision": "Native baseline retained for tested metering/accounting scopes; ccusage20.0.26 excluded by M2 compaction and inclusive Claude helper omissions",
+  "comparison_that_would_overturn": "A maintained pinned release must reconcile exact response/compaction IDs and whole-query known helper counters/estimates over the same fixed scopes, without treating missing usage as zero",
+  "private_packet_hashes": {
+    "proposed-job-verdict.json": "89800969ce65ec3084b4eb98330c8ac846bb90a74e6a2d8f72ddfd672767035c",
+    "preregistration-private.json": "6602e336ef522ec8152762caabc1f56fa72c9788c753c2e2e6295aa3e9bb0db3",
+    "native-parser-source-binding.json": "3b1711497210d356dbc33cfe168a613f005ff511a2058629357bafd8fc559ab9",
+    "artifacts.json": "d94cc55ea0d0df680a718862bc4ae6d8f5f9c4e06122db14d7860d5d14dfd036",
+    "verification.json": "c646edf30891d9653836fbcec141c23dd71ebbfcbfc8b61445ab7a2038f337b9",
+    "counter-reconciliation-private.json": "19194ca0437b3a15fcb4a7beea6828405908af37d76091fa6fb4b84ddc164f4d",
+    "native-invocations-private.json": "a60b69e1dc98979e89405d3250bc78c209a2a8cb61d7f22dfbae5b45e3499f1b"
+  },
+  "root_verification_sha256": "6403c53e8847cf8248610161289f6c00729189e1c9efcc45eec6a66455f65c74",
+  "limits": [
+    "Known native list estimates are known without invoice; invoice, wire identity and retries remain separate unknowns",
+    "Interrupted Claude Forge final endpoint and Astra startup native usage remain unknown; parser empty/zero report is not zero spend",
+    "Native HOME and CODEX_HOME unchanged; owned rootless network-none read-only fixtures and binary only; own container postcheck empty",
+    "No new model calls, install, candidate rerun, provider savings or global goal/default freeze acceptance",
+    "Broader advisor, iteration, nonmonotone replay and helper raw-ID coverage require the next scoped landscape sweep"
+  ]
+}

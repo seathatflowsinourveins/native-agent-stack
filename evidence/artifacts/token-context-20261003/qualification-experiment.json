@@ -1,0 +1,3756 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Qualify five client token/context jobs without touching peer layers. Prerequisite failures are retained; original P1 freeze stopped after one unproven A/A mechanics case,55laterUNRUN_FINAL. No comparative/default winner is selected.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+    },
+    {
+      "url": "https://github.com/rtk-ai/rtk",
+      "revision": "e001f773f80b22b7dc4c7a79521b30e35aaef026"
+    },
+    {
+      "url": "https://github.com/ccusage/ccusage",
+      "revision": "d9821088b98aa536c7a385aa1a4579d6fa02269b"
+    },
+    {
+      "url": "https://github.com/toon-format/toon",
+      "revision": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53"
+    }
+  ],
+  "discovery_provenance": [
+    "Coordinator search-first and five bounded Sol/max lifecycle-job workers; workstation Opus/max and GPT Researcher source leads retained, primary sources reread",
+    "Native consequential Astra/max and Opus/max reads, with exact main counters reconciled and critique incorporated",
+    "Independent pinned-provider completeness critic found continuation, child-model/effort, SDK-resolution and modality gaps",
+    "Unit12 metadata correction: scoped checker rejected invented native_model_run enum; current pinned validator EXECUTION supports model_task_execution. Original failed checker result retained; model evidence unchanged.",
+    "Unit12 aggregate task-list correction: scoped checker found missing task IDs. Added only four separate unit12 declarations from their private frozen source receipts; older task records and every native result unchanged. Actual failed check retained."
+  ],
+  "license_and_compatibility": "Pinned upstream sources used through native commands in disposable prefixes/containers; licensing remains that of each pinned source. No host default installation, account/config/auth copies or peer-layer change. RTK Git guard failures and TOON BOM defect remain incompatibility gates.",
+  "baseline_and_candidate": {
+    "baseline": "Native focused formatting/reads, compaction/caching/deferred tools/delegation and exact per-request usage records",
+    "candidate": "One nominated candidate per job: Context Mode, RTK, TOON, existing owner-bound QMD/Serena consumption, ccusage; this unit tests selected prerequisites only"
+  },
+  "frozen_inputs": {
+    "base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+    "tasks": [
+      "harness-read",
+      "meter-claude",
+      "meter-codex",
+      "meter-codex-control",
+      "meter-tests",
+      "protocol-read",
+      "repair-read",
+      "rtk-artifacts",
+      "rtk-tests",
+      "toon-fidelity",
+      "toon-tests",
+      "native-calibration",
+      "context-source-tests",
+      "context-current-tools",
+      "meter-compaction",
+      "native-resume",
+      "resume-read",
+      "native-command-baseline",
+      "native-structured-baseline",
+      "native-command-carrier",
+      "forge-preparation",
+      "retrieval-functional",
+      "context-isolation-read",
+      "native-command-schema",
+      "forge-local-grader",
+      "context-short-container",
+      "meter-artifact-overhead",
+      "context-parent-dwell",
+      "context-dwell-artifacts",
+      "forge-native-shape",
+      "forge-native-pilot-original",
+      "forge-native-pilot-typed",
+      "forge-stopped-program",
+      "astra-settings-read",
+      "context-fresh-role",
+      "context-native-artifacts",
+      "forge-claude-settings-relocation",
+      "forge-claude-stopped-program-grade",
+      "p2-trajectory-astra-source-judgment",
+      "usage-cost-metering",
+      "p1-first-aa",
+      "p1-prefreeze-opus-read",
+      "p1-prefreeze-astra-read",
+      "unit9-hook-pilot",
+      "unit9-trace-pilot",
+      "unit9-group-recovery",
+      "unit9-method-astra",
+      "unit9-method-opus",
+      "unit9-profile-initial",
+      "unit9-profile-repair",
+      "unit9-source-defaults",
+      "unit10-profile-judgment",
+      "unit10-profile-controls",
+      "unit11-native-carrier",
+      "unit11-observable-endpoint",
+      "unit11-qmd-readonly-predicates",
+      "unit12-qmd-codex-stop",
+      "unit12-opus-prefreeze-failed-read",
+      "unit12-opus-source-repair-timeout",
+      "unit12-native-hook-metadata-hold",
+      "unit13-codex-b-native-call-result-admission",
+      "unit13-claude-b-native-call-result-admission",
+      "unit13-r2-preregistration",
+      "unit13-r2-first-aa-stop",
+      "unit14-codex-tui-hook-metadata-source",
+      "unit15-native-stdio-hook-metadata-source",
+      "unit16-codex-synthetic-mount-enospc-source",
+      "unit17-native-stdio-carrier-astra-judgment",
+      "unit18-native-hook-profile-parse-stop",
+      "unit19-mandatory-hook-type-source-correction",
+      "unit19-native-tool-stdin-stop",
+      "unit20-native-tty-carrier-source",
+      "unit21-native-tty-carrier-astra-judgment",
+      "unit22-native-pty-operator-timing-stop",
+      "unit23-native-pty-metadata-acceptance",
+      "unit25-closed-opus-source-read",
+      "unit25-hook-state-source-routes",
+      "unit25-hook-state-astra-source-read",
+      "unit26-native-owned-home-hook-state",
+      "unit27-narrow-opus-source-read"
+    ],
+    "roles": [
+      "command-worker",
+      "context-worker",
+      "coordinator",
+      "meter-worker",
+      "structured-worker"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/token-context-20261003/harness-source-read.json",
+        "sha256": "63dcec9a9dd0051e8333d32a1cfe32e8aa783c5639cb6d5c41058444ef97c60b"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+        "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+      },
+      {
+        "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
+        "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c"
+      },
+      {
+        "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+        "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/token-context-20261003/protocol-opus-read.json",
+        "sha256": "b4adf401452c5f8788c3654c700d3ad3b4b9fc136d7b2218ad8809631efea56d"
+      },
+      {
+        "path": "evidence/artifacts/token-context-20261003/rtk-repair-astra-read.json",
+        "sha256": "f70eabd08db3501b1dc0550dbccdf0e7f06d2f7fe2dc4662c87dcbd1e4ba207b"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Historical prerequisite contracts remain unchanged. Original P1 actual212input freeze/all56quality predicates retained; first A/A mechanics UNKNOWN/NOTPASS stops55latercases and commonjudge. P2 and a future distinct measurable comparison remain open.",
+    "usage_rule": "Exact unique response/request counters counted once; cached/reasoning subsets not added. Research reads are overhead, not treatment savings. CLI/tests/artifacts do not substitute for provider counters. Unknown fields remain null; whole study coverage is partial. Unit9 review/pilot usage is outside arms; source/default views reuse previous counters without adding them. Distinct R2 addendum binds fixed within-client endpoint/BCa/joint quality/terminal stop; producers unfrozen."
+  },
+  "runtime_and_platform": {
+    "platform": "Declared Linux/amd64 destination with rootless Docker; disposable official Rust containers for native tests",
+    "tools": [
+      {
+        "name": "Codex CLI",
+        "version": "0.160.0"
+      },
+      {
+        "name": "Claude Code",
+        "version": "2.1.288"
+      },
+      {
+        "name": "RTK",
+        "version": "0.51.0"
+      },
+      {
+        "name": "ccusage",
+        "version": "20.0.26"
+      },
+      {
+        "name": "TOON",
+        "version": "4.1.1"
+      },
+      {
+        "name": "gpt-tokenizer/o200k_base",
+        "version": "4.0.0"
+      }
+    ],
+    "isolation": "Only owned disposable source/state/selected counters mounted. Container default homes stay empty. No credential values/auth files or native homes/config mounts. No compressor stack; no active token-tool installation."
+  },
+  "commands": [
+    "Native codex exec Astra/max read-only pinned Promptfoo harness source",
+    "Native claude -p Opus/max read-only draft protocol",
+    "Native codex exec Astra/max read-only final bounded RTK repair source",
+    "cargo test --all in declared disposable Rust1.91.0 container, unchanged source",
+    "cargo +1.97.1 test --locked --workspace --jobs 2 in declared disposable Rust1.97.1 container",
+    "ccusage codex session --id SELECTED --json --offline --no-cost --speed standard in selected-record container",
+    "ccusage claude session --id SELECTED --json --offline --mode display in selected-record container",
+    "CI=1 pnpm run test at pinned TOON source",
+    "Released TOON strict decode/semantic comparison controls",
+    "Existing token_manifest.count_files with gpt-tokenizer4.0.0/o200k_base",
+    "Promptfoo eval -c calibration.json --no-cache --repeat 1 -j 1 -o results.json; native SDK providers",
+    "Promptfoo eval -c calibration-regrade.json --model-outputs retained.json --no-cache; actually invokes configured native providers",
+    "Promptfoo eval --assertions schema.json --model-outputs retained.json --no-cache -j 1; native echo providers",
+    "npm test -- eight selected upstream Context Mode session/hooks/store files; source rebuild",
+    "npm exec --offline -- tsx tests/mcp-integration.ts; unchanged legacy source-built harness",
+    "Pinned Inspector2.9.0 native tools/call ctx_execute on shipped Context Mode sentinel",
+    "Pinned Inspector2.9.0 native tools/call ctx_search after separate native ctx_index",
+    "ccusage codex session --id SELECTED --json --offline --no-cost --speed standard; preregistered native third-compaction cutoff",
+    "Same released ccusage command on separately labelled exact-only synthetic control",
+    "Promptfoo eval -c resume-calibration.json --no-cache --repeat1 --max-concurrency1; native supported explicit parent UUIDs",
+    "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max read-only; missing keyless environment prerequisite",
+    "Same native read with one non-secret process-local placeholder and explicit requested pool URL",
+    "Promptfoo native package bin eval -c command-baseline/config.json --no-cache --repeat1 --max-concurrency1; fresh native parent/child C1/C2/C3",
+    "Promptfoo native package bin eval -c structured-baseline/config.json --no-cache --repeat1 --max-concurrency1; fresh native main/child focused jq QA and root-string controls",
+    "Promptfoo native eval -c command-carrier-control/config.json --no-cache --repeat1 --max-concurrency1; fresh native main/child observable diagnostic carriers",
+    "Native uv sync --locked, slop-code render-prompts and unchanged Forge pytest --collect-only; no model or grader execution",
+    "Existing named QMD native BM25 search context supply top2; no model, refresh or install",
+    "Existing named QMD search exact title/get docid span; fixed original15lines equality, no model",
+    "Native codex exec -m gpt-6-astra -c model_reasoning_effort=max --sandbox read-only --json; process-local requested keyless pool route; read-only admission judgment",
+    "Native Promptfoo command-carrier-native-schema eval; fresh main/child native structural-output diagnostic control",
+    "slop-code --quiet eval-snapshot <unchanged upstream checkpoint1 reference snapshot> -o <owned output> -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json",
+    "Pinned Inspector2.9 native initialize/list/index/search through inspected owned Docker stdio containers; separate native stop",
+    "Existing tools/token-report/token_manifest.py count_files(config,paths):159\u2013165 with gpt-tokenizer4.0.0/o200k_base; eleven separate original boundaries",
+    "Inspector2.9 native ctx_execute_file fixed70sec fixture with requested100000ms timeout",
+    "Promptfoo0.123.1 native directMCP eval same fixed70sec fixture with supported100000/110000ms limits",
+    "Existing token_manifest.count_files API on exact fixture/native reply/original directMCP output with o200k_base",
+    "Promptfoo0.123.1 native validate config -c original prepared Codex Forge JSON; actual Configuration is valid stdout",
+    "Promptfoo0.123.1 native validate config -c original prepared Claude Forge JSON; actual Configuration is valid stdout",
+    "Native Promptfoo package-bin eval registered original Forge checkpoint1 codex case, evaluator no-cache/repeat1/concurrency1; original relative -c config path",
+    "Native Promptfoo package-bin eval registered original Forge checkpoint1 claude case, evaluator no-cache/repeat1/concurrency1; original relative -c config path",
+    "Native Promptfoo0.123.1 registered typed Forge checkpoint1 Codex; absolute -c; no-cache/repeat1/concurrency1/no-share; source-supported explicit string schema types",
+    "Native Promptfoo0.123.1 registered typed Forge checkpoint1 Claude; absolute -c; SDK file-settings plus separate sandbox guard rejected before query",
+    "Native slop-code --quiet eval-snapshot immutable stopped copy private output -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json; timeout300s+5; unchanged40tests",
+    "Native codex exec -p omniroute -m gpt-6-astra max/read-only; original missing required keyless environment name",
+    "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max -s read-only; source-only exact loader/sandbox relocation judgment with task-local nonsecret keyless placeholder",
+    "Native Promptfoo0.123.1 registered freshCodex main/max-child case; releasedContextMode1.0.169 node-only source-derived private Docker npm launcher; four directed index/search calls",
+    "Native Promptfoo0.123.1 registered freshClaude main/max-child case; releasedContextMode1.0.169 source-derived private Docker npm launcher; four directed index/search calls",
+    "One existing unchanged token_manifest.count_files(config,paths) call through installed gpt-tokenizer4.0.0/o200k_base for42 exact overlapping artifact boundaries",
+    "Native Promptfoo0.123.1 distinct registered Claude Forge settings relocation, absolute -c, no-cache/repeat1/concurrency1/no-share, original900000ms deadline; nativeCLI2.1.288/Opus5.5/max main and one child observed",
+    "One unchanged pinned slop-code eval-snapshot stopped-copy -o owned-output -p forge -c checkpoint_1 -e pinned local-py.yaml --json; cap300s+5s",
+    "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max -s read-only source judgment; no benchmark or nested model",
+    "Nine preregistered native ccusage20.0.26 daily/codex-daily JSON commands on fixed usage-only copies in owned network-none read-only containers; no models",
+    "One supported Promptfoo0.123.1 native eval for frozen codex-01 AA1, no-cache/repeat1/max-concurrency1/no-share and process-local adaptive scheduler disabled; original absolute invocation retained privately.",
+    "One native read-only claude -p Opus/max prefreeze source read, exact frozen42inputs; final797words exceeds650word gate",
+    "One native read-only codex exec gpt-6-astra/max prefreeze source read, exact frozen129inputs; final391words within550word gate",
+    "Native Promptfoo eval fresh Claude directed released Docker hooks/main+max child",
+    "Native Codex0.160 readonly trace probe plus unchanged native debug trace-reduce",
+    "Native Promptfoo eval distinct frozen Claude MCP Tini process-group configuration; directed main+max child",
+    "Native codex exec gpt-6-astra/max keyless pool readonly consequential observable-contract judgment",
+    "Native claude -p Opus/max restricted Read-only immutable prefreeze method read",
+    "Native Codex sandbox named-profile allowed harmless control, original quoted flattened path syntax",
+    "Native Codex sandbox distinct frozen unquoted dot-free profile allowed harmless control",
+    "Pinned native release/source and existing-record checks; three limited native default decisions",
+    "Native Codex exec Astra/max consequential source judgment, one attempt through20128",
+    "Independent original-output/hash/inventory integration check on five native Codex sandbox controls (native exits0/1/0/1/1)",
+    "Native unchanged Promptfoo Codex carrier: one parent/child synthetic admission case",
+    "Native Codex exec Astra/max prospective native call/result boundary judgment through configured20128",
+    "Supported native better-sqlite3 read-only API selected predicate and independent file observation",
+    "Supported native Promptfoo one-case QMD Codex functional admission; own native role journals/trace and existing o200k facade",
+    "Native Claude2.1.288 restricted Opus/max read-only source review",
+    "Native Claude2.1.288 restricted Opus/max exact owned source-copy correction; one600s cap",
+    "Supported Codex0.160.0 pure native app-server generate-json-schema --experimental; unchanged pinned source/custody reads",
+    "Supported native Promptfoo fixed Codex B admission; complete native role/request/call/result prefix reconciliation and owned Docker lifecycle observations; synthetic integration only.",
+    "Supported native Promptfoo fixed Claude B admission; main/linked-child native journals plus finalized helper-inclusive result and owned Docker lifecycle observations; synthetic integration only.",
+    "Retained native public preregistration response and prelaunch 234-binding freeze custody; offline publication of an existing registration, no new execution.",
+    "Unchanged registered native Promptfoo first Codex AA case; retained root native reduction and nine finalized parent groups; required child helper failure and terminal STOP, no retry.",
+    "Read-only retained Codex released TUI hooks handler/detail sources; selected full-key/hash display HOLD, no TUI or model launch.",
+    "Read-only retained installed protocol/SDK and released native stdio hooks/list sources; matching profile and startup HOLD, no RPC/client/provider launch.",
+    "Read-only retained native error and pinned linux_run_main.rs source trace; registry write identified, resource cause/remedy unknown; no runtime repair.",
+    "Existing native Codex Astra/max keyless-pool read-only source judgment on unchanged private SDK formatter and supported stdio metadata recipe; five response prefixes independently reconciled, no metadata server launch.",
+    "Native Codex0.160 app-server strict-config metadata startup with unchanged35argv; one attempt exits1 before RPC; original packet immutable.",
+    "Pinned Codex tagged enum and Context Mode generator inspect required handler discriminator; nine owned copied profiles restore byte-exact after removing54 source-backed inserted lines.",
+    "Separate native Codex app-server strict-config typed35argv attempt returns native tool session, then rejects closedstdin write; zero confirmedRPC and later CLI0; first-mismatch STOP/no retry.",
+    "Bounded Codex stdio/capability and uutils0.8 terminal/foreground timeout source checks plus installed value-free help/version; no monitored command/client/TTY mutation in source unit.",
+    "One native Codex Astra/max source judgment via keyless pool on distinct actual-PTY/terminal/foreground-timeout metadata recipe; eight unique finalized native response prefixes independently reconciled.",
+    "One native typed35 metadata PTY exchange returned all six exact definitions; operator exceeded both20s projection guards, improperly continued, and native foreground timeout closed124. No repair/retry/regrade.",
+    "One distinct frozen literal native-tool PTY metadata sequence, same35argv/440B payload, immediate reply projections and deadline guards before every send; exactsix metadata and native exit0 independently reconciled.",
+    "Closed failed native source read;13groups1175609 known prefix only; no final result/verdict. Complete usage/cost UNKNOWN; original54 bindings unchanged.",
+    "Pinned parser/provider/native state source fields and unchanged metadata artifacts verified; source support only at closure, no model-task admission.",
+    "Actual source judgment closed0 with main-only400669; helper/whole total UNKNOWN, native reconnect1 and unplanned-helper bounded orchestration unqualified. Conditional H choice rests on primary rereads.",
+    "B-only native state metadata:6exact17-field objects trusted/enabled, unchangedkeys/hashes/definitions/order,diagnostics0,guards1185/1198ms,total4045ms;all138bindingsunchanged. No handler/role/resume/protection/winner claim.",
+    "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance."
+  ],
+  "observations": [
+    {
+      "id": "astra-harness",
+      "task": "harness-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/harness-source-read.json",
+          "sha256": "63dcec9a9dd0051e8333d32a1cfe32e8aa783c5639cb6d5c41058444ef97c60b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 77347,
+        "cache_creation": 0,
+        "cache_read": 390528,
+        "output": 8565,
+        "reasoning_in_output": 4763,
+        "total": 476440,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "opus-draft-hold",
+      "task": "protocol-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/protocol-opus-read.json",
+          "sha256": "b4adf401452c5f8788c3654c700d3ad3b4b9fc136d7b2218ad8809631efea56d"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 15289,
+        "cache_read": 8412,
+        "output": 66838,
+        "reasoning_in_output": 63592,
+        "total": 90543,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-repair-conditional",
+      "task": "repair-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-repair-astra-read.json",
+          "sha256": "f70eabd08db3501b1dc0550dbccdf0e7f06d2f7fe2dc4662c87dcbd1e4ba207b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 18847,
+        "cache_creation": 0,
+        "cache_read": 59264,
+        "output": 4091,
+        "reasoning_in_output": 3104,
+        "total": 82202,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "rtk-readonly-failure",
+      "task": "rtk-tests",
+      "role": "command-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 101,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+          "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "rtk-root-permission-failure",
+      "task": "rtk-tests",
+      "role": "command-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 101,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+          "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "rtk-final-guard-failure",
+      "task": "rtk-tests",
+      "role": "command-worker",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 101,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+          "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ccusage-workspace",
+      "task": "meter-tests",
+      "role": "meter-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+          "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ccusage-codex-main",
+      "task": "meter-codex",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+          "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ccusage-codex-exact-only",
+      "task": "meter-codex-control",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+          "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ccusage-claude-main",
+      "task": "meter-claude",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 6,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+          "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "toon-upstream-tests",
+      "task": "toon-tests",
+      "role": "structured-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 7,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
+          "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "toon-root-bom-control",
+      "task": "toon-fidelity",
+      "role": "structured-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 8,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
+          "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "rtk-complete-artifacts",
+      "task": "rtk-artifacts",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-artifact-qualification.json",
+          "sha256": "04b742c80f1f26d72ab78dd3fdec1c304cb0440b1dcb49b4e14906ce259ebff4"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-calibration-first",
+      "task": "native-calibration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 10,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-calibration.json",
+          "sha256": "56f4d5279102a64e9aae06cd5a98281e73d56a8b946bf8286a86e0c34c73f7b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 26211,
+        "cache_creation": 10536,
+        "cache_read": 199363,
+        "output": 3294,
+        "reasoning_in_output": 1953,
+        "total": 239404,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-calibration-unintended-live",
+      "task": "native-calibration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 11,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-calibration.json",
+          "sha256": "56f4d5279102a64e9aae06cd5a98281e73d56a8b946bf8286a86e0c34c73f7b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 25277,
+        "cache_creation": 3146,
+        "cache_read": 149177,
+        "output": 3742,
+        "reasoning_in_output": 2371,
+        "total": 181342,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-calibration-echo-regrade",
+      "task": "native-calibration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 12,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-calibration.json",
+          "sha256": "56f4d5279102a64e9aae06cd5a98281e73d56a8b946bf8286a86e0c34c73f7b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "context-selected-tests",
+      "task": "context-source-tests",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 13,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+          "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-legacy-mcp",
+      "task": "context-source-tests",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 14,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+          "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-current-execute",
+      "task": "context-current-tools",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 15,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+          "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-current-search",
+      "task": "context-current-tools",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 16,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+          "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "meter-native-compaction-gap",
+      "task": "meter-compaction",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 17,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-compaction-qualification.json",
+          "sha256": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "meter-compaction-exact-only",
+      "task": "meter-compaction",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 18,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-compaction-qualification.json",
+          "sha256": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-resume-codex",
+      "task": "native-resume",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 19,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze functional/accounting qualification only; no saving/protection/default adoption",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-resume-qualification.json",
+          "sha256": "a9f147289e39f82411183ce5e791de09ee4c6340562f54141e5cccca4c882188"
+        }
+      ],
+      "usage": {
+        "uncached_input": 327,
+        "cache_creation": 0,
+        "cache_read": 19712,
+        "output": 45,
+        "reasoning_in_output": 11,
+        "total": 20084,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-resume-claude",
+      "task": "native-resume",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 19,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze functional/accounting qualification only; no saving/protection/default adoption",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-resume-qualification.json",
+          "sha256": "a9f147289e39f82411183ce5e791de09ee4c6340562f54141e5cccca4c882188"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 386,
+        "cache_read": 17670,
+        "output": 126,
+        "reasoning_in_output": 77,
+        "total": 18184,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-resume-startup-failure",
+      "task": "resume-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 20,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze functional/accounting qualification only; no saving/protection/default adoption",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
+          "sha256": "2d5861a2204cfd48189919e0bda935d090c15ae3670f92fe12adb4863b5cfe72"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-resume-correction",
+      "task": "resume-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 21,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze functional/accounting qualification only; no saving/protection/default adoption",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
+          "sha256": "2d5861a2204cfd48189919e0bda935d090c15ae3670f92fe12adb4863b5cfe72"
+        }
+      ],
+      "usage": {
+        "uncached_input": 30906,
+        "cache_creation": 0,
+        "cache_read": 91392,
+        "output": 5168,
+        "reasoning_in_output": 2404,
+        "total": 127466,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-baseline-codex",
+      "task": "native-command-baseline",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 22,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fresh main/child native focused-command functional/accounting qualification; excluded RTK comparator stays unrun",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-baseline-qualification.json",
+          "sha256": "6b97431d58e1572fb8e507923e7cfd58a2221fef3fa72698ca9efd163c2204d1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 27444,
+        "cache_creation": 0,
+        "cache_read": 119936,
+        "output": 2659,
+        "reasoning_in_output": 1047,
+        "total": 150039,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-baseline-claude",
+      "task": "native-command-baseline",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 22,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fresh main/child native focused-command functional/accounting qualification; excluded RTK comparator stays unrun",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-baseline-qualification.json",
+          "sha256": "6b97431d58e1572fb8e507923e7cfd58a2221fef3fa72698ca9efd163c2204d1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1393,
+        "cache_creation": 17234,
+        "cache_read": 31405,
+        "output": 10009,
+        "reasoning_in_output": 7363,
+        "total": 60041,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-structured-baseline-codex",
+      "task": "native-structured-baseline",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 23,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fresh main/child native focused JSON semantic/accounting qualification; no TOON model arm or savings claim",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-structured-baseline-qualification.json",
+          "sha256": "ea06789baee978a8aeb5b1a1af6059f1b787f9e9832c2277b00f46f8bad427b3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 27223,
+        "cache_creation": 0,
+        "cache_read": 96000,
+        "output": 2414,
+        "reasoning_in_output": 834,
+        "total": 125637,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-structured-baseline-claude",
+      "task": "native-structured-baseline",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 23,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fresh main/child native focused JSON semantic/accounting qualification; no TOON model arm or savings claim",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-structured-baseline-qualification.json",
+          "sha256": "ea06789baee978a8aeb5b1a1af6059f1b787f9e9832c2277b00f46f8bad427b3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1569,
+        "cache_creation": 17409,
+        "cache_read": 31522,
+        "output": 9377,
+        "reasoning_in_output": 6794,
+        "total": 59877,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-carrier-codex",
+      "task": "native-command-carrier",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 24,
+      "evidence_class": "native_cli_execution",
+      "scope": "Observable diagnostic carrier/accounting control; strict-format failure preserved; no candidate/default; Codex case gold PASS within shared native evaluator exit100",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-carrier-qualification.json",
+          "sha256": "8ca5165b5f2d220fb23622adb206fa530dcb04c8a0d0cc459cb49c23759725ca"
+        }
+      ],
+      "usage": {
+        "uncached_input": 17782,
+        "cache_creation": 0,
+        "cache_read": 82176,
+        "output": 873,
+        "reasoning_in_output": 335,
+        "total": 100831,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-carrier-claude",
+      "task": "native-command-carrier",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 24,
+      "evidence_class": "native_cli_execution",
+      "scope": "Observable diagnostic carrier/accounting control; strict-format failure preserved; no candidate/default",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-carrier-qualification.json",
+          "sha256": "8ca5165b5f2d220fb23622adb206fa530dcb04c8a0d0cc459cb49c23759725ca"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1111,
+        "cache_creation": 13816,
+        "cache_read": 30577,
+        "output": 5777,
+        "reasoning_in_output": 4774,
+        "total": 51281,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-preparation",
+      "task": "forge-preparation",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 25,
+      "evidence_class": "native_cli_execution",
+      "scope": "Native uv sync --locked, slop-code render-prompts and unchanged Forge pytest --collect-only; no model or grader execution; direct command model0 only, coordinator/advisor usage outside this scope not counted here",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-preparation-qualification.json",
+          "sha256": "c62212b7f3a5a433d45563141ec11fa1df47403cdccfa8752369d67625f62f9b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "retrieval-qmd-target-miss",
+      "task": "retrieval-functional",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 26,
+      "evidence_class": "native_cli_execution",
+      "scope": "Existing named QMD native BM25 search context supply top2; no model, refresh or install; direct command model0 only, coordinator/advisor usage outside this scope not counted here",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/retrieval-consumption-qualification.json",
+          "sha256": "56a4d1b6cbb5d74a45551c5106978c7eacf0c7c1e77fbd015f4d4c0b9ff7c853"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "retrieval-qmd-exact-get",
+      "task": "retrieval-functional",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 27,
+      "evidence_class": "native_cli_execution",
+      "scope": "Existing named QMD search exact title/get docid span; fixed original15lines equality, no model; direct command model0 only, coordinator/advisor usage outside this scope not counted here",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/retrieval-consumption-qualification.json",
+          "sha256": "56a4d1b6cbb5d74a45551c5106978c7eacf0c7c1e77fbd015f4d4c0b9ff7c853"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-context-isolation",
+      "task": "context-isolation-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 28,
+      "evidence_class": "native_cli_execution",
+      "scope": "Consequential candidate-admission HOLD; no isolation/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-isolation-astra-read.json",
+          "sha256": "c14ccc68f87d002d37af441301598f779df7587dc058af84499e4eac410972c1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 27150,
+        "cache_creation": 0,
+        "cache_read": 36096,
+        "output": 4554,
+        "reasoning_in_output": 3104,
+        "total": 67800,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-schema-codex",
+      "task": "native-command-schema",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 29,
+      "evidence_class": "native_cli_execution",
+      "scope": "Both fact schemas PASS, native Claude structured_output proved; N5Codex runtime schema exposure UNPROVEN; no default",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-schema-qualification.json",
+          "sha256": "5d309dbe703ed1bc270441e9d9c6642f92582130a4fd34b0d0ee4a5fb7393463"
+        }
+      ],
+      "usage": {
+        "uncached_input": 31533,
+        "cache_creation": 0,
+        "cache_read": 71040,
+        "output": 1940,
+        "reasoning_in_output": 1385,
+        "total": 104513,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-schema-claude",
+      "task": "native-command-schema",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 29,
+      "evidence_class": "native_cli_execution",
+      "scope": "Both fact schemas PASS, native Claude structured_output proved; N5Codex runtime schema exposure UNPROVEN; no default",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-schema-qualification.json",
+          "sha256": "5d309dbe703ed1bc270441e9d9c6642f92582130a4fd34b0d0ee4a5fb7393463"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1111,
+        "cache_creation": 28971,
+        "cache_read": 19723,
+        "output": 9099,
+        "reasoning_in_output": 7893,
+        "total": 58904,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-local-grader-reference",
+      "task": "forge-local-grader",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 30,
+      "evidence_class": "native_cli_execution",
+      "scope": "Single model-free unchanged upstream local grader/reference prerequisite,40casesPASS; no model/protection/comparator",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-local-grader-qualification.json",
+          "sha256": "17db8ce847c844ea4468f55fbc9736f2c516b50691d56c5e2950a0e87c7419cf"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-short-container-lifecycle",
+      "task": "context-short-container",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 31,
+      "evidence_class": "native_cli_execution",
+      "scope": "Five short model-free containers, actual mounts/store persistence/shutdown only;30sec parent guard unexercised, no client/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-container-short-qualification.json",
+          "sha256": "d2d3e1b4cc0005b38bb97bb2d4a193d949f98064203a1fcff44fefd3549c70aa"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "meter-artifact-report-boundaries",
+      "task": "meter-artifact-overhead",
+      "role": "meter-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 32,
+      "evidence_class": "native_cli_execution",
+      "scope": "Single maintained artifact counter invocation; no native model call by this executable, no provider or workflow savings claim",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-artifact-overhead-qualification.json",
+          "sha256": "5867f55bc7e20b8e585aaed32616aa38ae16b5eab7514d734a2c863a0a65397b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-inspector-parent-dwell",
+      "task": "context-parent-dwell",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 33,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate model-free native parent-lifecycle attempts, not repair/regrade/model/protection/default acceptance",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-parent-dwell-qualification.json",
+          "sha256": "2c758f93605c428e3bb90604fc8fe4fadab8d3bc466adb00de0f140f8b97ac8b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-promptfoo-parent-dwell",
+      "task": "context-parent-dwell",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 34,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate model-free native parent-lifecycle attempts, not repair/regrade/model/protection/default acceptance",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-parent-dwell-qualification.json",
+          "sha256": "2c758f93605c428e3bb90604fc8fe4fadab8d3bc466adb00de0f140f8b97ac8b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-dwell-artifact-boundaries",
+      "task": "context-dwell-artifacts",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 35,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free selected artifact or native shape validation only; no runtime/client/quality/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-parent-dwell-qualification.json",
+          "sha256": "2c758f93605c428e3bb90604fc8fe4fadab8d3bc466adb00de0f140f8b97ac8b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-shape-codex",
+      "task": "forge-native-shape",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 36,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free selected artifact or native shape validation only; no runtime/client/quality/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-preparation-qualification.json",
+          "sha256": "80b936a6136a8d5e1875d146a3d3d6f62c1518f68a793b42c664a8d1380a7860"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-shape-claude",
+      "task": "forge-native-shape",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 37,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free selected artifact or native shape validation only; no runtime/client/quality/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-preparation-qualification.json",
+          "sha256": "80b936a6136a8d5e1875d146a3d3d6f62c1518f68a793b42c664a8d1380a7860"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-pilot-original-codex",
+      "task": "forge-native-pilot-original",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 38,
+      "evidence_class": "native_cli_execution",
+      "scope": "Preserved failed source/runtime engineering feasibility attempt before code; no comparison/default/P2 acceptance",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-original-failures.json",
+          "sha256": "1c06312516721f3d1ea8e6faff031475f46fb08d13f4f5c7657ad49fe928586e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-pilot-original-claude",
+      "task": "forge-native-pilot-original",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 39,
+      "evidence_class": "native_cli_execution",
+      "scope": "Preserved failed source/runtime engineering feasibility attempt before code; no comparison/default/P2 acceptance",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-original-failures.json",
+          "sha256": "1c06312516721f3d1ea8e6faff031475f46fb08d13f4f5c7657ad49fe928586e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-pilot-typed-codex",
+      "task": "forge-native-pilot-typed",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 40,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fixed schema/native main-child/code generation feasibility only; unchanged program quality separately FAIL38/40; no savings/P2/default; retained detailed gates {\"schema\":true,\"native_main_child\":true}",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-typed-qualification.json",
+          "sha256": "f2227989808ef8e4af27c4cc59b050097668570b6850dc58b82d1bbeff7ccb17"
+        }
+      ],
+      "usage": {
+        "uncached_input": 85704,
+        "cache_creation": 0,
+        "cache_read": 894464,
+        "output": 28784,
+        "reasoning_in_output": 11192,
+        "total": 1008952,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-pilot-typed-claude",
+      "task": "forge-native-pilot-typed",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 41,
+      "evidence_class": "native_cli_execution",
+      "scope": "Distinct preserved SDK guard failure; no native UUID/returned usage; spend unknown, no fabricated zero; retained detailed gates {\"runtime\":false}",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-typed-qualification.json",
+          "sha256": "f2227989808ef8e4af27c4cc59b050097668570b6850dc58b82d1bbeff7ccb17"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-codex-stopped-program",
+      "task": "forge-stopped-program",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 42,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free unchanged program grading; native evaluator0 is distinct from pytest1 and38/40FAIL; original case not repaired/regraded; retained detailed gates {\"unchanged_program_oracle\":false,\"no_infrastructure_failure\":true}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-codex-program-qualification.json",
+          "sha256": "4a8ee25845720b92d5ed0ac4e33357e5c60d7c58d658c3c1ba65a15f77633510"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-settings-startup-failure",
+      "task": "astra-settings-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 43,
+      "evidence_class": "native_cli_execution",
+      "scope": "Preserved startup rejection; no exact records or emitted usage; not zero-spend inference; retained detailed gates {\"completion\":false}",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/claude-sdk-settings-astra-read.json",
+          "sha256": "474276e4ddd548cee5f8527c83ec1adb16a2f2c23e6ef5466bb59f61c2111fdb"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-settings-source-read",
+      "task": "astra-settings-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 44,
+      "evidence_class": "native_cli_execution",
+      "scope": "Six exact unique native responses reconcile; original answer includes false compaction-absence claim, corrected independently; only narrow source-supported relocation retained; no runtime/default acceptance; retained detailed gates {\"source_supported_relocation\":true,\"word_limit\":true,\"original_compaction_absence_claim\":false}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/claude-sdk-settings-astra-read.json",
+          "sha256": "474276e4ddd548cee5f8527c83ec1adb16a2f2c23e6ef5466bb59f61c2111fdb"
+        }
+      ],
+      "usage": {
+        "uncached_input": 38897,
+        "cache_creation": 0,
+        "cache_read": 188544,
+        "output": 9325,
+        "reasoning_in_output": 5380,
+        "total": 236766,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-fresh-role-codex",
+      "task": "context-fresh-role",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 45,
+      "evidence_class": "native_cli_execution",
+      "scope": "Directed native candidate functionality and exact parent+child endpoint only; no natural rate, paired savings or protection; retained detailed gates {\"four_fact_gold\":true,\"main_child_calls\":true,\"native_max\":true}",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-native-role-qualification.json",
+          "sha256": "af371a3fc3e7759f8e8ebe5f1a1e2799404fff02fd88e35e796a1f4f3fc1a153"
+        }
+      ],
+      "usage": {
+        "uncached_input": 32731,
+        "cache_creation": 0,
+        "cache_read": 96768,
+        "output": 2666,
+        "reasoning_in_output": 1595,
+        "total": 132165,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-fresh-role-claude",
+      "task": "context-fresh-role",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 46,
+      "evidence_class": "native_cli_execution",
+      "scope": "Latest native query-inclusive scope includes known1274helper; changing child snapshots/trailer/Opus subset are not added; no paired savings/protection; retained detailed gates {\"four_fact_gold\":true,\"main_child_calls\":true,\"native_max\":true}",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-native-role-qualification.json",
+          "sha256": "af371a3fc3e7759f8e8ebe5f1a1e2799404fff02fd88e35e796a1f4f3fc1a153"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1274,
+        "cache_creation": 15673,
+        "cache_read": 34703,
+        "output": 3970,
+        "reasoning_in_output": 2447,
+        "total": 55620,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-native-artifact-boundaries",
+      "task": "context-native-artifacts",
+      "role": "meter-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 47,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free artifact counter execution, not provider usage/savings;42overlapping boundaries have no aggregate; retained detailed gates {\"hash_size_boundaries\":true,\"existing_fixed_gold_retained\":true}",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-native-artifact-qualification.json",
+          "sha256": "25823560929d27412580ebbd1349ee70753e9ee1641eeae87d505d7ae34e1b25"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-claude-settings-timeout",
+      "task": "forge-claude-settings-relocation",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 48,
+      "evidence_class": "native_cli_execution",
+      "scope": "Original evaluator timeout with independently known1489998persisted and1574196raw-with-partial alternative scopes; complete final endpoint unknown, views never added; no zero-spend/schema/protection/default acceptance; retained detailed gates {\"caller_result\":false,\"native_max_main_child\":true,\"complete_final_endpoint\":false}",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-claude-timeout-qualification.json",
+          "sha256": "459e2f01c5ba363bbdde1fb5522fceb558b29904b876c85e8d2532c2133a8e79"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-claude-stopped-program-grade",
+      "task": "forge-claude-stopped-program-grade",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 49,
+      "evidence_class": "native_cli_execution",
+      "scope": "Original stopped Claude program scored36/40; native evaluator0 and pytest1; no model rerun or correctness acceptance; retained detailed gates {\"all40_original_cases\":false,\"infrastructure_ok\":true,\"snapshot_custody\":true}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-claude-program-qualification.json",
+          "sha256": "1075f028094412250f4befee20876def9b523c71b3715032f936089419dceea4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "p2-trajectory-astra-source-judgment",
+      "task": "p2-trajectory-astra-source-judgment",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 50,
+      "evidence_class": "native_cli_execution",
+      "scope": "CircuitEval source/reference/continuation qualification lead; one protocol input changed append-only during read; no fully bound freeze/protection/adoption; retained detailed gates {\"answer_word_limit\":true,\"native_counter_reconciliation\":true,\"all_bound_inputs_immutable\":false}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/p2-trajectory-astra-read.json",
+          "sha256": "b2960b0c0c08b188e4eee24cf074193380f95d4c06a133753b57f24266f704d5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 57066,
+        "cache_creation": 0,
+        "cache_read": 298368,
+        "output": 11071,
+        "reasoning_in_output": 7341,
+        "total": 366505,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "meter-expanded-role-accounting",
+      "task": "usage-cost-metering",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 51,
+      "evidence_class": "native_cli_execution",
+      "scope": "Nine parser-only integration cases; selected Codex/Opus/deltas match, inclusive Claude helpers omitted; prior M2 compaction failure retained; native baseline retained for tested scopes; retained detailed gates {\"native_command_execution\":true,\"inclusive_native_usage_reconciles\":false,\"selected_raw_records_reconcile\":true}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-expanded-role-qualification.json",
+          "sha256": "27dc08de2c44998c62f224557f219b1e816920db26e5ad40d28d600e1e39eff7"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "p1-first-aa-codex-01",
+      "task": "p1-first-aa",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 52,
+      "evidence_class": "native_cli_execution",
+      "scope": "First frozen native A/A case only: CLI0 and schemaPASS; actual child assignment and advertised/deferred schema exposure UNKNOWN, frozen mechanics NOTPASS,55laterUNRUN_FINAL,commonjudgeUNRUN. Sixteen disjoint identified completed response records; billing and unreported helper coverage unknown.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
+          "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6"
+        }
+      ],
+      "usage": {
+        "uncached_input": 60250,
+        "cache_creation": 0,
+        "cache_read": 406784,
+        "output": 7441,
+        "reasoning_in_output": 4178,
+        "total": 474475,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit8-prefreeze-opus-read",
+      "task": "p1-prefreeze-opus-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 53,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate source/readiness review overhead; exact native disjoint response categories. Conditional opinion is not user approval or trial/default acceptance. Word gateFAIL preserved;110maxeffortblocks and36request/messagepairs reconcile native coststate; billing/helpers unknown.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
+          "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6"
+        }
+      ],
+      "usage": {
+        "uncached_input": 72,
+        "cache_creation": 206792,
+        "cache_read": 4107196,
+        "output": 76284,
+        "reasoning_in_output": 62960,
+        "total": 4390344,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit8-prefreeze-astra-read",
+      "task": "p1-prefreeze-astra-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 54,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate source/readiness review overhead; exact native disjoint response categories. Conditional opinion is not user approval or trial/default acceptance. 13distinct responses/all prefixes and39native command exits0; modelwire/invoice unknown. Metadata/source-read contract only.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
+          "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6"
+        }
+      ],
+      "usage": {
+        "uncached_input": 135237,
+        "cache_creation": 0,
+        "cache_read": 628096,
+        "output": 11376,
+        "reasoning_in_output": 5713,
+        "total": 774709,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-original-claude-hook-pilot",
+      "task": "unit9-hook-pilot",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 55,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate directed fourfact pilot; original ready-markerFAIL retained, directchildhook/APIinputUNKNOWN; inclusive102295 known native query scope only, not comparative/protection.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-claude-hook-pilot.json",
+          "sha256": "62e366f02b0d8b1cda6830cc0343ee496aae08b6cda9395fb5dde5703707b065"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1412,
+        "cache_creation": 23105,
+        "cache_read": 70228,
+        "output": 7550,
+        "reasoning_in_output": 5023,
+        "total": 102295,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-native-codex-trace-pilot",
+      "task": "unit9-trace-pilot",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 56,
+      "evidence_class": "native_cli_execution",
+      "scope": "Native seven responses/first-full+five-delta chain/fourfact fidelity captured; owned process cleanup visibilityUNKNOWN, encrypted assignment/complete deferred charging/backendhelpers unknown. Narrow capture evidence, not whole admission/P1regrade.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-codex-trace-pilot.json",
+          "sha256": "66b4e67004906f66163a68c93cd5bf4edd8ad15f6bed139ed0acd83a67dc35df"
+        }
+      ],
+      "usage": {
+        "uncached_input": 28981,
+        "cache_creation": 0,
+        "cache_read": 107008,
+        "output": 1665,
+        "reasoning_in_output": 782,
+        "total": 137654,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-cm-native-group-recovery",
+      "task": "unit9-group-recovery",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 57,
+      "evidence_class": "native_cli_execution",
+      "scope": "Exact oneattempt fourfact/mainchild/tool/ownedMCP native marker cleanup integration PASS; livePGID observed, marker absent before operator cleanup. Original markerFAIL unchanged; individual signal/directchildhook/APIinputUNKNOWN; no natural-use/protection/P2/default.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-cm-group-recovery-pilot.json",
+          "sha256": "599a16357f6dc71e5aee66417e3d8c6239c52a4e77cd0a1f807bc3abc061ad9b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1412,
+        "cache_creation": 24927,
+        "cache_read": 66198,
+        "output": 13200,
+        "reasoning_in_output": 8255,
+        "total": 105737,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-prospective-method-astra",
+      "task": "unit9-method-astra",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 58,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate source-method judgment452words<=550/all8boundinputs match/five disjoint native records; fair observable estimand lead and limited defaults, not approval/runtimeacceptance. Wire/backend/helper/invoiceUNKNOWN.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-prospective-method-judgment.json",
+          "sha256": "3e549e38c5c69d368186762f85dbca8c64b45df3c0f8bbce07d5988dffd91375"
+        }
+      ],
+      "usage": {
+        "uncached_input": 39247,
+        "cache_creation": 0,
+        "cache_read": 52480,
+        "output": 5137,
+        "reasoning_in_output": 3714,
+        "total": 96864,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-p1-r2-opus-method-read",
+      "task": "unit9-method-opus",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 59,
+      "evidence_class": "native_cli_execution",
+      "scope": "Family source-method lead completed; wordlimitFAIL557>550 retained, sixinputsunchanged. Two finalized groups/nativefinal/coststate57770; stream snapshot mismatch retained. No regrade/producerfreeze/approval/wirecomplete claim.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-opus-method-read.json",
+          "sha256": "534f0a9e5778f26d1b00228eb1a8634aa3dae1a50f897ea0b4f08f58a7bc1f5b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 6361,
+        "cache_read": 7948,
+        "output": 43457,
+        "reasoning_in_output": 41800,
+        "total": 57770,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-native-profile-initial",
+      "task": "unit9-profile-initial",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 60,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free source-backed nativeCLI allowed1/stdout0/stderr88 before command; deniedUNRUN. Nativeusage unavailable, no model launched/nozeroaccountclaim; namedprofile not universally unsupported.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-native-profile-failures.json",
+          "sha256": "4446bb73180ec78b4ebfb2672b683c70ab08ec1a4d4660581443f600504232a1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-native-profile-repair",
+      "task": "unit9-profile-repair",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 61,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free bounded Sol repair allowed1/stdout0/stderr133, bwrap installedclientnotvisible; deniedUNRUN/all11inputhashesmatch. Nativeusage unavailable/no model launched, nozeroaccountclaim; producerbundle unprepared.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-native-profile-failures.json",
+          "sha256": "4446bb73180ec78b4ebfb2672b683c70ab08ec1a4d4660581443f600504232a1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit9-sources-and-scoped-defaults",
+      "task": "unit9-source-defaults",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 62,
+      "evidence_class": "offline_artifact_check",
+      "scope": "No new producer run: existing210080command/185514structured/nativeparser views reused, neveradded. Limited prerequisite/fidelity/inclusive accounting defaults, not powered provider superiority. Currentrelease metadata unchanged; source-only constraints/retrieval runtime/corpus/client qualification pending; owner handoff received.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
+          "sha256": "b87819dda1e2f38b020db18d94507d06cac064f8cb2e651a0509bd4cb05fe0ce"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit10-runtime-profile-astra",
+      "task": "unit10-profile-judgment",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 63,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate native consequential judgment:403words<=550,23inputsunchanged,nine native records285466; accepted supported staged route, not runtime/default/userapproval.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit10-runtime-profile-judgment.json",
+          "sha256": "4be52ff75cb9c6abb44a3c9240b9729a2de6577ce059749e97016a2f6f3584f1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 49739,
+        "cache_creation": 0,
+        "cache_read": 227840,
+        "output": 7887,
+        "reasoning_in_output": 4795,
+        "total": 285466,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit10-native-stage1-controls",
+      "task": "unit10-profile-controls",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 64,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Separate native model-free sandbox controls qualify narrow registered integration only. Raw negative exits1/EROFS/ENOENT are expected and retained. Aggregate independent observer/check exited0;21bindingsunchanged. No model/provider launch/nativecounter, nozero-spend claim. Exec/skill/child/MCP/Claude/R2 admission still unqualified.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit10-native-stage1-admission.json",
+          "sha256": "644241c288ad10bedb4bbd983dca983d230fd51ec528791f0d0656d5368a96d2"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit11-native-carrier",
+      "task": "unit11-native-carrier",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 65,
+      "evidence_class": "native_cli_execution",
+      "scope": "Strict carrier remains UNQUALIFIED despite narrower source/copy/role/counter observations; no physical-stream or OS attribution regrade.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit11-native-carrier-observation.json",
+          "sha256": "528b079a96b7b035ef42f28cb75f65e1b63cdfc3a9345d4f3e55811618f03690"
+        }
+      ],
+      "usage": {
+        "uncached_input": 45943,
+        "cache_creation": 0,
+        "cache_read": 525568,
+        "output": 8235,
+        "reasoning_in_output": 4149,
+        "total": 579746,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit11-observable-endpoint-astra",
+      "task": "unit11-observable-endpoint",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 66,
+      "evidence_class": "native_cli_execution",
+      "scope": "Source-supported prospective methodological judgment; all56producers UNRUN/UNFROZEN, no default/userapproval.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit11-observable-endpoint-judgment.json",
+          "sha256": "13b8da1c258d356bfa59dbccfe53ef4f895edeaaaf3ba6ae517b29cb3ea1010f"
+        }
+      ],
+      "usage": {
+        "uncached_input": 48877,
+        "cache_creation": 0,
+        "cache_read": 145280,
+        "output": 8136,
+        "reasoning_in_output": 4962,
+        "total": 202293,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit11-qmd-readonly-predicates",
+      "task": "unit11-qmd-readonly-predicates",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 67,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Selected read-only connection/value/current-byte observation only; initial false aggregate and native PRAGMA readonly false retained. No model/MCP/currentcorpus acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit11-qmd-readonly-predicates.json",
+          "sha256": "7912837aec6cdf471203fe08d0844134955de4ef6e70fd1464e3e4e22093e03f"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit12-qmd-codex-stop",
+      "task": "unit12-qmd-codex-stop",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 68,
+      "evidence_class": "model_task_execution",
+      "scope": "Complete runtime source but truncated child model-facing forwarding; original D1 zero passages.10 disjoint finalized responses/main+child; cache/reason subsets. CLI/schema only PASS is not quality.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit12-qmd-codex-stop.json",
+          "sha256": "6d46bbce9215eded18a006fa5e3736e127d733dbcf0e497600deff02d470903b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 69033,
+        "cache_creation": 0,
+        "cache_read": 218496,
+        "output": 3816,
+        "reasoning_in_output": 2466,
+        "total": 291345,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit12-opus-prefreeze-failed-read",
+      "task": "unit12-opus-prefreeze-failed-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 69,
+      "evidence_class": "model_task_execution",
+      "scope": "First review all8 reads deniedscope; finalHOLD290/350 words; whole finalized usage24523. Correction separately native600s timeout despite8successfulreads; whole correction usageUNKNOWN, finalized subset7096 retained separately.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit12-prefreeze-source-read-failures.json",
+          "sha256": "7e3c36e3a149dc7ec19866bbbeae24e2b4e1ee06fc3fbfa3d92454d5819301f3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 5197,
+        "cache_read": 8444,
+        "output": 10878,
+        "reasoning_in_output": 9140,
+        "total": 24523,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit12-opus-source-repair-timeout",
+      "task": "unit12-opus-source-repair-timeout",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 70,
+      "evidence_class": "model_task_execution",
+      "scope": "Eight exact rich source Reads completed; native600s124 and final answer/result absent. Whole usageUNKNOWN; known finalized7096 subset only retained in receipt, not zero-filled or thinking-estimate sum.",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit12-prefreeze-source-read-failures.json",
+          "sha256": "7e3c36e3a149dc7ec19866bbbeae24e2b4e1ee06fc3fbfa3d92454d5819301f3"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit12-native-hook-metadata-hold",
+      "task": "unit12-native-hook-metadata-hold",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 71,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pure schema export0/sourcecontract observed; actual native per-case keys/current hashes missing. GateHOLD; no native model or live server/admission/protection.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit12-native-hook-metadata-hold.json",
+          "sha256": "2b072a71a9500dbad97507663399a033ddde9aad10fffaec2d5d1f725570aa95"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit13-codex-b-native-call-result-admission",
+      "task": "unit13-codex-b-native-call-result-admission",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 72,
+      "evidence_class": "model_task_execution",
+      "scope": "Synthetic directed Codex B native main/max-child call/result admission:12attempts/4MCPcalls, known disjoint572563tokens. Natural rates, performance, strict/full-plugin/protection and invoice UNQUALIFIED or UNKNOWN.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit13-codex-b-native-call-result-admission.json",
+          "sha256": "a21c657897a9953b7cf08fd8e199f8daf357aa7042fbdf76df382bbb2a36b5b9"
+        }
+      ],
+      "usage": {
+        "uncached_input": 77118,
+        "cache_creation": 0,
+        "cache_read": 489600,
+        "output": 5845,
+        "reasoning_in_output": 2501,
+        "total": 572563,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit13-claude-b-native-call-result-admission",
+      "task": "unit13-claude-b-native-call-result-admission",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 73,
+      "evidence_class": "model_task_execution",
+      "scope": "Synthetic directed Claude B native main/max-child call/result admission:12attempts/4MCPcalls, known inclusive460066tokens. Actual signal2/exit130 retained. Natural rates, performance, strict/full-plugin/protection and invoice UNQUALIFIED or UNKNOWN.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit13-claude-b-native-call-result-admission.json",
+          "sha256": "a989e9dedd54d1e7773a526eed8bfd58051bf7ab08652678316fc3e3784935a5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2519,
+        "cache_creation": 59682,
+        "cache_read": 364459,
+        "output": 33406,
+        "reasoning_in_output": 25955,
+        "total": 460066,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit13-r2-preregistration",
+      "task": "unit13-r2-preregistration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 74,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Historical prospective R2 registration/freeze234bindings and actual public prelaunch comment, not a model/performance run. Subsequent first A STOP;55/judge UNRUN_FINAL.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit13-r2-preregistration.json",
+          "sha256": "a284a8235f76028aba888750479c1ac87ad9023b3b3f2d65dbf6a9129c6e5e59"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit13-r2-first-aa-stop",
+      "task": "unit13-r2-first-aa-stop",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 75,
+      "evidence_class": "model_task_execution",
+      "scope": "Native R2 first A required child spawn failed ENOSPC; CLI/schema0 only. Known parent252333 receipt-only; failed-child/two-role estimand UNKNOWN;55/judge UNRUN_FINAL. No retry/repair/statistics/default claim.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit13-r2-first-aa-stop.json",
+          "sha256": "a07247e6c58b33c397b1a8cddac4ce389b16bbac88708949d0ed88cfc1bb2ce1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit14-codex-tui-hook-metadata-source",
+      "task": "unit14-codex-tui-hook-metadata-source",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 76,
+      "evidence_class": "pinned_source_review",
+      "scope": "Source-only selected TUI full-key/hash display HOLD; actual TUI/model UNRUN. Null exit/counters denote no launched-client claim, not executed-client failure.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit14-codex-tui-hook-metadata-source.json",
+          "sha256": "75920a01e5a1af1dd31bbd9c4759d509e1f590ff0f5e2fb1de44b3fdff3dd4ea"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit15-native-stdio-hook-metadata-source",
+      "task": "unit15-native-stdio-hook-metadata-source",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 77,
+      "evidence_class": "pinned_source_review",
+      "scope": "Source-only supported stdio protocol; matching TOML/startup/actual six-definition discovery HOLD as of unit15 closure. Null exit/counters; no client/RPC/model launch in this source unit.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit15-native-stdio-hook-metadata-source.json",
+          "sha256": "987b1f2a55954a6fa4222c33c61e038a7b2175c2a3646a153b27f18e01f5fe8d"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit16-codex-synthetic-mount-enospc-source",
+      "task": "unit16-codex-synthetic-mount-enospc-source",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 78,
+      "evidence_class": "pinned_source_review",
+      "scope": "Source-only pinned registry-marker write identified; actual allocation cause/backing namespace/capacity/remedy UNKNOWN. No repair/client/system/new native run. Failed denotes unclosed remedy gate; null exit/counters.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit16-codex-synthetic-mount-enospc-source.json",
+          "sha256": "0f9fe615d1f2a30954b3cf720d55dbc4cd64579129daf2029e0a082d22344343"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit17-native-stdio-carrier-astra-judgment",
+      "task": "unit17-native-stdio-carrier-astra-judgment",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 79,
+      "evidence_class": "model_task_execution",
+      "scope": "One native Astra/max consequential source judgment on exact private formatter/stdin/lane boundaries with source/counter custody. READY permits prospective recipe; native parsing/metadata, P2/default/full-plugin/protection and user approval unqualified.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit17-native-stdio-carrier-astra-judgment.json",
+          "sha256": "5184cd75cacf94e290d613306416e5663e29783ab32c8a5b9af567b765ca3d40"
+        }
+      ],
+      "usage": {
+        "uncached_input": 10691,
+        "cache_creation": 0,
+        "cache_read": 86784,
+        "output": 2944,
+        "reasoning_in_output": 1794,
+        "total": 100419,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit18-native-hook-profile-parse-stop",
+      "task": "unit18-native-hook-profile-parse-stop",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 80,
+      "evidence_class": "native_cli_execution",
+      "scope": "One separately frozen native metadata startup. Missing mandatory handler type caused pre-RPC parse STOP; stdout0, no stdin session or RPC. Usage unknown; no transport closure, effective metadata or protection claim.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit18-native-hook-profile-parse-stop.json",
+          "sha256": "17aec6a6f046b1f1e4d2763aae9921f5b111fadddda765d6b34ee7496c9241c5"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit19-mandatory-hook-type-source-correction",
+      "task": "unit19-mandatory-hook-type-source-correction",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 81,
+      "evidence_class": "pinned_source_review",
+      "scope": "Source-only mandatory command discriminator and exact54-line restoration across9 copies; not native catalog/continuity/default acceptance.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit19-mandatory-hook-type-source-correction.json",
+          "sha256": "7250e9d1088342990a98064da2c2f8ebef52038fd450a2c8a0522d0a9d4f1fb5"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit19-native-tool-stdin-stop",
+      "task": "unit19-native-tool-stdin-stop",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 82,
+      "evidence_class": "native_cli_execution",
+      "scope": "Distinct typed35argv native startup; first stdin write rejected by actual tool carrier, no confirmed RPC. CLI0 lacks prior type marker only. Metadata UNRUN_FINAL and usage UNKNOWN; no universal absence/teardown claim.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit19-native-tool-stdin-stop.json",
+          "sha256": "e097b23f4eb603ba941f3afec4660a6b95d5390a75adbacb7947955300c2077b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit20-native-tty-carrier-source",
+      "task": "unit20-native-tty-carrier-source",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 83,
+      "evidence_class": "pinned_source_review",
+      "scope": "Pinned source and installed help/version support distinct actual-PTY proposal with native foreground timeout/direct-child scope. All metadata execution, replies/EOF/protection unrun at source closure; no native wire/physical equivalence.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit20-native-tty-carrier-source.json",
+          "sha256": "007bf294bd1040352818dc4fadcefd24681e907c60991fac2125a141d68df8bf"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit21-native-tty-carrier-astra-judgment",
+      "task": "unit21-native-tty-carrier-astra-judgment",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 84,
+      "evidence_class": "model_task_execution",
+      "scope": "One consequential source judgment after bounded type repair/native closedstdin. READY permits distinct prospective native recipe only; actual metadata/physical/protection/default/user approval remain outside source judgment. Eight finalized responses, cache and reasoning subsets counted once.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit21-native-tty-carrier-astra-judgment.json",
+          "sha256": "3bdeb3a1251ed3015e01136f63d7bfa4fad3d95c7049dfa96c3d3818a00d51fe"
+        }
+      ],
+      "usage": {
+        "uncached_input": 47861,
+        "cache_creation": 0,
+        "cache_read": 287616,
+        "output": 11331,
+        "reasoning_in_output": 6461,
+        "total": 346808,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit22-native-pty-operator-timing-stop",
+      "task": "unit22-native-pty-operator-timing-stop",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 85,
+      "evidence_class": "native_cli_execution",
+      "scope": "Six exact native metadata tuples are partial custody only. Observation guards37.265967s/30.897438s measure operator delay, not native reply latency. Outer timeout124 is STOP; inner exit/physical EOF/hidden model usage UNKNOWN.",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit22-native-pty-operator-timing-stop.json",
+          "sha256": "bfa22348be86ae56b1ecfe5bcbb247f7022c04889324ad06027a1eb73e80d1b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit23-native-pty-metadata-acceptance",
+      "task": "unit23-native-pty-metadata-acceptance",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 86,
+      "evidence_class": "native_cli_execution",
+      "scope": "Scoped native metadata recipe only. Both reply guards1182/1180ms, final observation31543ms, native exit0. All six objects/keys/hashes preserved and untrusted; no hook execution, physicalEOF, hiddenusage, protection/savings/default/PR acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit23-native-pty-metadata-acceptance.json",
+          "sha256": "b9edf192556792ea8e1d86815ce9a0380845cd67c4c7674eab737d9c38007cbf"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit25-closed-opus-source-read",
+      "task": "unit25-closed-opus-source-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 87,
+      "evidence_class": "native_cli_execution",
+      "scope": "Closed failed native source read;13groups1175609 known prefix only; no final result/verdict. Complete usage/cost UNKNOWN; original54 bindings unchanged.",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit25-closed-opus-source-read.json",
+          "sha256": "0d5427fa2b5b376e482d6c2f1078a335e2b8898af0e56fa8a535cb9f94e6f470"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit25-hook-state-source-routes",
+      "task": "unit25-hook-state-source-routes",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 88,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pinned parser/provider/native state source fields and unchanged metadata artifacts verified; source support only at closure, no model-task admission.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit25-hook-state-source-routes.json",
+          "sha256": "d5d25a7c6fb3f9db0c8834eb6ca9f2000cbd07949db18e6a954839195b3ee2a3"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit25-hook-state-astra-source-read",
+      "task": "unit25-hook-state-astra-source-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 89,
+      "evidence_class": "model_task_execution",
+      "scope": "Actual source judgment closed0 with main-only400669; helper/whole total UNKNOWN, native reconnect1 and unplanned-helper bounded orchestration unqualified. Conditional H choice rests on primary rereads.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit25-hook-state-astra-source-read.json",
+          "sha256": "4f0c78f5293135fb8eb4d73f62c0fd7a4452761376321d0f6fcd7cdc1546a73d"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit26-native-owned-home-hook-state",
+      "task": "unit26-native-owned-home-hook-state",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 90,
+      "evidence_class": "native_cli_execution",
+      "scope": "B-only native state metadata:6exact17-field objects trusted/enabled, unchangedkeys/hashes/definitions/order,diagnostics0,guards1185/1198ms,total4045ms;all138bindingsunchanged. No handler/role/resume/protection/winner claim.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit26-native-owned-home-hook-state.json",
+          "sha256": "667c70a842a99d225a2c1c320bdd0ddbe81d77a329e7e6684259e02b0ea475e4"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit27-narrow-opus-source-read",
+      "task": "unit27-narrow-opus-source-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 91,
+      "evidence_class": "model_task_execution",
+      "scope": "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit27-narrow-opus-source-read.json",
+          "sha256": "3e9ec32ed02bb9a20f53d60a09be9dbee190c945027294a58c333e95faffa50c"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 5699,
+        "cache_read": 8743,
+        "output": 49381,
+        "reasoning_in_output": 47781,
+        "total": 63827,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "opus-draft-hold",
+      "reason": "HOLD plus1352-word reply exceeds1000-word contract; accepted-only gate corrected before comparative run"
+    },
+    {
+      "run_id": "rtk-readonly-failure",
+      "reason": "Checkout-relative pi test cannot write read-only source"
+    },
+    {
+      "run_id": "rtk-root-permission-failure",
+      "reason": "Namespace-root write bypass fails upstream0555 healing fixture"
+    },
+    {
+      "run_id": "rtk-final-guard-failure",
+      "reason": "Final non-root native guard suite has two failures;18 later integration files unexecuted; no further repair"
+    },
+    {
+      "run_id": "ccusage-codex-exact-only",
+      "reason": "Released parser fails synthetic new-exact-record-only projection; full native stream legacy fallback passed"
+    },
+    {
+      "run_id": "toon-root-bom-control",
+      "reason": "Released CLI changes U+FEFF-root-string values/types without decode rejection; JSON-wide scope rejected"
+    },
+    {
+      "run_id": "native-calibration-first",
+      "reason": "Assertion syntax failure after live model calls; later echo regrade passes same retained outputs"
+    },
+    {
+      "run_id": "native-calibration-unintended-live",
+      "reason": "--model-outputs without --assertions did not replay; unintended second native calls retained despite passing functional grades"
+    },
+    {
+      "run_id": "context-legacy-mcp",
+      "reason": "Whole unchanged obsolete harness fails against current ctx_* registry; current shipped tool checks separate"
+    },
+    {
+      "run_id": "meter-native-compaction-gap",
+      "reason": "Released meter excludes653816 actual native compaction tokens; native exact and thread counters reconcile"
+    },
+    {
+      "run_id": "meter-compaction-exact-only",
+      "reason": "Synthetic projection without legacy token_count records remains unparsed"
+    },
+    {
+      "run_id": "native-resume-codex",
+      "reason": "SDK per-query endpoint assumption fails: restored parent total116496 vs new exact20084; schemaPASS remains distinct"
+    },
+    {
+      "run_id": "native-resume-claude",
+      "reason": "SDK reset-on-resume assumption fails under native2.1.288 override: restored62239 vs new18184; schemaPASS remains distinct"
+    },
+    {
+      "run_id": "astra-resume-startup-failure",
+      "reason": "Native profile missing process-local keyless prerequisite before model response; reported/billed usage unknown; corrected by supported non-secret placeholder without saved changes"
+    },
+    {
+      "run_id": "native-command-baseline-codex",
+      "reason": "Original C3 separately captured stream prerequisite remains UNPROVEN despite schema PASS; prospective actual-carrier contract does not relabel this attempt"
+    },
+    {
+      "run_id": "native-command-baseline-claude",
+      "reason": "Original C3 separately captured stream prerequisite remains UNPROVEN despite schema PASS; prospective actual-carrier contract does not relabel this attempt"
+    },
+    {
+      "run_id": "native-command-carrier-claude",
+      "reason": "Exact semantic JSON enclosed in Markdown fence fails original strict is-json; exit100 preserved, no repair/regrade."
+    },
+    {
+      "run_id": "native-command-carrier-codex",
+      "reason": "Individual Codex gold PASS is retained, but the shared native evaluator process exits100 due to the Claude strict failure. No whole-CLI PASS inferred."
+    },
+    {
+      "run_id": "retrieval-qmd-target-miss",
+      "reason": "Native BM25 command exits0 but fixed target absent from top2. The later alternate title search does not erase this original target miss."
+    },
+    {
+      "run_id": "native-command-schema-codex",
+      "reason": "Preregistered N5 actual native Codex schema flag exposure remains UNPROVEN; source/config inference and gold PASS do not satisfy that condition."
+    },
+    {
+      "run_id": "context-inspector-parent-dwell",
+      "reason": "Pinned InspectorCLI ignores supplied timeout and fails original fixed70sec call at60sec; signal15/die143 cleanup remains distinct."
+    },
+    {
+      "run_id": "context-promptfoo-parent-dwell",
+      "reason": "Native directMCP returns0 with sustained guard/cleanup, but preregistered exact244byte response oracle fails;352byte source-derived carrier match is diagnostic only."
+    },
+    {
+      "run_id": "forge-native-pilot-original-codex",
+      "reason": "Native schema400with no emitted counters"
+    },
+    {
+      "run_id": "forge-native-pilot-original-claude",
+      "reason": "SDK loader fails before native query because root passed relativeconfig; source-bound zeros are placeholders, notbilling."
+    },
+    {
+      "run_id": "forge-native-pilot-typed-claude",
+      "reason": "Installed SDK guard rejects file-path settings plus separate sandbox before query; preserve unknown usage."
+    },
+    {
+      "run_id": "forge-codex-stopped-program",
+      "reason": "Strict unchanged40-case gate fails38/40; two blueprints.json layout assumptions are absent from the task contract, and sorting assertions not reached."
+    },
+    {
+      "run_id": "astra-settings-startup-failure",
+      "reason": "Native missing environment prerequisite; selected prefix contains no exact usage; spend stays unknown."
+    },
+    {
+      "run_id": "astra-settings-source-read",
+      "reason": "Original compaction-absence assertion false; source-supported relocation narrowly retained after independent correction, no full answer/runtime acceptance."
+    },
+    {
+      "run_id": "forge-claude-settings-timeout",
+      "reason": "Evaluator900000ms timeout and no final native terminal result/query endpoint; one null-stop-reason child frame84198is excluded from persisted aggregate. Known native scoped views and list estimate retained in receipt, full usage unknown."
+    },
+    {
+      "run_id": "forge-claude-stopped-program-grade",
+      "reason": "Original stopped Claude program scored36/40; native evaluator0 and pytest1; no model rerun or correctness acceptance; retained detailed gates {\"all40_original_cases\":false,\"infrastructure_ok\":true,\"snapshot_custody\":true}"
+    },
+    {
+      "run_id": "p2-trajectory-astra-source-judgment",
+      "reason": "CircuitEval source/reference/continuation qualification lead; one protocol input changed append-only during read; no fully bound freeze/protection/adoption; retained detailed gates {\"answer_word_limit\":true,\"native_counter_reconciliation\":true,\"all_bound_inputs_immutable\":false}"
+    },
+    {
+      "run_id": "meter-expanded-role-accounting",
+      "reason": "Nine parser-only integration cases; selected Codex/Opus/deltas match, inclusive Claude helpers omitted; prior M2 compaction failure retained; native baseline retained for tested scopes; retained detailed gates {\"native_command_execution\":true,\"inclusive_native_usage_reconciles\":false,\"selected_raw_records_reconcile\":true}"
+    },
+    {
+      "run_id": "p1-first-aa-codex-01",
+      "reason": "CLI0/schemaPASS but actual child assignment and tool/instruction exposure UNKNOWN; originalmechanicsNOTPASS,55laterUNRUN_FINAL/commonjudgeUNRUN."
+    },
+    {
+      "run_id": "unit8-prefreeze-opus-read",
+      "reason": "797words exceeds650word cap; original answer/counters retained; conditional readiness is source opinion only."
+    },
+    {
+      "run_id": "unit9-original-claude-hook-pilot",
+      "reason": "Separate directed fourfact pilot; original ready-markerFAIL retained, directchildhook/APIinputUNKNOWN; inclusive105? no:102295 known native query scope only, not comparative/protection."
+    },
+    {
+      "run_id": "unit9-native-codex-trace-pilot",
+      "reason": "Native seven responses/first-full+five-delta chain/fourfact fidelity captured; owned process cleanup visibilityUNKNOWN, encrypted assignment/complete deferred charging/backendhelpers unknown. Narrow capture evidence, not whole admission/P1regrade."
+    },
+    {
+      "run_id": "unit9-p1-r2-opus-method-read",
+      "reason": "Family source-method lead completed; wordlimitFAIL557>550 retained, sixinputsunchanged. Two finalized groups/nativefinal/coststate57770; stream snapshot mismatch retained. No regrade/producerfreeze/approval/wirecomplete claim."
+    },
+    {
+      "run_id": "unit9-native-profile-initial",
+      "reason": "Model-free source-backed nativeCLI allowed1/stdout0/stderr88 before command; deniedUNRUN. Nativeusage unavailable, no model launched/nozeroaccountclaim; namedprofile not universally unsupported."
+    },
+    {
+      "run_id": "unit9-native-profile-repair",
+      "reason": "Model-free bounded Sol repair allowed1/stdout0/stderr133, bwrap installedclientnotvisible; deniedUNRUN/all11inputhashesmatch. Nativeusage unavailable/no model launched, nozeroaccountclaim; producerbundle unprepared."
+    },
+    {
+      "run_id": "unit11-native-carrier",
+      "reason": "NativeCLI0/schemafactsandcounterviews retained; strict registered physical-stream split and OS-execution provenance missing. Contract remainsUNQUALIFIED/HOLD, no historicalregrade/retry/saving/default."
+    },
+    {
+      "run_id": "unit12-qmd-codex-stop",
+      "reason": "Complete runtime source but truncated child model-facing forwarding; original D1 zero passages.10 disjoint finalized responses/main+child; cache/reason subsets. CLI/schema only PASS is not quality."
+    },
+    {
+      "run_id": "unit12-opus-prefreeze-failed-read",
+      "reason": "First review all8 reads deniedscope; finalHOLD290/350 words; whole finalized usage24523. Correction separately native600s timeout despite8successfulreads; whole correction usageUNKNOWN, finalized subset7096 retained separately."
+    },
+    {
+      "run_id": "unit12-opus-source-repair-timeout",
+      "reason": "Eight exact rich source Reads completed; native600s124 and final answer/result absent. Whole usageUNKNOWN; known finalized7096 subset only retained in receipt, not zero-filled or thinking-estimate sum."
+    },
+    {
+      "run_id": "unit12-native-hook-metadata-hold",
+      "reason": "Pure schema export0/sourcecontract observed; actual native per-case keys/current hashes missing. GateHOLD; no native model or live server/admission/protection."
+    },
+    {
+      "run_id": "unit13-r2-first-aa-stop",
+      "reason": "Native R2 first A required child spawn failed ENOSPC; CLI/schema0 only. Known parent252333 receipt-only; failed-child/two-role estimand UNKNOWN;55/judge UNRUN_FINAL. No retry/repair/statistics/default claim."
+    },
+    {
+      "run_id": "unit14-codex-tui-hook-metadata-source",
+      "reason": "Source-only selected TUI full-key/hash display HOLD; actual TUI/model UNRUN. Null exit/counters denote no launched-client claim, not executed-client failure."
+    },
+    {
+      "run_id": "unit15-native-stdio-hook-metadata-source",
+      "reason": "Source-only supported stdio protocol; matching TOML/startup/actual six-definition discovery HOLD as of unit15 closure. Null exit/counters; no client/RPC/model launch in this source unit."
+    },
+    {
+      "run_id": "unit16-codex-synthetic-mount-enospc-source",
+      "reason": "Source-only pinned registry-marker write identified; actual allocation cause/backing namespace/capacity/remedy UNKNOWN. No repair/client/system/new native run. Failed denotes unclosed remedy gate; null exit/counters."
+    },
+    {
+      "run_id": "unit18-native-hook-profile-parse-stop",
+      "reason": "One native pre-RPC parse STOP; missing required handler type. Original packet stays closed. No stdin closure or model/metadata acceptance; unknown usage."
+    },
+    {
+      "run_id": "unit19-native-tool-stdin-stop",
+      "reason": "One distinct native tool carrier STOP; rejected closedstdin write and no confirmed RPC. Native CLI0 not catalog/protection qualification; metadata UNRUN_FINAL and usage unknown."
+    },
+    {
+      "run_id": "unit19-mandatory-hook-type-source-correction",
+      "reason": "Source checks pass for mandatory type and54insertions; aggregate failed denotes actual native metadata qualification still unclosed, not a source defect. Null runtime exit and unknown counters retained."
+    },
+    {
+      "run_id": "unit20-native-tty-carrier-source",
+      "reason": "Source recipe passes pinned review; aggregate failed denotes actual PTY metadata qualification UNRUN at source closure, not source failure. No runtime exit or model counters invented."
+    },
+    {
+      "run_id": "unit22-native-pty-operator-timing-stop",
+      "reason": "Root exceeded both20s observationguards and continued after first violation; native outer timeout124. Partial exactsix metadata retained, not native latency or cleancompletion; no replay/regrade."
+    },
+    {
+      "run_id": "unit25-closed-opus-source-read",
+      "reason": "Closed failed native source read;13groups1175609 known prefix only; no final result/verdict. Complete usage/cost UNKNOWN; original54 bindings unchanged."
+    },
+    {
+      "run_id": "unit25-hook-state-astra-source-read",
+      "reason": "Actual source judgment closed0 with main-only400669; helper/whole total UNKNOWN, native reconnect1 and unplanned-helper bounded orchestration unqualified. Conditional H choice rests on primary rereads."
+    },
+    {
+      "run_id": "unit27-narrow-opus-source-read",
+      "reason": "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance."
+    }
+  ],
+  "limitations": [
+    "The contract checker verifies declared consistency/hash integrity, not truth or a complete upstream/provider run",
+    "Source/runtime qualification receipts bind private original outputs through hashes and independent coordinator observation; sanitized summaries are not upstream acceptance by themselves",
+    "Context Mode selected source-built tests and shipped current-tool Inspector operations are complete within their receipts. Full/frozen-dependency acceptance, native-client hooks/continuity and comparative binding remain pending.",
+    "Three research reads share no study comparison: summaries reconcile native streams but are not independent invoices. Whole-research usage and paid costs remain unknown",
+    "No powered provider comparisons or accepted final PR; documented native command/JSON/meter defaults are limited prerequisite/fidelity/inclusive accounting decisions.",
+    "The latest native Claude query modelUsage covers only its upstream-declared pipeline; native list estimates are not invoices.",
+    "The two selected live calibrations include Codex child exact records; broader goal/research usage is not declared complete.",
+    "Actual root natural compaction validates accounting coverage only; fixed P2 quality/resume remains open.",
+    "Context Mode selected source tests and shipped Inspector checks are distinct; non-frozen dependencies/full original recovery remain limits.",
+    "S1 fixed questions now allow adequate focused native computation; no useful natural TOON opportunity is manufactured.",
+    "Initial local consistency check rejected duplicate task/role/condition attempt tuples; per-task attempt identifiers were corrected before publication, without repeating measurements.",
+    "Resume unit counts38268 additional tokens, not178735 returned endpoints; prior140467 repeats. Selected fresh420746 plus delta459014 is not whole-study usage. Consequential Astra5exact responses127466 are separate research overhead. Unknown startup/billing/helper-provenance and naturalP2 remain unknown. Common case timeout is supported; aborted evaluator zeros are placeholders.",
+    "Publication checker first invocation used unsupported --experiment flag and exited2 before validation. Native --help establishes positional record arguments; correction uses that supported interface. This is a checker invocation failure, not a model or measurement rerun.",
+    "Fresh command schema2PASS and12eligible calls do not satisfy original separately captured stream contract. C3 stream condition retained UNPROVEN; native210080 tokens include both children and known helper bucket, not savings. Prospective native returned-carrier contract does not relabel this attempt.",
+    "The first publication-unit4 consistency check failed because new command tasks and failed run reasons were omitted from the declared record. Those metadata declarations were corrected without changing native outputs or repeating measurements. A follow-up inspection also guessed an absent top-level tasks key; actual declarations are in frozen_inputs.",
+    "Focused JSON native185514tokens reconciles parent/children/helper once; harness136252 excludes Codex child49262. Eight calls and semantic controls PASS only within this unit; no TOON model arm or efficiency/default/freeze. A root inspection initially assumed prior packet keys; actual structured packet uses roles/native_usage_count_once and was read before publication.",
+    "Publication-unit4 validate rejected new public native UUIDs. Identifiers were removed into private custody; role labels/hash-bound selected captures preserve proof without publishing local session identifiers. No measurements changed.",
+    "Prospective diagnostic carrier control costs152112 native tokens counted once: Codex100831 and Claude51281. Harness105150 excludes Codex child46962. Exact semantic facts do not erase strict Claude format failure.",
+    "Two failed pre-model prompt validations retained; actual bound native raw template is prompts:[{{request}}] plus vars.request. Earlier guessed raw-object-copy source claim corrected by reading both bound configurations.",
+    "Context Mode legacy homedir cleanup source discovered after earlier host Inspector index/search. Earlier effect remains UNKNOWN; no host legacy directory or auth read. Further host content-store calls require supported isolation.",
+    "Publication-unit5 consistency check initially marked Codex carrier case passed while recording shared evaluator exit100. Declaration now preserves individual case gold PASS and failed shared-CLI unit; native output/usage unchanged.",
+    "Forge and direct existing QMD command units launched no model;0 usage is bounded to those executables. Coordinator/advisor/model-session overhead is outside those command scopes and remains separately accounted/unknown, not a zero-cost study claim.",
+    "Native Astra/max admission HOLD adds67800separate research tokens, three unique exact responses matched endpoint/snapshot; no cached/reasoning subset double count. Rejected missing-cwd launch occurred before a process and has no native usage record. A later official generic Docker stdio reference closes source discovery only, not CM qualification.",
+    "Independent publication critic narrowed retrieval mutations:none to no explicit layer changes; internal existing-tool state writes are unknown. Pre-existing untracked .serena state is preserved, without inspecting its configuration or inferring causation.",
+    "Native schema control163417 includes Codex child47140, absent from116277harness endpoint.2goldPASS does not establish N5nativeflag exposure; retain UNPROVEN and estimatedClaude.4062966USD, unknowninvoice/retries. Originalfailed30files unchanged. Localnativegrader40PASS is separatemodel-freeupstreamreference evidence, not model/candidate/P2 acceptance.",
+    "Publication-unit5 first registry import failed before mutation; native validation exit1 correctly reported three stale registrations and six unlisted receipts. Supported package import and scoped registration correct that publication error; original output is retained.",
+    "Publication-unit6 source readers initially guessed missing source directories and an absent failed_attempts key. Native errors precede runtime/model calls; selected filesystem locators and actual failures_and_skips schema correct the metadata reads without re-running measurements.",
+    "Short-container prior manifest check passed10176; current independent/root check matches10174 and reports2missing copied historical npm debuglogs. Current custody is partial, original source/runtime results and manifest unchanged.",
+    "Two registered native Forge pilot attempts fail before code: Codex400strictschema/type error with native usage unemitted; Claude SDK resolution fails because root used relativeconfig and pinned loader falls back to cwd. Separate source-supported recovery registration retains both failures. No shape-validation/import/typed-copy metadata substitutes runtime/P2 acceptance.",
+    "Original-failed packet hash projection first used worktree cwd for relative manifest paths. Corrected read anchors each path at the actual private packet directory; no original files, runtime observations or model calls changed.",
+    "Unit6 sanitization changed the public meter-artifact receipt bytes while leaving its experiment anchor stale; consistency check correctly failed. Public anchor now matches sanitized bytes, private original hashes/measurements remain unchanged; failed validator outputs retained.",
+    "Unit7 native role/functionality and artifact/program/source checks remain pre-freeze. Lifecycle missed views and reader-cleanup error preserved; writable engineering feasibility does not substitute for read-only P2 until independently bound.",
+    "First fixed schedule yields0accepted confirmatorycases; no ratio/CI, saving, protection, native-baselinewin or default inferred. Native trace/hook qualifications do not retrofit it.",
+    "Unit9 original markerFAIL/native trace processvisibilityUNKNOWN and OpuswordFAIL remain; distinct groupcleanupPASS is integrationonly. Namedprofile original and repairallowedcontrolsFAIL/deniedUNRUN; R2producerbundle unprepared. Hiddeninputs/billing/nativeP2/retrievalowner remain open.",
+    "Unit10 correction: PR608 comment5969106337 supplied the retrieval-owner handoff at12:21:24Z. The Unit9 pending statement was stale, corrected after exact-head review; the complete named owner record is not yet accessible. Owner snapshot remains a lead, pinned-source/runtime/corpus/client qualification pending; no new retrieval operation.",
+    "Unit10 five sandbox controls pass only a distinct model-free harmless-fixture integration. Three expected native negative exits1 remain in original outputs and receipt; observer aggregate success is not native producer exit or unchanged upstream tests. Actual exec/skill/child/MCP/Claude/R2/P2 admission remains unqualified. Astra285466 is separate review overhead, native wire/helpers/invoice unknown.",
+    "Unit10 owner record arrived after the location request:13,020bytes/fullSHA15bd8a386e640e9c98827ed6d4c4a18d9ace796889e5a59be7b7ebfab3fbc2cd verified from complete local copy. Earlier inaccessible wording is historical; current runtime/corpus/client admission remains open. Source status wrapper may repair legacy columns; owner current-schema snapshot is a lead, not lifetime no-write proof.",
+    "Unit11 strict carrier remains unqualified; prospective native-call/result boundary accepted only as method. Independent nested role/call/result inventory and each family treatment lifecycle required;56producers prepared UNRUN/UNFROZEN. Selected QMD readonly predicates are dated, not nativeMCP/corpus/lifetime no-write acceptance.",
+    "Unit12 QMD D1 child model-visible truncation terminalSTOP despite complete runtime bytes; all retrieval comparisons and Claude admissionlaterUNRUN. Two Opus review failures retained:8sourceReads repair observed but final critique/wholeusage missing. Native Codex hook map corrected privately but returnedkeys/hashes missing; no contextprotection. No candidate/default/install/context-supply amendment.",
+    "Units13-17: B fixtures are synthetic/directed admissions only. R2 child failure is terminal,55/judge UNRUN_FINAL; known parent252333 is receipt-only, two-role aggregate UNKNOWN. Source-only TUI/stdio/ENOSPC gates keep null native usage/exits. Astra100419 is source judgment, not approval/live metadata/default/protection. No host/other-layer change.",
+    "Publication corrections: derived STOP pending-unit16 prose updated to completed source diagnosis only. Proposed generic unit17 stopped-case label corrected to actual frozen formatter/stdin/lane judgment. First two metadata integrations expected absent proposal scope/usage fields and stopped before writes; root binds declared actual scopes/counters. All original native/freeze/private drafts and old aggregate observations remain unchanged.",
+    "Units18/19 are distinct immutable metadata STOPs. Source-backed type/PTY/foreground controls in19/20 do not qualify actual six returned definitions, P2 protection, full-plugin lifecycle, helper/invoice census or a default. Counter fields remain null where no native usage was supplied; no zero usage inference.",
+    "Units25\u201327 preserve failed/incomplete source reads and unplanned helper usage; direct native owned-home trusted state is scoped metadata only. Source/cap/field checks do not qualify handler/main/child/resume/natural compaction or protected quality. Native cost is list estimate, invoice unknown."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "Selected source/runtime prerequisites, original stopped P1, separate native observation/lifecycle/method units and limited documented native defaults; no powered comparative/default claim for context protection",
+    "qualification_run_ids": []
+  },
+  "rollback": "Keep existing native client/profile/defaults. Disposable study state can be removed through owned native cleanup after evidence custody; no peer state is changed.",
+  "next_decision_changing_test": "A separately prospective focused retrieval comparison with exact actual native role/call/result source exposure and finalized counters; full code-reference owner corpus handoff; supported actual native hook metadata plus unchanged treatment/lifecycle/compaction quality gates. Preserve all failed prior freezes/runs.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "astra-harness",
+      "opus-draft-hold",
+      "astra-repair-conditional",
+      "rtk-readonly-failure",
+      "rtk-root-permission-failure",
+      "rtk-final-guard-failure",
+      "ccusage-workspace",
+      "ccusage-codex-main",
+      "ccusage-codex-exact-only",
+      "ccusage-claude-main",
+      "toon-upstream-tests",
+      "toon-root-bom-control",
+      "rtk-complete-artifacts",
+      "native-calibration-first",
+      "native-calibration-unintended-live",
+      "native-calibration-echo-regrade",
+      "context-selected-tests",
+      "context-legacy-mcp",
+      "context-current-execute",
+      "context-current-search",
+      "meter-native-compaction-gap",
+      "meter-compaction-exact-only",
+      "native-resume-codex",
+      "native-resume-claude",
+      "astra-resume-startup-failure",
+      "astra-resume-correction",
+      "native-command-baseline-codex",
+      "native-command-baseline-claude",
+      "native-structured-baseline-codex",
+      "native-structured-baseline-claude",
+      "native-command-carrier-codex",
+      "native-command-carrier-claude",
+      "forge-preparation",
+      "retrieval-qmd-target-miss",
+      "retrieval-qmd-exact-get",
+      "astra-context-isolation",
+      "native-command-schema-codex",
+      "native-command-schema-claude",
+      "forge-local-grader-reference",
+      "context-short-container-lifecycle",
+      "meter-artifact-report-boundaries",
+      "context-inspector-parent-dwell",
+      "context-promptfoo-parent-dwell",
+      "context-dwell-artifact-boundaries",
+      "forge-native-shape-codex",
+      "forge-native-shape-claude",
+      "forge-native-pilot-original-codex",
+      "forge-native-pilot-original-claude",
+      "forge-native-pilot-typed-codex",
+      "forge-native-pilot-typed-claude",
+      "forge-codex-stopped-program",
+      "astra-settings-startup-failure",
+      "astra-settings-source-read",
+      "context-fresh-role-codex",
+      "context-fresh-role-claude",
+      "context-native-artifact-boundaries",
+      "forge-claude-settings-timeout",
+      "forge-claude-stopped-program-grade",
+      "p2-trajectory-astra-source-judgment",
+      "meter-expanded-role-accounting",
+      "p1-first-aa-codex-01",
+      "unit8-prefreeze-opus-read",
+      "unit8-prefreeze-astra-read",
+      "unit9-original-claude-hook-pilot",
+      "unit9-native-codex-trace-pilot",
+      "unit9-cm-native-group-recovery",
+      "unit9-prospective-method-astra",
+      "unit9-p1-r2-opus-method-read",
+      "unit9-native-profile-initial",
+      "unit9-native-profile-repair",
+      "unit9-sources-and-scoped-defaults",
+      "unit10-runtime-profile-astra",
+      "unit10-native-stage1-controls",
+      "unit13-codex-b-native-call-result-admission",
+      "unit13-claude-b-native-call-result-admission",
+      "unit13-r2-first-aa-stop",
+      "unit17-native-stdio-carrier-astra-judgment",
+      "unit25-closed-opus-source-read",
+      "unit25-hook-state-source-routes",
+      "unit25-hook-state-astra-source-read",
+      "unit26-native-owned-home-hook-state",
+      "unit27-narrow-opus-source-read"
+    ],
+    "coverage_artifact": null
+  }
+}

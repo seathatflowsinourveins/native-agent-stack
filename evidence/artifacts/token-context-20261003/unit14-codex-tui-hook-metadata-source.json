@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Identify native metadata modalities needed before natural compaction and same-session R&D protection qualification",
+  "evidence_class": "retained installed/released-source review only; offline publication draft, no native UI execution",
+  "status": "SELECTED_TUI_FULL_METADATA_DISPLAY_HOLD",
+  "native_client_revision": {
+    "Codex": "0.160.0",
+    "source_revision": "a956835d020762cb2b570053af06f643a11c0ecc"
+  },
+  "source_observations": {
+    "selected_listing_branch": "Cwd-scoped hooks/list; no model request or trust action in the selected dispatch branch",
+    "selected_detail_fields": [
+      "event",
+      "matcher",
+      "source",
+      "capped command",
+      "mode",
+      "timeout",
+      "context",
+      "trust status"
+    ],
+    "selected_detail_omits": [
+      "full key",
+      "currentHash"
+    ],
+    "complete_identity_fields_retained_internally": true,
+    "trust_or_toggle_is_metadata_export": false,
+    "trust_action_boundary": "Persisted native trust-state write; excluded by read-only contract",
+    "startup_model_consent_and_hook_effects": "UNQUALIFIED; no safe startup recipe or launch flags admitted",
+    "actual_TUI_operation": "UNRUN",
+    "actual_case_native_key_or_currentHash": "UNRUN",
+    "selected_scope": "Finding applies to inspected released detail view; no universal metadata absence claim"
+  },
+  "source_custody": {
+    "files": 10,
+    "all_exact_git_blobs_match": true,
+    "historical_pinned_source_downloads": 9,
+    "historical_source_download_native_exits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "retained_source_copy": 1
+  },
+  "corrections_and_failures": [
+    {
+      "condition": "Official documentation locator returned404; corrected official locator retained. No capability absence inferred from404.",
+      "artifact_sha256": "bbe43292267b6b3411a69e81ce5e9b73cd47f1793c6758cd8bf0ed6efdb65229",
+      "corrected_documentation_url": "https://learn.chatgpt.com/docs/hooks?translationFallback=de-DE"
+    }
+  ],
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/tui/src/chatwidget/slash_dispatch.rs",
+      "lines": "504 onward",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/tui/src/chatwidget/slash_dispatch.rs",
+      "retained_source_sha256": "26312475a26b671416ec336d41db0978f430969221b217b06db36a8b1ad0acaf"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/tui/src/app/background_requests.rs",
+      "lines": "299 onward",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/tui/src/app/background_requests.rs",
+      "retained_source_sha256": "2d2b5805529e3542ebec9b5e1372ae999d0236185db9213c6c6d789f50b0ae28"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/tui/src/bottom_pane/hooks_browser_view.rs",
+      "lines": "478–533,596–634",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/tui/src/bottom_pane/hooks_browser_view.rs",
+      "retained_source_sha256": "930029c782e783298a06aa38828c3d567feb03034bef0c727c563b99a751f588"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/tui/src/hooks_rpc.rs",
+      "lines": "24 onward,58–90",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/tui/src/hooks_rpc.rs",
+      "retained_source_sha256": "77dc41d222747937507ee86b97df04784a3db1624a4872ed2a43677fcfd69ca6"
+    }
+  ],
+  "custody": {
+    "report_sha256": "598bb06a88ec70aadc207809f965cb16b0045a4c5ff6a16b6c91d9ad7036abb8",
+    "receipt_sha256": "e3ce346b2e28144d1741b4e8f6489a999b10ec5dec59099bd0902e72038da732",
+    "source_bindings_sha256": "10cf8c3aac0b7a195042979b770acbce3a3a1045713eccf4f9f719e8fff8585c",
+    "manifest_sha256": "9bf67b4ddc7fa31eb2f54dc5c1a8f5d2910d6a4dd00b84c077f890817fe22405",
+    "root_documentation_locator_correction_sha256": "bbe43292267b6b3411a69e81ce5e9b73cd47f1793c6758cd8bf0ed6efdb65229"
+  },
+  "preserved_status": {
+    "prior_scoped_CLI_TUI_HOLD": "UNCHANGED",
+    "P2_context_protection": "UNQUALIFIED/HOLD_UNMEASURED",
+    "separate_R2_first_case_STOP": "UNCHANGED; remaining55UNRUN_FINAL; not assessed or regraded by these source drafts"
+  },
+  "native_usage_evidence": "NONE_SOURCE_ONLY; no counter or protection qualification",
+  "completeness_critic": "TUI is an additional native client class. Internal metadata and trust-bound identities do not establish a read-only full-field display/export, safe startup, compaction continuity or protection.",
+  "privacy": "Source facts, URLs/pins and artifact hashes only. No host paths, native hook-key/hash values, raw commands, environments, user configuration, credentials or conversations."
+}

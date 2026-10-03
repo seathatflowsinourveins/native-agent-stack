@@ -1,0 +1,109 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "One unchanged upstream native local candidate checkpoint_1 grade",
+  "north_star_action": "Executable correctness for stopped Codex long-engineering R&D checkpoint",
+  "runner_pin": "SprocketLab/slop-code-bench@31ceea3add480edb33431e70475c4c70597e6b31",
+  "corpus_pin": "gabeorlanski/scb-problems@38d627ecf668a88f88f8d260f8df8df6116e9b03",
+  "status": "FAIL program quality:38/40; CLI0 does not override pytest1",
+  "actual_native_execution": {
+    "attempts": 1,
+    "command_sha256": "ced5845ffcb8b5dfc4a2d8ffc5daebd16a3ccc169f580e3a50071e16037913f7",
+    "start_utc": "2026-10-03T08:02:00Z",
+    "end_utc": "2026-10-03T08:02:17Z",
+    "cli_exit": 0,
+    "cap_seconds": 300,
+    "kill_grace_seconds": 5,
+    "timeout_termination_exercised": false,
+    "pytest_exit": 1,
+    "infrastructure_failure": false,
+    "collected": 40,
+    "passed": 38,
+    "failed": 2,
+    "skipped": 0,
+    "pass_counts": {
+      "Core": 3,
+      "Functionality": 19,
+      "Regression": 0,
+      "Error": 16
+    },
+    "total_counts": {
+      "Core": 3,
+      "Functionality": 21,
+      "Regression": 0,
+      "Error": 16
+    },
+    "native_inventory_hash": "6d11f70b39513473a4e6fe500e150a3879af597cce531d9475388f2aa16c1a83",
+    "actual40_ids_exactly_match_prior_inventory": true,
+    "normalized_case_ids_sha256": "aec4b9d90736632c224c7bc3f9a39d3ef288e4be9eef95fe0514857006ee98fb",
+    "returned_and_saved_JSON_equal": true,
+    "stdout_sha256": "725fb59f7b976058615b357d9738fb122b1f829322fd4a3f938cce78bc5932a1",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "saved_evaluation_sha256": "2b206671d2d1653fa7d7819a3b6fc174ed6134559158aceef796d63a751eaedb",
+    "saved_native_report_sha256": "5efceab7d31dd0681afc661ad0ef3e765cadebcec730a7bea6b2cf81d45b8fb5",
+    "failed_ids": [
+      "test_blueprint_list_name_tiebreak_when_created_at_collides",
+      "test_blueprint_list_uuid_tiebreak_when_created_at_and_name_collide"
+    ]
+  },
+  "snapshot": {
+    "regular_files": 1040,
+    "symlinks": 4,
+    "bytes": 14058026,
+    "inventory_sha256": "007574edbe1f90adbee3498b0d9f22c28256724d9f48a22607477176ad638316",
+    "original_and_frozen_copy_unchanged": true,
+    "snapshot_archive_placement_source": "runner/src/slop_code/execution/snapshot.py155-168,284-316; models.py145-148 defaultNone",
+    "canonical_test_directory_source": "runner/src/slop_code/common/constants.py16; pytest_runner.py136-148 uses .evaluation_tests",
+    "model_visible_corpus_or_reference_copy": false,
+    "live_claude_case_inspected_or_copied": false
+  },
+  "source_oracle_diagnostic": {
+    "scope": "Source/oracle mapping only; no regrade, false-positive judgment, sorting correctness claim or repair",
+    "corpus_pin": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+    "spec": {
+      "sha256": "969c403ae7ce1cd08e93a4c116dd710f92d0db337426f1b95422e0b572d733ab",
+      "bytes": 5808,
+      "data_directory_persistence_lines": "6,14",
+      "ordering_line": 67,
+      "explicit_blueprints_json_filename_in_complete_selected_spec": false,
+      "explicit_JSON_array_storage_layout": "Not specified in selected checkpoint_1.md; JSON output and resources are specified"
+    },
+    "tests": {
+      "sha256": "5d9258955fae6d244215e3727f08945a22d37af191de1dd0b93bba13c4a8065d",
+      "first_failure_lines": "109-141; store_path/read/mutation125-132",
+      "second_failure_lines": "771-803; store_path/read/mutation789-797",
+      "failed_ids": [
+        "test_blueprint_list_name_tiebreak_when_created_at_collides",
+        "test_blueprint_list_uuid_tiebreak_when_created_at_and_name_collide"
+      ],
+      "assumption": "Both read and rewrite data_dir/blueprints.json as an iterable JSON resource array before invoking blueprint list",
+      "observed_failure": "FileNotFoundError at read_text before tie-break assertions",
+      "interpretation": "Undeclared storage-layout assumption in the selected test oracle; unchanged40-case gate remains failed, not relaxed"
+    },
+    "original_tracebacks": {
+      "path": "logs/failed-native-cases.json",
+      "sha256": "968191bb3a537663f8864cf33d3a12b53a4871570a42831e3ccb602619e4a0df"
+    }
+  },
+  "model_calls_from_grading": 0,
+  "quality_gate_unchanged": true,
+  "root_artifact_checks": 3825,
+  "all_match": true,
+  "private_original_hashes": {
+    "receipt.json": "b0187e043ac5f094ad880606cb0624396b7f8709405946f3ee902384b7de99bf",
+    "receipt.md": "b5899715e1def74dbbba8e09d1e09a0ae4d00a42aa4ffe4e01c7b30abe22b9b7",
+    "spec-versus-test-layout.json": "8c1b0d72f1052be854d713963a09640abf810f8ce39d9d20e336beaaa0e5b15e",
+    "artifacts.json": "97dceb2bcab80a64f4a5b13697cc29df4088d2d450b073826bd56c3f9bc980dc"
+  },
+  "unknowns": [
+    "Unchanged upstream discards successful setup/collection resolver streams; complete setup logs unavailable",
+    "Timeout termination300+5 unexercised",
+    "Program sorting logic was not reached by the two layout-dependent assertions; no logic correctness inference",
+    "No model-route/child/continuity/compaction/occupancy/provider-cost/default or whole-job acceptance"
+  ],
+  "repairs": 0,
+  "reruns": 0,
+  "candidate_code_changes": 0,
+  "native_command": "slop-code --quiet eval-snapshot <stopped-case-copy> -o <private-output> -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json; native timeout300s+5s",
+  "command_description_correction": "Sanitized display initially omitted -o; original retained actual argv used the supported -o output flag. No execution or original command hash changed."
+}

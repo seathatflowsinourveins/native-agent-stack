@@ -1,0 +1,100 @@
+{
+  "study": "token-context-20261003",
+  "operation": "Two separate model-free native npm-parent lifecycle attempts; full preregistered literal acceptance remains failed",
+  "source_pins": {
+    "context_mode": "mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40",
+    "inspector": "modelcontextprotocol/inspector@ae865a19178ddf6f375780a02e9c77c4cf4da184",
+    "promptfoo": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8 src/providers/mcp/{index,client}.ts",
+    "npm": "npm/cli@bfacd33ccbcd908480610703b60455d2da5b57a9 workspaces/libnpmexec/lib/{index,run-script}.js",
+    "mcp_stdio": "modelcontextprotocol/servers@a40bc270fb5ece62673f8a1196f57116d885c5eb src/filesystem/README.md:215",
+    "image": "node@sha256:5cbc7caba8c2c0f0bca675d1b61b9f2857e1cf1853c6164ee9dd409501a936e7"
+  },
+  "supported_launch": "Docker run -i --rm --init; npm --silent --offline exec --call /usr/local/bin/node /app/server.bundle.mjs; declared integration inference, unchanged bundle/no wrapper",
+  "actual_process_tree": "init1 \u2192 npm7 \u2192 shell20 \u2192 server21; current30sec parent guard unchanged",
+  "attempts": [
+    {
+      "harness": "Inspector2.9.0",
+      "started_utc": "2026-10-03T07:10:10Z",
+      "completed_utc": "2026-10-03T07:11:14Z",
+      "exit": 1,
+      "status": "FAILED",
+      "rpc_timeout_ms": 60000,
+      "supplied_request_timeout_ms": 100000,
+      "source_cause": "CLI177\u2013215 omits InspectorClient options.timeout; client789\u2013811/1346\u20131354 uses that property",
+      "container_alive_s": 63,
+      "termination_signal": 15,
+      "container_die_exit": 143,
+      "container_destroyed": true,
+      "repair_or_rerun": false
+    },
+    {
+      "harness": "Promptfoo0.123.1 direct MCP",
+      "started_utc": "2026-10-03T07:19:37Z",
+      "completed_utc": "2026-10-03T07:20:50Z",
+      "exit": 0,
+      "status": "FAILED frozen literal condition; sustained transport/cleanup observed",
+      "request_timeout_ms": 100000,
+      "max_total_timeout_ms": 110000,
+      "native_tool_latency_ms": 71352,
+      "live_observation_native_elapsed_s": [
+        55,
+        66
+      ],
+      "same_server_and_parent_observed": true,
+      "tool_subprocess_live": true,
+      "tool_is_error": false,
+      "native_successes": 1,
+      "native_errors": 0,
+      "native_assertions": 0,
+      "fixed_js_dwell_s": 70,
+      "original_expected_bytes": 244,
+      "actual_returned_bytes": 352,
+      "original_literal_comparison_exit": 1,
+      "postrun_source_derived_carrier_bytes": 108,
+      "postrun_complete_carrier_plus_fixture_bytes": 352,
+      "postrun_diagnostic_exact_match_exit": 0,
+      "postrun_diagnostic_not_regrade": true,
+      "container_die_exit": 0,
+      "kill_event": false,
+      "container_destroyed": true,
+      "all_observed_pids_absent": true,
+      "evaluator_tokens": 0,
+      "evaluator_requests": 1,
+      "model_free_scope_only": true
+    }
+  ],
+  "isolation": "Actual four owned binds; read-only root/networknone; fresh16MiB root tmpfs plus independent per-container tmpfs. No host home/auth/socket/corpus/reference mount, no HOME/CODEX_HOME override.",
+  "artifact_o200k": {
+    "fixture": {
+      "bytes": 244,
+      "tokens": 69
+    },
+    "native_reply": {
+      "bytes": 352,
+      "tokens": 97
+    },
+    "original_promptfoo_output": {
+      "bytes": 11794,
+      "tokens": 2949
+    },
+    "nonadditive": "Different artifact boundaries; not provider usage or compression savings",
+    "counter": "Existing token_manifest.count_files; gpt-tokenizer4.0.0/o200k_base"
+  },
+  "custody": {
+    "private_dwell_receipt_sha256": "f47590a5503eb084424d8c5ae019bae353e23b785ed82289ea6af5bea309e93b",
+    "private_artifact_count_receipt_sha256": "d5f8712a57c933a6e2bbce53b59a6c6143be0afefa9d5d345471f550498ed82c",
+    "fixture_sha256": "2b572f4dc2ce3558abe5ed4bf234132dad0f9280f2944c25b44420f4f8709c83",
+    "native_text_sha256": "9b23a2649a1ee38b7d1d69b06f6ff2ad4c143dcf6edb390cfb06b5c784a2beb3",
+    "output_sha256": "3ac9a02b4b768f167ec879be73a65022ba1f06220a6c47e286555e6f0b63431d",
+    "preregistration_sha256": "386dc490012ce4265c1cc7f0f36e4ad75e40c9526471d8ab5f4b7f2716693634",
+    "config_sha256": "deaaf07cedcaf3e451a1ade8dfe84e3c2d29458fd46b61932f57d721c76f92f9",
+    "events_sha256": "81ba4967ddd14af1457f8a8c059e261cba5c8aca1d2192a4658cfd788f6953ca"
+  },
+  "limits": [
+    "Source-derived complete carrier check is diagnostic; preregistered literal FAIL is preserved. Original353-byte diagnostic newline failure retained.",
+    "Short previous10176manifest currently has2missing copied historical npm debuglogs;10174existingmatch, no restoration or cause claim.",
+    "Per-container temp isolation does not qualify host plugin readiness/hooks. MCP-only differs from full plugin.",
+    "Native both-client main/child tool calls, concurrency/stats attribution, longer-session/resource/interruption lifecycle, P2 natural compaction/resume and protection/cost remain unqualified.",
+    "No default installation, protection/saving, protocol freeze or goal acceptance."
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "tokenizer": "gpt-tokenizer4.0.0/o200k_base",
+  "boundary": "Separate retained stdout/stderr artifacts. No model request/tool wrappers or provider trajectories; token lengths do not prove model savings. Required recall must be charged, overlapping boundaries never added as separate savings.",
+  "artifacts": [
+    {
+      "artifact": "c2-native.stdout.txt",
+      "bytes": 646,
+      "sha256": "0bfd818b2bd0b91330b2f13f4fd8381ef77bc7306e2bcb723f9f309d791c2a99",
+      "o200k_tokens": 182
+    },
+    {
+      "artifact": "c2-native.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c2-rtk.stdout.txt",
+      "bytes": 209,
+      "sha256": "ba172c3738216e1dd51e696957441fe5269db41e7305393de3b06c288a662c2a",
+      "o200k_tokens": 60
+    },
+    {
+      "artifact": "c2-rtk.stderr.txt",
+      "bytes": 78,
+      "sha256": "d2993bc68ad9a63f711c8f5473155e2ba00fdcd461220cc3849185f2f9ad93e6",
+      "o200k_tokens": 23
+    },
+    {
+      "artifact": "c2-format-native.stdout.txt",
+      "bytes": 302,
+      "sha256": "e4da2e51a3c5fecc85529cf13a26263d30e2087fd4c07b8ac4fcdac1ab4ec4d3",
+      "o200k_tokens": 94
+    },
+    {
+      "artifact": "c2-format-native.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c3-native.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c3-native.stderr.txt",
+      "bytes": 69,
+      "sha256": "d2b35cacadc66b7fad8dedd1be5244e17150a6625978c9330f831bd7a9cd6b1e",
+      "o200k_tokens": 17
+    },
+    {
+      "artifact": "c3-rtk.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c3-rtk.stderr.txt",
+      "bytes": 21,
+      "sha256": "457721ab10e6d275babf1d6cbed4150092902691a1ee73514728f2f16790e60b",
+      "o200k_tokens": 5
+    },
+    {
+      "artifact": "c4-native.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c4-native.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c4-rtk.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c4-rtk.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c6wide-native.stdout.txt",
+      "bytes": 9137,
+      "sha256": "e7a379b681b5153a6ff084edfc7b3c16ba251f30330a1ee5ee8fac1861e6ad16",
+      "o200k_tokens": 2514
+    },
+    {
+      "artifact": "c6wide-native.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c6wide-rtk.stdout.txt",
+      "bytes": 1444,
+      "sha256": "186c553c3ecd6ea0d225b04dc0ff1442ae0c989c8306caefdf464748de7c724c",
+      "o200k_tokens": 420
+    },
+    {
+      "artifact": "c6wide-rtk.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c6wide-recall-full.stdout.txt",
+      "bytes": 6271,
+      "sha256": "eb865801a1968006ec74745ff032f7752b9bb5a76fc6ab95e67fccaed4c7a66d",
+      "o200k_tokens": 1786
+    },
+    {
+      "artifact": "c6wide-recall-full.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c6wide-format-native.stdout.txt",
+      "bytes": 6272,
+      "sha256": "4720d1dd81ec779024c2b1aa5394a81edbf1a6c007034371065e46e9f9880e6a",
+      "o200k_tokens": 1787
+    },
+    {
+      "artifact": "c6wide-format-native.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    },
+    {
+      "artifact": "c6wide-format-rtk.stdout.txt",
+      "bytes": 6272,
+      "sha256": "4720d1dd81ec779024c2b1aa5394a81edbf1a6c007034371065e46e9f9880e6a",
+      "o200k_tokens": 1787
+    },
+    {
+      "artifact": "c6wide-format-rtk.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "o200k_tokens": 0
+    }
+  ],
+  "study": "token-context-20261003",
+  "status": "exploratory artifact check; native/provider comparison pending",
+  "source_pin": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026",
+  "quality_observations": [
+    "Eight-file set complete in native scoped formatting and folded RTK outputs",
+    "191-path default RTK listing omits141 names; required full recall reconstructs all191",
+    "Native formatted exhaustive list and RTK passthrough are byte-identical"
+  ],
+  "exhaustive_contract": {
+    "native_formatted_tokens": 1787,
+    "rtk_partial_plus_required_recall_tokens": 2206,
+    "rtk_formatted_passthrough_tokens": 1787,
+    "provider_savings": null
+  },
+  "limitations": [
+    "Native prerequisite failed: final bounded unchanged run exit101,3922 passed/2failed/8ignored; later suites not executed. No further repair.",
+    "These are retained standalone stdout/stderr artifacts, not full client trajectories",
+    "Native formatting discovery changed the exploratory baseline before freeze; never select outcomes after model trials"
+  ]
+}

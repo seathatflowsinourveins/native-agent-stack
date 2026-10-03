@@ -1,0 +1,166 @@
+{
+  "container_exit": 101,
+  "attach_exit": 101,
+  "oom": false,
+  "started_at": "2026-10-03T04:03:02.763255833Z",
+  "finished_at": "2026-10-03T04:04:24.871503129Z",
+  "totals": {
+    "passed": 3922,
+    "failed": 2,
+    "ignored": 8,
+    "measured": 0,
+    "filtered": 0
+  },
+  "suite_count_executed": 11,
+  "suite_results": [
+    {
+      "status": "ok",
+      "passed": 3834,
+      "failed": 0,
+      "ignored": 8,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 3.65
+    },
+    {
+      "status": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 0.33
+    },
+    {
+      "status": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 1.39
+    },
+    {
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 0.15
+    },
+    {
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 0.11
+    },
+    {
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 0.16
+    },
+    {
+      "status": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 1.31
+    },
+    {
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 17.7
+    },
+    {
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 0.1
+    },
+    {
+      "status": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 0.78
+    },
+    {
+      "status": "FAILED",
+      "passed": 20,
+      "failed": 2,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "seconds": 0.66
+    }
+  ],
+  "critical_tests_executed_and_passed": {
+    "test_global_uninstall_detects_shared_pi_omp_extension": true,
+    "unwritable_hooks_dir_never_breaks_the_hook": true,
+    "legacy_invocation_heals_project_and_global_to_current_stock": true,
+    "powershell_legacy_invocation_also_heals": true,
+    "heal_is_idempotent_across_invocations": true
+  },
+  "failures": [
+    "guard_integration_test::git_diff_dash_dash_stat_pathspec_after_double_dash_is_not_stat_flag",
+    "guard_integration_test::git_log_malformed_digit_run_propagates_real_git_error"
+  ],
+  "remaining_suite_status": "not executed after cargo stopped at guard_integration_test",
+  "user": "1000:1000",
+  "command": [
+    "cargo",
+    "test",
+    "--all"
+  ],
+  "cap_drop": [
+    "ALL"
+  ],
+  "security_opt": [
+    "no-new-privileges"
+  ],
+  "image": "sha256:307d198027388f780db83929487de35084a73ecbaa31319989438db38103439f",
+  "git_version": "git version 2.39.5",
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "source_pin": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026",
+  "status": "failed prerequisite; no further repair",
+  "scope": "One final unchanged native cargo test --all in the declared official Rust1.91.0/MSRV container, not current stable-toolchain CI replication",
+  "failure_classification": {
+    "malformed_git_log": "Pinned assertion expects not an integer (comment Git2.51); returned Git2.39.5 says not a non-negative integer. Exit propagation assertion passed first. Environment wording mismatch, not proof of matching every original stderr byte.",
+    "double_dash_stat": "Returned RTK diff lacks expected stat-summary header. Root cause unresolved; no further run or source patch."
+  },
+  "prior_attempts": [
+    "Read-only checkout failed native cwd-writing pi test exit101",
+    "Writable namespace-root run failed chmod0555 hook-healing test exit101",
+    "Scratch shallow/promisor source preparation exit128",
+    "Mistaken dependent nonexistent-container start exit1"
+  ],
+  "cleanup": "Only owned source/cache/temp/preflight children restored to host owner/mode; only three owned stopped test containers removed; shared image retained. CHOWN-only restoration failed then bounded CHOWN+DAC_OVERRIDE cleanup succeeded; test capabilities stayed ALL-dropped.",
+  "output_sha256": "8653cd268e9c3cd7f6a2f88b4fac8b95c2863e2846f1823abbccc30e37d60390",
+  "stderr_sha256": "96e82052a8537f1ce39e25d0a6eba021d1e98c50d0755b00061036409e1b97c6",
+  "private_packet_sha256": "ef57dd4965340af94b281b5d68ff01fee6aa092a28047eb13b6a905d5a3636e6",
+  "limitations": [
+    "18 later source integration files were not executed after Cargo stopped",
+    "A release fixture failure excludes adoption under this protocol; it does not prove another unmeasured candidate/native property",
+    "No model calls, active installation or savings from this worker"
+  ]
+}

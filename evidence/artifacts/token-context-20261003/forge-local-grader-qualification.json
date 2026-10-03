@@ -1,0 +1,71 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Unchanged native local Forge checkpoint1 reference grader prerequisite; no model/candidate/protection trial",
+  "source_pins": {
+    "runner": "SprocketLab/slop-code-bench@31ceea3add480edb33431e70475c4c70597e6b31",
+    "corpus": "gabeorlanski/scb-problems@38d627ecf668a88f88f8d260f8df8df6116e9b03"
+  },
+  "native_command": "slop-code --quiet eval-snapshot <unchanged upstream checkpoint1 reference snapshot> -o <owned output> -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json",
+  "native_help_exit": 0,
+  "native_execution": {
+    "attempts": 1,
+    "start_utc": "2026-10-03T06:28:06Z",
+    "end_utc": "2026-10-03T06:28:21Z",
+    "cli_exit": 0,
+    "pytest_exit": 0,
+    "infrastructure_failure": false,
+    "collected": 40,
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "returned_json_equals_saved_report": true,
+    "native_report_all40_outcomes_passed": true,
+    "test_collection_hash": "6d11f70b39513473a4e6fe500e150a3879af597cce531d9475388f2aa16c1a83",
+    "exact_upstream_case_inventory_matches": true,
+    "normalized_case_inventory_sha256": "aec4b9d90736632c224c7bc3f9a39d3ef288e4be9eef95fe0514857006ee98fb"
+  },
+  "quality_grade_scope": "Grader-source/reference prerequisite; CLI exit alone is insufficient. Actual saved/returned reports and original case inventory decide this result.",
+  "runtime": {
+    "python": "3.12.3",
+    "uv": "0.12.22",
+    "pytest_resolved_uvx": "9.1.1",
+    "pytest_collection_preparation": "9.0.3",
+    "uvx_package_count": 18,
+    "resolved_inventory_sha256": "f01b87c96c1fe5b344ad7019a31d4b48dc346ee84ffa233c4d4ef7e218389151",
+    "pytest_json_ctrf": "0.5.3",
+    "pytest_json_report": "1.5.0",
+    "pytest_metadata": "3.1.1",
+    "pytest_timeout": "2.4.0",
+    "outer_deadline_s": 300,
+    "kill_grace_s": 5,
+    "timeout_runtime": "uutils coreutils0.8.0",
+    "deadline_exercised": false,
+    "local_environment_config_sha256": "166c9a965e2bb1d3405e8dccdeaa0358dd8bae5e30f87333fbfbb6b7e00d0501"
+  },
+  "isolation": "Clean process environment/private cache/config/state/credential paths/emptyNETRC/dotenv stop. HOME/CODEX_HOME/UV_PROJECT_ENVIRONMENT/VIRTUAL_ENV/inheritedprovider vars absent; no rubric/model flags or native sign-in copies. References not exposed as model input.",
+  "preregistration_sha256": "9aeede6539289078c273bda0e003bc026b36e89f149c247b9363d0584bc4a78b",
+  "custody": {
+    "private_receipt_sha256": "125daafefbb288e7b3ce2c25846dd21004dc7a2e97ce8107e25dbc2ee7b9a818",
+    "private_manifest_sha256": "bd63077672b2b5facce1675c9ed15adb498859354fd5600050d4aa34a297613a",
+    "evaluation_report_sha256": "258579c8e95143fea0df630e9ddf484f13cd9b2c6a10d04783070812321a50a2",
+    "original_execution_report_sha256": "c3eebe340b59afd237bce6c06c65c228d440804c40de6a60dc5b03594332061c",
+    "root_independent_artifact_hash_count": 1751,
+    "all_match": true,
+    "source_snapshot_locks_and_runner_environment_unchanged": true,
+    "process_search_exit": 1,
+    "process_search_stream_bytes": 0
+  },
+  "failures_and_limits": [
+    "Missing-cwd setup rejected before process launch, then directory creation corrected; no grader rerun.",
+    "Unpinned native uvx selected18packages; runtime inventory is captured, not frozen upstream dependency resolution. Successful setup/collection resolver streams are discarded by upstream; not reconstructed.",
+    "Checkpoints2..8, candidate grading, native compaction/resume/occupancy/recall and fixed-task protection remain unqualified.",
+    "No models called by this native grader; coordinator/advisor model overhead outside this command scope remains separate.",
+    "No SOTA default, comparative savings or protocol freeze follows from passing reference grader prerequisite."
+  ],
+  "independent_completeness_read": {
+    "verdict": "ACCEPT publication fidelity only",
+    "reviewer": "Independent Sol6.1/max command owner",
+    "checked": "Actual returned/saved report/caseIDs/source/prereg/runtime/12criticalbindings;1751count/manifest/rootfullhashcheck reused; no model/P2/default claim."
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "fixed_base": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "original_sha256": "19431b3f3bb47ae7f85a2dd5e91b231713e41d518705d55f532e2a494bbee92f",
+  "qmd_span_equals_original": true,
+  "lines": 15,
+  "span": "271-285",
+  "indexed_docid_prefix": "19431b",
+  "serena_observed_error": "ValueError: No language servers available in the manager",
+  "mutations": "No installation, explicit configuration change, activation/onboarding or index refresh requested/performed. Implicit existing-tool cache/state effects are unknown.",
+  "study": "token-context-20261003",
+  "operation": "Read-only existing retrieval functional probe; no retrieval ownership change",
+  "qmd_version": "2.8.3",
+  "native_named_index_collection_counts": {
+    "us-equities-catalog": 24,
+    "us-equities-foundation": 114,
+    "foundation-adoption": 37,
+    "foundation-docs": 172
+  },
+  "native_commands": [
+    {
+      "command": "qmd --index native-agent-stack-catalog collection list",
+      "exit": 0
+    },
+    {
+      "command": "qmd --index native-agent-stack-catalog search \"context supply\" --collection foundation-docs --format json -n2",
+      "exit": 0,
+      "quality": "Target absent from top2; preserve missed target."
+    },
+    {
+      "command": "qmd --index native-agent-stack-catalog search \"new wsl definitive defaults\" --collection foundation-docs --format json -n2",
+      "exit": 0,
+      "quality": "Target docid#19431b appears at rank2."
+    },
+    {
+      "command": "qmd --index native-agent-stack-catalog get \"#19431b:271:15\"",
+      "exit": 0,
+      "returned_bytes": 1685,
+      "quality": "All15 returned prefixed lines match selected fixed original."
+    }
+  ],
+  "serena_call": {
+    "tool": "find_symbol",
+    "name_path_pattern": "check_artifacts",
+    "relative_path": "scripts/validate_convergence.py",
+    "include_body": false,
+    "result": "Observed operational error only; no claim of global semantic capability absence."
+  },
+  "corrections": [
+    "The QMD default unnamed index reports no collections; the existing named index has four. Default-index output does not imply QMD absence."
+  ],
+  "limits": [
+    "BM25/get only; no query model or local-model download.",
+    "No index update/embed, service/profile activation, onboarding or retrieval installation.",
+    "Selected original span identity proves neither entire-corpus freshness nor a frozen comparative inventory.",
+    "No fresh native client main/child retrieval comparator, savings/default/freeze or provider usage from this direct CLI probe.",
+    "Existing untracked .serena state was present in the worktree and retained; this probe neither inspects it nor establishes causation or absence of internal tool state writes. Serena tool error is directly observed in the coordinator transcript, without a separate raw tool-receipt file."
+  ]
+}

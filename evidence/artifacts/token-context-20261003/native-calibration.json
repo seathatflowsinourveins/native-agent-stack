@@ -1,0 +1,178 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "scope": "Two pre-freeze functional/accounting calibrations; no compressor treatment or efficiency/default claim",
+  "harness": {
+    "version": "promptfoo0.123.1",
+    "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "private_lock_sha256": "abbb26cbe159b867b6cd66dd4c53915f2e838f97a762de94adf21f4a530ede8e",
+    "evaluator_replay": false,
+    "native_provider_caching": true,
+    "retries": 0,
+    "concurrency": 1
+  },
+  "clients": {
+    "codex": {
+      "version": "0.160.0",
+      "sdk": "0.160.0",
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "child_effort_observed": "max",
+      "backend_resolution": null
+    },
+    "claude": {
+      "version": "2.1.288",
+      "sdk": "0.3.263",
+      "requested_model": "opus",
+      "observed_main_child_model": "claude-opus-5-5",
+      "effort": "max",
+      "child_effort_observed": "max"
+    }
+  },
+  "attempts": [
+    {
+      "id": "calibration-first",
+      "exit_code": 100,
+      "duration_ms": 99981,
+      "grade": "Assertion syntax failure; both returned fact objects pass the later offline schema regrade",
+      "codex": {
+        "parent": {
+          "input": 154860,
+          "cached_subset": 138240,
+          "output": 966,
+          "reasoning_subset": 530,
+          "total": 155826,
+          "unique_responses": 6
+        },
+        "child": {
+          "input": 40396,
+          "cached_subset": 31872,
+          "output": 496,
+          "reasoning_subset": 333,
+          "total": 40892,
+          "unique_responses": 2
+        },
+        "whole_total": 196718,
+        "cache_write_subset": 0
+      },
+      "claude": {
+        "query_pipeline": {
+          "ordinary_input": 1067,
+          "cache_creation": 10536,
+          "cache_read": 29251,
+          "output": 1832,
+          "thinking_subset": 1090,
+          "total": 42686
+        },
+        "opus_row_total": 41614,
+        "haiku_row_total": 1072,
+        "list_price_estimate_usd": 0.1165322
+      },
+      "result_sha256": "484194101bdd7c2eededf9458809b72ff503d73731d3f2b537faba8da399d6ce"
+    },
+    {
+      "id": "calibration-second-live",
+      "exit_code": 0,
+      "duration_ms": 84773,
+      "grade": "Two schema passes; unintended additional live run, retained",
+      "codex": {
+        "parent": {
+          "input": 95403,
+          "cached_subset": 79744,
+          "output": 1009,
+          "reasoning_subset": 576,
+          "total": 96412,
+          "unique_responses": 5
+        },
+        "child": {
+          "input": 40679,
+          "cached_subset": 32128,
+          "output": 196,
+          "reasoning_subset": 86,
+          "total": 40875,
+          "unique_responses": 2
+        },
+        "whole_total": 137287,
+        "cache_write_subset": 0
+      },
+      "claude": {
+        "query_pipeline": {
+          "ordinary_input": 1067,
+          "cache_creation": 3146,
+          "cache_read": 37305,
+          "output": 2537,
+          "thinking_subset": 1709,
+          "total": 44055
+        },
+        "raw_parent_total": 35018,
+        "raw_child_total": 7963,
+        "opus_row_total": 42981,
+        "haiku_row_total": 1074,
+        "unique_parent_request_message_pairs": 2,
+        "unique_child_request_message_pairs": 2,
+        "list_price_estimate_usd": 0.081637
+      },
+      "result_sha256": "d9e46533e8a745924c71de5bdd0a2a590e03d4291049cd0b95fbe4d07300b64d"
+    }
+  ],
+  "invocation": {
+    "opportunities_per_client": {
+      "main": 2,
+      "child": 2
+    },
+    "validated_fixture_reads_per_client": {
+      "main": 2,
+      "child": 2
+    },
+    "scope": "Directed native fact-file reading and delegation only; Codex command execution and Claude Read/Agent. No candidate tool invocation rate.",
+    "codex_binding": "Native SubAgentActivity started/completed items plus canonical child session_meta, not spawn function output or SDK item list",
+    "claude_binding": "Agent tool-use ID and native child parentToolUseId; main and child observed at Opus/max"
+  },
+  "accounting": {
+    "codex": "Sum 15 unique parent/child response IDs once; SDK totals cover parent only",
+    "claude": "Latest native query-pipeline modelUsage once per query; raw Opus parent+child reconcile and are not added again",
+    "selected_two_attempt_total": 420746,
+    "total_meaning": "Cross-model native reported tokens in these two selected calibrations; not all study usage, money or savings",
+    "helper_request_ids": "Known Haiku aggregate rows; independently bound helper request IDs unavailable",
+    "outside_query_pipeline": "Upstream excludes permission classification/token probes outside the query pipeline",
+    "cost": "Native list estimates only; invoice/subscription spend unknown"
+  },
+  "offline_regrade": {
+    "exit_code": 0,
+    "duration_ms": 51,
+    "providers": [
+      "echo",
+      "echo"
+    ],
+    "schema_passes": 2,
+    "reported_tokens": 0,
+    "source_outputs": "First live attempt retained outputs",
+    "native_model_calls": 0,
+    "result_sha256": "9393862f30e7c1325739224d7f0df0ce0b9c8726b3f576a32c7c608fb390b303"
+  },
+  "corrections": [
+    "Inline prompt configuration was rejected before model calls; supported variable prompt validated.",
+    "Single-line JavaScript assertion syntax failed after first live calls; preserve failed grades and usage.",
+    "Claim that --model-outputs alone replays without new calls was wrong; actual second native session IDs prove it. Offline loading requires --assertions too.",
+    "Initial Codex projection omitted SubAgentActivity child binding; native child counters now included.",
+    "Claude streaming duplicate usage changes; final chronological request/message counters reconcile.",
+    "A child tool-result total4235 represents its final request here, while whole child requests total7963; do not substitute.",
+    "Complete-data exposure for five S1 lookups weakens focused native baseline; fixed questions now permit focused computation before freeze."
+  ],
+  "sources": [
+    "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/util/config/load.ts#L792",
+    "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/claude-agent-sdk.ts#L2163",
+    "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L217",
+    "https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk/v/0.3.263"
+  ],
+  "retained_private_artifacts": {
+    "accounting_conclusions_sha256": "6d22d1ea6f16f583460b03dd9f52f17a90de3d95933c2e954a21cb1198f6685a",
+    "sdk_result_contract_sha256": "59560e31f91e47ed93e7cbcaa846e3fc3c96d8dcc41ea36cda64de96c0c4edf4"
+  },
+  "limits": [
+    "Hooks, automatic memory, project documents and MCP were process-locally suppressed for accounting isolation; full native profile parity unqualified",
+    "Advisor, aborted/billed retry and continuity/resume contracts unexercised",
+    "Model output does not establish requested settings; native argv and records do",
+    "No comparative protocol freeze or default promotion"
+  ]
+}

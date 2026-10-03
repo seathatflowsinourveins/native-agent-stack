@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "SCOPED_NATIVE_DEFAULTS_ADOPTED; BROAD_PROVIDER_COMPARISON_AND_GOAL_INCOMPLETE",
+  "north_star_action": "Keep token/context practice faithful and recoverable for complex source-grounded US-equities R&D.",
+  "scope": "This distribution token layer only. No workstation architecture, retrieval service, gateway or definitive context row is changed.",
+  "defaults": [
+    {
+      "job": "command-output-condensing",
+      "selected_default": "Native focused commands and bounded output",
+      "basis": "RTK0.51.0 candidate prerequisite exclusion, not measured provider-token superiority.",
+      "native_live_evidence": {
+        "main_and_max_child_actors": 4,
+        "eligible_calls": 12,
+        "additional_skill_read": 1,
+        "observed_native_tokens": 210080,
+        "views": "Codex150039 plus Claude60041 disjoint; already registered usage, not counted again."
+      },
+      "candidate_evidence": {
+        "unchanged_tests_passed": 3922,
+        "failed": 2,
+        "ignored": 8,
+        "native_exit": 101,
+        "later_suites": "UNRUN",
+        "exploratory_o200k": "Native1787; partial RTK plus recovery2206; passthrough1787. Separate artifact boundary, not provider savings."
+      },
+      "limits": "Original C3 stream-separation/N5 exposure and prior Claude format failure remain unqualified. No RTK installation.",
+      "overturn": "Maintained release passes unchanged prerequisites and full fidelity, then matched original native tasks with complete counters and quality."
+    },
+    {
+      "job": "structured-data-compaction",
+      "selected_default": "Native compact JSON for unrestricted tested data",
+      "basis": "Native source fidelity; released TOON4.1.1 loses three tested exact U+FEFF string values. Uniform artifact savings are narrower and live costs UNRUN.",
+      "native_live_evidence": {
+        "main_and_max_child_actors": 4,
+        "tool_calls": 8,
+        "exact_S1_answers": 5,
+        "string_controls": 3,
+        "observed_native_tokens": 185514,
+        "views": "Codex125637 plus Claude59877 disjoint; already registered usage, not counted again."
+      },
+      "candidate_evidence": {
+        "unchanged_tests_passed": 767,
+        "unrestricted_BOM_roundtrip_failures": 3,
+        "uniform_100x11_roundtrip_and_truncation": "PASS artifact scope only",
+        "artifact_o200k": {
+          "JSON_payload": 11640,
+          "TOON_payload": 8938,
+          "JSON_complete_presentation": 11742,
+          "TOON_complete_presentation": 9108,
+          "JSON_nested": 14,
+          "TOON_nested": 20,
+          "JSON_primer": 10,
+          "TOON_primer": 80
+        },
+        "counting": "Overlapping artifact boundaries never add; no provider saving inferred."
+      },
+      "limits": "Uniform TOON model comparison UNRUN; this default does not prohibit future measured typed eligible representations. No TOON installation.",
+      "overturn": "Maintained release passes exact BOM/type/source controls and original uniform native comparison including primers/conversion/recovery."
+    },
+    {
+      "job": "usage-and-cost-metering",
+      "selected_default": "Native finalized client records for the tested inclusive accounting scopes",
+      "basis": "Fixed native-record comparison exposes ccusage20.0.26 omissions; no new model A/B needed to identify omitted parser records.",
+      "candidate_evidence": {
+        "M2_distinct_native_records": 199,
+        "native_total": 25619275,
+        "candidate_total": 24965459,
+        "missing_three_natural_compaction_records": 653816,
+        "additional_native_parser_invocations": 9,
+        "usage_only_fixtures": 14,
+        "known_helper_omissions": "1274 in fresh query;1074 at each resumed endpoint. Endpoints overlap and are not added.",
+        "failed_startup": "Native usageUNKNOWN; parser0 is not zero spend."
+      },
+      "limits": "Native reported list cost is distinct from wire/invoices and unknown helper provenance; no universal billing-completeness claim. No new meter installation.",
+      "overturn": "Maintained release reconciles identical compaction/response/helper identities and known totals without treating missing usage as zero."
+    }
+  ],
+  "source_pins": {
+    "RTK": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026",
+    "TOON": "toon-format/toon@a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+    "ccusage": "ccusage/ccusage@d9821088b98aa536c7a385aa1a4579d6fa02269b"
+  },
+  "retained_evidence_sha256": {
+    "native-command-baseline-qualification.json": "6b97431d58e1572fb8e507923e7cfd58a2221fef3fa72698ca9efd163c2204d1",
+    "rtk-native-tests.json": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9",
+    "rtk-artifact-qualification.json": "04b742c80f1f26d72ab78dd3fdec1c304cb0440b1dcb49b4e14906ce259ebff4",
+    "native-structured-baseline-qualification.json": "ea06789baee978a8aeb5b1a1af6059f1b787f9e9832c2277b00f46f8bad427b3",
+    "toon-qualification.json": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c",
+    "meter-compaction-qualification.json": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670",
+    "meter-expanded-role-qualification.json": "27dc08de2c44998c62f224557f219b1e816920db26e5ad40d28d600e1e39eff7"
+  },
+  "coordinator_qualification": "Astra/max method judgment452words/96864 native tokens supports these limited defaults; source opinion is a lead. Native source, runtime and fixed-record receipts are the basis.",
+  "goal_gaps": [
+    "Context protection comparison and natural compaction/resume quality unaccepted",
+    "Retrieval owner handoff and complete record received/full hash verified; runtime/corpus/client qualification pending",
+    "Uniform structured live costs unrun",
+    "PR acceptance pending"
+  ],
+  "completeness_critic": {
+    "missed_modalities": "C3/N5 source visibility, uniform structured model use, interrupted/helper/billing formats, long-session protection and owner-bound retrieval.",
+    "next_sweep": "Use maintained releases and fixed exact tasks to overturn a scoped decision; current selected release metadata remains unchanged at2026-10-03T12:53Z."
+  },
+  "privacy": "Sanitized metadata only; no fact values, native IDs, conversations or host/auth paths.",
+  "definitive_manifest_proposal": {
+    "applied": false,
+    "source": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md atacceptedmain4ced2923063db6a6dcafa9f25af5ee05a4153c75",
+    "proposed_annotation": "Keep no context-supply layer. For the tested inclusive usage scopes, finalized native client records are authoritative; ccusage remains a supplemental usage view with known helper and compaction omissions.",
+    "boundary": "Distribution accounting qualification does not establish context-protection winner or authorize changing the definitive row."
+  }
+}

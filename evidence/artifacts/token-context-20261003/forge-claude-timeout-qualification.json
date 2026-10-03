@@ -1,0 +1,104 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Distinct registered source-supported Claude SDK settings relocation; original900000ms evaluator timeout retained",
+  "north_star_action": "Honest native main/child accounting and quality before context-continuity adoption",
+  "evaluator": {
+    "exit": 100,
+    "duration_ms": 900016,
+    "errors": 1,
+    "response_emitted": false,
+    "session_id_emitted": false,
+    "token_usage_placeholders": "Zeros are evaluator placeholders and do not establish zero usage or spend.",
+    "task_completion": "UNPROVEN; evaluator timeout does not establish native task completion/abortion reason.",
+    "native_terminal_result_observed": false,
+    "terminal_status": null,
+    "terminal_reason": null,
+    "num_turns": null
+  },
+  "native_identity": {
+    "cli_version": "2.1.288",
+    "main_model": "claude-opus-5-5",
+    "child_model": "claude-opus-5-5",
+    "main_effort": "max",
+    "child_effort": "max",
+    "one_canonical_forge_engineer_child": true,
+    "SDK_package": "0.3.263",
+    "SDK_embedded_client_metadata": "2.1.263",
+    "version_mismatch_not_proven_timeout_cause": true
+  },
+  "native_scope_views": {
+    "persisted_aggregate": {
+      "opus": 1487340,
+      "helper": 2658,
+      "total": 1489998,
+      "scope": "23 final observed request/message pairs with nonnull stop_reason; every Opus scalar reconciles persisted state; helper IDs unknown"
+    },
+    "raw_latest_prefix_with_unfinished_frame": {
+      "main_pairs": 13,
+      "child_pairs": 11,
+      "cross_role_overlap": 0,
+      "main": 950289,
+      "child": 621249,
+      "opus": 1571538,
+      "known_helper": 2658,
+      "total": 1574196,
+      "scope": "24 latest chronological request/message pairs including one null-stop-reason child frame; bounded observed view, not completed final query"
+    },
+    "unfinished_child_frame": {
+      "ordinary_input": 2,
+      "cache_creation": 6776,
+      "cache_read": 77412,
+      "output": 8,
+      "total": 84198,
+      "stop_reason": null
+    },
+    "complete_final_query_total": null,
+    "count_once": "Alternative scoped views are never added to each other; cache/reasoning/helper/child trailer subsets and cumulative state are not added twice"
+  },
+  "cost": {
+    "native_persisted_estimate_usd": 3.9189304000000003,
+    "has_unknown_model_cost": false,
+    "basis": "Native list estimate; not an invoice. No final SDK cost endpoint was emitted; unfinished request final cost is unobserved.",
+    "invoice_and_wire_request_cost": "UNKNOWN"
+  },
+  "compaction": {
+    "main_observed_boundaries": 0,
+    "child_observed_boundaries": 0,
+    "scope": "Bounded selected prefixes only; zero events does not prove compaction capability absence."
+  },
+  "stop_observation": {
+    "scope": "Exact owned case/descendant cwd observations; inaccessible/othercwd/global processes unknown",
+    "native_terminal_status": null,
+    "native_terminal_reason": null,
+    "numTurns": null,
+    "three_owned_case_process_views_empty": true,
+    "observer_sources": "Root one view and independent worker two dated views, not three independent observers"
+  },
+  "registered_inputs_retained": {
+    "config_sha256": "efee20b3ff010fc5c601e7eebd54c7f37d662ffc25fc675c67f0fc8280448d44",
+    "settings_sha256": "04943914ff8f155bbedab0a9d3b832cf23ccd1df1ded9300839a9ef33d840836",
+    "registration_sha256": "681a7cccb69c63bcac8daaf0c97ee2b6b6728a651f9b017df97b9cd0c12a7218"
+  },
+  "root_verification": {
+    "packet_artifacts": 8,
+    "sources": 18,
+    "native_prefixes": 2,
+    "independent_latest_pair_recomputation": true,
+    "persisted_reconciliation": true,
+    "partial_frame_gap": 84198,
+    "schema_read_correction": "Initial root metadata projection assumed a dictionary where role captures are a list; failed read retained, schema inspected before recomputation, no rerun/mutation"
+  },
+  "private_original_hashes": {
+    "accounting_conclusions": "26203864b3f659b1a67e50e8c03d81137c3afe6f5046f7ceee8fb9d101bf1f8a",
+    "source_bindings": "32b3984011f2e9d3856f71ba283acb2b07609dc46d5f94d6bb50040c34cb432c",
+    "manifest": "21a0fd36604a3126dde58ef752d350f8e5bc0e0fdd2d819b4428bc60a277b50e"
+  },
+  "quality": "Caller structural result absent; unchanged stopped-case native grade retained separately, never substituted for successful query completion",
+  "limits": [
+    "Timeout is failed acceptance and did not emit response/session UUID/usage; evaluator0placeholders are not zero spend",
+    "No native terminal result in selected records; cancellation/completion cause, final endpoint, effective exclusive filesystem confinement and complete helper/retry/invoice provenance unqualified",
+    "Known persisted estimate is a list estimate and excludes the unfinished frame; hasUnknownModelCost:false does not close final scope",
+    "No paired saving, natural compaction, supported-resume/P2, candidate/default or freeze acceptance"
+  ]
+}

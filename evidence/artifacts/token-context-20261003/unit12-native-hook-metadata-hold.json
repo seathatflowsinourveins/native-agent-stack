@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Measure natural compaction and same-session cumulative R&D continuity without bypassing native hook trust.",
+  "evidence_class": "offline_artifact_check / pinned source review; pure native protocol export",
+  "status": "FINAL_NATIVE_METADATA_HOLD_FOR_SELECTED_PREPARATION",
+  "native_operation": {
+    "client": "Codex0.160.0",
+    "command": "app-server generate-json-schema --experimental --out <owned>",
+    "exit": 0,
+    "stdout_bytes": 0,
+    "stderr_bytes": 0,
+    "generated_files": 440,
+    "generated_bytes": 4286533,
+    "model_or_live_server_launched": false,
+    "model_usage": null
+  },
+  "source_verified_contract": {
+    "hooks_state": "Map keyed by actual native hook key; enabled and trusted_hash belong to each entry.",
+    "discovery": "Actual current_hash must match configured trusted_hash for un-managed, non-builtin hooks.",
+    "native_protocol": "hooks/list accepts cwds and returns data[].hooks[].key/currentHash. Exported schema does not return the case metadata.",
+    "selected_installed_surface": "No metadata invocation route found in the selected CLI/help and pinned app-server-test-client command surface; not a universal absence claim.",
+    "bypass": "Excluded; no persistent/global configuration or native trust store changed."
+  },
+  "configuration_correction": {
+    "invalid_originals": 9,
+    "originals_unchanged": true,
+    "new_private_copies": 9,
+    "new_state": "Empty valid per-key map; UNRUN and unadmitted until actual native key/hash is returned.",
+    "unknowns": [
+      "Actual case-native hook keys and current hashes",
+      "Native trusted handler activation",
+      "Natural automatic event, same-ID continuation and retained literal recall",
+      "Main/child/helper usage and treatment lifecycle"
+    ],
+    "prospective_command_cwd": "Original shell cwd remains inert metadata; provider/state/log paths relocate. These HOLD records are not launch-ready."
+  },
+  "quality_scope": {
+    "required_original_execution_outcomes": 566,
+    "space_containing_outcomes_separate": 27,
+    "filtered_collection_view": 539,
+    "historic539_of566": "FAIL retained",
+    "universal_optimizer_equivalence": "UNQUALIFIED; some unchanged upstream CP8 tests use candidate-owned equiv."
+  },
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "files": [
+        "codex-rs/cli/src/main.rs:1403-1408",
+        "codex-rs/config/src/hook_config.rs:20-32",
+        "codex-rs/hooks/src/engine/discovery.rs:664-724,798-824",
+        "codex-rs/core/src/hook_runtime.rs:544-557",
+        "codex-rs/hooks/src/events/compact.rs:128-140"
+      ]
+    },
+    {
+      "repository": "SprocketLab/slop-code-bench",
+      "revision": "31ceea3add480edb33431e70475c4c70597e6b31"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "revision": "38d627ecf668a88f88f8d260f8df8df6116e9b03"
+    }
+  ],
+  "custody": {
+    "receipt": {
+      "bytes": 4994,
+      "sha256": "77bf0254a5c48efc6e357d6185b32a6c70b577a6e2455291aff739431051adc9"
+    },
+    "source-bindings": {
+      "bytes": 7393,
+      "sha256": "d5eab107d4e7a351e454de8f7c63eb5e667f6be5108e02152e4c0955c6886c88"
+    },
+    "protocol-schema-manifest": {
+      "bytes": 163806,
+      "sha256": "e26613a99c0f294cf3b762d5e9c7f466e36e5680ffd4d9779ccc415626326c49"
+    },
+    "corrected-config-manifest": {
+      "bytes": 2694,
+      "sha256": "99270bdb8df1b9de5589d7813e4e36e793af7d25033ed972b229b33c75c775f9"
+    },
+    "artifact-verification": {
+      "bytes": 715,
+      "sha256": "11b1260bec03d24eff47b18fe121fba221c5d3418a1f41db100b164ed05f2b42"
+    }
+  },
+  "root_source_re_read": "Exact selected hook map, discovery matching guard and explicit native PreCompact trigger/session/turn fields re-read.",
+  "completeness_critic": "A valid schema and empty hook map establish no actual trusted execution or context protection. Keep this finite metadata gap separate from ordinary MCP output consumption and native baseline compaction. The next source sweep needs an existing supported native metadata client, not an invented RPC bridge or hash calculator.",
+  "privacy": "No raw private path, config/auth value or conversations published."
+}
