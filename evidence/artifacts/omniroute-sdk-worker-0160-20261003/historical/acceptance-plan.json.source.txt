@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_native_acceptance_plan",
+  "lane": "foundation",
+  "sources": {
+    "codex": "openai/codex@ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "dagu": "dagucloud/dagu@58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+    "context_mode": "mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40"
+  },
+  "before_provider_execution": true,
+  "quality_contract": [
+    "Typed native preflight must discover the selected skill and nonempty Context Mode tool catalog without creating a model turn.",
+    "Missing required skill/server must return nonzero; discovery must not print configuration/credentials/skill bodies or call MCP tools.",
+    "Actual task must read the task-relevant using-superpowers body and execute a maintained Context Mode MCP tool.",
+    "Actual task must dispatch the configured native runtime-judge with gateway-compatible Astra-Max/Max; child must run the unchanged arithmetic oracle and return its exact exit.",
+    "Native Dagu graph must preserve readiness-before-worker dependency and bound one active run/deadlines; no scheduled-run acceptance without a scheduler.",
+    "Only the owned fixture/readiness state and private native artifacts may change; arithmetic source/oracle hashes remain unchanged.",
+    "Preserve failed attempts and unknown usage; keep SDK parent/child/provider response usage scopes distinct without overlapping totals."
+  ],
+  "limits": [
+    "No universal quality/ranking/token-savings claim.",
+    "No automatic model-write retry, new global service, scheduler or account route change.",
+    "No promotion of the failed Claude SDK bridge.",
+    "MCP catalog readiness, configured role metadata and enabling hook support are distinct from actual tool/agent/hook execution.",
+    "User-scope native skills may remain visible outside the private CODEX_HOME; this is not complete home isolation."
+  ]
+}
