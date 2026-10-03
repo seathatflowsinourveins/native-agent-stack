@@ -6608,7 +6608,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0"
+      "sha256": "160d85512e237a2d2f65de752aed86dd1f4da8633fc77feb35324e7c4499d028"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -6934,8 +6934,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.3",
-        "value": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79"
+        "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.160.0",
+        "value": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a"
       },
       "documented_install": [
         {
@@ -6952,16 +6952,17 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/native-clients.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
         "https://developers.openai.com/codex/noninteractive",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/artifacts/runtime-sdk-20261003/receipt.json"
       ],
       "install": {
-        "command": "npm install -g @openai/codex@0.159.3",
+        "command": "npm install -g @openai/codex@0.160.0",
         "execution_status": "UNRUN",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "scope": "Upstream npm install form with the accepted package version supplied using npm documented version syntax. This is a reviewed example; the selected bootstrap keeps its existing isolated-prefix installation path.",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/README.md"
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/README.md"
       },
       "name": "Codex",
       "native_update": {
@@ -6973,7 +6974,7 @@
         "order": "It runs after the bootstrap has installed the pin and before this client's acceptance command.",
         "receipt_fields": {
           "acceptance_result_on_that_version": "The result of this entry's acceptance command on that version.",
-          "floor": "The pin of this entry, 0.159.3: the release the bootstrap installs.",
+          "floor": "The pin of this entry, 0.160.0: the release the bootstrap installs.",
           "version_after_native_update": "The version that PATH resolves to after the native update, or after the updater's refusal."
         },
         "sources": [
@@ -6983,7 +6984,7 @@
       "owner_layer_id": "native-clients",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:@openai/codex",
-      "pin": "0.159.3",
+      "pin": "0.160.0",
       "position": 1,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/openai/codex",
@@ -10821,7 +10822,7 @@
           "Existing authorized native Codex authentication and the intended repository context."
         ],
         "scope": "The Python body is the unchanged upstream quickstart; the here-document is only its shell carrier. No SDK/provider/model execution or output-quality acceptance occurred.",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md#quickstart"
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md#quickstart"
       },
       "aliases": [
         "Codex Python SDK"
@@ -10830,8 +10831,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
-        "value": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f"
+        "source": "https://pypi.org/pypi/openai-codex/0.160.0/json",
+        "value": "61d2d855ca2ebedfd51280fbeb60ff31fc47ccbd55ebce186505e3f3da096921"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -10839,22 +10840,23 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/artifacts/runtime-sdk-20261003/receipt.json"
       ],
       "install": {
-        "command": "python -m pip install openai-codex==0.159.3",
+        "command": "python -m pip install openai-codex==0.160.0",
         "execution_status": "UNRUN",
-        "package_source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "package_source": "https://pypi.org/pypi/openai-codex/0.160.0/json",
         "pinning_source": "https://pip.pypa.io/en/stable/cli/pip_install/",
         "scope": "Upstream package installed using pip documented module invocation and exact version syntax; run in the owned Python environment, never the OS Python.",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md"
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md"
       },
       "name": "Codex Python SDK",
       "owner_layer_id": "agent-sdks",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "pypi:openai-codex",
-      "pin": "0.159.3",
+      "pin": "0.160.0",
       "position": 3,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/openai/codex",

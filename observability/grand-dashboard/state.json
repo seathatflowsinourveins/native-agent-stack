@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "recorded_at_utc": "2026-10-03T11:54:43Z",
-  "meaning": "Recorded checkpoint adding nine gate rows for work merged through PR 622 (the 2026-10-03 retirement of the historical WSL retrieval fixture with its isolated archive scan, the new-WSL definitive defaults, local model server gate, distribution recipe, install plan and client configuration, the Mac memory qualification closure, the SDK useful-task preparation and the two-host architecture). Every other entry is carried over unchanged from the checkpoint of 2026-10-02T22:57:25Z, whose meaning was: Recorded checkpoint adding one gate for the new WSL distribution: its source selection on main is stated apart from its host qualification, which is open. Every other entry is carried over unchanged from the checkpoint of 2026-10-01T19:18:16Z, whose meaning was: Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held.",
+  "meaning": "Recorded checkpoint adding nine gate rows for work merged through PR 622 (the 2026-10-03 retirement of the historical WSL retrieval fixture with its isolated archive scan, the new-WSL definitive defaults, local model server gate, distribution recipe, install plan and client configuration, the Mac memory qualification closure, the SDK useful-task preparation and the two-host architecture). The Codex native-daemon-queue and SDK-pair gate rows come from the checkpoint of 2026-10-03T00:28:54Z, whose meaning was: Recorded checkpoint selecting repository Codex/SDK 0.160.0 with same-host native-account and gateway marker qualification. The shared launcher and daemon still run 0.159.3 until a coordinated switch. Earlier queue, Hindsight, foundation, paper and simulation evidence retains its original scope; no new-host or model-quality acceptance is claimed. Every other entry is carried over unchanged from the checkpoint of 2026-10-02T22:57:25Z, whose meaning was: Recorded checkpoint adding one gate for the new WSL distribution: its source selection on main is stated apart from its host qualification, which is open. Every other entry is carried over unchanged from the checkpoint of 2026-10-01T19:18:16Z, whose meaning was: Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held.",
   "lanes": [
     {
       "kind": "lane",
@@ -345,7 +345,7 @@
       "kind": "gate",
       "id": "codex-native-daemon-queue-20261001",
       "title": "Codex native daemon and cross-session queue",
-      "state": "0.159.3 native idle / busy / reconnect delivery passed in owned thread / no shared restart",
+      "state": "shared host still runs 0.159.3 / historical idle busy and reconnect delivery passed in owned thread / 0.160.0 selected separately / no shared restart",
       "evidence_ref": "evidence/receipts/codex-01593-native-queue-20261001.json"
     },
     {
@@ -357,10 +357,10 @@
     },
     {
       "kind": "gate",
-      "id": "sdk-pair-candidate-01593-20261001",
-      "title": "SDK and bundled CLI 0.159.3 pair qualification",
-      "state": "paired protocol and native marker passed / qualified inventory and model guards intact / 209-test run passed (32 skips) / gateway HTTP 429 held - cause unknown",
-      "evidence_ref": "evidence/artifacts/runtime-sdk-20261001/receipt.json"
+      "id": "sdk-pair-qualified-01600-20261003",
+      "title": "SDK and bundled CLI 0.160.0 pair qualification",
+      "state": "SDK/CLI 0.160.0 markers retained / compatibility_attempt / invocation and timing evidence incomplete",
+      "evidence_ref": "evidence/artifacts/runtime-sdk-20261003/receipt.json"
     },
     {
       "kind": "gate",

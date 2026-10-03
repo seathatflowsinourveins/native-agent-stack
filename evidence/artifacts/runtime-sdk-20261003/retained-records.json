@@ -1,0 +1,457 @@
+{
+  "schema_version": 1,
+  "evidence_class": "retained sanitized native records plus local replay controls",
+  "recorded_at": "2026-10-03T04:06:37.282429+00:00",
+  "records": [
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/npm-dist.json",
+      "sha256": "62d95da79ec7b999cbc2f10dd75fffc46ac01e4c3d9950e3cea7f98315979846",
+      "bytes": 204,
+      "source": "<PRIVATE_RUN_DIR>/npm-dist.json",
+      "source_sha256": "62d95da79ec7b999cbc2f10dd75fffc46ac01e4c3d9950e3cea7f98315979846",
+      "source_bytes": 204,
+      "source_mtime_utc": "2026-10-03T00:13:12.183051+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/npm-dist-linux-x64.json",
+      "sha256": "be86da1a7e99e0a435c58fe3a9a5231f770bcbf696767133c4ba56cb772cbc9e",
+      "bytes": 214,
+      "source": "<PRIVATE_RUN_DIR>/npm-dist-linux-x64.json",
+      "source_sha256": "be86da1a7e99e0a435c58fe3a9a5231f770bcbf696767133c4ba56cb772cbc9e",
+      "source_bytes": 214,
+      "source_mtime_utc": "2026-10-03T03:42:02.452005+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/npm-install.log",
+      "sha256": "f6b3015540a8faaeab0d34bc590d69ab23310b3000fe44bf48780dbb883292f1",
+      "bytes": 24,
+      "source": "<PRIVATE_RUN_DIR>/npm-install.log",
+      "source_sha256": "f6b3015540a8faaeab0d34bc590d69ab23310b3000fe44bf48780dbb883292f1",
+      "source_bytes": 24,
+      "source_mtime_utc": "2026-10-03T00:13:28.421789+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/exec-help-0.159.3.txt",
+      "sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+      "bytes": 4031,
+      "source": "<PRIVATE_RUN_DIR>/exec-help-0.159.3.txt",
+      "source_sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+      "source_bytes": 4031,
+      "source_mtime_utc": "2026-10-03T00:13:28.813812+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/exec-help-0.160.0.txt",
+      "sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+      "bytes": 4031,
+      "source": "<PRIVATE_RUN_DIR>/exec-help-0.160.0.txt",
+      "source_sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+      "source_bytes": 4031,
+      "source_mtime_utc": "2026-10-03T00:13:28.789811+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/exec-help.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "<PRIVATE_RUN_DIR>/exec-help.diff",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "source_mtime_utc": "2026-10-03T00:13:28.813812+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-native/native-canary.json",
+      "sha256": "3a972da9f28f17e7ea32dbb43851e01b4ed33af878da6a58676490acc823b259",
+      "bytes": 501,
+      "source": "<PRIVATE_RUN_DIR>/canary-native/native-canary.json",
+      "source_sha256": "3a972da9f28f17e7ea32dbb43851e01b4ed33af878da6a58676490acc823b259",
+      "source_bytes": 501,
+      "source_mtime_utc": "2026-10-03T00:15:14.443637+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-native/native-canary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "<PRIVATE_RUN_DIR>/canary-native/native-canary.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "source_mtime_utc": "2026-10-03T00:15:07.993531+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/run.py",
+      "sha256": "61df9cdc175abd76dc751cb2b24366167377c6af0f737a8eb45497d609b7cfc7",
+      "bytes": 1223,
+      "source": "<PRIVATE_RUN_DIR>/canary-gateway/run.py",
+      "source_sha256": "61df9cdc175abd76dc751cb2b24366167377c6af0f737a8eb45497d609b7cfc7",
+      "source_bytes": 1223,
+      "source_mtime_utc": "2026-10-03T00:15:25.905077+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/gateway-canary.json",
+      "sha256": "0a7b7f4e7b12122859c1e49c913de7172077b62970619f1e6dd119e00fd9c499",
+      "bytes": 468,
+      "source": "<PRIVATE_RUN_DIR>/canary-gateway/gateway-canary.json",
+      "source_sha256": "0a7b7f4e7b12122859c1e49c913de7172077b62970619f1e6dd119e00fd9c499",
+      "source_bytes": 468,
+      "source_mtime_utc": "2026-10-03T00:15:30.404406+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/gateway-canary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "<PRIVATE_RUN_DIR>/canary-gateway/gateway-canary.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "source_mtime_utc": "2026-10-03T00:15:25.905077+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-canary.sh",
+      "sha256": "5f403fd2356f2dcc7c1beba7d423f85abe769d6052000da3643add8f2e4632df",
+      "bytes": 860,
+      "source": "<PRIVATE_RUN_DIR>/canary-gateway/exec-canary.sh",
+      "source_sha256": "47463df57dc55947ab7677438c012d253474b44a65e6fd09f68fb90aba83bee0",
+      "source_bytes": 1259,
+      "source_mtime_utc": "2026-10-03T00:15:42.264421+00:00",
+      "sanitization": [
+        {
+          "field": "file_text",
+          "placeholder": "<PRIVATE_RUN_DIR>",
+          "occurrences": 7
+        }
+      ]
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-events.ndjson",
+      "sha256": "36173272d2ebc5c5a9c5c309c51fbb982c9f36bdb67de2257486da9fd6dcb326",
+      "bytes": 346,
+      "source": "<PRIVATE_RUN_DIR>/canary-gateway/exec-events.jsonl",
+      "source_sha256": "f525dfae61794c24b5570f03521ca0cd7f4f4e7eaef80df199d08d7fbe1e7e88",
+      "source_bytes": 368,
+      "source_mtime_utc": "2026-10-03T00:15:46.957285+00:00",
+      "sanitization": [
+        {
+          "field": "line[1].thread_id",
+          "placeholder": "<THREAD_ID>"
+        }
+      ]
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-last.txt",
+      "sha256": "a2cfa1ce034fbe0362560432afc64e811e169fb180c6105414829655f50ef230",
+      "bytes": 27,
+      "source": "<PRIVATE_RUN_DIR>/canary-gateway/exec-last.txt",
+      "source_sha256": "a2cfa1ce034fbe0362560432afc64e811e169fb180c6105414829655f50ef230",
+      "source_bytes": 27,
+      "source_mtime_utc": "2026-10-03T00:15:46.957285+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-stderr.txt",
+      "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "bytes": 39,
+      "source": "<PRIVATE_RUN_DIR>/canary-gateway/exec-stderr.txt",
+      "source_sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "source_bytes": 39,
+      "source_mtime_utc": "2026-10-03T00:15:42.361021+00:00",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/qualification-facts.json",
+      "sha256": "ac7e7efc086c1c9e40575f26eae4ed9e20bdcc1407ebc182ac1d8606b24aba76",
+      "bytes": 5321,
+      "source": "<PRIVATE_RUN_DIR>/qualification-facts.json",
+      "source_sha256": "a356762e6cfe6d96508ad234c4676138882960e0f9dd1951c67bec63b130555c",
+      "source_bytes": 5456,
+      "source_mtime_utc": "2026-10-03T01:16:12.147434+00:00",
+      "sanitization": [
+        {
+          "field": "$.by",
+          "placeholder": "<SESSION>",
+          "occurrences": 1
+        },
+        {
+          "field": "$.sdk_pair.lock_file",
+          "placeholder": "<PRIVATE_RUN_DIR>",
+          "occurrences": 1
+        },
+        {
+          "field": "$.sdk_pair.lock_file_repo_root",
+          "placeholder": "<PRIVATE_RUN_DIR>",
+          "occurrences": 1
+        },
+        {
+          "field": "$.limits[2]",
+          "placeholder": "<HOST>",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-native/native-canary.reconstructed.py",
+      "sha256": "45112f741da09a4b6971f4fa5a48b222bed3b61686f009d7082cc155eb242697",
+      "bytes": 894,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/invocations.json",
+      "sha256": "000b2bd95c7e0dbcac873879f3a4af09890ed2d1238a5ecf46eacd98631ab9c5",
+      "bytes": 2594,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+      "sha256": "f833f52d401d124987b19de3cdf48bfe1f1f5f169b20dc3f8a79e101c8dbd82b",
+      "bytes": 1088,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-positive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-negative.json",
+      "sha256": "56b36db8990f7d03f7559f3e790d2dde0b6d9fab8f2744ae32b42ee97728b3e1",
+      "bytes": 145,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-positive.json",
+      "sha256": "95a06d838c88db93d260d4715905f3398d6c7d3d63d588a238152d659e06257f",
+      "bytes": 148,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-negative.json",
+      "sha256": "acb5a3f3182805162e39d95b459eb341f49ab05456d8656c8a969c37bc1bbf6c",
+      "bytes": 146,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-positive.json",
+      "sha256": "71b781bb906e8cc658e18ab6de06ae20bd992ebec4a6ea2dceeb2c23984e95aa",
+      "bytes": 151,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-positive.json",
+      "sha256": "d4fa8bcb49e187b0263e0ec6f64d32bec9464237a0430e48412ea3e17ce0dff7",
+      "bytes": 150,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-positive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-positive.json",
+      "sha256": "94277e33e38ad81334c66431151ca7e0f8e5c46593623afe53d88dac54558634",
+      "bytes": 145,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-negative.json",
+      "sha256": "22bfa79885acaf96088cc44e645dd42d763d903cdaf2f7e4fcc4a788b5ca08f6",
+      "bytes": 140,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-positive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-positive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-negative.json",
+      "sha256": "3ba8ae690fe430056d0bffb2de42c18d089410cc311c065028fc6a44c2a0628e",
+      "bytes": 144,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "Local deterministic reconstruction or replay control; no new provider execution.",
+      "sanitization": []
+    }
+  ],
+  "controls": [
+    {
+      "condition": "negative",
+      "argv": [
+        "python3",
+        "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+        "evidence/artifacts/runtime-sdk-20261003/canary-native/native-canary.json",
+        "WRONG_EXPECTED_MARKER"
+      ],
+      "working_directory": "<REPOSITORY_ROOT>",
+      "exit_code": 1,
+      "started_at": "2026-10-03T04:06:37.067244+00:00",
+      "ended_at": "2026-10-03T04:06:37.093124+00:00",
+      "stdout": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-negative.json",
+      "stderr": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-negative.stderr"
+    },
+    {
+      "condition": "positive",
+      "argv": [
+        "python3",
+        "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+        "evidence/artifacts/runtime-sdk-20261003/canary-native/native-canary.json",
+        "SDK_01600_NATIVE_CANARY_OK"
+      ],
+      "working_directory": "<REPOSITORY_ROOT>",
+      "exit_code": 0,
+      "started_at": "2026-10-03T04:06:37.093467+00:00",
+      "ended_at": "2026-10-03T04:06:37.122002+00:00",
+      "stdout": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-positive.json",
+      "stderr": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-positive.stderr"
+    },
+    {
+      "condition": "negative",
+      "argv": [
+        "python3",
+        "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+        "evidence/artifacts/runtime-sdk-20261003/canary-gateway/gateway-canary.json",
+        "WRONG_EXPECTED_MARKER"
+      ],
+      "working_directory": "<REPOSITORY_ROOT>",
+      "exit_code": 1,
+      "started_at": "2026-10-03T04:06:37.122576+00:00",
+      "ended_at": "2026-10-03T04:06:37.149595+00:00",
+      "stdout": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-negative.json",
+      "stderr": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-negative.stderr"
+    },
+    {
+      "condition": "positive",
+      "argv": [
+        "python3",
+        "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+        "evidence/artifacts/runtime-sdk-20261003/canary-gateway/gateway-canary.json",
+        "SDK_01600_GATEWAY_CANARY_OK"
+      ],
+      "working_directory": "<REPOSITORY_ROOT>",
+      "exit_code": 0,
+      "started_at": "2026-10-03T04:06:37.149965+00:00",
+      "ended_at": "2026-10-03T04:06:37.176910+00:00",
+      "stdout": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-positive.json",
+      "stderr": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-positive.stderr"
+    },
+    {
+      "condition": "negative",
+      "argv": [
+        "python3",
+        "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+        "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-last.txt",
+        "WRONG_EXPECTED_MARKER"
+      ],
+      "working_directory": "<REPOSITORY_ROOT>",
+      "exit_code": 1,
+      "started_at": "2026-10-03T04:06:37.177409+00:00",
+      "ended_at": "2026-10-03T04:06:37.203453+00:00",
+      "stdout": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-negative.json",
+      "stderr": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-negative.stderr"
+    },
+    {
+      "condition": "positive",
+      "argv": [
+        "python3",
+        "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+        "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-last.txt",
+        "CLI_01600_GATEWAY_CANARY_OK"
+      ],
+      "working_directory": "<REPOSITORY_ROOT>",
+      "exit_code": 0,
+      "started_at": "2026-10-03T04:06:37.203780+00:00",
+      "ended_at": "2026-10-03T04:06:37.230140+00:00",
+      "stdout": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-positive.json",
+      "stderr": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-positive.stderr"
+    },
+    {
+      "condition": "negative",
+      "argv": [
+        "python3",
+        "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+        "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-events.ndjson",
+        "WRONG_EXPECTED_MARKER"
+      ],
+      "working_directory": "<REPOSITORY_ROOT>",
+      "exit_code": 1,
+      "started_at": "2026-10-03T04:06:37.230466+00:00",
+      "ended_at": "2026-10-03T04:06:37.255221+00:00",
+      "stdout": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-negative.json",
+      "stderr": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-negative.stderr"
+    },
+    {
+      "condition": "positive",
+      "argv": [
+        "python3",
+        "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+        "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-events.ndjson",
+        "CLI_01600_GATEWAY_CANARY_OK"
+      ],
+      "working_directory": "<REPOSITORY_ROOT>",
+      "exit_code": 0,
+      "started_at": "2026-10-03T04:06:37.255530+00:00",
+      "ended_at": "2026-10-03T04:06:37.281100+00:00",
+      "stdout": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-positive.json",
+      "stderr": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-positive.stderr"
+    }
+  ],
+  "sanitization_policy": "Replace private absolute paths, usernames, native thread/request identifiers, session and host labels with placeholders. Fields replaced are recorded per artifact; unchanged retained records keep their original bytes.",
+  "time_limit": "Native source mtimes are retained; exact original process start/end times were not recorded. Control start/end times are new local replay observations.",
+  "source_limit": "The supplied qualification-facts.json has no native heredoc source despite the contract locator claim; native source is reconstructed and cannot be certified byte-identical."
+}

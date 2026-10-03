@@ -548,7 +548,7 @@ class CodexModelTests(unittest.TestCase):
     a host supplies it, like ${SOCRATICODE_VERSION} (SocratiCodeVersionTests)."""
 
     CODEX = TEMPLATES / "codex.config.template.toml"
-    # Today's two pins sit on either side of the rule: Linux 0.159.3, macOS 0.155.1.
+    # Today's two pins sit on either side of the rule: Linux 0.160.0, macOS 0.155.1.
     EXPECTED = {"linux-x86_64": "gpt-6.1-sol", "macos-arm64": "gpt-6-astra"}
 
     def setUp(self):
@@ -586,7 +586,7 @@ class CodexModelTests(unittest.TestCase):
                          [("model", "${CODEX_MODEL}"), ("default_subagent_model", "${CODEX_MODEL}")])
 
     def test_each_platform_renders_the_model_its_pinned_codex_lists(self):
-        self.assertEqual((self.pinned("linux-x86_64"), self.pinned("macos-arm64")), ("0.159.3", "0.155.1"))
+        self.assertEqual((self.pinned("linux-x86_64"), self.pinned("macos-arm64")), ("0.160.0", "0.155.1"))
         for platform_id, model in self.EXPECTED.items():
             with self.subTest(platform=platform_id):
                 out_dir = Path(self.tmp.name) / platform_id
