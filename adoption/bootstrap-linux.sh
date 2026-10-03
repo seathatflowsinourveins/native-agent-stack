@@ -296,7 +296,10 @@ export PATH="$bin_dir:$PATH"
 exec 9>"$ecosystem_root/bootstrap.lock"
 flock -n 9 || { printf 'Another ecosystem bootstrap is running.\n' >&2; exit 1; }
 stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
+pending_migration_prefix=""
+pending_migration_dest=""
 cleanup() {
+  set +e
   # An interrupted version report leaves its probe and watchdog running in
   # their own process groups (run_version_probe, below); stop both.
   # Reaped under a silenced stderr, so bash prints no job notice for them.
@@ -304,11 +307,23 @@ cleanup() {
   for group in "${version_probe_pid:-}" "${version_watchdog_pid:-}"; do
     if [[ -n "$group" ]]; then { kill -KILL -- "-$group" && wait "$group"; } 2>/dev/null || true; fi
   done
+  if [[ -n "${pending_migration_prefix:-}" && -e "$pending_migration_prefix" && -n "${pending_migration_dest:-}" ]]; then
+    if [[ ! -e "$pending_migration_dest" ]]; then
+      mv -- "$pending_migration_prefix" "$pending_migration_dest" 2>/dev/null && pending_migration_prefix=""
+    fi
+    if [[ -n "$pending_migration_prefix" ]]; then
+      printf 'WARNING: a previous install remains at %s; restore it with: mv -- %q %q\n' \
+        "$pending_migration_prefix" "$pending_migration_prefix" "$pending_migration_dest" >&2
+    fi
+  fi
   if [[ -n "${stage_dir:-}" && "$stage_dir" == "$ecosystem_root"/staging.* && -d "$stage_dir" ]]; then
     rm -rf -- "$stage_dir"
   fi
 }
 trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
 
 verify_sha256() {
   # Prefer macOS's native checker when available; Linux also supports the
@@ -390,24 +405,399 @@ npm_package_name() {
   printf '%s\n' "$rest"
 }
 
-# $5 is the pin's ignore_scripts field as install_pin reads it ("true" or
-# "false"): "true" adds --ignore-scripts, so npm runs no lifecycle script of
-# the package or of any dependency (socraticode), as bootstrap-macos.sh's
-# install_npm does.
+canonical_path() {
+  local target="$1"
+  if [[ -e "$target" ]]; then
+    if command -v python3 >/dev/null 2>&1; then
+      local via_python3
+      via_python3="$(python3 -c 'import os, sys
+print(os.path.realpath(sys.argv[1]))' "$target" 2>/dev/null)" && [[ -n "$via_python3" ]] && {
+        printf '%s\n' "$via_python3"; return
+      }
+    fi
+    if [[ -d "$target" ]]; then
+      (cd -P -- "$target" >/dev/null 2>&1 && pwd -P) && return
+    fi
+  fi
+  # $target does not exist (or every canonicalizer above failed): walk up to
+  # the nearest existing ancestor, canonicalize only that, and reattach the
+  # non-existent remainder unchanged -- matching os.path.realpath's own
+  # semantics for a path whose tail has not been created yet.
+  local remainder="" walk="$target"
+  while [[ "$walk" != "/" && -n "$walk" && ! -e "$walk" ]]; do
+    if [[ -z "$remainder" ]]; then
+      remainder="$(basename -- "$walk")"
+    else
+      remainder="$(basename -- "$walk")/$remainder"
+    fi
+    walk="$(dirname -- "$walk")"
+  done
+  local canonical_walk="$walk"
+  if [[ -d "$walk" ]]; then
+    canonical_walk="$(cd -P -- "$walk" >/dev/null 2>&1 && pwd -P)" || canonical_walk="$walk"
+  fi
+  if [[ -n "$remainder" ]]; then
+    printf '%s/%s\n' "$canonical_walk" "$remainder"
+  else
+    printf '%s\n' "$canonical_walk"
+  fi
+}
+
+prune_old_version() {
+  local id="$1" version="$2" target="$3"
+  [[ -n "$target" ]] || return 0
+  local canonical_tools canonical_target
+  canonical_tools="$(canonical_path "$ecosystem_root/tools")"
+  canonical_target="$(canonical_path "$target")"
+  if [[ ! -d "$canonical_target" ]]; then
+    printf 'Note: leaving %s in place (not a directory after resolving symlinks; not pruned for safety).\n' \
+      "$target" >&2
+    return 0
+  fi
+  if [[ "$(dirname -- "$canonical_target")" != "$canonical_tools" ]]; then
+    printf 'Note: leaving %s in place (resolves to %s, not directly under %s; not pruned for safety).\n' \
+      "$target" "$canonical_target" "$canonical_tools" >&2
+    return 0
+  fi
+  local base="${canonical_target##*/}"
+  case "$base" in
+    "$id-$version-"*) : ;;
+    *)
+      printf 'Note: leaving %s in place (resolved name %s does not match %s-%s-<stamp>; not pruned for safety).\n' \
+        "$target" "$base" "$id" "$version" >&2
+      return 0
+      ;;
+  esac
+  rm -rf -- "$canonical_target" 2>/dev/null \
+    || printf 'Note: failed to prune superseded %s; left in place (not fatal).\n' "$canonical_target" >&2
+}
+
+# Ported from bootstrap-macos.sh at 511168f4a: Node-resolved replacement,
+# deferred lifecycle scripts and the recoverable atomic prefix publication.
+# Linux additionally enforces the registry SHA-512 integrity and installed
+# executable SHA-256 pins. The wrapper's unverified optional fetch is never
+# published or executed before the verified dependency replaces it.
+install_platform_dependency() {
+  local id="$1" prefix="$2" wrapper_ignore_scripts="${3:-false}"
+  prefix="$(canonical_path "$prefix")"
+  local dep
+  dep="$(jq -c --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")"
+  [[ -n "$dep" && "$dep" != "null" ]] || return 0
+  local dep_name dep_url dep_sha256 dep_version dep_resolved_package
+  dep_name="$(jq -r '.name' <<<"$dep")"
+  dep_url="$(jq -r '.url' <<<"$dep")"
+  dep_sha256="$(jq -r '.sha256' <<<"$dep")"
+  dep_version="$(jq -r '.version' <<<"$dep")"
+  dep_resolved_package="$(jq -r '.resolved_package' <<<"$dep")"
+  if [[ "$dep_sha256" == "null" || -z "$dep_sha256" ]]; then
+    printf 'Refusing %s: platform dependency %s has no verified sha256 in %s (fail closed).\n' \
+      "$id" "$dep_name" "$pins_path" >&2
+    exit 1
+  fi
+  local archive="$cache_dir/${id}-platform-dependency.tgz"
+  fetch "$dep_url" "$dep_sha256" "$archive"
+  local dep_integrity
+  dep_integrity="$(jq -r '.integrity // empty' <<<"$dep")"
+  [[ "$dep_integrity" == sha512-* ]] || {
+    printf 'Refusing %s: platform dependency %s has no supported sha512 integrity pin (fail closed).\n' \
+      "$id" "$dep_name" >&2
+    exit 1
+  }
+  # npm registry SRI is SHA-512 over the archive bytes, independently of
+  # fetch()'s SHA-256 check. Stream the archive rather than loading it whole.
+  if ! python3 -c '
+import base64, hashlib, sys
+digest = hashlib.sha512()
+with open(sys.argv[1], "rb") as archive:
+    for chunk in iter(lambda: archive.read(1024 * 1024), b""):
+        digest.update(chunk)
+actual = "sha512-" + base64.b64encode(digest.digest()).decode("ascii")
+sys.exit(0 if actual == sys.argv[2] else 1)
+' "$archive" "$dep_integrity"; then
+    printf 'Refusing %s: platform dependency %s integrity mismatch (fail closed).\n' \
+      "$id" "$dep_name" >&2
+    exit 1
+  fi
+
+  local wrapper_url package
+  wrapper_url="$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .url' "$pins_path")"
+  package="$(npm_package_name "$wrapper_url")"
+  local wrapper_dir="$prefix/lib/node_modules/$package"
+  local expected_nested="$wrapper_dir/node_modules/$dep_name/package.json"
+  local resolved=""
+  resolved="$(node -e '
+    try {
+      console.log(require.resolve(process.argv[1] + "/package.json", { paths: [process.argv[2]] }));
+    } catch (error) {
+      process.exit(1);
+    }
+  ' "$dep_name" "$wrapper_dir" 2>/dev/null)" || resolved=""
+  # Node already realpath-resolves symlinks when it locates a module (unless
+  # --preserve-symlinks is set), so this is normally a no-op; canonicalizing
+  # it here too, independently of $expected_nested's own canonical prefix,
+  # is the "realpath what Node reports" half of the fix -- belt and braces
+  # against a Node build or flag where that default does not hold.
+  [[ -n "$resolved" ]] && resolved="$(canonical_path "$resolved")"
+
+  local target_dir
+  if [[ "$resolved" == "$expected_nested" ]]; then
+    target_dir="$(dirname -- "$resolved")"
+    rm -rf -- "$target_dir"
+  else
+    # Node's require.resolve, even given an explicit `paths` array, still
+    # searches its GLOBAL_FOLDERS fallback (NODE_PATH entries,
+    # $HOME/.node_modules, etc. -- Node's own module docs) -- measured
+    # directly: setting NODE_PATH to a decoy directory made this resolve
+    # OUTSIDE the prefix entirely. Only the EXACT nested path this wrapper's
+    # own node_modules would use is ever trusted enough to delete; anything
+    # else (a genuinely absent nested copy, a platform mismatch, or a decoy
+    # resolved from outside the prefix) falls back to a top-level alias
+    # inside this prefix, never touching whatever `resolved` actually named.
+    target_dir="$prefix/lib/node_modules/$dep_name"
+  fi
+  mkdir -p "$target_dir"
+  local extract_dir="$stage_dir/${id}-platform-dependency"
+  rm -rf -- "$extract_dir"
+  mkdir -p "$extract_dir"
+  tar -xzf "$archive" -C "$extract_dir"
+  cp -R "$extract_dir/package/." "$target_dir/"
+  rm -rf -- "$extract_dir"
+
+  local verify
+  verify="$(node -e '
+    const fs = require("fs");
+    const resolvedPath = require.resolve(process.argv[1] + "/package.json", { paths: [process.argv[2]] });
+    // fs.realpathSync canonicalizes both sides explicitly here (not the
+    // shell-side canonical_path helper): resolvedPath normally already has
+    // every symlink resolved by require.resolve itself, and argv[3] was
+    // built from the bash-canonicalized target_dir variable, but a
+    // symlinked ancestor introduced between the two calls (or a Node build
+    // with --preserve-symlinks) must not defeat this fail-closed comparison
+    // either way.
+    const expectedPath = fs.realpathSync(process.argv[3]);
+    const canonicalResolvedPath = fs.realpathSync(resolvedPath);
+    if (canonicalResolvedPath !== expectedPath) {
+      console.error("resolved to " + canonicalResolvedPath + ", expected " + expectedPath);
+      process.exit(1);
+    }
+    const pkg = require(resolvedPath);
+    console.log(pkg.version);
+    console.log(pkg.name);
+  ' "$dep_name" "$wrapper_dir" "$target_dir/package.json" 2>&1)" || {
+    printf 'Refusing %s: platform dependency %s does not resolve to %s after installing the verified copy (fail closed): %s\n' \
+      "$id" "$dep_name" "$target_dir/package.json" "$verify" >&2
+    exit 1
+  }
+  local verify_version verify_name
+  verify_version="$(sed -n '1p' <<<"$verify")"
+  verify_name="$(sed -n '2p' <<<"$verify")"
+  if [[ "$verify_version" != "$dep_version" ]]; then
+    printf 'Refusing %s: platform dependency %s resolves as version %s, pinned as %s (fail closed).\n' \
+      "$id" "$dep_name" "$verify_version" "$dep_version" >&2
+    exit 1
+  fi
+  if [[ "$verify_name" != "$dep_resolved_package" ]]; then
+    printf 'Refusing %s: platform dependency %s resolves with package.json name %s, pinned resolved_package is %s (fail closed).\n' \
+      "$id" "$dep_name" "$verify_name" "$dep_resolved_package" >&2
+    exit 1
+  fi
+  printf 'Installed and verified platform dependency %s@%s (%s) for %s (resolves from %s)\n' \
+    "$dep_name" "$verify_version" "$verify_name" "$id" "$wrapper_dir"
+
+  if [[ "$wrapper_ignore_scripts" != "true" ]]; then
+    # npm's own documented way to run the lifecycle scripts the
+    # --ignore-scripts install (in install_npm) deferred, now that the
+    # dependency it resolves is the verified one. --ignore-scripts=false is
+    # explicit: a user-level .npmrc with ignore-scripts=true would otherwise
+    # make this call return early without running anything.
+    npm rebuild --global --no-audit --no-fund --ignore-scripts=false --prefix "$prefix" "$package" >/dev/null
+
+    local binary_check
+    binary_check="$(jq -c '.postinstall_binary_check // empty' <<<"$dep")"
+    if [[ -n "$binary_check" && "$binary_check" != "null" ]]; then
+      # A wrapper whose own postinstall copies/hard-links from the platform
+      # dependency into its own bin/ (claude-code's install.cjs) can only be
+      # confirmed by comparing what actually landed there against the
+      # already fully verified source, byte for byte -- cmp works whether
+      # install.cjs used a hardlink or fell back to a plain copy.
+      local platform_file wrapper_file
+      platform_file="$(jq -r '.platform_file' <<<"$binary_check")"
+      wrapper_file="$(jq -r '.wrapper_file' <<<"$binary_check")"
+      if ! cmp -s "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file"; then
+        printf 'Refusing %s: %s does not match the verified %s byte for byte after npm rebuild (fail closed; a lifecycle script may have used an unverified source).\n' \
+          "$id" "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file" >&2
+        exit 1
+      fi
+      printf 'Verified %s is byte-identical to the verified platform dependency binary %s\n' \
+        "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file"
+    fi
+  fi
+
+  # The npm wrapper launches this platform executable at runtime. Check the
+  # installed bytes after any rebuild, before install_npm publishes a link.
+  local installed_binary_check binary_file binary_sha256 installed_binary
+  installed_binary_check="$(jq -c '.installed_binary_check // empty' <<<"$dep")"
+  binary_file="$(jq -r '.path // empty' <<<"$installed_binary_check")"
+  binary_sha256="$(jq -r '.sha256 // empty' <<<"$installed_binary_check")"
+  if [[ -z "$binary_file" || ! "$binary_sha256" =~ ^[0-9a-f]{64}$ ]]; then
+    printf 'Refusing %s: platform dependency %s has no verified installed binary pin (fail closed).\n' \
+      "$id" "$dep_name" >&2
+    exit 1
+  fi
+  installed_binary="$(canonical_path "$target_dir/$binary_file")"
+  if [[ "$installed_binary" != "$(canonical_path "$target_dir")/"* || ! -f "$installed_binary" || ! -x "$installed_binary" ]] \
+      || ! printf '%s  %s\n' "$binary_sha256" "$installed_binary" | verify_sha256; then
+    printf 'Refusing %s: installed binary %s is missing, outside its verified package, or has a SHA-256 mismatch (fail closed).\n' \
+      "$id" "$binary_file" >&2
+    exit 1
+  fi
+  printf 'Verified installed binary %s SHA-256 before publishing %s\n' "$binary_file" "$id"
+}
+
 install_npm() {
   local id="$1" version="$2" url="$3" sha256="$4" ignore_scripts="${5:-false}"
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
-  local prefix="$ecosystem_root/tools/$id-$version"
-  mkdir -p "$prefix"
+  # final_prefix is deliberately NEVER canonicalized (round 3d fix): once a
+  # platform_dependency install has run once, it is a SYMLINK (see below),
+  # and canonical_path would resolve straight through it to whatever
+  # versioned directory it currently targets -- silently defeating the
+  # entire point of it being a stable, never-resolved name. ecosystem_root
+  # is already canonical by the time the top-level script reaches here (see
+  # its own canonicalization above); the one path that still genuinely
+  # needs canonical_path for install_platform_dependency's sake is the
+  # versioned prefix itself, canonicalized separately below.
+  local final_prefix="$ecosystem_root/tools/$id-$version"
   local package
   package="$(npm_package_name "$url")"
+  local has_platform_dependency=0
+  if [[ "$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")" != "" ]]; then
+    has_platform_dependency=1
+  fi
+
+  local prefix="$final_prefix"
+  if [[ "$has_platform_dependency" == 1 ]]; then
+    # Round 3d (Codex): rounds 3b/3c's rename-aside-then-move-in swap was
+    # only ever RECOVERABLE, not atomic, and the recovery itself had two
+    # more bugs -- an unchecked rollback `mv` that could itself fail
+    # silently, and no coverage at all for a signal landing between the
+    # rename and reporting success. This replaces it with the Homebrew
+    # Cellar/opt pattern: final_prefix becomes a SYMLINK to a versioned,
+    # never-reused directory (tools/<id>-<version>-<stamp>), installed here
+    # BEFORE it is ever live. bin_dir's own symlinks point into
+    # final_prefix/bin/* (unchanged below) and so transparently follow
+    # final_prefix through this extra indirection -- they never need to be
+    # re-created when a later install flips final_prefix to a new target.
+    # Flipping final_prefix is then a SINGLE rename(2) of one symlink over
+    # another (via python3's os.replace, already used for integrity
+    # verification above -- and, unlike `ln -sfn`, a genuine
+    # single-syscall rename rather than an unlink-then-symlink pair), so at
+    # every instant final_prefix resolves to the complete old tree or the
+    # complete new one, never neither.
+    local stamp
+    stamp="$(date -u +%Y%m%d%H%M%S)-$$"
+    prefix="$final_prefix-$stamp"
+  fi
+  mkdir -p "$prefix"
+  prefix="$(canonical_path "$prefix")"
+
   local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
-  if [[ "$ignore_scripts" == "true" ]]; then
+  if [[ "$ignore_scripts" == "true" || "$has_platform_dependency" == 1 ]]; then
+    # A platform_dependency needs the wrapper's own lifecycle scripts
+    # deferred until install_platform_dependency has replaced whatever npm
+    # auto-fetched with the verified copy; see that function's comment.
     npm_install_args+=(--ignore-scripts)
   fi
   npm install "${npm_install_args[@]}" "$archive" >/dev/null
+  if [[ "$has_platform_dependency" == 1 ]]; then
+    install_platform_dependency "$id" "$prefix" "$ignore_scripts"
+
+    # --- Atomic-flip recovery step table (round 3e) -------------------------
+    # INT, TERM and HUP are explicitly trapped (script-wide, "exit N" only;
+    # see the top-level trap block) so bash always defers a caught signal
+    # until whatever foreign command (mv, ln, python3, rm) is currently
+    # running actually finishes -- every "On a signal here" cell below is
+    # therefore identical to "On failure here": a signal can only ever be
+    # acted on at a step boundary, never mid-step.
+    # Step                                    | On failure or a signal here
+    # 1. mkdir versioned dir, npm install,    | final_prefix untouched; the new versioned directory is an orphan
+    #    install_platform_dependency (above)  | (never referenced), safe to ignore or prune
+    # 2. one-time migration: mv a REAL        | pending_migration_prefix set; final_prefix now absent, previous
+    #    final_prefix aside (only when it     | install moved aside but not yet restored -- top-level cleanup()
+    #    predates this design and is not      | (trap, script-wide) moves it back onto pending_migration_dest if
+    #    already a symlink)                   | that destination is still free; reports the exact manual `mv`
+    #                                         | otherwise
+    # 3. readlink final_prefix (only when     | read-only; nothing mutated. The value read here is UNVERIFIED
+    #    already a symlink) -> previous_ver-  | (an external or "../" target, or one this run does not own) and
+    #    ioned                                | is never trusted directly -- see step 6
+    # 4. ln -s new versioned dir -> tmp_link  | tmp_link absent or partial; final_prefix untouched. Harmless:
+    #    (a NEW symlink under stage_dir)      | tmp_link lives under stage_dir, removed wholesale by cleanup()
+    # 5. os.replace(tmp_link, final_prefix)   | rename(2) either completes or does not begin; a failed call never
+    #    -- THE atomic step                   | touches final_prefix at all. On failure, tmp_link is removed and
+    #                                         | any pending migration is left for cleanup() to restore
+    # 6. prune_old_version(previous_versioned | best-effort ONLY, never fails the install: deletes previous_
+    #    or migration_prefix) -- only after   | versioned ONLY when its canonical form is a direct child of the
+    #    step 5 already succeeded             | canonical tools/ directory with a name matching <id>-<version>-*
+    #                                         | (rejects an external target, a relative "../" target, a wrong-
+    #                                         | name target, and a symlink loop, which canonical_path resolves
+    #                                         | without hanging and which then simply fails these checks); a
+    #                                         | rejected or failed deletion is logged and left in place, never
+    #                                         | escalated. migration_prefix (this run's own, already known-safe)
+    #                                         | skips the ownership check but is equally best-effort
+    # -------------------------------------------------------------------------
+    local migration_prefix=""
+    if [[ -e "$final_prefix" && ! -L "$final_prefix" ]]; then
+      migration_prefix="${final_prefix}.migrating.$$"
+      # Set BEFORE the mv, not after: a signal landing exactly between the
+      # mv completing and the next script line would otherwise reach
+      # cleanup() with pending_migration_prefix still empty, unable to find
+      # what it should restore even though the mv itself already succeeded.
+      # Harmless the other way around (signalled before the mv even starts):
+      # cleanup() only acts once pending_migration_prefix actually exists on
+      # disk.
+      pending_migration_prefix="$migration_prefix"
+      pending_migration_dest="$final_prefix"
+      mv -- "$final_prefix" "$migration_prefix"
+    fi
+
+    local previous_versioned=""
+    if [[ -L "$final_prefix" ]]; then
+      previous_versioned="$(readlink -- "$final_prefix")"
+      case "$previous_versioned" in
+        /*) : ;;
+        *) previous_versioned="$ecosystem_root/tools/$previous_versioned" ;;
+      esac
+    fi
+
+    local tmp_link="$stage_dir/${id}-${version}-link.$$"
+    rm -f -- "$tmp_link"
+    ln -s -- "$prefix" "$tmp_link"
+    if python3 -c '
+import os, sys
+os.replace(sys.argv[1], sys.argv[2])
+' "$tmp_link" "$final_prefix"; then
+      if [[ -n "$migration_prefix" ]]; then
+        # This run's own, already known-safe (we created it above); still
+        # best-effort, never fatal, matching prune_old_version's own
+        # contract.
+        rm -rf -- "$migration_prefix" 2>/dev/null \
+          || printf 'Note: failed to prune the migrated-aside %s; left in place (not fatal).\n' "$migration_prefix" >&2
+        pending_migration_prefix=""
+        pending_migration_dest=""
+      fi
+      if [[ -n "$previous_versioned" ]]; then
+        prune_old_version "$id" "$version" "$previous_versioned"
+      fi
+    else
+      rm -f -- "$tmp_link"
+      printf 'Failed to flip %s to the newly installed %s %s (fail closed).\n' \
+        "$final_prefix" "$id" "$version" >&2
+      exit 1
+    fi
+    prefix="$final_prefix"
+  fi
+
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do

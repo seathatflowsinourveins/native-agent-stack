@@ -359,7 +359,7 @@
       "kind": "gate",
       "id": "sdk-pair-qualified-01600-20261003",
       "title": "SDK and bundled CLI 0.160.0 pair qualification",
-      "state": "strict-hash sync and pip check passed / native SDK plus gateway SDK and CLI markers completed on this host / backend unobserved / no new-host or quality claim",
+      "state": "SDK/CLI 0.160.0 markers retained / compatibility_attempt / invocation and timing evidence incomplete",
       "evidence_ref": "evidence/artifacts/runtime-sdk-20261003/receipt.json"
     }
   ],

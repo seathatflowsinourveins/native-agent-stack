@@ -55,13 +55,26 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0.tgz",
       "sha256": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a",
-      "install_note": "npm registry tarball for @openai/codex@0.160.0 (thin wrapper package, 4,902 bytes); the downloaded bytes match npm dist.integrity sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg== and this row's SHA256. Registry signature and attestation metadata are present, but verification was not recorded for this promotion. A private-prefix npm install selected @openai/codex@0.160.0-linux-x64; its native binary SHA256 is 12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad, matching the SDK's bundled binary. The coordinator qualified strict-hash SDK/CLI 0.160.0 installation and native-account SDK, gateway SDK and gateway CLI marker canaries (evidence/artifacts/runtime-sdk-20261003/receipt.json). The upstream scripts/install/install.sh and app-server-daemon/README.md at rust-v0.160.0, commit a956835d020762cb2b570053af06f643a11c0ecc, are unchanged from rust-v0.159.3. The portable Linux bootstrap supports `npm install --global --prefix tools/codex-0.160.0 <verified codex-0.160.0.tgz>` and relinks its bin entry; applying that bootstrap to an existing identity wrapper needs the host's serialized launcher ownership. The shared host launcher, daemon and production prefix still run 0.159.3 until a coordinated switch. The host's existing daemon_auto_start is enabled and its 0.159.3 daemon updater is disabled and pinned; adoption/templates/codex.config.template.toml remains an opt-in portable baseline with daemon_auto_start false. The earlier queue and Hindsight receipts qualify only 0.159.3; this 0.160.0 evidence is same-host route and pair qualification, not new-host or model-quality acceptance.",
+      "install_note": "npm registry tarball for @openai/codex@0.160.0 (thin wrapper package, 4,902 bytes); the downloaded bytes match npm dist.integrity sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg== and this row's SHA256. Registry signature and attestation metadata are present, but verification was not recorded for this promotion. A private-prefix npm install selected @openai/codex@0.160.0-linux-x64; its native binary SHA256 is 12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad, matching the SDK's bundled binary. The coordinator recorded strict-hash SDK/CLI 0.160.0 installation facts and completed native-account SDK, gateway SDK and gateway CLI marker canaries (evidence/artifacts/runtime-sdk-20261003/receipt.json). The upstream scripts/install/install.sh and app-server-daemon/README.md at rust-v0.160.0, commit a956835d020762cb2b570053af06f643a11c0ecc, are unchanged from rust-v0.159.3. The portable Linux bootstrap supports `npm install --global --prefix tools/codex-0.160.0 <verified codex-0.160.0.tgz>` and relinks its bin entry; applying that bootstrap to an existing identity wrapper needs the host's serialized launcher ownership. The shared host launcher, daemon and production prefix still run 0.159.3 until a coordinated switch. The host's existing daemon_auto_start is enabled and its 0.159.3 daemon updater is disabled and pinned; adoption/templates/codex.config.template.toml remains an opt-in portable baseline with daemon_auto_start false. The earlier queue and Hindsight receipts qualify only 0.159.3; this 0.160.0 evidence is a same-host compatibility attempt with retained outputs and discriminating controls; original SDK invocation/source and process timing evidence is incomplete, so native_cli_e2e, new-host and model-quality acceptance remain unestablished. bootstrap-linux.sh installs the wrapper with lifecycle scripts deferred, replaces the Node-resolved optional package with the independently SHA-256/SHA-512 verified platform_dependency archive, checks package identity/version and the installed executable SHA-256, then atomically publishes the prefix and launcher. A mismatch fails closed before publication.",
       "version_probe": {
         "method": "exec",
         "command": "codex",
         "args": [
           "--version"
         ]
+      },
+      "platform_dependency": {
+        "name": "@openai/codex-linux-x64",
+        "resolved_package": "@openai/codex",
+        "version": "0.160.0-linux-x64",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0-linux-x64.tgz",
+        "sha256": "37a41d61c3399182b8c727b77090cc7a1566bd849d0f09070a0bbc6fec4c58dc",
+        "integrity": "sha512-KI/73OqGrHmR18s7ya7E1NqV6rT0y3lxr0s8S1qR2m6zU6QRF/HlR529jALLh5vjdUnsRT4Ahoxt0axb4kY99g==",
+        "checksum_ref": "npm view @openai/codex@0.160.0 optionalDependencies maps this alias to npm:@openai/codex@0.160.0-linux-x64; evidence/artifacts/runtime-sdk-20261003/npm-dist-linux-x64.json retains the registry URL and integrity (2026-10-03). The coordinator downloaded 163273896 bytes and independently matched SHA-256 and SHA-512; the archive executable SHA-256 matches the recorded installed and bundled CLI.",
+        "installed_binary_check": {
+          "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+          "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad"
+        }
       }
     },
     {

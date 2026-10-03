@@ -2113,7 +2113,7 @@
           {
             "id": "runtime-sdk-20261003",
             "path": "evidence/receipts/runtime-sdk-20261003.json",
-            "kind": "native_cli_e2e"
+            "kind": "compatibility_attempt"
           }
         ],
         "retained_operation_ids": [],

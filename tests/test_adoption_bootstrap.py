@@ -911,7 +911,8 @@ def run_install_pin(test: unittest.TestCase, tmp_path: Path, pin: dict, served: 
     harness = tmp_path / "install-pin-harness.sh"
     harness.write_text(
         "set -Eeuo pipefail\n"
-        + shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "npm_package_name", "install_npm",
+        + shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "canonical_path", "prune_old_version",
+                          "npm_package_name", "install_platform_dependency", "install_npm",
                           "install_uv_tool", "install_pin")
         + f"pins_path={shlex.quote(str(pins_path))}\n"
         + f"ecosystem_root={shlex.quote(str(eco))}\n"
