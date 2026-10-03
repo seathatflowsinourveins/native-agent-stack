@@ -400,12 +400,18 @@ def default_slot_inventory(data, catalogs):
 
 
 def consensus_slots(data):
-    """(slot, layer) of each row that the layer-consensus record adds; none where the manifest names no such record."""
+    """(slot, layer) of each row that the layer-consensus record adds, in its first batch (add_rows) and its wave-2 batch
+    (wave2.add_rows, 2026-10-03); none where the manifest names no such record."""
     consensus = data.get("consensus")
     require(consensus is None or isinstance(consensus, dict), "defaults manifest consensus source must be an object")
+    wave2 = (consensus or {}).get("wave2")
+    require(wave2 is None or isinstance(wave2, dict), "defaults manifest consensus wave-2 batch must be an object")
     rows = (consensus or {}).get("add_rows", [])
-    require(isinstance(rows, list) and all(isinstance(row, dict) and isinstance(row.get("slot_id"), str)
-                                           and isinstance(row.get("layer_id"), str) for row in rows),
+    added = (wave2 or {}).get("add_rows", [])
+    require(isinstance(rows, list) and isinstance(added, list), "defaults manifest consensus rows must be lists")
+    rows = rows + added
+    require(all(isinstance(row, dict) and isinstance(row.get("slot_id"), str)
+                and isinstance(row.get("layer_id"), str) for row in rows),
             "defaults manifest consensus source needs slot and layer identifiers")
     return [(row["slot_id"], row["layer_id"]) for row in rows]
 
@@ -523,6 +529,10 @@ def read_default_decisions(inputs, reference, override=None):
     counts = {"layers": len(layers), "slots": len(identifiers),
               "definitive": sum(slot["definitive"] for slot in value["slots"]),
               "by_row_kind": kinds, "by_state": states, "installed": installed}
+    if value.get("consensus_wave2") is not None:
+        # Amendment 3 of the decision rule (the layer consensus's wave-2 batch): the rows that carry an interim install,
+        # counted apart from the decided installs, as the producer counts them.
+        counts["interim"] = sum(1 for slot in value["slots"] if slot.get("interim"))
     require(value["counts"] == counts, "defaults manifest counts differ from its records")
     return {"source": DEFAULTS_MANIFEST,
             "status": "supplied-preview" if override is not None else "published-source",
@@ -941,8 +951,10 @@ def inventory_sentence(counts):
     """One sentence of counts, every one of them computed from the manifest's rows."""
     states = ", ".join(f"{state} {counts['by_state'][state]}" for state in STATE_ORDER if state in counts["by_state"])
     kinds = ", ".join(f"{kind} {count}" for kind, count in sorted(counts["by_row_kind"].items()))
+    interim = (f" {counts['interim']} of the slots that install nothing by their decided default carry an interim install "
+               "(amendment 3 of the decision rule)." if counts.get("interim") else "")
     return (f"The manifest holds {counts['slots']} slots in {counts['layers']} layers. By state: {states}. "
-            f"By row kind: {kinds}. {counts['installed']} slots install something and {counts['not_installed']} install nothing. "
+            f"By row kind: {kinds}. {counts['installed']} slots install something and {counts['not_installed']} install nothing.{interim} "
             f"Measurements not yet returned: {counts['measurements_pending']}; returned: {counts['measurements_returned']}.")
 
 
@@ -1005,7 +1017,7 @@ def render_markdown(data):
         lines += ["## Slot default decisions", "", f"Source: {link(defaults['source'])}; {defaults['status']}.", "",
                   defaults["metadata"]["meaning"], "", defaults["metadata"]["not_claimed"], "",
                   inventory_sentence(defaults["inventory"]), "",
-                  "An empty source state is displayed as open. A row that installs nothing by the manifest's own rule (a default, and not installs_nothing_extra) is shown as not installed, with the manifest's reason; that includes every split row, every measurement row whose measurement has not returned and every row resolved as not installed. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.", ""]
+                  "An empty source state is displayed as open. A row that installs nothing by the manifest's own rule (a default, and not installs_nothing_extra) is shown as not installed, with the manifest's reason; that includes every split row, every measurement row whose measurement has not returned and every row resolved as not installed. A row that carries an interim install (amendment 3 of the decision rule) is shown with that install, beside its decided default's reason. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.", ""]
         if defaults["inventory"]["by_row_kind"].get("consensus") or defaults["inventory"]["amendments"]:
             lines += ["A row of kind `consensus` was added by a recorded direct consensus of the two model families; its source basis says so and it is never definitive. An amendment by direct consensus is listed under its layer's table and changes no field of its row. "
                       f"Rows of kind consensus: {defaults['inventory']['by_row_kind'].get('consensus', 0)}; amendments: {defaults['inventory']['amendments']}.", ""]
@@ -1036,7 +1048,12 @@ def render_markdown(data):
                 recommendation = record["default"] or "none"
                 if record["repository"]:
                     recommendation = f"[{recommendation}]({record['repository']})"
+                interim = record.get("interim")
                 install = "installed" if slot["installed"] else "not installed: " + slot["not_installed_reason"]
+                if not slot["installed"] and isinstance(interim, dict) and interim.get("default"):
+                    # Amendment 3: the row installs its interim meanwhile; its own decision still waits, for the reason shown.
+                    install = (f"interim install ({interim['date_utc']}, amendment 3): [{interim['default']}]"
+                               f"({interim['repository']}); its decided default is {install}")
                 lines.append("| " + " | ".join(map(cell, [
                     record["slot_id"], slot["state"], record["job"], recommendation, install,
                     record["repository"] or "none", record["resolution"]["outcome"], record["label"],

@@ -1313,24 +1313,28 @@ uv remains a recorded limit. Available status does not make the runner the defau
 
 **Gateway (GW): one matrix.** Covered HTTP targets are literal `http` requests to
 `127.0.0.1`, `localhost`, `[::1]`, `10.0.2.2` or `host.docker.internal`, on ports
-20128 and 20129. Recognized scheme-less client targets use HTTP. Each covered
+20128 and 20129 (the workstation's two gateways) and 21128 and 21129 (the new WSL
+distribution's single-port gateway and its live-dashboard WebSocket, added on
+2026-10-03 before that gateway holds accounts; wave-2 custody ruling, change 11).
+21128 takes the rows of 20128; 21129 serves no management route, so no row names
+it. Recognized scheme-less client targets use HTTP. Each covered
 `/api/` request refuses `gateway_credential_route` unless the complete request
 matches one row. The rows never override another guard rule.
 
 | Effective method | Exact path | Ports | Query | Body condition |
 | --- | --- | --- | --- | --- |
-| GET | `/api/health` | both | absent | — |
-| GET | `/api/settings/compression` | both | absent | — |
-| GET | `/api/context/combos` | both | absent | — |
-| GET | `/api/model-capability-overrides` | both | absent | — |
-| GET | `/api/resilience` | both | absent | — |
-| GET | `/api/settings/feature-flags` | both | absent | — |
-| GET | `/api/cache` | both | absent | — |
-| GET | `/api/analytics/compression` | both | absent or exactly `since=all` | — |
-| GET | `/api/usage/call-logs` | both | absent, or `limit`/`offset` below | — |
-| GET | `/api/usage/call-logs/<id>` | both | absent | — |
-| GET | `/api/usage/provider-limits` | 20128 only | absent | no body |
-| POST | `/api/usage/provider-limits` | 20128 only | absent | no body |
+| GET | `/api/health` | 20128, 20129, 21128 | absent | — |
+| GET | `/api/settings/compression` | 20128, 20129, 21128 | absent | — |
+| GET | `/api/context/combos` | 20128, 20129, 21128 | absent | — |
+| GET | `/api/model-capability-overrides` | 20128, 20129, 21128 | absent | — |
+| GET | `/api/resilience` | 20128, 20129, 21128 | absent | — |
+| GET | `/api/settings/feature-flags` | 20128, 20129, 21128 | absent | — |
+| GET | `/api/cache` | 20128, 20129, 21128 | absent | — |
+| GET | `/api/analytics/compression` | 20128, 20129, 21128 | absent or exactly `since=all` | — |
+| GET | `/api/usage/call-logs` | 20128, 20129, 21128 | absent, or `limit`/`offset` below | — |
+| GET | `/api/usage/call-logs/<id>` | 20128, 20129, 21128 | absent | — |
+| GET | `/api/usage/provider-limits` | 20128, 21128 | absent | no body |
+| POST | `/api/usage/provider-limits` | 20128, 21128 | absent | no body |
 | POST | `/api/compression/preview` | 20129 only | absent | permitted |
 
 `<id>` is one ASCII `[A-Za-z0-9-]{1,64}` segment. Collection call-log queries have
@@ -1338,7 +1342,7 @@ matches one row. The rows never override another guard rule.
 D is ASCII `[0-9]{1,5}`. Extra/duplicate parameters, empty values, a bare `?`,
 child paths, fragments, userinfo, percent escapes and noncanonical/dynamic suffixes
 do not acquire an exception. POST provider-limits performs a live quota-cache
-synchronization; it is deliberately authorized with no body on 20128. Preview
+synchronization; it is deliberately authorized with no body on 20128 and 21128. Preview
 is 20129-only. Body absence is explicit: even an empty string, object or body-file
 option is body-present; no file is opened to decide this.
 
