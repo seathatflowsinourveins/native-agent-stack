@@ -17,6 +17,10 @@
 # - A preflight in upstream's own Config fails closed, before any network call: Config falls back to its built-in
 #   defaults (the tavily retriever and other models) when the file is missing (config.py L158-170).
 # - Only --report_type research_report runs; detailed_report reaches the embeddings route (research change 5).
+# - The research run keeps a 1500-second watchdog. Its timer is resolved before the scrub, from the caller's PATH, and run
+#   by absolute path, since the scrubbed PATH (/usr/bin:/bin) has no timeout on macOS: GNU coreutils' timeout, else
+#   gtimeout, the name Homebrew's coreutils gives it there. With neither, the research run fails closed (exit 1) before it
+#   starts; --preflight-only does not need one.
 # No credential is read or printed. It prints the upstream CLI's output, then "run directory: <path>".
 # GPTR_CONFIG_SOURCE names another configuration to copy (the tests use it); the preflight holds any copy to the same rule.
 set -euo pipefail
@@ -34,6 +38,11 @@ query="$1"
 if [[ ! -x "$python" || ! -f "$checkout/cli.py" ]]; then
   printf 'GPT Researcher is not installed under %s (install plan row research-harnesses).\n' "$checkout" >&2
   exit 1
+fi
+# type -P searches PATH for an executable file only (no alias, function or builtin); a relative PATH entry is anchored here.
+timer="$(type -P timeout || type -P gtimeout || true)"
+if [[ -n "$timer" && "$timer" != /* ]]; then
+  timer="$PWD/$timer"
 fi
 run="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/research/gptr/$(date -u +%Y%m%dT%H%M%SZ)-$$"
 install -d -m 700 "$run" "$run/home"
@@ -87,8 +96,12 @@ if [[ "$query" == --preflight-only ]]; then
   printf 'preflight passed\nrun directory: %s\n' "$run"
   exit 0
 fi
+if [[ -z "$timer" ]]; then
+  printf 'No supported timer for the 1500-second watchdog of the research run: neither timeout (GNU coreutils) nor gtimeout (Homebrew coreutils) is on PATH. The research did not start.\n' >&2
+  exit 1
+fi
 status=0
-"${scrub[@]}" timeout 1500 "$python" "$checkout/cli.py" "$query" --report_type research_report --tone objective --no-pdf --no-docx \
+"${scrub[@]}" "$timer" 1500 "$python" "$checkout/cli.py" "$query" --report_type research_report --tone objective --no-pdf --no-docx \
   || status=$?
 printf 'run directory: %s\n' "$run"
 exit "$status"

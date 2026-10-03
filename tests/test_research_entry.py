@@ -19,6 +19,14 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "tools/research/gpt_researcher.sh"
 CONFIG = ROOT / "tools/research/gpt-researcher.config.json"
 GATEWAY = "http://127.0.0.1:21128/v1"
+# The host timer, found as the wrapper finds its own: GNU coreutils' timeout on PATH, else gtimeout, Homebrew coreutils'
+# name for it on macOS. macOS has no timeout in /usr/bin or /bin (run 37141171758: exit 127, "env: timeout: No such file or
+# directory"), and the GitHub runner image of the CI's macos-15 label lists neither coreutils, timeout nor gtimeout
+# (actions/runner-images: README.md L34 at a99056ad maps macos-15 to macOS 15 Arm64; images/macos/macos-15-arm64-Readme.md
+# at f95c0c79 and images/macos/macos-15-Readme.md at 07cc2190, section Utilities).
+TIMER = shutil.which("timeout") or shutil.which("gtimeout")
+NO_TIMER = ("no supported timer on PATH (timeout from GNU coreutils, or gtimeout from Homebrew coreutils), so the research "
+            "run fails closed here; test_the_run_fails_closed_without_a_supported_timer covers that")
 
 STAND_IN_CONFIG = textwrap.dedent('''
     import json
@@ -68,6 +76,7 @@ class ResearchEntry(unittest.TestCase):
         (checkout / "cli.py").write_text(STAND_IN_CLI)
         (checkout / ".venv/bin").mkdir(parents=True)
         os.symlink(sys.executable, checkout / ".venv/bin/python")
+        self.checkout = checkout
         self.env = {"HOME": str(self.temp / "home"), "PATH": os.environ["PATH"], "XDG_DATA_HOME": str(self.temp / "data"),
                     "XDG_STATE_HOME": str(self.temp / "state"), "RETRIEVER": "tavily", "LEAKED_PARENT_VARIABLE": "x"}
 
@@ -82,6 +91,20 @@ class ResearchEntry(unittest.TestCase):
     @staticmethod
     def run_dir(result):
         return Path(next(line for line in result.stdout.splitlines() if line.startswith("run directory: "))[15:])
+
+    def provide_timer(self):
+        """(path, record) of the timer this fixture puts first on the wrapper's PATH: a `timeout` that writes how it was run
+        to `record` (the run's environment is scrubbed, so the path is written into the program) and then runs TIMER."""
+        if TIMER is None:
+            self.skipTest(NO_TIMER)
+        timer_bin = self.temp / "timer-bin"
+        timer_bin.mkdir()
+        record = self.temp / "timer-call"
+        (timer_bin / "timeout").write_text(f"#!/bin/sh\nprintf '%s\\n' \"$0\" \"$@\" > '{record}'\nexec '{TIMER}' \"$@\"\n",
+                                           encoding="utf-8")
+        (timer_bin / "timeout").chmod(0o755)
+        self.env["PATH"] = f"{timer_bin}{os.pathsep}{self.env['PATH']}"
+        return timer_bin / "timeout", record
 
     def test_the_committed_configuration_is_the_measured_one_without_a_key(self):
         config = json.loads(CONFIG.read_text())
@@ -120,8 +143,14 @@ class ResearchEntry(unittest.TestCase):
                 self.assertNotIn("Report written", result.stdout)
 
     def test_the_run_is_research_report_only_in_a_scrubbed_environment(self):
+        timer, record = self.provide_timer()
         result = self.run_script("Ubuntu 26.04 WSL news this month")
         self.assertEqual(result.returncode, 0, result.stderr)
+        # The watchdog: the CLI runs under the timer found before the scrub, run by its absolute path, with 1500 seconds.
+        self.assertEqual(record.read_text().splitlines(),
+                         [str(timer), "1500", str(self.checkout / ".venv/bin/python"), str(self.checkout / "cli.py"),
+                          "Ubuntu 26.04 WSL news this month", "--report_type", "research_report", "--tone", "objective",
+                          "--no-pdf", "--no-docx"])
         self.assertIn("Report written to 'outputs/report.md'", result.stdout)
         call = json.loads((self.run_dir(result) / "cli-call.json").read_text())
         self.assertEqual(call["argv"], ["Ubuntu 26.04 WSL news this month", "--report_type", "research_report", "--tone",
@@ -134,6 +163,26 @@ class ResearchEntry(unittest.TestCase):
         self.assertEqual(env["HOME"], str(self.run_dir(result) / "home"))
         self.assertEqual(env["CONFIG_PATH"], str(self.run_dir(result) / "config.json"))
         self.assertEqual(Path(call["cwd"]), self.run_dir(result))
+
+    def test_the_run_fails_closed_without_a_supported_timer(self):
+        """Negative control: with neither timeout nor gtimeout on the caller's PATH, as on macOS without Homebrew's coreutils,
+        the research run stops with exit 1 and names the missing timer. It does not drop the watchdog, and it does not reach
+        a bare lookup in the scrubbed run (macOS run 37141171758: exit 127, "env: timeout: No such file or directory")."""
+        bare = self.temp / "bin-without-a-timer"
+        bare.mkdir()
+        for name in ("bash", "env", "dirname", "date", "install"):  # what the wrapper runs from PATH before the research
+            found = shutil.which(name)
+            if found is None:
+                self.skipTest(f"needs {name} to run the wrapper")
+            (bare / name).symlink_to(found)
+        self.env["PATH"] = str(bare)
+        result = self.run_script("Ubuntu 26.04 WSL news this month")
+        self.assertNotEqual(result.returncode, 127, result.stderr)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("No supported timer for the 1500-second watchdog", result.stderr)
+        self.assertIn("neither timeout (GNU coreutils) nor gtimeout (Homebrew coreutils) is on PATH", result.stderr)
+        self.assertNotIn("Report written", result.stdout)
+        self.assertEqual(list((self.temp / "state").rglob("cli-call.json")), [])  # the CLI never started
 
     def test_the_script_names_no_other_report_type(self):
         code = "\n".join(line for line in SCRIPT.read_text().splitlines() if not line.lstrip().startswith("#"))
