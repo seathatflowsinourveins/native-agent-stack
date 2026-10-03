@@ -11,7 +11,9 @@ route:
         scope: equities-broker
       receiver: local-ntfy
       continue: false
-    # Codex lane alerts: critical ones reach the alert topic, the rest go to a quiet topic (ntfy priority low).
+    # Codex lane alerts: critical ones reach the alert topic, the rest go to their own topic, which can be muted on its own.
+    # No ntfy priority is set: with template=alertmanager, ntfy 2.28.0 renders without the query priority
+    # (server/server_template.go L58, L103 at 10cb6506), so a priority parameter would be a promise it does not keep.
     - match:
         scope: codex-lanes
         severity: critical
@@ -28,5 +30,5 @@ receivers:
         send_resolved: true
   - name: local-ntfy-lanes
     webhook_configs:
-      - url: 'http://127.0.0.1:18080/ecosystem-lanes?template=alertmanager&priority=low'
+      - url: 'http://127.0.0.1:18080/ecosystem-lanes?template=alertmanager'
         send_resolved: true

@@ -435,7 +435,9 @@ class CodexLaneRouteTests(unittest.TestCase):
         self.assertRoute("local-ntfy", "alertname=CodexLaneUsageLimited", "scope=codex-lanes", "severity=critical")
         self.assertRoute("local-ntfy", "scope=equities-broker", "severity=warning")
         self.assertRoute("local-ntfy", "scope=local-ecosystem", "severity=warning")
-        self.assertIn("/ecosystem-lanes?template=alertmanager&priority=low", self.config.read_text())
+        self.assertIn("/ecosystem-lanes?template=alertmanager'", self.config.read_text())
+        # ntfy 2.28.0 ignores a query priority in template mode (server_template.go L58, L103 at 10cb6506), so none is promised.
+        self.assertNotIn("priority=", self.config.read_text())
 
 
 if __name__ == "__main__":
