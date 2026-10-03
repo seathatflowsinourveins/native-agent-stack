@@ -1554,7 +1554,8 @@ for the five reference measurements. A clean later sample can resolve timing
 noise; three identical quadratic helper rounds of 10, 40 and 160 ms remain
 rejected at host factors 1.0, 2.6 and 4.0. The timed `check()` calls of the
 helper rounds and the nesting probe, which run inside the test process, run
-with the cyclic garbage collector disabled and its prior state restored, as
+with the cyclic garbage collector disabled, so no collection of any generation
+runs inside a timed window, and with its prior state restored, as
 [`timeit.Timer.timeit` does by default](https://docs.python.org/3/library/timeit.html#timeit.Timer.timeit)
 ([source](https://github.com/python/cpython/blob/58ed60b7415e218ce3d608302e39b5e55bfb0e88/Lib/timeit.py#L177-L183)),
 because a full collection costs in proportion to the whole test process's heap,
