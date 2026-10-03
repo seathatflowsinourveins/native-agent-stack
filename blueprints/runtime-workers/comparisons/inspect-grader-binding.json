@@ -31,7 +31,7 @@
     "parse_failure": "Missing grade, malformed multi-letter grade, off-menu grade or P when partial_credit=false returns native Score.unscored(reason=grader_failed). Preserve the native record and classify the entire task-repeat block infrastructure-invalid under shared-execution-contract.json.",
     "coverage": "Require zero UNSCORED/error records and exactly the frozen expected sample count before any quality decision. Native metrics exclude UNSCORED values; an aggregate accuracy alone cannot prove full coverage.",
     "required_negative_controls": ["missing grade", "malformed CI grade", "off-menu grade", "unoffered partial grade", "wrong source", "wrong attribution", "unsupported material claim", "missing source", "temporal violation", "incorrect numeric value", "wrong unit", "wrong denominator"],
-    "test_status": "Inspect 0.3.273 unchanged mock controls: pytest 0, 15 passed, one trio skip. Shared QA parser and Chat-header control covered; live grader, Responses headers, rubric and complete usage unqualified."
+    "test_status": "Inspect 0.3.273 unchanged mock controls after dependency-readiness repair: pytest 0, 15 passed, one trio skip. Shared QA parser and Chat-header control covered; live grader, Responses headers, rubric and complete usage unqualified."
   },
   "usage": {
     "authoritative_scope": "Each distinct original provider attempt, including grader helpers, retries, failures and interruptions. A correlated aggregate substitutes only after its complete nonoverlapping coverage is established. Missing usage remains unknown.",

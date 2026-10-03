@@ -9211,8 +9211,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "c54fea783ad25e64531de36a4fd8702350a0c6c36f5ee80a863fcd8279f7ae42",
-      "bytes": 19639
+      "sha256": "0f3d23fd3071edbe97f1c5fb6892ddc44ed57aebf2cebf4b59bc0bdb08ed37e0",
+      "bytes": 19758
     },
     {
       "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
@@ -9231,8 +9231,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/inspect-grader-binding.json",
-      "sha256": "c556812eda7553076ec9fd41abf88b04055a0e73858cd0688eb060040e5f76b9",
-      "bytes": 5044
+      "sha256": "915c893862f27ccba5691e7427b012de737d6a90b3a4f17cd2e5976c01167a17",
+      "bytes": 5078
     },
     {
       "path": "blueprints/runtime-workers/comparisons/multi-worker-draft.json",
@@ -9261,8 +9261,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
-      "sha256": "307101c01a8fb1cfdda44cbd7d91d29defd7a9ee579b77ff93635cdb690a4363",
-      "bytes": 7437
+      "sha256": "b3f199d285bb478a113e6085634aa74c853acbfc405f2c56f98416c8fdce1da5",
+      "bytes": 7498
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
@@ -15061,8 +15061,8 @@
     },
     {
       "path": "catalogs/foundation/runtime-jobs.json",
-      "sha256": "5afe18ee069caf4d41abb52b74ef3ac3e9157384a7aa4bbba46a9af2fe8f3ef9",
-      "bytes": 19862
+      "sha256": "c8b6cac81e22d992296124ebaadf17c05079fe8153578b0e055cbe8753ae8018",
+      "bytes": 19898
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -42016,8 +42016,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-primitive-preflight.json",
-      "sha256": "bd323d13dff35c0e3c6021b37a8fe5b5908267aa47fb26ef8c69ea9846ec8cea",
-      "bytes": 26995
+      "sha256": "1c63f491a66e553c3e9efb98e6a4d4a292769ec79c5e1815fd085148e51347c1",
+      "bytes": 27166
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-diagnostics.json",
@@ -42036,8 +42036,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-source-and-native-readiness.json",
-      "sha256": "8eb44ebfbb0e07485373d33843b0519fbb4795c266b461189bee38c97ea8258f",
-      "bytes": 25271
+      "sha256": "9d0fc2bd7ff199fe4bad1a566bb56926dbd2280f97ecc84807571ca747881af1",
+      "bytes": 25493
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-manifests.json",
@@ -42251,8 +42251,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-followup-20261003.json",
-      "sha256": "4c59408b92fe0b944d057491cf61efcc1de5edd6260756ad586fb9d944464c97",
-      "bytes": 33096
+      "sha256": "b290189a077273bb2aa469c0d4f46c86207c79cc17e9486bf50105f16770a5f6",
+      "bytes": 40518
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-judgments.json",
@@ -42266,8 +42266,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/scheduler-native-controls.json",
-      "sha256": "c1cf75255f9b782f77c9dd585a17c1effd3f4aceb75d06eda4917ecbe9da3f67",
-      "bytes": 57619
+      "sha256": "5762a989640f451d1393b2e4953b957ea9ec1f8f06602b9d49975599f2136b30",
+      "bytes": 57662
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-read.json",

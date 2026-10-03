@@ -93,7 +93,7 @@
   },
   "usage": {
     "authoritative_aggregate": "Exactly one native or owner-returned complete aggregate per arm/attempt, named before freeze",
-    "efficiency_metric": "uncached input tokens plus output tokens",
+    "efficiency_metric": "Original gross input minus original cache reads only, plus original output; output includes reasoning",
     "required_cache_read_for_metric": true,
     "cache_write_for_metric": "Optional reported breakdown; preserve missing as null. Unknown writes do not by themselves block gross-minus-known-read plus output, but no complete cache or cost claim follows",
     "metric_formula": "For each distinct provider attempt i: U_i=reported_gross_input_i-reported_cached_read_i; M=sum_i(U_i+reported_output_i), output includes reasoning",

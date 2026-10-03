@@ -355,7 +355,7 @@
       }
     },
     "thread_options": {
-      "model": "cx/gpt-6.1-sol",
+      "model": "cx/gpt-6.1-sol-ultra",
       "modelReasoningEffort": "ultra",
       "threadSource": "<frozen-role-job-classification>",
       "workingDirectory": "<owned-useful-task-cwd>",
@@ -369,7 +369,8 @@
     "stop_conditions": "unbound useful task/oracle, unavailable scoped provider window, effective model/effort unknown, failed terminal/tool effect, unexpected credentials/state access or missing complete native cache counters",
     "retry_contract": "no zero-retry claim; record all actual attempts and usage, including native retry behavior",
     "cache_control_scope": "the no-cache header is a gateway semantic response-cache bypass, not upstream prompt-cache isolation; actual headers, compression application and complete native cache counts still require request-matched observations",
-    "gateway_scope": "source-supported request fields only; current-process build, effective provider/model/Ultra and control application remain unqualified"
+    "gateway_scope": "source-supported request fields only; current-process build, effective provider/model/Ultra and control application remain unqualified",
+    "proposal_correction": "The unexecuted proposal previously named cx/gpt-6.1-sol. It now matches the catalog's cx/gpt-6.1-sol-ultra alias; neither proposal establishes delivered route, Ultra or role acceptance."
   },
   "sdk_617_boundary": {
     "pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/617",

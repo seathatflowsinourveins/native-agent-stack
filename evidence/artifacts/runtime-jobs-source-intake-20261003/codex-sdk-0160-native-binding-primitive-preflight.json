@@ -632,7 +632,8 @@
     {
       "kind": "Original ordinary-object metadata gate failure",
       "receipt": "codex-sdk-0160-native-binding-preflight.json",
-      "commit": "94e8b6a64c8d3e101e553d85053cd207d684b61d",
+      "worker_commit": "94e8b6a64c8d3e101e553d85053cd207d684b61d",
+      "commit_scope": "Historical worker receipt provenance, not an assertion of PR633 ancestry; public history comparison returned404 without an ancestry result",
       "bytes": 17142,
       "sha256": "aca0cc66e5fdf573f322a4de74f74e30f3a3cfc74a5ca3d1ec6be6e0972407ba",
       "native_observer_exit": 0,

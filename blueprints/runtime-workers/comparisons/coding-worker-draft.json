@@ -266,7 +266,7 @@
       "complete input",
       "complete output",
       "cached input subset",
-      "uncached input or original fields allowing exact derivation",
+      "Original gross input, original cache reads and original output with preserved presence/types, allowing exact G-R+O derivation; normalized uncached input is not an operand witness",
       "reasoning output subset when delivered",
       "authoritative complete aggregate identity",
       "main/child/helper coverage",

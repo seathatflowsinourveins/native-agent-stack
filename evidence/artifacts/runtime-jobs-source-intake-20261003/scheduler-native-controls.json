@@ -1078,7 +1078,7 @@
     "worker_original_sources_rehashed": true,
     "source_paths": [
       "dagucloud/dagu@3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7:internal/cmn/config/loader.go179–183,1969–1977,2439–2445",
-      "golang/go@go1.27.0:src/os/file.go605–614",
+      "golang/go@8af21751f066eced273ca3ce49506b366847c623 (go1.27.0):src/os/file.go605–614",
       "containers/bubblewrap@2a76602a8c71f36c1527cf9fc3417d9149822e0c:bubblewrap.c2488–2496,3427"
     ],
     "mechanism": "Repair mode omits outer env-i/native clearenv, then native bwrap unsets every inherited variable name except HOME after strict name validation; public runtime/test variables are set explicitly. Native namespace contains only declared variables, HOME and bwrap-generated PWD.",
