@@ -13,6 +13,7 @@
         "The first native review timed out without a verdict. The completed review exceeded its 450-word constraint with 566 words and reported an internal Claude Fable 5.1 advisor alongside Opus 5.5.",
         "Native policy agreement and peer acknowledgement do not establish implementation, runtime or CI acceptance. The model reviewed base revision 999eebd; independent source controls qualify the subsequent implementation.",
         "Two of 193 affected source tests skipped: no frozen workflow exemptions existed, and PyYAML was unavailable. The text workflow parser was tested. Nine portable-default tests also passed.",
+        "The first archive publication head 122700335726e9782633ce13a03d5c08cc99e1b8 failed four Linux full-suite assertions: missing documentary lock binding, stale source quotation and two generic-effort expectations. Narrow documentation/test corrections preserve the guard, scanner policy, actual template, explicit Max roles and historical evidence; this failed head is not counted as accepted.",
         "The native three-part SARIF controller uses the exact inventory and pinned scanner, but does not execute GitHub's Bash mapfile block or upload SARIF. Exact workflow execution remains a fresh CI gate.",
         "The installed Codex 0.160.0 default service tier and Sol/Ultra fields were source/schema checked without a model request. The generic Ultra template correction does not qualify older portable pins, SDK routes or explicit Max profiles.",
         "Full-stack readiness remains false. Surviving workstation, account, historical-data fitness, native paper faults and broader lifecycle gates retain their separate ownership and acceptance requirements.",
@@ -15907,6 +15908,11 @@
       "bytes": 10110
     },
     {
+      "path": "docs/decisions/2026-09-30-task-model-routing.md",
+      "sha256": "13f434565c93b8b287a7ae3d0b6ab9a0eb254411367b01b0c49e0bbd9d1dfea5",
+      "bytes": 42715
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
       "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
       "bytes": 8312
@@ -15968,8 +15974,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-wsl-retrieval-archive.md",
-      "sha256": "cadf4733be8e660fa1b821bc7237af8015348689037f5c549c4d9ea40c6b779c",
-      "bytes": 4669
+      "sha256": "0c4b8023143444a07810034012f833e6718de3c3d1c161c72560d22dbf9ec461",
+      "bytes": 4839
     },
     {
       "path": "docs/direct-results.md",
@@ -48003,8 +48009,8 @@
     },
     {
       "path": "evidence/receipts/north-star-publication-security-convergence-20261002.json",
-      "sha256": "e49fc239ce8d35c1fcb1455d495edea0799b97777a5a9cff77c33f517d3e0319",
-      "bytes": 7616
+      "sha256": "dedbd113f698a83fa8b19733f0180699d7e5084c499ee9525b9894e54edbf014",
+      "bytes": 9553
     },
     {
       "path": "evidence/receipts/notification-types-20260929.json",
@@ -50045,6 +50051,11 @@
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
+    },
+    {
+      "path": "tests/test_task_model_routing.py",
+      "sha256": "5d5744bf187ed8aa99501e67c3f07a2b07f49fa55b3c03e340bd673227736ad1",
+      "bytes": 23395
     },
     {
       "path": "tests/test_token_e2e_grader.py",

@@ -3,6 +3,9 @@
 The September 20 WSL retrieval record is incomplete historical evidence. Its
 experiment remains `defer`, with no qualification runs. Its immutable lock pins
 QMD 2.8.3 → fast-glob 3.3.3 → micromatch 4.0.8 → braces 3.0.3.
+The exact unchanged lock is
+`blueprints/convergence-practice/wsl-retrieval/package-lock.json`, SHA256
+`5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`.
 
 The [advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) describes stack
 exhaustion from attacker-controlled deeply nested brace patterns. At the

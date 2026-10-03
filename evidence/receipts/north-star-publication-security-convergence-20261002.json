@@ -11,12 +11,13 @@
     "The first native review timed out without a verdict. The completed review exceeded its 450-word constraint with 566 words and reported an internal Claude Fable 5.1 advisor alongside Opus 5.5.",
     "Native policy agreement and peer acknowledgement do not establish implementation, runtime or CI acceptance. The model reviewed base revision 999eebd; independent source controls qualify the subsequent implementation.",
     "Two of 193 affected source tests skipped: no frozen workflow exemptions existed, and PyYAML was unavailable. The text workflow parser was tested. Nine portable-default tests also passed.",
+    "The first archive publication head 122700335726e9782633ce13a03d5c08cc99e1b8 failed four Linux full-suite assertions: missing documentary lock binding, stale source quotation and two generic-effort expectations. Narrow documentation/test corrections preserve the guard, scanner policy, actual template, explicit Max roles and historical evidence; this failed head is not counted as accepted.",
     "The native three-part SARIF controller uses the exact inventory and pinned scanner, but does not execute GitHub's Bash mapfile block or upload SARIF. Exact workflow execution remains a fresh CI gate.",
     "The installed Codex 0.160.0 default service tier and Sol/Ultra fields were source/schema checked without a model request. The generic Ultra template correction does not qualify older portable pins, SDK routes or explicit Max profiles.",
     "Full-stack readiness remains false. Surviving workstation, account, historical-data fitness, native paper faults and broader lifecycle gates retain their separate ownership and acceptance requirements.",
     "Whole-task usage, failed-request settlement, escaped-descendant cleanup, billing and net savings remain unknown. Raw sessions, personal paths and authentication/configuration details remain private."
   ],
-  "recorded_at_utc": "2026-10-03T01:25:06Z",
+  "recorded_at_utc": "2026-10-03T02:04:35Z",
   "evidence_class": "Bounded native policy convergence, independent source validation and task-local pinned scanner measurements.",
   "data": {
     "decision_unit": "north-star-publication-security-archive-20261002",
@@ -72,7 +73,24 @@
         "skips": 0,
         "raw_log_sha256": "3921368d4b06b167db0687c7fab224b266acd85af0a6ffdb5f7628886825ee42"
       },
-      "negative_controls": "Actual QMD entrypoint refusal and guard-removal, metadata, lock, expiry and scope mutants reject before recorder effects; no QMD benchmark or model execution."
+      "negative_controls": "Actual QMD entrypoint refusal and guard-removal, metadata, lock, expiry and scope mutants reject before recorder effects; no QMD benchmark or model execution.",
+      "failure_contract_correction": {
+        "handoff_sha256": "e47759a13a3313290c05366aad1184fb6921971e8f103bcc1e9b780e29d22bb7",
+        "source_parent_revision": "122700335726e9782633ce13a03d5c08cc99e1b8",
+        "tests": 22,
+        "seconds": 0.722,
+        "exit_code": 0,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "test_log_sha256": "2cc0e961b299555609f71bd314527afff463649b711b83d3f32f17150927be02",
+        "protected_source_files_verified": 135,
+        "correction_paths": [
+          "docs/decisions/2026-10-02-wsl-retrieval-archive.md",
+          "docs/decisions/2026-09-30-task-model-routing.md",
+          "tests/test_task_model_routing.py"
+        ]
+      }
     },
     "scanner": {
       "version": "2.6.0",
@@ -112,6 +130,25 @@
         "reports_retained": 3,
         "upload_executed": false
       }
+    },
+    "ci_failure_history": {
+      "source_head": "122700335726e9782633ce13a03d5c08cc99e1b8",
+      "linux": {
+        "tests": 9848,
+        "seconds": 1427.112,
+        "failures": 4,
+        "errors": 0,
+        "skips": 972,
+        "exit_code": 1,
+        "raw_log_sha256": "dc15440d9b1f9b05bfd0565e6f929f442e40a5cb567bd8c4056b63199a2ae19d"
+      },
+      "failed_methods": [
+        "test_each_grant_is_recorded_by_the_receipt_it_names",
+        "test_every_quoted_value_is_in_its_cited_file",
+        "test_the_user_template_renders_on_each_platform_the_model_its_rows_name (Linux and macOS subcases)"
+      ],
+      "repair_scope": "Full immutable lock-path/hash citation and current generic Ultra source/test expectations, preserving explicit Max and legacy-model boundaries.",
+      "macos": "pending_original_run"
     }
   },
   "provenance": {
