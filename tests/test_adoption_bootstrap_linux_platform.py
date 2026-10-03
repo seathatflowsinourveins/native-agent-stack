@@ -15,6 +15,7 @@ from pathlib import Path
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -26,6 +27,13 @@ NODE = shutil.which("node")
 PYTHON = shutil.which("python3")
 BINARY_PATH = "vendor/x86_64-unknown-linux-musl/bin/codex"
 VERIFIED_BINARY = b"#!/bin/sh\nprintf 'VERIFIED_PLATFORM_BINARY\\n'\n"
+
+
+GNU_ONLY = unittest.skipUnless(
+    sys.platform.startswith("linux"),
+    "bootstrap-linux.sh relies on GNU coreutils and util-linux (mv -T, flock, sha256sum); "
+    "the macOS bootstrap has its own suite (tests.test_adoption_bootstrap_macos)",
+)
 
 
 class LinuxPlatformPinTests(unittest.TestCase):
@@ -408,6 +416,7 @@ class LinuxPlatformDependencyTests(unittest.TestCase):
             executed = subprocess.run([str(eco / "bin/widget")], capture_output=True, text=True, timeout=10)
             self.assertEqual((executed.returncode, executed.stdout), (0, "VERIFIED_PLATFORM_BINARY\n"))
 
+    @GNU_ONLY
     def test_failed_swap_restores_migrated_install_and_removes_unpublished_prefix(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -480,6 +489,7 @@ class LinuxPlatformDependencyTests(unittest.TestCase):
                 self.assertFalse((root / "npm.log").exists(), "platform verification must precede npm")
 
 
+@GNU_ONLY
 @unittest.skipUnless(os.geteuid() != 0, "bootstrap requires a normal user")
 class LinuxPrerequisiteTests(unittest.TestCase):
     def test_missing_python3_names_the_prerequisite_before_any_write(self):
