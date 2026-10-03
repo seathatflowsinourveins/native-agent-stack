@@ -47,8 +47,8 @@ Integrating the three units aligned the workflow with the oracle's run contract:
 ### Fix round before the first push (2026-10-03)
 
 A final verifier, an evidence reviewer and a security reviewer found the frozen oracle looser than the record. Each
-fix below landed before any push, and committed tests cover all seven items. Each test fails against the behaviour of
-the previous head `b0b89d1d`, the integrated head before this round:
+fix below landed before any push, and committed tests cover all seven items. Each fix has tests that fail against the
+behaviour of the previous head `b0b89d1d`, the integrated head before this round:
 
 - Items 1 to 6 are covered by `test_compare.py`. Run against `b0b89d1d`'s oracle, workflow and `make_fixtures.py`,
   every test added for them fails.
@@ -96,15 +96,21 @@ The coordinator's last review before the first push added these changes, each be
    positions, gives one failing `_FailedTest`, a `Ran 2 tests` line, exit status 1 and a co-listed module that still
    runs. The import also leaves no partly loaded blueprint in `sys.modules`. The suite under trial is unchanged; the
    trial workflow does not run this file.
-4. **Known macOS-only failures named.** Three tests failed on macOS only in this repository's CI from 2026-09-25 to
-   2026-10-02, as timing, signal or node-suite failures:
+4. **Known macOS-only failures named.** Three tests recur among the macOS-only failures of this repository's CI from
+   2026-09-25 to 2026-10-02, as timing, signal or node-suite failures:
    - `tests.test_secret_path_guard.K4GuardTests.test_k4_timing`;
    - the SIGQUIT subtest of `tests.test_credential_run.ProcessTests.test_exit_code_and_signal_propagate`;
    - `tests.test_child_usage_suite.ChildUsageNodeSuite.test_node_suite_passes`.
 
-   The source is plan W2's measurement: 30 macOS-only failures among 1,025 pull-request head SHAs. The record now names
-   them. A mismatch on one of them still counts under the zero-tolerance rule and is triaged against that history. The
-   verdict logic is unchanged.
+   The source is plan W2's measurement: 30 macOS-only failures among 1,025 pull-request head SHAs, with the failing
+   tests named for 17 of them (15 read by the measuring agent, 2 by the coordinator). Seven of those 17 runs are the
+   ones listed above. The other 10 itemized runs named other tests (for example
+   `tests.test_adoption_bootstrap.RtkConfigReminderTests`, the OpenHands resolver tests and
+   `tests.test_credential_run.InjectionTests`) and the other 13 SHAs were not itemized, so these three ids are not a
+   complete list of macOS-only failing tests, and whether a given failure is a flake or a Darwin-specific defect is not
+   established. Run 36752399506, counted above as a node-suite failure, also failed five `tests.test_currency_due`
+   tests. The record now names the three ids. A mismatch on one of them still counts under the zero-tolerance rule and
+   is triaged against that history. The verdict logic is unchanged.
 5. **The unpooled preference confirmed.** The coordinator confirmed the plan's "prefer P3F if within 10% of P3", for
    P3F over P3 and for L4F over L4.
 6. **Merge fallback.** After any change of the trial base, `ids.py` runs on the new base, and the six B1 classes must
@@ -115,11 +121,18 @@ The coordinator's last review before the first push added these changes, each be
    - The only conflicts were in `manifests/evidence.json`, in the three commits that only registered files. Each
      became empty with `main`'s copy and was dropped, and one registration built from `main`'s manifest ends the
      branch.
-   - Every other file of the branch is byte-identical to its version before the rebase, except
-     `.github/osv-scanner-lockfiles.json`, which keeps `main`'s new entry beside the two trial locks.
-   - `TRIAL_BASE_SHA` and the record's `base_revision` moved to `e88d59e4`.
+   - Apart from the re-basing described next, every file of the branch is byte-identical to its version before the
+     rebase, except `.github/osv-scanner-lockfiles.json`, which keeps `main`'s new entry beside the two trial locks.
+   - The re-basing commit moved `TRIAL_BASE_SHA` and the record's `base_revision` to `e88d59e4`. It also rewrote
+     SHA-bearing comments and prose: one comment in the workflow, four comment lines in `compare.py`, two comments in
+     `test_compare.py`, the docstring of `test_b1_failure_mode.py`, and passages of `README.md`, `experiment.json`
+     and this record. No rule, command or oracle constant changed: in `compare.py`, `test_compare.py` and
+     `test_b1_failure_mode.py` only comments and prose changed, so their hashes moved with the base.
    - `ids.py` lists 9,823 ids on `e88d59e4` and on the rebased head. The six B1 classes hold exactly 29 ids there, and
      `check_id_mapping` on the two inventories is ok, with no difference beyond the B1 prefix.
+   - `main` moved on to `652c15ac` (#620) before the push. The branch was not rebased again: `git merge-tree` reported
+     no conflict, the head does not carry #620, and the workflow checks out the pull request's head commit, so the
+     inventory still maps `e88d59e4` onto the head.
 
    The commit ids `b0b89d1d` and `aab78b12` in this record name local commits from before the rebase, which were
    never pushed. The rebased commits "Record the suite-parallelism trial decision (preregistered, nothing adopted)" and
@@ -208,13 +221,23 @@ The record holds the full text; in short:
   arm jobs plus controls): for pull requests the paths filter compares the three-dot diff against the merge base,
   which always contains the new workflow.
 - After the first push, do not rebase or merge `main` into PR-T unless you must. The inventory maps the trial base
-  `e88d59e4` onto the head, so a head carrying newer `main` commits fails the id mapping and gets no verdict.
+  `e88d59e4` onto the head, so a head that carries newer `main` commits fails the id mapping when those commits change
+  test ids, and then gets no verdict. Newer `main` commits alone change nothing, because the workflow checks out the
+  pull request's head commit.
 - GitHub runs no `pull_request` workflow on a pull request with a merge conflict. PR-T can conflict in
   `manifests/evidence.json`, and with open #615, which also edits `.github/osv-scanner-lockfiles.json`. If a merge is
-  unavoidable, follow the hot-file protocol (`docs/lanes.md`), set `TRIAL_BASE_SHA` to the new merge base and refreeze
-  `experiment.json` in the same commit. After changing the base SHA, run `ids.py` on the new base and confirm that the
-  six B1 classes of `tests/test_native_maintenance.py` still hold exactly 29 ids. If they do not, update `B1_CLASSES`,
-  `B1_IDS` and their comment in `compare.py`, and `B1_SHAPE` in `test_compare.py`, in the same refreeze commit.
+  unavoidable, follow the hot-file protocol (`docs/lanes.md`) and re-base the trial in one commit:
+  - Replace every occurrence of the old base SHA with the new merge base, and keep the mentions that are historical on
+    purpose: `TRIAL_BASE_SHA` and its comment in the workflow; `base_revision` and every passage of `experiment.json`
+    that names the trial base, the quality rule's B1 source and the inventory command among them; the B1 comments in
+    `compare.py` and `test_compare.py`; the docstring of `test_b1_failure_mode.py`; the passages of `README.md` and of
+    this record that name the trial base.
+  - Run `ids.py` on the new base and on the head, and confirm with `check_id_mapping` of `compare.py` that the two
+    inventories differ only by the B1 prefix rewrite and that the six B1 classes of `tests/test_native_maintenance.py`
+    still hold exactly 29 ids. If they do not, update `B1_CLASSES`, `B1_IDS` and their comment in `compare.py`, and
+    `B1_SHAPE` in `test_compare.py`, in the same commit.
+  - Refreeze `experiment.json` and register the changed files in `manifests/evidence.json` as the branch's last
+    commit.
 - Before every push, run `python3 scripts/validate.py` and
   `python3 scripts/validate_convergence.py --all-recorded --root . --json`. The workflow, the locks, the controls, the
   oracle and the B1 fix are frozen inputs of the record.

@@ -393,8 +393,8 @@ These are local integration evidence:
   depends on the active warning filter could differ, and the oracle would
   count that as a mismatch against S. Such a mismatch is triaged against this
   stated cause.
-- Three tests failed on macOS only in this repository's CI from 2026-09-25
-  to 2026-10-02, as timing, signal or node-suite failures:
+- Three tests recur among the macOS-only failures of this repository's CI
+  from 2026-09-25 to 2026-10-02, as timing, signal or node-suite failures:
   `tests.test_secret_path_guard.K4GuardTests.test_k4_timing` (timing, 2 runs
   on 2026-10-01), the `(signal='SIGQUIT')` subtest of
   `tests.test_credential_run.ProcessTests.test_exit_code_and_signal_propagate`
@@ -403,7 +403,16 @@ These are local integration evidence:
   (node suite, 4 runs on 2026-09-30). The source is plan W2's measurement of
   2026-10-03 (read-only REST reads, not re-measured here): 30 macOS-only
   failures among 1,025 pull-request head SHAs, with the failing tests named
-  for 15 of them. All three ids are in the trial head's inventory. Nothing
+  for 17 of them (15 read by the measuring agent, 2 by the coordinator).
+  Seven of those 17 runs are the ones listed above. The other 10 itemized
+  runs named other tests (for example
+  `tests.test_adoption_bootstrap.RtkConfigReminderTests`, the OpenHands
+  resolver tests and `tests.test_credential_run.InjectionTests`) and the
+  other 13 SHAs were not itemized, so these three ids are not a complete
+  list of macOS-only failing tests, and whether a given failure is a flake
+  or a Darwin-specific defect is not established. Run 36752399506, counted
+  above as a node-suite failure, also failed five `tests.test_currency_due`
+  tests. All three ids are in the trial head's inventory. Nothing
   excludes them in advance: the only exclusion is the flaky-id rule (records
   that differ among the eligible S repeats), so a mismatch on one of them
   still makes its run ineligible under the zero-tolerance rule, and it is
