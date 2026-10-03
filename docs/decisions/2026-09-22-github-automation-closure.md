@@ -362,7 +362,10 @@ locally with `GH_TOKEN` set and no `--offline`, using
   decision point, and an ignore needs its own reachability review); nested `osv-scanner.toml` files next to the locks (OSV's
   per-directory lookup applies only without an explicit `--config`, which would move every existing repo-wide ignore into
   per-directory files; a later cleanup could do that). **Overturn:** the frozen lock stops being kept, or an application built
-  from it is run (then bump `next` and delete the config, the inventory key and the `FROZEN_LOCKS` row); OSV lists an advisory
+  from it is run (then bump `next` and delete the dedicated config, the inventory key and the `FROZEN_LOCKS` row).
+  Removing an archive also removes its scan invocation, SARIF report, upload step, exact assignment in the `jq -e`
+  block and both non-empty array guards; an empty archive group fails the step. Keep the remaining ordinary, macOS
+  and WSL groups exhaustive and disjoint. OSV lists an advisory
   for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes. **Not covered:** the image's server binary (PyInstaller
   build of upstream's unchanged uv.lock, urllib3 2.7.0 and PyJWT 2.13.0 or older) and the grader venv, as for the earlier PyJWT
   relock. Evidence: `evidence/receipts/osv-urllib3-next-20260930.json`.
@@ -385,6 +388,12 @@ locally with `GH_TOKEN` set and no `--offline`, using
   Each group's primary and SARIF statuses are retained, and the largest observed
   status becomes the step status. Off pull requests, all three reports are kept
   and uploaded under separate categories by the existing tool-free write job.
+  Removing this WSL archive also removes its dedicated config, inventory key,
+  `FROZEN_LOCKS` row, scan invocation, SARIF report, upload step, exact assignment
+  in the `jq -e` block and both non-empty array guards; leaving an empty group
+  fails the step. The same removal list applies to the macOS archive.
+  The policy-key and override guards, later-upload conditions and discriminating
+  mutations are retained in `evidence/receipts/osv-split-hardening-port-20261003.json`.
 
   **Sources and correction.** Reuse the reviewed macOS partition at repository
   revision `56473e4b840f0e6940c031801d866e7e9bf29baf`, and OSV-Scanner v2.6.0
@@ -403,6 +412,10 @@ locally with `GH_TOKEN` set and no `--offline`, using
   the source/evidence binding fails, or the date reaches 2026-10-17. Reassess the
   disposition and remove or replace the dedicated grant; do not extend it to
   active inputs or relock historical evidence without its owner.
+  If reassessment removes this archive, remove its dedicated config, inventory
+  key, `FROZEN_LOCKS` row, scan invocation, SARIF report, upload step, `jq -e`
+  assignment and both non-empty guards together, preserving the remaining
+  groups' exhaustive/disjoint checks. See the hardening-port receipt above.
 
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required

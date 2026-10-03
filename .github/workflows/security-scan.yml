@@ -188,11 +188,15 @@ jobs:
           sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner.sarif
           category: osv-scanner
       - name: Upload the frozen-artifact OSV-Scanner SARIF to code scanning
+        # Keep this report uploadable after an earlier upload fails.
+        if: ${{ !cancelled() }}
         uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
           sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner-frozen-macos.sarif
           category: osv-scanner-frozen-macos
       - name: Upload the retired WSL artifact OSV-Scanner SARIF to code scanning
+        # Keep this report uploadable after an earlier upload fails.
+        if: ${{ !cancelled() }}
         uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
           sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner-frozen-wsl-retrieval.sarif

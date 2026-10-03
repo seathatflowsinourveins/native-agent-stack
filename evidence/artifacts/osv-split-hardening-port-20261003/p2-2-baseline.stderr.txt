@@ -1,0 +1,5 @@
+Starting filesystem walk for root: /
+Scanned <case-alias-root>/pnpm-lock.yaml file and found 1 package
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 257.539µs elapsed, 257.609µs wall time
+<case-alias-root>/baseline.toml has unused ignores:
+ - GHSA-test-unrelated
