@@ -15159,7 +15159,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
+      "sha256": "3555c655c7520060260875ad04b8922821826bfa911a9e5445d44ee292232485",
       "bytes": 314853
     },
     {
@@ -15224,8 +15224,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "2217a36d560e887b651aaf57028580175e1644c45134c6ef3d8208913998b02c",
-      "bytes": 251264
+      "sha256": "d6552e7c850b339d7b3a19ecd49a595f32cbd1a4d9a1c4c39cc3d7964dd59bfb",
+      "bytes": 253082
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15694,7 +15694,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
+      "sha256": "7711775feca87f381de4195c0019c08a0810c9abed23c70662815337105d52ef",
       "bytes": 32903
     },
     {
@@ -48153,6 +48153,11 @@
       "bytes": 11201
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--sandbox-runtime--use--20261001.json",
+      "sha256": "00689333bca603be1bb67bee130e03dac34e18ec1c4e5cdf079c0e7a28ec5068",
+      "bytes": 11206
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--serena--install--20260925.json",
       "sha256": "ceca3b1c253f8cf6a537d60b987547383e3fe571fde88c1339fd46a1e0661205",
       "bytes": 7311
@@ -49569,13 +49574,13 @@
     },
     {
       "path": "manifests/landscape.json",
-      "sha256": "bdb43cf59a1875cd49578d025a3ac76fcc173b7b63c449fd9921d1fe45558f48",
+      "sha256": "d74ad00b1be2c0a28ab6ed5998e241981bb8192de7e3b2fba6bfe2149d40a27f",
       "bytes": 21467
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "b10693331a67883d86a47ec40b6345f5f48d80aa287a991e20df4b40355ed72a",
-      "bytes": 100006
+      "sha256": "b2dff27d7388d26b581ef3e4e81b6b0a35d82fed826b071d8d8e8c19d607e145",
+      "bytes": 100828
     },
     {
       "path": "observability/README.md",
@@ -49854,8 +49859,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "2961a95fe20b829b92a9a01812bf6aa240955378674d1ee7afc8e4df727cc041",
-      "bytes": 124550
+      "sha256": "de6a06bcbdceb6b6788710bd4a682b238452c1a46075249108ecc1d7fe262354",
+      "bytes": 124848
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",

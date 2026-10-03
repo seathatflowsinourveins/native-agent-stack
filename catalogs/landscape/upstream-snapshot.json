@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 271,
+    "api_commands": 276,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -53,7 +53,7 @@
       }
     ],
     "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 254,
+    "selected_component_api_commands": 259,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -1881,8 +1881,8 @@
       "component_id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
       "selected_repository_url": "https://github.com/anthropics/sandbox-runtime",
-      "selected_version": "0.0.77",
-      "selected_source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "selected_version": "0.0.78",
+      "selected_source_pin": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
       "checks": [
         {
           "endpoint": "repos/anthropics/sandbox-runtime",
@@ -1915,33 +1915,73 @@
           "ended_at": "2026-09-21T22:32:17.828627+00:00",
           "stdout_sha256": "1ee99c5cf0fe9852a2ba2c0a85f07c63dc04caa154a37ff91ae900b365034722",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:05.389354+00:00",
+          "ended_at": "2026-10-02T11:43:05.771574+00:00",
+          "stdout_sha256": "93e18659e73af00d596472676ffa755c323526cba78c97a7e529aa771ec6709e",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:05.771862+00:00",
+          "ended_at": "2026-10-02T11:43:06.051811+00:00",
+          "stdout_sha256": "fff17805fa9f68c6dd4ff471e047782517cd41d730b110b2c021abcdb1a07550",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime/releases/tags/v0.0.78",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:06.052058+00:00",
+          "ended_at": "2026-10-02T11:43:06.361548+00:00",
+          "stdout_sha256": "fff17805fa9f68c6dd4ff471e047782517cd41d730b110b2c021abcdb1a07550",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime/commits/v0.0.78",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:06.361792+00:00",
+          "ended_at": "2026-10-02T11:43:06.713314+00:00",
+          "stdout_sha256": "ea1d0fc41ad8822910b11fdf6fab9f4adeff7cdf25c78c98918fefdec54cf58f",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime/commits/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:06.713786+00:00",
+          "ended_at": "2026-10-02T11:43:07.044538+00:00",
+          "stdout_sha256": "ea1d0fc41ad8822910b11fdf6fab9f4adeff7cdf25c78c98918fefdec54cf58f",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/anthropics/sandbox-runtime",
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T20:40:59Z",
+      "pushed_at": "2026-10-01T14:23:34Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.0.77",
-        "published_at": "2026-09-18T22:09:16Z",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "tag_name": "v0.0.78",
+        "published_at": "2026-09-30T01:09:22Z",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
-        "committed_at": "2026-09-18T20:54:45Z"
+        "ref": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "sha": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "committed_at": "2026-09-30T01:08:11Z"
       },
       "latest_release_source": {
-        "ref": "v0.0.77",
-        "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
-        "committed_at": "2026-09-18T20:54:45Z"
+        "ref": "v0.0.78",
+        "sha": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "committed_at": "2026-09-30T01:08:11Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

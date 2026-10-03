@@ -67,13 +67,13 @@
       "source_commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
     },
     {
-      "tag_name": "v0.0.77",
-      "published_at": "2026-09-18T22:09:16Z",
+      "tag_name": "v0.0.78",
+      "published_at": "2026-09-30T01:09:22Z",
       "prerelease": false,
-      "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+      "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78",
       "target_commitish": "main",
       "repo": "anthropics/sandbox-runtime",
-      "source_commit": "6fa731368807419ee157f9a3fac955fefe1019c6"
+      "source_commit": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b"
     },
     {
       "tag_name": "v20.0.26",
