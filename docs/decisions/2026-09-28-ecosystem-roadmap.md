@@ -336,3 +336,19 @@ Decision rights stay as recorded:
   The 12 trading layers stay staged. The trading lane will schedule them after the paper series, depending on Claude weekly capacity.
 - **Durable memory: ai-memory is a candidate only.** The user restated that ai-memory is a candidate while the memory evals run, not an assured winner. That matches the recorded target above (S3 decides; ai-memory is the reference arm).
 - **Capacity.** The shared Claude weekly window read 71% at 05:07Z and about 75% later (resets 2026-09-30 18:00Z). Codex weekly is at 94% (resets 2026-10-04 00:35Z). Non-critical Claude fan-outs are paused across sessions, and GPT-6 reviews run through native Codex.
+
+### 2026-10-03, main `9b0b8d6d25f9e3fb8f71770500e774170423315e`
+
+- **#445 is retired.** The Park item "re-derived on the rebuilt gateway" is replaced by the
+  [dated R02 retirement record](2026-10-03-retire-gateway-ab-r02.md). F-WK-3's R02 freeze-release and admissible-value
+  items above (`:187-188`) were not carried by the 2026-09-30 rebuild record
+  (`2026-09-30-omniroute-rebuild.md:3-8,30-32,43-55`, which names neither R02 nor #445). The freeze ended in fact no
+  later than 2026-09-29 00:42Z, when 20128 was running `5fc47d970` at `81c9b6da` instead of the frozen `dd6e9607e`
+  (`2026-09-30-omniroute-rebuild.md:30-32`). The apply-after-R02 order was broken in fact no later than the 2026-09-30
+  rebuild, which records the affinity patch `045aa81f3` on 20128 (`2026-09-30-omniroute-rebuild.md:54-55`). PR #425's
+  records, on main since 2026-09-28T22:57:18Z, already label `045aa81f3` as 20128's build
+  (`2026-09-28-openhands-resolver-isolation.md:281`). That label comes from a source read, not an observed version
+  read, and read as the running build it conflicts with the rebuild record
+  (`2026-09-30-omniroute-rebuild.md:30-31,135-136`). The sources do not settle whether either break came earlier, and
+  this update neither asserts nor rules out an earlier date. No explicit user release is on record, and this update
+  releases nothing. Evidence class: `source_review` of the retained records.

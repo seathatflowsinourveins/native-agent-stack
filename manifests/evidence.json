@@ -5949,8 +5949,8 @@
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/README.md",
-      "sha256": "9db0823f48a6007881fbf7848d126cb8a6814f1649461d80b644cee73388f328",
-      "bytes": 15796
+      "sha256": "83f400f86db59d34f1d783e837978d4930e478f997f28367a490a4f13a749b30",
+      "bytes": 17394
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
@@ -15869,8 +15869,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "9b3115f672526723e242d0d99bdcdd4fc9e536dc2529ecb54dfa64b61365204a",
-      "bytes": 33379
+      "sha256": "0ed0a3f7859c7610de209830f1cb33e9428c6909714565100cf60dda53500ea9",
+      "bytes": 34793
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -15971,6 +15971,11 @@
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
+      "sha256": "d8b119ccf00931c0d3ab837a2dcbc9c583a0dfa987a79056cd0176eaacf34356",
+      "bytes": 27952
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
