@@ -106,7 +106,7 @@
   },
   "decision_rule": {
     "quality": "Require no lower useful-task outcome on every frozen task and greater on at least one; lifecycle and native keyless/no-prompt/route conditions are mandatory gates",
-    "quality_tie": "Require at least5 percent lower paired median native input-plus-output tokens, complete counters and no greater paired median agent time",
+    "quality_tie": "Require at least5 percent lower paired median uncached-input-plus-output tokens (reported gross input minus reported cache reads, plus reported output including reasoning), complete counters and no greater paired median agent time",
     "rank": [
       "successful trials descending",
       "paired median uncached-input-plus-output tokens ascending, with complete authoritative same-scope cache subsets",

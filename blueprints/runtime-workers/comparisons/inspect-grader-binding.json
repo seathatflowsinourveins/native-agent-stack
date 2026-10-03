@@ -34,10 +34,12 @@
     "test_status": "Inspect 0.3.273 unchanged mock controls: pytest 0, 15 passed, one trio skip. Shared QA parser and Chat-header control covered; live grader, Responses headers, rubric and complete usage unqualified."
   },
   "usage": {
-    "authoritative_scope": "One complete correlated aggregate per frozen grader attempt; do not sum overlapping gateway/provider/Inspect snapshots.",
-    "input_tokens": "Inspect normalized input_tokens already excludes cache-read and cache-write tokens; do not subtract them again.",
-    "cache_presence": "Inspect's converter collapses absent and zero cache details. Retain field presence from native ModelCall.response.usage to distinguish complete zero from unknown. Unknown values stay null.",
-    "cost": "Uncached input plus output is the efficiency basis; gross, cache and reasoning subsets and billing remain separately reported."
+    "authoritative_scope": "Each distinct original provider attempt, including grader helpers, retries, failures and interruptions. A correlated aggregate substitutes only after its complete nonoverlapping coverage is established. Missing usage remains unknown.",
+    "input_tokens": "Inspect normalized input_tokens subtracts both cache reads and writes. Keep this native value separately labeled; it is not the original gross metric operand and normalized input plus output is not the contract metric.",
+    "metric": "Sum original reported gross input minus original reported cache read plus original reported output. Output includes reasoning; do not add it again. Cache writes are not an operand. Require original presence/types, finite nonnegative values and read <= gross.",
+    "operand_binding": "Bind original terminal provider G/R/O to the loaded gateway build, executed format/path, actual attempt/response identity and delivered grader observation. Neither normalized Inspect counters nor SDK ModelCall.response serialization authenticates pre-sanitation originals or exhaustive inner attempts. Reject unknown reconstruction.",
+    "cache_presence": "Native Inspect conversion collapses absent and zero details. Do not infer original presence/types from converted zeros or SDK dumps without verified preservation. Unknown writes can stay null for this metric.",
+    "cost": "This is a token-efficiency metric. Monetary cost and complete-cache accounting remain separately unqualified."
   },
   "sources": [
     {"file": "src/inspect_ai/scorer/_model.py", "sha256": "75c525f7a869fcf829bd83b66ad2431acae80f2a6fef8f2bfa5c11ec5a0e2817"},

@@ -80,7 +80,8 @@
     },
     "prior_production_install_receipt": {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-source-and-native-readiness.json",
-      "commit": "77821801bc720e8ecd369f38ff64fdfc7b4d61f6",
+      "worker_commit": "77821801bc720e8ecd369f38ff64fdfc7b4d61f6",
+      "commit_scope": "Historical worker production-install receipt commit; not an ancestor of PR633. Root reread the public packet receipt bytes at cdbf1872b87bcbaa15bc3f14d157d9a61765ca7b and verified the unchanged identity below.",
       "bytes": 25271,
       "sha256": "8eb44ebfbb0e07485373d33843b0519fbb4795c266b461189bee38c97ea8258f",
       "scope": "Production npm package installation/source identity only; this source-based Jest stage is separate."

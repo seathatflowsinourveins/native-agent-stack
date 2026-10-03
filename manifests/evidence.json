@@ -9216,8 +9216,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
-      "sha256": "779367506f76e08db0ceb917cdc190fabf1fb7b3f9b07c224915a05cb3b6a419",
-      "bytes": 10463
+      "sha256": "9c9fd6b855986863a26fe6c9958af173c78846f0b47a8762f6cd1a44796b5aba",
+      "bytes": 10497
     },
     {
       "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
@@ -9226,13 +9226,13 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/github-workflow-draft.json",
-      "sha256": "a7411b4a81eb84f8fb702c22df1c65d58a1d7eb01d681aaa268c0f8df8f1cbe7",
-      "bytes": 7174
+      "sha256": "20aae8b794039c3e210007aca3a2588574c3512f5a1e03ece673b12b564513a1",
+      "bytes": 7268
     },
     {
       "path": "blueprints/runtime-workers/comparisons/inspect-grader-binding.json",
-      "sha256": "0f8e5e96e13fbc5a26f908c626e3e2a1fc082c3e94486e763f911e803a054836",
-      "bytes": 4185
+      "sha256": "c556812eda7553076ec9fd41abf88b04055a0e73858cd0688eb060040e5f76b9",
+      "bytes": 5044
     },
     {
       "path": "blueprints/runtime-workers/comparisons/multi-worker-draft.json",
@@ -9766,8 +9766,8 @@
     },
     {
       "path": "blueprints/runtime-workers/org-extensions.md",
-      "sha256": "3f0f51af7505c6ce53102a8d3cf4ebba4ca95e68c5d1921020037e83c4e7d6e4",
-      "bytes": 6262
+      "sha256": "67550051b14ee2760ec2b8ef1290344293018845f24069b637564804f5d0c749",
+      "bytes": 6990
     },
     {
       "path": "blueprints/runtime-workers/sdk-role-qualification.md",
@@ -15061,8 +15061,8 @@
     },
     {
       "path": "catalogs/foundation/runtime-jobs.json",
-      "sha256": "4a392ac65449ca6a64a0930d4cf555107e4c7b138901e2455e49ee6a558f7d32",
-      "bytes": 19034
+      "sha256": "5afe18ee069caf4d41abb52b74ef3ac3e9157384a7aa4bbba46a9af2fe8f3ef9",
+      "bytes": 19862
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -42010,14 +42010,24 @@
       "bytes": 2582
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-preflight.json",
+      "sha256": "aca0cc66e5fdf573f322a4de74f74e30f3a3cfc74a5ca3d1ec6be6e0972407ba",
+      "bytes": 17142
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-primitive-preflight.json",
+      "sha256": "bd323d13dff35c0e3c6021b37a8fe5b5908267aa47fb26ef8c69ea9846ec8cea",
+      "bytes": 26995
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-diagnostics.json",
       "sha256": "31d433c2a0ae0fabfb0aabd8206cdcdc943b63d384cf99e6979a3c456c29fa1a",
       "bytes": 32768
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json",
-      "sha256": "f0d622731a87e31c6076350b6ceaed9e13c31b45ed8bf1bc9cf2e2dc39852f5f",
-      "bytes": 31925
+      "sha256": "29264e4ddce1c05ec41ea7ee90b95e5560a9ea33dae664aba81d97cd31f6e068",
+      "bytes": 32167
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.stdout.txt",
@@ -42090,6 +42100,11 @@
       "bytes": 1888
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-original-usage-source-boundaries.json",
+      "sha256": "48edae08cd839a4aadb85c591ca6a22805bc6edfe4ee18b72c4a4290528265c0",
+      "bytes": 8222
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-wire-owner-read.json",
       "sha256": "a198ff1577bd9e6717f73137b3099a92a37fe180d42f589843133664acafdf61",
       "bytes": 3274
@@ -42128,6 +42143,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-gateway-network-source-read.json",
       "sha256": "e50a759ae2a638fd6a09b044b8b4f0c4d1d22660bb820c9fe98423f8acab8d27",
       "bytes": 3485
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-native-egress-runtime-readiness.json",
+      "sha256": "05bb025c16bc08187f439a14d9bc20190025805c974b901ada6826d99a811c07",
+      "bytes": 21463
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-offline-controls.json",
@@ -42180,6 +42200,11 @@
       "bytes": 30332
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/openai-plugin-eval-native-controls.json",
+      "sha256": "6c8d57b8d7b5ea95489f05e55cf46ca91450b6871e8419dcff933ff69c2a3e6a",
+      "bytes": 5154
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/pi-historical-custody.json",
       "sha256": "e6f3cdad6ce929b35ce1792206f2146e0e49a0a4aee850d64ef5eabd5e3d2a62",
       "bytes": 2592
@@ -42221,13 +42246,13 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-followup-20261003.json",
-      "sha256": "d2a7e8894284a8622cade5cccceef75dc1d5a34789dab32b766a0fec33c30d5c",
-      "bytes": 21205
+      "sha256": "4c59408b92fe0b944d057491cf61efcc1de5edd6260756ad586fb9d944464c97",
+      "bytes": 33096
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-judgments.json",
-      "sha256": "6e8f7150896bda43e03ea464eb85262312ca480f0ed2deb7f0fbff6173d5fbe6",
-      "bytes": 16084
+      "sha256": "9a48a37fec2202ce5119fae3ae59332397f7c870283b7db2774d1d8ccafe5cc3",
+      "bytes": 16185
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-source-read-followup.json",
@@ -42236,8 +42261,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/scheduler-native-controls.json",
-      "sha256": "5a787bb41f8291645cb56aaf50b38f3ed3548e7a4fe32846922d757db34e23e2",
-      "bytes": 57486
+      "sha256": "c1cf75255f9b782f77c9dd585a17c1effd3f4aceb75d06eda4917ecbe9da3f67",
+      "bytes": 57619
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-read.json",

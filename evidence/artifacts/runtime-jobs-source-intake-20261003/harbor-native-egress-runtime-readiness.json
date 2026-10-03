@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "kind": "unchanged-upstream-native-runtime-readiness",
+  "source_packet_base": "1695dc686aa28299c184982b316591de2f65514d",
+  "scope": {
+    "result": "three unchanged Harbor Docker runtime network controls passed; zero skipped",
+    "upstream_repository": "https://github.com/harbor-framework/harbor",
+    "upstream_commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+    "upstream_version": "0.23.0",
+    "authorization": "Owner-authorized isolated Harbor installation and original task images; non-provider readiness only.",
+    "quality_comparison_executed": false,
+    "coding_candidates_executed": false,
+    "provider_or_model_requests": false,
+    "frozen_study_inputs_changed": false,
+    "freeze_or_default_decision": false,
+    "provider_usage": null,
+    "provider_usage_note": "No provider workload was invoked; no provider or comparative usage measurement is claimed."
+  },
+  "private_retention_and_redaction": {
+    "operational_log_role": "OWNED_RUN/logs/egress-*.stdout.txt and egress-*.stderr.txt",
+    "source_role": "OWNED_RUN/source",
+    "cache_role": "OWNED_RUN/uv-cache",
+    "executable_role": "OWNER_UV, the previously qualified private upstream UV executable",
+    "public_redaction": "Private absolute run paths are replaced with OWNED_RUN. The native rootless Unix socket path is summarized as a local user-runtime socket. SHA256 values identify the original retained bytes before redaction.",
+    "client_state": "No direct reads or copies of authentication stores, credentials, Docker/client configuration or environment values; no HOME/CODEX_HOME assignment, auth wrapper, forced platform or configuration repair. Native supported interfaces used their normal state."
+  },
+  "native_readiness": {
+    "docker_executable_lookup": {
+      "command": ["which", "docker"],
+      "native_exit": 0,
+      "stdout": "/usr/bin/docker\n",
+      "stdout_sha256": "ce536b639a11544da8f2741be433402954edb513f4ec4089084104b133a9a8ae",
+      "stderr_bytes": 0
+    },
+    "preflight": [
+      {"command": ["git", "rev-parse", "HEAD"], "native_exit": 0, "stdout": "1e5c5c6db929a10a140d05e606882c671ae20729\n", "stdout_sha256": "c16419d7595b5c92705c3087b66f011421299fdf8cbae1882ba995d38f49cb91", "stderr_bytes": 0},
+      {"command": ["git", "diff", "--exit-code"], "native_exit": 0, "stdout_bytes": 0, "stderr_bytes": 0},
+      {"command": ["docker", "--version"], "native_exit": 0, "stdout": "Docker version 29.8.2, build 7fc2dff\n", "stdout_sha256": "9b8f0e1d15b46031ab7b93c2d07aeec29aaccc759f52ebdc0bdbeb160bd79737", "stderr_bytes": 0},
+      {"command": ["docker", "context", "inspect", "--format", "{{.Name}} {{.Endpoints.docker.Host}}"], "native_exit": 0, "context": "rootless", "endpoint": "local rootless Unix user-runtime socket; private locator omitted", "original_stdout_sha256": "6725f6665a944b30169c7e27645df9bbf30056002c6d3822b1c2e82c1b39a647", "stderr_bytes": 0},
+      {"command": ["docker", "info", "--format", "{{.ServerVersion}} {{json .SecurityOptions}}"], "native_exit": 0, "stdout": "29.8.2 [\"name=seccomp,profile=builtin\",\"name=rootless\",\"name=cgroupns\"]\n", "stdout_sha256": "f0cdb553fcc8211e07190b1b97c57510f6c37408a736f9c61ac72926c47d208c", "stderr_bytes": 0},
+      {"command": ["docker", "compose", "version", "--short"], "native_exit": 0, "stdout": "5.5.1\n", "stdout_sha256": "db74d0caf81f43029fa28ce9888695d0b54d0a99003e6042823c9bc914897865", "stderr_bytes": 0}
+    ],
+    "source_cwd": "OWNED_RUN/source; necessary because unchanged fixtures resolve examples/tasks paths relative to the current directory",
+    "execution_boundary": "Outer commands used RTK and the owner-qualified absolute WSL executable; commands inside the isolated distro used the native upstream executables."
+  },
+  "unchanged_native_controls": {
+    "selectors": [
+      "tests/runtime/test_network_policy_matrix_docker.py::test_network_policy_matrix_task_runs_on_docker[static/e-allowlist]",
+      "tests/runtime/test_network_policy_matrix_docker.py::test_network_policy_matrix_task_runs_on_docker[dynamic/steps-mixed]",
+      "tests/runtime/test_network_policy_matrix_docker.py::test_extra_allowed_host_allows_no_network_phase_on_docker[a-allow-agent-host-agent]"
+    ],
+    "collection": {
+      "command_prefix": ["OWNER_UV", "--no-config", "--cache-dir", "OWNED_RUN/uv-cache", "run", "--locked", "pytest", "--collect-only", "-q"],
+      "command_suffix": "The three selectors above, in their listed order.",
+      "native_exit": 0,
+      "stdout_bytes": 982,
+      "stdout_sha256": "ee0b67e2c121b6956e7ec628b5d7b9cc1ff0f55fb8c2528b2f1b2f7d24b90d9a",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_summary": "3 tests collected in 0.27s",
+      "selected_ids_verified": true
+    },
+    "runtime": {
+      "command_prefix": ["OWNER_UV", "--no-config", "--cache-dir", "OWNED_RUN/uv-cache", "run", "--locked", "pytest", "-q"],
+      "command_suffix": "The same three selectors, in their listed order, with unchanged upstream source and fixtures.",
+      "observed_start_utc": "2026-10-03T11:35:40.520807+00:00",
+      "native_exit": 0,
+      "passed": 3,
+      "skipped": 0,
+      "warnings": 4,
+      "pytest_elapsed_seconds": 149.04,
+      "observer_elapsed_seconds": 150.057,
+      "observer_maximum_seconds": 900,
+      "observer_interrupts_sent": 0,
+      "observer_note": "A bounded observer allowed 880 seconds before a reserved interrupt/termination interval. The native process completed normally; no interruption or test/task timeout change occurred.",
+      "stdout_bytes": 1640,
+      "stdout_sha256": "06e4d0c0073b03546dba4d7b47fdfdd9dafefaf68f51bac0410e944575fcec83",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_stdout_sanitized": "============================= test session starts ==============================\nplatform linux -- Python 3.13.15, pytest-9.0.2, pluggy-1.6.0\nrootdir: OWNED_RUN/source\nconfigfile: pyproject.toml\nplugins: cov-7.0.0, anyio-4.12.1, langsmith-0.8.8, xdist-3.8.0, asyncio-1.3.0, hypothesis-6.155.0, typeguard-4.4.3\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollected 3 items\n\ntests/runtime/test_network_policy_matrix_docker.py ...                   [100%]\n\n=============================== warnings summary ===============================\ntests/runtime/test_network_policy_matrix_docker.py::test_network_policy_matrix_task_runs_on_docker[static/e-allowlist]\ntests/runtime/test_network_policy_matrix_docker.py::test_network_policy_matrix_task_runs_on_docker[dynamic/steps-mixed]\ntests/runtime/test_network_policy_matrix_docker.py::test_extra_allowed_host_allows_no_network_phase_on_docker[a-allow-agent-host-agent]\ntests/runtime/test_network_policy_matrix_docker.py::test_extra_allowed_host_allows_no_network_phase_on_docker[a-allow-agent-host-agent]\n  OWNED_RUN/source/src/harbor/trial/trial.py:967: DeprecationWarning: Task.checksum will be deprecated soon. Use TrialLock.task.digest from the trial lock when you need the task content hash.\n    task_checksum=self.task.checksum,\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n================== 3 passed, 4 warnings in 149.04s (0:02:29) ===================\n",
+      "unchanged_upstream_assertions": "The source invokes stock Oracle agents and real Docker/kernel support gates. Matrix tests require no exception and reward 1. The extra-host test requires no exception and reward 0 before www.iana.org is allowed, then reward 1 after it is allowed: four source-defined Oracle trials across three passed tests.",
+      "per_trial_observation_limit": "Individual generated result.json files were not independently reread. The native pytest result establishes that the original four trial assertions passed; no separate per-trial output or model quality claim is made."
+    }
+  },
+  "original_task_inputs": [
+    {
+      "path": "examples/tasks/network-policy-matrix/static/e-allowlist",
+      "git_tree_oid": "afcbe4195b1dd0e6f3b1d5707b7aac69c82596f2",
+      "task_toml_sha256": "3f2ee8e743e88b3b14cdd536c2fe0cffda30f70a83e6dad746d9789ae18abfe2",
+      "dockerfile_sha256": "6e9040b6c16b65e39429e13fff1899fafe3c8042e7461cd47bc9fcdebe0d5370",
+      "from_reference": "python:3.12-slim",
+      "source_policy": "Original allowlist; example.com and 1.1.1.1."
+    },
+    {
+      "path": "examples/tasks/network-policy-matrix/dynamic/steps-mixed",
+      "git_tree_oid": "e5820e1992fba297cad8ea8aa337c0fb2d7eb7c8",
+      "task_toml_sha256": "5f7f44658ec5caf14702d06690ab225fe40ac1a3338b8270b2b0d01326e9f2f6",
+      "dockerfile_sha256": "6e9040b6c16b65e39429e13fff1899fafe3c8042e7461cd47bc9fcdebe0d5370",
+      "from_reference": "python:3.12-slim",
+      "source_policy": "Original PUBLIC environment; step 0 agent PUBLIC/verifier NO_NETWORK; step 1 agent NO_NETWORK/verifier PUBLIC."
+    },
+    {
+      "path": "examples/tasks/network-policy-matrix/extra-allowed-hosts/a-allow-agent-host",
+      "git_tree_oid": "be372db596d0e69887ce867db85ed0dc361a650a",
+      "task_toml_sha256": "4fdaf7a291968a192773e9b71fbe64586d730b2c7cd9c8d525c28eec7afeb153",
+      "dockerfile_sha256": "6cc765a2df4fb471f8231b910f727ea3fb5a10da528e9be49afeebd772126a70",
+      "from_reference": "python:3.12",
+      "source_policy": "Original agent NO_NETWORK; unchanged test adds www.iana.org using AgentConfig.extra_allowed_hosts for its second trial."
+    }
+  ],
+  "image_input_and_observation": {
+    "preexecution_source_gate": "The original task Dockerfiles and pinned Harbor sidecar/kernel-probe sources were identified before controls ran. No task or SOURCE_POLICY replacement, forced platform, Dockerfile edit or custom fixture was supplied.",
+    "separate_input_scope": "These original network-control fixture Python/sidecar images are separate from the 24 SWE task source-policy rules. Those rules are not claimed to cover this readiness ingress.",
+    "original_sidecar_from": "gogost/gost:3.2.7-nightly.20260602@sha256:afc0137758ab4ce399d47a299f9abbacbf522b52a17e59cbb4b4e7a1a66e9196",
+    "original_kernel_probe_image": "alpine:3.23.4@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11",
+    "inspection_boundary": "Supported Docker image inspect/list interfaces exposed only image names, IDs, repository digests, OS and architecture. No image/container Env, credentials, authentication or active client configuration fields were queried.",
+    "lookup_failures": [
+      {"phases": ["before", "after"], "reference": "python:3.12-slim", "native_exit_each": 1, "stderr_each": "Error response from daemon: No such image: python:3.12-slim\n", "stderr_sha256_each": "f09b17029d174a7f7f6e1de2fc14fe56506562b9d0d48bd62e78e1ba69eafe67"},
+      {"phases": ["before", "after"], "reference": "python:3.12", "native_exit_each": 1, "stderr_each": "Error response from daemon: No such image: python:3.12\n", "stderr_sha256_each": "ee7edc6ec3125bcb3cc53023b023a575e0ddb96a727f2fbdc546aeb91d77c58a"},
+      {"phases": ["before"], "reference": "alpine:3.23.4@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11", "native_exit_each": 1, "stderr_each": "Error response from daemon: No such image: alpine:3.23.4@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11\n", "stderr_sha256_each": "6baa34c8a67f91be5229844885a6550238e1a5ccdf22eb6fb3c2a46344a9d67a"},
+      {"phases": ["before", "after"], "reference": "gogost/gost:3.2.7-nightly.20260602@sha256:afc0137758ab4ce399d47a299f9abbacbf522b52a17e59cbb4b4e7a1a66e9196", "native_exit_each": 1, "stderr_each": "Error response from daemon: No such image: gogost/gost:3.2.7-nightly.20260602@sha256:afc0137758ab4ce399d47a299f9abbacbf522b52a17e59cbb4b4e7a1a66e9196\n", "stderr_sha256_each": "c1c09db77f2fb2957bd8cb3ece988191d6391d932edcc59ce1eca8d8051545da"}
+    ],
+    "lookup_failure_count": 7,
+    "lookup_stdout_each": "\n",
+    "lookup_stdout_sha256_each": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "lookup_limitation": "Local named-reference lookup failures do not establish that a build did not use the original bases. Effective Python and Gost base-image digest identities remain unknown from these queries; original Python tags were not pre-frozen into digests.",
+    "successful_after_inspections": [
+      {"reference": "alpine:3.23.4@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11", "native_exit": 0, "repo_digest": "alpine@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11", "id": "sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11", "os": "linux", "architecture": "amd64", "stdout_sha256": "e3d438773549eebb00d18bafcf19963ae5ff64f606698f9d92f40554dcd96895", "stderr_bytes": 0},
+      {"reference": "harbor-prebuilt:harbor-docker-egress-control-sidecar--9af3dc172792cee8", "native_exit": 0, "repo_digest": "harbor-prebuilt@sha256:9822153c366f940202508403a3af2f1e0784904bae79ac537efbadbef69413ab", "id": "sha256:9822153c366f940202508403a3af2f1e0784904bae79ac537efbadbef69413ab", "os": "linux", "architecture": "amd64", "stdout_bytes": 293, "stdout_sha256": "3d0238802c83a07e6184efedb866d1c2864683a9653e2d3b66ea06b7050d0fe9", "stderr_bytes": 0}
+    ],
+    "sidecar_identity_limit": "The sidecar RepoDigest is an observed local built-image identity, not a publisher registry attestation.",
+    "after_image_list": {"native_exit": 0, "stdout_bytes": 320, "stdout_sha256": "cbf364942f89314189f04c00f7ff340f77f80a6aa94ce35bbe25468d3b18d680", "stderr_bytes": 0, "returned_stdout": "harbor-prebuilt:harbor-docker-egress-control-sidecar--9af3dc172792cee8 sha256:9822153c366f940202508403a3af2f1e0784904bae79ac537efbadbef69413ab\nalpine:<none> sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11\nhello-world:latest sha256:5e23090353324d887c48ad5e5c56d294eab81588df9605b07d1afe895f9cc8f8\n", "limit": "No complete pre-run image inventory was captured; hello-world is not classified as newly created. Authorized built image cache remains."}
+  },
+  "cleanup_and_source_integrity": {
+    "empty_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observations": [
+      {"phase": "before", "command": ["docker", "ps", "--all", "--format", "{{.ID}} {{.Names}} {{.Status}} {{.Label \"com.docker.compose.project\"}}"], "native_exit": 0, "stdout_bytes": 0, "stderr_bytes": 0},
+      {"phase": "after", "command": ["docker", "ps", "--all", "--format", "{{.ID}} {{.Names}} {{.Status}} {{.Label \"com.docker.compose.project\"}}"], "native_exit": 0, "stdout_bytes": 0, "stderr_bytes": 0},
+      {"phase": "after", "command": ["docker", "network", "ls", "--filter", "label=com.docker.compose.project", "--format", "{{.ID}} {{.Name}}"], "native_exit": 0, "stdout_bytes": 0, "stderr_bytes": 0},
+      {"phase": "after", "command": ["docker", "volume", "ls", "--filter", "label=com.docker.compose.project", "--format", "{{.Name}}"], "native_exit": 0, "stdout_bytes": 0, "stderr_bytes": 0},
+      {"phase": "after", "command": ["git", "diff", "--exit-code"], "native_exit": 0, "stdout_bytes": 0, "stderr_bytes": 0},
+      {"phase": "after", "command": ["git", "rev-parse", "HEAD"], "native_exit": 0, "stdout": "1e5c5c6db929a10a140d05e606882c671ae20729\n", "stdout_sha256": "c16419d7595b5c92705c3087b66f011421299fdf8cbae1882ba995d38f49cb91", "stderr_bytes": 0}
+    ],
+    "post_run_runtime_source_sha256": "464e593d4fdbb551096467fe5ce0cbd384f0ba82c756c2b87fc29df273ed7492",
+    "limit": "The native client's containers and Compose-labeled networks/volumes were empty in the queried scopes. Upstream delete=True lifecycle ran; no manual prune, daemon repair or cleanup mutation was issued. This is not a claim that every unrelated Docker resource or host state was inspected."
+  },
+  "pinned_original_sources": [
+    {"path": "tests/runtime/test_network_policy_matrix_docker.py", "sha256": "464e593d4fdbb551096467fe5ce0cbd384f0ba82c756c2b87fc29df273ed7492", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/runtime/test_network_policy_matrix_docker.py", "source_contract": "Docker availability and real kernel support skip gates at lines 55-78; original Oracle TrialConfig and delete=True at 101-122; reward/exception assertions at 126-164."},
+    {"path": "src/harbor/environments/docker/docker.py", "sha256": "8757d3fbc19e58c7ccd14c9b613a0d00dccd1b514375fa0e546ff41ca963a15e", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/environments/docker/docker.py", "source_contract": "Pinned Alpine probe image at 122; controlled service joins sidecar network namespace at 452-474; native kernel probe at 920-950."},
+    {"path": "src/harbor/environments/docker/harbor-docker-egress-control-sidecar/Dockerfile", "sha256": "a2385dd6b3eee6e04c49b467df84ed2a273fd402a9cdd404a64fb535e9b26ff7", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/environments/docker/harbor-docker-egress-control-sidecar/Dockerfile", "source_contract": "Unchanged pinned Gost base reference."},
+    {"path": "src/harbor/environments/docker/docker-compose-egress-control.yaml", "sha256": "6a7e63d3cdad6d7be919d110e536b8dbc52b871d0ee3a5195d65cbd0e5e36ca6", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/environments/docker/docker-compose-egress-control.yaml", "source_contract": "Native sidecar, NET_ADMIN/NET_RAW and ready health check."},
+    {"path": "src/harbor/environments/docker/harbor-docker-egress-control-sidecar/bin/network-policy", "sha256": "ff1cacfb95e17cda3668f389176ae54e5e4139cff12ee54b4d745722ad0ff0b2", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/environments/docker/harbor-docker-egress-control-sidecar/bin/network-policy", "source_contract": "Original native nft/Gost allowlist implementation."},
+    {"path": "src/harbor/environments/docker/harbor-docker-egress-control-sidecar/gost.yaml", "sha256": "78c18e58efbc7c8e226cb311e2a4cf3863d5a2f3e54b3bf15a0ea4b885345290", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/environments/docker/harbor-docker-egress-control-sidecar/gost.yaml", "source_contract": "Original transparent egress listener, sniffing and allowlist bypass."},
+    {"path": "pyproject.toml", "sha256": "00290ec17fb5f4f44ebd1a251dd07fe4f1b6dabb9fed61497cd303a4679e104d", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/pyproject.toml", "source_contract": "Supported native dev dependencies and pytest runtime marker."},
+    {"path": "uv.lock", "sha256": "ce2eed59946e8f0d21494c0115939e8169d1362e46d92d5db377861303192b01", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/uv.lock", "source_contract": "Unchanged locked environment used by native UV run --locked."},
+    {"path": ".github/workflows/pytest.yml", "sha256": "d9f2b526bf5feab942645996b986fea60c596c1de37f389287661828385e87da", "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/.github/workflows/pytest.yml", "source_contract": "Upstream UV/pytest commands; ordinary CI excludes runtime tests. This receipt's direct native invocation supplies the scoped runtime observation."}
+  ],
+  "remaining_gates": [
+    "RuntimeLab-to-NativeStack gateway literal address/listener binding and agent-container reachability remain unqualified; these public Internet lifecycle controls do not establish that route.",
+    "HTTP models metadata or host health is not native Codex model catalog, model request, delivered effort, child policy or wire-counter acceptance.",
+    "Native Codex/Pi catalog, role, skill and extension asset mounts and effective activation still need their scoped carrier acceptance before candidate execution.",
+    "Original 24 SWE task image source-policy enforcement and image ingress coverage remain separate; none of those frozen coding tasks were executed here.",
+    "Complete usage, uncached input/output equivalence, correlations, native bounds, model effort and multi-agent behavior remain unmeasured.",
+    "Owner isolation/admission, both-family acceptance and freeze gates remain independent. This record selects no runtime default."
+  ],
+  "repository_checks": {
+    "native_json_parse_exit": 0,
+    "native_staged_whitespace_exit": 0,
+    "required_validator": {
+      "command": "rtk python3 scripts/validate.py",
+      "native_exit": 1,
+      "stdout_bytes": 164,
+      "stdout_sha256": "3dcb3a63bbc8b825c48905d40ba2e18fc3df8d667c87a2d7e89d6939876ad767",
+      "returned_stdout": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/harbor-native-egress-runtime-readiness.json: evidence file is not hash-listed\n",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "publication_gate": "The coordinator owns registry integration. The required validator's sole reported failure is this newly owned file not yet being hash-listed; no registry file was edited by this worker."
+  }
+}

@@ -67,7 +67,9 @@
     },
     {
       "repo": "golang/go",
-      "pin": "go1.27.0",
+      "pin": "8af21751f066eced273ca3ce49506b366847c623",
+      "tag": "go1.27.0",
+      "root_commit_binding_verified": true,
       "file": "src/os/file.go",
       "bytes": 30343,
       "sha256": "d77653afbcbec5256b56aee25dce3df3ed001f964c9b245b848a5d378884bcb3",
