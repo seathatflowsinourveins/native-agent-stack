@@ -49579,13 +49579,13 @@
     },
     {
       "path": "observability/README.md",
-      "sha256": "c4fd4a7d69704bd51edf9e1eff5e14c96a5eb9938fdd55f18aaa99ec47b30d94",
-      "bytes": 15457
+      "sha256": "7c7795560a7ef6541c91dfb8b0bf4e693f5dcdf9cfc75f262d8e4832057177e3",
+      "bytes": 15625
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "cc394e24445dc7d194aaa7d2593d8b02dc5db2f89ee3c3bed3c7f26b934b7262",
-      "bytes": 25028
+      "sha256": "28d512ce7b62b9c87d6fc3ec1e4c2f4d1b616de498f48ddad02b062096c65212",
+      "bytes": 25778
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -49629,8 +49629,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-alertmanager.yml.example",
-      "sha256": "1c1188938dea6f4cd9510d6220153cb25f611f14a7494efa72a5349672bf6ee3",
-      "bytes": 1130
+      "sha256": "c2df17901a0807bbe1a75a27751f888ffbdfaa30fc238f5bc563d57349c1533e",
+      "bytes": 1587
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
@@ -49679,8 +49679,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "6e476fbf535971627466ec7b39b99b1952d938464ab894c231d59e7c0e2f0f55",
-      "bytes": 41579
+      "sha256": "df33394028df2a687f7e39beefe0aa02978a0d6a0b97fd9d8a14f12e6075d3d6",
+      "bytes": 44636
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -49689,8 +49689,8 @@
     },
     {
       "path": "observability/collector/codex-identity-launcher.sh.example",
-      "sha256": "ead8a934b90be6d6fef1ffa5ee06d32793e0af121cd9d1a04b2e2da06988c3f1",
-      "bytes": 4642
+      "sha256": "58a4254926d8b27ea16571d17a09a77869614f13a624997fedbf02a1c1c78929",
+      "bytes": 6167
     },
     {
       "path": "observability/collector/codex.toml.example",
@@ -50834,8 +50834,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "52127cd65bc1e47690e5b25147bf7ed5401ce28a76d81a557fcc34f219e994c4",
-      "bytes": 23943
+      "sha256": "256a60345e905991852d0500343202436f452623a8e3e5231232533d4969f12c",
+      "bytes": 31542
     },
     {
       "path": "tests/test_observability_run_correlation.py",
@@ -50849,8 +50849,8 @@
     },
     {
       "path": "tests/test_observability_writer_identity.py",
-      "sha256": "3c5f3407365526b6ea5c60ac0c2272b252d9785c22c75ef481e4e07dddcaf92c",
-      "bytes": 32287
+      "sha256": "2f58b64cbd4f1af2b23ed869147278e2f84ad3357fef11a13c6496154fb1f15b",
+      "bytes": 37789
     },
     {
       "path": "tests/test_observability_writer_identity_host.py",
