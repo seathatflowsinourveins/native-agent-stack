@@ -9,8 +9,12 @@ unmeasured runtime or transferring historical acceptance to another host.
 ## Decision and alternatives
 
 Keep every current OpenAI Agents SDK candidate row unqualified, and add the
-missing agent-sdks candidate and foundation-layer description. Retain the
-AD-5 hold on experimental codex_tool adoption. The alternatives were
+missing agent-sdks candidate and foundation-layer description. Retain
+the 2026-10-02 Codex-practice audit item AD-5, hold on Agents SDK codex_tool
+adoption. AD-5 is the audit's bounded decision to leave the experimental
+extension unadopted until a needed orchestration capability and its measured
+candidate comparison qualify it; the resolvable comparison source is
+catalogs/sota-convergence/manifest-20260926.json:451. The alternatives were
 preserving the contradictory conditional/unqualified labels or promoting
 the extension on source compatibility alone. Neither supplies the missing
 application requirement and measured qualification.
@@ -28,10 +32,20 @@ re-recorded under a new run id with a sealed cross-family review
 This PR therefore leaves those three fields byte-identical to main. Their
 premise correction and the codex_tool overturn arm are carried forward as
 an open item for that re-record: the next native-clients/agent-sdks verdict
-wave, which also covers the census item on the 28 refutations caused by
-missing GPT-6 votes. Until then the frozen row's wording stands as recorded,
+wave, which also covers the 28 fit refutations in
+evidence/artifacts/landscape-sweep-20260926/returns.json#/votes where the
+Claude vote did not refute but the GPT-6 vote was missing and counted as
+refuted. Until then the frozen row's wording stands as recorded,
 and this record and the corrected candidate rows state the accurate
 premise.
+
+The earlier repair registered the six-candidate agent-sdks collection with
+`python3 scripts/catalog_decisions.py --write --supplement
+catalogs/landscape/foundation.json#/layers/16/candidates`, so the new layer
+entry participates in the validated repository decision union. This added
+six layer-16 references, changing `counts.references` from 2045 to 2051 in
+catalogs/us-equities/decision-index.json. Registration supplies no SDK
+adoption or execution evidence.
 
 Replace the foundation gateway's September 27 build description with the
 two dated workstation build observations below. Retaining the replaced
@@ -58,28 +72,56 @@ At openai/openai-agents-python v0.23.1,
 resolves a local executable and builds a Codex exec invocation.
 [_build_env](https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/exec.py#L226-L240)
 copies the inherited environment by default and sets CODEX_API_KEY only
-when one is passed. Therefore the wrapper can use the existing local
-Codex login; an explicit environment or key override can change that
-behavior. The SDK's
+when one is passed. R641 correction, 2026-10-03: that function alone does
+not establish the tool's authentication. At
+[tool key resolution](https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L584-L628),
+an explicit `codex_options.api_key` wins. Otherwise the tool resolves
+`CODEX_API_KEY` or `OPENAI_API_KEY` from `options.env`, then the process
+environment, then the SDK default set by `set_default_openai_key`.
+[Thread forwarding](https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/thread.py#L108-L111)
+passes that key to CodexExec, which exports it as `CODEX_API_KEY`.
+The native Codex login applies only when no key resolves, or when the
+caller [supplies a Codex instance](https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L631-L639)
+without `api_key` and preserves the instance's native authentication
+environment/configuration. A key on the orchestrator can therefore select
+API-key authentication for its Codex tool even without an explicit tool
+key override. The SDK's
 [endpoint configuration](https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/config.md#L84-L88)
 supports OPENAI_BASE_URL for an OpenAI-compatible endpoint. These source
 capabilities do not measure whether OmniRoute accepts the SDK's actual
 requests, nor do they transfer Codex entitlement to an orchestrating model.
 
 The tagged [tool documentation](https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/tools.md#L890-L894)
-still classifies codex_tool as experimental. AD-5 remains a hold. Adoption
+still classifies codex_tool as experimental. The defined audit hold remains.
+Adoption
 requires a needed orchestration capability, graduation from experimental,
-and an accepted frozen comparison of the Codex thread API, Agents SDK
-codex_tool and codex exec --json plus resume. The comparison must account
+and an accepted newly preregistered comparison of Agents SDK codex_tool,
+the Codex thread API and codex exec --json plus resume, following the
+comparison design in catalogs/sota-convergence/manifest-20260926.json:451.
+The comparison must account
 for complete usage, events, external effects, cancellation and recovery.
+It stays separate from the sealed workers comparison of native Claude
+CLI, the Codex SDK via native_worker.py and the Claude Agent SDK. That
+layer-default verdict changes only through a re-preregistered rerun, as
+recorded in docs/grand-catalog-handbook.md's agent-sdks narrative. Neither
+this candidate comparison design nor these metadata edits change the
+frozen wave-20260922 layer-verdict rows.
 No installation or comparison is authorized by this documentation repair.
 
 The audit's assertion that the foundation manifest still cites table
 lines 78-84 no longer holds: its agent-sdks description already cites the
-October 2 two-host decision. The stale citation does remain in the
-landscape's agent-sdks rationale and is corrected to rows 82-86 of
-docs/foundation-closure-20260921.md (header at line 80). That table has
-five other SDK/runtime candidates and no OpenAI Agents SDK row.
+October 2 two-host decision. The closure assessment identifies four copies:
+catalogs/landscape/foundation.json's agent-sdks rationale,
+catalogs/foundation/decisions.json's agent-sdk-runtime-selection next_gap,
+catalogs/foundation/manifest.json's agent-sdks next_gap, and
+catalogs/landscape/research-state.json's agent-sdks next_action. The
+landscape rationale was corrected in C2; R641 corrects the two remaining
+stale copies in decisions.json and research-state.json. All three now
+cite the header at line 80 and candidate rows 82-86 of
+docs/foundation-closure-20260921.md and record the 2026-10-03 source revisit.
+The manifest copy was already clean at the assigned base. The historical
+table still has five other SDK/runtime candidates and no OpenAI Agents SDK
+row; the source revisit supplies no new execution.
 
 The September 26 return at
 evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/1/fit
@@ -89,6 +131,16 @@ substantive fit judgment with missing-vote provenance, not a completed
 two-family vote. The returns, saturation-ledger reference and dated
 sota-convergence manifest remain unchanged. No new vote is claimed, and
 their historical comparison baseline is not repinned by this task.
+
+The new agent-sdks candidate also cites the completed two-family fit return
+at evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/agent-sdks/6/fit.
+Claude refuted at confidence 0.72 using the managed API's key/billing
+premise, which this correction no longer generalizes to the local SDK.
+GPT-6 refuted at 0.99 and explicitly rejected that generalization while
+challenging the proposed isolation outcome. Correcting the authentication
+premise does not qualify the candidate or remove the orchestration,
+experimental-status and measured-comparison hold. Both historical returns
+retain their original votes and provenance.
 
 ## DD-2 verification and correction
 
@@ -104,24 +156,40 @@ was read with gh api at the contract's exact revision and records:
 | 20128 | omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 | cf6748d04 |
 | 20129 | omniroute-3.8.51-2f42a9ac-pr13788 | 87c4c488d |
 
-Both bases are 2f42a9ac19d1a247ec9ce5473b790843724b3061, with the same
-tree as released v3.8.51 commit c1e30b7676975feb298b49eff6ff58923c04b89e.
+Both bases are
+[2f42a9ac19d1a247ec9ce5473b790843724b3061](https://github.com/diegosouzapw/OmniRoute/commit/2f42a9ac19d1a247ec9ce5473b790843724b3061),
+with the same tree as released v3.8.51 commit
+[c1e30b7676975feb298b49eff6ff58923c04b89e](https://github.com/diegosouzapw/OmniRoute/commit/c1e30b7676975feb298b49eff6ff58923c04b89e).
+Fresh GitHub git-commit reads at both pins returned tree
+`0f58d8df20c0c2ae4336b432b3f39837119b6eed`.
 Both deployments carry
 [#13788](https://github.com/diegosouzapw/OmniRoute/pull/13788), whose
-head is 6c7990058c4ce9677de79452c8cefb10b4bf1b3d; 20128 additionally
-carries the local affinity patch and
-[#15167](https://github.com/diegosouzapw/OmniRoute/pull/15167), whose
-head is 0585aba5589d5a1f49243a13a8db249558e7c9e3. Fresh gh api reads
-on 2026-10-03 returned both PRs open with those heads. A PR head is not
-the deployed cherry-pick's BUILD_SHA.
+head is [6c7990058c4ce9677de79452c8cefb10b4bf1b3d](https://github.com/diegosouzapw/OmniRoute/commit/6c7990058c4ce9677de79452c8cefb10b4bf1b3d).
+R641 correction, 2026-10-03: 20128 additionally carries the local affinity
+patch and [#15167](https://github.com/diegosouzapw/OmniRoute/pull/15167)
+cherry-picked from upstream head `f5d8e150b79e0901fa18241c7f29bff889b87c14`
+into build `cf6748d04`, as retained in
+[qualification-pipeline-times.txt](../../evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-pipeline-times.txt)
+lines 1-2 and
+[omniroute.service.after-switch.txt](../../evidence/artifacts/omniroute-sol-max-20260930/checks/omniroute.service.after-switch.txt)
+line 2. The PR's later force-pushed head
+`0585aba5589d5a1f49243a13a8db249558e7c9e3` describes current upstream
+state only. Fresh gh api reads on 2026-10-03 returned both PRs open;
+the [pinned comparison](https://github.com/diegosouzapw/OmniRoute/compare/f5d8e150b79e0901fa18241c7f29bff889b87c14...0585aba5589d5a1f49243a13a8db249558e7c9e3)
+returned `diverged`, with the later commit dated 2026-09-30T10:20:42Z.
+A PR's current head does not identify the deployed cherry-pick.
 
 In the clean package's
 [effort sets](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11-L31),
 gpt-6.1-sol is unlisted, so
 [clampEffort](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L315-L340)
 caps it at xhigh. PR #15167's
-[pinned sets](https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L11-L33)
-include gpt-6.1-sol, preserving requested max;
+[carried sets](https://github.com/diegosouzapw/OmniRoute/blob/f5d8e150b79e0901fa18241c7f29bff889b87c14/open-sse/executors/codex/reasoningSuffix.ts#L11-L33)
+include gpt-6.1-sol, preserving requested max. The fetched
+reasoningSuffix.ts at that pin and the
+[current upstream state](https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L11-L33)
+are byte-identical (SHA256
+`e6709380c42b76fe115861df83afc9a00be64bba3e5fdf615ec910094d5901c9`). The
 [wire mapping](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L1401-L1442)
 maps ultra to max. The audit's separate October 2 Mac 3.8.52 observation
 in docs/decisions/2026-10-02-omniroute-mac-rebuild.md does not replace
@@ -147,21 +215,38 @@ resolved the contexts. The refused patches changed no bytes.
 
 Initial acceptance retained three exit-1 results. Catalog validation
 reported a stale decision-index disposition; the supported
-scripts/catalog_decisions.py --write regenerated its single changed
-conditional-to-unqualified reference in the foundation-owned union.
+scripts/catalog_decisions.py --write corrected the conditional-to-unqualified
+reference. The supplement registration described above also added six
+layer-16 references to the foundation-owned union (2045 to 2051).
 Landscape and explorer checks rejected a changed current_choice that
 differed from the quality catalog's incumbent choice. That choice remains
 unchanged, with the held SDK added as a candidate and described in the
-foundation manifest instead. Original logs retain those failures before
-the corrected reruns. All 26 registered convergence records were checked
-for changed-file artifact pins; none requires rebinding. The component
+foundation manifest instead. These initial failures are historical worker
+reports, not fresh R641 check results. The 26 convergence records listed
+in manifests/evidence.json#/convergence_records were checked for this
+repair's changed-file artifact pins; none requires rebinding. The component
 matrix and new-host grand list remained current without regeneration.
 
+R641 retained one refused patch before any bytes changed: its manifest
+context assumed a trailing comma on the final field. The first candidate
+edit then made verdict_review_gate.py exit 1 because landscape.py requires
+canonical repository file paths in evidence_refs, rejecting a JSON pointer
+fragment. The corrected candidate registers returns.json as the file and
+locates /votes/agent-sdks/6/fit in its rationale. Both frozen-verdict checks
+then passed with zero changed rows and zero violations. The failed attempt
+and the contract's final command outputs are retained in the repair handoff.
+
 The bounded completeness critic checked managed API versus open-source
-SDK, orchestrator versus Codex authentication, explicit environment/key
-overrides, experimental status, missing sweep votes, clean package versus
-each carried deployment, PR head versus build identity, and Mac versus
-workstation scope. The next native-clients/agent-sdks landscape sweep
+SDK, explicit keys and the tool's full default key-resolution chain,
+provided Codex instances, orchestrator versus Codex authentication,
+experimental status, both layer-specific fit returns and missing sweep
+votes, all four table citations, the newly preregistered candidate
+comparison versus the sealed workers comparison, clean package versus
+each carried deployment, carried PR head versus its later force-push and
+build identity, and Mac versus workstation scope. Pinned upstream SDK and
+gateway reads succeeded in R641; the other reviewer's network failures
+were verification gaps and did not require a content change. The next
+native-clients/agent-sdks landscape sweep
 should verify experimental graduation and endpoint request compatibility;
 the next gateway sweep should check whether a clean release incorporates
 #13788/#15167 and supports the exact gpt-6.1-sol effort. Neither task is
