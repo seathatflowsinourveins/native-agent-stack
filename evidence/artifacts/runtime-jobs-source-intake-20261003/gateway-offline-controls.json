@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "kind": "unchanged_upstream_offline_controls",
+  "recorded_date": "2026-10-03",
+  "repository": "diegosouzapw/OmniRoute",
+  "version": "3.8.51",
+  "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+  "source_files": [
+    {
+      "path": "package.json",
+      "bytes": 35615,
+      "sha256": "b002c54561bd762f41c7f4cafe6809ac5d5e58bbe175ce0399eb7c1df5b0baf6"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 1441921,
+      "sha256": "bf15f02bd7a691d8e69146a5b6ff417f5a74976299bc43faef77e0bcd6beafb3"
+    },
+    {
+      "path": ".github/workflows/quality.yml",
+      "bytes": 35927,
+      "sha256": "f55735f0212def0d5abe01f8ebe5f994f54eadea4b69fc3d870ac81f75281bde"
+    },
+    {
+      "path": ".github/actions/npm-ci-retry/action.yml",
+      "bytes": 3087,
+      "sha256": "ed388998edf4579da7481fa8ed07097619871460e5d4ce5b38b44d89f41a4db2"
+    },
+    {
+      "path": "scripts/build/postinstall.mjs",
+      "bytes": 15621,
+      "sha256": "9da3ba94288b262bfd54b397e36929d9ea25155ea873aa3407b29a88ae47479d"
+    },
+    {
+      "path": "scripts/build/sync-env.mjs",
+      "bytes": 98,
+      "sha256": "512a5e6f1aa640e9a646b92d10564376631bcfe38c9e027e2be5cd84cc42ea1a"
+    },
+    {
+      "path": "scripts/dev/sync-env.mjs",
+      "bytes": 13088,
+      "sha256": "2ae95ff7048f5aaf05365d8e9cb0eaaee8291a05751750c7bef5b54b6d4f9606"
+    },
+    {
+      "path": "scripts/postinstall.mjs",
+      "bytes": 751,
+      "sha256": "1de7b0506ef18fa669d278f1b7aba8be2ccf302433266a3ea15aa4b6ceaeac9e"
+    },
+    {
+      "path": "tests/_setup/isolateDataDir.ts",
+      "bytes": 3437,
+      "sha256": "ac1e620acc01b5584f6e15dce8f552ff746f844fd4094d84f7183fb784572793"
+    },
+    {
+      "path": "tests/unit/chatcore-semantic-cache.test.ts",
+      "bytes": 26810,
+      "sha256": "b9b865004322fee8876f3fff8b1fa7212952c8ed7fbf90e3b1e7a49b9efa8d39"
+    },
+    {
+      "path": "open-sse/utils/setupPolyfill.ts",
+      "bytes": 1527,
+      "sha256": "173b212b65c34745fa0d8c073e14cacc3be0552875940587acb7e94bbb394c9c"
+    },
+    {
+      "path": "src/lib/dataPaths.ts",
+      "bytes": 6773,
+      "sha256": "9098a08ba1adc97e075f71e36e8376fb0873e8934da8c0751536886a6463e380"
+    },
+    {
+      "path": "src/lib/db/core.ts",
+      "bytes": 69052,
+      "sha256": "50291ae75437964d95e30c041ab05e6bb5a14a85e2b38379a42f9ff7208c7b56"
+    },
+    {
+      "path": "src/lib/db/encryption.ts",
+      "bytes": 17252,
+      "sha256": "ec10ae370c25bf06983e5f949dd6fa9dd324acc2e7ebe75d9510e3575e7fb6ad"
+    },
+    {
+      "path": "open-sse/config/semanticCacheConfig.ts",
+      "bytes": 8966,
+      "sha256": "6b2ea0b037f67457ce5526fbe26b8d3ccb8331da4fcafbc60caec5cbb8af2f8c"
+    },
+    {
+      "path": "open-sse/services/cache/semanticCacheManager.ts",
+      "bytes": 15089,
+      "sha256": "8c270d298eb9106a687b84faf30844882f62c4ea13e3b2e1beace32d83a5f10a"
+    },
+    {
+      "path": "open-sse/services/cache/embeddingClient.ts",
+      "bytes": 6567,
+      "sha256": "c2d0d6f9c356dc646e7c2cd53f0655e2d5d9abf8661db3a27432e2c544a3f7e4"
+    },
+    {
+      "path": "src/lib/usage/costCalculator.ts",
+      "bytes": 13579,
+      "sha256": "e1ebad253021738c07e84ff20fe1e75e7be4bac6d4517532bdb56e47529925b1"
+    },
+    {
+      "path": "src/lib/db/settings.ts",
+      "bytes": 35865,
+      "sha256": "52781d9085b7ce3c24f65a9f54264be79d96f9b653da11b531d33161057cca00"
+    },
+    {
+      "path": "src/lib/db/settings/pricing.ts",
+      "bytes": 8862,
+      "sha256": "a2b325aaaf5532510f6cb63ca62102b6b8f43dd71d18cb647e8cef01d662c934"
+    },
+    {
+      "path": "src/lib/db/readCache.ts",
+      "bytes": 14298,
+      "sha256": "1a90a51da3e095ea40cc28800b48669d0d721fd55c8e3ccae6db958c5e82ca46"
+    },
+    {
+      "path": "src/shared/constants/pricing.ts",
+      "bytes": 1297,
+      "sha256": "1207c316cc7dde368471080e5aa45293cdda70007aa7e97773f766c57b30f556"
+    },
+    {
+      "path": "src/shared/constants/pricing/default-pricing.ts",
+      "bytes": 775,
+      "sha256": "1e79df91e2e2b7870d542676099beea5141ca63c8e97bdeb8042a21d6268a3b1"
+    },
+    {
+      "path": "src/shared/constants/pricing/oauth-subscriptions.ts",
+      "bytes": 12593,
+      "sha256": "60c357fe5a471e59814248db3f27497a227c58239de382a0c84ecefe7cedaa7f"
+    },
+    {
+      "path": "src/shared/constants/pricing/frontier-labs.ts",
+      "bytes": 11070,
+      "sha256": "6150ed04cb01833f2b5cefe404c36584c10af7500e0cabcc6c3f971112bfd8ef"
+    },
+    {
+      "path": "src/shared/constants/pricing/inference-hosts.ts",
+      "bytes": 13395,
+      "sha256": "24504bef04745d4d4ba5cc2eb59a4c20e9f88bdfd580cd9b7497eeec88f43d49"
+    },
+    {
+      "path": "src/shared/constants/pricing/regional.ts",
+      "bytes": 3986,
+      "sha256": "c866f5d56b091b206c743131591341126ad607a6d575a42e8296a8d691008dc7"
+    },
+    {
+      "path": "src/shared/constants/pricing/devin.ts",
+      "bytes": 4795,
+      "sha256": "5282992f7dae6ef1f590a44e0ce476e606a2a9956fbd16af7e1da2c342a6a965"
+    },
+    {
+      "path": "src/shared/constants/pricing/shared-tiers.ts",
+      "bytes": 5401,
+      "sha256": "a26547701d4dc9b934baab2a41d9de7514d6125e9c624d050348bde7a90b803a"
+    },
+    {
+      "path": ".npmrc",
+      "bytes": 1279,
+      "sha256": "bb0e92fad9d7f5743ae6ed981ef3074b3228a16d14c19e4416aed0c75e7ba5af"
+    },
+    {
+      "path": "src/lib/db/adapters/driverFactory.ts",
+      "bytes": 15934,
+      "sha256": "696384b55aa623821f1d5afca235fa8a75dd222051704ee725a47e4a00d54fb2"
+    }
+  ],
+  "installed_tools": {
+    "node": "24.21.0",
+    "npm": "11.19.0"
+  },
+  "installation": {
+    "native_clone_exit_code": 0,
+    "native_install_command": "npm ci --no-audit --no-fund",
+    "native_exit_code": 0,
+    "cleared_environment": true,
+    "fresh_private_DATA_DIR": true,
+    "warmup_skipped_by_upstream_CI_and_SKIP_POSTINSTALL": true,
+    "observed_added_packages": 2528,
+    "environment_sync_returned": "Created .env from .env.example (46 keys, 0 secrets generated)",
+    "generated_environment_file_read": false,
+    "blocked_native_install_scripts": [
+      "@playwright/browser-chromium@1.61.1",
+      "bun@1.4.2",
+      "libxmljs2@0.37.0",
+      "onnxruntime-node@1.30.0",
+      "opencode-ai@1.18.30"
+    ],
+    "scripts_approved_or_policy_bypassed": false,
+    "project_config_warning": "onnxruntime-node-install is an unknown npm project config; upstream file retained unchanged."
+  },
+  "test": {
+    "native_exit_code": 0,
+    "test_file": "tests/unit/chatcore-semantic-cache.test.ts",
+    "unchanged_upstream_source": true,
+    "native_preloads": [
+      "tsx/esm",
+      "./open-sse/utils/setupPolyfill.ts",
+      "./tests/_setup/isolateDataDir.ts"
+    ],
+    "environment": {
+      "cleared": true,
+      "NODE_ENV": "test",
+      "DISABLE_SQLITE_AUTO_BACKUP": "true",
+      "APP_LOG_TO_FILE": "false",
+      "OMNIROUTE_FORCE_DB_HEALTHCHECK": "0",
+      "OMNIROUTE_SEMANTIC_CACHE_ENABLED": "false",
+      "OMNIROUTE_SEMANTIC_CACHE_BACKEND": "memory"
+    },
+    "test_name_pattern": "^checkSemanticCache (returns null when the x-omniroute-no-cache header|returns a non-streaming JSON HIT|returns a streaming SSE HIT|HIT bills 0 incremental cost|returns null when cacheDefaultMode is .bypass.|HIT includes X-OmniRoute-Cache-Latency: synthetic header)",
+    "selected_tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "duration_ms": 3855.937293,
+    "returned_driver": "better-sqlite3",
+    "returned_data_path_private_and_temporary": true
+  },
+  "evidence_class": "unchanged_upstream_test_execution",
+  "fixture_class": "synthetic_local_cache_replay",
+  "output_artifact": "gateway-offline-controls.output.txt",
+  "output_preservation": "Actual returned merged tool output; ephemeral DATA_DIR paths replaced, no stdout/stderr separation or byte-identical original stdout claim.",
+  "scope": "Selected native cache-header/replay/metadata controls only. The header no-cache fixture is unseeded; its null result alone cannot distinguish bypass from a miss. Other selected fixtures seed local legacy cache.",
+  "limits": [
+    "No provider/model request, comparison, live cache setting, feature saving, quality gate, final default or destination build qualification.",
+    "Source predicts no live provider/Redis/embedding call under these controls; no independent network trace was captured.",
+    "Cache replay costs, saved-token/cost headers and synthetic latency are fixture metadata, not new provider consumption or realized billing.",
+    "Native allowScripts withheld five install hooks. Passing this scope does not accept those packages or complete upstream installation acceptance.",
+    "All selected source files and lock remained unchanged; no host auth/configuration copied or native sign-in changed."
+  ],
+  "preparation_failures": [
+    {
+      "reported_by": "bounded_source_worker",
+      "error": "JavaScript filter syntax error before any source request",
+      "exit_code": 1,
+      "correction": "Corrected read processor."
+    },
+    {
+      "reported_by": "bounded_source_worker",
+      "error": "Large lockfile contents response had empty encoded body; JSON parse exited1.",
+      "exit_code": 1,
+      "correction": "Recovered exact lock via pinned raw API."
+    }
+  ],
+  "provider_usage": null,
+  "billing": null
+}

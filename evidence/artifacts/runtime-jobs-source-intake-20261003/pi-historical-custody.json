@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "kind": "historical_pr_custody",
+  "recorded_date": "2026-10-03",
+  "evidence_class": "source_review",
+  "pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/524",
+  "read_head": "530238710157c6160741a0e9b9f757aecda0a726",
+  "ownership_source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965964357",
+  "original_reads": [
+    {"path": "blueprints/convergence-practice/pi-omni-trial-20260929/README.md", "bytes": 20708, "sha256": "25b69720d05cd7539ff3eb11527ecac0c4e9d3d4cd0ab51b36280fd79b43859c", "native_exit_code": 0},
+    {"path": "blueprints/convergence-practice/pi-omni-trial-20260929/experiment.json", "bytes": 78997, "sha256": "6377549f4c3a0fd3f46f4560ac2088c6af7a547add5594ab57aacd9536793b87", "native_exit_code": 0},
+    {"path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/pins.json", "bytes": 3689, "sha256": "9caff929da98e56010151dec90a569d5e7cbdf7145669d08146e9b9845f1132a", "native_exit_code": 0}
+  ],
+  "historical_declared_scope": {
+    "pi_version": "0.99.1",
+    "pi_pin": "d86654abb8862e201933517d6f1fce9f88dd117f",
+    "decision": "trial",
+    "qualification_run_ids": [],
+    "synthetic_fixture_count": 4,
+    "historical_observation_status_counts": {"passed": 28, "failed": 1},
+    "usage_assessment": {"claim": "none", "coverage": "partial", "expected_run_ids": [], "coverage_artifact": null},
+    "counts_are_historical_record_fields_not_new_model_execution": true
+  },
+  "retained_failure_scope": "The failed observation used the superseded unreleased Pi commit5257d0d5 and Astra/max wiring kit, not the later frozen Pi0.99.1 inputs. HTTP429 refusals occurred before model execution; the historical Pi JSON command exited0 despite the failed response. It is retained as a wiring refusal and is not scored against the later candidate.",
+  "decision": "close_superseded_trial_without_deleting_branch",
+  "closure_status": "closed_without_branch_deletion",
+  "closure_native_exit_code": 0,
+  "closure_readback_native_exit_code": 0,
+  "closed_at": "2026-10-03T05:49:04Z",
+  "closure_readback_head": "530238710157c6160741a0e9b9f757aecda0a726",
+  "current_scope": "The unfrozen coding-worker comparison targets Pi1.0.0, OpenHands1.50.1 and native Codex0.160, SolUltra through the qualified OmniRoute pool. This historical trial establishes no current default, useful-role acceptance, container isolation, token saving or source-epoch equivalence.",
+  "credentials_or_gateway_readbacks_read": false,
+  "new_model_runs": 0,
+  "provider_usage": null,
+  "billing": null
+}

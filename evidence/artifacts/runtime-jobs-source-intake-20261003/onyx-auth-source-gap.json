@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "kind": "pinned_candidate_admissibility_source_gap",
+  "recorded_date": "2026-10-03",
+  "evidence_class": "source_review",
+  "repository": "onyx-dot-app/onyx",
+  "version": "4.8.3",
+  "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+  "root_original_reads": [
+    {"path": "backend/onyx/auth/users.py", "bytes": 118027, "sha256": "ca0b4e3116996ed5706fbea16184dcf5c7690680d90bdc015cd797b42172f43f", "decisive_raw_lines": [194, 199, 201, 202]},
+    {"path": "deployment/docker_compose/env.template", "bytes": 18556, "sha256": "daf2ed0d054d8d81dac86b76ce4dddb6d1d5399b09e2d927f228cbf43815a4c9", "AUTH_TYPE_raw_line": 304}
+  ],
+  "source_observation": "verify_auth_setting explicitly warns that AUTH_TYPE='disabled' is no longer supported and authentication is always enabled. This disproves that proposed passwordless setup setting at this pin; it is not merely an unverified option.",
+  "scope_limit": "This is not an absence claim about every supported SSO/authentication path or a measured research-quality result. Supported frictionless native sign-in/API bootstrap and report export remain under source qualification.",
+  "comparison_status": "Requested Onyx4.8.3 pin retained; freeze remains ineligible until an admissible supported setup is qualified or this gap is explicitly preregistered and read as a failed condition.",
+  "native_deployment_or_model_runs": 0,
+  "credential_or_auth_file_access": false,
+  "provider_usage": null,
+  "billing": null
+}

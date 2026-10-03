@@ -21,3 +21,11 @@ The [Inspect offline controls](inspect-offline-controls.json) record an isolated
 The [gateway cache controls](gateway-cache-controls.json) bind native request-scoped semantic-cache bypass and allowlisted metadata at the release pin. Prompt compression off leaves reactive context-fit safety available; gateway cache bypass does not make provider prompt caching cold. The native fixture was read, not run, and no live gateway setting or feature saving is qualified.
 
 The [Harbor offline controls](harbor-offline-controls.json) record14 passing unchanged classifier cases using the locked core and a declared native UV test-tool overlay. [Actual returned tool output](harbor-offline-controls.output.txt) retains the results with host paths redacted. The fixture mocks a ClaudeCode environment; no worker or container was launched.
+
+The [historical Pi custody receipt](pi-historical-custody.json) binds the three root-original files and exact closed PR524 head; the historical branch and failures remain. The [publication retry receipt](publication-boundary-retry.json) preserves the command boundary failure and successful normal retry without promoting publication checks into role evidence.
+
+The [readiness publication read](readiness-publication-read.json) records bounded Sol acceptance at9a29de4 and its corrected preparation error. That verdict does not accept later native controls or a frozen study.
+
+The [gateway offline receipt](gateway-offline-controls.json) and [returned native output](gateway-offline-controls.output.txt) establish six selected original cache replay controls on the release pin. The [GPTR native preflight](gptr-offline-preflight.json) and [181-version dependency snapshot](gptr-dependency-snapshot.json) establish native CLI/configuration readiness only. The [promptfoo config control](promptfoo-config-control.json) validates its unchanged upstream example inside a temporary network namespace and private state; inline assertions and provider turns did not run. Neither telemetry flags alone nor early bare help probes establish offline behavior.
+
+The [Onyx auth source gap](onyx-auth-source-gap.json) preserves the original4.8.3 source contradiction of AUTH_TYPE=disabled. Its requested pin remains; alternative supported sign-in/bootstrap and export paths are unqualified.

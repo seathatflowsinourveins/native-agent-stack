@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_publication_read",
+  "recorded_date": "2026-10-03",
+  "read_head": "9a29de48b9046e6fb16e3475e802faf90e8e0273",
+  "previous_read_head": "66d784cfb87405e20765ab176cbf24c01ec32e14",
+  "reader": "Sol6.1/max bounded read-only source worker",
+  "verdict": "ACCEPT",
+  "scope": "Source publication and selected offline readiness only:17 owned artifacts plus registry; no suite/model/container reruns.",
+  "observations": {
+    "clean_exact_read_tree": true,
+    "owned_registered_hash_matches": 17,
+    "selected_original_source_identity_matches": 22,
+    "coding_source_map_rows": 24,
+    "complete_retained_native_manifest_outputs": 24,
+    "inspect_passed": 5,
+    "inspect_skipped": 3,
+    "harbor_passed": 14,
+    "all_job_defaults_null": true,
+    "all_studies_unfrozen": true
+  },
+  "source_of_claims": "Pinned original files in coding-input-read.json, gateway-cache-controls.json, inspect-offline-controls.json and harbor-offline-controls.json; root also original-read those source identities. A worker verdict is bounded review evidence, not upstream execution acceptance.",
+  "reader_failure": {
+    "tool": "context-mode ctx_execute/javascript",
+    "exit_code": 1,
+    "returned_error": "SyntaxError: Unexpected identifier '__cm_main'",
+    "cause": "Extra closing brace in the read processor.",
+    "native_commands_started": 0,
+    "correction": "Removed brace; subsequent head/status/diff/stat reads exited0.",
+    "usage": null
+  },
+  "claude_exact_head_read": "requested_and_running_at_9a29de4_per608comment5966170234",
+  "astra_previous_acceptance_scope": "66d784c source-only; not this new readiness delta",
+  "native_review_usage": null,
+  "provider_billing": null,
+  "does_not_qualify": ["Frozen comparison", "Useful role or default", "Image pull/build/digest enforcement", "Actual gateway effort or live token feature", "Activated org enhancement", "Current Claude manifest/startup carrier"]
+}
