@@ -242,8 +242,8 @@
     },
     {
       "id": "claude-hud",
-      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
-      "version": "0.10.0",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+      "version": "0.8.0",
       "license": "MIT",
       "profile": "optional",
       "role": "Claude statusline rendering",
@@ -259,14 +259,13 @@
         "token-practice-gap-followup-20260920",
         "native-claude-hud-interactive-20260920",
         "current-session-observation-20260920",
-        "claude-repository-evidence-20260921",
-        "claude-hud-0100-qualification-20261003"
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0"
+        "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0"
       ],
-      "source_pin": "75683c6de1ac07f6bbef00d739001679dba0740c",
-      "freshness": "2026-10-03 W1 scratch qualification: The three recorded package/plugin/marketplace version reads printed \"0.10.0\". The recorded synthetic stdin render printed \"[Opus 5] \u2502 workspace\" and \"Context \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591 0%\" (exit 0); the upstream test:stdin payload render printed \"[Opus]\" and \"Context \u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591 23%\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.8.0 receipts retain their original scope.",
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core.",
       "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
     },
@@ -602,27 +601,26 @@
     {
       "id": "mcp-inspector",
       "repository": "https://github.com/modelcontextprotocol/inspector",
-      "version": "2.9.0",
-      "license": "Apache-2.0 AND MIT (2.9.0 LICENSE: MIT-to-Apache-2.0 relicensing transition; documentation CC-BY-4.0)",
+      "version": "2.8.0",
+      "license": "Apache-2.0 AND MIT (2.8.0 LICENSE: MIT-to-Apache-2.0 relicensing transition; documentation CC-BY-4.0)",
       "profile": "supporting",
       "role": "Upstream direct stdio tool inspection/calls",
       "commands": [
-        "npx @modelcontextprotocol/inspector@2.9.0 --help"
+        "npx @modelcontextprotocol/inspector@2.8.0 --help"
       ],
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
         "token-native-retained-functional-20260920",
         "claude-repository-evidence-20260921",
-        "mcp-inspector-280-qualification-20260926",
-        "mcp-inspector-290-qualification-20261003"
+        "mcp-inspector-280-qualification-20260926"
       ],
       "upstream_sources": [
         "https://github.com/modelcontextprotocol/inspector",
-        "https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0"
+        "https://github.com/modelcontextprotocol/inspector/releases/tag/2.8.0"
       ],
       "source_pin": null,
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded npm ls output contained \"@modelcontextprotocol/inspector@2.9.0\" (exit 0). The integration tools/list returned set_tool_tier, announce_model, jcodemunch_guide, order, menu and route (exit 0); tools/call order/get_session_stats returned \"visible_tools\":6 (exit 0), and the unknown-tool control returned \"tool_not_found\" (exit 5). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 2.8.0 receipts retain their original scope.",
+      "freshness": "2.8.0 serves bin/mcp-inspector on the NativeStack WSL2 host since 2026-09-26, after a matched comparison against 2.7.0: 15 of 15 gated steps on both, including 10 CLI calls over stdio and streamable HTTP to a scratch QMD server, with identical outputs once per-run paths and markers are normalized. 2.8.0 closes the fail-open DANGEROUSLY_OMIT_AUTH parse (PR #2390): with 'false', '0' or 'yes', 2.7.0 served the web API without its token and 2.8.0 answered 401 (measured). 2.7.0 is kept for rollback. The landscape winner pin stays 2.7.0 until a new verdict wave.",
       "command_scope": "Direct upstream Inspector stdio call proved arithmetic execution; full plugin hooks and current desktop scope are separate."
     },
     {
@@ -653,7 +651,7 @@
     {
       "id": "openresearch",
       "repository": "https://github.com/alphaXiv/OpenResearch",
-      "version": "0.2.15",
+      "version": "0.2.7",
       "license": "MIT",
       "profile": "supporting",
       "role": "Selected public literature discovery and extracted paper retrieval",
@@ -668,20 +666,19 @@
         "token-practice-gap-followup-20260920",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921",
-        "openresearch-0215-qualification-20261003"
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/alphaXiv/OpenResearch",
-        "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.15"
+        "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7"
       ],
-      "source_pin": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
-      "freshness": "2026-10-03 W1 scratch qualification: The isolated recorded version command printed \"orx 0.2.15\" (exit 0). The documented discover/paper smoke output is \"NOT RUN\"; its -1 value is a not-run sentinel. Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.2.7 receipts retain their original scope."
+      "source_pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
     },
     {
       "id": "playwright-cli",
       "repository": "https://github.com/microsoft/playwright-cli",
-      "version": "0.1.22; Playwright 1.64.0-alpha-1790635538000",
+      "version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
       "license": "Apache-2.0",
       "profile": "optional",
       "role": "Native browser CLI with bounded Linux fixture acceptance and separately scoped Windows history",
@@ -693,15 +690,13 @@
         "component-history",
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
-        "claude-repository-evidence-20260921",
-        "playwright-cli-0122-qualification-20261003"
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/microsoft/playwright-cli",
-        "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.22"
+        "https://github.com/microsoft/playwright-cli"
       ],
       "source_pin": null,
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"0.1.22\" (exit 0); the help smoke printed \"Usage: playwright-cli <command> [args] [options]\" and \"--version                   print version\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.1.21; Playwright 1.64.0-alpha-1789764292000 receipts retain their original scope. npm sha512 matches dist.integrity and the provenance subject; SHA256 is a local rehash. The existing-Chrome fixture was not repeated and bundled Playwright remains alpha.",
+      "freshness": "Exact 0.1.21 package integrity verified against registry and lock; alpha Playwright dependencies and existing-Chrome acceptance are recorded in the dated gap follow-up receipt.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     },
     {
@@ -1065,7 +1060,7 @@
     {
       "id": "worktrunk",
       "repository": "https://github.com/max-sixty/worktrunk",
-      "version": "0.80.0",
+      "version": "0.79.0",
       "license": "MIT OR Apache-2.0",
       "profile": "optional",
       "role": "Native Git worktree convenience CLI",
@@ -1080,21 +1075,20 @@
         "velanext-native-quality-tools-20260920",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921",
-        "worktrunk-0800-qualification-20261003"
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/max-sixty/worktrunk",
-        "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
+        "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0"
       ],
-      "source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"\u25cb Showing 1 worktree\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.79.0 receipts retain their original scope.",
+      "source_pin": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     },
     {
       "id": "opentelemetry-collector-contrib",
       "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-      "version": "0.162.0",
+      "version": "0.161.0",
       "license": "Apache-2.0",
       "profile": "observability",
       "role": "Single native core/contrib Collector process; content filtering, metric conversion, upstream exporters and SDK file receiver",
@@ -1114,15 +1108,13 @@
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921",
-        "otelcol-contrib-0162-qualification-20261003"
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": null,
       "upstream_sources": [
-        "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-        "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0"
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib"
       ],
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"otelcol-contrib version 0.162.0\" (exit 0). The recorded validate command returned empty output with exit 0. Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.161.0 receipts retain their original scope."
+      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
     },
     {
       "id": "prometheus",
@@ -1405,10 +1397,10 @@
     {
       "id": "syft",
       "repository": "https://github.com/anchore/syft",
-      "version": "1.54.0",
+      "version": "1.52.0",
       "license": "Apache-2.0",
       "role": "Scoped native SDK dependency inventory; no vulnerability verdict",
-      "source_pin": "cc326e45a6213360266dda4b30cc68095946d676",
+      "source_pin": "02ba369d13b4248395b20a504eca94b0cab564d8",
       "commands": [
         "syft version -o json",
         "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json"
@@ -1417,14 +1409,13 @@
         "syft-sdk-inventory-20260919",
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
-        "claude-repository-evidence-20260921",
-        "syft-1540-qualification-20261003"
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
-        "https://github.com/anchore/syft/releases/tag/v1.54.0"
+        "https://github.com/anchore/syft/releases/tag/v1.52.0"
       ],
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version JSON returned \"version\": \"1.54.0\", \"gitCommit\": \"cc326e45a6213360266dda4b30cc68095946d676\" and \"schemaVersion\": \"16.1.11\" (exit 0). The recorded inventory smoke excerpt reports \"36 artifacts, 166 files, 177 relationships\" and \"CycloneDX 1.7, 123 components (36 library + 87 file)\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 1.52.0 receipts retain their original scope."
+      "freshness": "Native acceptance on 2026-09-19; actual selected SDK inventory, not a whole-host or automatic-update policy."
     },
     {
       "id": "alpaca-py",
@@ -1687,7 +1678,7 @@
     {
       "id": "jcodemunch-mcp",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "version": "1.108.327",
+      "version": "1.108.319",
       "license": "Dual-Use License 1.1; upstream non-commercial/commercial terms retained",
       "profile": "supporting",
       "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
@@ -1700,7 +1691,7 @@
           }
         }
       ],
-      "source_pin": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+      "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
       "evidence_ids": [
         "native-jcodemunch-20260920",
         "native-token-focus-clients-20260920",
@@ -1713,14 +1704,13 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921",
-        "jcodemunch-1108327-qualification-20261003"
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
-        "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/LICENSE"
+        "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/LICENSE"
       ],
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"jcodemunch-mcp 1.108.327\" (exit 0); the recorded get_session_stats smoke returned \"visible_tools\":6, \"catalog_tools\":94, \"schema_tokens_visible\":1050 and \"schema_tokens_catalog\":27880 (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 1.108.319 receipts retain their original scope.",
+      "freshness": "Pinned upstream installation, direct artifact acceptance and one bounded task in each native client verified 2026-09-20; no causal provider savings claim.",
       "command_scope": "Index only selected code; default upstream index root; sharing, AI summaries, watchers, cross-repository defaults and external context providers disabled. See native recipe and receipt for whole-file versus focused-source baselines."
     },
     {
