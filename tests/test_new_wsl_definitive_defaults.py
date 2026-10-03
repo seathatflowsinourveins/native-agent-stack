@@ -17,6 +17,8 @@ import unittest
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from tests.test_adoption_bootstrap import sha256sum_checks_like_gnu  # helpers only; its test classes run there
+
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
 RECORD = ROOT / "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md"
@@ -1064,6 +1066,11 @@ class LocalModelAcceptance(unittest.TestCase):
     answers and no model runs. The embedder's library manifest is not published (the registry's copy carries its build
     path), so its case writes a stand-in manifest and puts that file's digest in place of the pinned one, after checking
     that the program names the pinned digest once.
+
+    The files checks run `sha256sum --check --status`. Where this host's sha256sum rejects those options (the probe
+    sha256sum_checks_like_gnu from tests/test_adoption_bootstrap.py: macOS's /sbin/sha256sum prints its usage and
+    exits 1), a scratch sha256sum runs `shasum -a 256` in its place, as that module's run_install_pin does. A failed
+    case's message carries the program's exit code, stdout and stderr.
     """
 
     PINNED_LIBRARY = "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"
@@ -1072,8 +1079,9 @@ class LocalModelAcceptance(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        if not (shutil.which("bash") and shutil.which("jq") and shutil.which("sha256sum")):
-            raise unittest.SkipTest("bash, jq and sha256sum are needed to run the acceptance programs")
+        for tool in ("bash", "jq") if sha256sum_checks_like_gnu() else ("bash", "jq", "shasum"):
+            if shutil.which(tool) is None:
+                raise unittest.SkipTest(f"{tool} is needed to run the acceptance programs")
         rows = {r["slot"]: r for r in load(PLAN / "install-plan.json")["owners"]}
         cls.generation = rows["local-generation-model"]["acceptance"]
         cls.embedding = rows["embedding-model"]["acceptance"]
@@ -1092,6 +1100,7 @@ class LocalModelAcceptance(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
 
     def run_program(self, program, scratch, show="", reply=""):
+        """The finished process of `program`, run as accept.sh runs it with the stubs first on PATH."""
         stub = scratch / "bin"
         stub.mkdir(exist_ok=True)
         (stub / "show.txt").write_text(show, encoding="utf-8")
@@ -1099,11 +1108,19 @@ class LocalModelAcceptance(unittest.TestCase):
         for name, canned in (("ollama", "show.txt"), ("curl", "reply.json")):
             (stub / name).write_text(f'#!/bin/sh\ncat "$STUB_DIR/{canned}"\n', encoding="utf-8")
             (stub / name).chmod(0o755)
+        if not sha256sum_checks_like_gnu():
+            (stub / "sha256sum").write_text('#!/bin/sh\nexec shasum -a 256 "$@"\n', encoding="utf-8")
+            (stub / "sha256sum").chmod(0o755)
         env = {key: value for key, value in os.environ.items() if key not in ("OLLAMA_MODELS", "BASH_ENV", "ENV")}
         env.update(HOME=str(scratch / "home"), tool_root=str(scratch / "tools"), STUB_DIR=str(stub),
                    PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
         return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
-                              timeout=60).returncode
+                              timeout=60)
+
+    @staticmethod
+    def outcome(name, result):
+        """A case's assertion message: its name, and the program's exit code, stdout and stderr."""
+        return f"{name}: exit {result.returncode}\nstdout: {result.stdout!r}\nstderr: {result.stderr!r}"
 
     def test_the_programs_are_the_ones_accept_sh_runs(self):
         checker = load_source(PLAN / "check_plan.py", "check_plan")
@@ -1129,8 +1146,8 @@ class LocalModelAcceptance(unittest.TestCase):
                 if change != "missing":
                     layer = "0" * 64 if change == "layer" else self.SWIFT_FILE
                     self.store(scratch, "swift-iq3s-s2o-64k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
-                status = self.run_program(self.generation["post_install"]["command"], scratch)
-                self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
+                result = self.run_program(self.generation["post_install"]["command"], scratch)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
 
     def test_the_embedding_files_check(self):
         program = self.embedding["post_install"]["command"]
@@ -1145,8 +1162,8 @@ class LocalModelAcceptance(unittest.TestCase):
                 self.store(scratch, "qwen3-embedding", "0.6b", library + ("\n" if change == "library" else ""))
                 layer = "1" * 64 if change == "layer" else self.EMBEDDER_LAYER
                 self.store(scratch, "qwen3-embedding-8k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
-                status = self.run_program(program, scratch)
-                self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
+                result = self.run_program(program, scratch)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
 
     def test_the_service_checks(self):
         answer = json.dumps({"model": "swift-iq3s-s2o-64k", "response": "ready", "done": True})
@@ -1165,8 +1182,8 @@ class LocalModelAcceptance(unittest.TestCase):
             with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
                 scratch = Path(scratch)
                 (scratch / "home").mkdir()
-                status = self.run_program(program, scratch, show, reply)
-                self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
+                result = self.run_program(program, scratch, show, reply)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
 
     def test_the_server_smoke_check(self):
         """The server row's after_sign_in check embeds with the settled embedder and runs or pulls no other model."""
@@ -1184,8 +1201,8 @@ class LocalModelAcceptance(unittest.TestCase):
             with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
                 scratch = Path(scratch)
                 (scratch / "home").mkdir()
-                status = self.run_program(program, scratch, reply=reply)
-                self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
+                result = self.run_program(program, scratch, reply=reply)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
 
 
 if __name__ == "__main__":
