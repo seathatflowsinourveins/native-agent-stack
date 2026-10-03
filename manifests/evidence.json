@@ -15805,6 +15805,11 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-retire-token-stack-release-review.md",
+      "sha256": "1c7abbced652c29a84c00b36d8ad150e905e48c41be12cf1ab4c8e3e4c753af3",
+      "bytes": 20552
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
