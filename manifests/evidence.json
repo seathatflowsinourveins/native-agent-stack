@@ -15751,8 +15751,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md",
-      "sha256": "4135783851cc0c8cdfc26ade8cf73e8b95935898e75a8343d315822ba67c61cf",
-      "bytes": 14002
+      "sha256": "8dc65f98e6e84f3b94621259b22914a63f4bce1a6e127c17f198f2c07870c96f",
+      "bytes": 14266
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
@@ -15760,9 +15760,14 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
+      "sha256": "bacfbc96954a8c87344b815176e82ead6898211307efb7318d2aca9f348e8fb9",
+      "bytes": 11353
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
-      "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
-      "bytes": 8312
+      "sha256": "8aecf90eec8f7ab52087f4aec141b2a56e5caf90c482aa88eea020850823b805",
+      "bytes": 8576
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
