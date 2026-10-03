@@ -42010,6 +42010,11 @@
       "bytes": 2582
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-source-and-native-readiness.json",
+      "sha256": "8eb44ebfbb0e07485373d33843b0519fbb4795c266b461189bee38c97ea8258f",
+      "bytes": 25271
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-manifests.json",
       "sha256": "2fb1d6c97576e2f6f9eb03709acb596ccca00553797846ed1c6c0d49e8568719",
       "bytes": 30855
@@ -42018,6 +42023,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-input-read.json",
       "sha256": "35c351f9560fad85de00840e4a310c130434a7df963d8ea93d375a5e31f412cc",
       "bytes": 3027
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-carriers-source-read.json",
+      "sha256": "4fcef4a9f16c4eeb9c6c2d6c1f796b24993d64e61e1ba1a54ee891a3d068fe46",
+      "bytes": 42119
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-pre-push-classification-repair.json",
@@ -42140,6 +42150,11 @@
       "bytes": 1487
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/onyx-lite-source-readiness-binding.json",
+      "sha256": "434d09b8aca08dfe615ec10a9c5a104ad5de3fe47430ed1ad792b0fcec44d0e1",
+      "bytes": 30332
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/pi-historical-custody.json",
       "sha256": "e6f3cdad6ce929b35ce1792206f2146e0e49a0a4aee850d64ef5eabd5e3d2a62",
       "bytes": 2592
@@ -42178,6 +42193,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/readiness-publication-read.json",
       "sha256": "6d315b8bf439e07ea399752d5253504e076bffdbe2988c6b95085d735c70d1da",
       "bytes": 1953
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-source-read-followup.json",
+      "sha256": "f02d8e250fda9f42427eff044d333c10dbdf02b597d4f547ac30daa0c789d76d",
+      "bytes": 11172
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-read.json",

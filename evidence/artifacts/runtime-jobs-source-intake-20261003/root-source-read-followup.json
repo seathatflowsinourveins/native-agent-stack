@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "class": "root-original-source-and-preparation-followup-not-comparative-acceptance",
+  "checked_at": "2026-10-03T09:12:29Z",
+  "published_protocol_head": "65a0d370ed8c075d922ff60857287e33d3a14788",
+  "scope": "Source reads, private receipt integration and prerequisite observations only. No quality study froze and no new runtime default was selected.",
+  "worker_receipt_identity_checks": [
+    {
+      "path": "coding-native-carriers-source-read.json",
+      "bytes": 42119,
+      "sha256": "4fcef4a9f16c4eeb9c6c2d6c1f796b24993d64e61e1ba1a54ee891a3d068fe46",
+      "match": true
+    },
+    {
+      "path": "codex-sdk-0160-source-and-native-readiness.json",
+      "bytes": 25271,
+      "sha256": "8eb44ebfbb0e07485373d33843b0519fbb4795c266b461189bee38c97ea8258f",
+      "match": true
+    },
+    {
+      "path": "onyx-lite-source-readiness-binding.json",
+      "bytes": 30332,
+      "sha256": "434d09b8aca08dfe615ec10a9c5a104ad5de3fe47430ed1ad792b0fcec44d0e1",
+      "match": true
+    }
+  ],
+  "original_source_reads": [
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/config/mod.rs",
+      "sha256": "854f5a6b184714740500b8d3eae2bb04cb88172efccf11d38a74f2f6189c0341",
+      "lines": "2143-2163",
+      "finding": "Native model_catalog_json loader parses ModelsResponse and rejects an empty catalog."
+    },
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/model-provider/src/provider.rs",
+      "sha256": "adabad97f59dbc593431a9c47911e74d1fd9d48648b874026a23db86b32ec5a1",
+      "lines": "421-430",
+      "finding": "Provided native catalog selects StaticModelsManager before remote model discovery."
+    },
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/client.rs",
+      "sha256": "605ced35cd853fcc4e23f6edd724c96f96f74c736a45e6ea95bf5300f3ab814c",
+      "lines": "989-1002",
+      "finding": "Lite requests set parallel_tool_calls to prompt.parallel_tool_calls && !model_info.use_responses_lite."
+    },
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/models-manager/models.json",
+      "sha256": "fd219bd9f061278275f528939f82f54d2eb97df4b25c23b022adbe48813d920b",
+      "finding": "Unchanged Sol6.1/Astra catalog rows include low through Ultra, multi_agent_reasoning_effort xhigh, use_responses_lite true and supports_parallel_tool_calls true. Source metadata is distinct from native resolved and actual wire effort."
+    },
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/features/src/lib.rs",
+      "sha256": "124c76d1fbad7b05fd78a62b89a28282c7ecab1de7426ac18696987024ddeae0",
+      "lines": "1336-1340",
+      "finding": "Native multi_agent_v2 is stable and defaults false; explicit supported configuration and observed activation remain required."
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "ref": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "path": "open-sse/executors/codex.ts",
+      "sha256": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+      "lines": "182-210;1428-1441",
+      "finding": "Ultra exception preserves incoming Lite parallel false; alias effort precedes explicit reasoning, and Ultra maps to wire Max. Previous owner probes with parallel absent do not qualify this client request."
+    },
+    {
+      "repository": "earendil-works/pi",
+      "ref": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/model-config.ts",
+      "sha256": "fda5acc6e80ed31750efd33cacb417f012f19ff22b2e24fcc1bed2d03261513c",
+      "lines": "55-64",
+      "finding": "Native thinking map schema exposes xhigh and max."
+    },
+    {
+      "repository": "earendil-works/pi",
+      "ref": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/provider-composer.ts",
+      "sha256": "8e0739b7a4b1512c9d3f4380f858538099eb4515ee5b141cd89c51cc8ea58371",
+      "lines": "212-225",
+      "finding": "Custom model reasoning defaults false; explicit native capability metadata is needed."
+    },
+    {
+      "repository": "earendil-works/pi",
+      "ref": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/ai/src/models.ts",
+      "sha256": "4739010c7e4f7596607b1dd495b9d5ab6cd921e29f55c5c331259a04b7253269",
+      "lines": "1215-1225",
+      "finding": "Nonreasoning models expose off only; xhigh/max require a nonundefined map."
+    },
+    {
+      "repository": "earendil-works/pi",
+      "ref": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/main.ts",
+      "sha256": "d5f850220fa7ed946b6e6d21593fee33e2ab7ce815cc40fb380c47a856e0301f",
+      "lines": "475-495",
+      "finding": "Model-pattern thinking selector applies only without an explicit --thinking override."
+    },
+    {
+      "repository": "onyx-dot-app/onyx",
+      "ref": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/main.py",
+      "sha256": "68ec03de3fa5b37b29e48299743da37b06c41a78fb9e28e1ffb9e3e77e05a299",
+      "lines": "394-398",
+      "finding": "Startup verifies stale auth setting and user auth secret. This is not a global absence claim for anonymous chat or supported bootstrap paths."
+    },
+    {
+      "repository": "onyx-dot-app/onyx",
+      "ref": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/llm/model_response.py",
+      "sha256": "65ffb56dad9a0302ec70d19765fbbaab4c8ea01bede4bbf6610900554b221277",
+      "lines": "187-199",
+      "finding": "Native normalized usage zero-fills missing fields; native zeros alone do not establish provider field presence."
+    },
+    {
+      "repository": "microsoft/RD-Agent",
+      "ref": "484776c211e4fbbeef03e0ec00d6bbee7362a4f4",
+      "path": "rdagent/oai/llm_conf.py",
+      "sha256": "2ea02d3031c719db69b5d28a8c2412b1b39e551362f79eee804299e49bb2a76e",
+      "lines": "15-18;41",
+      "finding": "Arbitrary chat_model, native effort low/medium/high/None, default embedding model and ten retries. Gateway alias routing, embedding-free operation and bounded retry controls remain separate unqualified paths."
+    },
+    {
+      "repository": "microsoft/qlib",
+      "ref": "da920b7f954f48ab1bb64117c976710de198373e",
+      "path": "examples/benchmarks/LightGBM/workflow_config_lightgbm_Alpha158.yaml",
+      "sha256": "0cbe1f729f43a2b8cd735759e6244c2e9f8db967555bfe24a7143fce4605d680",
+      "finding": "CN/CSI300 dated software simulation fixture and native Signal/SigAna/PortAna records; no US-market, original-availability or paper-performance qualification."
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "ref": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "path": "demos/bubblewrap-shell.sh",
+      "sha256": "dd2ed261e8a29df26d4ca8e629d57e882b7fdf0f019cb495a26bc1a74ca17c51",
+      "lines": "3-5;30-34",
+      "finding": "First-party separate /home,/etc and --file stub passwd/group pattern. Owned synthetic nonsecret UID/GID records reuse this pattern without reading host account/auth stores."
+    }
+  ],
+  "anti_pattern_log": [
+    {
+      "mistake": "Guessed wrong OmniRoute org/path",
+      "returned_processor_exit": 0,
+      "observed_error": "caught HTTPError404 for diegoauper/OmniRoute/src/lib/executors/codex.ts",
+      "correction": "Read the existing source-identity receipt before canonical fetch; retained caught error is not success at source retrieval."
+    },
+    {
+      "mistake": "Corrected path but retained wrong OmniRoute org",
+      "returned_processor_exit": 1,
+      "observed_error": "HTTPError404 for diegoauper/OmniRoute/open-sse/executors/codex.ts",
+      "correction": "Canonical diegosouzapw source returned the recorded original hash."
+    },
+    {
+      "mistake": "Guessed shared contract at blueprint root",
+      "returned_processor_exit": 1,
+      "observed_error": "FileNotFoundError",
+      "correction": "Scoped inventory identified comparisons/shared-execution-contract.json."
+    },
+    {
+      "mistake": "Guessed former Codex features source layout",
+      "returned_processor_exit": 1,
+      "observed_error": "HTTPError404 for core/src/features.rs",
+      "correction": "Native exact-pin Git tree returned0; original features/src/lib.rs returned the recorded hash."
+    },
+    {
+      "mistake": "Oversized tracker-tail and file/key derivations",
+      "returned_processor_exit": 0,
+      "observed_error": "Derived stdout exceeded compact budget",
+      "correction": "Select needed fields and assert total printed stdout under5KB."
+    },
+    {
+      "mistake": "Guessed unittest class",
+      "returned_native_exit": 1,
+      "observed_error": "AttributeError: module tests.test_blind_checkout has no attribute EveryBlueprintClassificationTests",
+      "correction": "AST-inspected existing source; unchanged RepositoryClassificationTests then passed2 tests at native0."
+    },
+    {
+      "mistake": "Root suggested wrong SDK binary locator",
+      "returned_native_exit": null,
+      "observed_error": "Source lead CODEX_EXECUTABLE contradicted by unchanged tests/testCodex.ts",
+      "correction": "Use upstream CODEX_EXEC_PATH; worker local mock stage records exact source and execution separately."
+    }
+  ],
+  "repository_integration_checks": [
+    {
+      "command": "python3 -m unittest tests.test_blind_checkout.RepositoryClassificationTests",
+      "native_exit_code": 0,
+      "stdout": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.170s\n\nOK\n",
+      "scope": "Unchanged repository integration checks, not upstream runtime or model acceptance."
+    }
+  ],
+  "gateway_liveness": {
+    "endpoint": "destination21128/api/health",
+    "native_command_exit": 0,
+    "returned_http_status": 200,
+    "response_body_retained": false,
+    "scope": "Public liveness only; no model invocation, provider acceptance or counter completeness."
+  },
+  "consequential_read": {
+    "trigger": "Coding configuration and Lite/effort source conflict before #617 roles",
+    "role": "Astra/max",
+    "source_disposition": "Conditional source-carrier acceptance; freeze/transport/usage rejected pending native evidence",
+    "root_original_source_recheck": true,
+    "acceptance_scope": "Source only"
+  },
+  "measured_defaults": 0,
+  "quality_study_frozen": false,
+  "limits": [
+    "Published65a head remains unchanged while Claude exact-head read runs.",
+    "Source bytes, private installation, local mock tests, public liveness and actual provider execution are separate evidence levels.",
+    "All coding assets still need supported in-container carriers and observed org-bundle loading.",
+    "Harbor PUBLIC baseline does not become restricted by extra allowed hosts; a declared source-backed integration configuration and native controls remain pending.",
+    "No trading experiment, data acquisition, strategy gate, broker order or trading catalog edit occurred."
+  ]
+}
