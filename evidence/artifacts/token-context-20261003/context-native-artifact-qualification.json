@@ -1,0 +1,572 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "One unchanged supported token_manifest.count_files call through installed gpt-tokenizer4.0.0/o200k_base",
+  "north_star_action": "Measure complete context-tool artifact boundaries without double-counting native use during complex R&D",
+  "native_exit": 0,
+  "native_stderr_bytes": 0,
+  "counter_source": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "commit": "c56954a404d75dda1d3296438ac496d205541acc",
+    "path": "tools/token-report/token_manifest.py",
+    "sha256": "57c98b9b1389315a06de47f59d6d4708e00f44959e02a717f14e0c500365b8b4",
+    "native_api": "count_files(config,paths):159-165"
+  },
+  "tokenizer": {
+    "package": "gpt-tokenizer",
+    "version": "4.0.0",
+    "encoding": "o200k_base",
+    "module_sha256": "51ad895a49b5acb36368ae67639ebe3463e360df63e46553afe2f75421f6abcb",
+    "node_version": "24.21.0"
+  },
+  "artifact_boundaries": [
+    {
+      "alias": "shared-provider-request",
+      "bytes": 1614,
+      "sha256": "c81ac7d6521abec5dd242fbf12d4744da0a170a7a0d837c7b20f0a22e4fd5640",
+      "o200k_tokens": 336,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Actual rendered request used in both native parent sessions; no system/tool/protocol framing",
+      "overlap_groups": [
+        "shared_request"
+      ]
+    },
+    {
+      "alias": "shared-fixture",
+      "bytes": 244,
+      "sha256": "2b572f4dc2ce3558abe5ed4bf234132dad0f9280f2944c25b44420f4f8709c83",
+      "o200k_tokens": 69,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Original fixture, supplied to both clients; repeated facts elsewhere are overlapping",
+      "overlap_groups": [
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex-provider-output-schema",
+      "bytes": 1230,
+      "sha256": "96266a12c886e9d99f0ddc6e962aa52e928704c44566526c41591e6255c328a2",
+      "o200k_tokens": 324,
+      "boundary_kind": "exact_schema_file_copy",
+      "scope": "Complete output schema value matched to this client config; same bytes across both providers",
+      "overlap_groups": [
+        "same_provider_schema"
+      ]
+    },
+    {
+      "alias": "codex.main.ctx_index-arguments",
+      "bytes": 63,
+      "sha256": "24aa74c415e5f6a2a633522b0a7a3fae54654087f833c40bd998a6ba36588709",
+      "o200k_tokens": 17,
+      "boundary_kind": "lossless_json_arguments",
+      "scope": "Exact complete actual native argument value, including every property/list element",
+      "overlap_groups": [
+        "same_directed_arguments_main_ctx_index"
+      ]
+    },
+    {
+      "alias": "codex.main.ctx_index-returned-content",
+      "bytes": 196,
+      "sha256": "c5056e6b86cabb36c4a15f577657784e22bf94a56ee7e1e3ca039ceceefa8830",
+      "o200k_tokens": 51,
+      "boundary_kind": "lossless_json_content",
+      "scope": "Complete returned native content array, every block/property/text including attribution/throttle footer",
+      "overlap_groups": [
+        "same_tool_content_main_ctx_index",
+        "index_receipt"
+      ]
+    },
+    {
+      "alias": "codex.main.ctx_index-returned-text",
+      "bytes": 164,
+      "sha256": "de4a5bacf6eb364d8748d5402cab29f3029fcca922a61f88777180ec976fb339",
+      "o200k_tokens": 41,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Exact complete sole native text block; no header/throttle/text trimming",
+      "overlap_groups": [
+        "same_tool_content_main_ctx_index",
+        "index_receipt"
+      ]
+    },
+    {
+      "alias": "codex.main.ctx_search-arguments",
+      "bytes": 96,
+      "sha256": "5de7cad39d128422b3308e22176507e545800585323c153f81fd8760f9bc149d",
+      "o200k_tokens": 27,
+      "boundary_kind": "lossless_json_arguments",
+      "scope": "Exact complete actual native argument value, including every property/list element",
+      "overlap_groups": [
+        "same_directed_arguments_main_ctx_search"
+      ]
+    },
+    {
+      "alias": "codex.main.ctx_search-returned-content",
+      "bytes": 880,
+      "sha256": "0c8a8cc07b002cc7f2b469aa17a2d42529d543c461f36a3049b1a04dc7835e91",
+      "o200k_tokens": 281,
+      "boundary_kind": "lossless_json_content",
+      "scope": "Complete returned native content array, every block/property/text including attribution/throttle footer",
+      "overlap_groups": [
+        "same_tool_content_main_ctx_search",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex.main.ctx_search-returned-text",
+      "bytes": 815,
+      "sha256": "ff5925fe37b9935ca322d326911715c2e744322bda5b3563016c3f3ed66dc78f",
+      "o200k_tokens": 239,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Exact complete sole native text block; no header/throttle/text trimming",
+      "overlap_groups": [
+        "same_tool_content_main_ctx_search",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex.child.ctx_index-arguments",
+      "bytes": 64,
+      "sha256": "5c6c87dc40a81243d00dde8a4be391d3324350531c81a86ca499b8846d7c1557",
+      "o200k_tokens": 17,
+      "boundary_kind": "lossless_json_arguments",
+      "scope": "Exact complete actual native argument value, including every property/list element",
+      "overlap_groups": [
+        "same_directed_arguments_child_ctx_index"
+      ]
+    },
+    {
+      "alias": "codex.child.ctx_index-returned-content",
+      "bytes": 198,
+      "sha256": "467508f17f241b3b452038858fec0ec065e91754be359594f13b08ea4153a40a",
+      "o200k_tokens": 51,
+      "boundary_kind": "lossless_json_content",
+      "scope": "Complete returned native content array, every block/property/text including attribution/throttle footer",
+      "overlap_groups": [
+        "same_tool_content_child_ctx_index",
+        "index_receipt"
+      ]
+    },
+    {
+      "alias": "codex.child.ctx_index-returned-text",
+      "bytes": 166,
+      "sha256": "3d6f016c14f9d35539e1e4eb01ae95fe8f902be40224eacfe9055f048af6c655",
+      "o200k_tokens": 41,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Exact complete sole native text block; no header/throttle/text trimming",
+      "overlap_groups": [
+        "same_tool_content_child_ctx_index",
+        "index_receipt"
+      ]
+    },
+    {
+      "alias": "codex.child.ctx_search-arguments",
+      "bytes": 97,
+      "sha256": "d5cfbc4c77281b6a7c12cf86b076d928fc1cf77489e8d440f83c3d395c988b66",
+      "o200k_tokens": 27,
+      "boundary_kind": "lossless_json_arguments",
+      "scope": "Exact complete actual native argument value, including every property/list element",
+      "overlap_groups": [
+        "same_directed_arguments_child_ctx_search"
+      ]
+    },
+    {
+      "alias": "codex.child.ctx_search-returned-content",
+      "bytes": 884,
+      "sha256": "6c0e4adab758a05e2b8eab6a282e338a335650e082e7f022705c143ddffa47fc",
+      "o200k_tokens": 281,
+      "boundary_kind": "lossless_json_content",
+      "scope": "Complete returned native content array, every block/property/text including attribution/throttle footer",
+      "overlap_groups": [
+        "same_tool_content_child_ctx_search",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex.child.ctx_search-returned-text",
+      "bytes": 819,
+      "sha256": "b91ee65df17a5ed453208e9964ded34e6b731dfa7036768eb7e251053dd81453",
+      "o200k_tokens": 239,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Exact complete sole native text block; no header/throttle/text trimming",
+      "overlap_groups": [
+        "same_tool_content_child_ctx_search",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex-native-main-answer",
+      "bytes": 583,
+      "sha256": "1ee749c03a442a313e1610e9ad28e9419e096933ac9a959f0f932f5413763ef7",
+      "o200k_tokens": 161,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Entire final parent answer with both role fields; exactly the returned provider output text",
+      "overlap_groups": [
+        "provider_output_codex",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex-native-child-answer",
+      "bytes": 293,
+      "sha256": "5870a9b26d90d1a02e0a8096da105728e70aafd44c94b84ba607222403b35345",
+      "o200k_tokens": 81,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Entire final child JSON text; retains its original outer child wrapper",
+      "overlap_groups": [
+        "native_child_answer_codex",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex-provider-main-answer",
+      "bytes": 282,
+      "sha256": "2a2d341eb7cd901877dba46fd4b9943aa1ccdf6e14bb2f5c78caee2b97271b5a",
+      "o200k_tokens": 79,
+      "boundary_kind": "lossless_json_role_projection",
+      "scope": "Complete role object selected from returned provider output; overlaps native parent/provider output and child facts",
+      "overlap_groups": [
+        "provider_output_codex",
+        "fixture_facts",
+        "native_parent_answer_codex"
+      ]
+    },
+    {
+      "alias": "codex-provider-child-answer",
+      "bytes": 283,
+      "sha256": "c9c7ac031376d962adf5d87bcafdbbaad1830439e53150bf890bcbc85cc48a3b",
+      "o200k_tokens": 79,
+      "boundary_kind": "lossless_json_role_projection",
+      "scope": "Complete role object selected from returned provider output; overlaps native parent/provider output and child facts",
+      "overlap_groups": [
+        "provider_output_codex",
+        "fixture_facts",
+        "native_child_answer_codex"
+      ]
+    },
+    {
+      "alias": "codex-provider-output",
+      "bytes": 583,
+      "sha256": "1ee749c03a442a313e1610e9ad28e9419e096933ac9a959f0f932f5413763ef7",
+      "o200k_tokens": 161,
+      "boundary_kind": "exact_provider_text",
+      "scope": "Complete actual provider output value; not whole provider wire/prompt/history",
+      "overlap_groups": [
+        "provider_output_codex",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex-provider-raw",
+      "bytes": 3461,
+      "sha256": "b8e86aa432692378c962de3a01f4480d28a77ca7de52a1fa3b8d2dafddc01c26",
+      "o200k_tokens": 975,
+      "boundary_kind": "exact_utf8_sdk_raw",
+      "scope": "Entire recorded provider raw string; includes overlapping output/counter/tool fields, parent SDK/query scope",
+      "overlap_groups": [
+        "provider_response_codex",
+        "provider_output_codex",
+        "native_counter_copy_codex",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "codex-provider-response-object",
+      "bytes": 4996,
+      "sha256": "2602127afd8131b67553223eb1f11e851a75b32de829e0fe570116ece9b6418b",
+      "o200k_tokens": 1483,
+      "boundary_kind": "lossless_complete_provider_object",
+      "scope": "Entire returned provider response object with every field; overlaps raw/output/role/usage boundaries",
+      "overlap_groups": [
+        "provider_response_codex",
+        "provider_output_codex",
+        "native_counter_copy_codex",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude-provider-output-schema",
+      "bytes": 1230,
+      "sha256": "96266a12c886e9d99f0ddc6e962aa52e928704c44566526c41591e6255c328a2",
+      "o200k_tokens": 324,
+      "boundary_kind": "exact_schema_file_copy",
+      "scope": "Complete output schema value matched to this client config; same bytes across both providers",
+      "overlap_groups": [
+        "same_provider_schema"
+      ]
+    },
+    {
+      "alias": "claude.main.ctx_index-arguments",
+      "bytes": 63,
+      "sha256": "24aa74c415e5f6a2a633522b0a7a3fae54654087f833c40bd998a6ba36588709",
+      "o200k_tokens": 17,
+      "boundary_kind": "lossless_json_arguments",
+      "scope": "Exact complete actual native argument value, including every property/list element",
+      "overlap_groups": [
+        "same_directed_arguments_main_ctx_index"
+      ]
+    },
+    {
+      "alias": "claude.main.ctx_index-returned-content",
+      "bytes": 196,
+      "sha256": "c5056e6b86cabb36c4a15f577657784e22bf94a56ee7e1e3ca039ceceefa8830",
+      "o200k_tokens": 51,
+      "boundary_kind": "lossless_json_content",
+      "scope": "Complete returned native content array, every block/property/text including attribution/throttle footer",
+      "overlap_groups": [
+        "same_tool_content_main_ctx_index",
+        "index_receipt"
+      ]
+    },
+    {
+      "alias": "claude.main.ctx_index-returned-text",
+      "bytes": 164,
+      "sha256": "de4a5bacf6eb364d8748d5402cab29f3029fcca922a61f88777180ec976fb339",
+      "o200k_tokens": 41,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Exact complete sole native text block; no header/throttle/text trimming",
+      "overlap_groups": [
+        "same_tool_content_main_ctx_index",
+        "index_receipt"
+      ]
+    },
+    {
+      "alias": "claude.main.ctx_search-arguments",
+      "bytes": 96,
+      "sha256": "5de7cad39d128422b3308e22176507e545800585323c153f81fd8760f9bc149d",
+      "o200k_tokens": 27,
+      "boundary_kind": "lossless_json_arguments",
+      "scope": "Exact complete actual native argument value, including every property/list element",
+      "overlap_groups": [
+        "same_directed_arguments_main_ctx_search"
+      ]
+    },
+    {
+      "alias": "claude.main.ctx_search-returned-content",
+      "bytes": 880,
+      "sha256": "145abe8c180122a0648998d99da03350d8fa2ad1905b81e940231c801f99e697",
+      "o200k_tokens": 281,
+      "boundary_kind": "lossless_json_content",
+      "scope": "Complete returned native content array, every block/property/text including attribution/throttle footer",
+      "overlap_groups": [
+        "same_tool_content_main_ctx_search",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude.main.ctx_search-returned-text",
+      "bytes": 815,
+      "sha256": "b930283330d4a77027de5d77ad5980c177950d66f44321f5265bb4e1721650a1",
+      "o200k_tokens": 239,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Exact complete sole native text block; no header/throttle/text trimming",
+      "overlap_groups": [
+        "same_tool_content_main_ctx_search",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude.child.ctx_index-arguments",
+      "bytes": 64,
+      "sha256": "5c6c87dc40a81243d00dde8a4be391d3324350531c81a86ca499b8846d7c1557",
+      "o200k_tokens": 17,
+      "boundary_kind": "lossless_json_arguments",
+      "scope": "Exact complete actual native argument value, including every property/list element",
+      "overlap_groups": [
+        "same_directed_arguments_child_ctx_index"
+      ]
+    },
+    {
+      "alias": "claude.child.ctx_index-returned-content",
+      "bytes": 198,
+      "sha256": "467508f17f241b3b452038858fec0ec065e91754be359594f13b08ea4153a40a",
+      "o200k_tokens": 51,
+      "boundary_kind": "lossless_json_content",
+      "scope": "Complete returned native content array, every block/property/text including attribution/throttle footer",
+      "overlap_groups": [
+        "same_tool_content_child_ctx_index",
+        "index_receipt"
+      ]
+    },
+    {
+      "alias": "claude.child.ctx_index-returned-text",
+      "bytes": 166,
+      "sha256": "3d6f016c14f9d35539e1e4eb01ae95fe8f902be40224eacfe9055f048af6c655",
+      "o200k_tokens": 41,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Exact complete sole native text block; no header/throttle/text trimming",
+      "overlap_groups": [
+        "same_tool_content_child_ctx_index",
+        "index_receipt"
+      ]
+    },
+    {
+      "alias": "claude.child.ctx_search-arguments",
+      "bytes": 97,
+      "sha256": "d5cfbc4c77281b6a7c12cf86b076d928fc1cf77489e8d440f83c3d395c988b66",
+      "o200k_tokens": 27,
+      "boundary_kind": "lossless_json_arguments",
+      "scope": "Exact complete actual native argument value, including every property/list element",
+      "overlap_groups": [
+        "same_directed_arguments_child_ctx_search"
+      ]
+    },
+    {
+      "alias": "claude.child.ctx_search-returned-content",
+      "bytes": 884,
+      "sha256": "275a6f08efa58b3a1e9b0ed9910727280bc5708d9a0fe051b7245c6f350726cc",
+      "o200k_tokens": 281,
+      "boundary_kind": "lossless_json_content",
+      "scope": "Complete returned native content array, every block/property/text including attribution/throttle footer",
+      "overlap_groups": [
+        "same_tool_content_child_ctx_search",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude.child.ctx_search-returned-text",
+      "bytes": 819,
+      "sha256": "fcc651604a6ea9af841722d86069d28f2a784640d754c2b0100a888e11f02d80",
+      "o200k_tokens": 239,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Exact complete sole native text block; no header/throttle/text trimming",
+      "overlap_groups": [
+        "same_tool_content_child_ctx_search",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude-native-main-answer",
+      "bytes": 583,
+      "sha256": "1ee749c03a442a313e1610e9ad28e9419e096933ac9a959f0f932f5413763ef7",
+      "o200k_tokens": 161,
+      "boundary_kind": "lossless_json_structured_answer",
+      "scope": "Actual complete native StructuredOutput input; native main answer carrier is an object, not fabricated final text",
+      "overlap_groups": [
+        "provider_output_claude",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude-native-child-answer",
+      "bytes": 844,
+      "sha256": "47a801b321a1f01f74d017a5800746f4d019cf61452f6667fda16e328d2d7312",
+      "o200k_tokens": 217,
+      "boundary_kind": "exact_utf8_text",
+      "scope": "Entire final child text including original prose/formatting; all literal child facts/source present",
+      "overlap_groups": [
+        "native_child_answer_claude",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude-provider-main-answer",
+      "bytes": 282,
+      "sha256": "2a2d341eb7cd901877dba46fd4b9943aa1ccdf6e14bb2f5c78caee2b97271b5a",
+      "o200k_tokens": 79,
+      "boundary_kind": "lossless_json_role_projection",
+      "scope": "Complete role object selected from returned provider output; overlaps native parent/provider output and child facts",
+      "overlap_groups": [
+        "provider_output_claude",
+        "fixture_facts",
+        "native_parent_answer_claude"
+      ]
+    },
+    {
+      "alias": "claude-provider-child-answer",
+      "bytes": 283,
+      "sha256": "c9c7ac031376d962adf5d87bcafdbbaad1830439e53150bf890bcbc85cc48a3b",
+      "o200k_tokens": 79,
+      "boundary_kind": "lossless_json_role_projection",
+      "scope": "Complete role object selected from returned provider output; overlaps native parent/provider output and child facts",
+      "overlap_groups": [
+        "provider_output_claude",
+        "fixture_facts",
+        "native_child_answer_claude"
+      ]
+    },
+    {
+      "alias": "claude-provider-output",
+      "bytes": 583,
+      "sha256": "1ee749c03a442a313e1610e9ad28e9419e096933ac9a959f0f932f5413763ef7",
+      "o200k_tokens": 161,
+      "boundary_kind": "lossless_provider_output_object",
+      "scope": "Complete actual provider output value; not whole provider wire/prompt/history",
+      "overlap_groups": [
+        "provider_output_claude",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude-provider-raw",
+      "bytes": 3368,
+      "sha256": "3147895fc22de63490c495a93a5aee7fd910b965b322848bd4c85f6706bcd793",
+      "o200k_tokens": 956,
+      "boundary_kind": "exact_utf8_sdk_raw",
+      "scope": "Entire recorded provider raw string; includes overlapping output/counter/tool fields, parent SDK/query scope",
+      "overlap_groups": [
+        "provider_response_claude",
+        "provider_output_claude",
+        "native_counter_copy_claude",
+        "fixture_facts"
+      ]
+    },
+    {
+      "alias": "claude-provider-response-object",
+      "bytes": 12930,
+      "sha256": "40b12f84b0669be6390c3afdc12f60afc095aaf401366ea25d7fd46c2289e588",
+      "o200k_tokens": 3685,
+      "boundary_kind": "lossless_complete_provider_object",
+      "scope": "Entire returned provider response object with every field; overlaps raw/output/role/usage boundaries",
+      "overlap_groups": [
+        "provider_response_claude",
+        "provider_output_claude",
+        "native_counter_copy_claude",
+        "fixture_facts"
+      ]
+    }
+  ],
+  "quality_preservation": {
+    "codex": {
+      "retained_eval_exit": 0,
+      "retained_gold_assertion_pass": true,
+      "provider_output_equals_registered_gold": true,
+      "four_directed_main_child_mcp_calls": 4,
+      "new_model_evaluation_or_grading": false,
+      "native_main_answer_equals_provider_output_text": true,
+      "native_child_original_wrapper_retained": true,
+      "native_child_child_field_equals_provider_child": true
+    },
+    "claude": {
+      "retained_eval_exit": 0,
+      "retained_gold_assertion_pass": true,
+      "provider_output_equals_registered_gold": true,
+      "four_directed_main_child_mcp_calls": 4,
+      "new_model_evaluation_or_grading": false,
+      "native_structured_output_equals_provider_output_object": true,
+      "native_child_full_answer_has_all_literal_source_fact_values": true
+    }
+  },
+  "count_once": "Every distinct file appears once. Shared request/fixture, duplicate schemas, native text/JSON, roles/output/raw/whole response and copied usage fields overlap. No totals across these boundary rows; do not add to native provider counters or claim savings.",
+  "artifact_total": null,
+  "provider_saving": null,
+  "provider_cost_saving": null,
+  "private_packet_hashes": {
+    "receipt": "bcf296d3bb15f65eb12615d82a4b0fa23018086e2bfd33f66044641ca4321beb",
+    "manifest": "d4ac41d8646ca926d304517a7f85520f822df2c06e67538ad8fb96d4b4346fbb",
+    "original_counter_stdout": "583432214fd8dfc65600f6472ff0f0a0294c7810fbfabe2e10f4cd5b60f58b55",
+    "source_bindings": "eb121e6811f2b4afad95fb019886776e5fc4b705eda301fc8e30a9e94ef14510"
+  },
+  "root_verification": {
+    "packet_entries": 70,
+    "primary_and_native_source_hashes": 46,
+    "input_to_report_hash_and_size_bindings": 42,
+    "all_match": true
+  },
+  "baseline_control_gap": "A69-token focused read suffices for the content question. It violates the original MCP-only invocation contract and container-only file exposure; an equal-information native arm requires a distinct prospectively registered exposure/configuration. No post-hoc comparison.",
+  "limits": [
+    "Native provider counters stay separate from these42 overlapping artifact boundaries",
+    "No full system/tool/schema inventory, wire encoding, native Claude tokenizer, billing or occupied-context inference",
+    "Existing directed role/oracle acceptance reused; no model, grader or source-test rerun",
+    "No compaction/protection/default/freeze or whole-job acceptance"
+  ]
+}

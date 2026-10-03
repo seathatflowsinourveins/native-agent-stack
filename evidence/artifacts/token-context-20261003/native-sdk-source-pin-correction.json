@@ -1,0 +1,37 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "pinned_source_review",
+  "operation": "Correct comparator version label without regrading recorded native cases",
+  "incorrect_registered_label": "openai/codex@3d2ee51ca2d5db578f328aa75e20aa22c0197c9a SDK0.160.0",
+  "verified_primary_tags": {
+    "rust-v0.153.4": {
+      "annotated_tag": "042fb41b7c813ac7999105e886b2b7aa715b5081",
+      "commit": "3d2ee51ca2d5db578f328aa75e20aa22c0197c9a"
+    },
+    "rust-v0.160.0": {
+      "annotated_tag": "79b1b666f2e8551f8abbbca34957227f67f3f553",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc"
+    }
+  },
+  "correction": "The3d2ee51 source comparator is0.153.4; native CLI0.160.0 source is a956835d. Installed selected SDK package0.160.0 remains distinct from nested0.153.4 package, although distcode/types match exactly. Do not label source comparator as SDK0.160.",
+  "registration_original_sha256": "b36a58c628a6f37b93d2d6e8714390e70411cb93fa0abffc5549b6465017840b",
+  "registration_unchanged": true,
+  "new_primary_source_reads": [
+    {
+      "path": "sdk/typescript/src/exec.ts",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79",
+      "byte_equal_prior1534_source": true
+    },
+    {
+      "path": "sdk/typescript/src/events.ts",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "sha256": "dca9d5a0c216eff99f242067814be1985c027e64bf38ab4a6b6fe5c2571a4403",
+      "byte_equal_prior1534_source": true
+    }
+  ],
+  "private_correction_sha256": "ad30d029cd59f3948543e9d236bb80d45e19474ad9a40d8419d35264d6c98ca0",
+  "limits": [
+    "Source/metadata label correction only; no instrumented module-import claim, code mutation, model rerun or regrade. Actual native main/child CLI/version/model/effort/tool records and counted-once usage remain their separate observations."
+  ]
+}

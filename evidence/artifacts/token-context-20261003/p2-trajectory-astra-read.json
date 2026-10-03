@@ -1,0 +1,78 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Consequential nativeAstra/max source judgment on real P2 trajectory after failed bounded engineering feasibility",
+  "north_star_action": "Select a maintained real-work continuity corpus and supported upstream interfaces before protection trials",
+  "native_command": "codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max -c approval_policy=never -s read-only; no nested models or benchmark",
+  "native_exit": 0,
+  "completed_utc": "2026-10-03T08:53:06Z",
+  "answer_words": 406,
+  "answer_limit": 650,
+  "choice": "CircuitEval source/reference/continuation qualification only; no complete P2 route qualified",
+  "alternatives": [
+    "Further Forge continuation: unchanged38/40and36/40FAIL retained, no repair/regrade",
+    "Octobench DuckDB: native judge/gold-restoration/globalGit setup and approved-harness compatibility gaps",
+    "LHTB migration: fork-specific continuation/reference deployment unqualified"
+  ],
+  "source_interfaces": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "path": "src/providers/openai/codex-sdk.ts",
+      "lines": "1091\u20131104/2410",
+      "interface": "thread_id with deep_tracing:false ->resumeThread; returned sessionId"
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "path": "src/providers/claude-agent-sdk.ts",
+      "lines": "1661/2272",
+      "interface": "Explicit resume; returned sessionId"
+    },
+    {
+      "repository": "gabeorlanski/scb-problems",
+      "commit": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "path": "circuit_eval/tests/test_checkpoint_8.py",
+      "interface": "Oracle qualification required; tests1301\u20131321 invoke the submitted equiv command and require equivalent:true"
+    }
+  ],
+  "decision_changing_test": "CircuitEval public reference/contract cannot support unchanged tests, or an unchanged approved DuckDB route demonstrates fewer unqualified interfaces under identical continuity/quality/gold/counter conditions",
+  "P1_scope": "P1 may be prospectively bound/read/conditionally frozen as a task contract; shared prerequisites and both-family exact input review still apply; P1/P2 conjunctive decision unchanged",
+  "P2_scope": "Bind real fixed trajectory, permissions, four original gold constraints, observed natural compaction, supported resume and stopping cap; no event stays unmeasured",
+  "native_counters": {
+    "input": 355434,
+    "cached_subset": 298368,
+    "cache_write": 0,
+    "output": 11071,
+    "reasoning_subset": 7341,
+    "total": 366505,
+    "unique_own_responses": 8,
+    "exec_and_original_native_reconciled": true,
+    "source_commands_completed": 26,
+    "source_command_failures": 0,
+    "billing_wire_identity": "UNKNOWN"
+  },
+  "input_custody_correction": {
+    "selected_bindings": 14,
+    "one_current_protocol_hash_changed": true,
+    "append_only_pre_adoption_scope_clarification": true,
+    "original_bound_protocol_recovered_from_exact_head": "fabe2906026923a11d593278644ebf181da0c3fb",
+    "original_hash_matches": true,
+    "original_P2_criteria_unchanged": true,
+    "actual_protocol_version_read": "UNKNOWN; appended marker not found in retained command output; no claim all14unchanged",
+    "required_future_control": "Immutable inputs and exact-head review before freeze; no claim this is required fullybound Opus read"
+  },
+  "private_packet_hashes": {
+    "answer.md": "17d0038a01c154585f73f0e0e6723443047e30bc74f2c3a0e6c6f52f647783b5",
+    "events.jsonl": "0c228bc007737f4192ba9bf91037b09de9fdd7870f58a1ae88a63ae33c637ea7",
+    "source-bindings.json": "4f49d5ce99c60d09129a144cf63a6f9560dc1312035a064ee9b03d1d8dedd8b4",
+    "root-input-custody-correction.json": "d35e1c9af5175643b8ad41b27dc4553c2ba3ed7f36a589d0a4663ec6f625a6f8",
+    "root-native-accounting-private.json": "c1b7d630e1ce122ec6844af01ac9980c51ded9e6b1bef2b69a7af956ebe77859"
+  },
+  "limits": [
+    "Source judgment is a lead, not user approval, grader/runtime/default/freeze or whole-goal acceptance",
+    "Current nativeCLI0.160/max records requested model identity; backend/wire/pricing not independently observed",
+    "Root re-read selected pinned provider continuation and original CP8 test interfaces; source judgment remains a lead, with no custom reference/bridge/runner",
+    "No P2 natural compaction or whole-context quality measured here"
+  ]
+}

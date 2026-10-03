@@ -65,7 +65,16 @@
       "context-parent-dwell",
       "context-dwell-artifacts",
       "forge-native-shape",
-      "forge-native-pilot-original"
+      "forge-native-pilot-original",
+      "forge-native-pilot-typed",
+      "forge-stopped-program",
+      "astra-settings-read",
+      "context-fresh-role",
+      "context-native-artifacts",
+      "forge-claude-settings-relocation",
+      "forge-claude-stopped-program-grade",
+      "p2-trajectory-astra-source-judgment",
+      "usage-cost-metering"
     ],
     "roles": [
       "command-worker",
@@ -179,7 +188,19 @@
     "Promptfoo0.123.1 native validate config -c original prepared Codex Forge JSON; actual Configuration is valid stdout",
     "Promptfoo0.123.1 native validate config -c original prepared Claude Forge JSON; actual Configuration is valid stdout",
     "Native Promptfoo package-bin eval registered original Forge checkpoint1 codex case, evaluator no-cache/repeat1/concurrency1; original relative -c config path",
-    "Native Promptfoo package-bin eval registered original Forge checkpoint1 claude case, evaluator no-cache/repeat1/concurrency1; original relative -c config path"
+    "Native Promptfoo package-bin eval registered original Forge checkpoint1 claude case, evaluator no-cache/repeat1/concurrency1; original relative -c config path",
+    "Native Promptfoo0.123.1 registered typed Forge checkpoint1 Codex; absolute -c; no-cache/repeat1/concurrency1/no-share; source-supported explicit string schema types",
+    "Native Promptfoo0.123.1 registered typed Forge checkpoint1 Claude; absolute -c; SDK file-settings plus separate sandbox guard rejected before query",
+    "Native slop-code --quiet eval-snapshot immutable stopped copy private output -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json; timeout300s+5; unchanged40tests",
+    "Native codex exec -p omniroute -m gpt-6-astra max/read-only; original missing required keyless environment name",
+    "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max -s read-only; source-only exact loader/sandbox relocation judgment with task-local nonsecret keyless placeholder",
+    "Native Promptfoo0.123.1 registered freshCodex main/max-child case; releasedContextMode1.0.169 node-only source-derived private Docker npm launcher; four directed index/search calls",
+    "Native Promptfoo0.123.1 registered freshClaude main/max-child case; releasedContextMode1.0.169 source-derived private Docker npm launcher; four directed index/search calls",
+    "One existing unchanged token_manifest.count_files(config,paths) call through installed gpt-tokenizer4.0.0/o200k_base for42 exact overlapping artifact boundaries",
+    "Native Promptfoo0.123.1 distinct registered Claude Forge settings relocation, absolute -c, no-cache/repeat1/concurrency1/no-share, original900000ms deadline; nativeCLI2.1.288/Opus5.5/max main and one child observed",
+    "One unchanged pinned slop-code eval-snapshot stopped-copy -o owned-output -p forge -c checkpoint_1 -e pinned local-py.yaml --json; cap300s+5s",
+    "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max -s read-only source judgment; no benchmark or nested model",
+    "Nine preregistered native ccusage20.0.26 daily/codex-daily JSON commands on fixed usage-only copies in owned network-none read-only containers; no models"
   ],
   "observations": [
     {
@@ -1669,6 +1690,378 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "forge-native-pilot-typed-codex",
+      "task": "forge-native-pilot-typed",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 40,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fixed schema/native main-child/code generation feasibility only; unchanged program quality separately FAIL38/40; no savings/P2/default; retained detailed gates {\"schema\":true,\"native_main_child\":true}",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-typed-qualification.json",
+          "sha256": "f2227989808ef8e4af27c4cc59b050097668570b6850dc58b82d1bbeff7ccb17"
+        }
+      ],
+      "usage": {
+        "uncached_input": 85704,
+        "cache_creation": 0,
+        "cache_read": 894464,
+        "output": 28784,
+        "reasoning_in_output": 11192,
+        "total": 1008952,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-native-pilot-typed-claude",
+      "task": "forge-native-pilot-typed",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 41,
+      "evidence_class": "native_cli_execution",
+      "scope": "Distinct preserved SDK guard failure; no native UUID/returned usage; spend unknown, no fabricated zero; retained detailed gates {\"runtime\":false}",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-native-pilot-typed-qualification.json",
+          "sha256": "f2227989808ef8e4af27c4cc59b050097668570b6850dc58b82d1bbeff7ccb17"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": 0,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-codex-stopped-program",
+      "task": "forge-stopped-program",
+      "role": "context-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 42,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free unchanged program grading; native evaluator0 is distinct from pytest1 and38/40FAIL; original case not repaired/regraded; retained detailed gates {\"unchanged_program_oracle\":false,\"no_infrastructure_failure\":true}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-codex-program-qualification.json",
+          "sha256": "4a8ee25845720b92d5ed0ac4e33357e5c60d7c58d658c3c1ba65a15f77633510"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-settings-startup-failure",
+      "task": "astra-settings-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 43,
+      "evidence_class": "native_cli_execution",
+      "scope": "Preserved startup rejection; no exact records or emitted usage; not zero-spend inference; retained detailed gates {\"completion\":false}",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/claude-sdk-settings-astra-read.json",
+          "sha256": "474276e4ddd548cee5f8527c83ec1adb16a2f2c23e6ef5466bb59f61c2111fdb"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": 0,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-settings-source-read",
+      "task": "astra-settings-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 44,
+      "evidence_class": "native_cli_execution",
+      "scope": "Six exact unique native responses reconcile; original answer includes false compaction-absence claim, corrected independently; only narrow source-supported relocation retained; no runtime/default acceptance; retained detailed gates {\"source_supported_relocation\":true,\"word_limit\":true,\"original_compaction_absence_claim\":false}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/claude-sdk-settings-astra-read.json",
+          "sha256": "474276e4ddd548cee5f8527c83ec1adb16a2f2c23e6ef5466bb59f61c2111fdb"
+        }
+      ],
+      "usage": {
+        "uncached_input": 38897,
+        "cache_creation": 0,
+        "cache_read": 188544,
+        "output": 9325,
+        "reasoning_in_output": 5380,
+        "total": 236766,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-fresh-role-codex",
+      "task": "context-fresh-role",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 45,
+      "evidence_class": "native_cli_execution",
+      "scope": "Directed native candidate functionality and exact parent+child endpoint only; no natural rate, paired savings or protection; retained detailed gates {\"four_fact_gold\":true,\"main_child_calls\":true,\"native_max\":true}",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-native-role-qualification.json",
+          "sha256": "af371a3fc3e7759f8e8ebe5f1a1e2799404fff02fd88e35e796a1f4f3fc1a153"
+        }
+      ],
+      "usage": {
+        "uncached_input": 32731,
+        "cache_creation": 0,
+        "cache_read": 96768,
+        "output": 2666,
+        "reasoning_in_output": 1595,
+        "total": 132165,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-fresh-role-claude",
+      "task": "context-fresh-role",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 46,
+      "evidence_class": "native_cli_execution",
+      "scope": "Latest native query-inclusive scope includes known1274helper; changing child snapshots/trailer/Opus subset are not added; no paired savings/protection; retained detailed gates {\"four_fact_gold\":true,\"main_child_calls\":true,\"native_max\":true}",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-native-role-qualification.json",
+          "sha256": "af371a3fc3e7759f8e8ebe5f1a1e2799404fff02fd88e35e796a1f4f3fc1a153"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1274,
+        "cache_creation": 15673,
+        "cache_read": 34703,
+        "output": 3970,
+        "reasoning_in_output": 2447,
+        "total": 55620,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-native-artifact-boundaries",
+      "task": "context-native-artifacts",
+      "role": "meter-worker",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 47,
+      "evidence_class": "native_cli_execution",
+      "scope": "Model-free artifact counter execution, not provider usage/savings;42overlapping boundaries have no aggregate; retained detailed gates {\"hash_size_boundaries\":true,\"existing_fixed_gold_retained\":true}",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-native-artifact-qualification.json",
+          "sha256": "25823560929d27412580ebbd1349ee70753e9ee1641eeae87d505d7ae34e1b25"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-claude-settings-timeout",
+      "task": "forge-claude-settings-relocation",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 48,
+      "evidence_class": "native_cli_execution",
+      "scope": "Original evaluator timeout with independently known1489998persisted and1574196raw-with-partial alternative scopes; complete final endpoint unknown, views never added; no zero-spend/schema/protection/default acceptance; retained detailed gates {\"caller_result\":false,\"native_max_main_child\":true,\"complete_final_endpoint\":false}",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-claude-timeout-qualification.json",
+          "sha256": "459e2f01c5ba363bbdde1fb5522fceb558b29904b876c85e8d2532c2133a8e79"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-claude-stopped-program-grade",
+      "task": "forge-claude-stopped-program-grade",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 49,
+      "evidence_class": "native_cli_execution",
+      "scope": "Original stopped Claude program scored36/40; native evaluator0 and pytest1; no model rerun or correctness acceptance; retained detailed gates {\"all40_original_cases\":false,\"infrastructure_ok\":true,\"snapshot_custody\":true}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-claude-program-qualification.json",
+          "sha256": "1075f028094412250f4befee20876def9b523c71b3715032f936089419dceea4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "p2-trajectory-astra-source-judgment",
+      "task": "p2-trajectory-astra-source-judgment",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 50,
+      "evidence_class": "native_cli_execution",
+      "scope": "CircuitEval source/reference/continuation qualification lead; one protocol input changed append-only during read; no fully bound freeze/protection/adoption; retained detailed gates {\"answer_word_limit\":true,\"native_counter_reconciliation\":true,\"all_bound_inputs_immutable\":false}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/p2-trajectory-astra-read.json",
+          "sha256": "b2960b0c0c08b188e4eee24cf074193380f95d4c06a133753b57f24266f704d5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 57066,
+        "cache_creation": 0,
+        "cache_read": 298368,
+        "output": 11071,
+        "reasoning_in_output": 7341,
+        "total": 366505,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "meter-expanded-role-accounting",
+      "task": "usage-cost-metering",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 51,
+      "evidence_class": "native_cli_execution",
+      "scope": "Nine parser-only integration cases; selected Codex/Opus/deltas match, inclusive Claude helpers omitted; prior M2 compaction failure retained; native baseline retained for tested scopes; retained detailed gates {\"native_command_execution\":true,\"inclusive_native_usage_reconciles\":false,\"selected_raw_records_reconcile\":true}",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-expanded-role-qualification.json",
+          "sha256": "27dc08de2c44998c62f224557f219b1e816920db26e5ad40d28d600e1e39eff7"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
     }
   ],
   "failures_and_skips": [
@@ -1767,6 +2160,38 @@
     {
       "run_id": "forge-native-pilot-original-claude",
       "reason": "SDK loader fails before native query because root passed relativeconfig; source-bound zeros are placeholders, notbilling."
+    },
+    {
+      "run_id": "forge-native-pilot-typed-claude",
+      "reason": "Installed SDK guard rejects file-path settings plus separate sandbox before query; preserve unknown usage."
+    },
+    {
+      "run_id": "forge-codex-stopped-program",
+      "reason": "Strict unchanged40-case gate fails38/40; two blueprints.json layout assumptions are absent from the task contract, and sorting assertions not reached."
+    },
+    {
+      "run_id": "astra-settings-startup-failure",
+      "reason": "Native missing environment prerequisite; selected prefix contains no exact usage; spend stays unknown."
+    },
+    {
+      "run_id": "astra-settings-source-read",
+      "reason": "Original compaction-absence assertion false; source-supported relocation narrowly retained after independent correction, no full answer/runtime acceptance."
+    },
+    {
+      "run_id": "forge-claude-settings-timeout",
+      "reason": "Evaluator900000ms timeout and no final native terminal result/query endpoint; one null-stop-reason child frame84198is excluded from persisted aggregate. Known native scoped views and list estimate retained in receipt, full usage unknown."
+    },
+    {
+      "run_id": "forge-claude-stopped-program-grade",
+      "reason": "Original stopped Claude program scored36/40; native evaluator0 and pytest1; no model rerun or correctness acceptance; retained detailed gates {\"all40_original_cases\":false,\"infrastructure_ok\":true,\"snapshot_custody\":true}"
+    },
+    {
+      "run_id": "p2-trajectory-astra-source-judgment",
+      "reason": "CircuitEval source/reference/continuation qualification lead; one protocol input changed append-only during read; no fully bound freeze/protection/adoption; retained detailed gates {\"answer_word_limit\":true,\"native_counter_reconciliation\":true,\"all_bound_inputs_immutable\":false}"
+    },
+    {
+      "run_id": "meter-expanded-role-accounting",
+      "reason": "Nine parser-only integration cases; selected Codex/Opus/deltas match, inclusive Claude helpers omitted; prior M2 compaction failure retained; native baseline retained for tested scopes; retained detailed gates {\"native_command_execution\":true,\"inclusive_native_usage_reconciles\":false,\"selected_raw_records_reconcile\":true}"
     }
   ],
   "limitations": [
@@ -1800,7 +2225,8 @@
     "Short-container prior manifest check passed10176; current independent/root check matches10174 and reports2missing copied historical npm debuglogs. Current custody is partial, original source/runtime results and manifest unchanged.",
     "Two registered native Forge pilot attempts fail before code: Codex400strictschema/type error with native usage unemitted; Claude SDK resolution fails because root used relativeconfig and pinned loader falls back to cwd. Separate source-supported recovery registration retains both failures. No shape-validation/import/typed-copy metadata substitutes runtime/P2 acceptance.",
     "Original-failed packet hash projection first used worktree cwd for relative manifest paths. Corrected read anchors each path at the actual private packet directory; no original files, runtime observations or model calls changed.",
-    "Unit6 sanitization changed the public meter-artifact receipt bytes while leaving its experiment anchor stale; consistency check correctly failed. Public anchor now matches sanitized bytes, private original hashes/measurements remain unchanged; failed validator outputs retained."
+    "Unit6 sanitization changed the public meter-artifact receipt bytes while leaving its experiment anchor stale; consistency check correctly failed. Public anchor now matches sanitized bytes, private original hashes/measurements remain unchanged; failed validator outputs retained.",
+    "Unit7 native role/functionality and artifact/program/source checks remain pre-freeze. Lifecycle missed views and reader-cleanup error preserved; writable engineering feasibility does not substitute for read-only P2 until independently bound."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -1860,7 +2286,19 @@
       "forge-native-shape-codex",
       "forge-native-shape-claude",
       "forge-native-pilot-original-codex",
-      "forge-native-pilot-original-claude"
+      "forge-native-pilot-original-claude",
+      "forge-native-pilot-typed-codex",
+      "forge-native-pilot-typed-claude",
+      "forge-codex-stopped-program",
+      "astra-settings-startup-failure",
+      "astra-settings-source-read",
+      "context-fresh-role-codex",
+      "context-fresh-role-claude",
+      "context-native-artifact-boundaries",
+      "forge-claude-settings-timeout",
+      "forge-claude-stopped-program-grade",
+      "p2-trajectory-astra-source-judgment",
+      "meter-expanded-role-accounting"
     ],
     "coverage_artifact": null
   }

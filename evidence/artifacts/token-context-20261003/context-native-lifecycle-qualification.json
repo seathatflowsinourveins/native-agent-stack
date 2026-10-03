@@ -1,0 +1,65 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Own labeled Docker observation of fresh native main/child Context Mode cases",
+  "registration_sha256": "b36a58c628a6f37b93d2d6e8714390e70411cb93fa0abffc5549b6465017840b",
+  "source_launch": "Official stdio Docker pattern atmodelcontextprotocol/servers@a40bc270fb5ece62673f8a1196f57116d885c5eb applied to CM asdeclared integration; native npm11.19 exec atbfacd33ccbcd908480610703b60455d2da5b57a9",
+  "image": "node@sha256:5cbc7caba8c2c0f0bca675d1b61b9f2857e1cf1853c6164ee9dd409501a936e7",
+  "codex": {
+    "recorded_containers": 2,
+    "first_live_observation": {
+      "four_configured_mounts_verified": true,
+      "readonly_root": true,
+      "network_none": true,
+      "root_and_tmp_tmpfs": true,
+      "init_npm_shell_node_parent_chain": true,
+      "actual_node_namespace_pid": 22,
+      "readiness_preload_sentinels": true
+    },
+    "second_live_observation": "UNKNOWN:19second container missed",
+    "native_shutdown_signals": [
+      15,
+      15
+    ],
+    "die_codes": [
+      143,
+      143
+    ],
+    "both_destroyed": true,
+    "final_containers_absent": true,
+    "four_actually_observed_host_pids_absent": true
+  },
+  "claude": {
+    "recorded_containers": 1,
+    "duration_seconds": 40,
+    "live_mounts_tree_parent_sentinels": "UNKNOWN: missed while active",
+    "native_shutdown_signals": [
+      2,
+      15
+    ],
+    "die_code": 143,
+    "destroyed": true,
+    "final_ps_empty_and_object_absent": true
+  },
+  "worker_stop_or_kill_calls": 0,
+  "root_server_stop_or_kill_calls": 0,
+  "observer_corrections": [
+    "Codex original fixed --since08:04:00Z preserved; independent Docker history from actual observer-start08:03:59Z retains exact events",
+    "Original proc21 read hit shell; actualNode22 status read after removal failed, unknown retained",
+    "Root additional event-reader argv/FD assertion failed, then root incorrectly proceeded to interrupt only the two earlier positively label/PID identified Docker event readers; exits130 retained; no successful additional assertion claimed"
+  ],
+  "root_cleanup_correction_sha256": "e6fe5ccb33d1054f493bd2c88dfee411046323f7875db575168d2b074b51ee29",
+  "observer_receipt_hashes": {
+    "codex": "3faaf42ba5dd31fbeb35698f7dd57ed95fb155669da904fb7d95dec0bf26cbaf",
+    "claude": "85053993206a58477a3ba5cebb647e52f0329f0d3fd5bedd0761053f1b91fe8f"
+  },
+  "worker_artifact_manifest_sha256": "a8b378d6abeda89354543fd475dd4f80ddd2a604341f341b4f37b8d666b6367b",
+  "root_checked_artifacts": 110,
+  "all_match": true,
+  "limits": [
+    "Native SIGTERM/SIGINT disposal differs from EOF/die0; no normal EOF-only pass",
+    "Native role UUID/tool records separately establish invocation; Docker PIDs/stats do not",
+    "Configured confinement/source parity is distinct from the missed Claude live observation",
+    "No peer/gateway/global profile/lifecycle changes; no protection/default claim"
+  ]
+}
