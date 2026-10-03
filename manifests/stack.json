@@ -294,7 +294,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.159.3",
+      "version": "0.160.0",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -338,16 +338,17 @@
         "codex-01571-qualification-20260926",
         "codex-01592-qualification-20260930",
         "codex-01593-native-queue-20261001",
-        "codex-01593-hindsight-native-memory-20261001"
+        "codex-01593-hindsight-native-memory-20261001",
+        "runtime-sdk-20261003"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex",
-        "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/scripts/install/install.sh",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/app-server-daemon/README.md"
+        "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/scripts/install/install.sh",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server-daemon/README.md"
       ],
-      "source_pin": "01fc69f4026735edfdf6789820549727a4867b11",
-      "freshness": "Linux 0.159.3 is selected after the official rust-v0.159.3 installer staged the complete native package and the 2026-10-01 receipts qualified native queue delivery while idle and busy, receiver reconnect, and synthetic Hindsight hook capture and native recollection through both headless and shared-daemon sessions. These are scoped native client operations with independent observations, not upstream test-suite execution or a whole-memory-backend readiness claim. On the qualified host, daemon_auto_start is enabled, the native daemon is pinned to 0.159.3 and its automatic updater is disabled; the shared portable template still sets daemon_auto_start false, so daemon adoption on other hosts remains opt-in. The Linux npm wrapper download matches its registry integrity, but its signature and attestation were not verified in this promotion. tools/adoption/apply_codex_lane.py tracks the Linux version pin. Historical receipts and rollback installations remain available; the independent landscape selection is unchanged, and macOS remains pinned to 0.155.1 pending its own qualification."
+      "source_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "freshness": "Linux 0.160.0 is selected from the current stable rust-v0.160.0 release, commit a956835d020762cb2b570053af06f643a11c0ecc. The 2026-10-03 coordinator compatibility record retains the matching Python SDK and bundled CLI, strict-hash installation with CPython 3.13.15 and uv 0.12.17, matching npm-platform and bundled binary SHA256, and completed native-account SDK, gateway SDK and gateway CLI marker canaries (evidence/artifacts/runtime-sdk-20261003/receipt.json). The official install.sh and app-server-daemon README are unchanged upstream from rust-v0.159.3. The dated 0.159.3 queue and Hindsight receipts retain their original scope and do not qualify those operations at 0.160.0. The shared host launcher, daemon and production prefix still run 0.159.3 until a coordinated switch; the repository pin does not switch them. The shared portable template keeps daemon_auto_start false, so daemon adoption on another host remains opt-in. The npm wrapper bytes match registry dist.integrity and SHA256; signature and attestation verification were not recorded. Gateway backend model and effort were not read from the call log. Sanitized returned results, hashes and positive/negative marker controls are retained; original SDK outer argv/cwd, attested native heredoc and process start/end times remain incomplete, so runtime-sdk-20261003 is compatibility_attempt. This is same-host compatibility evidence, not native_cli_e2e, new-host, model-quality or whole-memory-backend acceptance. The move is inside the seven-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as the earlier 0.159.2 and 0.159.3 moves were (docs/decisions/2026-09-27-model-currency.md). tools/adoption/apply_codex_lane.py follows the Linux pin; historical receipts and rollback installations remain available, and macOS stays at 0.155.1 pending its own qualification."
     },
     {
       "id": "codex-for-claude",
