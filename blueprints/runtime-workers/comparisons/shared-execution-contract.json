@@ -5,7 +5,7 @@
   "comparison_modes": {
     "default": "full_usage",
     "selected_mode": null,
-    "selection": "Absent or null selection retains the prior full_usage contract. quality_only can be selected only by an accepted prospective per-job/shared amendment and new preregistration before any candidate quality output; this draft selects no mode and admits no run.",
+    "selection_policy": "Absent or null selection retains the prior full_usage contract. quality_only can be selected only by an accepted prospective per-job/shared amendment and new preregistration before any candidate quality output; this draft selects no mode and admits no run.",
     "full_usage": {
       "semantics": "All prior complete-usage, original-operand, coverage, efficiency and selection requirements remain in force without change. Missing usage cannot fall through a usage tiebreak to elapsed time."
     },

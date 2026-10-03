@@ -154,3 +154,5 @@ the repeated note-binding check exited 0. Structural JSON/mode checks are local 
 not unchanged upstream acceptance, runtime delivery, quality measurement or run
 admission; repository/native integration validation remains the coordinator's
 merge responsibility under [the acceptance evidence policy](../../../docs/acceptance-evidence-policy.md).
+
+The native pre-push label-classification check refused local585931a because three new policy paragraphs used `selection`, a label key in `tests/test_blind_checkout.py`. The bounded correction names all four paragraphs `selection_policy`, following the maintained policy field in `scripts/build_ecosystem.py`; their text, mode defaults and every decision/gate value remain exact. The failed commit and returned check output are retained. This changes metadata names and does not select a mode, waive any gate or bypass the required check.

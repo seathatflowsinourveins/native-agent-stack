@@ -8,7 +8,7 @@
   "comparison_modes": {
     "default": "full_usage",
     "selected_mode": null,
-    "selection": "Absent or null selection preserves the prior full_usage rules. quality_only requires accepted exact shared/job/preregistration bindings before candidate outputs; this draft selects no mode and remains ineligible for freeze.",
+    "selection_policy": "Absent or null selection preserves the prior full_usage rules. quality_only requires accepted exact shared/job/preregistration bindings before candidate outputs; this draft selects no mode and remains ineligible for freeze.",
     "full_usage": {
       "decision_rule": "proposed_evaluation.decision_rule",
       "usage_requirements": "All prior complete authoritative aggregate, all-call usage, original-operand and efficiency-tie conditions remain unchanged. Unknown usage cannot fall through to agent time."

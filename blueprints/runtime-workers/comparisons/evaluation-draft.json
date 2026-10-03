@@ -11,7 +11,7 @@
   "comparison_modes": {
     "default": "full_usage",
     "selected_mode": null,
-    "selection": "Absent or null selection preserves the prior full_usage rules. quality_only is selectable only by accepted exact shared/subjob/preregistration bindings before outputs; this draft admits no run or evaluator promotion.",
+    "selection_policy": "Absent or null selection preserves the prior full_usage rules. quality_only is selectable only by accepted exact shared/subjob/preregistration bindings before outputs; this draft admits no run or evaluator promotion.",
     "full_usage": {
       "decision_rule": "selection_rule",
       "usage_requirements": "All prior complete original-operand, counter-fidelity, coverage and efficiency conditions remain unchanged. Missing usage cannot fall through to elapsed time."

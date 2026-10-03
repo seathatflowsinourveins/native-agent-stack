@@ -9211,13 +9211,13 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "e8699f9aa49a875bcad12b6a8ae76b36b770d2ed6eaf5bead706e4449274225b",
-      "bytes": 23655
+      "sha256": "926d3720284df49f584f735fd6313d226b5d3f61de0a0f82d57d0c61c0b32ed5",
+      "bytes": 23662
     },
     {
       "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
-      "sha256": "90a559504399984fa6e2706b0672a6c43a81a4ed10cd6101488140d8c2f83d76",
-      "bytes": 14002
+      "sha256": "b5d3106de0f07c0683202d12ed4d11f219e84fe6a88953d5bdb57b78c23a6ce4",
+      "bytes": 14009
     },
     {
       "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
@@ -9246,13 +9246,13 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/quality-only-contract-amendment-20261003.md",
-      "sha256": "d22715d03fbdb206bf0c5d53bee4ff49163656a9a06afb044d7998007be2f913",
-      "bytes": 12277
+      "sha256": "d0a1fd649ec685fafba27f00a6a863ac6da6ea9d18a2f2253b110c25229b2f3f",
+      "bytes": 12816
     },
     {
       "path": "blueprints/runtime-workers/comparisons/research-gatherer-draft.json",
-      "sha256": "ff58f1449140c99e100ccd2d2c51e1c5e9db34b54e8cbc88c67f267a1c2ceaea",
-      "bytes": 15063
+      "sha256": "8c30caf06ca897f2fe7797b7a897c49ebe71855dcf5f394a8279f0ecc18cb2f1",
+      "bytes": 15070
     },
     {
       "path": "blueprints/runtime-workers/comparisons/reviewer-draft.json",
@@ -9271,8 +9271,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
-      "sha256": "4c0405134288d3155dbd3f5df651debe03df92e0363c70e9ffff933ca086c61b",
-      "bytes": 12624
+      "sha256": "25e94cd5d82fac977d1f132bd683485b170aca50917ed3376f5045c19a51ae8b",
+      "bytes": 12631
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",

@@ -7,7 +7,7 @@
   "comparison_modes": {
     "default": "full_usage",
     "selected_mode": null,
-    "selection": "Absent or null selection preserves the prior full_usage rules. quality_only is a proposal requiring accepted exact shared/job/preregistration bindings before outputs; this draft remains ineligible for freeze.",
+    "selection_policy": "Absent or null selection preserves the prior full_usage rules. quality_only is a proposal requiring accepted exact shared/job/preregistration bindings before outputs; this draft remains ineligible for freeze.",
     "full_usage": {
       "decision_rule": "proposed_decision_rule.selection",
       "usage_requirements": "All prior usage_contract required_fields, complete authoritative coverage and efficiency conditions remain unchanged. Unknown usage cannot fall through to agent time."
