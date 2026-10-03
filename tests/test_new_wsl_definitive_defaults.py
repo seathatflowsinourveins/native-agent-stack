@@ -1,13 +1,18 @@
 """The new WSL's definitive defaults: one default per slot, one owner per tool, and no stale generated text.
 
-Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001). They do not
-judge any pick; they hold the manifest to its own rule.
+Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001, and the
+layer-consensus record that its assembler reads last). They do not judge any pick; they hold the manifest to its own rule.
+One class runs a committed program: the install plan's acceptance of the consensus row skill-authoring, against stand-ins.
 """
 import hashlib
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
+import types
 import unittest
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -16,7 +21,14 @@ ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
 RECORD = ROOT / "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md"
 SELECTION = ROOT / "evidence/artifacts/new-wsl-clean-install-selection-20261001"
-ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added"}
+CONSENSUS_ART = ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002"
+CONSENSUS_RECORD = ROOT / "docs/decisions/2026-10-02-new-wsl-layer-consensus.md"
+PLAN = ROOT / "evidence/artifacts/new-wsl-install-plan-20261002"
+ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added", "consensus"}
+# What the rounds decided on a row: an amendment by direct consensus is recorded beside these and carries none of them.
+PROTECTED = {"default", "state", "definitive", "repository", "installs_nothing_extra", "row_kind"}
+PRIVATE_SHAPES = (r"/home/[a-z][a-z0-9_-]*/|/mnt/[a-z]/Users/|/tmp/claude-\d+/|-home-[a-z]",
+                  r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}")
 DECISION_SLOTS = {"container-engine", "isolation-container-boundary", "code-search", "memory-owner", "context-supply",
                   "local-model-server"}
 RESOLVED = ("final", "installed_on_critic", "not_installed", "split")
@@ -66,6 +78,19 @@ def converged_key(slot):
     return picks[0] if picks[0] == picks[1] else None
 
 
+def load_source(path, name):
+    """A module compiled from source, so that no bytecode is written into an artifact folder."""
+    module = types.ModuleType(name)
+    module.__file__ = str(path)
+    exec(compile(path.read_text(encoding="utf-8"), str(path), "exec"), module.__dict__)
+    return module
+
+
+def load_assembler():
+    """The assembler's functions."""
+    return load_source(ART / "assemble_manifest.py", "assemble_manifest")
+
+
 class Manifest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -76,6 +101,8 @@ class Manifest(unittest.TestCase):
         cls.convergence = load(ART / "convergence.json")
         cls.decisions = {d["slot_id"]: d for d in cls.convergence["decisions"] + cls.convergence["added_slots"]}
         cls.combined = load(ROOT / cls.convergence["combined"]["path"])
+        cls.consensus = load(CONSENSUS_ART / "consensus.json")
+        cls.consensus_rows = {row["slot_id"]: row for row in cls.consensus["add_rows"]}
         cls.rows = cls.manifest["slots"]
 
     def source_slots(self):
@@ -138,7 +165,9 @@ class Manifest(unittest.TestCase):
                     self.assertEqual(row["state"], "")
 
     def test_every_row_has_job_and_resolution(self):
-        self.assertEqual({row["slot_id"] for row in self.rows}, set(self.decisions))
+        # A row is decided by the rounds (convergence.json) or added by the direct consensus (consensus.json), never both.
+        self.assertEqual(set(self.decisions) & set(self.consensus_rows), set())
+        self.assertEqual({row["slot_id"] for row in self.rows}, set(self.decisions) | set(self.consensus_rows))
         self.assertEqual(len(self.decisions), len(self.convergence["decisions"]) + len(self.convergence["added_slots"]))
         added_jobs = {d["slot_id"]: d["job"] for d in self.convergence["added_slots"]}
         owners = {}
@@ -146,14 +175,19 @@ class Manifest(unittest.TestCase):
             sid = row["slot_id"]
             with self.subTest(slot=sid):
                 self.assertTrue(row.get("job"), sid)
-                self.assertEqual(row["job"], self.convergence["jobs"].get(sid, added_jobs.get(sid)))
                 self.assertIn("resolution", row)
                 resolution = row["resolution"]
                 self.assertIsInstance(resolution, dict)
-                self.assertEqual(resolution["outcome"], self.decisions[sid]["outcome"])
-                for key in ("by", "votes", "covered_by", "arms", "deciding_measurement", "measurement_id"):
-                    if key in self.decisions[sid]:
-                        self.assertEqual(resolution[key], self.decisions[sid][key])
+                if row["row_kind"] == "consensus":
+                    self.assertEqual(row["job"], self.consensus_rows[sid]["job"])
+                    self.assertEqual(resolution, self.consensus_rows[sid]["resolution"])
+                    self.assertNotIn(resolution["outcome"], RESOLVED + ("kept",))
+                else:
+                    self.assertEqual(row["job"], self.convergence["jobs"].get(sid, added_jobs.get(sid)))
+                    self.assertEqual(resolution["outcome"], self.decisions[sid]["outcome"])
+                    for key in ("by", "votes", "covered_by", "arms", "deciding_measurement", "measurement_id"):
+                        if key in self.decisions[sid]:
+                            self.assertEqual(resolution[key], self.decisions[sid][key])
                 if row["default"] and not row["installs_nothing_extra"]:
                     self.assertNotIn(row["job"], owners, f"{sid}: job already owned by {owners.get(row['job'])}")
                     owners[row["job"]] = sid
@@ -214,6 +248,8 @@ class Manifest(unittest.TestCase):
     def test_critic_evidence_and_covering_slots_are_valid(self):
         rows = {row["slot_id"]: row for row in self.rows}
         for row in self.rows:
+            if row["row_kind"] == "consensus":
+                continue  # No round decided it: it has no critic and no covering slot; its own tests are further down.
             sid, resolution = row["slot_id"], row["resolution"]
             decision = self.decisions[sid]
             with self.subTest(slot=sid):
@@ -263,7 +299,8 @@ class Manifest(unittest.TestCase):
             self.assertEqual(row["layer_id"], added["layer_id"])
             added_by_layer.setdefault(row["layer_id"], []).append(row["slot_id"])
         for lid, added in added_by_layer.items():
-            order = [row["slot_id"] for row in self.rows if row["layer_id"] == lid]
+            # The consensus step places its rows after these, so the order is taken over the rows the rounds decided.
+            order = [row["slot_id"] for row in self.rows if row["layer_id"] == lid and row["row_kind"] != "consensus"]
             self.assertEqual(order[-len(added):], added)
         for correction in self.convergence["hygiene"]:
             row = rows[correction["slot_id"]]
@@ -350,6 +387,9 @@ class Manifest(unittest.TestCase):
         self.assertIn("decision-round", rule)
         self.assertNotEqual(rule, self.foundation["decision_rule"])
         self.assertEqual(self.manifest.get("decision_rule_before_amendment_2"), self.foundation["decision_rule"])
+        # The consensus record's rule is appended whole, after the rounds' rule.
+        self.assertTrue(rule.endswith(" " + self.consensus["rule"]))
+        self.assertLess(rule.index("decision-round"), rule.index(self.consensus["rule"]))
 
     def test_counts_include_states_and_installed_rows(self):
         counts = self.manifest["counts"]
@@ -578,6 +618,9 @@ class Manifest(unittest.TestCase):
             ref = self.convergence[source]
             self.assertEqual(self.manifest["sources"][source], ref)
             self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        consensus = CONSENSUS_ART / "consensus.json"
+        self.assertEqual(self.manifest["sources"]["consensus"],
+                         {"path": consensus.relative_to(ROOT).as_posix(), "sha256": sha(consensus)})
 
     def test_preregistered_inputs_are_the_committed_ones(self):
         prereg = load(ART / "preregistration.json")
@@ -662,6 +705,325 @@ class Manifest(unittest.TestCase):
         self.assertEqual(len(self.trading["layers"]), 12)
         pinned = {p["name"] for p in self.trading["pinned_requirements"]}
         self.assertTrue(any("NautilusTrader 2.0.0rc5" in name for name in pinned))
+
+    # The layer consensus of 2026-10-02: rows added, and amendments recorded, by a direct consensus of the two families.
+
+    def test_counts_after_the_layer_consensus(self):
+        counts, by_catalog = self.manifest["counts"], {}
+        for row in self.rows:
+            by_catalog[row["catalog"]] = by_catalog.get(row["catalog"], 0) + 1
+        self.assertEqual(counts["slots"], 89)
+        self.assertEqual(by_catalog, {"foundation": 69, "us-equities": 20})
+        self.assertEqual(counts["layers"], 37)
+        self.assertEqual(counts["installed"], 56)
+        self.assertEqual(counts["by_row_kind"]["consensus"], 5)
+        self.assertEqual(counts["by_state"]["resolved"], 22)
+        self.assertEqual(counts["by_state"]["measurement"], 4)
+
+    def test_consensus_rows_are_the_records_rows_with_its_states(self):
+        rows = {row["slot_id"]: row for row in self.rows}
+        self.assertEqual(sorted(self.consensus_rows), ["credential-custody", "cross-family-review", "research-skill",
+                                                       "skill-authoring", "skill-discovery"])
+        self.assertEqual({row["slot_id"] for row in self.rows if row["row_kind"] == "consensus"}, set(self.consensus_rows))
+        # The fields a consensus row must carry are the ones the assembler writes for a row the rounds decided.
+        fields = load_assembler().ROW_FIELDS
+        self.assertEqual(tuple(key for key in self.rows[0] if key != "amendments"), fields)
+        for sid, recorded in self.consensus_rows.items():
+            with self.subTest(slot=sid):
+                self.assertEqual(rows[sid]["state"], recorded["state"])
+                self.assertEqual(rows[sid], recorded)  # copied as the record gives it
+                self.assertEqual(tuple(rows[sid]), fields)
+        # Each is placed after the last row the rounds decided in its layer, in the record's order.
+        for lid in sorted({row["layer_id"] for row in self.consensus_rows.values()}):
+            in_layer = [row for row in self.rows if row["layer_id"] == lid]
+            kinds = [row["row_kind"] == "consensus" for row in in_layer]
+            self.assertEqual(kinds, sorted(kinds), lid)
+            self.assertEqual([row["slot_id"] for row in in_layer if row["row_kind"] == "consensus"],
+                             [row["slot_id"] for row in self.consensus["add_rows"] if row["layer_id"] == lid])
+
+    def test_no_consensus_row_is_definitive(self):
+        for row in self.rows:
+            if row["row_kind"] != "consensus":
+                continue
+            with self.subTest(slot=row["slot_id"]):
+                self.assertIs(row["definitive"], False)
+                self.assertNotEqual(row["state"], "definitive")
+                self.assertIn("direct consensus", row["label"])
+                self.assertEqual(row["resolution"]["by"], "direct consensus of both model families")
+                self.assertTrue(row["resolution"]["sources"])
+                if row["measurement"] is not None:
+                    # A consensus row that waits names what decides it and installs nothing meanwhile.
+                    self.assertEqual(row["measurement"], {"returned": False, "receipts": []})
+                    self.assertTrue(row["resolution"]["deciding_measurement"])
+                    self.assertTrue(row["resolution"]["measurement_id"])
+                    self.assertTrue(row["installs_nothing_extra"])
+
+    def test_amendments_leave_the_rows_as_the_rounds_decided_them(self):
+        _, _, decided, _, _ = load_assembler().assemble_rows()
+        before = {row["slot_id"]: row for row in decided}
+        self.assertEqual(set(before), {row["slot_id"] for row in self.rows} - set(self.consensus_rows))
+        recorded = {}
+        for entry in self.consensus["amend_rows"]:
+            self.assertEqual(set(entry), {"slot_id", "amendment"})
+            self.assertEqual(set(entry["amendment"]) & PROTECTED, set(), entry["slot_id"])
+            recorded.setdefault(entry["slot_id"], []).append(entry["amendment"])
+        self.assertTrue(recorded)
+        self.assertTrue(set(recorded) <= set(before), "an amendment names a row that no round decided")
+        for row in self.rows:
+            sid = row["slot_id"]
+            with self.subTest(slot=sid):
+                if sid in recorded:
+                    self.assertEqual(row["amendments"], recorded[sid])
+                    for amendment in row["amendments"]:
+                        for key in ("date_utc", "by", "decision"):
+                            self.assertTrue(amendment[key], key)
+                else:
+                    self.assertNotIn("amendments", row)
+                if row["row_kind"] != "consensus":
+                    # Every other field is the one the assembler builds before the consensus step.
+                    self.assertEqual({key: value for key, value in row.items() if key != "amendments"}, before[sid])
+
+    def test_consensus_records_are_the_hashed_published_copies(self):
+        records = self.consensus["records"]
+        copies = load(CONSENSUS_ART / "copy-notes.json")["copies"]
+        named = {name: ref for name, ref in records.items() if name != "acknowledgements"}
+        # The Claude lane's review of the Codex lane's scoped dispositions is hashed like the copies but is not one: it was
+        # written in the folder from the review as returned, so copy-notes.json, which accounts for the copies, omits it.
+        review = named.pop("claude_review_held_topics")
+        self.assertEqual(review["path"], (CONSENSUS_ART / "claude-review-held-topics.md").relative_to(ROOT).as_posix())
+        self.assertNotIn(Path(review["path"]).name, copies)
+        self.assertEqual(sha(ROOT / review["path"]), review["sha256"])
+        self.assertEqual(sorted(Path(ref["path"]).name for ref in named.values()), sorted(copies))
+        for name, ref in named.items():
+            path = ROOT / ref["path"]
+            with self.subTest(record=name):
+                self.assertTrue(path.is_file())
+                self.assertEqual(sha(path), ref["sha256"])
+                self.assertEqual(copies[path.name]["sha256"], ref["sha256"])
+        # Both families' acknowledgements are on record; they are links to pull-request comments, not hashed files.
+        self.assertEqual({ack["family"] for ack in records["acknowledgements"]}, {"claude", "gpt"})
+        for ack in records["acknowledgements"]:
+            self.assertTrue(ack["url"].startswith("https://github.com/"), ack["url"])
+        # Each acknowledgement says what its comment covers, in time order. The scoped dispositions are in the Codex
+        # lane's note of 18:57:10Z: the Claude lane agreed to them from the note, before its review (5959684384), and the
+        # Codex lane recorded receipt of that agreement (5959996494).
+        acknowledgements = records["acknowledgements"]
+        self.assertEqual([(ack["family"], ack["url"].rsplit("-", 1)[1]) for ack in acknowledgements],
+                         [("claude", "5958766754"), ("gpt", "5959059286"), ("gpt", "5959205007"),
+                          ("claude", "5959684384"), ("gpt", "5959996494")])
+        self.assertEqual([ack["at"] for ack in acknowledgements], sorted(ack["at"] for ack in acknowledgements))
+        for ack in acknowledgements:
+            self.assertTrue(ack["covers"].strip(), ack["url"])
+        by_id = {ack["url"].rsplit("-", 1)[1]: ack["covers"] for ack in acknowledgements}
+        self.assertIn("claude_review_held_topics", by_id["5959684384"])
+        self.assertIn("2026-10-02T18:57:10Z", by_id["5959684384"])
+        self.assertIn("5959684384", by_id["5959996494"])
+
+    def test_consensus_labels_follow_the_rule(self):
+        """The rule's label clause, in the labels' own words: every consensus row names the direct consensus of both
+        families; a row whose install waits says that its gate or its measurement decides and that nothing is installed
+        until it returns, and every other row says that it is not a blind round and not a measurement. Acceptance gates
+        that an installed or resolved row still has to pass are its open acceptance gates and do not hold its install."""
+        self.assertIn("listed as its open acceptance gates and do not hold its install", self.consensus["rule"])
+        rows = [row for row in self.rows if row["row_kind"] == "consensus"]
+        self.assertEqual(len(rows), len(self.consensus_rows))
+        for row in rows:
+            label, resolution = row["label"], row["resolution"]
+            with self.subTest(slot=row["slot_id"]):
+                self.assertTrue(label.startswith("both families by direct consensus"), label)
+                self.assertNotIn("open_gates", resolution)
+                if row["state"] == "measurement":
+                    self.assertRegex(label, r"; (?:an activation gate|the named measurement) decides\b")
+                    self.assertTrue(label.endswith(", nothing installed until it returns"), label)
+                    self.assertNotIn("not a blind round", label)
+                    self.assertTrue(resolution["deciding_measurement"])
+                    self.assertNotIn("open_acceptance_gates", resolution)
+                else:
+                    self.assertTrue(label.endswith("; not a blind round, not a measurement"), label)
+                    self.assertNotIn("decides", label)
+                    self.assertNotIn("deciding_measurement", resolution)
+        gated = {row["slot_id"]: row for row in rows if "open_acceptance_gates" in row["resolution"]}
+        self.assertEqual(sorted(gated), ["cross-family-review", "skill-authoring", "skill-discovery"])
+        for sid, row in gated.items():
+            with self.subTest(gated=sid):
+                # Installed or resolved, not waiting: the gates are acceptance on the destination, not a hold on the install.
+                self.assertNotIn(row["state"], ("measurement", "split"))
+                self.assertIsNone(row["measurement"])
+                self.assertTrue(row["resolution"]["open_acceptance_gates"])
+
+    def test_consensus_carries_the_reviews_qualifications_without_changing_a_decision(self):
+        """Three facts of the Claude lane's review qualify the credential-guard amendment and two held topics: the
+        comparison pins HOL Guard 3.17.2 or later; AgentCompass's Claude adapter writes its API key in plaintext; Docker's
+        apt channel already carries Compose 5.6.0 and nothing holds the package. The decisions stay as they were."""
+        amendment = next(entry["amendment"] for entry in self.consensus["amend_rows"] if entry["slot_id"] == "credential-guard")
+        held = {topic["topic"]: topic for topic in self.consensus["held_without_a_row_change"]}
+        expected = {
+            "credential-guard": (amendment, ("3.17.2 or later", "21:12:17Z", "topic 1, claim 10")),
+            "evaluation harness": (held["evaluation harness"], ("plaintext", "/tmp", "0600", "topic 2, omission 2")),
+            "Docker Compose 5.6.0": (held["Docker Compose 5.6.0"], ("5.6.0", "only at install time", "topic 4, omission 2")),
+        }
+        for name, (item, phrases) in expected.items():
+            with self.subTest(item=name):
+                text = " ".join(item["qualifications"])
+                for phrase in phrases:
+                    self.assertIn(phrase, text)
+        self.assertEqual(amendment["decision"], "keep the guard; hold one enforcement comparison")
+        self.assertEqual(held["evaluation harness"]["decision"],
+                         "keep Inspect AI 0.3.273 and Harbor 0.23; AgentCompass 1.0.0 only for an identified unmet evaluation requirement")
+        self.assertEqual(held["Docker Compose 5.6.0"]["decision"],
+                         "qualify the update; the selected 5.5.1 stays until the owner of that review accepts it")
+        # The amendment carries its qualification into the manifest beside the row; the row's own fields do not change.
+        guard = next(row for row in self.rows if row["slot_id"] == "credential-guard")
+        self.assertEqual(guard["amendments"][-1]["qualifications"], amendment["qualifications"])
+
+    def test_tables_show_consensus_rows_by_their_label_and_list_the_amendments(self):
+        lines = RECORD.read_text(encoding="utf-8").splitlines()
+        for sid, row in self.consensus_rows.items():
+            with self.subTest(slot=sid):
+                line = next(line for line in lines if line.startswith(f"| {row['layer_id']} | {sid} |"))
+                cells = [cell.strip() for cell in line.split("|")[1:-1]]
+                self.assertEqual(cells[4], row["state"])
+                self.assertEqual(cells[5], row["label"])
+                self.assertNotIn("**", cells[3])
+        start, end = lines.index("### Amendments by direct consensus"), lines.index("<!-- tables:end -->")
+        self.assertLess(start, end)
+        table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:end] if line.startswith("| ")]
+        self.assertEqual(table[:2], [["Slot", "Date", "Decision"], ["---"] * 3])
+        self.assertEqual(table[2:], [[row["slot_id"], amendment["date_utc"], amendment["decision"]]
+                                     for row in self.rows for amendment in row.get("amendments", [])])
+        self.assertEqual(len(table) - 2, len(self.consensus["amend_rows"]))
+
+    def test_consensus_decision_record_quotes_the_rule_and_the_owner(self):
+        text = CONSENSUS_RECORD.read_text(encoding="utf-8")
+        self.assertIn(self.consensus["rule"], text)
+        self.assertIn(self.consensus["authorization"]["verbatim"], text)
+        for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.consensus["amend_rows"]]:
+            self.assertIn(f"`{sid}`", text, sid)
+        for sentence in self.consensus["not_established"]:
+            self.assertIn(sentence, text)
+        # The earlier record points to this one outside its generated tables.
+        earlier = RECORD.read_text(encoding="utf-8")
+        outside = earlier[:earlier.index("<!-- tables:begin")] + earlier[earlier.index("<!-- tables:end -->"):]
+        self.assertIn(CONSENSUS_RECORD.name, outside)
+
+    def test_no_host_path_or_user_name_in_the_consensus_folder(self):
+        for path in sorted(CONSENSUS_ART.rglob("*")):
+            if path.is_file():
+                text = path.read_text(encoding="utf-8")
+                self.assertIsNone(re.search(PRIVATE_SHAPES[0], text), str(path.relative_to(ROOT)))
+                self.assertIsNone(re.search(PRIVATE_SHAPES[1], text, re.I), str(path.relative_to(ROOT)))
+
+
+class SkillAuthoringAcceptance(unittest.TestCase):
+    """The install plan's acceptance of the consensus row skill-authoring, run against stand-ins.
+
+    The record's reason for the row is that no same-name copy of skill-creator is placed beside the one Codex embeds.
+    The program that accept.sh runs for the row is run here as accept.sh runs it (bash -euo pipefail -c), with a stub
+    npx that prints a canned listing and records its arguments, a canned lock file and a scratch HOME. The expected state
+    passes, and each condition of the program, planted on its own, fails it. The fixtures are our own: the stub does not
+    exercise the installer's listing logic, and nothing is installed.
+    """
+
+    WANT = "3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6"
+    LISTING_ARGS = "--yes skills@1.7.0 list -g --json"
+    SKILL = "---\nname: skill-creator\n---\n"
+
+    @classmethod
+    def setUpClass(cls):
+        if not (shutil.which("bash") and shutil.which("jq")):
+            raise unittest.SkipTest("bash and jq are needed to run the acceptance program")
+        row = next(r for r in load(PLAN / "install-plan.json")["owners"] if r["slot"] == "skill-authoring")
+        cls.program = row["acceptance"]["post_install"]["command"]
+
+    def run_case(self, agents=("Claude Code",), folder_hash=None, plant=(), codex_home=False, errexit=True):
+        """The program's exit status for one state, the arguments the stub npx received, and the program's stderr.
+
+        HOME is <scratch>/home and, with codex_home, CODEX_HOME is <scratch>/codex-home; `plant` holds (kind, path under
+        the scratch folder) pairs, where kind is "folder" (a skill folder) or "dangling" (a link to nothing). Without
+        errexit the program runs without -e."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            home, stub = scratch / "home", scratch / "bin"
+            (home / ".agents/skills/find-skills").mkdir(parents=True)  # another skill in the shared directory
+            embedded = home / ".codex/skills/.system/skill-creator"  # where Codex keeps its embedded skills
+            embedded.mkdir(parents=True)
+            (embedded / "SKILL.md").write_text(self.SKILL, encoding="utf-8")
+            listing = [{"name": "find-skills", "scope": "global", "agents": ["Claude Code", "Codex"]}]
+            if agents is not None:
+                listing.append({"name": "skill-creator", "scope": "global", "agents": list(agents)})
+            (scratch / "listing.json").write_text(json.dumps(listing), encoding="utf-8")
+            lock = {"version": 3, "skills": {"skill-creator": {"skillFolderHash": folder_hash or self.WANT}}}
+            (home / ".agents/.skill-lock.json").write_text(json.dumps(lock), encoding="utf-8")
+            for kind, relative in plant:
+                path = scratch / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                if kind == "folder":
+                    path.mkdir()
+                    (path / "SKILL.md").write_text(self.SKILL, encoding="utf-8")
+                else:
+                    path.symlink_to(scratch / "nowhere")
+            stub.mkdir()
+            (stub / "npx").write_text('#!/bin/sh\nprintf \'%s\\n\' "$*" >"$STUB_DIR/args"\ncat "$STUB_DIR/listing.json"\n',
+                                      encoding="utf-8")
+            (stub / "npx").chmod(0o755)
+            env = {key: value for key, value in os.environ.items()
+                   if key not in ("XDG_STATE_HOME", "CODEX_HOME", "CLAUDE_CONFIG_DIR", "BASH_ENV", "ENV")}
+            env.update(HOME=str(home), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}", STUB_DIR=str(scratch))
+            if codex_home:
+                env["CODEX_HOME"] = str(scratch / "codex-home")
+            result = subprocess.run(["bash", "-euo" if errexit else "-uo", "pipefail", "-c", self.program], env=env,
+                                    capture_output=True, text=True, timeout=60)
+            args = scratch / "args"
+            return result.returncode, args.read_text(encoding="utf-8").strip() if args.exists() else None, result.stderr
+
+    def test_the_program_is_the_one_accept_sh_runs(self):
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        functions = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
+        self.assertEqual(checker.checks_of(functions["skill-authoring"]),
+                         [("post_install", "skill-authoring", "smoke", self.program)])
+
+    def test_the_expected_state_passes_and_the_listing_has_no_agent_filter(self):
+        # Listed for Claude Code alone, the recorded tree hash, another skill in the shared directory and Codex's
+        # embedded copy under skills/.system.
+        status, args, stderr = self.run_case()
+        self.assertEqual(status, 0, stderr)
+        self.assertEqual(args, self.LISTING_ARGS)
+
+    def test_each_planted_condition_fails_the_program(self):
+        cases = {
+            "the listing names Codex as well": dict(agents=("Claude Code", "Codex")),
+            "the listing names Codex alone": dict(agents=("Codex",)),
+            "the listing has no skill-creator": dict(agents=None),
+            "the lock records another tree hash": dict(folder_hash="0" * 40),
+            "a copy in the installer's shared directory": dict(plant=[("folder", "home/.agents/skills/skill-creator")]),
+            "a dangling link in the installer's shared directory": dict(plant=[("dangling", "home/.agents/skills/skill-creator")]),
+            "a copy in Codex's skills directory": dict(plant=[("folder", "home/.codex/skills/skill-creator")]),
+            "a dangling link in Codex's skills directory": dict(plant=[("dangling", "home/.codex/skills/skill-creator")]),
+            "a copy in the skills directory under CODEX_HOME": dict(codex_home=True,
+                                                                    plant=[("folder", "codex-home/skills/skill-creator")]),
+        }
+        for name, case in cases.items():
+            with self.subTest(case=name):
+                status, args, stderr = self.run_case(**case)
+                self.assertEqual(status, 1, stderr)
+                self.assertEqual(args, self.LISTING_ARGS)
+
+    def test_the_directory_conditions_do_not_rest_on_errexit(self):
+        # Before bash 4.1 (macOS /bin/bash is 3.2) a failing [[ ]] does not stop a set -e script (bash NEWS, bash-4.1,
+        # item j). The directory test is therefore the program's last command, and without -e its status is still the
+        # program's: each planted copy or link fails the program on any bash.
+        cases = {
+            "a copy in the installer's shared directory": dict(plant=[("folder", "home/.agents/skills/skill-creator")]),
+            "a dangling link in the installer's shared directory": dict(plant=[("dangling", "home/.agents/skills/skill-creator")]),
+            "a copy in Codex's skills directory": dict(plant=[("folder", "home/.codex/skills/skill-creator")]),
+            "a dangling link in Codex's skills directory": dict(plant=[("dangling", "home/.codex/skills/skill-creator")]),
+            "a copy in the skills directory under CODEX_HOME": dict(codex_home=True,
+                                                                    plant=[("folder", "codex-home/skills/skill-creator")]),
+        }
+        for name, case in cases.items():
+            with self.subTest(case=name):
+                status, _, stderr = self.run_case(errexit=False, **case)
+                self.assertEqual(status, 1, stderr)
 
 
 if __name__ == "__main__":
