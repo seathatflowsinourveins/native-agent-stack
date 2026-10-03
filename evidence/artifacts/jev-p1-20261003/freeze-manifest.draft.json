@@ -20,8 +20,8 @@
   "case_pack": [
    {
     "external": "case-pack.draft.json (private until labels exist)",
-    "sha256": "b3f6a03d69bb9dc80257f03bde397e57c637fb66240443b41c98ab20db6f4a44",
-    "bytes": 359670
+    "sha256": "10c27d8161461704efe8668a7897ad1abd5b919aa74e508d2f8997a2814cc961",
+    "bytes": 359694
    }
   ],
   "label_packet": [
@@ -87,8 +87,8 @@
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_casepack.py",
-    "sha256": "e105a9042a86bf8514576b20618176af7a83267c129f6cb21599324234dba5ab",
-    "bytes": 34109
+    "sha256": "d04270216da791ff25469acdd300a39f2a028d2ac58ef921054f2e654610597e",
+    "bytes": 34807
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_scoring.py",

@@ -619,26 +619,8 @@
    "authoring_prompt_sha256": "e9fdbba07b62f7d570515b6ae9f4f5d48d903e2b4f12e9f7316319f5af0b4f77"
   }
  ],
- "relabel_positions": [
-  "c046",
-  "c082",
-  "c041",
-  "c020",
-  "c090",
-  "c108",
-  "c010",
-  "c038",
-  "c119",
-  "c064",
-  "c076",
-  "c032",
-  "c098",
-  "c092",
-  "c110",
-  "c057",
-  "c058",
-  "c036"
- ],
+ "relabel_count": 18,
+ "relabel_ids_sha256": "2e00e21ebeaf000cdb616c9fbd919f89ef939728067e866097e9cfba19e054b7",
  "strata_counts": {
   "enriched": {
    "cases": 45,
@@ -658,13 +640,13 @@
  },
  "private_files": {
   "case_pack": {
-   "sha256": "b3f6a03d69bb9dc80257f03bde397e57c637fb66240443b41c98ab20db6f4a44",
-   "bytes": 359670
+   "sha256": "10c27d8161461704efe8668a7897ad1abd5b919aa74e508d2f8997a2814cc961",
+   "bytes": 359694
   },
   "label_packet": {
    "sha256": "14911c165d2ba8f25f2eed81ebc42ba3d8c7c6e0904f8efe7a2a819484ff3fce",
    "bytes": 119864
   }
  },
- "note": "Case ids are draft presentation positions; the completed packet reorders every case."
+ "note": "No case id is recorded here: the completed packet reorders every case and redraws the re-label positions, both keyed on the insertions."
 }

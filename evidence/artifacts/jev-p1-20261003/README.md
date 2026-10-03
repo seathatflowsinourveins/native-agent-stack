@@ -13,7 +13,7 @@ frame commit and the seed.
 
 | File | Content |
 |---|---|
-| `draw-record.draft.json` | frame commit and digest, counts, frame rules and statistics, drawn candidate ids, adversarial form and author per slot, re-label positions, strata counts, sha256 of the private case pack and label packet |
+| `draw-record.draft.json` | frame commit and digest, counts, frame rules and statistics, drawn candidate ids, adversarial form and author per slot, the re-label count and hash, strata counts, sha256 of the private case pack and label packet; no case id |
 | `freeze-manifest.draft.json` | sha256 of every frozen-input role that exists (private files by hash only), the eight roles still missing, and the render-check count |
 
 Frame size 458 natural candidates (433 documents), enriched pool 70, adversarial base candidates 398;

@@ -40,7 +40,7 @@ tracked file outside dated prefixes that quotes its pinned version.
 
 Public draft record, in `evidence/artifacts/jev-p1-20261003/`: `draw-record.draft.json` (frame
 commit, frame digest, counts, rules, drawn candidate ids, adversarial form and author per slot,
-re-label positions, strata counts, and the sha256 of the private files) and
+the re-label count and hash, strata counts, and the sha256 of the private files; no case id) and
 `freeze-manifest.draft.json` (sha256 of every input that exists, the eight roles still missing, and
 the render-check count). Private draft, outside the repository: `case-pack.draft.json`,
 `label-packet.draft.json` and `rendered-inputs.draft.json`.
@@ -82,8 +82,9 @@ pairs. The top-up reserve is the enriched ranking after the first 45; a batch is
 below 60 non-supported labels, at most 30 in total. Adversarial slots get five per vendor form
 (injected instruction, misleading framing, text arguing for its own classification), then Opus 8 and
 Sol 7, balanced 3-3-2 across forms, all by seed; code places each insertion after the cited span.
-The presentation order is keyed on the insertions as well, so the completed packet's case ids share
-nothing with the draft's. The 18 re-label positions (15%) are drawn by code over the case ids.
+The presentation order and the 18 re-label positions (15%) are keyed on the insertions as well, so
+the completed packet's ids and re-label set share nothing with the draft's, and neither can be
+computed from public data before the pack is published.
 
 ## Label packet
 

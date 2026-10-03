@@ -173,12 +173,19 @@ def assign_adversarial(slots: list[str], seed: int = SEED) -> dict[str, dict]:
     return assignment
 
 
-def relabel_ids(case_ids: list[str], previous: list[str] | None = None, seed: int = SEED) -> list[str]:
-    """ceil(15%) of all cases. A top-up keeps the earlier list and adds the rest from the new cases."""
+def relabel_ids(case_ids: list[str], previous: list[str] | None = None, seed: int = SEED,
+                purpose: str = "relabel") -> list[str]:
+    """ceil(15%) of all cases. A top-up keeps the earlier list and adds the rest from the new cases.
+    The pack passes a purpose keyed on the insertions, so the list cannot be computed from the
+    public case-id strings alone and stays unknown to the labeller until the pack is published."""
     previous = list(previous or [])
     wanted = math.ceil(RELABEL_SHARE * len(case_ids) - 1e-9)
     fresh = [case for case in case_ids if case not in previous]
-    return previous + seeded_order(fresh, "relabel", seed)[:max(0, wanted - len(previous))]
+    return previous + seeded_order(fresh, purpose, seed)[:max(0, wanted - len(previous))]
+
+
+def relabel_purpose(insertions: dict[str, str]) -> str:
+    return "relabel|" + canonical_sha256(insertions) if insertions else "relabel"
 
 
 def native_repeat_ids(labels: dict[str, dict], seed: int = SEED) -> dict:
@@ -225,7 +232,8 @@ def extend_pack(pack: dict, frame: dict, candidate_ids: list[str]) -> list[str]:
         })
         added.append(case_id)
     pack["relabel"]["case_ids"] = relabel_ids([case["case_id"] for case in pack["cases"]],
-                                              previous=pack["relabel"]["case_ids"], seed=pack["seed"])
+                                              previous=pack["relabel"]["case_ids"], seed=pack["seed"],
+                                              purpose=pack["relabel"]["purpose"])
     return added
 
 
@@ -365,7 +373,8 @@ def build_pack(frame: dict, frame_sha256: str, seed: int = SEED, insertions: dic
                           f"enriched pairs from topup_reserve in order, one deficit-sized batch at a time, at most "
                           f"{TOPUP_MAX}; label them, then freeze",
                   "reserve_available": len(drawn["topup_reserve"]), "reserve_wanted": TOPUP_MAX, "reserve": reserve},
-        "relabel": {"share": RELABEL_SHARE, "case_ids": relabel_ids(case_ids, seed=seed),
+        "relabel": {"share": RELABEL_SHARE, "purpose": relabel_purpose(insertions),
+                    "case_ids": relabel_ids(case_ids, seed=seed, purpose=relabel_purpose(insertions)),
                     "rule": "seeded 15% (ceil) of all cases, shown again at least 24 hours after the first pass "
                             "and before any model call; a top-up adds its share from the new cases"},
         "native_repeat_rule": f"after labels: {NATIVE_REPEAT_PER_CLASS} cases per human class by seed "
@@ -433,11 +442,13 @@ def draw_record(pack: dict, private_files: dict[str, Path]) -> dict:
         "adversarial_assignment": [{key: slot[key] for key in ("slot_id", "form", "author", "target",
                                                                "insert_after_line", "authoring_prompt_sha256")}
                                    for slot in sorted(pack["adversarial_slots"], key=lambda item: item["slot_id"])],
-        "relabel_positions": pack["relabel"]["case_ids"],
+        "relabel_count": len(pack["relabel"]["case_ids"]),
+        "relabel_ids_sha256": canonical_sha256(pack["relabel"]["case_ids"]),
         "strata_counts": strata_counts,
         "private_files": {name: {"sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                                  "bytes": path.stat().st_size} for name, path in sorted(private_files.items())},
-        "note": "Case ids are draft presentation positions; the completed packet reorders every case.",
+        "note": "No case id is recorded here: the completed packet reorders every case and redraws the "
+                "re-label positions, both keyed on the insertions.",
     }
 
 
