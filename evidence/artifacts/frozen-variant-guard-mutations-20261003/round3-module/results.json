@@ -1,0 +1,85 @@
+{
+ "clone_head": "faaa86f9216c9cf03ccbaafeb203e958a7f8331d",
+ "results": [
+  {
+   "id": "M0",
+   "origin": "baseline",
+   "mutant": "unmutated tree",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 7 tests in 1.346s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N1",
+   "origin": "round 4",
+   "mutant": "new blueprints/x/launch.json: an mcpServers entry whose command runs pnpm start with cwd = the variant",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 7 tests in 0.348s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N2",
+   "origin": "round 4",
+   "mutant": "new macOS workflow running pnpm install and start with working-directory = the variant path with the directory's name upper-cased",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 7 tests in 0.335s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N3",
+   "origin": "round 4",
+   "mutant": "the frozen TOML's ignoreUntil changed from 2026-12-24 to 2027-03-24",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 7 tests in 0.341s",
+    "OK"
+   ]
+  }
+ ]
+}

@@ -378,14 +378,14 @@ locally with `GH_TOKEN` set and no `--offline`, using
   reasoning, records the authority for the dismissal: it describes the user's message of 2026-10-03 and its limits,
   without quoting it, and how far section 8's precedent ("Fixture alerts dismissed", alerts 7-15) carries.
   `tests/test_frozen_macos_variant_no_use.py` is a tripwire for direct references, not a proof of no use. It fails when
-  a scanned file names the artifact directory, in any letter case, on a line it does not pin, or a pinned line is no
+  a scanned file names the artifact directory, in any ASCII letter case, on a line it does not pin, or a pinned line is no
   longer found; when the artifact directory gains a file, OS metadata excepted; when the variant's `package.json` or
   lock no longer pins `next` 16.3.5, or the lock's sha256 differs from the value `FROZEN_LOCKS` binds; when
   `.github/osv-scanner-frozen-macos.toml` no longer holds exactly one exception for the advisory, with `ignoreUntil`
   2026-12-24 and no key besides `id`, `ignoreUntil` and `reason`; and when `git ls-files` cannot run. It scans every
   tracked file except `*.md`, `evidence/**`, `manifests/evidence.json` and `catalogs/**`, and in those reads only the
   configuration and scripts it recognises by name, suffix, directory, shebang or Git mode (the module lists them; agent,
-  command and skill definitions under `.claude`, `.codex` or `.agents`, names matched in any letter case, are
+  command and skill definitions under `.claude`, `.codex` or `.agents`, names matched in any ASCII letter case, are
   configuration), so another file there, such
   as a JSON launch configuration under `evidence/**`, is not scanned; a route that never spells the directory's name,
   such as a step that reads the path from the OSV inventory, is not caught either, and the guard is only as strong as

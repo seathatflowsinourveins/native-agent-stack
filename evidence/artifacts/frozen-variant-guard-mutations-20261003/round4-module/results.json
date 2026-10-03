@@ -1,0 +1,145 @@
+{
+ "clone_head": "4af88b1d5b153b7d2f09f83385bcca05ff4fb87e",
+ "results": [
+  {
+   "id": "M0",
+   "origin": "baseline",
+   "mutant": "unmutated tree",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 9 tests in 1.791s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N4",
+   "origin": "round 5 (section 2)",
+   "mutant": "rebuild.sh beside variant/ (cd variant && pnpm install), tracked (git add)",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 9 tests in 0.529s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N5",
+   "origin": "round 5 (section 2)",
+   "mutant": "the same rebuild.sh beside variant/ on disk, untracked",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 9 tests in 0.520s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N6",
+   "origin": "round 5 (section 2)",
+   "mutant": "the same rebuild.sh, tracked under the artifact directory's name upper-cased (another directory on this case-sensitive file system, the same one on a case-insensitive one)",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 9 tests in 0.555s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N7",
+   "origin": "round 5 (section 1)",
+   "mutant": "new .claude/agents/x.md whose frontmatter hooks: entry runs pnpm install in the variant",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 9 tests in 0.642s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N8",
+   "origin": "round 5 (section 4)",
+   "mutant": "the frozen TOML's exception gains a key besides id, ignoreUntil and reason (effectiveUntil = 2027-03-24), date and reason unchanged",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 9 tests in 0.585s",
+    "OK"
+   ]
+  },
+  {
+   "id": "X13",
+   "origin": "extra",
+   "mutant": "new .agents/skills/frozen-app/SKILL.md whose instructions run pnpm install in the variant",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 9 tests in 0.520s",
+    "OK"
+   ]
+  }
+ ]
+}
