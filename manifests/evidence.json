@@ -15771,8 +15771,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "19431b3f3bb47ae7f85a2dd5e91b231713e41d518705d55f532e2a494bbee92f",
-      "bytes": 62594
+      "sha256": "1fd69a27771cb6a5ba1ac14d3b2d6884a1170a430fb3e5b89f4d9444a5455898",
+      "bytes": 65591
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
@@ -15781,8 +15781,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-handbook-generator.md",
-      "sha256": "df94c30001ee7c19b517c7f43705179bdc6384c2e618c9ce37b9e00d2899decc",
-      "bytes": 49664
+      "sha256": "8182507ba291e470c07d776aa1aced61161f607fc09c5ca3acf16bd0d99710d4",
+      "bytes": 53136
     },
     {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
@@ -15801,8 +15801,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
-      "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
-      "bytes": 16881
+      "sha256": "64d49f2de46d3309d7802678039caac1609027b8f00b561987e464e94432847f",
+      "bytes": 21453
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
@@ -16071,13 +16071,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "159d381dd77a3066feee265220de9f6c1142c5236f448ba1d762c4b06769d7dc",
-      "bytes": 510040
+      "sha256": "9b6f0cbf8f1bbfbfa170b8b3ed5ee78bf63a6e0d40e20b522f3d4c24060a8391",
+      "bytes": 535421
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "6833563e5718a5f8fc75b2b16b064722e0aa5aea180e88f44d2ff0059f522ee7",
-      "bytes": 312114
+      "sha256": "cf5e84fed408698c1a6350e62966c0571986edc5178fec7c42b68f1e085c546b",
+      "bytes": 319527
     },
     {
       "path": "docs/next-host-stages.md",
@@ -36496,8 +36496,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/README.md",
-      "sha256": "22aae185ed10f42ee08894bfdcc3d388297fba20d373f928ebb95df414c2abf5",
-      "bytes": 4922
+      "sha256": "e923f405b9cd8f1517cf15c430f7fae10e646a0510680abf30c64f0cd3d07f4f",
+      "bytes": 5758
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_foundation_definitive.py",
@@ -36506,8 +36506,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "c92211c42147709e6e33602d94caca39d6a90dfc61a1c570e79bdb64362334cd",
-      "bytes": 20901
+      "sha256": "d0cb5ca0da91681705530deb449872756e0c8bba7dfc31dd7277007449149503",
+      "bytes": 28239
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -36521,8 +36521,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/controls.py",
-      "sha256": "0a2dc12291694d3b52a3f9c77107f22fad61216f67e46af54657558013c9f6d3",
-      "bytes": 8255
+      "sha256": "5ce92c2f0782edd0b2f9942663b2576a8a32e7e34c30972737ff2c9f58127424",
+      "bytes": 15592
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json",
@@ -36551,8 +36551,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "894dff866e2e6f332d6927879ca89b81a7da67d066664122f163e23707c4205b",
-      "bytes": 104384
+      "sha256": "cfd08b85efca343f428fadd8253a06ce9c08afb944a4f66a2aaae15d3c08fa96",
+      "bytes": 124299
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -36631,8 +36631,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
-      "sha256": "bdf05cadbea0f8be7ef4606abce64c90be915337850f2896c19a558c213f1ead",
-      "bytes": 5982
+      "sha256": "3bc0e589699b58ae209953041ebafbf181b077a84f02236feb2b0b86c5a3b92f",
+      "bytes": 7061
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
@@ -37271,7 +37271,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "ba8cfd7fa91b2d413a7f9dad7dfb05e46c250b19037112fad47d24088d9181e6",
+      "sha256": "82aea4297fb7cdc31dea6e3a2a6ed66a5c8d5ea2909872533b6d7ece091888d8",
       "bytes": 4174
     },
     {
@@ -37281,23 +37281,23 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "68d23be52f2b6a2bc26737d2bdba484b6cf2c1fae3a7d929b6eddb767e24cfe7",
-      "bytes": 12636
+      "sha256": "78c05b0802d69ed2c6de7fb02556fe6aa09cd53c8ea58d856b5710f8dc339411",
+      "bytes": 16956
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "5d9675de8af0ef3457cfbea4b306fdd17d109ecbe74f95b8d048634d499b450a",
-      "bytes": 48083
+      "sha256": "51af2466d460b7791f98b8ed39f8ed7b88fa3c4acf0f7bc2d44ea8a88d3f1e08",
+      "bytes": 55908
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
-      "sha256": "2604bfbfee99f66d8d7b6c5ce2dcef634571c530a4c5bd73ec8834ecde41e039",
-      "bytes": 20515
+      "sha256": "a83631d2036bc1c5c82ca69fb33a5b26846f86634133d6cf75cffc6566f2882b",
+      "bytes": 27792
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "d5eec991323a039375ac5f62546c744045233f2f1c077d42e2e10b5b84fd563e",
-      "bytes": 30355
+      "sha256": "f74d1b53b230f7834c596991dac9c61cddb00b4e6a58a0ced13342e491d24bf7",
+      "bytes": 33897
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
@@ -37346,13 +37346,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "b8ac25dff11ae7ebb3fbbd71a18d0f6a14469a61f428c9d7dd90b8e756828a67",
-      "bytes": 109611
+      "sha256": "a7c682ca1af9ea93954da04b9d5ee9dbead51d76fd76d175945f8cb887af48d0",
+      "bytes": 125434
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "56cb6a8c2cb8168b191caa9d1eaeacac6bdc0a9a6b8d9b74f8ee585e25fd5a89",
-      "bytes": 40982
+      "sha256": "144405be67281997cb68b6b27947d381b05c8d71715b2e8a62c46e176ca46b5a",
+      "bytes": 44544
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -37361,8 +37361,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "4ab26a9a7617cfa8741aa8ced5c178beeadf0606b26b5edaf663ea0cb1916b99",
-      "bytes": 24777
+      "sha256": "edc53463513f84586f7a0b87e98f5de2f1616958d76a010c39d2e7a3c3e0ed23",
+      "bytes": 28409
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
@@ -37373,6 +37373,41 @@
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
       "sha256": "3e45b756af99d7683eb329af5672d48b14c2cac35e058f1900a87d6c19532552",
       "bytes": 13984
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/README.md",
+      "sha256": "21d8fb75ed518dd8e8f09056c242b040a3cd9642487959e7611b252b17fe4e7d",
+      "bytes": 9081
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-proposals.md",
+      "sha256": "cd7b99553cc8d9c608262e47e709add19819aef84c06bbf35b84787f5969e832",
+      "bytes": 7792
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-request.md",
+      "sha256": "d939a5b4ee1433a0f68250c334fbe5bce1759279c19e2a9a21ca2c21d00af005",
+      "bytes": 2575
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-review-held-topics.md",
+      "sha256": "2f181c0b48c4f5a4ca1e45de56521501ba5744ba8305398e099019c273c54c91",
+      "bytes": 34612
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/codex-decisions.md",
+      "sha256": "464608b928709f5fd987b44ce2a019b29bb85f886b38c1bc095dc326c02cbac6",
+      "bytes": 18637
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "e47e7a98053a7a83a5eecdf9da2b42cbeb68e635c71fcd4feda443fa26e37e83",
+      "bytes": 31130
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
+      "sha256": "01254578f639d6cba5f14b856feb4ef9af43bf8c2d82c1336242eb940842b7a5",
+      "bytes": 2856
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
@@ -49181,8 +49216,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "e7136a2188ca4e7dcfe57affad586ff45faf297f3d71aab66fa60f92cb61f6bc",
-      "bytes": 19333
+      "sha256": "a72c591c08b3efe59ed339ace3e141c90f57cb81ed41349e5c826d89f87f616d",
+      "bytes": 20092
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -49321,8 +49356,8 @@
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
-      "sha256": "1b00e26e019984a742476f658f491bcfdfc98ff7595cd04c154a7fcf84a5f52a",
-      "bytes": 64101
+      "sha256": "da63be4afa284c0d7e9fd8be8225d1c1cab7e8d3bedf7b82d2e5ba0ff3d3316d",
+      "bytes": 68145
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -50226,13 +50261,13 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "b4dcb528eeebfe76fdd0387f99701ac1ecb86de9941ce2d69efbe73e9163dafb",
-      "bytes": 41427
+      "sha256": "117e413b693a31f0c5ee10dd8ce5375311d565b770b29898982596bb3490b852",
+      "bytes": 66319
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "0a8e643dc6a50c1287a83dbd45eef3988f4481d1464942ba32a10bdb1167ca2f",
-      "bytes": 72252
+      "sha256": "4f24f92ff3387df0beef2ac4ed967aac1bb65c9c435b8083334381db2ab9c13a",
+      "bytes": 76855
     },
     {
       "path": "tests/test_new_wsl_profile.py",

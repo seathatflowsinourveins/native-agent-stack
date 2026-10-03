@@ -663,3 +663,54 @@ or `wsl.exe` command was run.
 | Stage 2's steps carried bootstrap, sign-in and configure commands as typed text. | The steps point at F9 and the commands are F9's block, read from the page. | A test fails when the generator source types those commands or any command line of the page. |
 | The version rule said that the install takes the release current at install time, which the bootstrap does not do. | The rule says what the bootstrap does, and the profile adds the native update step. | The rule is byte-enforced across the profile, the overview and the bootstrap page, and a test fails if the old sentence returns. |
 | A handbook receipt named frozen hashes that nothing checked. | The receipt's generator, profile and output hashes follow the regenerated files. | The test that the committed outputs are current also compares each frozen hash with its file. |
+
+## Rows and amendments by direct consensus (2026-10-02)
+
+The definitive manifest has its next version: 89 rows, five of them of the row
+kind `consensus`, and six rows with an `amendments` list. Both come from the
+layer-consensus record, which the manifest names under `sources.consensus` by
+`path` and SHA-256; the decision is in
+[its own record](2026-10-02-new-wsl-layer-consensus.md). The generator of the
+base commit, run on that manifest with `--check`, printed
+`new-wsl-handbook: unknown defaults manifest row kind` and exited 1.
+
+Earlier sections stay as written. Their counts (84 rows, 54 installs) describe
+the manifest of their day.
+
+**Generator.** The closed set of row kinds gains `consensus`. The
+layer-consensus record is parsed as the convergence decisions are, and the rows
+it adds join the slot inventory as the producer's `apply_consensus()` adds them.
+A row is of kind `consensus` exactly when that record adds it. Such a row is
+never definitive and its outcome is none of the rounds' outcomes, which is the
+producer's rule. An `amendments` list on a row is accepted when every item has a
+date, an author and a decision. Each amendment is printed as one line under its
+layer's slot table, and the row's cells stay as the manifest gives them. The
+inventory gains the number of amendments, and the slot-decision preamble says
+what a consensus row and an amendment are when the manifest has either. A
+manifest that names no consensus record is read as before.
+
+| Choice | Alternative not taken | What would overturn it |
+| --- | --- | --- |
+| An amendment is a line under its layer's table. | Merge it into its row's cells, which would show a decision the rounds did not make as the row's own. | The producer starts to change a row's fields from an amendment. |
+| A consensus row must be one that the record adds, and every row the record adds must be a consensus row. | Accept any row that calls itself `consensus`. | None; the check only refuses a manifest that disagrees with its own source. |
+| Any outcome that is none of the rounds' outcomes is accepted on a consensus row. | Fix the three outcomes of today's record in the generator. | The producer closes that set. |
+
+**Verification.** In order: `--write` and then `--check` returned exit 0
+(`written`, then `passed`); the handbook module returned exit 0
+(`Ran 72 tests`, `OK`) and the profile module returned exit 0 (`Ran 17 tests`,
+`OK`). The handbook module has two tests more than before: one holds the
+consensus rows, the amendment lines and the hashed consensus source against
+the manifest, and one changes the real manifest four ways (a row that calls
+itself `consensus`, a consensus row relabelled, a consensus row with an outcome
+of the rounds, an amendment without its decision) and expects each refusal. The
+inventory test now holds 89 rows, the ten added ones and the five consensus
+ones. The receipt's generator and output hashes follow the regenerated files;
+the profile and its hash did not change. These are local integration checks of
+projections of source documents; none is host acceptance, and no install,
+service or `wsl.exe` command was run.
+
+A repair of 2026-10-02 adds a fifth change to that test: a consensus row that
+calls itself definitive, with its state set to match so that the flag check
+passes, which only the rule that a consensus row is never definitive refuses.
+With that clause removed from a scratch copy of the generator, the test failed
+on that change alone.

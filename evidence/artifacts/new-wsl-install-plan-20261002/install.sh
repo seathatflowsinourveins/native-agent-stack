@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision.
-# This revision ran once, on 2026-10-02, in a throwaway distribution (real-distribution-validation.json); on the destination distribution it is unrun.
+# This revision ran once, on 2026-10-02, in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to
+# main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that
+# distribution's acceptance.
+# Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The commands of skill-discovery
+# and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing.
 # Baseline results and limitations: VALIDATION.md.
 # Upstream command quotations and parameterizations: install-plan.json and SOURCES.md. Consistency check: check_plan.py.
 set -euo pipefail
@@ -178,6 +182,23 @@ engineering-process-skills() {
   # Planned. Source: https://raw.githubusercontent.com/mattpocock/skills/v1.2.3/README.md#L52
   # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L111 (non-interactive flags), https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/source-parser.ts#L284 (owner/repo#ref pin)
   run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''mattpocock/skills#v1.2.3'\'' -g -a claude-code codex -s tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills -y' || return "$?"
+}
+
+skill-discovery() {
+  # find-skills (vercel-labs/skills) | none | planned
+  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89 (one named skill), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315 (a full commit as the ref)
+  run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''vercel-labs/skills#7407f3893ad4dceab546ac002c3ef806e4000c73'\'' -g -a claude-code codex -s find-skills -y' || return "$?"
+}
+
+skill-authoring() {
+  # skill-creator (embedded in Codex; anthropics/skills for Claude Code) | none | planned
+  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  # For Claude Code only. Nothing is installed for Codex, which embeds its own skill-creator, and --copy keeps a same-name copy out of the shared $HOME/.agents/skills.
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L91 (--copy), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89 (one named skill), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315 (a full commit as the ref)
+  run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''anthropics/skills#8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4'\'' -g -a claude-code -s skill-creator --copy -y' || return "$?"
 }
 
 mcporter() {
@@ -458,6 +479,9 @@ if $list; then
   printf '%s\n' 'codex-sdk-and-codex-exec-app-server | Codex SDK and codex exec/app-server | none | planned'
   printf '%s\n' 'trail-of-bits-security-skills-trailofbits-skills | Trail of Bits security skills (trailofbits/skills) | none | planned'
   printf '%s\n' 'engineering-process-skills | mattpocock/skills (selected skills, not the bundle) | none | planned'
+  printf '%s\n' 'skill-discovery | find-skills (vercel-labs/skills) | none | planned'
+  printf '%s\n' 'skill-authoring | skill-creator (embedded in Codex; anthropics/skills for Claude Code) | none | planned'
+  printf '%s\n' 'research-skill | Not installed until its activation gate returns (GPT Researcher'\''s own skill with its MCP server) | none | excluded'
   printf '%s\n' 'mcporter | mcporter | npm-global | planned'
   printf '%s\n' 'mcp-inspector | MCP Inspector | none | excluded'
   printf '%s\n' 'agent-messaging | Not installed until the deciding measurement returns | none | excluded'
@@ -501,12 +525,14 @@ if $list; then
   printf '%s\n' 'gpu-container-runtime | Not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does | none | excluded'
   printf '%s\n' 'betterleaks | betterleaks | mise | planned'
   printf '%s\n' 'trufflehog | Not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog'\''s verification against live services is a separate audit job that the layer'\''s requirement does not ask for | none | excluded'
+  printf '%s\n' 'credential-custody | Not installed until the deciding measurement returns (the repository'\''s runner and guard stay the practice) | none | excluded'
   printf '%s\n' 'git | git | apt | planned'
   printf '%s\n' 'gh-github-cli | gh (GitHub CLI) | mise | planned'
   printf '%s\n' 'worktrunk | worktrunk | mise | planned'
   printf '%s\n' 'difftastic | difftastic | mise | planned'
   printf '%s\n' 'claude-code-action | Not installed: it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it | none | excluded'
   printf '%s\n' 'agent-structural-diff | Not installed: git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic'\''s JSON output is still behind DFT_UNSTABLE=yes) | none | excluded'
+  printf '%s\n' 'cross-family-review | No additional component: the two clients'\'' native review commands, each family on the other'\''s work | none | excluded'
   printf '%s\n' 'mise | mise | native-installer | planned'
   printf '%s\n' 'restic | Restic | mise | planned'
   printf '%s\n' 'chezmoi | Not installed: mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it | none | excluded'
@@ -519,7 +545,7 @@ if $list; then
   exit 0
 fi
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two acceptance checks change into repo_root, so the plan runs from a checkout of the repository (README.md); --list needs none.
@@ -529,9 +555,9 @@ esac
 needs_execution=false
 needs_runtime=false
 needs_docker=false
-for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'otel-collector-contrib' 'prometheus' 'alerting' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
+for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'otel-collector-contrib' 'prometheus' 'alerting' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
 for slot in 'playwright-cli' 'loki' 'grafana'; do named "$slot" && needs_execution=true; done
-for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
+for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
 for slot in 'playwright-cli'; do named "$slot" && needs_runtime=true; done
 for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose' 'research-harnesses'; do selected "$slot" && needs_docker=true; done
 
@@ -577,6 +603,8 @@ if selected 'claude-agent-sdk'; then run_slot 'claude-agent-sdk'; fi
 if selected 'codex-sdk-and-codex-exec-app-server'; then run_slot 'codex-sdk-and-codex-exec-app-server'; fi
 if selected 'trail-of-bits-security-skills-trailofbits-skills'; then run_slot 'trail-of-bits-security-skills-trailofbits-skills'; fi
 if selected 'engineering-process-skills'; then run_slot 'engineering-process-skills'; fi
+if selected 'skill-discovery'; then run_slot 'skill-discovery'; fi
+if selected 'skill-authoring'; then run_slot 'skill-authoring'; fi
 if selected 'mcporter'; then run_slot 'mcporter'; fi
 if selected 'sandbox-runtime-srt'; then run_slot 'sandbox-runtime-srt'; fi
 if selected 'serena'; then run_slot 'serena'; fi
