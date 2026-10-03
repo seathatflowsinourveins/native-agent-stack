@@ -424,7 +424,10 @@ reader of the web page but cannot change an exit status, a job result or an arti
   while it was ineligible only so (`verdicts.<os>.flags`), and the outcome record must address the flag. While the
   arm runs ran on more than one runner image, such a run whose records differ from the S baseline makes the OS
   incomplete instead (rule 5): the loss or stop may come from the image, not from sharding, as when a test that gates
-  on a tool of one image hangs there until its step's limit stops the step. The asymmetry, on one image: a shard step
+  on a tool of one image hangs there until its step's limit stops the step. A step stopped only after it wrote every
+  record it owns (a hang in the last class's or module's teardown, or at interpreter exit) leaves records equal to the
+  S baseline, so it stays ineligible and flagged on any number of images, even if the image caused the stop (an
+  accepted residual). The asymmetry, on one image: a shard step
   is the candidate itself, which would meet the same fault in production, while S is the baseline and the controls
   measure the platform for both arms, and a lost S or control step measured nothing. A step that wrote any of its
   files is judged on them.

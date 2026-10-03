@@ -437,7 +437,7 @@ Accepted residual risks:
 - The interpreter's implementation is not recorded per run; every job's interpreter check asserts CPython before
   its clock starts, so another implementation can only give a run whose test phase never started (incomplete).
 - An S step that wrote any of its files before a fault is judged on them: S is ineligible and the OS gets no verdict,
-  final. A shard step lost to a runner fault still makes its run ineligible (flagged), as preregistered.
+  final. A shard step lost to a runner fault still makes its run ineligible, flagged on one runner image, as preregistered; on more than one image its records differ from the S baseline and the OS is incomplete.
 - A macOS image that no longer caches 3.13.15 makes `actions/setup-python` download it before the clock starts; a
   failed download fails the job before its test phase (incomplete).
 - Arm runs on different runner images with one runtime are flagged whatever the outcome. An image change can shift
@@ -445,7 +445,11 @@ Accepted residual risks:
   image provides, or make it hang until its step's limit stops the step, which would make a sharded run ineligible
   through a record mismatch that sharding did not cause and give reject or a hand-over to the other arm; since the
   fifth and sixth review rounds, such a mismatch beside more than one image makes the OS incomplete instead, a run
-  with a step that never wrote its exit status included (`README.md`, "Limits"). Still accepted: whether two
+  with a step that never wrote its exit status included (`README.md`, "Limits"). Still accepted: a shard step stopped
+  only after it wrote every record it owns (a hang in the last class's or module's teardown, or at interpreter exit)
+  leaves records equal to the S baseline, so on more than one image its run stays ineligible and its arm flagged,
+  which can still give reject or a hand-over even if the image caused the stop (seventh review round below). Still
+  accepted: whether two
   consecutive images differ in a gated tool is unverified. Linux's system python3 is not pinned; the comparison
   across runs covers it.
 
@@ -501,6 +505,28 @@ inside a hanging test, on two images (incomplete) and on one (ineligible and fla
 head `2ad9627b` with only `test_compare.py` replaced, exactly the two subtests on two images fail
 (`'adopt' != 'incomplete'`), the new test's subtest on one image passes, and the other 117 tests pass on both. The
 protocol sentences are unchanged.
+
+## Seventh review round (2026-10-03)
+
+A narrow evidence delta review of the sixth round's change approved it (no high or medium finding) and left two low
+findings, both about this record, before the first push:
+
+- **R7-1.** Dropping the exception also dropped the sentence that accepted the case of a shard step stopped after it
+  wrote every record it owns (a hang in the last class's or module's teardown, or at interpreter exit). That case
+  leaves records equal to the S baseline, so it raises no record mismatch, and on more than one runner image its run
+  stays ineligible and its arm flagged; the rule can still give reject or a hand-over even if the image caused the
+  stop. The case predates the sixth round and its code behaviour is unchanged. It is an accepted residual, stated in
+  "Risks" above, `README.md` "Limits" and `experiment.json` limitation [5]; widening the incomplete condition to cover
+  it (any started sharded run with an unfinished step, on more than one image) is the code option, not taken because
+  this is the last round before the oracle freezes and the flag already makes the outcome record address it.
+- **R7-2.** The residual about a shard step lost to a runner fault said "ineligible (flagged)" without the two-image
+  case; it now says it is flagged on one image and makes the OS incomplete on more than one.
+
+The environmental-fault paths of the oracle (a runner, a download, an upload, a step, a cancellation, a reopen, a
+conflict, a crash, a runtime or an image that intervened in one run) were searched in the third to seventh review
+rounds, each by a reviewer asked to look for a path to a wrong adopt or reject. Every search found something the next
+round closed or recorded, so the search is not exhaustive; the first hosted run is the next test, and the first-run
+checklist in `README.md` is what reads it.
 
 ## SOTA sources
 
