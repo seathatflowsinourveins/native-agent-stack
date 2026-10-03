@@ -1,0 +1,90 @@
+{
+  "actual_arguments_equal_frozen_plan": true,
+  "actual_login": false,
+  "actual_tty": true,
+  "admission": {
+    "defaults_or_PR_acceptance": false,
+    "full_recipe": "STOP",
+    "old_type18_stdin19_R2_model21_regraded": false,
+    "protection": "UNQUALIFIED"
+  },
+  "all_unchanged": true,
+  "attempts": 1,
+  "capture_modes": {
+    "files": "0600",
+    "independent_stat_verified": true,
+    "parent": "0700"
+  },
+  "evidence_scope": "One distinct actual native PTY metadata attempt; partial native tuple custody only",
+  "failure_class": "OPERATOR_REPLY_OBSERVATION_GUARDS_AND_NATIVE_TIMEOUT",
+  "frozen_bindings": 24,
+  "independent_reconciliation": {
+    "authority": "Independent source/counter custody; not user approval or regrade.",
+    "manifest_sha256": "517b9574090195b0889207520bcd4bcbe7f4a8f5bd8355e4568e32ef0db66a2d",
+    "source_draft_sha256": "8d0d8781b874a1685e48d141cf50d87b30f3b6ff9c29215c00485c76711c729e"
+  },
+  "native_argv_count": 35,
+  "native_client": "Codex 0.160.0",
+  "native_completion": {
+    "EOT": "One tool-accepted intent; native EOF before TERM unproved",
+    "clean_native_completion": false,
+    "inner_exit": null,
+    "outer_exit": 124,
+    "root_RPC_writes_tool_accepted": 3,
+    "tool_closed": true
+  },
+  "native_model_usage": null,
+  "north_star_action": "Qualify native context metadata before fixed-task protection comparisons for long US-equities research sessions.",
+  "partial_native_metadata": {
+    "catalog_errors": 0,
+    "catalog_warnings": 0,
+    "exact_cwd_entries": 1,
+    "exact_frozen_tuple_match": true,
+    "flat_handler_metadata": "handlerType/command/async; primary serde flatten verified",
+    "id0_unique_success": true,
+    "id1_unique_success": true,
+    "native_key_hash_trust_displayOrder_custody": "Verbatim private raw-reply/root-selection equality verified; full values not published",
+    "native_order_matches": true,
+    "selected_hooks": 6,
+    "source_classes": {
+      "sessionFlags": 6
+    }
+  },
+  "private_artifact_hashes": {
+    "actual_start": "60c7d2b1c8262f1373d29493edf22c3af34cfd5f187676247531cbfa030775b7",
+    "completion": "480d7aafeea5096c170ce5f66a886f1e19cd7b2e94050f3bfd70418f960169b0",
+    "freeze": "7f607dd682758449530ffc85de724264f0aae46261fee1773f5a6087b48b18d7",
+    "native_tool_results": "ea5a4a4403631916bbe9e2d53ed3504eb2eb5812fc32e216e096529a568eddca",
+    "selected_native_metadata": "0fab4dcf5cccd7701284a83985e13b92da1add3fd59683fdd1692215863ef821",
+    "source_correction": "232308102c2c4040a2001b9bcb86d57e693959d1b2f64bbe92d89d45bc764db9",
+    "stderr": "e3fa32bf92c81e2b74315a30babf13b0d758d89a090d843f93f83abd2e2c2eea",
+    "stdout": "539e6021d33402073adf1ddf5c22f96e2fbd286f49dc96043d58053a7e2cd382"
+  },
+  "retained_failures": [
+    "Operator continued beyond first reply-observation guard",
+    "Outer70s TERM reported before EOT handling completed; clean native inner exit unproved",
+    "Prior source-file and definition-locator misses retained, corrected without capability absence claim"
+  ],
+  "retries": 0,
+  "sources": [
+    {
+      "lines": "553-604",
+      "path": "codex-rs/app-server-protocol/src/protocol/v2/plugin.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "sha256": "7d50b22ae6fbf54b9f42d95f817e389e2e3cd25fd0238c1dced84cdd373d7ea5",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server-protocol/src/protocol/v2/plugin.rs#L553-L604"
+    }
+  ],
+  "status": "STOP",
+  "timing": {
+    "both_guards_exceeded": true,
+    "guard_seconds_each": 20,
+    "id0_projection_seconds_after_write_return": 37.265967,
+    "id1_projection_seconds_after_write_return": 30.897438,
+    "native_reply_latency": "UNKNOWN; recorded delays are operator projections",
+    "operator_continued_after_first_deadline": true
+  },
+  "unit": "unit22-native-pty-metadata-exchange",
+  "usage_scope": "UNKNOWN_NOT_ZERO; no root model/thread/turn request is not a hidden-helper census"
+}

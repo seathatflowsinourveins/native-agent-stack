@@ -104,7 +104,14 @@
       "unit14-codex-tui-hook-metadata-source",
       "unit15-native-stdio-hook-metadata-source",
       "unit16-codex-synthetic-mount-enospc-source",
-      "unit17-native-stdio-carrier-astra-judgment"
+      "unit17-native-stdio-carrier-astra-judgment",
+      "unit18-native-hook-profile-parse-stop",
+      "unit19-mandatory-hook-type-source-correction",
+      "unit19-native-tool-stdin-stop",
+      "unit20-native-tty-carrier-source",
+      "unit21-native-tty-carrier-astra-judgment",
+      "unit22-native-pty-operator-timing-stop",
+      "unit23-native-pty-metadata-acceptance"
     ],
     "roles": [
       "command-worker",
@@ -258,7 +265,14 @@
     "Read-only retained Codex released TUI hooks handler/detail sources; selected full-key/hash display HOLD, no TUI or model launch.",
     "Read-only retained installed protocol/SDK and released native stdio hooks/list sources; matching profile and startup HOLD, no RPC/client/provider launch.",
     "Read-only retained native error and pinned linux_run_main.rs source trace; registry write identified, resource cause/remedy unknown; no runtime repair.",
-    "Existing native Codex Astra/max keyless-pool read-only source judgment on unchanged private SDK formatter and supported stdio metadata recipe; five response prefixes independently reconciled, no metadata server launch."
+    "Existing native Codex Astra/max keyless-pool read-only source judgment on unchanged private SDK formatter and supported stdio metadata recipe; five response prefixes independently reconciled, no metadata server launch.",
+    "Native Codex0.160 app-server strict-config metadata startup with unchanged35argv; one attempt exits1 before RPC; original packet immutable.",
+    "Pinned Codex tagged enum and Context Mode generator inspect required handler discriminator; nine owned copied profiles restore byte-exact after removing54 source-backed inserted lines.",
+    "Separate native Codex app-server strict-config typed35argv attempt returns native tool session, then rejects closedstdin write; zero confirmedRPC and later CLI0; first-mismatch STOP/no retry.",
+    "Bounded Codex stdio/capability and uutils0.8 terminal/foreground timeout source checks plus installed value-free help/version; no monitored command/client/TTY mutation in source unit.",
+    "One native Codex Astra/max source judgment via keyless pool on distinct actual-PTY/terminal/foreground-timeout metadata recipe; eight unique finalized native response prefixes independently reconciled.",
+    "One native typed35 metadata PTY exchange returned all six exact definitions; operator exceeded both20s projection guards, improperly continued, and native foreground timeout closed124. No repair/retry/regrade.",
+    "One distinct frozen literal native-tool PTY metadata sequence, same35argv/440B payload, immediate reply projections and deadline guards before every send; exactsix metadata and native exit0 independently reconciled."
   ],
   "observations": [
     {
@@ -2988,6 +3002,223 @@
         "total": 100419,
         "native_retries": null
       }
+    },
+    {
+      "id": "unit18-native-hook-profile-parse-stop",
+      "task": "unit18-native-hook-profile-parse-stop",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 80,
+      "evidence_class": "native_cli_execution",
+      "scope": "One separately frozen native metadata startup. Missing mandatory handler type caused pre-RPC parse STOP; stdout0, no stdin session or RPC. Usage unknown; no transport closure, effective metadata or protection claim.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit18-native-hook-profile-parse-stop.json",
+          "sha256": "17aec6a6f046b1f1e4d2763aae9921f5b111fadddda765d6b34ee7496c9241c5"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit19-mandatory-hook-type-source-correction",
+      "task": "unit19-mandatory-hook-type-source-correction",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 81,
+      "evidence_class": "pinned_source_review",
+      "scope": "Source-only mandatory command discriminator and exact54-line restoration across9 copies; not native catalog/continuity/default acceptance.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit19-mandatory-hook-type-source-correction.json",
+          "sha256": "7250e9d1088342990a98064da2c2f8ebef52038fd450a2c8a0522d0a9d4f1fb5"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit19-native-tool-stdin-stop",
+      "task": "unit19-native-tool-stdin-stop",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 82,
+      "evidence_class": "native_cli_execution",
+      "scope": "Distinct typed35argv native startup; first stdin write rejected by actual tool carrier, no confirmed RPC. CLI0 lacks prior type marker only. Metadata UNRUN_FINAL and usage UNKNOWN; no universal absence/teardown claim.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit19-native-tool-stdin-stop.json",
+          "sha256": "e097b23f4eb603ba941f3afec4660a6b95d5390a75adbacb7947955300c2077b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit20-native-tty-carrier-source",
+      "task": "unit20-native-tty-carrier-source",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 83,
+      "evidence_class": "pinned_source_review",
+      "scope": "Pinned source and installed help/version support distinct actual-PTY proposal with native foreground timeout/direct-child scope. All metadata execution, replies/EOF/protection unrun at source closure; no native wire/physical equivalence.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit20-native-tty-carrier-source.json",
+          "sha256": "007bf294bd1040352818dc4fadcefd24681e907c60991fac2125a141d68df8bf"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit21-native-tty-carrier-astra-judgment",
+      "task": "unit21-native-tty-carrier-astra-judgment",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 84,
+      "evidence_class": "model_task_execution",
+      "scope": "One consequential source judgment after bounded type repair/native closedstdin. READY permits distinct prospective native recipe only; actual metadata/physical/protection/default/user approval remain outside source judgment. Eight finalized responses, cache and reasoning subsets counted once.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit21-native-tty-carrier-astra-judgment.json",
+          "sha256": "3bdeb3a1251ed3015e01136f63d7bfa4fad3d95c7049dfa96c3d3818a00d51fe"
+        }
+      ],
+      "usage": {
+        "uncached_input": 47861,
+        "cache_creation": 0,
+        "cache_read": 287616,
+        "output": 11331,
+        "reasoning_in_output": 6461,
+        "total": 346808,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit22-native-pty-operator-timing-stop",
+      "task": "unit22-native-pty-operator-timing-stop",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 85,
+      "evidence_class": "native_cli_execution",
+      "scope": "Six exact native metadata tuples are partial custody only. Observation guards37.265967s/30.897438s measure operator delay, not native reply latency. Outer timeout124 is STOP; inner exit/physical EOF/hidden model usage UNKNOWN.",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit22-native-pty-operator-timing-stop.json",
+          "sha256": "bfa22348be86ae56b1ecfe5bcbb247f7022c04889324ad06027a1eb73e80d1b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit23-native-pty-metadata-acceptance",
+      "task": "unit23-native-pty-metadata-acceptance",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 86,
+      "evidence_class": "native_cli_execution",
+      "scope": "Scoped native metadata recipe only. Both reply guards1182/1180ms, final observation31543ms, native exit0. All six objects/keys/hashes preserved and untrusted; no hook execution, physicalEOF, hiddenusage, protection/savings/default/PR acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit23-native-pty-metadata-acceptance.json",
+          "sha256": "b9edf192556792ea8e1d86815ce9a0380845cd67c4c7674eab737d9c38007cbf"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -3182,6 +3413,26 @@
     {
       "run_id": "unit16-codex-synthetic-mount-enospc-source",
       "reason": "Source-only pinned registry-marker write identified; actual allocation cause/backing namespace/capacity/remedy UNKNOWN. No repair/client/system/new native run. Failed denotes unclosed remedy gate; null exit/counters."
+    },
+    {
+      "run_id": "unit18-native-hook-profile-parse-stop",
+      "reason": "One native pre-RPC parse STOP; missing required handler type. Original packet stays closed. No stdin closure or model/metadata acceptance; unknown usage."
+    },
+    {
+      "run_id": "unit19-native-tool-stdin-stop",
+      "reason": "One distinct native tool carrier STOP; rejected closedstdin write and no confirmed RPC. Native CLI0 not catalog/protection qualification; metadata UNRUN_FINAL and usage unknown."
+    },
+    {
+      "run_id": "unit19-mandatory-hook-type-source-correction",
+      "reason": "Source checks pass for mandatory type and54insertions; aggregate failed denotes actual native metadata qualification still unclosed, not a source defect. Null runtime exit and unknown counters retained."
+    },
+    {
+      "run_id": "unit20-native-tty-carrier-source",
+      "reason": "Source recipe passes pinned review; aggregate failed denotes actual PTY metadata qualification UNRUN at source closure, not source failure. No runtime exit or model counters invented."
+    },
+    {
+      "run_id": "unit22-native-pty-operator-timing-stop",
+      "reason": "Root exceeded both20s observationguards and continued after first violation; native outer timeout124. Partial exactsix metadata retained, not native latency or cleancompletion; no replay/regrade."
     }
   ],
   "limitations": [
@@ -3225,7 +3476,8 @@
     "Unit11 strict carrier remains unqualified; prospective native-call/result boundary accepted only as method. Independent nested role/call/result inventory and each family treatment lifecycle required;56producers prepared UNRUN/UNFROZEN. Selected QMD readonly predicates are dated, not nativeMCP/corpus/lifetime no-write acceptance.",
     "Unit12 QMD D1 child model-visible truncation terminalSTOP despite complete runtime bytes; all retrieval comparisons and Claude admissionlaterUNRUN. Two Opus review failures retained:8sourceReads repair observed but final critique/wholeusage missing. Native Codex hook map corrected privately but returnedkeys/hashes missing; no contextprotection. No candidate/default/install/context-supply amendment.",
     "Units13-17: B fixtures are synthetic/directed admissions only. R2 child failure is terminal,55/judge UNRUN_FINAL; known parent252333 is receipt-only, two-role aggregate UNKNOWN. Source-only TUI/stdio/ENOSPC gates keep null native usage/exits. Astra100419 is source judgment, not approval/live metadata/default/protection. No host/other-layer change.",
-    "Publication corrections: derived STOP pending-unit16 prose updated to completed source diagnosis only. Proposed generic unit17 stopped-case label corrected to actual frozen formatter/stdin/lane judgment. First two metadata integrations expected absent proposal scope/usage fields and stopped before writes; root binds declared actual scopes/counters. All original native/freeze/private drafts and old aggregate observations remain unchanged."
+    "Publication corrections: derived STOP pending-unit16 prose updated to completed source diagnosis only. Proposed generic unit17 stopped-case label corrected to actual frozen formatter/stdin/lane judgment. First two metadata integrations expected absent proposal scope/usage fields and stopped before writes; root binds declared actual scopes/counters. All original native/freeze/private drafts and old aggregate observations remain unchanged.",
+    "Units18/19 are distinct immutable metadata STOPs. Source-backed type/PTY/foreground controls in19/20 do not qualify actual six returned definitions, P2 protection, full-plugin lifecycle, helper/invoice census or a default. Counter fields remain null where no native usage was supplied; no zero usage inference."
   ],
   "decision_and_scope": {
     "decision": "trial",

@@ -15805,6 +15805,11 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-native-token-hook-metadata-stops.md",
+      "sha256": "71be3a34bda745599f5ad1174610c8be57d098b1f9b5d1451aa07b545549a375",
+      "bytes": 8081
+    },
+    {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
       "sha256": "0d2f1b408829c949a4fbde0d55a4a9348e7e9c6eaeaf04bdf2acde380a12a9d6",
       "bytes": 69738
@@ -45571,8 +45576,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "a7f71c0a80eab1928d91b313654450de460f9deae14ff08c24161693ac03613b",
-      "bytes": 134218
+      "sha256": "87fd758889764333d80f510e55fd317b34ed105c6493a904f6c078ada37efe56",
+      "bytes": 145459
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -45688,6 +45693,41 @@
       "path": "evidence/artifacts/token-context-20261003/unit17-native-stdio-carrier-astra-judgment.json",
       "sha256": "5184cd75cacf94e290d613306416e5663e29783ab32c8a5b9af567b765ca3d40",
       "bytes": 4820
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit18-native-hook-profile-parse-stop.json",
+      "sha256": "17aec6a6f046b1f1e4d2763aae9921f5b111fadddda765d6b34ee7496c9241c5",
+      "bytes": 2287
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit19-mandatory-hook-type-source-correction.json",
+      "sha256": "7250e9d1088342990a98064da2c2f8ebef52038fd450a2c8a0522d0a9d4f1fb5",
+      "bytes": 4852
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit19-native-tool-stdin-stop.json",
+      "sha256": "e097b23f4eb603ba941f3afec4660a6b95d5390a75adbacb7947955300c2077b",
+      "bytes": 4860
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit20-native-tty-carrier-source.json",
+      "sha256": "007bf294bd1040352818dc4fadcefd24681e907c60991fac2125a141d68df8bf",
+      "bytes": 10087
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit21-native-tty-carrier-astra-judgment.json",
+      "sha256": "3bdeb3a1251ed3015e01136f63d7bfa4fad3d95c7049dfa96c3d3818a00d51fe",
+      "bytes": 3765
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit22-native-pty-operator-timing-stop.json",
+      "sha256": "bfa22348be86ae56b1ecfe5bcbb247f7022c04889324ad06027a1eb73e80d1b4",
+      "bytes": 4004
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit23-native-pty-metadata-acceptance.json",
+      "sha256": "b9edf192556792ea8e1d86815ce9a0380845cd67c4c7674eab737d9c38007cbf",
+      "bytes": 4775
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",

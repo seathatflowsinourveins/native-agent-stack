@@ -1,0 +1,126 @@
+{
+  "accepted_RPC_methods": [
+    "initialize",
+    "initialized",
+    "hooks/list"
+  ],
+  "all_frozen_bindings_unchanged": true,
+  "captures": [
+    {
+      "bytes": 18548,
+      "label": "stdout",
+      "mode": "0o600",
+      "parent_mode": "0o700",
+      "sha256": "fb7f66898a8f0870eacb06e8d6a46f590423191ff626d99886f1fb96993a5e27"
+    },
+    {
+      "bytes": 501,
+      "label": "stderr",
+      "mode": "0o600",
+      "parent_mode": "0o700",
+      "sha256": "1ad3810c73c3afcef033ffaf20cfbebf4801fb6e7f085df575396fb647891d38"
+    }
+  ],
+  "catalog_diagnostics": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "evidence_level": "actual native metadata-only operation plus pinned protocol source",
+  "frozen_bindings": 113,
+  "independent_reconciliation": {
+    "manifest_sha256": "37f0aa48536d98d46905a5536c18ddc8dc212224c6a5aec07210ec1ca1d0c159",
+    "receipt_sha256": "e11097f9eb09cb77a9f4eb567898f73de009ff7cf8a80eb28e7d13aff07248f4",
+    "scope": "Independent native metadata custody and timing; not user approval or whole-goal acceptance.",
+    "source_draft_sha256": "16994c12e141e33268a0f3d43a8cf12f1083d2bf95db13c138fafc6ff7ca8bd3"
+  },
+  "limits": [
+    "Actual metadata does not establish handler execution or trusted execution acceptance.",
+    "Physical EOF/OS/hidden-helper/global-descendant scopes UNKNOWN.",
+    "P2/protection/natural compaction/savings/rate/invoice/default/user approval UNQUALIFIED."
+  ],
+  "message_bytes": 440,
+  "native_argv_count": 35,
+  "native_attempts": 1,
+  "native_fields": [
+    "additionalContextLimit",
+    "async",
+    "command",
+    "currentHash",
+    "displayOrder",
+    "enabled",
+    "eventName",
+    "handlerType",
+    "isManaged",
+    "key",
+    "matcher",
+    "pluginId",
+    "source",
+    "sourcePath",
+    "statusMessage",
+    "timeoutSec",
+    "trustStatus"
+  ],
+  "native_metadata_exact_tuple_and_private_projection_match": true,
+  "native_outer_exit_code": 0,
+  "native_relative_order_and_unique_keys_verified": true,
+  "native_retries": 0,
+  "native_source_classes": {
+    "sessionFlags": 6
+  },
+  "native_trust_status": {
+    "untrusted": 6
+  },
+  "north_star_action": "Qualify faithful native metadata before measured long-session context comparisons for US-equities research.",
+  "prior_closed_units": "Unit18 parse STOP, unit19 stdin STOP and unit22 operator timing STOP remain unchanged.",
+  "private_custody_hashes": {
+    "completion": "73df20f5688902485996ddeddc1542d2bf769461c6228aa4ecf0bff81f9e7a5b",
+    "freeze": "dd4cd6d2ef3d3a94ac1df4eca9cdcd0e114273a8a04d4a37d933161da5f09c28",
+    "independent_observation": "fbf45abd9f37d6bee11c2b34749d0adb2eb799e7a4a1d5a097794790f326d35b",
+    "independent_receipt": "e11097f9eb09cb77a9f4eb567898f73de009ff7cf8a80eb28e7d13aff07248f4",
+    "native_tool_results": "e02755127aa6d9eee7f30bfeb9c7e562bdcae86d3951c957d979e81b10447a61",
+    "six_selected_projection": "436a0bb57d211cbc7fb7a78baed1cb09011fd1adf5ab8ac2a2a7c0370d8df42f",
+    "source_bindings": "a11567d3fc6e35a42362a68f23404b27a4744cbfe3be7740e68f328f78d00b85"
+  },
+  "retained_preparation_failures": [
+    "JavaScript source syntax corrected before execution.",
+    "Pre-initialize case deadline check added before freeze.",
+    "Escaping suspicion produced no command-byte changes.",
+    "Historical4990ms checkpoint kept distinct from final31543ms observation.",
+    "Worker prior-completion path corrected to the existing bound receipt."
+  ],
+  "selected_hooks": 6,
+  "source": {
+    "lines": [
+      [
+        61,
+        63
+      ],
+      [
+        558,
+        604
+      ]
+    ],
+    "path": "codex-rs/app-server-protocol/src/protocol/v2/plugin.rs",
+    "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "private_source_copy_sha256": "7d50b22ae6fbf54b9f42d95f817e389e2e3cd25fd0238c1dced84cdd373d7ea5",
+    "repository": "openai/codex",
+    "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server-protocol/src/protocol/v2/plugin.rs"
+  },
+  "status": "SCOPED_NATIVE_METADATA_CUSTODY_AND_COMPLETION_OBSERVED",
+  "timing_ms": {
+    "EOF_observation_limit": 50000,
+    "EOT_return_checkpoint": 4990,
+    "EOT_start_from_case_start": 3885,
+    "EOT_to_completion_observation": 27658,
+    "case_TERM_limit": 70000,
+    "final_native_completion_observation_from_case_start": 31543,
+    "id0_guard": 1182,
+    "id1_guard": 1180,
+    "reply_guard_limit": 20000
+  },
+  "timing_scope": "Recorded write-plus-projection intervals and native completion observations; no backend latency or physical EOF attribution.",
+  "tty": true,
+  "unit_id": "unit23-distinct-native-pty-metadata-observation",
+  "usage": null,
+  "usage_scope": "UNKNOWN_NOT_ZERO; no thread/turn model-task method was among these three calls; invisible startup/helper census unavailable."
+}

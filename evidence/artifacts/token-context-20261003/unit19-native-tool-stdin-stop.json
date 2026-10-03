@@ -1,0 +1,112 @@
+{
+  "RPC_messages_confirmed_sent": 0,
+  "all_frozen_bindings_match": true,
+  "argv_count": 35,
+  "attempts": 1,
+  "complete_prepared_vs_actual_argv_equal": true,
+  "evidence_level": "One separate closed native startup attempt; independent artifact reconciliation",
+  "former_missing_type_marker_returned": false,
+  "inserted_type_lines": 54,
+  "limits": [
+    "No universal transport absence",
+    "No effective hook metadata admission",
+    "No wire, physical EOF, OS actor or complete post-process census claim",
+    "No historical STOP/HOLD or protection regrade"
+  ],
+  "metadata_exchange": "UNRUN_FINAL",
+  "native_client": "Codex 0.160.0",
+  "native_exit_code": 0,
+  "native_model_usage": null,
+  "native_six_hook_keys_hashes": "UNRUN_FINAL",
+  "originals": 9,
+  "outer_timeout_seconds": 120,
+  "packet_files": 29,
+  "private_artifact_hashes": {
+    "freeze": "871337f34d5a2bada1334be83e77b524e3f9ff87b8cb76e146c0a395d72e2aa7",
+    "manifest": "e53790da24f410e48a4b4bb4aa31033aaaf47feae774e728a012b777ebba3a73",
+    "native_completion": "77e069c43e40f0b462ea2a554dcb495506c09a7c865aefbde3b00a2eddf93a4e",
+    "native_start": "9970b2981ec0e144265938f39596d7b7475b67e3a0de630811ff1c6fb18573f2",
+    "prelaunch_check": "1e40aac388a43cb0dbf9e67b47ac22369b3b65a4cb95a867b46ea0217d10ae50",
+    "prepared_command": "209cf85c2d8e72bdac4f6b9424e585ded0be53d8d8dd2c653f08d542904de0ad",
+    "stderr": "1fcadbe5ae839dba8d4a1593061fa2fb2e864003cb69ad3bbe6cebfc7ffa50db",
+    "unit18_failure_binding": "f7bcf58182b677e264703424e67a53b070cf7524cec8604500d94ed9289557c1"
+  },
+  "removing_only_added_lines_restores_all_original_bytes": true,
+  "retained_metadata_corrections": [
+    "Root prelaunch manifest-key guess corrected before launch",
+    "Worker list-versus-object projection corrected",
+    "Worker current source-copy locator selection corrected; five copies verified"
+  ],
+  "retries": 0,
+  "sources": [
+    {
+      "locations": [
+        "19-24",
+        "36-59",
+        "153-200"
+      ],
+      "path": "codex-rs/config/src/hook_config.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "sha256": "b7ac42b2a895a00b6aa491eee1d3eb04d8a147ba0e77e016bde42381e067d1c0",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/hook_config.rs"
+    },
+    {
+      "locations": [
+        "properties.hooks",
+        "definitions.HooksToml",
+        "definitions.MatcherGroup",
+        "definitions.HookHandlerConfig.oneOf[0]"
+      ],
+      "path": "retained native config schema",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "sha256": "7ce31bde1ed6ef15c53a96ba460bb1d0fb7b99fd9ab719b567c94c474f62b023"
+    },
+    {
+      "locations": [
+        "517-547",
+        "558-579"
+      ],
+      "path": "codex-rs/app-server/src/lib.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "sha256": "1591686b49c80c062d2b1ce48e03eb7c95bb872cc57b41e0ecc016ceb42fd6f2",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server/src/lib.rs"
+    },
+    {
+      "locations": [
+        "486-555",
+        "850-868"
+      ],
+      "path": "src/adapters/codex/index.ts",
+      "pin": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "repository": "mksglu/context-mode",
+      "sha256": "4e204df7987b941030714e2f5ece7fc8653815e73a5df922595891512f3e888c",
+      "url": "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/adapters/codex/index.ts"
+    },
+    {
+      "locations": [
+        "1-38"
+      ],
+      "path": "src/adapters/codex/hooks.ts",
+      "pin": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "repository": "mksglu/context-mode",
+      "sha256": "80c5fd3f313c573f3b2316f0e4bc003103f03f4dd84ab03752fa0468b9d47e65",
+      "url": "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/adapters/codex/hooks.ts"
+    }
+  ],
+  "startup_success_scope": "Former missing-type marker absent only; actual hook metadata was not returned",
+  "status": "STOP",
+  "stderr_bytes": 218,
+  "stdin_write_attempts": 1,
+  "stdin_write_outcome": "TOOL_REJECTED_CLOSED_STDIN",
+  "stdout_bytes": 0,
+  "tty": false,
+  "typed_copies": 9,
+  "unit": "unit19-native-tool-stdin-stop",
+  "unit18": "Separate pre-RPC parse STOP remains unchanged",
+  "usage_scope": "UNKNOWN_NOT_ZERO; no root model/thread/turn request sent; invisible native helper census unknown",
+  "north_star_action": "Qualify native token/context metadata so later cumulative R&D sessions can compare faithful context protection while retaining native usage and client behavior.",
+  "private_source_receipt_sha256": "5274f216aacec5aec28b9e59db068e1d918e8cf624d3d1c893f48b90f747cf45"
+}

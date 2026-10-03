@@ -1,0 +1,82 @@
+{
+  "answer": {
+    "cap": 275,
+    "native_CLI_journal_bytes_equal": true,
+    "sha256": "142ab951cd123d7c274d3f8b4a18c11c74182677f6b17a428b890839510d8dd4",
+    "words": 210
+  },
+  "decision": "READY_FOR_DISTINCT_PROSPECTIVE_PTY_RECIPE",
+  "decision_scope": "Source-only readiness for a distinct prospective native PTY recipe; not native metadata acceptance, user approval, default, PR approval or protection.",
+  "limits": [
+    "No actual PTY setup or hooks/list execution in this judgment",
+    "Wire/backend identity, invoice and unobserved helper/startup coverage UNKNOWN",
+    "No OS physical-stream/EOF/global lifecycle claim",
+    "Old17 and unit18/19 STOP/source records unchanged",
+    "P2 protection and future state-key transport remain UNQUALIFIED"
+  ],
+  "native": {
+    "effort": "max",
+    "model": "gpt-6-astra",
+    "native_exit": 0,
+    "native_internal_retries": null,
+    "provider_label": "omniroute",
+    "schedule_attempts": 1,
+    "schedule_retries": 0,
+    "version": "0.160.0"
+  },
+  "native_usage": {
+    "all_response_prefixes_token_count_and_CLI_match": true,
+    "cache_write_input_tokens": 0,
+    "cached_and_cache_write_scope": "Input subsets",
+    "cached_input_tokens": 287616,
+    "input_tokens": 335477,
+    "invoice_cost": null,
+    "output_tokens": 11331,
+    "reasoning_output_tokens": 6461,
+    "reasoning_scope": "Output subset",
+    "scope": "Source-judgment overhead; eight finalized own response groups counted once",
+    "total_tokens": 346808,
+    "unique_response_groups": 8,
+    "unreported_helper_coverage": "UNKNOWN"
+  },
+  "private_artifact_hashes": {
+    "freeze": "34b95a063381ad95c569a75cecf29cc12457dbea85a0088d1d16d993359b80fd",
+    "native_journal": "74ff1be0aa5b2d168333ca0a21f3b133a2b2e4df6cb51212d400ce61bf27dea8",
+    "native_stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native_stdout": "19a66f2e9e43cb49bbb1e84b92f7f144ac7b27d4fae07fc33fc340fc97a890ba",
+    "preparation_observation": "1fe2f1dc3144d8932d97d025bcc69d2ec5e07a891ffd47c18dd2203c5e1ec057",
+    "root_completion": "4aaaba107dd439a210cb7ee6b5e46dd572ab7f717a120fe4f388f5f634beaa3b",
+    "root_start": "c4e1925ad800d770a77d5c22ed4b1b56a2ecab93d0f9774a8fee8732d94c79c6"
+  },
+  "source_and_call_custody": {
+    "actual_prohibited_calls_observed": 0,
+    "actual_return_outputs_match_model_visible_blocks": true,
+    "additional_startup_primary_windows": 4,
+    "advertised_deferred_tool_schema": "UNKNOWN",
+    "all_command_status_zero": true,
+    "all_selected_carriers_exact": true,
+    "all_unchanged": true,
+    "custom_exec_cells": 7,
+    "distinct_source_packet_binding_checks": 60,
+    "focused_primary_source_windows": 36,
+    "frozen_inputs": 13,
+    "native_command_items": 8,
+    "nested_source_rg_processes": 1
+  },
+  "sources": [
+    {
+      "lines": "2241-2282",
+      "path": "codex-rs/protocol/src/protocol.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "sha256": "d3d3d384da91b2824c10091de4331a2bc26ec5474887ed0aef1e3f3c4ae110f4",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/protocol.rs#L2241-L2282"
+    }
+  ],
+  "status": "SOURCE_JUDGMENT_RECONCILED",
+  "unit": "unit21-native-tty-carrier-astra-source-judgment",
+  "warning": "Inherited native standalone_web_search feature warning retained; no actual web call observed.",
+  "north_star_action": "Qualify faithful native metadata before later cumulative context protection comparisons.",
+  "private_source_receipt_sha256": "af44fe630de95c8cc615929083ec55660ff232d28229b6e8381f18505cefbaf5",
+  "private_root_independent_counter_check_sha256": "397c20eb46de611a93ed562811a73359c8da25c5349eb808a2e04567f25ff289"
+}

@@ -1,0 +1,251 @@
+{
+  "unit": "unit20-distinct-native-pty-source-proposal",
+  "status": "SOURCE_ONLY_COMPLETE_ACTUAL_PTY_AND_METADATA_UNRUN_AT_SOURCE_CLOSURE",
+  "north_star_action": "Qualify faithful native metadata for later cumulative context protection measurements.",
+  "evidence_level": "Pinned source review and installed value-free help/version; no terminal mutation, monitored command, native client or model run by this source worker.",
+  "native_clients": {
+    "codex": "0.160.0",
+    "stty": "uutils0.8.0",
+    "timeout": "uutils0.8.0"
+  },
+  "primary_sources": [
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/app-server/src/transport.rs",
+      "source_locations": [
+        "34"
+      ],
+      "sha256": "5e88d3210a738216a1c8e1dd678a947a8991a486b729685e4089a6a36aa769c8",
+      "role": "Selected native transport reexport; not stdio implementation."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/app-server-transport/src/lib.rs",
+      "source_locations": [
+        "12",
+        "41"
+      ],
+      "sha256": "5da669d70451916afa4548b58a9bc023652e944b503011f8576ce4df36c45d6a",
+      "role": "Crate transport module/reexport to exact implementation."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/app-server-transport/src/transport/mod.rs",
+      "source_locations": [
+        "27",
+        "43",
+        "212-228",
+        "269-280"
+      ],
+      "sha256": "3d9696a60255f90404ffd00864b426242963f1ea54fe0d54eb635574ec6e08e8",
+      "role": "Dedicated stdio module, maintained JSONRPC parsing/serialization."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/app-server-transport/src/transport/stdio.rs",
+      "source_locations": [
+        "28-79",
+        "80-150",
+        "168-180"
+      ],
+      "sha256": "e4f83304498aec2e9ccad9ad3a0af66965ab93508a4a6923f993731adcd69c19",
+      "role": "Native process-owned line reader, newline JSON writes, EOF close/watchdog; no TTY-vs-pipe equivalence claim."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/app-server-protocol/src/protocol/common.rs",
+      "source_locations": [
+        "90-102",
+        "385-399",
+        "879-883"
+      ],
+      "sha256": "d0cca691d21ffe282d3ca3d8ca9eaee8afe9aab058b04a3d4ef579f72a6918c7",
+      "role": "HooksList has no experimental reason; unchanged false optin is supported for this method."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/app-server/src/message_processor.rs",
+      "source_locations": [
+        "975-978",
+        "1530-1532"
+      ],
+      "sha256": "f1a1bb0029e7c2f46de3048cbbc52b55ccca413dacb8ce67c63796372468318f",
+      "role": "Initialized dispatch/capability guard and native catalog handoff."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/app-server/src/request_processors/initialize_processor.rs",
+      "source_locations": [
+        "82-85",
+        "153-163"
+      ],
+      "sha256": "4535560b07ab10d1538acd461560a55c1bdf0c9b4049e72775d6b770421f117f",
+      "role": "Original per-connection capability and explicit native sign-in preservation."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/app-server/src/lib.rs",
+      "source_locations": [
+        "481-489",
+        "783-801",
+        "1158-1177"
+      ],
+      "sha256": "1591686b49c80c062d2b1ce48e03eb7c95bb872cc57b41e0ecc016ceb42fd6f2",
+      "role": "Default signal handler=true, native stdio start/closure branch and disclosed normal startup."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "installed0.160.0 retained help",
+      "upstream_path": "app-server --help",
+      "source_locations": [
+        "13-16",
+        "30-41"
+      ],
+      "sha256": "4226dbf080b9d3a620385fba067bd3b8ac3c76654f28c3bd4d92ae20df2b03d2",
+      "role": "Installed native config/strict/stdiosyntax already retained, no new client launch."
+    },
+    {
+      "repository": "uutils/coreutils",
+      "pin": "c4093734e2ebe2efb7d65e216cd1444664bcf26a",
+      "upstream_path": "src/uu/stty/src/stty.rs",
+      "source_locations": [
+        "207-210",
+        "369-388",
+        "420-439",
+        "800-819",
+        "975-990",
+        "1094-1118"
+      ],
+      "sha256": "c19a64234ceb92faea03cf4835cf413db2232a561d94f3bbbad06472a3527a0d",
+      "role": "Native stdin device, tcgetattr/tcsetattr, flag disable, EOF control mapping. Version0.8.0 tag bytes equal exact commit."
+    },
+    {
+      "repository": "uutils/coreutils",
+      "pin": "c4093734e2ebe2efb7d65e216cd1444664bcf26a",
+      "upstream_path": "src/uu/stty/src/flags.rs",
+      "source_locations": [
+        "237-243",
+        "331"
+      ],
+      "sha256": "5ed9b96e5c52c016374425849a8d0a781d5190618798e3c2e307c9fa652001ea",
+      "role": "Native icanon/echo/echonl/VEOF settings; tag bytes equal exact commit."
+    },
+    {
+      "repository": "https://github.com/uutils/coreutils",
+      "pin": "c4093734e2ebe2efb7d65e216cd1444664bcf26a",
+      "upstream_path": "src/uu/timeout/src/timeout.rs",
+      "selected_lines": [
+        "58-71",
+        "188-220",
+        "242-255",
+        "278-309",
+        "348-395",
+        "414-474"
+      ],
+      "sha256": "95aeacfbdf7f1aa178774e96532ea9ed9183f7f6fde23cfdfcadf7ceb69ab750",
+      "url": "https://github.com/uutils/coreutils/blob/c4093734e2ebe2efb7d65e216cd1444664bcf26a/src/uu/timeout/src/timeout.rs",
+      "supports": [
+        "TERM default/configured signal",
+        "caught external signal tracking",
+        "foreground direct-child signal only",
+        "kill grace statuses",
+        "foreground skips setpgid; inherited stdin/out/err; terminal signals reset; Linux direct-child parent-death signal",
+        "timer/termination/grace wait and failure path"
+      ]
+    },
+    {
+      "repository": "https://github.com/uutils/coreutils",
+      "pin": "c4093734e2ebe2efb7d65e216cd1444664bcf26a",
+      "upstream_path": "src/uucore/src/lib/features/process.rs",
+      "selected_lines": [
+        "98-164"
+      ],
+      "sha256": "bd4be721fa848e3140c2412653419dfcbe25c48077d2165de428fc0a7b26c9cb",
+      "url": "https://github.com/uutils/coreutils/blob/c4093734e2ebe2efb7d65e216cd1444664bcf26a/src/uucore/src/lib/features/process.rs",
+      "supports": [
+        "direct kill(child PID); group kill(0) only on caller group; 100 ms polling; zero duration disables; final blocking wait is not universal wall/cleanup confinement"
+      ]
+    },
+    {
+      "repository": "https://github.com/uutils/coreutils",
+      "pin": "c4093734e2ebe2efb7d65e216cd1444664bcf26a",
+      "upstream_path": "src/uu/timeout/src/status.rs",
+      "selected_lines": [
+        "21-46"
+      ],
+      "sha256": "3de6877993b93cc2ba2f4b18990fe21ad678ac3100d4267fe630489d0b9b8207",
+      "url": "https://github.com/uutils/coreutils/blob/c4093734e2ebe2efb7d65e216cd1444664bcf26a/src/uu/timeout/src/status.rs",
+      "supports": [
+        "124 timeout;125 utility failure;126 cannotinvoke;127 notfound;signal128+signal"
+      ]
+    }
+  ],
+  "prospective_native_controls": {
+    "exec_tty": true,
+    "exec_login": false,
+    "terminal_argv": [
+      "stty",
+      "-echo",
+      "-echonl",
+      "icanon",
+      "eof",
+      "^D"
+    ],
+    "timeout_argv": [
+      "/usr/bin/timeout",
+      "--foreground",
+      "--signal=TERM",
+      "--kill-after=50s",
+      "70s"
+    ],
+    "typed_codex_argv_count": 35,
+    "native_codex_argv_changed": false,
+    "messages_changed": false,
+    "three_messages_bytes": 440,
+    "three_messages_sha256": "c35dae7e034e7768884ec537844b06cfc47216e6087c06805dfbbeb8bf6e9934",
+    "experimentalApi": false,
+    "reply_guard_seconds_each": 20,
+    "EOF_observation_seconds": 50,
+    "first_mismatch": "STOP_NO_RETRY"
+  },
+  "source_disposition": "Separate root consequential judgment is outside this source receipt; neither its future verdict nor live acceptance is inferred here.",
+  "native_expected_selection": {
+    "relative_event_order": [
+      "preToolUse",
+      "postToolUse",
+      "preCompact",
+      "sessionStart",
+      "userPromptSubmit",
+      "stop"
+    ],
+    "last_two_native_matchers": null,
+    "absolute_displayOrder_key_currentHash_trustStatus": "Native returned values only; no derivation or presupposed offset."
+  },
+  "limits": [
+    "Actual PTY disclosed; no pipe or physical-byte equivalence.",
+    "Foreground timeout signals direct monitored child only; descendants outside timed-out cleanup.",
+    "70+50s is nominal escalation, not a universal hard wall or clean native exit.",
+    "Native EOF/SIGTERM watchdog45s once installed; startup/hidden-helper/lifecycle unknown.",
+    "Selected cwd does not confine native sign-in/cloud/SQLite/plugin/cache effects.",
+    "No new RPC adapter, forwarding loop, encoder, hook-hash calculator or benchmark runner.",
+    "Old unit18/19 STOPs, original/typed9, payload and native35argv unchanged.",
+    "No default, installation, P2 protection, invoice or PR/task acceptance."
+  ],
+  "private_artifact_hashes": {
+    "source_manifest": "fe429a4ed99d70ac7c9363f9adddf8af296c780e05ecfef840944b0d9dfcfe37",
+    "timeout_addendum_manifest": "bf361c2ced47961ada03c6607fed9de5c3377f8bafab5b6956a25fe98663c841",
+    "tty_tool_proposal": "30c2b2c573a97b87265283b8a34030101f3b3512e6065da99c35029bbcb5f3c5",
+    "root_selected_timeout_prefix": "a5bda9c744ac887365da9e306515e3445b2510850779d2efe7ef9c7a1233fa92"
+  },
+  "native_model_usage": null,
+  "usage_scope": "Source worker launched no model; hidden native/client usage not measured or imputed as zero.",
+  "utc": "2026-10-03T17:47:29.913281+00:00"
+}
