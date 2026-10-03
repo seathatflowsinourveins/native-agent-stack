@@ -10,20 +10,25 @@ name: Suite parallelism trial (draft pull request only)
 # installed; controls-macos and controls-linux run each arm's exact command on the control file and on the crash
 # control, each copied alone into an empty directory, apart from the timed arms; arms-macos and arms-linux run the
 # whole suite once per arm and repeat on GitHub-hosted runners; compare runs the oracle's own tests on its
-# interpreter, then compare.py over every artifact with the pull request head as the frozen corpus, then requires a
-# clean checkout after every run (git-status.txt empty, the oracle's second part). The controls are two jobs, not
-# one job over a matrix of runner labels, because tests/test_workflow_hardening.py needs a literal ubuntu or macos
-# runs-on label in every job.
+# interpreter, then compare.py over every artifact with the pull request head as the frozen corpus (compare.py
+# applies both oracle parts, the second being a clean checkout after every run: git-status.txt exists and is empty),
+# then repeats the second part as its own step. The controls are two jobs, not one job over a matrix of runner
+# labels, because tests/test_workflow_hardening.py needs a literal ubuntu or macos runs-on label in every job.
 #
 # Every job checks out the pull request head (a pull_request checkout is otherwise the merge commit) and asserts it.
 # Each timed run writes <os>-<arm>-r<N>/ and each control run <os>-<arm>-controls/ or <os>-<arm>-crash/, all in one
-# results tree: log.txt (stdout and stderr), exit-code.txt and meta.json (the keys compare.py reads), plus
-# command.txt, step-seconds.txt, git-status.txt, and runtime.json (timed runs) or limit.txt (control runs). The exit
+# results tree: log.txt (stdout and stderr), exit-code.txt, meta.json, git-status.txt and runtime.json (with the run
+# attempt), which compare.py reads, plus command.txt, step-seconds.txt and, for control runs, limit.txt. The exit
 # status is recorded and never fails the step: the oracle decides.
+#
+# Re-runs: the trial is repeated only as a whole, by a new synchronize of the draft pull request, never by re-running
+# jobs. Every upload sets overwrite: false (actions/upload-artifact action.yml at the pin: the action fails if an
+# artifact of that name already exists), so a re-run cannot replace an earlier attempt's artifact, and compare.py
+# makes any run whose runtime.json records a run_attempt above 1, or none, ineligible.
 #
 # Discovery: unittest-parallel defaults to -s '.', -p 'test*.py' and no -t (src/unittest_parallel/main.py lines
 # 45-50 at the pin), which are the defaults `python -m unittest` discovers with when it is given no test name
-# (CPython Lib/unittest/main.py lines 122-126 and 231-234 at v3.13.15, 133-137 and 242-245 at v3.12.3), so both
+# (CPython Lib/unittest/main.py lines 122-126 and 231-234 at v3.13.16, 133-137 and 242-245 at v3.12.3), so both
 # runners collect the same ids from the repository root. Workers are spawned processes (main.py lines 150-158); a
 # failed run exits with the number of errors, failures and unexpected successes, capped at 255 (lines 240-242).
 #
@@ -114,7 +119,7 @@ jobs:
           path: ${{ runner.temp }}/inventory/
           if-no-files-found: error
           retention-days: 30
-          overwrite: true
+          overwrite: false
 
   controls-macos:
     runs-on: macos-15
@@ -272,7 +277,7 @@ jobs:
           ARM: ${{ matrix.arm }}
         run: |
           python3 - <<'PYEOF'
-          import json, os, platform, subprocess
+          import importlib.metadata, json, os, platform, subprocess, sys
 
           results = os.path.join(os.environ["RUNNER_TEMP"], "results")
 
@@ -281,6 +286,16 @@ jobs:
               return done.stdout if done.returncode == 0 else None
 
           head, status = git("rev-parse", "HEAD"), git("status", "--porcelain=v1", "--untracked-files=all")
+          packages = {}
+          for package in ("coverage", "unittest-parallel"):
+              try:
+                  packages[package] = importlib.metadata.version(package)
+              except importlib.metadata.PackageNotFoundError:
+                  packages[package] = None
+          # The same runtime record as a timed run; compare.py reads run_attempt from it (a re-run voids the run).
+          runtime = {"image_os": os.environ.get("ImageOS", ""), "runner_arch": os.environ.get("RUNNER_ARCH", ""),
+                     "cpu_count": os.cpu_count(), "python_executable": sys.executable, "python_full_version": sys.version,
+                     "packages": packages, "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", "")}
           for kind in ("controls", "crash"):
               out = os.path.join(results, f"{os.environ['OS_LABEL']}-{os.environ['ARM']}-{kind}")
               os.makedirs(out, exist_ok=True)
@@ -302,6 +317,9 @@ jobs:
                   handle.write("\n")
               with open(os.path.join(out, "git-status.txt"), "w", encoding="utf-8") as handle:
                   handle.write(status if status is not None else "git status failed\n")
+              with open(os.path.join(out, "runtime.json"), "w", encoding="utf-8") as handle:
+                  json.dump(runtime, handle, indent=2, sort_keys=True)
+                  handle.write("\n")
           PYEOF
       - name: Upload the control runs
         if: always()
@@ -311,7 +329,7 @@ jobs:
           path: ${{ runner.temp }}/results/
           if-no-files-found: error
           retention-days: 30
-          overwrite: true
+          overwrite: false
 
   controls-linux:
     runs-on: ubuntu-24.04
@@ -459,7 +477,7 @@ jobs:
           ARM: ${{ matrix.arm }}
         run: |
           python3 - <<'PYEOF'
-          import json, os, platform, subprocess
+          import importlib.metadata, json, os, platform, subprocess, sys
 
           results = os.path.join(os.environ["RUNNER_TEMP"], "results")
 
@@ -468,6 +486,16 @@ jobs:
               return done.stdout if done.returncode == 0 else None
 
           head, status = git("rev-parse", "HEAD"), git("status", "--porcelain=v1", "--untracked-files=all")
+          packages = {}
+          for package in ("coverage", "unittest-parallel"):
+              try:
+                  packages[package] = importlib.metadata.version(package)
+              except importlib.metadata.PackageNotFoundError:
+                  packages[package] = None
+          # The same runtime record as a timed run; compare.py reads run_attempt from it (a re-run voids the run).
+          runtime = {"image_os": os.environ.get("ImageOS", ""), "runner_arch": os.environ.get("RUNNER_ARCH", ""),
+                     "cpu_count": os.cpu_count(), "python_executable": sys.executable, "python_full_version": sys.version,
+                     "packages": packages, "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", "")}
           for kind in ("controls", "crash"):
               out = os.path.join(results, f"{os.environ['OS_LABEL']}-{os.environ['ARM']}-{kind}")
               os.makedirs(out, exist_ok=True)
@@ -489,6 +517,9 @@ jobs:
                   handle.write("\n")
               with open(os.path.join(out, "git-status.txt"), "w", encoding="utf-8") as handle:
                   handle.write(status if status is not None else "git status failed\n")
+              with open(os.path.join(out, "runtime.json"), "w", encoding="utf-8") as handle:
+                  json.dump(runtime, handle, indent=2, sort_keys=True)
+                  handle.write("\n")
           PYEOF
       - name: Upload the control runs
         if: always()
@@ -498,7 +529,7 @@ jobs:
           path: ${{ runner.temp }}/results/
           if-no-files-found: error
           retention-days: 30
-          overwrite: true
+          overwrite: false
 
   arms-macos:
     runs-on: macos-15
@@ -706,7 +737,7 @@ jobs:
           path: ${{ runner.temp }}/results/
           if-no-files-found: error
           retention-days: 30
-          overwrite: true
+          overwrite: false
 
   arms-linux:
     runs-on: ubuntu-24.04
@@ -924,7 +955,7 @@ jobs:
           path: ${{ runner.temp }}/results/
           if-no-files-found: error
           retention-days: 30
-          overwrite: true
+          overwrite: false
 
   compare:
     needs: [inventory, controls-macos, controls-linux, arms-macos, arms-linux]
@@ -971,9 +1002,9 @@ jobs:
           pattern: control-*
           merge-multiple: true
           path: ${{ runner.temp }}/results
-      # The oracle was tested locally on CPython 3.13 and 3.14 (its README, "Run it"); this job runs it on the
-      # image's python3. An oracle that fails its own tests here gives no verdict: the step fails and compare.py is
-      # skipped (fail-closed), while every arm and control artifact stays downloadable for a rerun.
+      # The oracle was tested locally on CPython 3.12.3, 3.13.16 and 3.14.4 (its README, "Run it"); this job runs it
+      # on the image's python3. An oracle that fails its own tests here gives no verdict: the step fails and
+      # compare.py is skipped (fail-closed), while every arm and control artifact stays downloadable.
       - name: Run the oracle's own tests on this interpreter (fail-closed)
         run: python3 -m unittest discover -s "$TRIAL_DIR" -p test_compare.py -v
       - name: Compare every arm run with the serial arm of its runner (compare.py)
@@ -991,9 +1022,10 @@ jobs:
             --expected-sha "$PR_HEAD_SHA" \
             --out "$RUNNER_TEMP/compare/result.json" \
             --summary-md "$RUNNER_TEMP/compare/summary.md"
-      # The preregistered oracle's second part (the experiment record): compare.py does not read git-status.txt, so
-      # this step requires an empty `git status --porcelain=v1 --untracked-files=all` for every run directory. A
-      # missing file or the recorder's "git status failed" counts as dirty. A dirty run makes its arm ineligible.
+      # The preregistered oracle's second part (the experiment record), repeated as a second check of compare.py's
+      # own: every run directory's `git status --porcelain=v1 --untracked-files=all` (git-status.txt) exists and is
+      # empty. A missing file or the recorder's "git status failed" counts as dirty. A dirty run makes its arm
+      # ineligible.
       - name: Check that every run left the checkout clean (git status, second part of the oracle)
         if: always()
         run: |
@@ -1013,7 +1045,7 @@ jobs:
                   continue
               with open(path, encoding="utf-8", errors="replace") as handle:
                   status = handle.read()
-              clean = status.strip() == ""
+              clean = status == ""
               runs.append({"name": name, "clean": clean, "status": status[:4000],
                            "reason": None if clean else "the checkout was not clean after the run"})
           dirty = [run["name"] for run in runs if not run["clean"]]
@@ -1063,4 +1095,4 @@ jobs:
           path: ${{ runner.temp }}/compare/
           if-no-files-found: warn
           retention-days: 30
-          overwrite: true
+          overwrite: false
