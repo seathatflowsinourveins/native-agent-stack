@@ -94,7 +94,12 @@
   "usage": {
     "authoritative_aggregate": "Exactly one native or owner-returned complete aggregate per arm/attempt, named before freeze",
     "efficiency_metric": "uncached input tokens plus output tokens",
-    "required_cache_subsets": true,
+    "required_cache_read_for_metric": true,
+    "cache_write_for_metric": "Optional reported breakdown; preserve missing as null. Unknown writes do not by themselves block gross-minus-known-read plus output, but no complete cache or cost claim follows",
+    "metric_formula": "For each distinct provider attempt i: U_i=reported_gross_input_i-reported_cached_read_i; M=sum_i(U_i+reported_output_i), output includes reasoning",
+    "operand_validation": "Require original reported finite nonnegative gross/read/output fields and0<=read<=gross; no clamping, estimates or normalized-zero substitutions",
+    "provider_attempt_coverage_required": true,
+    "source_clarification_status": "Prospective; Astra/max source ACCEPT conditional, actual counter binding and both-family amendment read pending",
     "gross_input_output": "Retained separately; cached input and reasoning output subsets are not added twice",
     "missingness": "Unknown stays null; normalized zeros, estimates and price-table costs are not observed consumption or billing",
     "scopes": [
@@ -107,14 +112,14 @@
   },
   "request_controls": {
     "every_arm": [
-      "unique correlation id for Chat; exclusive Responses window plus retained attempt start/end and client-row mapping",
+      "unique correlation id for Chat; exclusive Responses window plus retained native provider-attempt identities/start/end and presentation-row mapping; correlation alone is not attempt identity",
       "semantic-response-cache no-cache bypass",
       "compression-off baseline",
       "fresh owned native state"
     ],
     "cache_limits": "No-cache does not disable upstream prompt caching",
     "metadata": "Allowlisted values only; no accounts, tokens, request bodies or auth/configuration exports",
-    "row_counting": "Count client rows with requestedModel; do not sum their upstream-attempt duplicates. Retain complete original row field presence, status and helper coverage before declaring usage complete."
+    "row_counting": "Count each distinct actual provider attempt once. Duplicate client/upstream observations of one attempt are not additive; distinct retries are separate attempts. One native aggregate may replace constituent rows only with established complete attempt/role coverage. Retain original field presence/types, status and main/child/helper/grading coverage; normalized or history zeros do not establish reported zero."
   },
   "amendments": "Every changed task/model/route/evaluator/limit/rule is a prospective recorded amendment read by both families; historical gates and earlier failures retain their original conditions."
 }

@@ -28,6 +28,12 @@ jobs:
           check-latest: false
       - name: Validate the runtime skills contract
         run: python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills
+      - name: Validate runtime job and comparison JSON syntax
+        run: |
+          python3 -m json.tool catalogs/foundation/runtime-jobs.json /dev/null
+          for runtime_job_document in blueprints/runtime-workers/comparisons/*.json; do
+            python3 -m json.tool "$runtime_job_document" /dev/null
+          done
       - name: Report pins against upstream HEAD and native check semantics
         if: ${{ !cancelled() }}
         env:

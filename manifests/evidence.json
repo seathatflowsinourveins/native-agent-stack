@@ -4025,8 +4025,8 @@
     },
     {
       "path": ".github/workflows/runtime-worker-skills-freshness.yml",
-      "sha256": "9fd015cf990c339c1ab95447086b549ff577e577be374299acd9a9ce69ea7a53",
-      "bytes": 5398
+      "sha256": "e9e8da2d4f1f08f721535013e4cfb765fee2de4af4d0d8bc759addf83c2b2bb3",
+      "bytes": 5724
     },
     {
       "path": ".github/workflows/security-scan.yml",
@@ -9196,8 +9196,8 @@
     },
     {
       "path": "blueprints/runtime-workers/README.md",
-      "sha256": "a25b560791586000ec8dcde568b5c17c7370441e4187f34da76229d75681f215",
-      "bytes": 10442
+      "sha256": "19ceafae91a9f5419f9e9f819b73f9354740ae727a2c25179a6c76932ab6ef58",
+      "bytes": 12084
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
@@ -9261,8 +9261,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
-      "sha256": "c71885acf86c83f239fe0fb689b9e16fe83c340fc00bb08f99685969f082cef6",
-      "bytes": 6378
+      "sha256": "307101c01a8fb1cfdda44cbd7d91d29defd7a9ee579b77ff93635cdb690a4363",
+      "bytes": 7437
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
@@ -15061,8 +15061,8 @@
     },
     {
       "path": "catalogs/foundation/runtime-jobs.json",
-      "sha256": "34be2d7fe0bbf2d13d80f87177eb0e00af5fc59c1c054fc46a1525acd4fe178a",
-      "bytes": 18897
+      "sha256": "4a392ac65449ca6a64a0930d4cf555107e4c7b138901e2455e49ee6a558f7d32",
+      "bytes": 19034
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -42055,6 +42055,11 @@
       "bytes": 19725
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-task-source-identities.json",
+      "sha256": "22fa8d867f17db85aa2e92f871024dc47ec255c2f75b529cfc4f83085b3cfe6f",
+      "bytes": 116428
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/deerflow-native-readiness.json",
       "sha256": "38fc896da374cd54e973514a67215dcc74a13081136a319af463c27112e7bcb9",
       "bytes": 20946
@@ -42113,6 +42118,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-supplied-source-sdk-binding.json",
       "sha256": "4df3420b14765c9c2707df43c3f08db01d5388aca2033893e80395a4d420e0b8",
       "bytes": 24598
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-codex-native-carrier-readiness.json",
+      "sha256": "e7dbd9ee243123f7d7e509260fe56150c2a005470f43d29624d939447255a4b0",
+      "bytes": 28919
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-gateway-network-source-read.json",
@@ -42211,8 +42221,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-followup-20261003.json",
-      "sha256": "4d412b24d21841d7871b8de2658edafcd4c920ba66397d110b59629483b56b2f",
-      "bytes": 6860
+      "sha256": "d2a7e8894284a8622cade5cccceef75dc1d5a34789dab32b766a0fec33c30d5c",
+      "bytes": 21205
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-judgments.json",
