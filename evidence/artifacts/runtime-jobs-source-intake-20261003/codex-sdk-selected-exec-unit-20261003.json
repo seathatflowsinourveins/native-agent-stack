@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository": "openai/codex",
+    "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "path": "sdk/typescript/tests/exec.test.ts",
+    "sha256": "b8fdebb70f761b729093555d09328879cf9400db53aa8c47156f21fb7f44f594"
+  },
+  "selected_command": "pnpm test --runInBand --runTestsByPath tests/exec.test.ts --json --outputFile=<task-owned-original>",
+  "native_package_manager": {
+    "version": "10.34.5",
+    "node_version": "24.21.0"
+  },
+  "evidence_kind": "unchanged upstream selected unit tests",
+  "native_exit": 0,
+  "results": {
+    "success": true,
+    "tests_total": 14,
+    "tests_passed": 14,
+    "tests_failed": 0,
+    "tests_pending": 0,
+    "suites": 1,
+    "suite_names": [
+      "exec.test.ts"
+    ],
+    "artifacts": [
+      {
+        "name": "jest-original.json",
+        "bytes": 5600,
+        "sha256": "6c2717d71e0b966418fe6c691bc005bb922fb64fe225234b2534776acfe4f301"
+      },
+      {
+        "name": "captures/stdout",
+        "bytes": 356,
+        "sha256": "5cf0d84a40ed559d42422fd8234944b558a53b9c50a667d139414cfa9122a1ee"
+      },
+      {
+        "name": "captures/stderr",
+        "bytes": 1414,
+        "sha256": "ac294ab68aa0dc63fdb1061d965452b51319a5f6a0ea97b998dba4324595f0f9"
+      }
+    ]
+  },
+  "scope": "14 unchanged source-defined mocked-spawn unit tests; no native Codex process/provider execution or lifecycle/role/default qualification.",
+  "failure_retained": {
+    "first_driver_exit": 127,
+    "phase": "before Jest startup",
+    "stdout_bytes": 0,
+    "stderr_bytes": 48,
+    "stderr_sha256": "bfde0c264c6a92a6e830dbcd1487bafa6ba8d9c4192b45331f40a13ef200b4a8",
+    "repair": "one bounded explicit PATH correction to installed Node; test/source inputs unchanged"
+  },
+  "fixture_cleanup": {
+    "owned_tmp_entries_removed": 4,
+    "native_exit": 0,
+    "independent_empty_observation": true,
+    "original_streams_and_jest_retained": true
+  },
+  "existing_matching_evidence": {
+    "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json",
+    "source_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "exec_tests_passed": 14,
+    "original_jest_sha256": "fcc20e35c8a9033c9a38bf58f3e642fbdfd634d478a0fd511aa467626e42507b",
+    "note": "The matching earlier14-test receipt was located while this narrow check was running. Reuse it for unchanged inputs; this fresh run adds no stronger runtime or default acceptance."
+  },
+  "preservation": {
+    "historical_native_23_test_failure_unchanged": true,
+    "claimed_48_test_suite_original_not_obtained": true,
+    "comparative_model_runs": 0,
+    "defaults_qualified": 0
+  }
+}

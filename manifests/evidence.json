@@ -42688,9 +42688,19 @@
       "bytes": 3594
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-selected-exec-unit-20261003.json",
+      "sha256": "bc7197eba1f1e9a31c6ec4858eb629fdd30185b1449067d7ff67a8c01da00d6c",
+      "bytes": 2657
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-source-position-pilot-preregister.json",
       "sha256": "e2885ebcc270cbb1a4977d8c1521ad33348d578a1eeaab2dc294f616afa8f13e",
       "bytes": 19187
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-carrier-native-inputs-source-proposal-20261003.json",
+      "sha256": "468dd35adf2c33073751a72a4e34e8ef78ae550b9b979c4225daef9dec1d431f",
+      "bytes": 11726
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-concrete-freeze.json",
@@ -42923,6 +42933,11 @@
       "bytes": 21190
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/native-ultra-gateway-source-qualification-20261003.json",
+      "sha256": "fbe037da7a17986673d8ea151293848a8e011fcf1808a6d375a2734a184bb58b",
+      "bytes": 11188
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/network-policy-native-controlled-fixture-20261003.json",
       "sha256": "8cbf76e1eab50fd279fab2e4f3a16f4f2e4be105583d27e42bed6b7dcf2165e5",
       "bytes": 4171
@@ -43016,6 +43031,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/readiness-publication-read.json",
       "sha256": "6d315b8bf439e07ea399752d5253504e076bffdbe2988c6b95085d735c70d1da",
       "bytes": 1953
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/research-native-bounds-source-proposal-20261003.json",
+      "sha256": "b2eec06b2f0efbbb12501b5cc3d5156382dc389e78019e322afab89b9b73dea8",
+      "bytes": 18818
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-followup-20261003.json",

@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-03",
+  "evidence_kind": "source_review",
+  "status": "prospective source leads; active method and runtime delivery unchanged",
+  "active_draft_sha256": "8c30caf06ca897f2fe7797b7a897c49ebe71855dcf5f394a8279f0ecc18cb2f1",
+  "default_mode": "full_usage",
+  "selected_mode": null,
+  "original_limits": {
+    "timeout_seconds_per_question_arm_repeat": 900,
+    "maximum_searches": 40,
+    "maximum_fetches": 80
+  },
+  "prospective_mode": {
+    "mode": "quality_only",
+    "timeout_seconds_per_question_arm_repeat": 900,
+    "search_call_limit": null,
+    "fetch_call_limit": null,
+    "search_fetch_status": "uncapped_observed_only",
+    "accepted": false,
+    "frozen": false
+  },
+  "native_scopes": [
+    {
+      "runtime": "DeerFlow2.1.0",
+      "native_input": "subagents.timeout_seconds or per-agent override",
+      "candidate_seconds": 900,
+      "builtin_default_seconds": 1800,
+      "scope": "subagent execution only; local cancellation paths do not establish a whole-question deadline or external cleanup",
+      "source_refs": [
+        "D-global-subagents:71-86,130-167",
+        "D-executor:1774-1801,1866-1894"
+      ]
+    },
+    {
+      "runtime": "Onyx4.8.3",
+      "native_threshold_seconds": 1800,
+      "scope": "force-report threshold can overrun; helper timeout separate; stop-chat-session endpoint sets a cooperative fence",
+      "source_refs": [
+        "O-loop:80-104",
+        "O-chat:1371-1392",
+        "O-stop:14-58"
+      ]
+    },
+    {
+      "runtime": "Inspect0.3.273",
+      "native_input": "Task.time_limit=900",
+      "scope": "sample solver context; working_limit and scoring timer are separate; external server/helper teardown is unobserved",
+      "source_refs": [
+        "I-task:177-197",
+        "I-run:2666-2704,2970-2994",
+        "I-limit:1356-1404"
+      ]
+    },
+    {
+      "runtime": "promptfoo",
+      "native_input": "PROMPTFOO_EVAL_TIMEOUT_MS=900000",
+      "scope": "per-step abort reaches HTTP fetch; whole-run timeout and request timeout are separate; no proof of Onyx/helper shutdown",
+      "source_refs": [
+        "P-envars:563-586",
+        "P-evaluator:3725-3804,4754-4770",
+        "P-http:2650-2670,2914-2927"
+      ]
+    }
+  ],
+  "invocation_lead": {
+    "onyx": "Fresh native session, POST send-chat-message with deep_research=true and stream=false returns ChatFullResponse.answer",
+    "source_refs": [
+      "O-chat:775-806",
+      "O-chat-models:80-101"
+    ],
+    "evaluation": "Pinned promptfoo native HTTP provider supports response transformation; exact delivered mapping and common oracle compatibility remain unknown"
+  },
+  "count_qualification": "No common40-search/80-fetch count enforcement qualified in these named originals; native research iterations/search queries/documents are distinct scopes.",
+  "sources": [
+    {
+      "id": "D-client",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/client.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/client.py",
+      "bytes": 80673,
+      "sha256": "b711d819593265cd8eed98d9b0784626e38b62a100fa8dd0120dd78e2a11f7ef",
+      "native_exit": 0
+    },
+    {
+      "id": "D-config",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "config.example.yaml",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/config.example.yaml",
+      "bytes": 151127,
+      "sha256": "14a630a2e1d8eb8872a47f3eac9dcc01795820c37c4052583ddbdcac42a5a5f1",
+      "native_exit": 0
+    },
+    {
+      "id": "D-models",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/models/factory.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/models/factory.py",
+      "bytes": 20843,
+      "sha256": "1ccd4b57c6f54a90667cf8af5ec92f4b2629915f4ef1c403e8525893e0d13840",
+      "native_exit": 0
+    },
+    {
+      "id": "O-loop",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/deep_research/dr_loop.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/deep_research/dr_loop.py",
+      "bytes": 39422,
+      "sha256": "51eaa4815340a4becfc8f915c2c31b6e958fb3014a44c8525122aa55891902eb",
+      "native_exit": 0
+    },
+    {
+      "id": "O-searxng",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/tools/tool_implementations/web_search/clients/searxng_client.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/tools/tool_implementations/web_search/clients/searxng_client.py",
+      "bytes": 5401,
+      "sha256": "f93df0b0485e41814df96830167d3f84ffbdc5eb126bc9cbac5529dd1c3a2987",
+      "native_exit": 0
+    },
+    {
+      "id": "O-crawler",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/tools/tool_implementations/open_url/onyx_web_crawler.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/tools/tool_implementations/open_url/onyx_web_crawler.py",
+      "bytes": 15798,
+      "sha256": "b6bd9eb1a54bb6ecf0f39ccf8dbf68fa9cd47a92374f8fa7f9951754a06bd44d",
+      "native_exit": 0
+    },
+    {
+      "id": "D-ddg",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/community/ddg_search/tools.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/community/ddg_search/tools.py",
+      "bytes": 7606,
+      "sha256": "cb9549c556ffc1305aca067396f2c9b3db8d918e77d7a046b9457c9eed515f25",
+      "native_exit": 0
+    },
+    {
+      "id": "D-executor",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/subagents/executor.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/subagents/executor.py",
+      "bytes": 98640,
+      "sha256": "1a134078c49cef63c0064f1a1cd5de58b1504d92aea60dff8afb9c36081b262b",
+      "native_exit": 0
+    },
+    {
+      "id": "D-runtime-config",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/config/subagent_runtime_config.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/subagent_runtime_config.py",
+      "bytes": 990,
+      "sha256": "5090d9ce30d797881defda705dfe10a1149d82dbef8a996956377525701255d5",
+      "native_exit": 0
+    },
+    {
+      "id": "D-jina",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/community/jina_ai/jina_client.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/community/jina_ai/jina_client.py",
+      "bytes": 1858,
+      "sha256": "c7118660f9c98749420fe484966d2b8399123a6eea05ad88ac3606975c4d6b86",
+      "native_exit": 0
+    },
+    {
+      "id": "O-agent",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/tools/fake_tools/research_agent.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/tools/fake_tools/research_agent.py",
+      "bytes": 36602,
+      "sha256": "92f9f6080e1fa5b2056b4d022bdcc580dc0bc30e20787b20721fc22b52443ae7",
+      "native_exit": 0
+    },
+    {
+      "id": "O-chat",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/server/query_and_chat/chat_backend.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/server/query_and_chat/chat_backend.py",
+      "bytes": 52145,
+      "sha256": "a3751fe46c61896a4b60fe6cdab79c51e0f9168b256d09d22873b4440a6f0343",
+      "native_exit": 0
+    },
+    {
+      "id": "O-eval",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/evals/eval_cli.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/evals/eval_cli.py",
+      "bytes": 9223,
+      "sha256": "eee324eeed830582b6cd5be250dfe721055549b7669d07681ed02c670d19ffe4",
+      "native_exit": 0
+    },
+    {
+      "id": "D-subagent-config",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/subagents/config.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/subagents/config.py",
+      "bytes": 2808,
+      "sha256": "8a01cd25ceb0a61d707d762f3854fe76c25015ea9b1006718550f7202686a746",
+      "native_exit": 0
+    },
+    {
+      "id": "O-llm-schema",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/server/manage/llm/models.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/server/manage/llm/models.py",
+      "bytes": 30853,
+      "sha256": "8492d2c5cf1d5ac4122b07538e806d50ece00c7ca92971433aeb0c9e5fcd839a",
+      "native_exit": 0
+    },
+    {
+      "id": "O-llm-factory",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/llm/factory.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/llm/factory.py",
+      "bytes": 19822,
+      "sha256": "cd04c04e8df334885516c49ed10c609eef074c0dcb9c14f8c66f2b3a1c8be381",
+      "native_exit": 0
+    },
+    {
+      "id": "I-task",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "path": "src/inspect_ai/_eval/task/task.py",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/_eval/task/task.py",
+      "bytes": 31115,
+      "sha256": "35d0d2885253b9e83d2b6e8e7bd7dfa3fde24d9b00af5fe6e209fb2aa91bf2ce",
+      "native_exit": 0
+    },
+    {
+      "id": "I-run",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "path": "src/inspect_ai/_eval/task/run.py",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/_eval/task/run.py",
+      "bytes": 180807,
+      "sha256": "43f7ddd54c9df47ee331fe5f298a6b96eb02fbec3aee0af0afc961ef3d6f1a3f",
+      "native_exit": 0
+    },
+    {
+      "id": "P-eval",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "path": "src/commands/eval.ts",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/commands/eval.ts",
+      "bytes": 9478,
+      "sha256": "d4a417916e117dbda2ba6d026edf044d3b009dbd5b9da0d20365cd1aa4406ad2",
+      "native_exit": 0
+    },
+    {
+      "id": "P-evaluator",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "path": "src/evaluator.ts",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/evaluator.ts",
+      "bytes": 157115,
+      "sha256": "0e6859a4a1fdabd9fd273983a3e86d11b516b468c1af20bc3843315df767276c",
+      "native_exit": 0
+    },
+    {
+      "id": "P-http",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "path": "src/providers/http.ts",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/http.ts",
+      "bytes": 111693,
+      "sha256": "549c986d6e50f13bfa2b317e441c55fa5b74a631a912a73f780f98de490d0bd7",
+      "native_exit": 0
+    },
+    {
+      "id": "D-global-subagents",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/config/subagents_config.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/subagents_config.py",
+      "bytes": 13551,
+      "sha256": "3346030ccf8944f860fa11b4f5566ff4203fb7966545337df08ba50a17f6629a",
+      "native_exit": 0
+    },
+    {
+      "id": "O-request",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/server/query_and_chat/models.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/server/query_and_chat/models.py",
+      "bytes": 10544,
+      "sha256": "adfb0aeda7c2b0cb74f89b3c439a081fdf52d6a6d82d40c620d381385155b338",
+      "native_exit": 0
+    },
+    {
+      "id": "O-stop",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/chat/stop_signal_checker.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/chat/stop_signal_checker.py",
+      "bytes": 1750,
+      "sha256": "97b3895447c372297cb0ecb3e875cf1dd761e03e59320522ad6be638eac55888",
+      "native_exit": 0
+    },
+    {
+      "id": "I-limit",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "path": "src/inspect_ai/util/_limit.py",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/util/_limit.py",
+      "bytes": 55039,
+      "sha256": "b75cfa3ee8b4359d3cc5f97830f04c3dbc20260aef84cb6febd6d443a108bdac",
+      "native_exit": 0
+    },
+    {
+      "id": "I-openai",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "path": "src/inspect_ai/model/_openai.py",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/model/_openai.py",
+      "bytes": 66605,
+      "sha256": "febf8a04be8a97057f6f14aa59b4e58f2acf9bb0cda480b65788c0091fd32b19",
+      "native_exit": 0
+    },
+    {
+      "id": "P-envars",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "path": "src/envars.ts",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/envars.ts",
+      "bytes": 19441,
+      "sha256": "7c789d5272d300a991857001248fbf84483477ff1af8cce9996b81ad41972e71",
+      "native_exit": 0
+    },
+    {
+      "id": "I-responses",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "path": "src/inspect_ai/model/_providers/openai_responses.py",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/model/_providers/openai_responses.py",
+      "bytes": 23825,
+      "sha256": "7a9f9998f4942e2fe18e86609c034f9eebf699cfa5600fd6382dbdef7aaa140a",
+      "native_exit": 0
+    },
+    {
+      "id": "I-provider",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "path": "src/inspect_ai/model/_providers/openai.py",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/model/_providers/openai.py",
+      "bytes": 36063,
+      "sha256": "fd83c176e22815f962c433e3ba5f736035f7ad57b0c0c1c2a2acf6ee85014aba",
+      "native_exit": 0
+    },
+    {
+      "id": "D-searxng",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/community/searxng/tools.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/community/searxng/tools.py",
+      "bytes": 2100,
+      "sha256": "63c850fdc2c8960965037b894140025056fc1391c4ecb6b5e28f59fce189b897",
+      "native_exit": 0
+    },
+    {
+      "id": "D-searxng-client",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/community/searxng/searxng_client.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/community/searxng/searxng_client.py",
+      "bytes": 2347,
+      "sha256": "a249723fbfc72c92bde34b723c70f2939270c9961338511b7cca7b260c2df017",
+      "native_exit": 0
+    },
+    {
+      "id": "O-chat-models",
+      "repository": "onyx-dot-app/onyx",
+      "pin": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "path": "backend/onyx/chat/models.py",
+      "url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/backend/onyx/chat/models.py",
+      "bytes": 8838,
+      "sha256": "6b5f0bdccaf540a5a7f068be041c85786b176cc24acf764d0e0579752304e69c",
+      "native_exit": 0
+    }
+  ],
+  "root_primary_recheck": {
+    "sources": 32,
+    "native_exit": 0,
+    "complete_original_match": true
+  },
+  "private_custody": {
+    "findings_sha256": "3cc659cc9bcb13d79b1185581501eacedac2465c674d90da70d2a8589e0d5834",
+    "inventory_sha256": "06957b5502d6ad4e7edb72c108250ce4761e7b4b9231e6efae46e1d980ab2520",
+    "consistency_attempt_exits": [
+      1,
+      1,
+      0
+    ],
+    "failed_conditions": "Two over-specific source literal assertions, corrected to original wording/mechanism; not upstream/runtime failures"
+  },
+  "preservation": {
+    "active_draft_unchanged": true,
+    "original_coding_packet_unchanged": true,
+    "all_actual_auth_deadline_lifecycle_usage_route_window_gates_remain": true,
+    "comparative_model_runs": 0,
+    "defaults_qualified": 0
+  }
+}
