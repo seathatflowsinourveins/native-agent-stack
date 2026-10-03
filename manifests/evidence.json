@@ -15805,6 +15805,11 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-definitive-round-audit.md",
+      "sha256": "dbd30f0772d8b1b525cc106808e277811ff4f34f77296da98a7e4c43af87bd8d",
+      "bytes": 10104
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -36665,6 +36670,1061 @@
       "bytes": 10505
     },
     {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/README.md",
+      "sha256": "be7cd51f4b4b454d8565b6606bf20032e3cd52082872c90aba5a4fb713229278",
+      "bytes": 5620
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/adjudicate-prompt.txt",
+      "sha256": "eb8fc95dace2a239ecfe530935735ef9a56417cbe0c6816316406d36a92a937d",
+      "bytes": 883
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/adjudicate-schema.json",
+      "sha256": "b873311444854b4ed4dbd6a911103a484406a9603b7992ace775033f430b09c0",
+      "bytes": 693
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/assemble.py",
+      "sha256": "0ba2d74b870f78e55a9d0be955538b70d7f1635cc36c3f47dc139f22ad68a4e3",
+      "bytes": 8684
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/audit-observations.json",
+      "sha256": "5c16434972e319ba14a26cc254b9c57692c91417ab9927c542a4b03677f82d4b",
+      "bytes": 142516
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/audit-of-manifest.before-amendment-4.json",
+      "sha256": "49ec7a45bf52a1aaf38240d875a0bc224562be35ace4fd152456776b99c0efa8",
+      "bytes": 26407
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/audit-of-manifest.json",
+      "sha256": "b7f2b3fd585f24d3e694467c8fe5f21715f93c147ed23ce151fa017c4268372c",
+      "bytes": 26470
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/build_units.py",
+      "sha256": "88ba4c99c063a50be140d301ae83cecbef24872ecf1552203b43752fc0606535",
+      "bytes": 23315
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/clean-room.json",
+      "sha256": "b832db0cbe4afc7ed8714e441b46e58e54d9132ab971dc1a75f3bd80fe832d3e",
+      "bytes": 3778
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/compare.py",
+      "sha256": "0c37d5933077e16b314b832409f24c7b49a7640c4a76527b67d3afc32d48bd27",
+      "bytes": 7198
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/contenders.json",
+      "sha256": "891cf1d8b76c33466a89acb043689eecd3f142106dc6989ebd11476cd3979a74",
+      "bytes": 42138
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/criteria.txt",
+      "sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+      "bytes": 992
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/critic-prompt.txt",
+      "sha256": "16e06e3a8f97c4b5ad2d1416ad16ef273e8d3364e86fb35a2b4d99abdd993985",
+      "bytes": 2092
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/critic-schema.json",
+      "sha256": "957f3d327814f0eccafabee9e55d0693d6e0496e52fc8e1eef658446ea9fc954",
+      "bytes": 1147
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/decide-prompt.txt",
+      "sha256": "d729c168ff735071af3c0381b34f4f2ceae2baaeb5fe10b6bd61543841e069de",
+      "bytes": 2627
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/decide-schema.json",
+      "sha256": "de889c65b0be6d486e0e5d63ab839002c60dadee05cf0ace38fc7896eec47c3e",
+      "bytes": 1271
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/decision-rule.txt",
+      "sha256": "51f49237ba79cdc87357e8b6a83346f33773810315812c2ca29fa32584a11824",
+      "bytes": 2380
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossier-prompt.txt",
+      "sha256": "42d9e97cc70f2bc8dc16c9823c342872a591c86771199d2c76ad1b482777afb0",
+      "bytes": 2666
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossier-schema.json",
+      "sha256": "8e932f1b961970137aaa23be059864a5c81648f9dad360ebba79826404efb235",
+      "bytes": 3741
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/abhigyanpatwari__gitnexus.json",
+      "sha256": "32e9bec3d96650b54e02180b9c848caa9b162f6327a10ef3444d31cbb2921564",
+      "bytes": 48285
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/actions__attest.json",
+      "sha256": "c3c457ccd98d1cb77d79e350829812d0cb86a8be4005675f54c30e562ab761aa",
+      "bytes": 35353
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/adbar__trafilatura.json",
+      "sha256": "9951c29fff85188efad06245e04b7d0fed7d8a59238b6254c8fcc17bb204b2bc",
+      "bytes": 39134
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/affaan-m__ecc.json",
+      "sha256": "1f612da3439ce4e44408d9ac0ec79cc8005850cc7ddc63da9712e5a15c01b086",
+      "bytes": 46198
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/agentgateway__agentgateway.json",
+      "sha256": "a924c53767f14fb54e49bd76675afa9e03ee7970202cae804f6cbe6f9a838c17",
+      "bytes": 40873
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/agentskills__agentskills.json",
+      "sha256": "b416635ed37ccc98112e2d99e4c59bf445ee43ccd55cd179f60611d550921461",
+      "bytes": 32437
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/akitaonrails__ai-memory.json",
+      "sha256": "45dad52b41c669fb964eee04a13dde442350a57c99f8af240c5dc4838f751504",
+      "bytes": 36070
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/alphaxiv__openresearch.json",
+      "sha256": "1dd6decfc800570a0d46b388026262ff50a540637dbfba19ef3f231e41ebde6f",
+      "bytes": 45756
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/anchore__grype.json",
+      "sha256": "77d0a3b9fbf4d4500281e94ebf6871032b1c9c1011287468ecb2b0e1d362c592",
+      "bytes": 36887
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/anchore__syft.json",
+      "sha256": "19f7fb77ab0115fa5886f6b7e7fc1bd64844940d3e8179cbd3cf023c2c463db6",
+      "bytes": 34653
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/andrewyng__context-hub.json",
+      "sha256": "7bc64c363aaab1eb1f0b51aad13a423f36fa7941036a6c00ed489ee7cbad6a96",
+      "bytes": 37054
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/anthropics__claude-agent-sdk-python.json",
+      "sha256": "c9e156fde5ff25706a03fa1aabb020f7bb8693a8d122d093808b9bb3bcc12369",
+      "bytes": 36069
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/anthropics__claude-code-action.json",
+      "sha256": "dda093bd3c14772d6b8e12498edbc2be610b45e30c383827dd547d7c1eea7f2a",
+      "bytes": 40770
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/anthropics__claude-plugins-official.json",
+      "sha256": "e571058952dcf9f871350f14395d3671f3163e9244b8753e2b350261b60533d5",
+      "bytes": 39404
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/anthropics__sandbox-runtime.json",
+      "sha256": "3355dada97fc894142a7176b7081d0733c039eb45a8b1c064d5c7fcabb6c0a6b",
+      "bytes": 40239
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/anthropics__skills.json",
+      "sha256": "e14cf98f2bb3fccbc60d7c13f08c99c0a68b7694c1dd7c54c8758d9b24c050bd",
+      "bytes": 29338
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/apple__container.json",
+      "sha256": "83bb1fd177517a37e2ae6fff32fc68d17da7f6aebfd9a3c73f58f39af83d14c9",
+      "bytes": 37821
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/aquasecurity__trivy.json",
+      "sha256": "fa5020c87801869a854afeaed4efcc17a632b6aac33f42f7109437ea9aed1476",
+      "bytes": 42025
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/arabold__docs-mcp-server.json",
+      "sha256": "3d4f27e2a48dacc42e531839766103a68d2a7d4e0b8eb465f253d5563bed1653",
+      "bytes": 45731
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/arize-ai__phoenix.json",
+      "sha256": "0c201f525236d35594d835ca2a6f15af105568128b9822eb1ae9d1bcfca8d7ed",
+      "bytes": 46729
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/assafelovic__gpt-researcher.json",
+      "sha256": "87f1c9241eb9e45909cac521553831f5b9344bede099716f50895b3a4e998fb9",
+      "bytes": 54884
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/ast-grep__ast-grep.json",
+      "sha256": "a000e33359e1d362f11c329e735ffe4395666671a98e6dbde626ab51dc1c1984",
+      "bytes": 39655
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/astral-sh__uv.json",
+      "sha256": "4e50f35cd867a15872232e5a615bcab3ad08f923f1aab37bdcef2039fe6a9a3f",
+      "bytes": 43058
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/ataraxy-labs__sem.json",
+      "sha256": "66f029e9cb47462a40d992688a79c407b2599f061c8258589fc5c1c86f1f0e6c",
+      "bytes": 46567
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/basicmachines-co__basic-memory.json",
+      "sha256": "28c2ac025cd4afc76fe27ce3f7307a8f70344d604f77d1f8912d8a1244ceb505",
+      "bytes": 43824
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/benbjohnson__litestream.json",
+      "sha256": "94c78830dd4dcd14b9ae53093bcbbc57e454deb1dcb5ccf656c8fef70acdd43a",
+      "bytes": 34128
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/bentoml__bentoml.json",
+      "sha256": "22f9a751187fac6cf42a6eed7010e67de966851f622e302b8c09cdf7efbdc0b6",
+      "bytes": 44396
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/berriai__litellm.json",
+      "sha256": "ed77ccf01210c13fa58a894b426b70afedae4469edb8cd46cacb6aa0196b6822",
+      "bytes": 43621
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/betterleaks__betterleaks.json",
+      "sha256": "02d5037f8b0051972e6b133497ddb86c0124a5f2d4cd77d6b8a038949fece3f7",
+      "bytes": 34037
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/binwiederhier__ntfy.json",
+      "sha256": "b6d1be70ca2ce4370a2086aebd9f307ba47a021d8ddac4812e62aef574a27b06",
+      "bytes": 37300
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/boostsecurityio__poutine.json",
+      "sha256": "69644921c54795e80aab76d31e87246cf37c30b9d48ea8362793383e59d06e7e",
+      "bytes": 37705
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/boxlite-ai__boxlite.json",
+      "sha256": "1ae99d5c2fb17b3bf55797524b96e2601561690df1f7dea73869028c8db38462",
+      "bytes": 52534
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/browser-use__browser-use.json",
+      "sha256": "20648ac512979a9bf1144f31869dfd697790ce0510a3dda399a506bfa025a781",
+      "bytes": 46326
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/bytedance__deer-flow.json",
+      "sha256": "95be104140bcc2d765e144878126e7d1597076304e9d948cfe8001f884dcab4b",
+      "bytes": 47257
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/ccusage__ccusage.json",
+      "sha256": "60142a055ba83e81907c9a34cba03db2b935fb95602ff5bc8ff47cdfdc21454a",
+      "bytes": 41484
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/cli__cli.json",
+      "sha256": "c15d2dd5d7eddfb3e42fbd74ba118d029e005923e94c5608fe380f414ef5a4fd",
+      "bytes": 40376
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/colbymchenry__codegraph.json",
+      "sha256": "513660792341e0e1d301b174c00535cb37c9d4c23a4545231a923b685151b38f",
+      "bytes": 47317
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/conductor-oss__conductor.json",
+      "sha256": "2cfbfa426c51b5350f25604f1b246d661f7195661c64666cf0901484ceffaec1",
+      "bytes": 43881
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/dagster-io__dagster.json",
+      "sha256": "d2a121f35f6a5b852f0781d8291a85dd8e5f594431bc1981d15ce8f02fa94f90",
+      "bytes": 46011
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/dagucloud__dagu.json",
+      "sha256": "2365b31673d1b750552930f24c4f43489063b70d95b350433f72c6dd4bb2a6c6",
+      "bytes": 44942
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/davila7__claude-code-templates.json",
+      "sha256": "8f83144b5ce72e298eeb6a35d69e3eb01ca16806af3d064bcea1227d8a7c4ef0",
+      "bytes": 37179
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/deepset-ai__haystack.json",
+      "sha256": "7ab576ac149db34b3d9aac0971f04ceca2915bc8befb5d2c5c274aa8a2a4d516",
+      "bytes": 47082
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/dependabot__dependabot-core.json",
+      "sha256": "fb05f792c93623a6c48bfba348b234f96c1a1c165dfd1cf0e481c63a54892199",
+      "bytes": 40913
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/determinatesystems__nix-installer.json",
+      "sha256": "4a6e4ddd09dd26420448049ae6edf4c3f3055a420afba6d393628a42426b6664",
+      "bytes": 44652
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/deusdata__codebase-memory-mcp.json",
+      "sha256": "e72cdbe681badbdcc8e32cd465b5eb186950e8b2bba3b31e2eb0911e40c11653",
+      "bytes": 43539
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/devcontainers__cli.json",
+      "sha256": "a97eaa48f257ac0b19f73703c4d3ae6e9d00684a91ece51940daa05adf1405a2",
+      "bytes": 35510
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/diegosouzapw__omniroute.json",
+      "sha256": "8c7d0a2f2782fa819c1029f4f4e501a375a0fd8385cde8ef52c8e9e43a963c44",
+      "bytes": 46361
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/docker__compose.json",
+      "sha256": "76dd83b709a06a50039c6178e72ca6291fadda18c59f85fb4fd4187146e9340b",
+      "bytes": 40495
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/docling-project__docling.json",
+      "sha256": "dda093fdce525fa5a240e76b50088b86c10dec8566c424cbdfac5a9639d1aea5",
+      "bytes": 44106
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/drona23__claude-token-efficient.json",
+      "sha256": "ac308319bc3a7c0d7bd95ed421ef12a15c38639c46401ea7a7a1f521e795a1fb",
+      "bytes": 35108
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/e2b-dev__e2b.json",
+      "sha256": "0076962ecbb9a9bb3af1cf04b48eb2adc9d321f77eebdb345b418ef6695faaa8",
+      "bytes": 38779
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/exa-labs__exa-mcp-server.json",
+      "sha256": "c7f2b34c33e2c06216d61248ac674e4f79f45bd6346882e394d725e0e01c81b1",
+      "bytes": 37248
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/facebookincubator__glean.json",
+      "sha256": "7fbe95dc6a462bbabce498230505bd9ae6299d6b70e73e14f577ae471ec3414a",
+      "bytes": 43131
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/fastapi__fastapi.json",
+      "sha256": "9076cfb75476f2894bb420fd54662f48a81ac67d9f42013c99ec9de360d9e45e",
+      "bytes": 34828
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/firecrawl__firecrawl-mcp-server.json",
+      "sha256": "f30c23e566799b619308087bcbcc56704241d299912433da26121d6d425f10f3",
+      "bytes": 37608
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/getzep__graphiti.json",
+      "sha256": "1ee887d449ca979084971c8d7f682dd02df8b2ac0886ac87bde4db7160f899a9",
+      "bytes": 45336
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/ggml-org__llama.cpp.json",
+      "sha256": "1e33547c473cd1a48459fd114d050cecb27229501e337b39ac607987981cf76e",
+      "bytes": 42875
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/giancarloerra__socraticode.json",
+      "sha256": "0694229b192203e9de6f6229b7417ac1a220ca708cdaf54b7e2a5f14294cd384",
+      "bytes": 52020
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/git__git.json",
+      "sha256": "509469edd9f1af507b7e43f17bf365bd3ff19b2831d56ba81d7d3af36d3ee168",
+      "bytes": 34461
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/gitguardian__ggshield.json",
+      "sha256": "c92dc320ae4968ef76b29cca2a7cde859d255643356d786ee2584f544e3ab66c",
+      "bytes": 42075
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/github__codeql-action.json",
+      "sha256": "9017da91e058455786784eabac65affa776e455e4b032f82b0ce8c9f3ec0ce7b",
+      "bytes": 39279
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/gitleaks__gitleaks.json",
+      "sha256": "4f0875366a75451efad4a16526dbde19bdbb88967d181a2fa394cb585c05dc41",
+      "bytes": 36875
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/gnzsnz__ib-gateway-docker.json",
+      "sha256": "a9b2a51900a24d496de163effb1ca02d0cf49b9936e9d5b9eb5a39b1021fb327",
+      "bytes": 37447
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/google__gvisor.json",
+      "sha256": "b3aa751ebe98137c6cc08d972c5feb14ab63e39ccda74d0399f9cf5deb4f03fc",
+      "bytes": 58709
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/google__osv-scanner.json",
+      "sha256": "23b4b0f934e707a20ebee305f04de5a5f5e0220dbe17e491ad3e42cb9af34543",
+      "bytes": 43710
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/grafana__grafana.json",
+      "sha256": "ed7e47c201b43a6362bb658fdeac86202fcc304ff5f40387ac3cd84bac2903db",
+      "bytes": 45930
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/grafana__loki.json",
+      "sha256": "6b266581b85feb1bfe62b9bccac3ec8124baeba5113010f5f43d94fe9732d5e5",
+      "bytes": 47301
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/harbor-framework__harbor.json",
+      "sha256": "7738f192913429bb73d9a5a3bf11c0d49e21e0cee49ab875a2a417c2c300975c",
+      "bytes": 55289
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/headroomlabs-ai__headroom.json",
+      "sha256": "14dfdcfdb9e6559baa1d3c3719f8675bd6a4d725d8c34d909a6102403a809ea9",
+      "bytes": 55459
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/huggingface__huggingface_hub.json",
+      "sha256": "4f10d5a360113eade173ffbd69d76048b74a1b8c66ef3c6edeba728434260f7b",
+      "bytes": 43584
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/jarrodwatts__claude-hud.json",
+      "sha256": "51d2bfd3e5900593c3c872376c9e76c71042a56fb9b979b7f74bc88ddc4290ce",
+      "bytes": 37342
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/jdx__mise.json",
+      "sha256": "bdf763a5e30d9c92d57e950c6bb140b6eb0917a55c5636debfd066eadb3ccbbd",
+      "bytes": 40119
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/jetify-com__devbox.json",
+      "sha256": "3d4fba5258b52a03b7353fda93f3966302de6df31157241fcff1b5a4f12983eb",
+      "bytes": 42091
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/jgravelle__jcodemunch-mcp.json",
+      "sha256": "30c1c91322a4c0fc8408170e21be857c389622b6312c3b1cddcc8a9cfc3cdd19",
+      "bytes": 43845
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/kapillamba4__code-memory.json",
+      "sha256": "7d0defbd60d6ad8e51598a5fae68c2f131b1a6a2415a97ef6ff75d59c672e8b9",
+      "bytes": 35136
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/kenn-io__agentsview.json",
+      "sha256": "8739b2ceee690b48a4470a2d8d5fa64660fa0b372ac690b70a197cd64138d749",
+      "bytes": 46914
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/kjanat__actionlint.json",
+      "sha256": "495eb53b30fb543c82a9346f872c4f3460497b65544a5897c58d8de720316a5c",
+      "bytes": 38575
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/koalaman__shellcheck.json",
+      "sha256": "e5295a249f80fc3ba651e358e4fc34d6c48baec74de3c285a12c88d35eee5b48",
+      "bytes": 40714
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/lancedb__lancedb.json",
+      "sha256": "e247f05e1e51190f35c427c2b7fc57670e3a88d2cb887f0a6ec299b3afd53e39",
+      "bytes": 40041
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/langchain-ai__deepagents.json",
+      "sha256": "16e06fe81e4a8fccd3846235e60627322c3c270ab236fc3881670a6f47761ecd",
+      "bytes": 40727
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/langchain-ai__langgraph.json",
+      "sha256": "69f62a52a3e1f3f5fc5207ed48d7b1f95fc23495ce35e1a2f5973e3a38ebbe03",
+      "bytes": 46043
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/langchain-ai__langmem.json",
+      "sha256": "a8bd4359ee86768564044c03f25db4d461ecc6b725181f82b4fdc0fdff77ba1a",
+      "bytes": 33012
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/letta-ai__letta-code.json",
+      "sha256": "8132a71a3cccffa0959c5ee764b134aa10f953b04cc2692bbec0f28fb8580b15",
+      "bytes": 44325
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/letta-ai__letta.json",
+      "sha256": "f03358e199639084660483436d5c73b58fa4244b9317339721fed977072584aa",
+      "bytes": 43139
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/lightonai__next-plaid.json",
+      "sha256": "1ba49b351c5c9e179fb19afc7422ab89b0cb5891fc06fe579a16439ad152015e",
+      "bytes": 50546
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/lockedinlabs-ai__agent-console.json",
+      "sha256": "4766dc0bb9c3b577257b638d1c4e4178119535db8b5342a2ce9198455996bf8c",
+      "bytes": 49999
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/mattpocock__skills.json",
+      "sha256": "137c5e369c78fe09fad54ebc722635db04afce6635059d1be1ddef2d1b144947",
+      "bytes": 36083
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/max-sixty__worktrunk.json",
+      "sha256": "da0925945723d9ec65c8be26f33a37e772d4c51f9978bb24de75361d5b9bd40d",
+      "bytes": 46446
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/maximhq__bifrost.json",
+      "sha256": "e60e96b47cbe000d19433ea309765dc005aa040d5c778c2ca9335dd901ef97bf",
+      "bytes": 51678
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/mem0ai__mem0.json",
+      "sha256": "e3540314c92bc9f9d30e085e325db5df0fe75c203833e1e4afd197c6ac57517e",
+      "bytes": 56649
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/mempalace__mempalace.json",
+      "sha256": "1746096b9e1493a9517890ff1542a45604b27319a986e402d755f63fe22a5fcd",
+      "bytes": 46948
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/memtensor__memos.json",
+      "sha256": "973dc6295b73652ed1ceed5bfb0b43faa8b147d56449335e66ff4212b8e26f0d",
+      "bytes": 41915
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/mibayy__token-savior.json",
+      "sha256": "dc6174f2e1b3df90b1295bd7977c5658a39a8bf5786e20d0d71134ca81f7b6e5",
+      "bytes": 40606
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/microsoft__agent-framework.json",
+      "sha256": "dc978b8264e6cfd141b587de9bb4b39f78ac84a9e8deb6321c1cff4c43d56706",
+      "bytes": 53514
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/microsoft__markitdown.json",
+      "sha256": "66ac2721f1cb2bd28fa27456f4041f47f31452769249518b25927382a077b7b3",
+      "bytes": 44098
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/microsoft__pg_durable.json",
+      "sha256": "def3a7cad980e35925afa697ccede83bfd7946efb49738f2684792259e0a40e3",
+      "bytes": 40702
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/microsoft__playwright-cli.json",
+      "sha256": "918d4f1095644c3699ba58f09ddfa07a95ecd5efccfa6906c699653e05e12f87",
+      "bytes": 33399
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/microsoft__playwright.json",
+      "sha256": "dcd9fb9757b1a254246ff2d67c1692dda2dbe5f43afffd158be0f37074fac644",
+      "bytes": 45501
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/microsoft__wsl.json",
+      "sha256": "82cc3c27eea568b38d4a83dcbfb9068b7906a759e710b68c918022b62384f169",
+      "bytes": 44451
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/minishlab__semble.json",
+      "sha256": "23ee819596a1f231f2d2a8b5ffec0d092bdce5dff42ad725e3ba27823e29c0de",
+      "bytes": 40233
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/mksglu__context-mode.json",
+      "sha256": "433181864b451798e5a743eafdb4eab0ff65847b733ed6b34ec5d106502d39c0",
+      "bytes": 43322
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/mlflow__mlflow.json",
+      "sha256": "d053f5d3d54b6835e4b74a7341619d7f94d809e032ed2bdcce14edc292aedfa8",
+      "bytes": 48544
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/moby__moby.json",
+      "sha256": "7495942b8e82fe57412dc08d08957f7edde80b0737ddb20e2a97671fe1e28dae",
+      "bytes": 53841
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/modal-labs__modal-client.json",
+      "sha256": "7dcf816a4bb5f28dbaccd8d1611eb63583fb823ad227fa5f489452630d93064c",
+      "bytes": 37546
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/modelcontextprotocol__inspector.json",
+      "sha256": "8afb275d1374e41f53c3840685b4617f97f582c9bac99e9f388e6dbfcf7ce25d",
+      "bytes": 46544
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/musistudio__claude-code-router.json",
+      "sha256": "1029b00e84ed2d78bb70f80a30e93ae099ffd254e060ddff21af7f595a8da226",
+      "bytes": 45809
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/ojuschugh1__sqz.json",
+      "sha256": "87fbaaf46b99acb0a721becc2bda9fd94b03e24e9ab580f920b12c7af1edad7d",
+      "bytes": 42279
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/ollama__ollama.json",
+      "sha256": "7d047a742e6701da3abb950ae4d52dbead7bed1857c2bea2db0bfb6d87f89885",
+      "bytes": 38524
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/open-telemetry__opentelemetry-collector-contrib.json",
+      "sha256": "d04e61706dcf3c928e6a132a2453c8c6bd6d895debfd89117aa13c7b26a685ca",
+      "bytes": 44653
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/openai__codex-plugin-cc.json",
+      "sha256": "7150d839249b546f583571deb11bbceeba38e5bdac68b94040d0c7bbb11277ad",
+      "bytes": 37498
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/openai__codex.json",
+      "sha256": "4c9b72762c60a88ee1fcd5ae61ac5434dc05561548476a75a18b52b54bffbcf5",
+      "bytes": 36610
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/openai__openai-agents-python.json",
+      "sha256": "8e0be95103185f9016ed09e3e75032190a9431140b4b2f15f06a2868f676aa35",
+      "bytes": 41057
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/openai__skills.json",
+      "sha256": "a0749d77720bb6214e01c38fa1f2986f548acaef7d28f8f57747277d8444e517",
+      "bytes": 46869
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/openbao__openbao.json",
+      "sha256": "48c773f7c925c6b41c7da627499b05e1ba241c9f273e3b93e3316a71a42d88b8",
+      "bytes": 41609
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/opendatalab__mineru.json",
+      "sha256": "425b7331430c9ecafb190f397b44a8daafcf77099ddad8c84927e8a7340ddeeb",
+      "bytes": 45989
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/openhands__software-agent-sdk.json",
+      "sha256": "2a7969f0bc3461a81d4cea7edd438ca6bdb7eb27bbd608aee6749b278d5f4eb1",
+      "bytes": 49305
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/openlit__openlit.json",
+      "sha256": "4afe6cf1c214f6d2f0399b048ee7c0c3c1d8613db2991748c22dc9c08b0c5f8f",
+      "bytes": 42450
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/oraios__serena.json",
+      "sha256": "ff06abfc494351fa45d1e06163873f6eabcffbdc82deb5fa309451f5e6299723",
+      "bytes": 64239
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/page_arch-linux-wsl-distribution.json",
+      "sha256": "081bb2eb445a89cd6d5cab262c3d3b725b594e8ea7c9621e58df2e349a3aaddd",
+      "bytes": 22498
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/page_debian-13-wsl-distribution.json",
+      "sha256": "f5eee15000b4808b369daf5e903053ad90febc7f0a036149683f00806711c79e",
+      "bytes": 34935
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/page_fedora-wsl-distribution.json",
+      "sha256": "cafc74c97dea9bb3a5a95a88cbf0fea9ede76a688c1712da37630d5f77191ebe",
+      "bytes": 19863
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/page_nvidia-nemotron-3-embed-1b-bf16-embedding-model.json",
+      "sha256": "99d1196a0c1a9584b6be11a648082c0c5749043754034fc4a555ab73bb170fc7",
+      "bytes": 38506
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/page_ubuntu-24-04-5-lts-canonical-wsl-image.json",
+      "sha256": "63801ea0fdcd920e29123b10282124181ac12790aadacd6c3db59adb156c10bd",
+      "bytes": 31376
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/page_ubuntu-26-04-1-lts-canonical-wsl-image.json",
+      "sha256": "7aac907bd22c98c19af3acfaf2a2801178931f07b442a18ec030e312743c0d09",
+      "bytes": 28863
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/paritok-official__paritok-4b-v1.json",
+      "sha256": "6a5c1d0728598c1852a300c60c666abaed3361dc42686df201ed0eda5ab7f0d8",
+      "bytes": 48765
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/pgvector__pgvector.json",
+      "sha256": "c72556cc303bffac64c1ca069ae0eb992ff99d3aecc2d1f664f1cbf4bb0c3b3c",
+      "bytes": 37081
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/podman-container-tools__podman.json",
+      "sha256": "89d520c4e84778b7d054419f8a5b4abfcd5642166d3ba269d223244f3072e3cc",
+      "bytes": 41892
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/portkey-ai__gateway.json",
+      "sha256": "7bea524e60182674f91d0bb3cbddc91dcf797cb3a0e4995c48f17a60e7f28e4a",
+      "bytes": 35070
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/postgres__postgres.json",
+      "sha256": "8f1caf67095316356e319fafac2ad50b9a0413e3918e2c3e9acdb86efd7d0b86",
+      "bytes": 37601
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/praetorian-inc__noseyparker.json",
+      "sha256": "7bca4fabec677a035201e3297d6f7d2d4f33420aa7e278c5c7e2b1949a94f34d",
+      "bytes": 40692
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/prefecthq__prefect.json",
+      "sha256": "d09ec6b3c9f391f48c1787d9416a1235c9f77c7592a6234ca8c8ceb034714931",
+      "bytes": 42279
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/prometheus__alertmanager.json",
+      "sha256": "26249917d49ce0e02851d84947cfd04ff3535704f1eb926c38c4e612fe541be4",
+      "bytes": 37680
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/prometheus__prometheus.json",
+      "sha256": "0621708c0f1faccb2020e1bd1c8003969db98606ca25762a2176c70bdeccc445",
+      "bytes": 41900
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/promptfoo__promptfoo.json",
+      "sha256": "7414cb419f53dbf1ad25b740223ec3ba32945ca4ce656b167e89eaee12ed273c",
+      "bytes": 47085
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/qdrant__qdrant.json",
+      "sha256": "314d05a527c2487d13b2dc25fd0cb61e5e77e95c2c6d19a139e222b36c0abaeb",
+      "bytes": 41608
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/react__react.json",
+      "sha256": "f5cfeca7db44e23b96439b3ff6d5f33c834416615befa834290217c08c439e61",
+      "bytes": 42115
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/restatedev__restate.json",
+      "sha256": "4b0fe40161c870ca9a9cbf2f9bd8b99eac052afa712e19c15005da079ae38a19",
+      "bytes": 46675
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/restic__restic.json",
+      "sha256": "d8f343c51b667424d4a428770813dac6c8fd7390232576e33234d4f9033360e1",
+      "bytes": 41895
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/rhysd__actionlint.json",
+      "sha256": "465dd95baf2da5c67d2e613d8031a61dd009fa41c678870eeba81c2aec3b0caa",
+      "bytes": 39804
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/rohitg00__agentmemory.json",
+      "sha256": "0a42baaf065cc4b17db4598a64d349553ddacf386d501a037c8d67146a03487f",
+      "bytes": 48459
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/rtk-ai__rtk.json",
+      "sha256": "eca236ff452e1e8216dbdfd36a46e696947e572685cdfe73b21df57e9a3942ce",
+      "bytes": 42604
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/run-llama__llama_index.json",
+      "sha256": "c5cf393594c823d2c15bc8ab368cd4b7d199db6b8939cffe3032f070de6aba85",
+      "bytes": 48290
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/scip-code__scip.json",
+      "sha256": "af3449409be3c737416127d800373973b649b2ce04ef38bd1b0501657f1c4808",
+      "bytes": 51407
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/sgl-project__sglang.json",
+      "sha256": "9aac1d8299a7061a96e41d58c0f84311f85e48d602542962067d262a1462a3d7",
+      "bytes": 48471
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/shanraisshan__claude-code-best-practice.json",
+      "sha256": "b0848d2e838c628bafb315db84419f3a22d687cc746bac0e1e356711e9a2d12e",
+      "bytes": 34228
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/supermemoryai__supermemory.json",
+      "sha256": "e7c8c6f0bb3ff235a727de13ecb75578ccd8832865ff2893ba90464bc571acd1",
+      "bytes": 44452
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/superradcompany__microsandbox.json",
+      "sha256": "99ec1016e1ce5db2f7a63bbe3d5395854bcf6b6958feed33dadc320242e90e38",
+      "bytes": 42471
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/swe-agent__mini-swe-agent.json",
+      "sha256": "84dd4bf7a3eb5d89dcd419ffd4a7790d093e9bb29e39592d74a8d02cdb149786",
+      "bytes": 39888
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/systemd__systemd.json",
+      "sha256": "3620fe27ca634864834cc6dcba99bb2005c0639a81d47329a2eaa7360a976c2c",
+      "bytes": 41253
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/tavily-ai__tavily-cli.json",
+      "sha256": "e6a5b207762924e8f4340155b302e0d2c1786a20cd0d5de7d63a147601701708",
+      "bytes": 34693
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/temporalio__temporal.json",
+      "sha256": "21778570c76dfda326bc7f653d524964d31fbb53fe6f5f333f105d67dafd1b9a",
+      "bytes": 42385
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/thedotmack__claude-mem.json",
+      "sha256": "5f06cf78de8feb62e76c7abb5aa57053f2bd466d4c722fda95a828acac63858f",
+      "bytes": 49807
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/tigerless-labs__agent-memory.json",
+      "sha256": "ce026f214621fda044b6b4a787bf4a3d82f4fdc2445a3c0cad87b4f58a6e2df1",
+      "bytes": 46740
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/tobi__qmd.json",
+      "sha256": "b146a80afe4c77b6797770174b4cb82db7726b1c30588374e59515ec68266078",
+      "bytes": 39833
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/toon-format__toon.json",
+      "sha256": "20b2a0b6a957352f1b95c5a7a7b68287be88dcdf68f1ef124071393008f9995d",
+      "bytes": 40479
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/topoteretes__cognee.json",
+      "sha256": "edfc662a0d34cc054bedeef4be8c049ffe06e3acbb8a7215b3ded33be72b500f",
+      "bytes": 38311
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/trailofbits__skills.json",
+      "sha256": "37bc2816afa3c9bf76c452abd2b547e933a3b9167a5de4a5264a711269f86081",
+      "bytes": 39239
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/trufflesecurity__trufflehog.json",
+      "sha256": "d78d3e57c1ec8119bf732494ec7ee0de9769c71a3b4f404ebd19c1dcb3f0f46c",
+      "bytes": 41313
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/trycua__cua.json",
+      "sha256": "77e5e06806fd1954a826b15a95c3ffa0de974cdd2b954f32e139035025a868aa",
+      "bytes": 49718
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/tsdgeos__poppler_mirror.json",
+      "sha256": "cc62577c1fa6ee58fdb7fffe8f977599b08212399f2577060797e79944f3a042",
+      "bytes": 38228
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/twpayne__chezmoi.json",
+      "sha256": "b1271a1029229c6a5296e6218d551ea0c7d39889ab3ea7c5b76c06e8df3afd31",
+      "bytes": 47354
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/typesafe-ai__skills.json",
+      "sha256": "fec389903ab4b9abff5e635662644672e2cd85c770b1917a1707fada8d04ab08",
+      "bytes": 24398
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/ukgovernmentbeis__inspect_ai.json",
+      "sha256": "04021479c35ffc332ca8ff492165ebb6be3842032c45443fff4f6a5eff690f9f",
+      "bytes": 44236
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/unclecode__crawl4ai.json",
+      "sha256": "f1ef52ab1787c16f13b9cd438b1247b61ee5c7127832713d5ce821d7ba18d4ea",
+      "bytes": 52333
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/vectifyai__pageindex.json",
+      "sha256": "c74bff62928fe5c5b6f856246c1caaf2bb02dbd15fb8fc3ac0dea8759aa5480a",
+      "bytes": 41102
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/vectorize-io__hindsight.json",
+      "sha256": "ac3d6e476086c81ca33b112cc619f299bd436b5fafdca73f51f4fbedfd3321f0",
+      "bytes": 35067
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/vercel-labs__agent-browser.json",
+      "sha256": "3ef90c02fae61df1772cefa0f139b2b0d6a2fc10e401fe20e3b3b7f4b3815772",
+      "bytes": 42333
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/vercel-labs__agent-skills.json",
+      "sha256": "5b00693d8a6013a8c85a1c2d539a13511881a58bb3a112a35902ac13e8e39dfd",
+      "bytes": 38704
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/vercel__next.js.json",
+      "sha256": "80c4a97b1bc8c480ab810a64a7e5ee18cbf1b8fb5ff39271605aa3eb9e1fe207",
+      "bytes": 45286
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/vllm-project__vllm.json",
+      "sha256": "9fcb8de2f0206785bb21084c7f2377f3e9393a31061094668b64f350e678ac81",
+      "bytes": 46147
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/volcengine__openviking.json",
+      "sha256": "7b734eb7c1dced6f7ed44a9ad8e7fe2eeef0f49538db095d828333ffe5d5aa32",
+      "bytes": 47467
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/voltagent__awesome-claude-code-subagents.json",
+      "sha256": "9365da1b3ba14b00c93eab381dfc072bb05b1db13f29d35e60c6d58e5d39bb64",
+      "bytes": 33913
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/vshulcz__deja-vu.json",
+      "sha256": "4309416f69cc71e7232eaa9670549c981572964454137e20bb76946ab0715034",
+      "bytes": 43353
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/wilfred__difftastic.json",
+      "sha256": "de81b59eaf54e92661492f19e3e0d4f98073c1d085cb41ac4109eb22d1066b14",
+      "bytes": 37772
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/yamadashy__repomix.json",
+      "sha256": "6f510981505253b36a1c3b0a28bbd2773e80785c607a87852ee24ab9c7792c35",
+      "bytes": 40795
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/ymtdzzz__otel-tui.json",
+      "sha256": "4f8b65ceceb7f8ee5d1bbe64568007ec1613435a88dab70a80db811c88c2556c",
+      "bytes": 28639
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/zizmorcore__zizmor.json",
+      "sha256": "e70d711360f76cab3cc4b85868b13d93a13533fe4b520997d5b631e0f5e2b907",
+      "bytes": 27619
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/freeze.py",
+      "sha256": "894b938d245683aa79505f6d45cf4e426a90f21a6fcefda6a7979749c083fbcc",
+      "bytes": 4947
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/preregistration-amendment-1.json",
+      "sha256": "fdd7640cfb9436410c5627c596103d026aa31cf662a78922771ca20ef4518404",
+      "bytes": 2022
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/preregistration-amendment-2.json",
+      "sha256": "68c275c7b6f4e05b23aae7a7ab75f1739d25d4bd9b21f438e201c2f13bc1f375",
+      "bytes": 13891
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/preregistration-amendment-3.json",
+      "sha256": "bef2662232e81d900e6e84a282335ad0d8ce899af157e863d42551f5e4811bd5",
+      "bytes": 2566
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/preregistration-amendment-4.json",
+      "sha256": "f0b92cb868f6577fae6592748c4ff040ebc6e0e2089c2ee245416e38ab990c1d",
+      "bytes": 2149
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/preregistration-amendment-5.json",
+      "sha256": "1b6871f886e411a9bf19579ebc29e9743e8a12ca2e1263a31d4e9f000d85c3a2",
+      "bytes": 2906
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/preregistration.json",
+      "sha256": "9d7e0a92e07c0f5d82191a08c94c0fd59cc67115b0720e1569f3a68caff7d8a6",
+      "bytes": 3044
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/reverify.py",
+      "sha256": "3021460e6bd76dac66d58e50730b21534b1bfdb43019d9d6448346242d5fb538",
+      "bytes": 5343
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/run-notes.json",
+      "sha256": "a17476819e5175bddc292bc8b30b88d0d1a02365232c68a8f931bcad2bfd0ff6",
+      "bytes": 9094
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/run-record.json",
+      "sha256": "a2c85f85bff8f2904bca7f0b010fc98db1dda8a49fab78a6b2293f03a84f01db",
+      "bytes": 1286462
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/run_round.py",
+      "sha256": "733112de3f739dfb2c9a17258a3b1835c40a17ae80a589f69996599e4ecc5d00",
+      "bytes": 28241
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/selection.json",
+      "sha256": "12a73f724d4c8689ec240743df9a0f6ede80353d6553cfec55c610bbc0eaa55a",
+      "bytes": 61730
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/units.json",
+      "sha256": "17ff807e97cb22f72fab6cde0cfd7a4acf2ae857b6516d2cd15ff37eeba64cfd",
+      "bytes": 79054
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/verify-prompt.txt",
+      "sha256": "f9248448b4d0f17b5722cdf6a20ba0de422da521b845f1eae927de7d609fee23",
+      "bytes": 748
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-round-20261002/verify-schema.json",
+      "sha256": "80692572a3e567701d8e694494e2946571b29fe8e434de78e6a6ab64462950a0",
+      "bytes": 671
+    },
+    {
       "path": "evidence/artifacts/new-wsl-dual-image-20261001/receipt.json",
       "sha256": "a591594fd223b81d60597ebbaeb9a3e55a3b36d97646756a0c540fc7394a7d97",
       "bytes": 3558
@@ -50651,8 +51711,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
-      "bytes": 55711
+      "sha256": "c7923ce3f3251a1b2e7c63dab4ea5cc9f29b8fe8d3f33adddcca79897a479d63",
+      "bytes": 56544
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
