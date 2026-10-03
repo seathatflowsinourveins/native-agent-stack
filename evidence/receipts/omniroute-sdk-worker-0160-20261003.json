@@ -2895,5 +2895,17 @@
         "index_scope": "real checkout index"
       }
     }
+  },
+  "coordinator_shell_observation_final_bytes": {
+    "attribution": "Separate coordinator Bash observation on the final B3 bytes (Claude session native-agent-stack-0c); not a builder run",
+    "candidate_phase": "after-B3-repair (head 33aef763)",
+    "observation_artifact": {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation-final-bytes.json",
+      "sha256": "147ba86f3aa68354193872213065e81a6162896a01e684cc1038b2a53d002f08"
+    },
+    "source_artifact_sha256_equals_current_source_closure": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
+    "backend_effort": "unobserved",
+    "native_result_review_scope": "Hash and sanitized fields copied from the run's own stdout and native result; the private native result stays outside the repository",
+    "scope_note": "coordinator_shell_observation and live_task stay bound to the before-B2 worker (3aa19fa7…); this entry is the final-byte native observation. B2 and B3 builder checks are local fixtures and preflight (native_model_tasks_started 0)."
   }
 }
