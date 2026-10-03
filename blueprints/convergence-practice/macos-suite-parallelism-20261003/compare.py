@@ -31,6 +31,7 @@ import re
 import shlex
 import statistics
 import sys
+from fractions import Fraction
 from pathlib import Path
 
 SCHEMA = "suite-parallelism-oracle/1"
@@ -75,25 +76,59 @@ RUN_DIR_RE = re.compile(
     r"^(?P<os>macos-15|ubuntu-24\.04)-(?P<arm>[A-Za-z0-9]+)-"
     r"(?:r(?P<rep>[1-9][0-9]*)|(?P<kind>controls|crash)(?:-r(?P<krep>[1-9][0-9]*))?)$")
 
-# The preregistered arms (README.md, "Arms"). Baseline arm per OS is S.
+# The preregistered arms (README.md, "Arms"). Baseline arm per OS is S. "command" is the arm's exact command,
+# token for token: the workflow's `set --` words, which it records in command.txt as "$*" before any time limit
+# wraps them. Any other token (an interpreter flag such as -X or -O, a wrapper such as coverage run or timeout, a
+# reordering or an extra argument) makes the run ineligible; S alone may append "--durations N" (DURATIONS).
+_SERIAL = ("python3", "-m", "unittest", "-v")
 ARMS = {
     "macos-15": {
-        "S": {"runner": "unittest"},
-        "P3": {"runner": "unittest_parallel", "jobs": 3, "level": "module", "pooling": True},
-        "P3F": {"runner": "unittest_parallel", "jobs": 3, "level": "module", "pooling": False},
-        "P3C": {"runner": "unittest_parallel", "jobs": 3, "level": "class", "pooling": True},
-        "P4": {"runner": "unittest_parallel", "jobs": 4, "level": "module", "pooling": True},
+        "S": {"runner": "unittest", "command": _SERIAL},
+        "P3": {"runner": "unittest_parallel", "jobs": 3, "level": "module", "pooling": True,
+               "command": ("python3", "-m", "unittest_parallel", "-j", "3", "--level", "module", "-v")},
+        "P3F": {"runner": "unittest_parallel", "jobs": 3, "level": "module", "pooling": False,
+                "command": ("python3", "-m", "unittest_parallel", "-j", "3", "--level", "module",
+                            "--disable-process-pooling", "-v")},
+        "P3C": {"runner": "unittest_parallel", "jobs": 3, "level": "class", "pooling": True,
+                "command": ("python3", "-m", "unittest_parallel", "-j", "3", "--level", "class", "-v")},
+        "P4": {"runner": "unittest_parallel", "jobs": 4, "level": "module", "pooling": True,
+               "command": ("python3", "-m", "unittest_parallel", "-j", "4", "--level", "module", "-v")},
     },
     "ubuntu-24.04": {
-        "S": {"runner": "unittest"},
-        "L4": {"runner": "unittest_parallel", "jobs": 4, "level": "module", "pooling": True},
-        "L4F": {"runner": "unittest_parallel", "jobs": 4, "level": "module", "pooling": False},
-        "L4C": {"runner": "unittest_parallel", "jobs": 4, "level": "class", "pooling": True},
+        "S": {"runner": "unittest", "command": _SERIAL},
+        "L4": {"runner": "unittest_parallel", "jobs": 4, "level": "module", "pooling": True,
+               "command": ("python3", "-m", "unittest_parallel", "-j", "4", "--level", "module", "-v")},
+        "L4F": {"runner": "unittest_parallel", "jobs": 4, "level": "module", "pooling": False,
+                "command": ("python3", "-m", "unittest_parallel", "-j", "4", "--level", "module",
+                            "--disable-process-pooling", "-v")},
+        "L4C": {"runner": "unittest_parallel", "jobs": 4, "level": "class", "pooling": True,
+                "command": ("python3", "-m", "unittest_parallel", "-j", "4", "--level", "class", "-v")},
     },
 }
+# The plan's S diagnostic: the workflow appends "--durations 25" (CPY main.py:184 at v3.12.3 defines
+# "--durations N"); a positive count after the exact S command is the only extra any arm may carry.
+DURATIONS = re.compile(r"[1-9][0-9]*")
 # The plan's preference: the unpooled variant wins when its median is within 10% of the pooled arm.
 UNPOOLED_OF = {"P3": "P3F", "L4": "L4F"}
 RULE = {"median_ratio_max": 0.60, "max_ratio_max": 0.75, "unpooled_within": 1.10, "min_repeats": 3}
+# The same thresholds as exact rationals. The rule compares the exact ratios of the recorded step_seconds with
+# these (no rounding before the comparison); result.json rounds the ratios for display only.
+EXACT_RULE = {"median_ratio_max": Fraction("0.60"), "max_ratio_max": Fraction("0.75"),
+              "unpooled_within": Fraction("1.10")}
+# B1 (experiment.json task_and_failure): at base 56473e4b, tests/test_native_maintenance.py loaded these six
+# TestCase classes inside load_tests under bare module names; the trial head loads them as child modules of the
+# wrapper. ids.py on 56473e4b lists 29 ids for them (6 + 7 + 2 + 2 + 2 + 10, in this order), and the inventories may
+# differ by nothing but this prefix on exactly those 29 ids.
+B1_PREFIX = "tests.test_native_maintenance."
+B1_CLASSES = (
+    "memory_patch_evidence_tests.EvidenceTests",
+    "memory_patch_evidence_tests.FunctionalFactsTests",
+    "application_portability_tests.MakeBoundaryTests",
+    "application_portability_tests.RecipeHistoryTests",
+    "application_portability_tests.RestartPortTests",
+    "wsl_transport_evidence_tests.TransportEvidenceTests",
+)
+B1_IDS = 29
 META_FIELDS = ("os", "arm", "repeat", "command", "python_version", "platform", "runner_image",
                "checkout_sha", "step_seconds")
 LIST_CAP = 200
@@ -781,17 +816,43 @@ def load_inventory(path: Path) -> list:
     return ids
 
 
-def check_id_mapping(base: list, trial: list, expected_classes: int = 6) -> dict:
-    """Base and trial inventories must differ only by a dotted prefix added to the ids of the
-    tests/test_native_maintenance.py load_tests classes, and that rewrite must be a bijection."""
+def check_id_mapping(base: list, trial: list, classes: tuple = B1_CLASSES, prefix: str = B1_PREFIX,
+                     expected_ids: int = B1_IDS) -> dict:
+    """The base and trial inventories may differ only by the B1 rewrite: the single prefix B1_PREFIX on exactly
+    the base ids of the six B1_CLASSES, of which the base inventory must hold B1_IDS, as a bijection. Anything else
+    (a partial rewrite, another prefix, identical inventories, any other id) sets ok to false, and build_result then
+    gives every OS no verdict (experiment.json quality_rule, ID MAPPING)."""
     base_only = sorted(set(base) - set(trial))
     trial_only = sorted(set(trial) - set(base))
+    rewritten = sorted(item for item in base if item.rsplit(".", 1)[0] in classes)
     report = {"base_count": len(base), "trial_count": len(trial), "base_only": len(base_only),
-              "trial_only": len(trial_only), "mapped": 0, "prefixes": {}, "classes": [], "problems": []}
-    if not base_only and not trial_only:
-        report["ok"] = True
-        report["note"] = "identical inventories: no id was rewritten"
-        return report
+              "trial_only": len(trial_only), "expected_prefix": prefix, "expected_ids": expected_ids,
+              "base_ids_of_the_classes": len(rewritten), "mapped": 0, "prefixes": {}, "classes": [], "problems": []}
+    # The preregistered rewrite itself: exactly these ids leave the base and exactly their prefixed forms arrive.
+    if len(rewritten) != expected_ids:
+        report["problems"].append(f"the base inventory holds {len(rewritten)} ids of the six B1 classes; "
+                                  f"the preregistration names {expected_ids}")
+    absent = [name for name in classes if not any(item.rsplit(".", 1)[0] == name for item in rewritten)]
+    if absent:
+        report["problems"].append(f"B1 classes without a base id: {_cap(absent)}")
+    left_bare = sorted(set(rewritten) - set(base_only))
+    if left_bare:
+        report["problems"].append(f"{len(left_bare)} of the {len(rewritten)} B1 base ids are not rewritten in the "
+                                  f"trial: {_cap(left_bare)}")
+    other_base = sorted(set(base_only) - set(rewritten))
+    if other_base:
+        report["problems"].append(f"{len(other_base)} base ids outside the B1 classes are missing from the trial: "
+                                  f"{_cap(other_base)}")
+    wanted = {prefix + item for item in rewritten}
+    other_trial = sorted(set(trial_only) - wanted)
+    if other_trial:
+        report["problems"].append(f"{len(other_trial)} trial ids are not {prefix!r} plus a B1 base id: "
+                                  f"{_cap(other_trial)}")
+    missing_target = sorted(wanted - set(trial))
+    if missing_target:
+        report["problems"].append(f"{len(missing_target)} prefixed B1 ids are missing from the trial: "
+                                  f"{_cap(missing_target)}")
+    # Diagnostics: how the trial actually renamed the base-only ids (one target per id, one prefix per module).
     by_suffix = collections.defaultdict(list)
     for item in trial_only:
         parts = item.split(".")
@@ -814,32 +875,39 @@ def check_id_mapping(base: list, trial: list, expected_classes: int = 6) -> dict
     for module, found in prefixes.items():
         if len(found) != 1:
             report["problems"].append(f"{module}: rewritten with {len(found)} different prefixes")
+        elif found != {prefix[:-1]}:
+            report["problems"].append(f"{module}: rewritten with the prefix {sorted(found)[0]!r}, "
+                                      f"not {prefix[:-1]!r}")
     report["mapped"] = len(mapping)
     report["prefixes"] = {module: sorted(found) for module, found in sorted(prefixes.items())}
     report["classes"] = sorted({item.rsplit(".", 1)[0] for item in mapping})
-    if len(report["classes"]) != expected_classes:
-        report["problems"].append(f"{len(report['classes'])} classes rewritten; the preregistration names {expected_classes}")
+    if sorted(report["classes"]) != sorted(classes):
+        report["problems"].append(f"{len(report['classes'])} classes rewritten; the preregistration names the "
+                                  f"{len(classes)} B1 classes")
     report["ok"] = not report["problems"]
     report["problems"] = report["problems"][:LIST_CAP]
     return report
 
 
 def parse_command(command: str):
-    """The arm a command line runs: {"runner", "jobs", "level", "pooling", "verbose", "extra"}."""
+    """How a command line reads, for diagnostics only (command_problems decides by exact tokens):
+    {"runner", "before", "jobs", "level", "pooling", "verbose", "extra"}; "before" holds the tokens before the
+    runner other than the interpreter python3 and its -m."""
     try:
         tokens = shlex.split(command)
     except ValueError:
         return None
     for index, token in enumerate(tokens):
         if token == "-m" and index + 1 < len(tokens) and tokens[index + 1] in ("unittest", "unittest_parallel"):
-            runner, args = tokens[index + 1], tokens[index + 2:]
+            runner, args, before = tokens[index + 1], tokens[index + 2:], tokens[:index]
             break
         if Path(token).name == "unittest-parallel":
-            runner, args = "unittest_parallel", tokens[index + 1:]
+            runner, args, before = "unittest_parallel", tokens[index + 1:], tokens[:index + 1]
             break
     else:
         return None
-    spec = {"runner": runner, "verbose": False, "extra": []}
+    before = before[1:] if before[:1] == ["python3"] else before
+    spec = {"runner": runner, "before": before, "verbose": False, "extra": []}
     if runner == "unittest_parallel":
         spec.update({"jobs": None, "level": "module", "pooling": True})
     position = 0
@@ -867,16 +935,39 @@ def parse_command(command: str):
     return spec
 
 
+def command_matches(tokens: list, arm_spec: dict) -> bool:
+    """Whether the tokens are the arm's preregistered command exactly; S may append "--durations N"."""
+    expected = list(arm_spec["command"])
+    if tokens == expected:
+        return True
+    return (arm_spec["runner"] == "unittest" and len(tokens) == len(expected) + 2
+            and tokens[:len(expected)] == expected and tokens[-2] == "--durations"
+            and DURATIONS.fullmatch(tokens[-1]) is not None)
+
+
 def command_problems(command, arm_spec: dict) -> list:
+    """[] when meta.json's command is the arm's preregistered command token for token (ARMS "command"; S may append
+    "--durations N"); otherwise the mismatch first, then how the command reads (parse_command)."""
     if not isinstance(command, str) or not command.strip():
         return ["meta.json command is missing"]
+    try:
+        tokens = shlex.split(command)
+    except ValueError:
+        tokens = None
+    if tokens is not None and command_matches(tokens, arm_spec):
+        return []
+    allowed = " (optionally followed by --durations N)" if arm_spec["runner"] == "unittest" else ""
+    problems = [f"command {command!r} is not the arm's preregistered command "
+                f"{' '.join(arm_spec['command'])!r}{allowed}"]
     spec = parse_command(command)
     if spec is None:
-        return [f"command {command!r} runs neither python3 -m unittest nor unittest_parallel"]
-    problems = []
+        problems.append(f"command {command!r} runs neither python3 -m unittest nor unittest_parallel")
+        return problems
     if spec["runner"] != arm_spec["runner"]:
         problems.append(f"command runs {spec['runner']}, the arm needs {arm_spec['runner']}")
         return problems
+    if spec["before"]:
+        problems.append(f"command has tokens before the runner (a wrapper or interpreter flags): {spec['before']}")
     if not spec["verbose"]:
         problems.append("command lacks -v: per-test result lines are required")
     if spec["extra"]:
@@ -913,6 +1004,46 @@ def read_run_dir(path: Path) -> tuple:
     except (OSError, ValueError):
         problems.append("meta.json is missing or not JSON")
     return log, exit_code, meta, problems
+
+
+def read_checkout_status(path: Path) -> tuple:
+    """(git-status.txt text or None, problems). ORACLE PART 2 (experiment.json quality_rule): after every run the
+    workflow records `git status --porcelain=v1 --untracked-files=all` of the checkout in git-status.txt, or the text
+    "git status failed". The file must exist and be empty; a dirty or unrecorded run is ineligible. This applies to
+    every run directory, the control runs included, and the workflow's clean-checkout step repeats the check."""
+    try:
+        status = (path / "git-status.txt").read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None, ["git-status.txt is missing: the checkout status after the run is unrecorded"]
+    if status == "":
+        return status, []
+    if status.strip() == "git status failed":
+        return status, ["git-status.txt says git status failed: the checkout status after the run is unrecorded"]
+    lines = status.splitlines() or [repr(status)]
+    return status, [f"the checkout was not clean after the run (git-status.txt holds {len(lines)} line(s): "
+                    f"{_cap(lines)})"]
+
+
+def read_run_attempt(path: Path) -> tuple:
+    """(run attempt or None, problems). The workflow records GITHUB_RUN_ATTEMPT (github.run_attempt: 1 for a run's
+    first attempt, one more for each re-run) in runtime.json for every run directory. A job re-run voids the run
+    (experiment.json), so an attempt above 1, or none recorded, makes the run ineligible (fail-closed)."""
+    try:
+        runtime = json.loads((path / "runtime.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None, ["runtime.json is missing or not JSON: the run attempt is unrecorded"]
+    raw = runtime.get("run_attempt") if isinstance(runtime, dict) else None
+    attempt = None
+    if isinstance(raw, str) and re.fullmatch(r"[0-9]+", raw):
+        attempt = int(raw)
+    elif isinstance(raw, int) and not isinstance(raw, bool):
+        attempt = raw
+    if attempt is None or attempt < 1:
+        return None, [f"runtime.json run_attempt {raw!r} is not a recorded attempt: the run attempt is unrecorded"]
+    if attempt > 1:
+        return attempt, [f"run_attempt {attempt}: a job re-run voids this run (reported as a failed attempt; the "
+                         "trial is repeated by a new synchronize of the draft pull request, never by a re-run)"]
+    return attempt, []
 
 
 def meta_problems(meta, os_name: str, arm: str, repeat: int, kind: str = "arm") -> list:
@@ -969,6 +1100,8 @@ class Run:
     missing_ids: list = dataclasses.field(default_factory=list)
     extra_ids: list = dataclasses.field(default_factory=list)
     count_deltas: dict = dataclasses.field(default_factory=dict)  # arm minus the first eligible S run
+    checkout_status: str | None = None  # git-status.txt, "" when clean, None when missing
+    run_attempt: int | None = None  # runtime.json run_attempt, None when unrecorded
 
     @property
     def seconds(self):
@@ -990,6 +1123,9 @@ def load_runs(results: Path) -> tuple:
         repeat = int(match.group("rep") or match.group("krep") or 1)
         run = Run(entry.name, match.group("os"), match.group("arm"), kind, repeat)
         log, run.exit_code, run.meta, run.problems = read_run_dir(entry)
+        run.checkout_status, status_problems = read_checkout_status(entry)
+        run.run_attempt, attempt_problems = read_run_attempt(entry)
+        run.problems.extend(status_problems + attempt_problems)
         arm_spec = ARMS[run.os].get(run.arm)
         if arm_spec is None:
             run.problems.append(f"arm {run.arm} is not preregistered for {run.os}")
@@ -1151,17 +1287,33 @@ def timing(values: list) -> dict | None:
     return {"median": statistics.median(values), "min": min(values), "max": max(values), "n": len(values)}
 
 
+def exact_median(values: list) -> Fraction:
+    """The median as an exact rational of the recorded values (whole seconds in the workflow; a float counts at its
+    exact binary value), so that no rule compares a rounded or float-divided number."""
+    ordered = sorted(Fraction(value) for value in values)
+    middle = len(ordered) // 2
+    return ordered[middle] if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+
+
+def ratio_text(value: Fraction) -> str:
+    return f"{value.numerator}/{value.denominator}"
+
+
 def verdict_for_os(os_name: str, runs: list, controls: dict, min_repeats: int) -> dict:
     arm_runs = [run for run in runs if run.kind == "arm"]
     s_runs = [run for run in arm_runs if run.arm == "S" and not run.problems]
     s_times = [run.seconds for run in s_runs if run.seconds is not None]
     s_timing = timing(s_times)
+    s_exact = (exact_median(s_times), min(Fraction(value) for value in s_times)) if s_times else None
+    medians = {}  # exact medians: the speed rule, the fastest-arm choice and the unpooled preference use these
     arms = {}
     for arm in ARMS[os_name]:
         mine = [run for run in arm_runs if run.arm == arm]
         eligible = [run for run in mine if not run.problems]
         times = [run.seconds for run in mine if run.seconds is not None]
         stats = timing(times)
+        if times:
+            medians[arm] = exact_median(times)
         control = controls.get((os_name, arm), {})
         reasons = []
         if len(mine) < min_repeats:
@@ -1180,10 +1332,15 @@ def verdict_for_os(os_name: str, runs: list, controls: dict, min_repeats: int) -
                  "controls_passed": (control.get("controls") or {}).get("passed"),
                  "crash_passed": (control.get("crash") or {}).get("passed")}
         if arm != "S" and stats and s_timing:
-            entry["median_vs_s_median"] = round(stats["median"] / s_timing["median"], 4)
-            entry["max_vs_s_fastest"] = round(stats["max"] / s_timing["min"], 4)
-            entry["meets_speed_rule"] = (entry["median_vs_s_median"] <= RULE["median_ratio_max"]
-                                         and entry["max_vs_s_fastest"] <= RULE["max_ratio_max"])
+            # Exact ratios against the exact thresholds (EXACT_RULE); the two rounded fields are for display only.
+            median_ratio = medians[arm] / s_exact[0]
+            max_ratio = max(Fraction(value) for value in times) / s_exact[1]
+            entry["median_vs_s_median"] = round(float(median_ratio), 4)
+            entry["max_vs_s_fastest"] = round(float(max_ratio), 4)
+            entry["median_vs_s_median_exact"] = ratio_text(median_ratio)
+            entry["max_vs_s_fastest_exact"] = ratio_text(max_ratio)
+            entry["meets_speed_rule"] = (median_ratio <= EXACT_RULE["median_ratio_max"]
+                                         and max_ratio <= EXACT_RULE["max_ratio_max"])
         entry["eligible"] = not reasons
         entry["reasons"] = reasons
         arms[arm] = entry
@@ -1197,21 +1354,24 @@ def verdict_for_os(os_name: str, runs: list, controls: dict, min_repeats: int) -
         report["outcome"] = "reject"
         report["reasons"].append("no parallel arm is eligible")
         return report
-    fastest = min(candidates, key=lambda arm: (arms[arm]["timing"]["median"], arm))
+    fastest = min(candidates, key=lambda arm: (medians[arm], arm))
     report["fastest_eligible_arm"] = fastest
     if not arms[fastest].get("meets_speed_rule"):
         report["outcome"] = "reject"
         report["reasons"].append(f"the fastest eligible arm {fastest} misses the speed rule "
-                                 f"(median {arms[fastest]['median_vs_s_median']} of S median, "
-                                 f"max {arms[fastest]['max_vs_s_fastest']} of S fastest)")
+                                 f"(median {arms[fastest]['median_vs_s_median_exact']} of S median, "
+                                 f"max {arms[fastest]['max_vs_s_fastest_exact']} of S fastest; "
+                                 f"the rule allows {ratio_text(EXACT_RULE['median_ratio_max'])} and "
+                                 f"{ratio_text(EXACT_RULE['max_ratio_max'])})")
         return report
     chosen = fastest
     unpooled = UNPOOLED_OF.get(fastest)
     if unpooled and unpooled in candidates and arms[unpooled].get("meets_speed_rule"):
-        ratio = arms[unpooled]["timing"]["median"] / arms[fastest]["timing"]["median"]
-        report["unpooled_preference"] = {"from": fastest, "to": unpooled, "median_ratio": round(ratio, 4),
-                                         "applied": ratio <= RULE["unpooled_within"]}
-        if ratio <= RULE["unpooled_within"]:
+        ratio = medians[unpooled] / medians[fastest]
+        applied = ratio <= EXACT_RULE["unpooled_within"]
+        report["unpooled_preference"] = {"from": fastest, "to": unpooled, "median_ratio": round(float(ratio), 4),
+                                         "median_ratio_exact": ratio_text(ratio), "applied": applied}
+        if applied:
             chosen = unpooled
     report["selected_arm"] = chosen
     report["outcome"] = "adopt"
@@ -1222,7 +1382,8 @@ def run_summary(run: Run) -> dict:
     parsed = run.parsed
     item = {"name": run.name, "os": run.os, "arm": run.arm, "kind": run.kind, "repeat": run.repeat,
             "eligible": not run.problems, "reasons": run.problems[:LIST_CAP], "exit_code": run.exit_code,
-            "step_seconds": run.seconds}
+            "step_seconds": run.seconds, "run_attempt": run.run_attempt,
+            "checkout_clean": None if run.checkout_status is None else run.checkout_status == ""}
     for field in ("python_version", "platform", "runner_image", "checkout_sha", "command"):
         item[field] = (run.meta or {}).get(field)
     if parsed is not None:
@@ -1272,30 +1433,48 @@ def build_result(results: Path, base_path: Path, trial_path: Path, expectations_
         control_items.append({"name": run.name, "os": run.os, "arm": run.arm, "kind": run.kind,
                               "passed": not problems, "problems": problems[:LIST_CAP],
                               "exit_code": run.exit_code, "ran": run.parsed.ran if run.parsed else None,
-                              "status_word": run.parsed.status_word if run.parsed else None})
+                              "status_word": run.parsed.status_word if run.parsed else None,
+                              "run_attempt": run.run_attempt,
+                              "checkout_clean": None if run.checkout_status is None else run.checkout_status == ""})
+    mapping = check_id_mapping(base, trial)
     verdicts = {}
     for os_name in ARMS:
         if any(run.os == os_name for run in runs):
             verdicts[os_name] = verdict_for_os(os_name, [run for run in runs if run.os == os_name],
                                                controls, min_repeats)
             verdicts[os_name]["baseline"] = baselines[os_name]
+            if not mapping["ok"]:
+                # experiment.json quality_rule, ID MAPPING: otherwise neither OS gets a verdict.
+                verdicts[os_name]["outcome"] = "no verdict"
+                verdicts[os_name]["selected_arm"] = None
+                verdicts[os_name]["reasons"].insert(
+                    0, "id_mapping.ok is false: the base and trial inventories differ by more than the B1 rewrite, "
+                       "so neither OS gets a verdict")
     return {
         "schema": SCHEMA,
         "decision_rule": {
-            "eligibility": "every run of the arm is eligible (zero mismatches against S outside flaky ids), "
-                           f"at least {min_repeats} runs, and its controls and crash control passed on that OS",
+            "eligibility": "every run of the arm is eligible under both oracle parts (part 1: zero mismatches "
+                           "against S outside flaky ids, the exact preregistered command, run_attempt 1 recorded in "
+                           "runtime.json; part 2: an existing, empty git-status.txt), at least "
+                           f"{min_repeats} runs, and its controls and crash control passed on that OS (their run "
+                           "directories under the same two parts)",
             "speed": "take the fastest eligible arm by median step_seconds; adopt it only if its median <= "
-                     f"{RULE['median_ratio_max']} x S median and its max <= {RULE['max_ratio_max']} x S fastest; "
-                     "otherwise reject (no fall-through to a slower arm)",
+                     f"{RULE['median_ratio_max']} x S median and its max <= {RULE['max_ratio_max']} x S fastest, "
+                     "compared as exact ratios (rounded for display only); otherwise reject (no fall-through to a "
+                     "slower arm)",
             "unpooled_preference": f"if the adopted arm is P3 (L4), take P3F (L4F) when it is eligible, meets the "
-                                   f"speed rule and its median is <= {RULE['unpooled_within']} x the pooled median",
+                                   f"speed rule and its median is <= {RULE['unpooled_within']} x the pooled median "
+                                   "(exact ratio)",
+            "id_mapping": "the inventories differ only by the prefix " + repr(B1_PREFIX) + f" on exactly the "
+                          f"{B1_IDS} base ids of the six B1 classes, as a bijection; otherwise every OS gets "
+                          "no verdict",
         },
         "inputs": {"inventory_base": {"count": len(base), "sha256": sha256_of(base_path)},
                    "inventory_trial": {"count": len(trial), "sha256": sha256_of(trial_path)},
                    "control_expectations_sha256": sha256_of(expectations_path),
                    "frozen_checkout_sha": frozen, "checkout_shas_seen": sorted(k for k in shas if k),
                    "ignored_entries": ignored},
-        "id_mapping": check_id_mapping(base, trial),
+        "id_mapping": mapping,
         "runs": [run_summary(run) for run in runs if run.kind == "arm"],
         "controls": control_items,
         "verdicts": verdicts,
@@ -1326,8 +1505,8 @@ def summary_markdown(result: dict) -> str:
                      f"{' (' + reasons + ')' if reasons else ''}; flaky ids in S: "
                      f"{verdict['baseline']['flaky_total']}")
     mapping = result["id_mapping"]
-    lines.append(f"- id mapping: {'ok' if mapping['ok'] else 'FAILED'} ({mapping['mapped']} ids, "
-                 f"{len(mapping['classes'])} classes rewritten)")
+    lines.append(f"- id mapping: {'ok' if mapping['ok'] else 'FAILED, so no OS gets a verdict'} "
+                 f"({mapping['mapped']} ids, {len(mapping['classes'])} classes rewritten)")
     bad = [run["name"] for run in result["runs"] if not run["eligible"]]
     lines.append(f"- ineligible arm-runs: {', '.join(bad) if bad else 'none'}")
     failed = [item["name"] for item in result["controls"] if not item["passed"]]

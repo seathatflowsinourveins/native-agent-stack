@@ -5,7 +5,9 @@
 
 VENV holds unittest-parallel 1.8.6 and coverage 7.16.2, installed with
 --only-binary=:all: --require-hashes (README.md, "Fixtures"); its interpreter runs
-every configuration, so S and the parallel arms share one Python. Each control file
+every configuration, so S and the parallel arms share one Python. SCRATCH_DIR must lie
+outside the checkout and be empty or absent: the tool creates every run directory in it
+and never deletes a directory it did not create. Each control file
 is copied alone into a fresh directory under SCRATCH_DIR and the arm's exact command
 runs there with stdout and stderr in one file, as the trial workflow runs it. Logs
 are sanitized (run directory, virtualenv, interpreter and home prefixes become
@@ -26,6 +28,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[2]  # the checkout root: <root>/blueprints/convergence-practice/<this directory>
 FIXTURES = HERE / "fixtures"
 CONTROL = HERE / "controls" / "test_zz_trial_controls.py"
 CRASH = HERE / "controls" / "crash_control" / "test_crash.py"
@@ -129,10 +132,33 @@ def probe(python: str) -> dict:
     return dict(zip(keys, out))
 
 
+def checkout_roots() -> list:
+    """The checkout this file belongs to: ROOT and, where git answers, its top level (a linked worktree's own)."""
+    roots = [ROOT]
+    try:
+        done = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--show-toplevel"],
+                              capture_output=True, text=True, check=False, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return roots
+    top = done.stdout.strip()
+    if done.returncode == 0 and top and Path(top).resolve() not in roots:
+        roots.append(Path(top).resolve())
+    return roots
+
+
+def check_work(work: Path) -> None:
+    """--work (already resolved) must lie outside the checkout, not merely outside this directory, and be empty or
+    absent, so that every run directory under it is one this tool creates and nothing it did not create is deleted."""
+    for root in checkout_roots():
+        if work == root or root in work.parents:
+            raise SystemExit("make_fixtures.py: --work must be outside the checkout")
+    if work.exists() and (not work.is_dir() or any(work.iterdir())):
+        raise SystemExit("make_fixtures.py: --work must be an empty or absent directory: this tool creates every "
+                         "run directory itself and never deletes one it did not create")
+
+
 def run_one(python: str, args: list, source: Path, run_dir: Path, bound: int) -> tuple:
-    if run_dir.exists():
-        shutil.rmtree(run_dir)
-    run_dir.mkdir(parents=True)
+    run_dir.mkdir()  # never an existing directory: check_work requires an empty --work and names are unique
     shutil.copy2(source, run_dir / source.name)
     log = run_dir / "log.txt"
     with log.open("wb") as handle:
@@ -144,14 +170,15 @@ def run_one(python: str, args: list, source: Path, run_dir: Path, bound: int) ->
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
     parser.add_argument("--parallel-python", required=True, help="interpreter of the hash-locked virtualenv")
-    parser.add_argument("--work", required=True, type=Path, help="scratch directory outside the checkout")
+    parser.add_argument("--work", required=True, type=Path,
+                        help="an empty or absent scratch directory outside the checkout")
     parser.add_argument("--crash-timeout", type=int, default=20,
                         help="local bound for the crash control (the workflow uses 300 s)")
     args = parser.parse_args(argv)
     work = args.work.resolve()
-    if HERE in work.parents or work == HERE:
-        raise SystemExit("make_fixtures.py: --work must be outside the checkout")
+    check_work(work)
     facts = probe(args.parallel_python)
+    work.mkdir(parents=True, exist_ok=True)
     replacements = [(str(work), "<scratch>"), (facts["prefix"], "<venv>"), (facts["base_prefix"], "<python>"),
                     (str(Path.home()), "<home>")]
     (FIXTURES / "real").mkdir(parents=True, exist_ok=True)
