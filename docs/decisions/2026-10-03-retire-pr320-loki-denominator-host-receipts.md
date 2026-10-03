@@ -51,7 +51,7 @@ nonnegative integers. The matching day's reference is the `cacheReadTokens` valu
 of `ccusage daily --timezone UTC -O -j`, supplied by the operator; this hook does
 not execute ccusage. `loki_reconciliation_tolerance_pct` defaults to `1.0` percent.
 [Source: token_manifest.py, L715–789](https://github.com/seathatflowsinourveins/native-agent-stack/blob/d59d0fca32a820bc19a58dc78f27148ddeb9c142/tools/token-report/token_manifest.py#L715-L789),
-[and tools/token-report/README.md, L142–163.](https://github.com/seathatflowsinourveins/native-agent-stack/blob/d59d0fca32a820bc19a58dc78f27148ddeb9c142/tools/token-report/README.md#L142-L163)
+[and tools/token-report/README.md, L142–164.](https://github.com/seathatflowsinourveins/native-agent-stack/blob/d59d0fca32a820bc19a58dc78f27148ddeb9c142/tools/token-report/README.md#L142-L164)
 
 `refresh()` invokes `provider_usage_denominator()` with its capture directory.
 Raw responses and request receipts are saved under
@@ -150,9 +150,12 @@ or retire it while preserving recovery. The current sources favor retirement:
 - **Target and legacy evidence are separate.**
   `docs/decisions/2026-10-02-clean-resolution-goal.md`, L23–27, explicitly separates
   the selected target's clients/OTel metering and no additional context-supply
-  layer from legacy-host qualification. Legacy ccusage or RTK evidence therefore
-  does not require either component on the new target.
-  [Source, L23–27.](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-02-clean-resolution-goal.md#L23-L27)
+  layer from legacy-host qualification; L27 names RTK. Legacy RTK evidence
+  therefore does not require that component on the new target. The ccusage half
+  follows from L25's metering assignment and the definitive defaults' ccusage
+  row (L78).
+  [Source, L23–27](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-02-clean-resolution-goal.md#L23-L27),
+  [definitive defaults, L78.](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-new-wsl-definitive-defaults.md#L78)
 - **The legacy accounting question already has a recorded answer and a report
   path.** `docs/token-practice.md`, L345–350, records a transcript scan matching
   ccusage 20.0.26 on input, output, cache-read and cache-creation totals within
@@ -164,11 +167,15 @@ or retire it while preserving recovery. The current sources favor retirement:
   [Run shape and accounting, L345–350](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/token-practice.md#L345-L350),
   [optional reports, L206–215](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/tools/token-report/README.md#L206-L215),
   [L242–250.](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/tools/token-report/README.md#L242-L250)
-- **A22 duplicates an evidence view while losing dissent and binding.**
-  `docs/component-evidence-matrix.md`, L19 and L40, already publishes the
-  token-efficiency winners' per-platform host receipt counts, independently
-  reviewed counts and standing dissent. Counts deliberately ignore pins; the
-  JSON's derived status binds receipts to the current winner pin.
+- **A22 partially overlaps an evidence view while losing dissent and binding.**
+  `docs/component-evidence-matrix.md`, L19 and L40, already publishes per-platform
+  host receipt counts, independently reviewed counts and standing dissent, but
+  only for layer winners (L40 names rtk, headroom and ccusage for token
+  efficiency). A22 attached receipts to every component of
+  `docs/token-efficiency-stack.json` (24 components at this base; #320's
+  `token_manifest.py` L1003 selects receipts per component id), so its rows for
+  non-winner components have no counterpart in the matrix. Counts deliberately
+  ignore pins; the JSON's derived status binds receipts to the current winner pin.
   `scripts/platform_status.py`, L12–27, defines schema/platform/pin/layer binding,
   supersession, reviewed use-stage qualification and failures that remain
   blocking. `scripts/receipt_staleness.py`, L2–39, separately reports age, moved
@@ -196,7 +203,8 @@ behavior, including retained check output. A source read or version check cannot
 replace the live reconciliation or publication acceptance.
 
 **A22:** reopen if the explorer needs per-receipt host claims the component
-evidence matrix does not carry. Build on `platform_status` binding and
+evidence matrix does not carry, such as receipts for token-efficiency components
+that are not layer winners, which the matrix omits. Build on `platform_status` binding and
 `receipt_staleness` flags. Show standing dissent instead of hiding it; take hosts
 from validated `evidence/hosts/` rather than a hard-coded list. Reject malformed
 limitation fields rather than filtering them. Keep each receipt's scope and review
@@ -228,14 +236,15 @@ or the architecture owner's measurement.
 Existing main implementation, configuration, receipts and historical decisions
 remain byte-for-byte unchanged. This change adds this record and registers its
 hash in `manifests/evidence.json`; generated reports are only rewritten through
-their native `--write` commands. PR #320, its pinned head and its branch are
-preserved until the coordinator closes the PR after the record merges. No finding
+their native `--write` commands. PR #320 stays open until the coordinator closes
+it after the record merges; its pinned head and its branch stay preserved after
+that closure. No finding
 is repaired in token-report or the explorer, no observation measurement is
 pre-empted, and no other lane's PR is changed.
 
 ## Privacy
 
-This record uses repository paths, public receipt host identifiers and GitHub
-URLs. It includes no host filesystem paths, user names, coordination-folder
+This record uses repository paths, public receipt host identifiers, GitHub URLs
+and two public upstream documentation URLs. It includes no host filesystem paths, user names, coordination-folder
 paths or private review-file locator. The published hold comment is the review
 evidence of record.
