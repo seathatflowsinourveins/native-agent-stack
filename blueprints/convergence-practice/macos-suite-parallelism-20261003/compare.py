@@ -115,10 +115,10 @@ RULE = {"median_ratio_max": 0.60, "max_ratio_max": 0.75, "unpooled_within": 1.10
 # these (no rounding before the comparison); result.json rounds the ratios for display only.
 EXACT_RULE = {"median_ratio_max": Fraction("0.60"), "max_ratio_max": Fraction("0.75"),
               "unpooled_within": Fraction("1.10")}
-# B1 (experiment.json task_and_failure): at base 56473e4b, tests/test_native_maintenance.py loaded these six
-# TestCase classes inside load_tests under bare module names; the trial head loads them as child modules of the
-# wrapper. ids.py on 56473e4b lists 29 ids for them (6 + 7 + 2 + 2 + 2 + 10, in this order), and the inventories may
-# differ by nothing but this prefix on exactly those 29 ids.
+# B1 (experiment.json task_and_failure): at the trial base e88d59e4 (TRIAL_BASE_SHA), as at the first base 56473e4b,
+# tests/test_native_maintenance.py loads these six TestCase classes inside load_tests under bare module names; the
+# trial head loads them as child modules of the wrapper. ids.py on both bases lists 29 ids for them (6 + 7 + 2 + 2 +
+# 2 + 10, in this order), and the inventories may differ by nothing but this prefix on exactly those 29 ids.
 B1_PREFIX = "tests.test_native_maintenance."
 B1_CLASSES = (
     "memory_patch_evidence_tests.EvidenceTests",

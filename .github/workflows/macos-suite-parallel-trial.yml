@@ -55,8 +55,9 @@ defaults:
     shell: bash
 
 env:
-  # The commit the trial branch was cut from: the unmodified suite whose ids the inventory maps onto the trial head.
-  TRIAL_BASE_SHA: 56473e4b840f0e6940c031801d866e7e9bf29baf
+  # The commit the trial branch is based on (rebased onto it before the first push): the unmodified suite whose ids
+  # the inventory maps onto the trial head.
+  TRIAL_BASE_SHA: e88d59e4b4670ca19211a9ab2adb45e1a28901c7
   TRIAL_DIR: blueprints/convergence-practice/macos-suite-parallelism-20261003
 
 jobs:

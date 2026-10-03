@@ -171,7 +171,8 @@ eligible S repeats of an OS. They are listed in `result.json`
 (`verdicts.<os>.baseline.flaky_ids`) and excluded from mismatch counting. S
 runs that disagree on `python_version` void that OS.
 
-Id mapping: at base `56473e4b`, `tests/test_native_maintenance.py` loaded six
+Id mapping: at the trial base `e88d59e4` (the workflow's `TRIAL_BASE_SHA`), as
+at the first base `56473e4b`, `tests/test_native_maintenance.py` loads six
 classes through `load_tests` under bare module names, with 29 ids in total
 (`compare.py` `B1_CLASSES` and `B1_IDS`: 6, 7, 2, 2, 2 and 10 ids). The trial
 head loads them as child modules of the wrapper, which prefixes their ids with
@@ -339,6 +340,14 @@ These are local integration evidence:
   full-suite log of run 37073310931 (push to main at that commit) reports
   `Ran 9800 tests`. Its parsed ids equal the inventory exactly, with zero
   parse anomalies.
+- Before the first push the branch was rebased onto `e88d59e4` (`main` with
+  #622 and #639), which became the trial base. `ids.py` on `e88d59e4` and on
+  the rebased head listed 9,823 unique ids each, byte-identical under CPython
+  3.13.16 and the bare 3.12.3. The six B1 classes hold 29 ids at `e88d59e4`
+  (6, 7, 2, 2, 2 and 10). `check_id_mapping` on the two inventories is ok:
+  29 ids mapped, 6 classes, the one prefix and no other difference. No macOS
+  log exists at `e88d59e4`, so the macOS cross-check above holds for
+  `56473e4b` only.
 - Four real macOS full-suite logs (runs 36946376402, 37042100443,
   37073310931, 37075955141; 9,483 to 9,829 tests, one with a failing
   subtest) parse with zero anomalies. Started tests equal `Ran N` and the
@@ -366,8 +375,9 @@ These are local integration evidence:
   ubuntu-24.04's system CPython 3.12.3 with only the trial lock installed
   (none of the arms' npm pins, zizmor or promotion-gate venv), and applies it
   to the macOS arms too. Discovery could depend on the platform; the evidence
-  that it does not is the base-commit check above (the Linux inventory equals
-  the set executed on macOS). The first hosted macOS S run decides it for the
+  that it does not is the check at the first base `56473e4b` above (the Linux
+  inventory equals the set executed on macOS), and no such check exists at
+  the trial base `e88d59e4`. The first hosted macOS S run decides it for the
   trial head: a platform difference makes every macOS run ineligible, S
   included, so macOS gets no verdict (fail-closed).
 - Warning filters differ between S and the parallel arms. With no `-W`

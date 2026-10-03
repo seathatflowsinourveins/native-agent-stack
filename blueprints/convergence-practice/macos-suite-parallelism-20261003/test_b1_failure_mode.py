@@ -5,8 +5,8 @@
 
 tests/test_native_maintenance.py loads three blueprint test modules when it is imported, so that a spawned
 unittest-parallel worker can unpickle their classes (B1). Fix round item 7: a blueprint that raises while it loads
-must not abort a named run. As at base 56473e4b, where load_tests loaded the blueprints, the loader turns the error
-into one failing test (CPython Lib/unittest/loader.py loadTestsFromModule, v3.12.3 :109-118, v3.13.16 :113-122), the
+must not abort a named run. As with the base wrapper (56473e4b, byte-identical at the trial base e88d59e4), where
+load_tests loaded the blueprints, the loader turns the error into one failing test (CPython Lib/unittest/loader.py loadTestsFromModule, v3.12.3 :109-118, v3.13.16 :113-122), the
 run prints its Ran line and exits 1, and a module named beside the wrapper still runs. The wrapper also leaves no
 partly loaded blueprint registered in sys.modules.
 

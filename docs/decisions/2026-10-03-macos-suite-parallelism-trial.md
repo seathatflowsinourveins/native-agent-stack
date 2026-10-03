@@ -109,6 +109,21 @@ The coordinator's last review before the first push added these changes, each be
    P3F over P3 and for L4F over L4.
 6. **Merge fallback.** After any change of the trial base, `ids.py` runs on the new base, and the six B1 classes must
    still hold exactly 29 ids (handoff, below).
+7. **Rebase onto `main`.** `main` had moved to `e88d59e4` (#622, then #639), and the branch conflicted with it in
+   `manifests/evidence.json`. GitHub runs no `pull_request` workflow on a conflicting pull request, so the branch was
+   rebased onto `e88d59e4` under the hot-file protocol before the first push:
+   - The only conflicts were in `manifests/evidence.json`, in the three commits that only registered files. Each
+     became empty with `main`'s copy and was dropped, and one registration built from `main`'s manifest ends the
+     branch.
+   - Every other file of the branch is byte-identical to its version before the rebase, except
+     `.github/osv-scanner-lockfiles.json`, which keeps `main`'s new entry beside the two trial locks.
+   - `TRIAL_BASE_SHA` and the record's `base_revision` moved to `e88d59e4`.
+   - `ids.py` lists 9,823 ids on `e88d59e4` and on the rebased head. The six B1 classes hold exactly 29 ids there, and
+     `check_id_mapping` on the two inventories is ok, with no difference beyond the B1 prefix.
+
+   The commit ids `b0b89d1d` and `aab78b12` in this record name local commits from before the rebase, which were
+   never pushed. The rebased commits "Record the suite-parallelism trial decision (preregistered, nothing adopted)" and
+   "Refreeze the suite-parallelism preregistration after the fix round" carry the same files.
 
 ### What PR-A and PR-A2 change if the trial passes
 
@@ -192,8 +207,8 @@ The record holds the full text; in short:
   template's `### SOTA sources` section from the list below. Every push re-runs the whole trial (15 macOS and 12 Linux
   arm jobs plus controls): for pull requests the paths filter compares the three-dot diff against the merge base,
   which always contains the new workflow.
-- Do not rebase or merge `main` into PR-T unless you must. The inventory maps base `56473e4b` onto the head, so a head
-  carrying newer `main` commits fails the id mapping and gets no verdict.
+- After the first push, do not rebase or merge `main` into PR-T unless you must. The inventory maps the trial base
+  `e88d59e4` onto the head, so a head carrying newer `main` commits fails the id mapping and gets no verdict.
 - GitHub runs no `pull_request` workflow on a pull request with a merge conflict. PR-T can conflict in
   `manifests/evidence.json`, and with open #615, which also edits `.github/osv-scanner-lockfiles.json`. If a merge is
   unavoidable, follow the hot-file protocol (`docs/lanes.md`), set `TRIAL_BASE_SHA` to the new merge base and refreeze
@@ -280,6 +295,8 @@ Revisit this record when any of these happens:
       the CLI test's printed output. Against `b0b89d1d`'s oracle, workflow and `make_fixtures.py` it fails every test
       the first fix round added.
     - `test_b1_failure_mode.py` fails six subtests against `b0b89d1d`'s wrapper and passes against the base wrapper.
+    - After the rebase, `ids.py` on the trial base `e88d59e4` and on the rebased head: 9,823 ids each, byte-identical
+      under CPython 3.13.16 and the bare 3.12.3. The production id rule on them: ok (29 ids, 6 classes, one prefix).
 - **No GitHub-hosted run** exists for this record. The hosted runs will be `native_cli_execution` evidence on
   GitHub-hosted runners.
 

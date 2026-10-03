@@ -48,8 +48,8 @@ RUNS = {entry["file"]: entry for entry in INDEX["runs"]}
 PASS_ID = "test_zz_trial_controls.TrialControlsA.test_pass"
 OS_OF = {"S": "macos-15", "P3": "macos-15", "P3F": "macos-15", "P3C": "macos-15", "P4": "macos-15",
          "L4": "ubuntu-24.04", "L4F": "ubuntu-24.04", "L4C": "ubuntu-24.04"}
-# The real shape of the B1 classes at base 56473e4b (ids.py on the base: 29 ids in these six classes, in the order
-# of compare.B1_CLASSES), with synthetic method names.
+# The real shape of the B1 classes at the trial base e88d59e4, as at the first base 56473e4b (ids.py on both: 29 ids
+# in these six classes, in the order of compare.B1_CLASSES), with synthetic method names.
 B1_SHAPE = (("memory_patch_evidence_tests", (("EvidenceTests", 6), ("FunctionalFactsTests", 7))),
             ("application_portability_tests", (("MakeBoundaryTests", 2), ("RecipeHistoryTests", 2),
                                                ("RestartPortTests", 2))),
@@ -708,8 +708,8 @@ class RunAttemptTests(unittest.TestCase):
 
 
 class IdMappingTests(unittest.TestCase):
-    # The six B1 classes with their real id counts at base 56473e4b (29 ids; this set held 12 before the rule
-    # required exactly those 29).
+    # The six B1 classes with their real id counts at the trial base e88d59e4 and the first base 56473e4b (29 ids;
+    # this set held 12 before the rule required exactly those 29).
     BASE_ONLY = B1_BASE
     COMMON = ["tests.test_a.A.test_1", "tests.test_b.B.test_1"]
     PREFIX = B1_PREFIX
