@@ -44,8 +44,10 @@ import subprocess  # noqa: E402
 import sys  # noqa: E402
 from pathlib import Path  # noqa: E402
 
+# The four exports the suite-environment steps write to GITHUB_ENV, the control job's own export, and the two
+# variables the runner sets for every step, which some tests read (for example IN_CI in tests/test_secret_path_guard.py).
 ENV_NAMES = ("CHILD_USAGE_SHELL_PARSER", "LANDSCAPE_SWEEP_SKILLS_YAML", "PROMOTION_GATE_PYTHON",
-             "REQUIRE_PROMOTION_GATE_VENV", "SUITE_SHARDS_ENV_PROBE")
+             "REQUIRE_PROMOTION_GATE_VENV", "SUITE_SHARDS_ENV_PROBE", "GITHUB_ACTIONS", "CI")
 
 
 def write_json(path: Path, value) -> None:

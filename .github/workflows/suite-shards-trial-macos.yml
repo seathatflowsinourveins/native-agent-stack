@@ -34,7 +34,9 @@ name: Suite shards trial, macos-15 (draft pull request only)
 #
 # Suite environment: as validate-macos, actions/setup-python 3.13, plus the two npm pins that validate.yml installs,
 # because their tripwires (tests/test_shell_parser_ci.py, tests/test_landscape_sweep_skills.py) fail any Actions job
-# that is not a recorded gap; validate-macos is one, this workflow's jobs are not.
+# that is not a recorded gap; validate-macos is one, this workflow's jobs are not. The step scripts use only bash 3.2
+# features (no mapfile): the image's bash is 3.2.57 (actions/runner-images at f95c0c79,
+# images/macos/macos-15-arm64-Readme.md, image 20260907.0337.1).
 
 on:
   pull_request:
@@ -46,7 +48,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: suite-shards-trial-macos-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 defaults:

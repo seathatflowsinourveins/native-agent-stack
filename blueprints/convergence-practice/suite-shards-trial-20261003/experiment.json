@@ -54,14 +54,14 @@
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/controls/test_ctl_hang.py", "sha256": "ef0a8d984d739b96f9742b0f656cbe84c44c65fa0096f5140077dd8d4d943e72"}
     ],
     "evaluation": [
-      {"path": ".github/workflows/suite-shards-trial-linux.yml", "sha256": "6b515f68eae8be9a32994ddb1d271fa849ced18ca508cf797c1f9c0f1069deac"},
-      {"path": ".github/workflows/suite-shards-trial-macos.yml", "sha256": "1f10929bb17a50dff10f04d398e938e1cb62d72a58bfa8d90a192df0f628b066"},
+      {"path": ".github/workflows/suite-shards-trial-linux.yml", "sha256": "27c97ad1a4a89df9e5c21b9d1ecde4c5db41e3a71fb0cb992dc86180a9fe368f"},
+      {"path": ".github/workflows/suite-shards-trial-macos.yml", "sha256": "d7f769c29a25e8946ff914c473218962cd0072e062762438ed67a874412ce2c6"},
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/compare.py", "sha256": "8f74f740bf42fff824cdc6495d6e48d8a69f4d981a076ac71698d87dc2a5f265"},
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/logparse.py", "sha256": "722f26cd461270cd7d1de37b5d9a00a466f228198a6a387189e8c39f66445d12"},
-      {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/record.py", "sha256": "caf38dffa97e78285754a3b241bdc9dd56e7512bf215bd58532bc36b51f2dfe0"},
-      {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/test_compare.py", "sha256": "c996cf1dc4f022b26c084c2f4313f930cded8aa5871c93f248b5c57703dddcc9"},
+      {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/record.py", "sha256": "25f24f3b95512472c4ad062777e78272312947c45d05cf8a212d58b7b0389921"},
+      {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/test_compare.py", "sha256": "bc6dc3db36fa1dacc6bd6098ed54d69e449ee54aed133dcc9ebf351949583fe4"},
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/make_fixtures.py", "sha256": "ddb096a172aa03411b7bc20134a011627aae42d9d54c394b79a5e91d0f116dbc"},
-      {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/index.json", "sha256": "da8e678b554ef62d951850a50cbd8c0028120c2d5857c80b8aef777a75cbe03a"},
+      {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/index.json", "sha256": "f9d746418e3bae07273a515a64cd6b0b82388267e2a681996172538e04f979a8"},
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/README.md", "sha256": "1ea1ad618bee2717b957762d8be16e282a6b7302fcfa9a1ab3109ebbf112f5e4"}
     ]
   },

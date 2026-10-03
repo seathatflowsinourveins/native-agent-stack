@@ -1,6 +1,8 @@
 {
   "env_present": {
     "CHILD_USAGE_SHELL_PARSER": false,
+    "CI": false,
+    "GITHUB_ACTIONS": false,
     "LANDSCAPE_SWEEP_SKILLS_YAML": false,
     "PROMOTION_GATE_PYTHON": false,
     "REQUIRE_PROMOTION_GATE_VENV": false,

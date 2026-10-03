@@ -29,7 +29,7 @@
   "files": [
     {
       "file": "controls/foreground.probe.json",
-      "sha256": "c34dd18ab6161322cd89f5df39b97df98a90da636cb107f186ce02705b273086"
+      "sha256": "245df8257e47081f2b1a092045cc4975bf19f7095996e429de19e22862b34bef"
     },
     {
       "file": "controls/shard-0.log",
@@ -37,7 +37,7 @@
     },
     {
       "file": "controls/shard-0.probe.json",
-      "sha256": "3ef6257a33b904317330cfe42ea75428f3918bc28afd68988a41b21bf5af5538"
+      "sha256": "72624e409c9b564c6fb0bf3f8b6243e2239ae8eed146f0e5b2d3d9ebc674816d"
     },
     {
       "file": "controls/shard-1.log",
@@ -45,7 +45,7 @@
     },
     {
       "file": "controls/shard-1.probe.json",
-      "sha256": "3ef6257a33b904317330cfe42ea75428f3918bc28afd68988a41b21bf5af5538"
+      "sha256": "72624e409c9b564c6fb0bf3f8b6243e2239ae8eed146f0e5b2d3d9ebc674816d"
     },
     {
       "file": "controls/shard-2.log",
@@ -53,7 +53,7 @@
     },
     {
       "file": "controls/shard-2.probe.json",
-      "sha256": "3ef6257a33b904317330cfe42ea75428f3918bc28afd68988a41b21bf5af5538"
+      "sha256": "72624e409c9b564c6fb0bf3f8b6243e2239ae8eed146f0e5b2d3d9ebc674816d"
     },
     {
       "file": "controls/shard-3.log",
@@ -61,7 +61,7 @@
     },
     {
       "file": "controls/shard-3.probe.json",
-      "sha256": "3ef6257a33b904317330cfe42ea75428f3918bc28afd68988a41b21bf5af5538"
+      "sha256": "72624e409c9b564c6fb0bf3f8b6243e2239ae8eed146f0e5b2d3d9ebc674816d"
     },
     {
       "file": "inventory/inventory.txt",

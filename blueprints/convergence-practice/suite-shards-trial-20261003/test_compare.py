@@ -370,9 +370,10 @@ class RecordTests(unittest.TestCase):
         self.assertEqual(len(meta["checkout_sha"]), 40)
         self.assertEqual((self.out / "git-status.txt").read_text(), "")
         probe = json.loads((self.out / "shard-0.probe.json").read_text())
-        self.assertEqual(set(probe["env_present"]), set(compare.CONTROL_ENV_NAME.split()) | {
-            "CHILD_USAGE_SHELL_PARSER", "LANDSCAPE_SWEEP_SKILLS_YAML", "PROMOTION_GATE_PYTHON",
-            "REQUIRE_PROMOTION_GATE_VENV"})
+        self.assertEqual(set(probe["env_present"]), {
+            compare.CONTROL_ENV_NAME, "CHILD_USAGE_SHELL_PARSER", "LANDSCAPE_SWEEP_SKILLS_YAML", "PROMOTION_GATE_PYTHON",
+            "REQUIRE_PROMOTION_GATE_VENV", "GITHUB_ACTIONS", "CI"})
+        self.assertTrue(all(isinstance(value, bool) for value in probe["env_present"].values()), "names only, no values")
 
     def test_finish_without_start_is_untimed_and_a_dirty_checkout_is_recorded(self):
         (self.repo / "untracked.txt").write_text("x")
