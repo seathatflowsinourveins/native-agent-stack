@@ -54,9 +54,12 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # Later on 2026-09-30, after unit F3 (#553) pinned skill-creator, which the skills templates name for its paired
 # with-skill/without-skill benchmark, the common Skills paragraph names it too (build_args.TEMPLATE_SKILLS), as a
 # Claude-Code-only skill to read and never run. Previous value: 9c34fa7211bc…f14b.
-PROMPTS_SHA256_CURRENT = "b61956f351f5b71b6478f713a5f5f10a0c13e09198e528e6b10c9e1daa3c726d"
+# 2026-10-03: the Skills paragraph of common and common_v2 drops semgrep (retired) and agent-browser (held) with the
+# wave-2 skills ruling, changes 1 and 3 (build_args.TEMPLATE_SKILLS). Previous value: b61956f351f5…726d.
+PROMPTS_SHA256_CURRENT = "a57b659ddc5738728ae25848979561ce84dd24139dd6ff05858ccaffa38cf5e2"
 # Future U11 A/B source contract, filled with the same fixture values. This is not an activated runner's receipt.
-PROMPTS_SHA256_V2_CURRENT = "67e3adfa24fd4110f9784283ad3884fd18ae67cabad53977f6cb98839b94e525"
+# 2026-10-03: the same Skills paragraph change in common_v2. Previous value: 67e3adfa24fd…e525.
+PROMPTS_SHA256_V2_CURRENT = "fab3672aac7490dd223fcadee194510055a64864fbe745fd05f9240cb8fc9191"
 # The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
 # and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
 # the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
@@ -65,8 +68,9 @@ PROMPTS_SHA256_V2_CURRENT = "67e3adfa24fd4110f9784283ad3884fd18ae67cabad53977f6c
 # only as a plain false, a source the catalog marks maintenance stale labels its skills not_adopted, and writing
 # CLAUDE.md or AGENTS.md conflicts only when unasked (skills-agent-docs maintains them). Previous value: 5d9ae85a17be…48db.
 # Later on 2026-09-30: common's Skills paragraph names skill-creator (see PROMPTS_SHA256_CURRENT). Previous value:
-# 2c2efbaed4d9…63d3.
-PROMPTS_SHA256_SKILLS_CURRENT = "a76ee858fe65b998dc974f8fe9cdac9562bdf14abe6f73dcd7d1778c9f95b460"
+# 2c2efbaed4d9…63d3. 2026-10-03: common's Skills paragraph drops semgrep and agent-browser (see PROMPTS_SHA256_CURRENT).
+# Previous value: a76ee858fe65…b460.
+PROMPTS_SHA256_SKILLS_CURRENT = "dabae268b07a8bc8c9b3dd1e7770a7f8dc181b40f77c06a3775591f56f280291"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -1348,7 +1352,9 @@ web_search = "live"
 [mcp_servers.context-mode]
 disabled_tools = ["ctx_upgrade", "ctx_purge"]
 """
-TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode")
+# The Codex user template's servers, which the lane home carries: semble joined on 2026-10-03 (the new WSL distribution's
+# interim code search) and, like codebase-memory, does not connect on a host that has not installed it.
+TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode", "semble")
 
 
 class OmniRouteLaneBuildTests(unittest.TestCase):

@@ -21,7 +21,7 @@
         "RTK_TELEMETRY_DISABLED",
         "rtk"
       ],
-      "note": "rtk filters command output between the tools and the model, the job of the context-supply slot, which the manifest resolved as no layer."
+      "note": "rtk filters command output between the tools and the model, the job of the context-supply slot."
     },
     {
       "match": [
@@ -108,16 +108,15 @@
         "AI_MEMORY_URL",
         "AI_MEMORY_CAPTURE_ASSISTANT"
       ],
-      "note": "The memory slot waits for the head-to-head; ai-memory is its documented-fit pick, not its default."
+      "note": "The memory slot's interim install is ai-memory 2.5.2 (definitive manifest, amendment 3); the memory head-to-head at its frozen revision decides the slot. The hooks run AI_MEMORY_BIN, which this tool takes from the install plan's memory-owner row (the link it makes, ~/.local/bin/ai-memory), against the host value AI_MEMORY_URL, 127.0.0.1:29374 (wave-2 synthesis X5). The hook lines were written against ai-memory 2.4.x: compare them with what ai-memory 2.5.2's own install-hooks writes before relying on them (synthesis, verification gaps)."
     },
     {
       "match": [
         "claude/settings/hook/*/*context-mode-cache-heal.mjs*"
       ],
-      "wiring": "slot:context-supply",
-      "owner": "context-mode",
+      "wiring": "not_wired:context-mode writes this SessionStart hook into settings.json itself and deploys the file it runs, ~/.claude/hooks/context-mode-cache-heal.mjs (start.mjs L166-183 at mksglu/context-mode@6f0cc684; evidence/artifacts/context-mode-codex-binding-20260926/README.md L207-217), and its self-heal runs on every start from either client and on npm postinstall (start.mjs L227-427 and L237-239, scripts/heal-installed-plugins.mjs L202-205); the repository does not copy that file, and a second writer of the entry would compete with the plugin's own (wave-2 synthesis X11; context ruling, change 8)",
       "names": [
-        "context-mode"
+        "context-mode-cache-heal"
       ]
     },
     {
@@ -143,7 +142,7 @@
         "claude/profile/hook-file/token-lanes-block.verifier.md",
         "claude/profile/hook-file/token-lanes-subagent-start.py"
       ],
-      "wiring": "not_wired:the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire",
+      "wiring": "not_wired:the token-lane carrier names retrieval and compression servers (SocratiCode, jCodeMunch, headroom, codebase-memory) that this distribution does not install, and the wave-2 code-search ruling keeps it unwired here (change 7)",
       "names": [
         "token-lanes",
         "jcodemunch"
@@ -164,14 +163,49 @@
     },
     {
       "match": [
-        "claude/settings/plugin/claude-hud@claude-hud",
-        "claude/settings/marketplace/claude-hud",
-        "claude/settings/setting/statusLine"
+        "claude/settings/plugin/claude-hud@claude-hud"
       ],
-      "wiring": "not_wired:claude-hud is not a slot of the manifest, and the status line runs it",
+      "wiring": "slot:statusline",
+      "owner": "claude-hud",
       "names": [
         "claude-hud"
-      ]
+      ],
+      "note": "The statusline row of the definitive manifest (layer consensus, wave-2 batch): claude-hud 0.10.0 for Claude Code."
+    },
+    {
+      "match": [
+        "claude/settings/marketplace/claude-hud"
+      ],
+      "wiring": "slot:statusline",
+      "owner": "claude-hud",
+      "names": [
+        "claude-hud"
+      ],
+      "override": {
+        "source": {
+          "source": "github",
+          "repo": "jarrodwatts/claude-hud",
+          "ref": "v0.10.0"
+        }
+      },
+      "source": "Wave-2 usage ruling, change 8: the marketplace at the v0.10.0 tag (tag object 801f75c6, commit 75683c6d). The shared template keeps v0.8.0, the pin manifests/stack.json records for the workstation; this entry renders the new distribution's."
+    },
+    {
+      "match": [
+        "claude/settings/setting/statusLine"
+      ],
+      "wiring": "slot:statusline",
+      "owner": "claude-hud",
+      "names": [
+        "claude-hud"
+      ],
+      "keep_existing": true,
+      "override": {
+        "type": "command",
+        "command": "'${HOME}/.local/share/mise/installs/node/24.21.0/bin/node' '${HOME}/.claude/plugins/claude-hud/statusline.mjs'",
+        "refreshInterval": 5
+      },
+      "source": "The command upstream's setup.mjs writes for --shell posix: the quoted runtime that ran it, then the launcher it copies to <config dir>/plugins/claude-hud/statusline.mjs (jarrodwatts/claude-hud@75683c6d scripts/setup.mjs L21-32 and L69-80), with refreshInterval 5 (wave-2 usage ruling, changes 3-5 and 8). The runtime is the install plan's mise Node 24.21.0 (mise.toml). keep_existing: setup.mjs writes the runtime that actually ran it (step 1.7 of the wave-2 install order runs it before this tool's apply), so a value settings.json already has stays. The template's bash wrapper is retired here: Claude Code sets COLUMNS and the 0.10.0 launcher subtracts the padding (statusline.mjs L8-10)."
     },
     {
       "match": [
@@ -226,6 +260,15 @@
       ],
       "wiring": "practice",
       "source": "Model, effort and workflow settings: docs/decisions/2026-09-29-max-default-effort.md, 2026-09-29-sonnet-5-5-dispatch.md and AGENTS.md."
+    },
+    {
+      "match": [
+        "claude/settings/permission/allow/mcp__semble__search",
+        "claude/settings/permission/allow/mcp__semble__find_related"
+      ],
+      "wiring": "authorization:an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3)",
+      "slot": "code-search",
+      "owner": "semble"
     },
     {
       "match": [
@@ -303,7 +346,12 @@
       "owner": "ai-memory",
       "names": [
         "ai-memory"
-      ]
+      ],
+      "override": {
+        "type": "http",
+        "url": "http://${AI_MEMORY_URL}/mcp"
+      },
+      "source": "adoption/mcp/claude-user.json names the repository's default bind, 127.0.0.1:49374; this entry takes the host file's AI_MEMORY_URL, as the Codex entry and the Claude hooks do, so the new distribution's 127.0.0.1:29374 (its host template; the install plan's memory-owner bind) is the one port truth (wave-2 synthesis X5). This tool fills the host value in the override; install_claude_profile.py fills only ${HOME} and ${ECO_ROOT}."
     },
     {
       "match": [
@@ -314,7 +362,18 @@
       "names": [
         "socraticode"
       ],
-      "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement."
+      "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; semble is its interim install."
+    },
+    {
+      "match": [
+        "claude/mcp/server/semble"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "semble",
+      "names": [
+        "semble"
+      ],
+      "source": "The code-search slot's interim install (definitive manifest, amendment 3): the uv tool's console script, SEMBLE_MODEL_NAME on the pinned model's local snapshot and Claude Code's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 4 and 5)."
     },
     {
       "match": [
@@ -384,9 +443,20 @@
     },
     {
       "match": [
+        "codex/config/hooks.state.\"context-mode@context-mode:*"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "context-mode",
+      "names": [
+        "context-mode"
+      ],
+      "note": "The trust of the six hooks of the context-mode plugin at the template's hashes (codex.config.template.toml). On the destination, read each hook's currentHash through `codex app-server` hooks/list after the plugin install and require it to equal the template's before an apply; this tool's merge into the existing config.toml is then the one writer of the trust (wave-2 context ruling, change 9; synthesis X10 and X11). A Codex home without config.toml is created by codex_home.py --keep-hook-trust, which keeps them, so a new home and a merge end the same. Never pass --dangerously-bypass-hook-trust; the /hooks review stays the fallback."
+    },
+    {
+      "match": [
         "codex/config/hooks.state*"
       ],
-      "wiring": "not_wired:each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here",
+      "wiring": "not_wired:each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's Codex hooks in ~/.codex/hooks.json, which ai-memory's installer writes and whose template hashes were taken from ai-memory 2.4.x; for 2.5.2 they are read back through `codex app-server` hooks/list on the destination and compared before they are rendered (wave-2 synthesis X10; context ruling, change 9)",
       "source": "tools/adoption/codex_home.py L85-87"
     },
     {
@@ -460,6 +530,15 @@
     },
     {
       "match": [
+        "codex/*/mcp_servers.semble.default_tools_approval_mode"
+      ],
+      "wiring": "authorization:a tool approval mode of \"approve\" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has",
+      "slot": "code-search",
+      "owner": "semble",
+      "note": "semble's tools carry no MCP annotations, so Codex 0.160.0 asks before each call, and a never policy refuses it (wave-2 code-search ruling, change 2)."
+    },
+    {
+      "match": [
         "codex/*/mcp_servers.ai-memory.*"
       ],
       "wiring": "slot:memory-owner",
@@ -497,6 +576,36 @@
       "names": [
         "context-mode"
       ]
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.semble.*"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "semble",
+      "names": [
+        "semble"
+      ],
+      "source": "command semble, enabled_tools search and find_related, SEMBLE_MODEL_NAME and Codex's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 2, 4 and 5)."
+    },
+    {
+      "match": [
+        "codex/config/tui.status_line"
+      ],
+      "wiring": "slot:statusline",
+      "owner": "tui.status_line",
+      "source": "Codex's native footer with six items (wave-2 usage ruling, change 8; the statusline row's default names it). Item names from codex-rs/tui/src/bottom_pane/status_line_setup.rs at rust-v0.160.0."
+    },
+    {
+      "match": [
+        "codex/config/shell_environment_policy.inherit",
+        "codex/config/shell_environment_policy.set.HOME",
+        "codex/config/shell_environment_policy.set.LANG",
+        "codex/config/shell_environment_policy.set.TERM",
+        "codex/config/shell_environment_policy.set.TMPDIR"
+      ],
+      "wiring": "practice",
+      "source": "docs/secret-storage.md, Codex: inherit = \"none\" with an explicit table of non-secret variables, the practice's Codex control that credential_status.py --client-guards checks (wave-2 custody ruling, change 7). XDG_RUNTIME_DIR and DOCKER_HOST, which that change also lists, depend on the user's id, which no host value carries; they stay out of the table until a host value does."
     },
     {
       "match": [

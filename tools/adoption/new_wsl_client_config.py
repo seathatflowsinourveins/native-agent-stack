@@ -34,8 +34,9 @@ a piece it does not name is an error. The tool does not read the old bootstrap p
              confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy
              and sandbox_mode, and the tool approval mode of a Codex MCP server, which also needs its server wired) only
              with the option. Placeholders
-             are filled by tools/adoption/render_config.py. The telemetry endpoint and the gateway port come from the
-             install plan; HOST_PATH gains the directories of the wired path pieces.
+             are filled by tools/adoption/render_config.py. The telemetry endpoint, the gateway port and AI_MEMORY_BIN
+             (the ai-memory executable the plan's memory-owner row links) come from the install plan; HOST_PATH gains
+             the directories of the wired path pieces.
   --write-blocks
              writes adoption/new-wsl/claude-user-instructions.md and codex-user-instructions.md: the two instruction blocks
              (examples/claude-native/CLAUDE.md, adoption/templates/codex.AGENTS.template.md) with every sentence, list item,
@@ -82,6 +83,7 @@ import re
 import shlex
 import shutil
 import stat
+import string
 import subprocess
 import sys
 import tempfile
@@ -242,7 +244,13 @@ def is_authorization_piece(key: str, value=None) -> bool:
 
 
 def authorization_label(key: str) -> str:
-    return ("Claude Code " if key.startswith("claude/") else "Codex ") + key.rsplit("/", 1)[1]
+    """How --apply names an authorization piece: the client, the Codex profile when the piece is in one (the same tool
+    approval mode can be in the user config and in the stack-worker profile), and an allow rule as one."""
+    group, _, name = key.rpartition("/")
+    if key.startswith("claude/"):
+        return f"Claude Code allow rule {name}" if group.endswith("/permission/allow") else f"Claude Code {name}"
+    profile = {"codex/stack-worker": " stack-worker profile", "codex/omniroute": " omniroute profile"}.get(group, "")
+    return f"Codex{profile} {name}"
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -311,7 +319,22 @@ def load_plan(root: Path) -> dict:
             "ports": {"collector_grpc_port": int(listening.group(1)), "collector_http_port": int(listening.group(2)),
                       "gateway_port": gateway},
             "codex_model": render_config.codex_model_for(release.group(1)),
-            "skills": installed_skills(rows, root)}
+            "skills": installed_skills(rows, root),
+            "ai_memory_bin": ai_memory_link(rows.get("memory-owner") or {})}
+
+
+def ai_memory_link(row: dict):
+    """The path, under $HOME, of the ai-memory executable the plan's memory-owner row links, or None while the row does
+    not install it. The Claude hooks run AI_MEMORY_BIN; without it render_config.py derives the path from the platform's
+    pin (${ECO_ROOT}/tools/ai-memory-<version>/ai-memory), which is not where this plan installs ai-memory."""
+    if not row.get("installed"):
+        return None
+    for command in row.get("commands", []):
+        link = re.search(r'ln -sfn "\$HOME/[^"]+/ai-memory" "\$HOME/([^"$]+/ai-memory)"', command)
+        if link:
+            return link.group(1)
+    raise ConfigError("the install plan's memory-owner row installs ai-memory but links no ai-memory executable under "
+                      "$HOME, so the hooks' AI_MEMORY_BIN could not be read")
 
 
 SKILLS_MANIFEST_REL = "adoption/skills/manifest.json"
@@ -946,6 +969,8 @@ def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> d
     base = values["HOME"].rstrip("/")
     values["OTEL_ENDPOINT"] = f"127.0.0.1:{plan['ports']['collector_http_port']}"
     values["CODEX_MODEL"] = plan["codex_model"]
+    if plan.get("ai_memory_bin"):
+        values["AI_MEMORY_BIN"] = f"{base}/{plan['ai_memory_bin']}"
     values["HOST_PATH"] = ":".join([*(f"{base}/{relative}" for relative in wired_dirs), values["HOST_PATH"]])
     return values
 
@@ -977,12 +1002,17 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
     keep, replaced = keep_of("claude/overlay")
     overlay = prune_settings(read_json(root / TEMPLATES["claude/overlay"]), keep, replaced)
     files["settings.linux-wsl2.overlay.json"] = json.dumps(overlay, indent=2, ensure_ascii=False) + "\n"
-    # The user-scope MCP servers: a wired server with the launch the entry gives it.
+    # The user-scope MCP servers: a wired server with the launch the entry gives it. ${HOME} and ${ECO_ROOT} stay for
+    # install_claude_profile.py, which fills them when it registers the file; an override's other placeholders are host
+    # values and are filled here (ai-memory's URL takes the host file's AI_MEMORY_URL, as the hooks and Codex do).
     servers = {}
+    host_only = {key: value for key, value in values.items() if key not in ("HOME", "ECO_ROOT")}
     for name, spec in read_json(root / TEMPLATES["claude/mcp"]).get("mcpServers", {}).items():
         verdict = wired.get(f"claude/mcp/server/{name}")
         if verdict:
-            servers[name] = {**spec, **verdict.entry.raw.get("override", {})}
+            override = json.loads(string.Template(json.dumps(verdict.entry.raw.get("override", {}))).safe_substitute(
+                host_only))
+            servers[name] = {**spec, **override}
     files["mcp-servers.json"] = json.dumps({"mcpServers": servers}, indent=2, ensure_ascii=False) + "\n"
     # Codex: the user config (placeholders filled), the hooks and the two profiles.
     keep, replaced = keep_of("codex/config")
@@ -1104,12 +1134,22 @@ def agent_gaps(root: Path, results: list, plan: dict) -> dict:
     """{agent file: {"mcp_tools": [...], "skills": [...]}}: what a project agent's frontmatter names that this
     distribution will not have (nothing is installed to fill the gap)."""
     servers = {v.piece.key.rsplit("/", 1)[1] for v in results if v.wired and v.piece.key.startswith("claude/mcp/server/")}
+    # A wired Claude Code plugin supplies its own MCP tools, named mcp__plugin_<plugin>_<server>__<tool>, and its skills,
+    # named <plugin>:<skill> (context-mode's plugin: mcp__plugin_context-mode_context-mode__ctx_execute and
+    # context-mode:context-mode).
+    plugins = {v.piece.key.rsplit("/", 1)[1].split("@", 1)[0] for v in results
+               if v.wired and v.piece.key.startswith("claude/settings/plugin/")}
+
+    def supplied(server: str) -> bool:
+        return server in servers or any(server.startswith(f"plugin_{plugin}_") for plugin in plugins)
+
     gaps = {}
     for path in sorted((root / CLAUDE_AGENTS_REL).glob("*.md")):
         fields = frontmatter(path.read_text(encoding="utf-8"))
         tools = [tool.strip() for tool in fields.get("tools", "").split(",") if tool.strip().startswith("mcp__")]
-        missing_tools = [tool for tool in tools if re.match(r"mcp__(.+?)__", tool).group(1) not in servers]
-        missing_skills = [skill for skill in fields.get("skills", "").split(",") if skill and skill not in plan["skills"]]
+        missing_tools = [tool for tool in tools if not supplied(re.match(r"mcp__(.+?)__", tool).group(1))]
+        missing_skills = [skill for skill in fields.get("skills", "").split(",") if skill and skill not in plan["skills"]
+                          and skill.partition(":")[0] not in (plugins if ":" in skill else ())]
         if missing_tools or missing_skills:
             gaps[path.name] = {"mcp_tools": missing_tools, "skills": missing_skills}
     return gaps
@@ -1701,8 +1741,9 @@ class Apply:
         because its step was skipped or failed."""
         if not self.args.with_authorization_settings:
             print("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode and "
-                  "skipDangerousModePermissionPrompt and Codex approval_policy and sandbox_mode are not written, and a "
-                  f"value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file lacks)")
+                  "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, and the tool approval modes "
+                  "and allow rules of the wired MCP servers are not written, and a value of theirs that a file has is not "
+                  f"touched; {AUTHORIZATION_OPTION} adds the ones a file lacks)")
             return
         verdict_of = {v.piece.key: v for v in self.results if v.authorization and v.wired}
         by_status = {status: [authorization_label(key) for key in verdict_of if self.authorization.get(key) == status]
@@ -1799,6 +1840,12 @@ class Apply:
                     and verdict.piece.group in ("claude/settings", "claude/overlay")):
                 continue
             path = list(verdict.piece.path)
+            if isinstance(path[-1], int):
+                # A rule of a permission list (an allow rule): the file has it or it is added; the merge unions the list.
+                present, rules = lane.get_path(current, path[:-1])
+                found[verdict.piece.key] = ("same" if present and isinstance(rules, list) and verdict.piece.value in rules
+                                            else "added")
+                continue
             have, mine = lane.get_path(current, path), lane.get_path(wanted, path)
             if have[0] and mine[0]:
                 name = ".".join(str(part) for part in path)
@@ -1905,8 +1952,10 @@ class Apply:
             return
         if running:
             self.say("codex-config", f"  DRY RUN: {self.codex_dry_note(running, how).strip()}")
+        # --keep-hook-trust: the render's [hooks.state] approvals are the ones the map wires, which the merge into an
+        # existing config.toml adds too, so a new home and a second run end with the same file.
         argv = [str(ROOT / "tools/adoption/codex_home.py"), "--rendered", str(self.stage / "codex.config.toml"),
-                "--eco-root", str(self.eco), "--codex-home", str(self.codex_home)]
+                "--eco-root", str(self.eco), "--codex-home", str(self.codex_home), "--keep-hook-trust"]
         codex = self.binary("codex", self.args.codex_bin)
         if codex:
             argv += ["--codex", codex]
@@ -2067,7 +2116,9 @@ class Apply:
             self.record("verify", "skipped", "a dry run starts no shell")
             return
         servers = json.loads((self.stage / "mcp-servers.json").read_text())["mcpServers"]
-        names = list(dict.fromkeys(["claude", "codex", "mise", *(spec["command"] for spec in servers.values())]))
+        # A stdio server runs a command a login shell must find; an http server (ai-memory) runs none here.
+        commands = (spec["command"] for spec in servers.values() if "command" in spec)
+        names = list(dict.fromkeys(["claude", "codex", "mise", *commands]))
         found = login_shell_resolution(self.home, names)
         launcher = self.eco / "bin" / "claude"
         problems = []

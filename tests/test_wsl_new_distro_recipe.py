@@ -462,6 +462,14 @@ def plan_collector_ports() -> tuple[int, int]:
     return int(match.group(1)), int(match.group(2))
 
 
+def plan_memory_port():
+    """The port of the install plan's memory-owner service while the plan installs it (its interim install, ai-memory on
+    the host template's AI_MEMORY_URL: wave-2 synthesis X5), else None."""
+    row = next((row for row in plan_rows() if row["slot"] == "memory-owner"), {})
+    service = row.get("service") if row.get("installed") else None
+    return int(service["port"]) if isinstance(service, dict) and service.get("port") is not None else None
+
+
 def plan_loopback_ports() -> set[int]:
     """Every loopback port the install plan's services (their ``service.port``) and configuration files use."""
     ports = {int(row["service"]["port"]) for row in plan_rows()
@@ -473,7 +481,7 @@ def plan_loopback_ports() -> set[int]:
 
 def host_template_errors(template: str, example: dict, recipe: str, user: str = "example") -> list[str]:
     errors = []
-    collector, plan_used = plan_collector_ports()[1], plan_loopback_ports()
+    collector, memory, plan_used = plan_collector_ports()[1], plan_memory_port(), plan_loopback_ports()
     if "$" in template.replace(PLACEHOLDER, ""):
         errors.append("the host template has a $ other than ${WSL_USER}")
     try:
@@ -495,7 +503,12 @@ def host_template_errors(template: str, example: dict, recipe: str, user: str = 
         if key == "OTEL_ENDPOINT" and port != collector:
             errors.append(f"OTEL_ENDPOINT uses {port}; the install plan's collector listens on {collector} (OTLP/HTTP), "
                           "the port the client-configuration tool renders into both clients")
-        elif key != "OTEL_ENDPOINT" and port in plan_used:
+        elif key == "AI_MEMORY_URL" and memory is not None and port != memory:
+            errors.append(f"AI_MEMORY_URL uses {port}; the install plan's memory-owner serves on {memory}, the port both "
+                          "clients take from this value (wave-2 synthesis X5)")
+        elif key not in ("OTEL_ENDPOINT", "AI_MEMORY_URL") and port in plan_used:
+            errors.append(f"{key} uses {port}, a port the install plan's services use")
+        elif key == "AI_MEMORY_URL" and memory is None and port in plan_used:
             errors.append(f"{key} uses {port}, a port the install plan's services use")
     if len(set(ports)) != len(ports):
         errors.append("two services share a port")
@@ -1308,8 +1321,10 @@ class HostTemplateTests(unittest.TestCase):
         self.assertEqual((grpc, http), tuple(int(port) for port in stated.groups()))
         values = json.loads(string.Template(read(HOST_TEMPLATE)).substitute(WSL_USER="example"))
         self.assertEqual(values["OTEL_ENDPOINT"], f"127.0.0.1:{http}")
+        # AI_MEMORY_URL is the port of the plan's memory-owner service (wave-2 synthesis X5: one port truth).
+        self.assertEqual(values["AI_MEMORY_URL"], f"127.0.0.1:{plan_memory_port()}")
         # None of the template's other ports is one the plan's services or configuration files use.
-        others = {int(values[key].rsplit(":", 1)[1]) for key in URL_KEYS if key != "OTEL_ENDPOINT"}
+        others = {int(values[key].rsplit(":", 1)[1]) for key in URL_KEYS if key not in ("OTEL_ENDPOINT", "AI_MEMORY_URL")}
         self.assertEqual(others & plan_loopback_ports(), set())
         self.assertEqual(others & WORKSTATION_PORTS, set())
 
@@ -1401,7 +1416,8 @@ class StageTwoTests(unittest.TestCase):
 
     def test_the_after_sign_in_owners_are_read_from_the_plan_and_accept_sh_takes_the_stage_and_the_slot(self):
         owners = plan_after_sign_in_slots()
-        self.assertEqual(owners, ["codex", "claude-agent-sdk", "codex-sdk-and-codex-exec-app-server",
+        # tobi-qmd's after-provisioning check joined with the wave-2 records (2026-10-03; wave-2 qmd ruling, change 16).
+        self.assertEqual(owners, ["codex", "claude-agent-sdk", "codex-sdk-and-codex-exec-app-server", "tobi-qmd",
                                   "local-model-server", "agent-runtime-worker", "research-harnesses"])
         script = read(PLAN_DIR / "accept.sh")
         for part in ("--only)", "--stage)", "post_install|service_health|after_sign_in) ;;"):

@@ -35,7 +35,7 @@ CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.md", "
                        "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md")
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
-USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd"}
+USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd", "semble"}
 # A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
 # it out: jCodeMunch registers per project (2026-09-25 addendum of docs/decisions/2026-09-23-claude-user-profile.md;
 # its user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex. The
@@ -46,6 +46,14 @@ USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebas
 CARRIER_EXCEPTIONS = {
     "jcodemunch": (("adoption/bootstrap.md", "claude mcp add --scope local jcodemunch"),
                    ("adoption/templates/codex.config.template.toml", "jcodemunch stays project-scoped (#240)")),
+}
+# A server the user-scope template registers that no carrier block names, with each file and the phrase in it that says
+# why: semble is the code-search slot's interim install on the new WSL distribution (definitive manifest, amendment 3),
+# whose SubagentStart carrier the wave-2 code-search ruling keeps unwired there (change 7); the instruction blocks carry
+# its lane instead.
+UNCARRIED_SERVERS = {
+    "semble": (("adoption/mcp/claude-user.json", "semble joins, the code-search slot's interim install"),
+               ("adoption/new-wsl/client-config-map.json", "keeps it unwired here (change 7)")),
 }
 # Codex-side variables a Claude registration does not carry: the installer renders no ${HOST_PATH}, and serena's
 # entry has carried neither since 2026-09-23.
@@ -95,6 +103,12 @@ CLIENT_ARGS = {
     "socraticode": {"${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/lib/node_modules/socraticode/dist/index.js":
                     "${ECO_ROOT}/bin/socraticode"},
 }
+# Environment values that differ by client on purpose, Codex value -> Claude value: each client keeps its own semble cache,
+# since a cache shared by two processes can keep serving an index another process rebuilt (wave-2 code-search ruling,
+# change 5).
+CLIENT_ENV = {
+    "semble": {"SEMBLE_CACHE_LOCATION": {"${HOME}/.cache/semble-codex": "${HOME}/.cache/semble-claude"}},
+}
 
 
 def codex_host_values() -> dict:
@@ -125,7 +139,9 @@ def codex_parity_errors(claude: dict, codex: dict, values: dict) -> list[str]:
         mapped = [CLIENT_ARGS.get(name, {}).get(arg, arg) for arg in other.get("args", [])]
         if entry.get("args", []) != mapped:
             errors.append(f"{name}: arguments differ")
-        expected_env = {key: render(value) for key, value in other.get("env", {}).items() if key not in CODEX_ONLY_ENV}
+        per_client = CLIENT_ENV.get(name, {})
+        expected_env = {key: per_client.get(key, {}).get(render(value), render(value))
+                        for key, value in other.get("env", {}).items() if key not in CODEX_ONLY_ENV}
         if set(entry.get("env", {})) != set(expected_env):
             errors.append(f"{name}: env names differ")
         elif entry.get("env", {}) != expected_env:
@@ -1077,7 +1093,7 @@ class McpMatchTests(unittest.TestCase):
 class McpTemplateShapeTests(unittest.TestCase):
     def test_template_names_the_expected_servers(self):
         # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in; socraticode, headroom,
-        # codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
+        # codebase-memory and qmd joined on 2026-09-30, the Codex user template's set, and semble on 2026-10-03.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
         self.assertEqual(set(data["mcpServers"].keys()), USER_SCOPE_SERVERS)
         self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
@@ -1123,8 +1139,13 @@ class McpCarrierCoverageTests(unittest.TestCase):
         registered = set(template_server_names())
         carrier = carrier_blocks_text(self.BLOCKS)
         self.assertEqual(carrier_coverage_errors(carrier, registered, CARRIER_EXCEPTIONS, self.read), [])
-        # Exactly: no server the carrier blocks do not name.
-        self.assertEqual(registered, carrier_servers(carrier) - set(CARRIER_EXCEPTIONS))
+        # Exactly: no server the carrier blocks do not name, but the uncarried ones whose reason is still written.
+        self.assertEqual(registered - set(UNCARRIED_SERVERS), carrier_servers(carrier) - set(CARRIER_EXCEPTIONS))
+        for name, sources in UNCARRIED_SERVERS.items():
+            self.assertIn(name, registered)
+            self.assertNotIn(name, carrier_servers(carrier))     # a server the carrier names needs no exception
+            for path, phrase in sources:
+                self.assertIn(phrase, self.read(path) or "", f"{name}: the reason is not in {path}")
 
     def test_a_server_named_only_by_a_role_block_is_caught(self):
         # Control for reading every block: a server that only a role block names is invisible to the general block
@@ -1454,12 +1475,16 @@ class PortableTopRuleTests(unittest.TestCase):
     operator's user-level file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex
     routing and skill matching, then the coordinator scoping and pinned-launch rule of the Gate A owner's review
     (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
+    Re-baselined on 2026-10-03 to 1,962 words (1,808 before): phase 0.3 of the wave-2 synthesis asks for instruction lines
+    in both client blocks, which no existing text held (context-mode's working directory, semble's lane, the GPT
+    Researcher entry and Claude Code to Codex messaging; the 2026-10-03 addendum of
+    docs/decisions/2026-10-02-new-wsl-client-configuration.md); the 5% rule applies from that baseline.
     docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1750  # Python str.split() count after the Gate A owner's review of PR #557 (1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1962  # Python str.split() count after the wave-2 instruction lines of 2026-10-03 (1,808 before them; 1,750 after the Gate A owner's review of PR #557, 1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
