@@ -388,9 +388,11 @@ locally with `GH_TOKEN` set and no `--offline`, using
   command and skill definitions under `.claude`, `.codex` or `.agents`, names matched in any ASCII letter case, are
   configuration), so another file there, such as a JSON launch configuration under `evidence/**`, is not scanned; a
   route that never spells the directory's name, such as a step that reads the path from the OSV inventory, is not
-  caught either (the receipt's `indirect_routes` records why these routes stay limits, the alternatives declined and
-  the dated backstop of the OSV exception), and the guard is only as strong as review of the module itself, since any
-  part of it can be changed in the change that adds a use and the main ruleset requires no code-owner review.
+  caught either (the receipt's `indirect_routes` records why these routes stay limits, the alternatives declined, the
+  dated backstop of the OSV exception, and the same day's convergence decision to rename both files to `.frozen` and
+  stop scanning them in a follow-up pull request, which supersedes this dismissal when it merges), and the guard is
+  only as strong as review of the module itself, since any part of it can be changed in the change that adds a use
+  and the main ruleset requires no code-owner review.
   **Overturn:** reopen the alert if an application is built, run or served from the frozen lock (then the overturn
   above applies). The dismissal lasts until the alert is reopened: recheck alert 16 when the exception in
   `.github/osv-scanner-frozen-macos.toml` (`ignoreUntil` 2026-12-24) is renewed, changed or removed, which that
