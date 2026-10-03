@@ -402,3 +402,137 @@ Claude lane's review, which names each one.
 - For an amendment: the comparison it names returns. The amended row itself is overturned as its own record says.
 - For the rule: the owner withdraws the sentence that allows it. A consensus row that is found to replace a blind
   definitive default or a measured result breaks the rule's last sentence and does not stand.
+
+## Wave 2 (2026-10-03): amendment 3, a status-line row, two amendments and three interim installs
+
+The record gains a second batch, `wave2` in `consensus.json`, with its own hashed record
+(`evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json`), its own acknowledgements and the families
+whose acknowledgement it still owes. The assembler applies it after the record's own rows and amendments and prints,
+for the regenerated manifest:
+
+```
+layers 37 | slots 90 {'foundation': 70, 'us-equities': 20} | definitive 31 | installed 57 | interim 3 | {'first_round': 53, 'added': 10, 'consensus': 6, 'judged': 11, 'pinned': 6, 'project_practice': 2, 'no_blind_default_today': 2} | {'definitive': 31, 'resolved': 23, 'measurement': 4, 'split': 7, 'open': 25} | amendments 8 on 7 rows
+```
+
+The batch rests on the wave-2 run `wf_18aa601f-b71` (14 layers, each a Claude dossier, a GPT-6 Astra check through
+`codex exec` and a Claude ruling) and its synthesis (`wsl-architecture-design-wave2-final-architecture-20261003.md`, sha256
+`3b51261387827a2c7c3eb0d866e36e2976ff8d66eb0b4ee9febb206878c4a8c1`). Both are private coordination records. `wave2-records.json` carries,
+per layer the batch uses, the dossier's default, the GPT check's verdict and model, the ruling's decided default and the
+ruling's changes that the repository records cite, each event hashed in canonical JSON, with the journal's sha256
+`5f904de283d268f787b24bb0e8ee7c5dda07acf10faa6637861c4c2a9d40ecef`; it also carries the synthesis items the records rest on (X1 to X3, X5, X10
+to X12, X16 to X18 and its phase 0) and the owner's decisions of 2026-10-03 as the coordinator's records relay them.
+
+### Amendment 3
+
+The rule text, verbatim. The assembler appends it to the manifest's `decision_rule`, after the consensus rule:
+
+> Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it.
+
+Its exception to the no-install rule, verbatim. The manifest carries it as `no_install_rule_exception`, beside the
+no-install rule, which stays as the first round wrote it:
+
+> Amendment 3 makes one exception to the no-install rule: an interim install puts something extra on the destination before measured evidence shows a gain, on documented fit and the authority it names, and only until its named measurement decides; the row's decided default, which installs nothing, stays recorded beside it.
+
+Why it exists: the wave-2 ruling for the code-search layer (its change 1) found that every part of the chain refused an
+interim install on a split or waiting row (the protected fields, the install plan's checker and the client
+configuration's slot rule), and the GPT family's whole-wave read
+([pull request 608, comment 5965501630](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630))
+asked that the mechanism keep the blind decisions, add explicit superseding authority and evidence, and not bypass the
+protected outcomes. The interim is therefore a field of its own, outside the protected fields: the row's decided
+default, state, definitive flag, repository, install flag and row kind stay as the rounds recorded them.
+
+What the assembler holds an interim to: its slot exists and its decided default installs nothing; the row carries no
+interim yet; the interim has its date, default, https repository, pin, label, what decides it, its authority, both
+families' reviews and at least one hashed record, which exists with its recorded SHA-256; the authority is the owner's
+dated decision (with the record that relays it) or a direct consensus with both families' acknowledgements; no other
+installed row owns the row's job; and an amendment cannot carry an interim. An owner's decision is resolved in the record
+it names: its `relayed_by` (`<records file> owner_decisions[<n>]`) must point at an entry of one of the interim's hashed
+records, dated as the authority is, that names the slot or the owner (the last part of the interim's repository), so the
+record itself keeps a hold the owner kept, such as the browser's (added 2026-10-03 after the branch review). A mention is
+not an authorization: the entry's `authorizes` must also list the interim's exact slot and repository under an
+affirmative action, `install` or `use`, the decision's own verb. The record lists `memory-owner` with
+`akitaonrails/ai-memory` and `code-search` with `MinishLab/semble` (`owner_decisions[0]`, `install`), and
+`context-supply` with `mksglu/context-mode` (`owner_decisions[1]`, `use`); crawl4ai, which the kept browser hold names
+as a candidate to measure first, is in no such list, so a browser interim relayed by that entry is refused (added
+2026-10-03 after the Codex root lane's source read of `b6828c7d`, finding 1). The batch
+needs its rule texts and its records, and `acknowledgements_owed` must name exactly the families without an
+acknowledgement. It stops with a message and a non-zero exit otherwise. Three readers use the interim: the install plan's
+checker compares the plan row's owner and repository with the interim's, requires the plan to install it and requires its
+install function to call the acknowledgement gate first; the client configuration treats the interim's default as what
+the slot installs; and the definitive-defaults record lists the interims in a table of their own.
+
+### The three interim installs
+
+- **`memory-owner`**: ai-memory 2.5.2 (`akitaonrails/ai-memory` tag v2.5.2 = `7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83`),
+  zero-LLM with the local embedder set explicitly, on 127.0.0.1:29374 with a fresh store. Authority: the owner's
+  decision of 2026-10-03 (decision 2 of the synthesis lifts the memory hold). Reviews: the Claude ruling installs it
+  only once the owner lifts the hold; the GPT check agreed with conditions, its first condition keeping the hold unless
+  the owner supersedes it, and the whole-wave read, before the owner's decision, recommended keeping the hold. Decided
+  by the memory head-to-head at its frozen revision (D3r2 or later). The port is the one the host template and the
+  client templates already carry (synthesis X5); the ruling's 21374 is not used.
+- **`code-search`**: semble 0.6.1 (`MinishLab/semble` tag v0.6.1 = `24497845460960db1839c8485319df189a889225`) with the
+  model `minishlab/potion-code-16M-v2` pinned at `e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b` from a local snapshot, MCP
+  only, CPU only, no port. Authority: the owner's decision of 2026-10-03 (decision 2 lifts the code-search hold).
+  Reviews: the Claude ruling names semble as the interim once amendment 3 exists; the GPT check agreed with conditions;
+  the whole-wave read, before the owner's decision, recommended keeping the hold. Decided by the frozen code-search
+  confirmatory: semble selected, it becomes final once its pins equal the annex's; another arm selected, it replaces
+  semble; no selection, the slot returns to empty.
+- **`context-supply`**: context-mode 1.0.169 (`mksglu/context-mode` at `6f0cc6841c687e754059f36714a11233fda1a02b` for the
+  plugins, the npm tarball 1.0.169 for the Codex session server). Authority: the owner's pin, in the owner's words
+  "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond
+  simple action of web search". The row's decided default stays the definitive no-install verdict of the decision round.
+  Reviews: the Claude ruling adopts the pin as the slot's interim; the GPT check disagreed and named no additional layer,
+  with context-mode kept as the user-mandated exception until acceptance and a comparison support promotion; the
+  whole-wave read keeps the explicit user pin. Decided by a preregistered end-to-end comparison against the clients'
+  native output limits, none on file yet; its result goes to the owner, and the pin is never removed automatically.
+
+The browser hold stays: `playwright-cli` carries no interim, because the owner wants an LLM-native browser practice
+measured first. The two local-model rows are settled by their own measurement record, not by this batch.
+
+### The added row
+
+- **`statusline`** (layer `token-efficiency`, state `resolved`, installs). Default: claude-hud 0.10.0
+  (`jarrodwatts/claude-hud` tag v0.10.0 = `75683c6de1ac07f6bbef00d739001679dba0740c`, marketplace
+  `jarrodwatts/claude-hud#v0.10.0`, auto-update off) for Claude Code; Codex shows its native footer with six items. Job:
+  the interactive status line of the two clients. The layer is token-efficiency, beside the usage meter whose readings
+  the status line shows; the usage meter stays none by design. Runner-up: claude-powerline 1.32.1 (a second cost meter
+  by default and an unpinned pricing fetch). Its four open acceptance gates do not hold its install.
+
+### The two amendments
+
+- **`credential-custody`**: keep the measurement; each arm passes an eligibility gate before it is scored; HASP 1.0.44
+  is ineligible on Linux as documented; systemd-creds --user, scoped to the storage part, becomes the deciding storage
+  comparison. The row's state and install flag stay as they were (custody ruling, change 15).
+- **`credential-guard`**: the guard's gateway rule covers the destination gateway's ports 21128 and 21129 before that
+  gateway holds accounts; the guard's scope stays Claude Code's Bash tool (custody ruling, change 11).
+
+### Acknowledgements owed
+
+The batch lists no acknowledgement yet: `acknowledgements_owed` names both families, and the manifest carries both
+lists under `consensus_wave2`. The pull-request comments that acknowledge the batch are added to it when its pull
+request exists; until then the added row's label and both amendments say that their acknowledgements are owed. For the
+three interim installs the authority is the owner's decision, not a consensus; their labels say so and claim no
+consensus.
+
+The gate (added 2026-10-03 after the branch review; the code-search ruling's change 1: "Until all of that exists, nothing
+is installed"). The rule amendment itself waits for both acknowledgements, so nothing installs or wires an interim while
+`acknowledgements_owed` names a family. It is held where installing happens, not in the assembler, so the records and
+their checks pass while the pull request collects the acknowledgements:
+
+- `evidence/artifacts/new-wsl-install-plan-20261002/install.sh`: the install function of each interim row first calls
+  `interim_acknowledged`, which reads this batch's `acknowledgements_owed` and refuses while it is not empty;
+  `check_plan.py` fails a plan whose interim row's function does not call it first.
+- `tools/adoption/new_wsl_client_config.py --apply` refuses, and writes nothing, while a render wires an interim install
+  and an acknowledgement is owed; its dry run says that a real run would refuse.
+
+Recording both acknowledgements in this batch (which empties `acknowledgements_owed`) opens the gate; tests cover both
+sides.
+
+### Not established by this batch
+
+- No comparison named here has run, and no interim's open acceptance gate has run. A selection or an owner's decision
+  is not a host acceptance.
+- This record changes nothing on any host. What the coordinator installs on the destination is recorded by its own
+  receipts, not by this record.
+- The GPT family's whole-wave read blocks the synthesis as a final architecture and keeps it as a conditional proposal;
+  this batch records the owner's decisions and the selections, not a final architecture.
