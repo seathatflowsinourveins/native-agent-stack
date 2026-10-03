@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-gpt-lane-omniroute-failover.md",
-      "sha256": "43e138dd57872210ad7b8549a284ab2d7f7a91942093195f55938e09dcdd90c1",
-      "bytes": 16401
+      "sha256": "fc541ea35372fed4256af2927371fbd366b365ccbb27096bf9ce4a7b3f041946",
+      "bytes": 23761
     },
     {
       "path": "docs/direct-results.md",
@@ -49971,8 +49971,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "79773c94b71b3f0dee8911f5470205499ea4f776a6f08502585acb95ff9cb7d9",
-      "bytes": 295097
+      "sha256": "a92a6da603ac650ad49ad4ff0cd116146b21ad929cbaa3f3a946e02e7e38ab69",
+      "bytes": 309351
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -50691,13 +50691,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "ddc0daed72aad649b085a037586739e98890d5ea993ee288177ff9fbfb703e9f",
-      "bytes": 99728
+      "sha256": "70e9b928087eac704b20e255b63447adac719e1dca6df9c7f362a22c38a7a584",
+      "bytes": 101473
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "2ba3da7e44e3034eb43d065ff8db6c92f4f3f7c71dd1be07d9f1d1a4cc23d9df",
-      "bytes": 51065
+      "sha256": "0fbd99b30bd5a1225b1a251691f7b7d3fdf935b3df3e501f1fd29be86e6da0b5",
+      "bytes": 51492
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
@@ -50711,8 +50711,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "1cbf487d610ebc3474a127519686f500d9ddc381d95a7f88ad3f219698924131",
-      "bytes": 78657
+      "sha256": "beae25c90f40f9ccaed90f940507dfb63ca4737bcba3e8681540373a767cde32",
+      "bytes": 81310
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
