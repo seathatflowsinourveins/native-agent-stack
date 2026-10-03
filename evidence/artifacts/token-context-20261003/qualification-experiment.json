@@ -2413,7 +2413,7 @@
       "artifacts": [
         {
           "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
-          "sha256": "361c1c0f407508d2b09f4eae425d2aaf182ed1ba239c5d190abfe51190c36fa5"
+          "sha256": "e4f30efea33131ce278a19b935907eafccd25bd592b19606d6cf03030dbb3787"
         }
       ],
       "usage": {

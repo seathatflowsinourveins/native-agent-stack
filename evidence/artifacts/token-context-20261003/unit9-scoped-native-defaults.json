@@ -101,5 +101,11 @@
     "missed_modalities": "C3/N5 source visibility, uniform structured model use, interrupted/helper/billing formats, long-session protection and owner-bound retrieval.",
     "next_sweep": "Use maintained releases and fixed exact tasks to overturn a scoped decision; current selected release metadata remains unchanged at2026-10-03T12:53Z."
   },
-  "privacy": "Sanitized metadata only; no fact values, native IDs, conversations or host/auth paths."
+  "privacy": "Sanitized metadata only; no fact values, native IDs, conversations or host/auth paths.",
+  "definitive_manifest_proposal": {
+    "applied": false,
+    "source": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md atacceptedmain4ced2923063db6a6dcafa9f25af5ee05a4153c75",
+    "proposed_annotation": "Keep no context-supply layer. For the tested inclusive usage scopes, finalized native client records are authoritative; ccusage remains a supplemental usage view with known helper and compaction omissions.",
+    "boundary": "Distribution accounting qualification does not establish context-protection winner or authorize changing the definitive row."
+  }
 }

@@ -15811,8 +15811,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-native-scoped-defaults.md",
-      "sha256": "264bdee8a83dbc0dcd988f646edb53be816368112df27d4e2dfcb5aea7fd0ece",
-      "bytes": 4118
+      "sha256": "0e5f50aedbd949892e740ab727363cbf68555e4c49cd24da83f850cf5425f530",
+      "bytes": 4647
     },
     {
       "path": "docs/direct-results.md",
@@ -45551,7 +45551,7 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "e5e87c18a767ae92e1516929bbdc518f8124f8ba6d3a448ae82a2cb4280f9e72",
+      "sha256": "f3c2f33779b615ddf8683bc01c327bdf98d1b8e5f96631793d21cb25d0a2409a",
       "bytes": 106627
     },
     {
@@ -45651,8 +45651,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
-      "sha256": "361c1c0f407508d2b09f4eae425d2aaf182ed1ba239c5d190abfe51190c36fa5",
-      "bytes": 6200
+      "sha256": "e4f30efea33131ce278a19b935907eafccd25bd592b19606d6cf03030dbb3787",
+      "bytes": 6771
     },
     {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
