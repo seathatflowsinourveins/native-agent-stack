@@ -15805,6 +15805,11 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-macos-full-suite-coverage.md",
+      "sha256": "2a4eb8819b32b7bf7c9f83e8df1d35e86e9da61075440c02e1027bafaafea7b3",
+      "bytes": 22715
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15936,8 +15941,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "d287f7a805406b916eea9408ecb50851cbf8b7deb92a8a3c7c0a584d2bd4b2a3",
-      "bytes": 143284
+      "sha256": "d03b81d956d95ea21d53c9cc71baa9c0924c638abdddb937176864e7fd4135e2",
+      "bytes": 146361
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -31728,6 +31733,16 @@
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
       "sha256": "c51d516dd0ff1e3438d2a9371b089e647c621c749a723e488b57190b4034d5c5",
       "bytes": 22807
+    },
+    {
+      "path": "evidence/artifacts/github-ci-measurements-20261003/input.json",
+      "sha256": "d01f9b6398988964dec35bdb567f5b0f72fe5419255818fbf49beea81ebc127c",
+      "bytes": 15399
+    },
+    {
+      "path": "evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json",
+      "sha256": "b100809511623c4cc13ef62939f7cf52e3113b40eae63952146657ed47f56ab3",
+      "bytes": 56770
     },
     {
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
@@ -48013,6 +48028,11 @@
       "path": "evidence/receipts/github-automation-newpc-20260922.json",
       "sha256": "531713a7a8062ff78d8f541ea92ea57eb665d28c7a1f875f538fe3cd26d38a63",
       "bytes": 5836
+    },
+    {
+      "path": "evidence/receipts/github-ci-measurements-20261003.json",
+      "sha256": "fa4f3cf96679d17fd3813ee48e555e34893f41c9d32db6bc42f26ec104c16e1b",
+      "bytes": 53778
     },
     {
       "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json",
