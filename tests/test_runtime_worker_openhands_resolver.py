@@ -1498,6 +1498,11 @@ leak = int(sys.argv[sys.argv.index("--exit-code") + 1])
 sys.exit(1 if "BROKEN" in text else leak if "LEAK" in text else 0)
 """
 
+# A host path for host_path refusals that does not depend on TMPDIR. A path under a TMPDIR inside a
+# personal home path is refused first as scripts/validate.py PRIVATE_CONTENT. The first component does
+# not exist, so realpath returns this path unchanged on Linux and macOS.
+SYNTHETIC_HOST_ROOT = "/resolver-fixture-host/state/attempt"
+
 
 class OutgoingGuardTests(unittest.TestCase):
     """Unit 6: the outgoing-text guard (plan section 3), before any text reaches GitHub."""
@@ -1511,7 +1516,7 @@ class OutgoingGuardTests(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp(prefix="resolver-guard-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.key_value = secrets.token_urlsafe(32)
-        self.host_root = str(self.tmp / "state" / "attempt")
+        self.host_root = SYNTHETIC_HOST_ROOT
         self.guard = self.g.OutgoingGuard(directory=self.g.private_directory(self.tmp),
                                           session_key=self.g.SessionKey(self.key_value),
                                           host_paths=[self.host_root], user_name="fixtureuser")
@@ -1562,6 +1567,10 @@ class OutgoingGuardTests(unittest.TestCase):
         self.refused("It was FixtureUser's run", "host_user_name")
         for text in ("fixtureusers and prefix_fixtureuser are other words", "a state/attempt path without a root"):
             self.guard.check(text)
+        for paths, user in ((["/tmp"], "fixtureuser"), (["relative/dir"], "fixtureuser"), ([self.host_root], "")):
+            with self.subTest(paths=paths, user=user), self.assertRaises(ValueError):
+                self.g.OutgoingGuard(directory=self.g.private_directory(self.tmp),
+                                     session_key=self.g.SessionKey(self.key_value), host_paths=paths, user_name=user)
         real = self.tmp / "real"
         real.mkdir()
         link = self.tmp / "link"
@@ -1569,14 +1578,18 @@ class OutgoingGuardTests(unittest.TestCase):
         guard = self.g.OutgoingGuard(directory=self.g.private_directory(self.tmp),
                                      session_key=self.g.SessionKey(self.key_value), host_paths=[str(link)],
                                      user_name="fixtureuser")
+        # A real link needs a real temporary root, so this case probes its prerequisite, as git's
+        # test_lazy_prereq does. If the root is PRIVATE_CONTENT (a personal home path), the guard refuses
+        # both texts as private_content first. It comes last: under failfast a skipped subtest ends the test.
+        temp_root_is_private = any(pattern.search(f"{self.tmp}/") for _, pattern in self.g.PRIVATE_CONTENT)
         for text in (f"{link}/x", f"{os.path.realpath(real)}/x"):
-            with self.subTest(text=text), self.assertRaises(self.g.GuardRefused) as caught:
-                guard.check(text)
-            self.assertEqual(caught.exception.reason, "host_path")
-        for paths, user in ((["/tmp"], "fixtureuser"), (["relative/dir"], "fixtureuser"), ([self.host_root], "")):
-            with self.subTest(paths=paths, user=user), self.assertRaises(ValueError):
-                self.g.OutgoingGuard(directory=self.g.private_directory(self.tmp),
-                                     session_key=self.g.SessionKey(self.key_value), host_paths=paths, user_name=user)
+            with self.subTest(text=text):
+                if temp_root_is_private:
+                    self.skipTest("prerequisite missing: TMPDIR is under a personal home path, which the guard "
+                                  "refuses as private_content before host paths")
+                with self.assertRaises(self.g.GuardRefused) as caught:
+                    guard.check(text)
+                self.assertEqual(caught.exception.reason, "host_path")
 
     def test_model_text_may_not_close_issues_or_mention_accounts(self):
         for text, reason in (("Fixes #5", "closing_keyword"), ("this closes: #7", "closing_keyword"),
@@ -1853,7 +1866,7 @@ class PullRequestLoopTests(unittest.TestCase):
         self.key_value = secrets.token_urlsafe(32)
         self.guard = self.g.OutgoingGuard(directory=self.g.private_directory(self.tmp),
                                           session_key=self.g.SessionKey(self.key_value),
-                                          host_paths=[str(self.tmp)], user_name="fixtureuser")
+                                          host_paths=[str(self.tmp), SYNTHETIC_HOST_ROOT], user_name="fixtureuser")
 
     def harness(self, github):
         return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=planted_base(self.home),
@@ -1923,7 +1936,7 @@ class PullRequestLoopTests(unittest.TestCase):
         self.assertEqual(self.r.pr_title(12, "two\nlines\tand tabs"), "[#12] two lines and tabs")
         for changes, reason in (({"final_message": "thanks @octocat"}, "mention"),
                                 ({"final_message": "This fixes #3 too"}, "closing_keyword"),
-                                ({"sota_sources": [f"see {self.tmp}/notes"]}, "host_path"),
+                                ({"sota_sources": [f"see {SYNTHETIC_HOST_ROOT}/notes"]}, "host_path"),
                                 ({"final_message": f"key {self.key_value}"}, "session_key")):
             with self.subTest(reason=reason), self.assertRaises(self.g.GuardRefused) as caught:
                 self.r.build_pr_body(resolver_receipt(**changes), guard=self.guard)
