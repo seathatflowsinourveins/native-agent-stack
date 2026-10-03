@@ -49629,8 +49629,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-alertmanager.yml.example",
-      "sha256": "11cb872dd788bc26035213691580a19f779bb6d0f29d3a17c52a846c63290b64",
-      "bytes": 906
+      "sha256": "1c1188938dea6f4cd9510d6220153cb25f611f14a7494efa72a5349672bf6ee3",
+      "bytes": 1130
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
@@ -50834,8 +50834,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "ffef5a77a903a12b6fea40fe78fb2db66716a8847ce2610402e50d3747a34156",
-      "bytes": 23733
+      "sha256": "52127cd65bc1e47690e5b25147bf7ed5401ce28a76d81a557fcc34f219e994c4",
+      "bytes": 23943
     },
     {
       "path": "tests/test_observability_run_correlation.py",

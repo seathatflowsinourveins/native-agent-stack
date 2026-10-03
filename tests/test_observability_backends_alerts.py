@@ -415,7 +415,7 @@ class CodexLaneRuleTests(unittest.TestCase):
 
 @unittest.skipUnless(AMTOOL.exists(), "amtool not installed at the documented ecosystem tool path")
 class CodexLaneRouteTests(unittest.TestCase):
-    """``amtool config routes test`` over configure.py's rendered Alertmanager config: lane warnings go to the quiet
+    """``amtool config routes test`` over configure.py's rendered Alertmanager config: lane warnings go to their own (separate, mutable)
     topic, critical lane alerts to the alert topic, and the other routes are unchanged. native_proven when it runs."""
 
     def setUp(self):
@@ -430,7 +430,7 @@ class CodexLaneRouteTests(unittest.TestCase):
                                  f"--verify.receivers={receiver}", *labels], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_lane_warnings_are_quiet_and_critical_lane_alerts_reach_the_alert_topic(self):
+    def test_lane_warnings_use_their_own_topic_and_critical_lane_alerts_reach_the_alert_topic(self):
         self.assertRoute("local-ntfy-lanes", "alertname=CodexLaneGoalBlocked", "scope=codex-lanes", "severity=warning")
         self.assertRoute("local-ntfy", "alertname=CodexLaneUsageLimited", "scope=codex-lanes", "severity=critical")
         self.assertRoute("local-ntfy", "scope=equities-broker", "severity=warning")
