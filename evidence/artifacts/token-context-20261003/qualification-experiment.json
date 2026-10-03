@@ -85,7 +85,9 @@
       "unit9-method-opus",
       "unit9-profile-initial",
       "unit9-profile-repair",
-      "unit9-source-defaults"
+      "unit9-source-defaults",
+      "unit10-profile-judgment",
+      "unit10-profile-controls"
     ],
     "roles": [
       "command-worker",
@@ -222,7 +224,9 @@
     "Native claude -p Opus/max restricted Read-only immutable prefreeze method read",
     "Native Codex sandbox named-profile allowed harmless control, original quoted flattened path syntax",
     "Native Codex sandbox distinct frozen unquoted dot-free profile allowed harmless control",
-    "Pinned native release/source and existing-record checks; three limited native default decisions"
+    "Pinned native release/source and existing-record checks; three limited native default decisions",
+    "Native Codex exec Astra/max consequential source judgment, one attempt through20128",
+    "Independent original-output/hash/inventory integration check on five native Codex sandbox controls (native exits0/1/0/1/1)"
   ],
   "observations": [
     {
@@ -2413,7 +2417,69 @@
       "artifacts": [
         {
           "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
-          "sha256": "a725beca2182398975d6a9860b0fe0dee0171bb34b96dea4ad7d01512054774a"
+          "sha256": "b87819dda1e2f38b020db18d94507d06cac064f8cb2e651a0509bd4cb05fe0ce"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit10-runtime-profile-astra",
+      "task": "unit10-profile-judgment",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 63,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate native consequential judgment:403words<=550,23inputsunchanged,nine native records285466; accepted supported staged route, not runtime/default/userapproval.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit10-runtime-profile-judgment.json",
+          "sha256": "4be52ff75cb9c6abb44a3c9240b9729a2de6577ce059749e97016a2f6f3584f1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 49739,
+        "cache_creation": 0,
+        "cache_read": 227840,
+        "output": 7887,
+        "reasoning_in_output": 4795,
+        "total": 285466,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit10-native-stage1-controls",
+      "task": "unit10-profile-controls",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 64,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Separate native model-free sandbox controls qualify narrow registered integration only. Raw negative exits1/EROFS/ENOENT are expected and retained. Aggregate independent observer/check exited0;21bindingsunchanged. No model/provider launch/nativecounter, nozero-spend claim. Exec/skill/child/MCP/Claude/R2 admission still unqualified.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit10-native-stage1-admission.json",
+          "sha256": "644241c288ad10bedb4bbd983dca983d230fd51ec528791f0d0656d5368a96d2"
         }
       ],
       "usage": {
@@ -2620,7 +2686,9 @@
     "Unit7 native role/functionality and artifact/program/source checks remain pre-freeze. Lifecycle missed views and reader-cleanup error preserved; writable engineering feasibility does not substitute for read-only P2 until independently bound.",
     "First fixed schedule yields0accepted confirmatorycases; no ratio/CI, saving, protection, native-baselinewin or default inferred. Native trace/hook qualifications do not retrofit it.",
     "Unit9 original markerFAIL/native trace processvisibilityUNKNOWN and OpuswordFAIL remain; distinct groupcleanupPASS is integrationonly. Namedprofile original and repairallowedcontrolsFAIL/deniedUNRUN; R2producerbundle unprepared. Hiddeninputs/billing/nativeP2/retrievalowner remain open.",
-    "Unit10 correction: PR608 comment5969106337 supplied the retrieval-owner handoff at12:21:24Z. The Unit9 pending statement was stale, corrected after exact-head review; the complete named owner record is not yet accessible. Owner snapshot remains a lead, pinned-source/runtime/corpus/client qualification pending; no new retrieval operation."
+    "Unit10 correction: PR608 comment5969106337 supplied the retrieval-owner handoff at12:21:24Z. The Unit9 pending statement was stale, corrected after exact-head review; the complete named owner record is not yet accessible. Owner snapshot remains a lead, pinned-source/runtime/corpus/client qualification pending; no new retrieval operation.",
+    "Unit10 five sandbox controls pass only a distinct model-free harmless-fixture integration. Three expected native negative exits1 remain in original outputs and receipt; observer aggregate success is not native producer exit or unchanged upstream tests. Actual exec/skill/child/MCP/Claude/R2/P2 admission remains unqualified. Astra285466 is separate review overhead, native wire/helpers/invoice unknown.",
+    "Unit10 owner record arrived after the location request:13,020bytes/fullSHA15bd8a386e640e9c98827ed6d4c4a18d9ace796889e5a59be7b7ebfab3fbc2cd verified from complete local copy. Earlier inaccessible wording is historical; current runtime/corpus/client admission remains open. Source status wrapper may repair legacy columns; owner current-schema snapshot is a lead, not lifetime no-write proof."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -2703,7 +2771,9 @@
       "unit9-p1-r2-opus-method-read",
       "unit9-native-profile-initial",
       "unit9-native-profile-repair",
-      "unit9-sources-and-scoped-defaults"
+      "unit9-sources-and-scoped-defaults",
+      "unit10-runtime-profile-astra",
+      "unit10-native-stage1-controls"
     ],
     "coverage_artifact": null
   }

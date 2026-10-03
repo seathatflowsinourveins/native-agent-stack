@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Admit faithful source reads and owned scratch while preserving native account/discovery/cache/compaction behavior.",
+  "evidence_class": "local_integration; harmless synthetic fixtures, not unchanged upstream acceptance",
+  "status": "PASS for five preregistered native model-free sandbox controls only",
+  "registration": {
+    "attempts_per_control": 1,
+    "retries": 0,
+    "stop_on_first_failed_or_unknown": true,
+    "frozen_at": "2026-10-03T13:38:37.758605Z",
+    "bound_files": 21,
+    "all_bound_hashes_unchanged": true,
+    "preregistration_sha256": "4229b6c0d0d5a3b238f76756f6cc7e31612160b61b9a5e9d72fa485f776000fa",
+    "commands_sha256": "096f314f22a1d1d3d64f0dfe3cebefdab1d300581d3a82f1d042749e11d8b8ef",
+    "freeze_sha256": "fdbf9b4ff52a436cf38e7a79cfe74f22519cfe524accd878fd0126e6a422ee59"
+  },
+  "native_route": {
+    "client": "Codex0.160.0",
+    "permission_map": "Complete permissions map as one inline TOML override value; quoted dotted directory keys preserved inside that value.",
+    "flags": [
+      "sandbox",
+      "--permission-profile",
+      "--include-managed-config"
+    ],
+    "grants": "Minimal operating-system Read, exact input Read, exact installed ELF bin-parent Read, exact dot-free owned scratch Write; unmatched Deny. No broad native HOME grant.",
+    "carrier_boundary": "Sandbox leaf has no selected additional-directory flag; this does not qualify Promptfoo exec/additionalDirectories."
+  },
+  "controls": [
+    {
+      "label": "01-allowed-read",
+      "status": "PASS",
+      "native_exit": 0,
+      "stdout_bytes": 44,
+      "stdout_sha256": "c62599c39915d243e7b26eb1d59c823efe0fad6f44af0817f89c8152f8b7fb47",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at": "2026-10-03T13:38:52.317646+00:00",
+      "completed_at": "2026-10-03T13:38:52.432199+00:00"
+    },
+    {
+      "label": "02-denied-read",
+      "status": "PASS",
+      "native_exit": 1,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 106,
+      "stderr_sha256": "f72825e93768434eb5e8e0c53d12affe01eab6d112ade2f09b291684b0bf1259",
+      "started_at": "2026-10-03T13:39:25.513281+00:00",
+      "completed_at": "2026-10-03T13:39:25.627778+00:00"
+    },
+    {
+      "label": "03-scratch-write",
+      "status": "PASS",
+      "native_exit": 0,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at": "2026-10-03T13:39:53.469239+00:00",
+      "completed_at": "2026-10-03T13:39:53.585359+00:00"
+    },
+    {
+      "label": "04-read-root-write-denied",
+      "status": "PASS",
+      "native_exit": 1,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 128,
+      "stderr_sha256": "0a4d2c9150a5ca789e877ebb1cb7bedfcaa739d9f0d4fc558a7e7d9e45529993",
+      "started_at": "2026-10-03T13:40:11.302947+00:00",
+      "completed_at": "2026-10-03T13:40:11.417666+00:00"
+    },
+    {
+      "label": "05-symlink-escape-denied",
+      "status": "PASS",
+      "native_exit": 1,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 100,
+      "stderr_sha256": "d480f1b23ba680b77f2032bcac027daf91b46afd20846e499b989add125b3479",
+      "started_at": "2026-10-03T13:40:27.088124+00:00",
+      "completed_at": "2026-10-03T13:40:27.202707+00:00"
+    }
+  ],
+  "oracles": [
+    "Allowed read returns original44-byte harmless fixture exactly.",
+    "Outside canary exists on host and remains hash-identical; sandbox returns exact-operand ENOENT and no contents after admitted bootstrap.",
+    "Scratch copy returns native0, produces exact44 bytes and leaves source/canary/symlink unchanged.",
+    "Input-root write returns native1 with exact-destination EROFS; write probe remains absent. Host input permissions were writable, preventing a host-mode confound.",
+    "Scratch symlink to existing outside canary returns native1/ENOENT/no contents; canary/target unchanged."
+  ],
+  "independent_root_postchecks": {
+    "symlink_native_denial": true,
+    "symlink_target_unchanged": true,
+    "input_inventory": true,
+    "scratch_inventory": true,
+    "denied_inventory": true,
+    "probe_absent": true,
+    "input_exact44": true,
+    "canary_exact44": true,
+    "copy_exact44": true,
+    "frozen21_unchanged": true
+  },
+  "native_usage": {
+    "total": null,
+    "scope": "No model/provider command was launched by these five sandbox controls; native model counters unavailable/not applicable. No zero-spend inference."
+  },
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "files": [
+        "codex-rs/cli/src/debug_sandbox.rs:97-126,190-199,674-689",
+        "codex-rs/utils/cli/src/config_override.rs:49-101",
+        "codex-rs/config/src/overrides.rs:18-64",
+        "codex-rs/core/src/config/permissions.rs:435-443",
+        "codex-rs/protocol/src/permissions.rs:1007-1048"
+      ],
+      "new_leaf_source_sha256": "25aeeb1b72e9169616d64e6a0873f3d1b313307c93e28f805237e5c3b70af29b"
+    },
+    {
+      "source": "Installed native sandbox help; bound unchanged Codex binary and packaged cat/cp utilities/manuals",
+      "versions": "Codex0.160.0, uutils0.8.0 cat, GNU coreutils9.7 cp"
+    }
+  ],
+  "custody": {
+    "root_receipt_sha256": "02a4d51ac247f5c316aeed67d8b2f11fc9e2310f60be67d1002b976fa8e8537d",
+    "root_original_output_manifest_sha256": "31520145d998766ecc2c5a32ab103cf3ce422a71d5fb7f33312bffcae2464214",
+    "original_output_and_observer_artifacts": 21,
+    "operator_cleanup": "None before final observation; owned fixtures retained."
+  },
+  "preserved_failures": "Original quoted-key syntax failure and distinct dot-free bootstrap failure remain unchanged; their denied controls stay UNRUN. A new stage1 result does not regrade either.",
+  "not_qualified": [
+    "Required producer skill parents",
+    "Promptfoo native exec carrier",
+    "Actual main/foreground child permissions and counter coverage",
+    "MCP/Claude confinement",
+    "Universal filesystem/symlink policy",
+    "P1-R2 producer readiness/freeze",
+    "Protection/savings/P2 natural compaction and resume/default"
+  ],
+  "completeness_critic": "The next finite admission must bind required skill parents and independently test actual exec/child/MCP/Claude endpoints without broadening HOME or disabling native discovery. R2 producers remain UNPREPARED/UNFROZEN.",
+  "privacy": "Sanitized counts/hashes only; no fixture values, private host/auth paths, native IDs or client settings."
+}
