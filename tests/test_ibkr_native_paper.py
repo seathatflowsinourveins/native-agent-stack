@@ -7,16 +7,20 @@ below are hand calculated; tests use real SQLite, reopen and subprocess flock.
 """
 
 import argparse
+import copy
 from contextlib import closing
 from dataclasses import asdict, replace
+from decimal import Decimal, ROUND_HALF_EVEN
 import hashlib
 import importlib.util
+import io
 import json
 from pathlib import Path
 import sqlite3
 import subprocess
 import sys
 import tempfile
+import traceback
 import unittest
 
 
@@ -24,6 +28,8 @@ ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = ROOT / "blueprints/us-equities/engine-nautilus/ibkr-native-paper/state.py"
 FREEZE_PATH = STATE_PATH.with_name("offline-FREEZE.md")
 RECORDS = []
+RUN_EVIDENCE_DIR = None
+RUN_ATTEMPT = "normal"
 NOW = 1_500_000_000_000
 ACCOUNT = "ba8321e3eb5d7d550215e79e1070cd7b2e2324e6684e4704cfe5b808b12be468"
 PIN = "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
@@ -58,6 +64,80 @@ class Clock:
         return self.now
 
 
+class FakeBroker:
+    """Independent account observations from transport and injected events only.
+
+    No journal reads, risk/reservation/budget logic or state helper arithmetic.
+    Opening account is a literal USD10000 and no positions/orders/executions.
+    Received execution/commission facts book cash and quantities; reports are
+    generated from this separate namespace, not from the controller's outputs.
+    """
+
+    def __init__(self):
+        self.cash = Decimal("10000.00")
+        self.fees = Decimal("0.00")
+        self.positions = {}
+        self.orders = {}
+        self.executions = {}
+        self.commissions = {}
+
+    def accepted(self, intent, payload, identity):
+        self.orders[intent] = {"payload": copy.deepcopy(payload), "identity": copy.deepcopy(identity),
+                               "filled": 0, "status": "accepted"}
+
+    def identified(self, reference, identity):
+        for order in self.orders.values():
+            seen = order["identity"]
+            ref = seen.get("order_ref", seen.get("client_order_id", "")).rsplit(":", 1)[0]
+            if ref == reference:
+                order["identity"].update(copy.deepcopy(identity))
+
+    def pending_cancel(self, identity):
+        for order in self.orders.values():
+            if any(k in identity and order["identity"].get(k) == identity[k]
+                   for k in ["order_id", "perm_id", "venue_order_id"]):
+                order["status"] = "cancel_pending"
+
+    def received(self, method, args):
+        if method == "execution":
+            intent, exec_id, quantity, fill_price, currency = args
+            if intent not in self.orders or exec_id in self.executions or currency != "USD":
+                return
+            order = self.orders[intent]
+            self.executions[exec_id] = (intent, quantity, fill_price, currency)
+            symbol = order["payload"]["symbol"]
+            signed = quantity if order["payload"]["side"] == "BUY" else -quantity
+            amount = (Decimal(str(fill_price))*quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
+            self.cash += -amount if signed > 0 else amount
+            self.positions[symbol] = self.positions.get(symbol, 0)+signed
+            if not self.positions[symbol]:
+                del self.positions[symbol]
+            order["filled"] += quantity
+            if order["filled"] == order["payload"]["quantity"]:
+                order["status"] = "filled"
+        elif method == "commission":
+            exec_id, amount, currency, posting = args
+            if exec_id not in self.executions or exec_id in self.commissions or currency != "USD" or posting != "final" or Decimal(str(amount)) == -1:
+                return
+            amount = Decimal(str(amount)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
+            self.commissions[exec_id] = amount
+            self.cash -= amount
+            self.fees += amount
+        elif method == "status":
+            intent, status, cumulative = args
+            if intent in self.orders and status in ["cancelled", "rejected", "filled"]:
+                self.orders[intent]["status"] = status
+
+    def report(self):
+        return {"complete": {k: True for k in ["orders", "executions", "commissions", "positions", "cash"]},
+                "orders": [{"intent": intent, "identity": copy.deepcopy(order["identity"]),
+                            "filled": order["filled"], "status": order["status"]}
+                           for intent, order in sorted(self.orders.items())],
+                "executions": sorted(self.executions), "commissions": sorted(self.commissions),
+                "positions": dict(self.positions), "cash": str(self.cash), "fees": str(self.fees),
+                "currency": "USD", "fee_posting": "final"}
+
+
 class Transport:
     """Injected boundary only; SQLite independently observes commit before send."""
 
@@ -69,6 +149,7 @@ class Transport:
         self.cancel_mode = "pending"
         self.identities = {}
         self.broker_orders = set()
+        self.current_intent = None
 
     def identity(self, ref):
         if ref not in self.identities:
@@ -88,6 +169,7 @@ class Transport:
         if self.submit_mode != "reject":
             self.broker_orders.add(ref)
             self.calls[-1]["fake_broker_accepted_identity"] = self.identity(ref)
+            self.case.broker.accepted(self.current_intent, payload, self.identity(ref))
         if self.submit_mode == "lost":
             raise TimeoutError("accepted_then_response_lost")
         if self.submit_mode == "crash":
@@ -99,12 +181,16 @@ class Transport:
     def lookup(self, ref):
         observed = self.identity(ref) if self.lookup_mode == "found" and ref in self.broker_orders else None
         self.calls.append({"kind": "lookup", "ref": ref, "observed_identity": observed})
+        if observed is not None:
+            self.case.broker.identified(ref, observed)
         return observed
 
     def cancel(self, identity):
         self.calls.append({"kind": "cancel", "identity": identity})
         if self.cancel_mode == "fail":
             raise TimeoutError("cancel_response_unknown")
+        if self.cancel_mode == "pending":
+            self.case.broker.pending_cancel(identity)
         return {"kind": self.cancel_mode}
 
 
@@ -119,6 +205,7 @@ class StateCases(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.db_path = Path(self.tmp.name) / "state.sqlite"
         self.clock = Clock()
+        self.broker = FakeBroker()
         self.transport = Transport(self)
         self.binding = self.module.Binding(
             broker="IBKR", endpoint="127.0.0.1:4002", account_fingerprint=ACCOUNT,
@@ -153,6 +240,7 @@ class StateCases(unittest.TestCase):
     def action(self, method, *args, **kwargs):
         self.record["sequence"].append({"operation": method, "args": sanitized(args), "kwargs": sanitized(kwargs),
                                         "clock_ns": self.clock.now})
+        self.broker.received(method, args)
         try:
             result = getattr(self.state, method)(*args, **kwargs)
         except BaseException as exc:
@@ -163,6 +251,7 @@ class StateCases(unittest.TestCase):
         return result
 
     def order(self, intent="buy", qty=10, price="100.00", side="BUY", **extra):
+        self.transport.current_intent = intent
         payload = {"symbol": "SYNTH.TEST", "side": side, "quantity": qty,
                    "limit_price": price, "currency": extra.pop("currency", "USD")}
         return self.action("submit", intent, payload, self.transport,
@@ -184,14 +273,7 @@ class StateCases(unittest.TestCase):
             self.assertEqual(snap["orders"][0]["filled"], filled)
 
     def complete_snapshot(self):
-        snap = self.state.snapshot()
-        return {"complete": {k: True for k in ["orders", "executions", "commissions", "positions", "cash"]},
-                "orders": [{"intent": o["intent"], "identity": o["identity"], "filled": o["filled"],
-                            "status": o["status"]} for o in snap["orders"] if o["identity"]],
-                "executions": [e["exec_id"] for e in snap["executions"]],
-                "commissions": [f["exec_id"] for f in snap["commissions"] if f["posting"] == "final"],
-                "positions": snap["positions"], "cash": str(snap["cash_cents"] / 100),
-                "fees": str(snap["fees_cents"] / 100), "currency": "USD", "fee_posting": "final"}
+        return self.broker.report()
 
     def test_duplicate_intent_has_one_durable_transport_attempt(self):
         """Exactly one submit, attempted=1, reserve=100000 cents; repeat survives restart."""
@@ -464,7 +546,8 @@ class StateCases(unittest.TestCase):
         self.order("buy2", qty=1)
         self.fill("b2", 1, intent="buy2")
         self.fee("b2", "0")
-        self.order("sell2", qty=1, price="99.99", side="SELL")
+        # Current quote stays100; the later injected fill99.99 causes the loss.
+        self.order("sell2", qty=1, price="99.99", quote_price="100.00", side="SELL")
         self.fill("s2", 1, "99.99", "sell2")
         self.fee("s2", "0")
         self.assertEqual(self.state.snapshot()["gross_loss_cents"], 10001)
@@ -565,6 +648,7 @@ class StateCases(unittest.TestCase):
         incomplete["complete"]["cash"] = False
         self.assertFalse(self.action("reconcile", incomplete))
         self.assertFalse(self.state.snapshot()["ready"])
+        self.assertEqual(self.state.snapshot()["observation_conflicts"], [])
         self.assertTrue(self.action("reconcile", self.complete_snapshot()))
         self.assertTrue(self.state.snapshot()["ready"])
 
@@ -594,19 +678,26 @@ class StateCases(unittest.TestCase):
 
     def test_position_cash_fee_currency_and_execution_snapshot_contradictions(self):
         """Unknown position/cash/fee/currency/missing execution each blocks; original economics never erased."""
-        self.order(qty=3)
-        self.fill(quantity=3)
-        self.fee()
-        for field, value in [("positions", {}), ("cash", "10000.00"), ("fees", "0"),
+        for index, (field, value) in enumerate([("positions", {}), ("cash", "10000.00"), ("fees", "0"),
                              ("currency", "EUR"), ("executions", []), ("commissions", []),
                              ("fee_posting", "pending"), ("positions", {"FOREIGN": 1}),
-                             ("cash", None), ("fees", None), ("currency", None)]:
+                             ("cash", None), ("fees", None), ("currency", None)]):
             with self.subTest(field=field):
+                # Each fault gets an independent broker and SQLite fixture, so
+                # an earlier permanent conflict cannot satisfy the later case.
+                self.close_state()
+                self.db_path = Path(self.tmp.name)/("snapshot-fault-"+str(index)+".sqlite")
+                self.broker = FakeBroker()
+                self.state = self.open_state()
+                self.order(qty=3)
+                self.fill(quantity=3)
+                self.fee()
                 snapshot = self.complete_snapshot()
                 snapshot[field] = value
                 self.assertFalse(self.action("reconcile", snapshot))
                 self.economics(3, 969970, 30, 3)
                 self.assertFalse(self.state.snapshot()["ready"])
+                self.assertTrue(self.state.snapshot()["observation_conflicts"])
 
     def test_unknown_execution_and_commission_currency_freeze(self):
         """Unowned fill/fee and nonUSD fee block without inventing economics."""
@@ -726,16 +817,211 @@ sys.exit(0)
         self.assertIn("account_writer_already_running", r.stdout)
         self.assertFalse(second.exists())
 
+    def test_fresh_admission_quote_latches_101_dollar_drawdown(self):
+        """Fresh89.90 on held10 bought100 exposes101 loss: halt before next submit, survives restart."""
+        self.order()
+        self.fill(quantity=10)
+        self.fee(amount="0")
+        with self.assertRaisesRegex(self.module.Refused, "halted"):
+            self.order("next", qty=1, price="89.90", quote_price="89.90")
+        self.assertEqual(self.state.snapshot()["halt"], "drawdown_cap_exceeded")
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"])
+        self.economics(10, 900000, 0)
+        self.restart()
+        self.assertEqual(self.state.snapshot()["halt"], "drawdown_cap_exceeded")
+        self.assertFalse(self.state.snapshot()["ready"])
+
+    def test_late_cancelled_sell_revalidates_other_sell_reservation(self):
+        """Late old sell3 leaves held7 against new sell10: numeric halt and cancellation of new order."""
+        self.order()
+        self.fill(quantity=10)
+        self.fee(amount="0")
+        self.order("old_sell", side="SELL")
+        self.action("cancel", "old_sell", self.transport)
+        self.action("status", "old_sell", "cancelled", 0)
+        self.order("new_sell", side="SELL")
+        self.fill("old-sell-exec", 3, "100.00", "old_sell")
+        self.fee("old-sell-exec", "0")
+        self.economics(7, 930000, 0)
+        self.assertEqual(self.state.snapshot()["halt"], "aggregate_sell_reservation_exceeds_position")
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit", "submit", "cancel", "submit", "cancel"])
+        self.assertEqual(self.transport.calls[-1]["identity"]["order_id"], 73)
+        self.assertEqual(next(o for o in self.state.snapshot()["orders"] if o["intent"] == "new_sell")["status"], "cancel_pending")
+        self.restart()
+        self.assertEqual(self.state.snapshot()["halt"], "aggregate_sell_reservation_exceeds_position")
+
+    def test_control_window_renewal_cannot_clear_submission_backoff(self):
+        """Lookup renews control capacity at window boundary but submission deadline remains unchanged."""
+        for i in range(5):
+            self.order(str(i), qty=1)
+        self.clock.now += 59_999_999_999
+        with self.assertRaisesRegex(self.module.Refused, "request_budget"):
+            self.order("overflow", qty=1)
+        deadline = self.state.snapshot()["budget"]["blocked_until_ns"]
+        self.clock.now = NOW+60_000_000_000
+        self.action("lookup", "0", self.transport)
+        self.assertEqual(self.state.snapshot()["budget"]["blocked_until_ns"], deadline)
+        with self.assertRaisesRegex(self.module.Refused, "request_budget"):
+            self.order("still_paused", qty=1)
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"]*5+["lookup"])
+        self.clock.now = deadline
+        self.assertEqual(self.order("resumed", qty=1), "accepted")
+
+    def test_definitive_rejection_reconciles_without_fabricated_native_ids(self):
+        """Conclusive rejected intent with no IDs is terminal: independent empty broker snapshot clears restart gap."""
+        self.transport.submit_mode = "reject"
+        self.order()
+        self.restart()
+        observed = self.complete_snapshot()
+        self.assertEqual(observed["orders"], [])
+        self.assertEqual((observed["positions"], observed["cash"], observed["fees"]), ({}, "10000.00", "0.00"))
+        self.assertTrue(self.action("reconcile", observed))
+        order = self.state.snapshot()["orders"][0]
+        self.assertEqual((order["identity"], order["filled"], order["reserved_cents"], order["status"]), (None, 0, 0, "rejected"))
+        self.assertTrue(self.state.snapshot()["ready"])
+        self.assertEqual(len(self.transport.calls), 1)
+
+    def test_unexplained_snapshot_observation_cannot_disappear_on_next_match(self):
+        """Unknown order, position and cash observations remain conflicts through later matching snapshot/restart."""
+        for field, value in [
+            ("orders", [{"intent": "foreign", "identity": {"order_ref": "foreign", "order_id": 999}, "filled": 0, "status": "accepted"}]),
+            ("positions", {"FOREIGN": 1}), ("cash", "9999.00"),
+        ]:
+            with self.subTest(field=field):
+                self.close_state()
+                self.db_path = Path(self.tmp.name)/("conflict-"+field+".sqlite")
+                self.broker = FakeBroker()
+                self.state = self.open_state()
+                conflict = self.complete_snapshot()
+                conflict[field] = value
+                self.assertFalse(self.action("reconcile", conflict))
+                self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                self.assertFalse(self.state.snapshot()["ready"])
+                self.assertTrue(self.state.snapshot()["observation_conflicts"])
+                self.restart()
+                self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                self.economics(0, 1000000, 0)
+
+    def test_evidence_attributes_failed_subtest_to_parent_case(self):
+        """Public failed-subtest result must retain parent failed status and subtest diagnostics."""
+        class Probe(unittest.TestCase):
+            def runTest(self):
+                with self.subTest(label="fixture_quantity"):
+                    self.assertEqual(3, 2)
+        probe_record = {"case": "runTest", "expected": "failed_subtest", "sequence": [],
+                        "transport_calls": [], "before": None, "after": None}
+        RECORDS.append(probe_record)
+        try:
+            result = unittest.TextTestRunner(stream=io.StringIO(), resultclass=EvidenceResult).run(unittest.TestSuite([Probe()]))
+        finally:
+            RECORDS.remove(probe_record)
+        self.record["sequence"].append({"operation": "failed_subtest_evidence_probe", "failures": len(result.failures),
+                                        "expected_parent": "failed", "actual_parent": copy.deepcopy(probe_record)})
+        self.assertEqual(len(result.failures), 1)
+        self.assertEqual(probe_record["actual"], "failed")
+        self.assertIn("fixture_quantity", probe_record["failure"])
+        class SkipProbe(unittest.TestCase):
+            def runTest(self):
+                with self.subTest(label="required_field"):
+                    self.skipTest("required_subcase_fault_fixture")
+        skipped_parent = {"case": "runTest", "expected": "skipped_subtest", "sequence": [],
+                          "transport_calls": [], "before": None, "after": None}
+        offset = len(RECORDS)
+        RECORDS.append(skipped_parent)
+        try:
+            result = unittest.TextTestRunner(stream=io.StringIO(), resultclass=EvidenceResult).run(unittest.TestSuite([SkipProbe()]))
+            probe_records = copy.deepcopy(RECORDS[offset:])
+        finally:
+            del RECORDS[offset:]
+        self.record["sequence"].append({"operation": "skipped_subtest_evidence_probe", "skips": len(result.skipped),
+                                        "expected_parent": "skipped", "actual_records": probe_records})
+        self.assertEqual(len(result.skipped), 1)
+        self.assertEqual(skipped_parent["actual"], "skipped")
+        self.assertEqual(skipped_parent["subtests"][0]["actual"], "skipped")
+
+    def test_acceptance_cli_rejects_required_skipped_case(self):
+        """One required case deliberately skipped: CLI exits1, retains skipped outcome rather than acceptance."""
+        evidence = RUN_EVIDENCE_DIR or Path(self.tmp.name)/"skip-evidence"
+        attempt = RUN_ATTEMPT+"-required-skip"
+        code = """import runpy,sys,unittest
+target,evidence,attempt=sys.argv[1:]
+def required_skip(self,cls):
+ name='test_duplicate_intent_has_one_durable_transport_attempt'
+ setattr(cls,name,unittest.skip('required_case_fault_fixture')(getattr(cls,name)))
+ return unittest.TestSuite([cls(name)])
+unittest.TestLoader.loadTestsFromTestCase=required_skip
+sys.argv=[target,'--evidence-dir',evidence,'--attempt',attempt]
+runpy.run_path(target,run_name='__main__')
+"""
+        result = subprocess.run(["rtk", "proxy", sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
+                                capture_output=True, text=True)
+        artifact = json.loads((evidence/(attempt+".json")).read_text())
+        self.record["sequence"].append({"operation": "required_skip_cli_probe", "expected_exit": 1,
+                                        "actual_exit": result.returncode, "artifact": artifact,
+                                        "returned_output": (result.stdout+result.stderr).replace(str(evidence), "<private-evidence>").replace(str(ROOT), "<checkout>")})
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual((artifact["tests"], artifact["skips"], artifact["exit_code"]), (1, 1, 1))
+        self.assertEqual(artifact["cases"][0]["actual"], "skipped")
+
 
 class EvidenceResult(unittest.TextTestResult):
+    def startTest(self, test):
+        self.current_case = test
+        super().startTest(test)
+
+    def case_record(self, test):
+        name = test.id().split(".")[-1]
+        case = next((r for r in reversed(RECORDS) if r["case"] == name), None)
+        if case is None:
+            case = {"case": name, "expected": test.shortDescription(), "sequence": [],
+                    "transport_calls": [], "before": None, "after": None}
+            RECORDS.append(case)
+        return case
+
+    def diagnostic(self, err):
+        message = "".join(traceback.format_exception(*err)).replace(str(ROOT), "<checkout>")
+        # Keep public traceback diagnostics and source basenames, without host paths.
+        import re
+        return re.sub(r'File "(/[^\"]+)"', lambda m: 'File "<source>/'+Path(m.group(1)).name+'"', message)
+
+    def failed(self, test, message):
+        case = self.case_record(test)
+        case["actual"] = "failed"
+        case["failure"] = (case.get("failure") or "")+message
+
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        self.failed(test, self.diagnostic(err))
+
+    def addError(self, test, err):
+        super().addError(test, err)
+        self.failed(test, self.diagnostic(err))
+
+    def addSubTest(self, test, subtest, err):
+        super().addSubTest(test, subtest, err)
+        case = self.case_record(test)
+        message = self.diagnostic(err) if err is not None else None
+        case.setdefault("subtests", []).append({"name": subtest.id(), "actual": "failed" if err else "passed", "failure": message})
+        if err is not None:
+            self.failed(test, subtest.id()+"\n"+message)
+
+    def addSkip(self, test, reason):
+        super().addSkip(test, reason)
+        parent = getattr(self, "current_case", None) or test
+        case = self.case_record(parent)
+        if case.get("actual") != "failed":
+            case["actual"] = "skipped"
+        case.setdefault("failure", None)
+        case["skip_reason"] = reason
+        if parent is not test:
+            case.setdefault("subtests", []).append({"name": test.id(), "actual": "skipped", "skip_reason": reason})
+
     def stopTest(self, test):
-        case = next((r for r in reversed(RECORDS) if r["case"] == test.id().split(".")[-1]), None)
-        if case:
-            failure = next((text for t, text in self.failures+self.errors if t is test), None)
-            case["actual"] = "failed" if failure else "passed"
-            # Traceback is returned test evidence; strip temporary private paths.
-            case["failure"] = failure.replace(str(ROOT), "<checkout>") if failure else None
+        case = self.case_record(test)
+        case.setdefault("actual", "passed")
+        case.setdefault("failure", None)
         super().stopTest(test)
+        self.current_case = None
 
 
 if __name__ == "__main__":
@@ -743,8 +1029,10 @@ if __name__ == "__main__":
     parser.add_argument("--evidence-dir", type=Path)
     parser.add_argument("--attempt", default="local")
     args, rest = parser.parse_known_args()
+    RUN_EVIDENCE_DIR, RUN_ATTEMPT = args.evidence_dir, args.attempt
     result = unittest.TextTestRunner(verbosity=2, resultclass=EvidenceResult).run(
         unittest.defaultTestLoader.loadTestsFromTestCase(StateCases))
+    acceptance_exit = 0 if result.wasSuccessful() and not result.skipped else 1
     if args.evidence_dir:
         args.evidence_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
         target = args.evidence_dir / (args.attempt+".json")
@@ -753,11 +1041,14 @@ if __name__ == "__main__":
         artifact = {"scope": "offline_synthetic_integration", "attempt": args.attempt,
                     "broker_network_calls": 0, "tests": result.testsRun,
                     "failures": len(result.failures), "errors": len(result.errors),
-                    "skips": len(result.skipped), "exit_code": 0 if result.wasSuccessful() else 1,
+                    "skips": len(result.skipped), "exit_code": acceptance_exit,
+                    "acceptance_status": "blocked_required_skips" if result.skipped else ("passed" if acceptance_exit == 0 else "failed"),
                     "source_hashes": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                                       for p in [STATE_PATH, FREEZE_PATH, Path(__file__)] if p.exists()},
                     "cases": RECORDS}
         target.write_text(json.dumps(artifact, sort_keys=True, indent=2)+"\n")
         target.chmod(0o600)
         print("evidence="+str(target)+" sha256="+hashlib.sha256(target.read_bytes()).hexdigest())
-    raise SystemExit(0 if result.wasSuccessful() else 1)
+    if result.skipped:
+        print("acceptance=blocked_required_skips")
+    raise SystemExit(acceptance_exit)

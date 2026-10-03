@@ -160,7 +160,7 @@ class PaperState:
                                        "fees_cents": 0, "gross_loss_cents": 0, "gross_loss_exact_cents": "0",
                                        "peak_equity_cents": self.limits.start_cash_cents,
                                        "halt": None, "stream_block": False, "contradiction": False,
-                                       "alerts": [], "budget": {"window_start_ns": self._now(), "used": 0,
+                                       "alerts": [], "observation_conflicts": [], "budget": {"window_start_ns": self._now(), "used": 0,
                                                                  "backoff_ns": 0, "blocked_until_ns": 0}}.items():
                         self._set(key, value)
                 elif self.db.execute("SELECT 1 FROM orders LIMIT 1").fetchone():
@@ -247,11 +247,26 @@ class PaperState:
             self._set("halt", reason)
             self._event("halt", {"reason": reason})
 
+    def _conflict(self, reason, observed, expected=None):
+        """Retain unexplained complete observations; ordinary stream recovery cannot erase them."""
+        record = {"reason": reason, "observed": observed, "expected": expected}
+        try:
+            canonical(record)
+        except (ValueError, TypeError):
+            record = {"reason": reason, "observed_type": type(observed).__name__, "expected": expected}
+        conflicts = self._get("observation_conflicts") or []
+        if record not in conflicts:
+            conflicts.append(record)
+            self._set("observation_conflicts", conflicts)
+            self._event("unexplained_observation", record)
+        return self._block(reason)
+
     def _pending_fees(self):
         return self.db.execute("SELECT 1 FROM executions e LEFT JOIN commissions c USING(exec_id) WHERE c.exec_id IS NULL OR c.posting!='final' LIMIT 1").fetchone() is not None
 
     def _ready(self):
         return not (self._get("halt") or self._get("stream_block") or self._get("contradiction")
+                    or self._get("observation_conflicts")
                     or self._pending_fees() or self.db.execute("SELECT 1 FROM orders WHERE status IN ('unknown','cancel_pending','cancel_unknown') LIMIT 1").fetchone())
 
     def _order(self, intent):
@@ -264,11 +279,13 @@ class PaperState:
         if now < b["window_start_ns"]:
             raise Refused("clock_regressed")
         if now >= b["window_start_ns"] + self.limits.request_window_ns:
-            if not control and now < b["blocked_until_ns"]:
-                self._event("request_paused", b)
-                return False
-            b = {"window_start_ns": now, "used": 0, "backoff_ns": 0, "blocked_until_ns": 0}
+            # Control capacity renews independently of an unexpired submit pause.
+            b = {**b, "window_start_ns": now, "used": 0}
         limit = self.limits.request_calls if control else self.limits.request_calls-self.limits.control_reserve
+        if not control and now < b["blocked_until_ns"] and b["used"] < limit:
+            self._set("budget", b)
+            self._event("request_paused", b)
+            return False
         if b["used"] >= limit:
             b["backoff_ns"] = min(self.limits.backoff_max_ns,
                                     max(self.limits.backoff_initial_ns, b["backoff_ns"]*2))
@@ -277,6 +294,8 @@ class PaperState:
             self._event("request_paused", b)
             return False
         b["used"] += 1
+        if not control:
+            b["backoff_ns"], b["blocked_until_ns"] = 0, 0
         self._set("budget", b)
         return True
 
@@ -293,7 +312,7 @@ class PaperState:
             raise Refused("single_order_cap_exceeded")
         return qty, px
 
-    def _risk(self, payload, quote_price, quote_time_ns):
+    def _risk(self, payload, quote_price, quote_time_ns, transport):
         qty, px = self._payload(payload)
         now = self._now()
         fresh_mark = price(quote_price)
@@ -302,6 +321,16 @@ class PaperState:
         if not self.limits.session_open_ns <= now < self.limits.session_close_ns:
             raise Refused("session_closed")
         symbol = payload["symbol"]
+        reason, _ = self._numeric_guard_values({symbol: fresh_mark})
+        if reason and self._get("halt") is None:
+            # A valid fresh quote exposing an existing numeric breach is itself
+            # an observation: persist the halt and disposition before transport.
+            with self._tx():
+                self.db.execute("UPDATE positions SET mark=? WHERE symbol=?", (str(fresh_mark), symbol))
+                self._risk_latch()
+                self._event("admission_numeric_halt", {"symbol": symbol, "mark": str(fresh_mark), "reason": reason})
+            self._cancel_halted(transport)
+            raise Refused("halted:"+self._get("halt"))
         position = self.db.execute("SELECT * FROM positions WHERE symbol=?", (symbol,)).fetchone()
         quantity = position["quantity"] if position else 0
         rows = self.db.execute("SELECT * FROM orders WHERE status NOT IN ('filled','cancelled','rejected')").fetchall()
@@ -335,7 +364,7 @@ class PaperState:
                 return previous["status"]
             if self.stop_path.exists():
                 self.stop("independent_STOP", transport)
-            reservation = self._risk(payload, quote_price, quote_time_ns)
+            reservation = self._risk(payload, quote_price, quote_time_ns, transport)
             if self._get("halt"):
                 raise Refused("halted:"+self._get("halt"))
             if not self._ready():
@@ -349,9 +378,14 @@ class PaperState:
                     self._event("durable_submission_attempt", {"intent": intent, "order_ref": ref,
                                                                 "payload_sha256": hashlib.sha256(encoded.encode()).hexdigest(),
                                                                 "reserved_cents": reservation})
+                    self.db.execute("UPDATE positions SET mark=? WHERE symbol=?", (str(price(quote_price)), payload["symbol"]))
+                    self._risk_latch()
             if not admitted:
                 raise Refused("request_budget_exhausted")
             self._transport = transport
+            if self._get("halt"):
+                self._cancel_halted(transport)
+                raise Refused("halted:"+self._get("halt"))
             try:
                 result = transport.submit(ref, json.loads(encoded))
             except Exception as exc:
@@ -587,18 +621,33 @@ class PaperState:
         with self._tx():
             return self._block("disconnect:"+str(reason))
 
-    def _risk_latch(self):
-        exposure = sum(cents(p["quantity"]*decimal(p["mark"])) for p in self.db.execute("SELECT * FROM positions"))
+    def _numeric_guard_values(self, override_marks=None):
+        marks = override_marks or {}
+        positions = {p["symbol"]: p for p in self.db.execute("SELECT * FROM positions")}
+        exposure = sum(cents(p["quantity"]*decimal(marks.get(p["symbol"], p["mark"]))) for p in positions.values())
         pending = self.db.execute("SELECT COALESCE(sum(reserved_cents),0) FROM orders WHERE status NOT IN ('filled','cancelled','rejected')").fetchone()[0]
-        if exposure+pending > self.limits.exposure_cents:
-            self._halt("aggregate_exposure_cap_exceeded")
-        if decimal(self._get("gross_loss_exact_cents")) > self.limits.gross_loss_cents:
-            self._halt("gross_loss_cap_exceeded")
-        equity = self._get("cash_cents")+sum(cents(p["quantity"]*decimal(p["mark"])) for p in self.db.execute("SELECT * FROM positions"))
+        sells = {}
+        for order in self.db.execute("SELECT payload,filled FROM orders WHERE status NOT IN ('filled','cancelled','rejected')"):
+            payload = json.loads(order["payload"])
+            if payload["side"] == "SELL":
+                sells[payload["symbol"]] = sells.get(payload["symbol"], 0)+payload["quantity"]-order["filled"]
+        equity = self._get("cash_cents")+exposure
         peak = max(self._get("peak_equity_cents"), equity)
-        self._set("peak_equity_cents", peak)
+        if any(quantity > (positions[symbol]["quantity"] if symbol in positions else 0) for symbol, quantity in sells.items()):
+            return "aggregate_sell_reservation_exceeds_position", peak
+        if exposure+pending > self.limits.exposure_cents:
+            return "aggregate_exposure_cap_exceeded", peak
+        if decimal(self._get("gross_loss_exact_cents")) > self.limits.gross_loss_cents:
+            return "gross_loss_cap_exceeded", peak
         if peak-equity > self.limits.drawdown_cents:
-            self._halt("drawdown_cap_exceeded")
+            return "drawdown_cap_exceeded", peak
+        return None, peak
+
+    def _risk_latch(self):
+        reason, peak = self._numeric_guard_values()
+        self._set("peak_equity_cents", peak)
+        if reason is not None:
+            self._halt(reason)
 
     def _cancel_halted(self, transport=None):
         if self._get("halt") is not None:
@@ -659,43 +708,45 @@ class PaperState:
                 return self._block("incomplete_snapshots")
             if self._get("contradiction"):
                 return self._block("contradiction_requires_adjudication")
+            if self._get("observation_conflicts"):
+                return self._block("observation_conflict_requires_adjudication")
             if self._pending_fees():
                 return self._block("commission_pending")
-            if self.db.execute("SELECT 1 FROM orders WHERE identity IS NULL OR status IN ('unknown','cancel_pending','cancel_unknown') LIMIT 1").fetchone():
+            if self.db.execute("SELECT 1 FROM orders WHERE status IN ('unknown','cancel_pending','cancel_unknown') OR (identity IS NULL AND NOT (status='rejected' AND filled=0 AND reserved_cents=0 AND reason IS NOT NULL AND length(reason)>0)) LIMIT 1").fetchone():
                 return self._block("unresolved_order_or_cancel")
             try:
                 if snapshot.get("currency") != "USD" or snapshot.get("fee_posting") != "final":
-                    return self._block("snapshot_currency_posting_unknown")
+                    return self._conflict("snapshot_currency_posting_unknown", {"currency": snapshot.get("currency"), "fee_posting": snapshot.get("fee_posting")}, {"currency": "USD", "fee_posting": "final"})
                 # Exact money agreement after predeclared cents conversion.
                 if cents(snapshot["cash"]) != self._get("cash_cents") or cents(snapshot["fees"]) != self._get("fees_cents"):
-                    return self._block("snapshot_cash_fee_mismatch")
+                    return self._conflict("snapshot_cash_fee_mismatch", {"cash": snapshot["cash"], "fees": snapshot["fees"]}, {"cash_cents": self._get("cash_cents"), "fees_cents": self._get("fees_cents")})
                 positions = {p["symbol"]: p["quantity"] for p in self.db.execute("SELECT * FROM positions")}
                 if not isinstance(snapshot["positions"], dict) or any(type(v) is not int or v <= 0 for v in snapshot["positions"].values()) or snapshot["positions"] != positions:
-                    return self._block("snapshot_position_mismatch")
+                    return self._conflict("snapshot_position_mismatch", snapshot["positions"], positions)
                 for table, key in [("executions", "executions"), ("commissions", "commissions")]:
                     expected = {r[0] for r in self.db.execute("SELECT exec_id FROM "+table)}
                     observed = snapshot[key]
                     if not isinstance(observed, list) or len(observed) != len(set(observed)) or set(observed) != expected:
-                        return self._block("snapshot_"+key+"_mismatch")
+                        return self._conflict("snapshot_"+key+"_mismatch", observed, sorted(expected))
                 observed_orders = snapshot["orders"]
                 if not isinstance(observed_orders, list):
-                    return self._block("snapshot_orders_invalid")
+                    return self._conflict("snapshot_orders_invalid", observed_orders)
                 known = {o["intent"]: o for o in self.db.execute("SELECT * FROM orders WHERE identity IS NOT NULL")}
                 seen = set()
                 for observed in observed_orders:
                     intent = observed["intent"]
                     if intent not in known or intent in seen:
-                        return self._block("snapshot_unknown_or_duplicate_order")
+                        return self._conflict("snapshot_unknown_or_duplicate_order", observed, sorted(known))
                     order = known[intent]
                     if type(observed["filled"]) is not int or observed["filled"] != order["filled"] or observed["status"] != order["status"]:
-                        return self._block("snapshot_order_progress_mismatch")
+                        return self._conflict("snapshot_order_progress_mismatch", observed, {"filled": order["filled"], "status": order["status"]})
                     if not self._bind_identity(intent, observed["identity"]):
-                        return False
+                        return self._conflict("snapshot_order_identity_unresolved", observed["identity"], json.loads(order["identity"]))
                     seen.add(intent)
                 if seen != set(known):
-                    return self._block("snapshot_missing_orders")
+                    return self._conflict("snapshot_missing_orders", sorted(seen), sorted(known))
             except (KeyError, TypeError, Refused, ValueError):
-                return self._block("snapshot_malformed")
+                return self._conflict("snapshot_malformed", snapshot)
             self._set("stream_block", False)
             self._event("reconciled", {"position_quantities": positions, "cash_cents": self._get("cash_cents"), "fees_cents": self._get("fees_cents")})
             return self._get("halt") is None
@@ -725,4 +776,5 @@ class PaperState:
                     "gross_loss_cents": self._get("gross_loss_cents"), "halt": self._get("halt"),
                     "gross_loss_exact_cents": self._get("gross_loss_exact_cents"),
                     "ready": bool(self._ready()), "alerts": self._get("alerts"), "budget": self._get("budget"),
+                    "observation_conflicts": self._get("observation_conflicts") or [],
                     "event_count": self.db.execute("SELECT count(*) FROM events").fetchone()[0]}
