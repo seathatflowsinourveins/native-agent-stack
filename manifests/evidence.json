@@ -4044,7 +4044,7 @@
       "claim": "A recorded fast-tier A/B probe at 2026-10-03T22:25:23Z ran the packaged Codex SDK worker (openai-codex 0.160.0) on cx/gpt-6.1-sol-max through the OmniRoute loopback gateway on port 20128, read-only, with an identical 60-line prompt and two private worker homes that differed only in service_tier. All four interleaved runs completed with closed cleanup and requested effort max. Native output tokens per turn second were 61.05 and 61.26 on the fast tier against 32.63 and 32.79 on the standard tier, about 1.87 times; the probe's own wall times were 102.8-118.5 s against 194.2-211.3 s.",
       "limitations": [
         "Two rounds per tier on one prompt: no variance estimate, no task-quality comparison and no other model, route or prompt.",
-        "Every run requested effort max through the previous worker revision; the tier was not measured at ultra, which this repository's worker now uses by default.",
+        "Every run requested effort max, the worker's default, through the revision before its --effort option; the tier was not measured at the opt-in ultra.",
         "Rates divide each run's native cumulative output tokens by its native turn duration_ms. Wall times are quoted as the probe receipt wrote them; it lists no separate std-1 row, and its standard range 194.2-211.3 s includes that run.",
         "The gateway-forwarded service tier, the gateway-forwarded effort and the backend identity were not observed in these records. The probe's note that the gateway honours the tier is an inference from the rate difference, not a gateway log.",
         "The fast tier draws more pool usage per token (the bundled Codex catalog describes it as 2x speed with increased usage); pool usage and limits were not measured.",
@@ -4061,8 +4061,8 @@
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
-      "sha256": "d8b775a376829b9059ab912d82317e8f8ce43f844d5e1984984f7a9829347ce3",
-      "bytes": 4593
+      "sha256": "d065d2d8063373fcd5866986a74d9eaa0ce82f412d6a46b8711dbf060dbbe110",
+      "bytes": 4608
     },
     {
       "path": ".gitattributes",
@@ -4226,8 +4226,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "79b0b04ce8d22c6d424854286f9e67b49fceb0c9d6e8eb2f597bd89ab4ba740c",
-      "bytes": 13977
+      "sha256": "40595dfcde0dea50175380e773d78ff5aca00be901a290ea634fef8b84fe64a1",
+      "bytes": 13787
     },
     {
       "path": "CLAUDE.md",
@@ -4275,6 +4275,11 @@
       "bytes": 3509
     },
     {
+      "path": "adoption/agents/claude/semantic-evidence-reviewer.md",
+      "sha256": "c1cb4882dc104b306e5fd07c52d0a444674b26ffa71f5577710aa03bacd22853",
+      "bytes": 2303
+    },
+    {
       "path": "adoption/agents/claude/source-scout.md",
       "sha256": "f79cead4a3f9c14986bb28815d046eacf8bf79c92fe923094f66f97a64c06341",
       "bytes": 3066
@@ -4306,7 +4311,7 @@
     },
     {
       "path": "adoption/agents/codex/workers/SHA256SUMS",
-      "sha256": "513ac0038d09f050b387657d057a22d1e5a2158ddee7271bc9aa1986cd75b4b4",
+      "sha256": "dad872bde4e5653a2babf6c0e5fd1e5f9e225b80a78f5100c6e9c6cdb06280ae",
       "bytes": 275
     },
     {
@@ -4321,8 +4326,8 @@
     },
     {
       "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
-      "sha256": "ee924bbed2b5ee86e75f04212ada84e631677902bb33a8679b1269d498627d28",
-      "bytes": 5894
+      "sha256": "0a406ec9687b23cefe2b351a4caf6047201df2f4c18b122f994a372800f2de9f",
+      "bytes": 6250
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -4341,8 +4346,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "a7363da986a1552b4ae6e3c8a44b61929c484347c3e48ded5259a08ad8ea98d4",
-      "bytes": 23768
+      "sha256": "6e1e50f3ad647859915eefa64835ff4c43767bf8abec104b5d30f47895cef097",
+      "bytes": 24095
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -4561,8 +4566,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "d643d9f35120aff85bab6d082579386597f5ee15141e3008730ce073ab53d150",
-      "bytes": 8307
+      "sha256": "6de588ac1fb849452370f9cd8891d5ff70e179505fda6f1355461c090184522d",
+      "bytes": 8180
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -9107,8 +9112,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
-      "sha256": "013aa43f686b413287b5058c9a04689029b7d8421ae306cd7c6beb23eb0c5060",
-      "bytes": 7960
+      "sha256": "905e26b9169fd8997344849a312d10709a7519759a23b76262bb85b4dbd9effc",
+      "bytes": 13989
     },
     {
       "path": "blueprints/native-skill-practice/cases.json",
@@ -9139,6 +9144,11 @@
       "path": "blueprints/native-skill-practice/response.cjs",
       "sha256": "c990b1db80f116ecceddb649a175af1aab35d5a1a58762e71f7be13ee7dcb5b7",
       "bytes": 1764
+    },
+    {
+      "path": "blueprints/native-skill-practice/semantic-evidence-reviewer.schema.json",
+      "sha256": "11f7d0f95e8d5df2c07d52ea8217da40e3c12409c09a648381aee52f6e2f928b",
+      "bytes": 2106
     },
     {
       "path": "blueprints/native-skill-practice/test-contract.cjs",
@@ -16021,9 +16031,9 @@
       "bytes": 21398
     },
     {
-      "path": "docs/decisions/2026-10-03-sol-ultra-workhorse.md",
-      "sha256": "2fed4bd0108f87319eea311dc0d98a1fabe503af0aaceeb6b7041305ab10f8cf",
-      "bytes": 12211
+      "path": "docs/decisions/2026-10-03-sol-max-worker-default.md",
+      "sha256": "8789339d836b77cd87fbe7a045cc2feea246f473095d65b369c5c138ce648559",
+      "bytes": 11313
     },
     {
       "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
@@ -16332,8 +16342,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "01ff9518390a36ff3da3e7e0dd0d4d38c4d2c58b90513e0e189ed9231ec0eae1",
-      "bytes": 183193
+      "sha256": "41337b4ec009a2085a08ce776b998a27519a14fa5a6acd7b34188de4d497fd63",
+      "bytes": 183431
     },
     {
       "path": "docs/stack.md",
@@ -49102,8 +49112,8 @@
     },
     {
       "path": "evidence/receipts/omniroute-sdk-worker-fast-tier-20261003.json",
-      "sha256": "54ed0ad9c5ab97991ccb6b1fe9f5b5c697fd7cb49525350e70f0ab9c0881e4c6",
-      "bytes": 8408
+      "sha256": "1e5c5ab23e0d2d871e3acced80b0706a66dac2a843c9bef8ce549672e4fb5ca9",
+      "bytes": 8414
     },
     {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
@@ -49337,8 +49347,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "d46dedde5bbca42c04bc2342c2427048f5430482d14b53c2a661b019c33c19d5",
-      "bytes": 13704
+      "sha256": "e35358c4eb22a9ed155061e0ec2dd577ab5488f82c9436c8daa82da976bee3db",
+      "bytes": 13577
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -49362,8 +49372,8 @@
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
-      "sha256": "0763bbfa0e635ffd6aaaba8ae1f668d3e2398776bc0be3516ad1593701b6a745",
-      "bytes": 1888
+      "sha256": "c1cb4882dc104b306e5fd07c52d0a444674b26ffa71f5577710aa03bacd22853",
+      "bytes": 2303
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
@@ -49512,8 +49522,8 @@
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
-      "sha256": "d81d057a8d8121a9e7a4009fadbcc18141ec5b47b74b876908e808be81de9043",
-      "bytes": 4472
+      "sha256": "2c471a1d71165c46157aa75c0760a097a5adf057c11a73080c30baa92c5b02d0",
+      "bytes": 4786
     },
     {
       "path": "examples/codex-native/agents/stack-researcher.toml",
@@ -49547,8 +49557,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "e3daedcd65b4cff6f234ab58a9e9baa4318604fa615784aef62ce5f63481e9ff",
-      "bytes": 20024
+      "sha256": "7cf93be83411e29ea87cf5135a435344abd5a2d50090d7d3fe1d45f8b8b19422",
+      "bytes": 20556
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -49567,8 +49577,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/enhancements.md",
-      "sha256": "d236c5b687570adab6494a6bf38fbdca90e977d260aa387e56af8661a81b6e2b",
-      "bytes": 10970
+      "sha256": "48a9a32198f3ad34b287c8f6b890d3ce8f292a8cf7382273b10088a658532651",
+      "bytes": 11044
     },
     {
       "path": "examples/omniroute-codex-sdk/rerun-plan.json",
@@ -49587,8 +49597,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py",
-      "sha256": "0fabe71bf06a8a91f80b5f698f166913fadbefa80fc410c76a11d72d812691e5",
-      "bytes": 44574
+      "sha256": "1d9ab2432f80df12d5ade1bc9855fb0eafb3389d0f01db80e850984bb5136015",
+      "bytes": 44548
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
@@ -49597,8 +49607,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "b5808ab3ca328cf5fce25ab80f52439de1915ce18a3824d449c5f032c5280c95",
-      "bytes": 26558
+      "sha256": "d6d9cae14f06a1bdf36de6b4825ff7a6d17d8b0c5f08345e2dc8c6b3a44e0e56",
+      "bytes": 25805
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
@@ -50627,8 +50637,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "7ad574d51b777b7c6d2ce823789f60ea13b9feda7082071fdd65e307b2444171",
-      "bytes": 156097
+      "sha256": "1f63efdc8a1d2dd14507eedaa9603cd4a382b4b7e4835fbb982923d669360abd",
+      "bytes": 155728
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -50731,6 +50741,11 @@
       "bytes": 5678
     },
     {
+      "path": "tests/test_gap_crosswalk_routing.py",
+      "sha256": "3fee83f89033d101c71cbfcdb4eb2efb12166a459ae80f7c9a96cb58bb5937aa",
+      "bytes": 13100
+    },
+    {
       "path": "tests/test_gap_resolution_ledger.py",
       "bytes": 5845,
       "sha256": "686fab880ea35dd0863d04a721d924158b76f0edde464af93f40fac1bd36b156"
@@ -50802,8 +50817,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "67d22e0dcb2295e5a9b75ab30244e0d8d5e8c577236a5988d936fdf9b46cd7e9",
-      "bytes": 99565
+      "sha256": "ca72ad1ad78e20d9524dface39eb91a0f6d49ac9fcd465623303a3463ed7d138",
+      "bytes": 99427
     },
     {
       "path": "tests/test_install_skills.py",
@@ -51154,6 +51169,11 @@
       "path": "tests/test_security_identity.py",
       "sha256": "cdd357d5cc1521959509ce41b519787790d046b51f91a2c29275f3842b667fee",
       "bytes": 22857
+    },
+    {
+      "path": "tests/test_semantic_reviewer_schema.py",
+      "sha256": "5fa5c78306ee6d01653dc1c7dd175289589757844293d9f100d1725b4f0e9988",
+      "bytes": 3738
     },
     {
       "path": "tests/test_service_reboot.py",
@@ -51562,8 +51582,8 @@
     },
     {
       "path": "tools/sota-convergence/gap_crosswalk.py",
-      "sha256": "012d515016a61a1b7c78d47fa79fb80eb69ba5f7215a204cc69f09dfeb6f4c00",
-      "bytes": 25258
+      "sha256": "7545a9aa0a709aaca636e69b6ca7a1d6d9e317a53027098df7133e952d4f705f",
+      "bytes": 30150
     },
     {
       "path": "tools/sota-convergence/gap_wave_ledger.py",
