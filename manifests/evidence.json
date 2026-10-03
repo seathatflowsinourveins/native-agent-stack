@@ -46350,6 +46350,10 @@
       "sha256": "bdf702621ea05990da2c6f57cdf76beb81dad3dadaaf9cf879c950419c57f22a"
     },
     {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/ci-correction.md",
+      "sha256": "7dbf17b90380631057c36adead9702b95c7d005e0a5c3f33424adfa72eb235d6"
+    },
+    {
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-active-control.exit.txt",
       "bytes": 2,
       "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
@@ -46461,8 +46465,8 @@
     },
     {
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/controls.json",
-      "bytes": 12148,
-      "sha256": "f2970e1a17b387fe426e8fecce43107c4a1dd291c736fca086bfe02c825202f2"
+      "bytes": 12146,
+      "sha256": "d13f3f30f5f903305708a054af4b7f9f7d5b16d23baa0f2175dac571cd8ce48e"
     },
     {
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive-attempt2.stderr.txt",
@@ -46480,7 +46484,7 @@
       "sha256": "d3f5e81d6d698b0ae93a28c9bfeec7098ed95ad8d719e7da64dc2c8afec42b2e"
     },
     {
-      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive.stdout.json",
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive.stdout.txt",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
@@ -46735,14 +46739,14 @@
       "sha256": "51d1d7bf8dd549a7e1e7fec51000cb7010e626455904fc852033c6d05f64d26f"
     },
     {
-      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive.stdout.json",
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive.stdout.txt",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/publication-correction.md",
-      "bytes": 1673,
-      "sha256": "622214f9e81e1ec34618839a6d13fd4ceff622846f4a91da92a438bc373c3bd7"
+      "bytes": 1671,
+      "sha256": "b833498956e275154205a4ce17fda3d47b0c7155001207230de1429e2dddc2a5"
     },
     {
       "path": "evidence/artifacts/wsl-terminal-defaults-20260929/README.md",
