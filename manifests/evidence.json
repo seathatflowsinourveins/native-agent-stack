@@ -15835,8 +15835,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-currency-wave-w1b.md",
-      "sha256": "41447359a95efe3dcd0e5df03969353f47bdcb53e2366727aefcd11234e6230a",
-      "bytes": 16291
+      "sha256": "36f5494a6e55a207ace59a3222cfa98a622530d8ef86c296d16cb45f2c2bb287",
+      "bytes": 16990
     },
     {
       "path": "docs/direct-results.md",
@@ -17872,6 +17872,21 @@
       "path": "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
       "sha256": "5fb0e0f31cbcb1448d70c271b840cf252d6922069440a87b33ba6f387107d0e6",
       "bytes": 6515
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/move-hold-judges.json",
+      "sha256": "f50e4ed112f596cf05206e6bdb5e3ee99c5fd892214a42634b2ae0093aba6ca2",
+      "bytes": 42160
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/repair-round-replies.md",
+      "sha256": "57c7ac53ea6c12d23c45f1feab5979814c60f7ecc622b03e1e46ce861579ff67",
+      "bytes": 17182
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/review-round-findings.json",
+      "sha256": "109fac651186384944dafd29e8cf084a7f1293dd785beee67fb413cd8b5bc51d",
+      "bytes": 12370
     },
     {
       "path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stderr.txt",
