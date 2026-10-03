@@ -2097,7 +2097,7 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | Repository source | SHA-256 |
 | --- | --- |
 | [adoption/manifest.json](../adoption/manifest.json) | `7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a` |
-| [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0` |
+| [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `f91dfea40e83add9fdf3192619d1f6c06acd27f7de4599df009e8c37bc5f5001` |
 | [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80` |
 | [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `84c65a395145efe884a70b561205a3359b2b21022bd6fd4107d35d18016efdf6` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1` |

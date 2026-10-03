@@ -6590,7 +6590,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0"
+      "sha256": "f91dfea40e83add9fdf3192619d1f6c06acd27f7de4599df009e8c37bc5f5001"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",

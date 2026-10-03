@@ -175,7 +175,7 @@ class NewWslProfileCliTests(unittest.TestCase):
         data = self.load()
         rows = {row["name"]: row for row in data["entries"]}
         self.assertEqual(rows["Codex"]["pin"], "0.159.3")
-        self.assertEqual(data["boundary"]["accepted_python_sdk_pin"], "0.159.3")
+        self.assertEqual(data["boundary"]["accepted_python_sdk_pin"], "0.160.0")
         for name in ("Codex TypeScript SDK", "Codex Python SDK"):
             self.assertEqual(rows[name]["pin"], "0.159.3")
             self.assertEqual(rows[name]["provisioning_status"], "unprovisioned_source_review")

@@ -4038,8 +4038,8 @@
     "meaning": "Source-review recommendations and isolated comparison arms, not merit winners or new-host acceptance.",
     "new_host_acceptance_verified": false,
     "primary_client": "Codex",
-    "accepted_codex_cli_pin": "0.159.3",
-    "sdk_gate": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/580",
+    "accepted_codex_cli_pin": "0.160.0",
+    "sdk_gate": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626",
     "default_profile": "Minimal native foundation only: existing bootstrap component_ids [codex, claude-code], implicit Node/uv/gh pins, and CPython 3.13.15 via uv; Git and OS utilities are prerequisites.",
     "install_dispatch": "Do not iterate over entries. The existing bootstrap installs only the named native profile and its implicit toolchain; every optional row and comparison arm is excluded. Examples are not an authorization to install.",
     "bootstrap": {
@@ -4215,10 +4215,10 @@
       "Historical acceptance receipts retain their original host/input scope.",
       "Install and functional/source-test commands remain UNRUN; the current host help/version probes and archive hashes qualify only those observations."
     ],
-    "accepted_python_sdk_pin": "0.159.3",
+    "accepted_python_sdk_pin": "0.160.0",
     "proposed_typescript_sdk_pin": "0.159.3",
-    "sdk_gate_status": "merged_at_2026-10-01T21:18:12Z",
-    "accepted_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+    "sdk_gate_status": "pending_pr_626: basis is PR #626 and its cross-family convergence comment https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5970286472; the 0.160.0 pair lands only with #626's own gates, and accepted_main is the main commit #626 was refreshed onto, not a merge of #626.",
+    "accepted_main": "59f8a1e36e1f2870d9de18a16c42f1e72cdae1c6",
     "review_update": "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
     "command_gap_semantics": "An empty blocking_gaps list means the recorded source fields are populated; it does not establish prerequisites, installation, functional execution, sign-in, merit selection or new-host acceptance."
   },
