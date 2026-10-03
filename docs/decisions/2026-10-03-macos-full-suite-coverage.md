@@ -112,16 +112,21 @@ the first three successful runs per event at measurement time.
 | --- | --- | --- | --- |
 | R1 | Collapse concurrent push runs on `main` with a push-scoped concurrency group without `queue: max`, in `validate.yml`, `token-report.yml`, `security-scan.yml` and `adoption-bootstrap.yml` | 350 Validate and 339 Adoption push runs in 8 days, up to 90 a day, 1 of the 689 cancelled; median wall time 1,740 s and 2,163 s | The repository owner, because it conflicts with `docs/github-automation.md:77` ("Run on the integrated revision"); default no change until measured |
 | R2 | Run the report-only betterleaks trial (`secret-scan-betterleaks`, `validate.yml:394`) only after merge | It has no job-level condition, so it runs on every pull-request event; its minutes were not measured here | The automation maintainer, with P1 of `docs/decisions/2026-10-02-github-automation-practice.md` |
-| R3 | Move the `sota-sources` job (`validate.yml:564`), which reads the pull-request description, into its own small workflow that runs on `edited`, keeping the job name so the required context is unchanged, so a description edit stops restarting the 29-minute `validate` job | 241 of Validate's 425 superseded pull-request runs were replaced by a run on the same head SHA, against 2 of 243 for Adoption; in the failure anatomy, which classified 80 of Validate's 88 failed pull-request runs, 13 of 86 failing job instances were the `sota-sources` gate, which a description edit fixes; the 8 runs it left out each failed only in `sota-sources` and a later run on the same head SHA passed, so over all 88 runs the gate has 21 of 94 instances (reclassified 2026-10-03) | The automation maintainer, after the speed-up. Unresolved: `edited` is also how a retargeted pull request is judged again against its new base (`validate.yml:6-9`; `tests/test_workflow_hardening.py:539-544`, review of #135, H1), so dropping it from the heavy workflow needs a replacement for that run. Never gate a job on `github.event.action`: a skipped job reports Success and can put a green check on a red SHA |
+| R3 | Move the `sota-sources` job (`validate.yml:564`), which reads the pull-request description, into its own small workflow that runs on `edited`, keeping the job name so the required context is unchanged, so a description edit stops restarting the 29-minute `validate` job | 241 of Validate's 425 superseded pull-request runs were replaced by a run on the same head SHA, against 2 of 243 for Adoption; in the failure anatomy, which classified 80 of Validate's 88 failed pull-request runs, 13 of 86 failing job instances were the `sota-sources` gate, which a description edit fixes; the 8 it left out each failed only in `sota-sources` (the counts force this; the 8 that a later same-SHA run turned green fit that), so over all 88 runs the gate has 21 of 94 instances (reclassified 2026-10-03) | The automation maintainer, after the speed-up. Unresolved: `edited` is also how a retargeted pull request is judged again against its new base (`validate.yml:6-9`; `tests/test_workflow_hardening.py:539-544`, review of #135, H1), so dropping it from the heavy workflow needs a replacement for that run. Never gate a job on `github.event.action`: a skipped job reports Success and can put a green check on a red SHA |
 | R4 | Run `bootstrap-macos-brew` (`adoption-bootstrap.yml:536`) only on push and on the weekly schedule (`:42-43`) | It runs on a pull request whenever a bootstrap path changed (`:541`); its minutes were not measured here | The adoption owner; `tests/test_workflow_hardening.py:1257-1288` changes with it |
 | R5 | Extend `scripts/git-hooks/pre-push`, which already runs three registry tests on each pushed tip, with the fast validators that fail in CI, and with a non-empty SOTA sources check when the description is drafted first | In the failure anatomy (80 classified of Validate's 88 failed pull-request runs, all 75 of Adoption's), validator and lint steps failed 18 times in Validate (host evidence receipts 4, new-host grand list 3, convergence evidence 3, release-due report 2, landscape choices 2, manifests and evidence integrity 2, actionlint 1, capability claims 1) and 15 times in `validate-macos` (convergence evidence 4, host receipts 4, grand list 2, landscape choices 2, manifests 2, capability claims 1; the 3 failures of its adoption-module gate step count as test failures), one commit can fail both, and `sota-sources` 13 times (21 over all 88 runs); it cannot reach the dominant class, the test steps (47 failing instances in Validate's unittest step, also 47 over all 88 runs; 54 in the macOS full-suite step and 3 in its adoption-module gate step) | The automation maintainer |
 | R6 | De-flake or fix the timing and signal tests that fail only on macOS | `K4GuardTests.test_k4_timing` failed only on macOS on two SHAs and the `SIGQUIT` subtest of `ProcessTests.test_exit_code_and_signal_propagate` on one; each failure costs a whole required cycle (the macOS job's median is 2,154 s) | The owners of `tests/test_secret_path_guard.py` and `tests/test_credential_run.py` |
 
 The failure counts in R3 and R5 come from the receipt's failure anatomy, which classified 80 of Validate's 88 failed
 pull-request runs, all 75 of Adoption's and 10 of the 76 failures of other workflows. The measurement did not record
-why 8 Validate runs were left out. A later reclassification of all 88 (2026-10-03, rule and rows in the receipt) shows
-that the 80 are the failed runs that no later run on the same head SHA turned green, and that each of the other 8
-failed only in `sota-sources`; including them strengthens R3 and leaves R5's ordering unchanged. The 66 unclassified
+which 8 Validate runs were left out, or why. A later reclassification of all 88 (2026-10-03, rule and rows in the
+receipt) found 94 failing job instances, 21 of them `sota-sources`, against the anatomy's 86 and 13 with every other
+count equal, so the 8 runs left out hold 94 - 86 = 8 instances, 21 - 13 = 8 of them `sota-sources`: each failed only
+in that gate. The reclassification is consistent with the 80 being the failed runs that no later run on the same head
+SHA turned green, but it does not identify them: leaving out any 8 of the 19 runs that failed only in `sota-sources`
+reproduces the same counts. The identification rests on the input's count of 8 later-success Validate runs (of 96,
+all events), and the 8 non-pull-request failures were not checked for a later success. R3 and R5 do not depend on
+which 8 runs were left out: including them strengthens R3 and leaves R5's ordering unchanged. The 66 unclassified
 failures of other workflows (64 security-scan, 2 dependency-review) are outside both counts; whether R5's pre-push
 check would reach any of them is unknown.
 
@@ -187,14 +192,14 @@ returned-output rule of `docs/acceptance-evidence-policy.md:57-60`. Later observ
 GET calls on 2026-10-03, kept with exact argument vectors, times, exit codes and payload hashes in
 `evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json`, reclassified all 88 failed Validate
 pull-request runs and placed the 712 cancelled runs by workflow and event, and read both cache endpoints and the
-retention setting. The 1,025-SHA pairing was cross-checked on two endpoints. The
-pull-request conclusion counts for 2026-10-01 and 2026-10-02 were recomputed independently with identical cells; an
-independent run-level pairing of those two days found 4 macOS-only failures among 140 decisive pairs, against the
-measuring agent's 5 among 143 decisive pairs (218 paired heads), a difference this record does not reconcile (likely run-level against job-level pairing
-or list completeness; that cause is an inference). Source reads: the workflow and test lines
-cited here, at `56473e4b`. Computed, not measured: the escape bounds. Local integration: none for this record; the O2
-gate-script unit tests would be local integration if built. GitHub's documentation statements were read on
-2026-10-03. Nothing here is upstream acceptance.
+retention setting. The input records the 1,025-SHA pairing as cross-checked on two endpoints (identical matrices);
+the second endpoint was not recorded. The pull-request conclusion counts for 2026-10-01 and 2026-10-02 were
+recomputed independently with identical cells; an independent run-level pairing of those two days found 4 macOS-only
+failures among 140 decisive pairs, against the measuring agent's 5 among 143 decisive pairs (218 paired heads), a
+difference this record does not reconcile (likely run-level against job-level pairing or list completeness; that
+cause is an inference). Source reads: the workflow and test lines cited here, at `56473e4b`. Computed, not
+measured: the escape bounds. Local integration: none for this record; the O2 gate-script unit tests would be local
+integration if built. GitHub's documentation statements were read on 2026-10-03. Nothing here is upstream acceptance.
 
 ## SOTA sources
 

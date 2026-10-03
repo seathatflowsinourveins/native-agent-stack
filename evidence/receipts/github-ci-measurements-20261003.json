@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "github-ci-measurements-20261003",
   "kind": "artifact_measurement",
-  "evidence_class": "independent observation (the Independent observation class of docs/acceptance-evidence-policy.md): read-only gh REST GET calls on 2026-10-03 over GitHub's own Actions run, job and step records and the full-suite log artifacts of this public repository (platform records), the 1,025-SHA pairing cross-checked on two endpoints, and the pull_request conclusion counts for 2026-10-01 and 2026-10-02 recomputed independently with identical cells (an independent run-level pairing of those two days differs from the measuring agent's by one macOS-only failure and is not reconciled: see limitations). What was kept is a compiled summary of those observations (source.published_input), not their returned payloads or per-call argument vectors (queries.not_retained). Later observations on 2026-10-03, with exact argument vectors, times, exit codes and payload hashes (source.later_reads), back the corrections listed in source.changes_from_input. Not an upstream test, not a local integration check and not acceptance of any change",
+  "evidence_class": "independent observation (the Independent observation class of docs/acceptance-evidence-policy.md): read-only gh REST GET calls on 2026-10-03 over GitHub's own Actions run, job and step records and the full-suite log artifacts of this public repository (platform records), the 1,025-SHA pairing, which the input records as cross-checked on two endpoints (the second endpoint was not recorded: queries), and the pull_request conclusion counts for 2026-10-01 and 2026-10-02 recomputed independently with identical cells (an independent run-level pairing of those two days differs from the measuring agent's by one macOS-only failure and is not reconciled: see limitations). What was kept is a compiled summary of those observations (source.published_input), not their returned payloads or per-call argument vectors (queries.not_retained). Later observations on 2026-10-03, with exact argument vectors, times, exit codes and payload hashes (source.later_reads), back the corrections listed in source.changes_from_input. Not an upstream test, not a local integration check and not acceptance of any change",
   "kind_basis": "artifact_measurement as in evidence/receipts/claude-spend-attribution-20260929.json, a count-only measurement of native records; docs/evidence.md defines the kind for tokenizer counts of a public artifact pair, and unlike such a pair these counts cannot be recounted after retention (limitations)",
   "claim": "Read-only gh REST GET calls on 2026-10-03 over this public repository's GitHub Actions records for runs created 2026-09-25 to 2026-10-02 UTC (8,782 runs; every query partition under the 1,000-result cap; the duration samples are the newest runs at measurement time, created on 2026-10-02 and 2026-10-03) measured: both required test jobs run the whole suite serially in one process (Linux validate 1,727-1,745 s on sampled pull_request runs and 1,167-1,828 s on push runs against a 2,400 s limit; macOS validate-macos 1,932-2,394 s, median 2,154 s over 12 pull_request runs, against 3,600 s, its full-suite step 84% of the median job); the serial macOS suite grew from 5,596 tests in 489 s (2026-09-25) to 9,483 tests in 1,830 s (2026-10-02), 9,750 the latest seen; pull_request runs of Validate published evidence were 1,354 (816 success, 88 failure, 449 cancelled, 1 action_required) and of Adoption bootstrap smoke 1,028 (700, 75, 252, 1); 672 of all 712 cancelled runs in the window (94.4%; 701 of them pull_request runs of these two workflows) were superseded by a newer run of the same workflow, branch and event; and of 1,025 pull_request head SHAs paired across the Linux and macOS runs, 695 passed both, 46 failed both, 30 failed only on macOS (2.9% of SHAs, 3.9% of the 779 decisive pairs), 8 failed only on Linux and 246 were incomplete.",
   "limitations": [
@@ -18,8 +18,8 @@
     "Whether a macOS-only failure is a real Darwin defect or a flake cannot be read from step names; the proxies are re-runs and later same-SHA successes, and a re-run overwrites a run's conclusion.",
     "The 8-day window applies to the counts. The duration samples (12 macOS and 3 Linux pull-request runs) are the newest runs at measurement time, created on 2026-10-02 and 2026-10-03 (up to 2026-10-03T01:18Z for the macOS sample). The Linux sample's creation range is inferred from run ids above the macOS sample's last id. The push and pull_request duration samples of data.push_versus_pull_request_duplication are the first three successful runs per event at measurement time.",
     "Of the 712 cancelled runs, 701 are pull-request runs of the two workflows in data.pull_request_runs. The other 11 are 8 runs of other workflows and 3 runs of those two workflows on other events (Validate push 1 and workflow_dispatch 1, Adoption workflow_dispatch 1), by a GET listing of all 712 cancelled runs on 2026-10-03 (data.cancelled_run_supersession.other_workflows.composition); the input said all 11 belonged to other workflows.",
-    "Failure anatomy coverage: the measurement input did not record which failed runs its anatomy classified. Validate: 80 of its 88 failed pull-request runs. A later reclassification of all 88 on 2026-10-03 (rule and results in data.failure_anatomy_non_cancelled.coverage) reproduces every recorded count for the 80 exactly when it leaves out the 8 failed runs that a later Validate run on the same head SHA turned green, which is how the selection is reconstructed; each of the 8 failed only in sota-sources, so over all 88 runs sota-sources has 21 of 94 failing job instances (13 of 86 in the 80) and every other count is unchanged. Adoption: all 75 failed pull-request runs. Other workflows: 10 of 76 failures (security-scan 7 of 71, dependency-review 2 of 4, native-token-e2e 1 of 1); the other 66 were classified neither by the measurement nor later.",
-    "Cache counts: the measurement recorded 130 active caches but 131 by key prefix (130 codeql-overlay-base-database plus 1 macos-embed-model), and its byte total equals the by-prefix sum. Neither the endpoints nor the capture times were recorded, and the difference is not reconciled (data.caches_and_artifacts.caches.count_reconciliation). Two later paired reads on 2026-10-03 showed the same one-cache gap between the usage endpoint's count and the cache listing, with identical byte totals, so snapshot skew is an unlikely explanation for those later pairs; the cause is unknown.",
+    "Failure anatomy coverage: the measurement input did not record which failed runs its anatomy classified. Validate: 80 of its 88 failed pull-request runs. A later reclassification of all 88 on 2026-10-03 (its rule and results in data.failure_anatomy_non_cancelled.coverage) gives 94 failing job instances, 21 of them sota-sources, against the recorded 86 and 13 with every other count equal, so the 8 runs left out hold 94 - 86 = 8 instances, 21 - 13 = 8 of them sota-sources: each of the 8 failed only in sota-sources. Over all 88 runs sota-sources therefore has 21 of 94 failing job instances (13 of 86 in the 80) and every other count is unchanged, whichever 8 were left out. Which 8 they were is not established (data.failure_anatomy_non_cancelled.coverage.validate.selection): leaving out any 8 of the 19 runs that failed only in sota-sources reproduces the same counts. Adoption: all 75 failed pull-request runs. Other workflows: 10 of 76 failures (security-scan 7 of 71, dependency-review 2 of 4, native-token-e2e 1 of 1); the other 66 were classified neither by the measurement nor later.",
+    "Cache counts: the measurement recorded 130 active caches but 131 by key prefix (130 codeql-overlay-base-database plus 1 macos-embed-model), and its byte total equals the by-prefix sum to 0.1 MiB, which does not indicate which count is right (data.caches_and_artifacts.caches.bytes_reconciliation). Neither the endpoints nor the capture times were recorded, and the difference is not reconciled (data.caches_and_artifacts.caches.count_reconciliation). Two later paired reads on 2026-10-03 showed the same one-cache gap between the usage endpoint's count and the cache listing, with identical byte totals, so snapshot skew is an unlikely explanation for those later pairs; the cause is unknown.",
     "data.linux_validate_job_seconds.failed_runs_job_seconds_by_day lists sampled failing jobs for five days (the selection was not recorded), not each day's range; the later per-day ranges over all 65 failing validate jobs of the 88 failed pull-request runs are given beside it."
   ],
   "scope": "Public-repository CI measurements only; no dollar or allowance figures and no private-repository data (billed minutes of this public repository, which are free, appear only as per-job rounded counts). A recorded summary of read-only observations of platform records: its counts can be re-derived from GitHub only while the run records exist, because the returned payloads and per-call argument vectors were not retained (queries.not_retained); run ids are pointers that stop resolving with retention.",
@@ -44,16 +44,17 @@
       "scope: the no-billing-figures wording clarified (billed minutes of this public repository appear only as per-job rounded counts), and the durability sentence replaced (description above).",
       "data.macos_unique_failures: key failing_tests_for_15_of_the_30 renamed failing_tests_for_17_of_the_30 and limits corrected to 17 runs on 17 distinct head SHAs with 13 not itemized; the input miscounted its own list.",
       "data.caches_and_artifacts.caches: active (130) renamed count_recorded_as_active; count_by_prefix_sum (131), the likely endpoints, bytes_reconciliation, count_reconciliation and later_observation added; bytes, mib and by_prefix unchanged.",
-      "data.failure_anatomy_non_cancelled: coverage added (populations, the reconstructed selection, the 8 omitted Validate runs, a later reclassification of all 88 and the effect on R3 and R5); the input's counts unchanged.",
+      "data.failure_anatomy_non_cancelled: coverage added (populations, what the counts show about the unrecorded Validate selection, the 8 runs with a later same-SHA success, a later reclassification of all 88 and the effect on R3 and R5); the input's counts unchanged.",
       "data.cancelled_run_supersession.other_workflows: composition added; counts unchanged.",
       "data.reruns_and_flake_proxies: denominators added; counts unchanged.",
       "data.linux_validate_job_seconds: failed_runs_job_seconds_by_day_note and the later per-day ranges added; the input's values unchanged.",
-      "data.suite_size_and_growth: definitions_reproduced added (the definitions behind 9,698, 233, 0.268 and 632, reproduced at 56473e4b); the input's values unchanged.",
+      "data.suite_size_and_growth: definitions_reproduced added (the definitions behind 9,698, 233, 0.268 and 632, reproduced at 56473e4b) and largest_file corrected (next entry); the input's other values unchanged.",
+      "data.suite_size_and_growth.largest_file: the input's '632 tests' corrected to 632 'def test' occurrences (624 test definitions), as definitions_reproduced shows; the input's 632 is the occurrence count, not the number of test definitions.",
       "limitations: the input's five limitations are kept; the receipt's retention, test-name and cancelled-run limitations were corrected and three were added (anatomy coverage, cache counts, sampled failed-job seconds)."
     ]
   },
   "queries": {
-    "status": "Request forms reconstructed on 2026-10-03, after the measurement, from the coordinator's unpublished measurement plan (its provenance appendix) and the data below. They are templates, not a transcript of the roughly 587 calls. {owner}/{repo} is seathatflowsinourveins/native-agent-stack; <...> marks a value that varied per call. Every GitHub read is a GET: gh run list sends REST GET requests (actions/workflows, then actions/workflows/<id>/runs), as GH_DEBUG=api showed on gh 2.102.0 on 2026-10-03.",
+    "status": "Request forms reconstructed on 2026-10-03, after the measurement, from the coordinator's unpublished measurement plan (its provenance appendix) and the data below. They are templates, not a transcript of the roughly 587 calls. {owner}/{repo} is seathatflowsinourveins/native-agent-stack; <...> marks a value that varied per call, and each form's basis says what it rests on. The gh api forms of the measuring agent's reads, including the reads it shares with the coordinator, give the path only (gh api <path>) because their client flags were not retained. The input records the calls as read-only GETs (data.measured_by); a GH_DEBUG=api check on 2026-10-03 with gh 2.102.0 (not retained) showed that gh run list sends GET requests (actions/workflows, then actions/workflows/<id>/runs).",
     "not_retained": "The returned payloads and the per-call argument vectors, times and exit codes of the measuring agent's roughly 587 calls and of the coordinator's recomputation. The receipt is therefore a recorded summary of observations that can be re-derived from GitHub only while its records exist (up to 90 days under GitHub's retention policy, and this repository's retention setting reads 90 days; the full-suite log artifacts keep 30 days), and for the measurement it does not meet docs/acceptance-evidence-policy.md lines 57-60 (exact argument vectors, start and end times, returned output). The later reads in source.later_reads keep their exact argument vectors, times, exit codes and payload hashes; their payloads are withheld.",
     "reads_on": "2026-10-03 (UTC date of the measurement; per-call times were not retained)",
     "window": "runs created 2026-09-25 to 2026-10-02 UTC",
@@ -61,23 +62,23 @@
       {
         "for": "data.runs_per_day",
         "by": "measuring agent",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/runs?created=<YYYY-MM-DD>"],
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/runs?created=<YYYY-MM-DD>"],
         "parameters": "each UTC day of the window; the field read is total_count",
         "basis": "plan: per-day totals from total_count; the client flags, per_page and page values were not retained"
       },
       {
         "for": "the 1,000-result cap (data.caps_and_partitions)",
         "by": "measuring agent",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/runs?created=<window start>..<window end>&per_page=<n>&page=<k>"],
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/runs?created=<window start>..<window end>&per_page=<n>&page=<k>"],
         "parameters": "the four days with more than 1,000 runs (2026-09-25, 09-26, 09-27 and 10-01) split into UTC 6-hour created windows; no partition reached 1,000 and the per-day sum equals the endpoint total_count",
-        "basis": "plan and data.caps_and_partitions; the window boundary syntax and the paging values were not retained"
+        "basis": "plan and data.caps_and_partitions; the client flags, the window boundary syntax and the paging values were not retained"
       },
       {
         "for": "data.pull_request_runs, data.push_runs_to_main, data.cancelled_run_supersession, data.reruns_and_flake_proxies",
         "by": "measuring agent",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/runs?created=<day or 6-hour window>&per_page=<n>&page=<k>"],
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/runs?created=<day or 6-hour window>&per_page=<n>&page=<k>"],
         "parameters": "the run fields workflow, event, conclusion, head_branch, head_sha, run_attempt, created_at and updated_at, pivoted by workflow, event, day and conclusion; supersession and re-run proxies computed from the same lists by the rules stated in data",
-        "basis": "plan: the workflow-by-event pivots and the supersession rule; whether the agent listed runs repository-wide or per workflow was not recorded"
+        "basis": "plan: the workflow-by-event pivots and the supersession rule; the client flags were not retained, and whether the agent listed runs repository-wide or per workflow was not recorded"
       },
       {
         "for": "the coordinator's recomputation of the 2026-10-01 and 2026-10-02 pull_request cells",
@@ -96,65 +97,65 @@
       {
         "for": "data.macos_unique_failures (1,025-SHA pairing)",
         "by": "measuring agent",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/runs/<run_id>/jobs"],
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/runs/<run_id>/jobs"],
         "parameters": "pull_request runs of the two workflows from the run lists above, paired by head SHA (run-level conclusions); 266 jobs-API calls for the job-level checks of failures",
-        "basis": "plan (266 jobs-API calls) and data.macos_unique_failures.method; the second endpoint of the two-endpoint cross-check was not recorded"
+        "basis": "plan (266 jobs-API calls) and data.macos_unique_failures.method; the client flags were not retained, and the second endpoint of the two-endpoint cross-check that the input records was not recorded"
       },
       {
         "for": "data.failure_anatomy_non_cancelled",
         "by": "measuring agent",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/runs/<run_id>/jobs"],
-        "parameters": "failed runs, reading job and step conclusions; the selection of runs was not recorded (data.failure_anatomy_non_cancelled.coverage reconstructs it for Validate)",
-        "basis": "plan (failure anatomy) and data; endpoint inferred from the job and step fields"
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/runs/<run_id>/jobs"],
+        "parameters": "failed runs, reading job and step conclusions; the selection of runs was not recorded (data.failure_anatomy_non_cancelled.coverage shows what the counts imply about it for Validate)",
+        "basis": "plan (failure anatomy) and data; endpoint inferred from the job and step fields; the client flags were not retained"
       },
       {
         "for": "data.validate_macos_step_medians_seconds and data.linux_validate_job_seconds",
         "by": "measuring agent and coordinator",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/runs/<run_id>/jobs"],
-        "parameters": "the 12 runs 37062901624 to 37085568588 (agent) and the 8 listed coordinator_sample runs, reading steps[].started_at and steps[].completed_at (job started_at and completed_at for the Linux job seconds); queue seconds as job started_at minus created_at",
-        "basis": "plan: jq over steps[].started_at and completed_at from the jobs API; the jq expressions were not retained"
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/runs/<run_id>/jobs"],
+        "parameters": "the 12 runs 37062901624 to 37085568588 (agent) and the 8 listed coordinator_sample runs, reading steps[].started_at and steps[].completed_at (job started_at and completed_at for the Linux job seconds); the agent's queue_seconds (6-11) are taken to be job started_at minus created_at, which is inferred: the plan gives that definition only for the coordinator's 120-job queue sample, and the agent's definition was not recorded",
+        "basis": "plan: jq over steps[].started_at and completed_at from the jobs API (the coordinator's 8-run sample); the client flags and the jq expressions were not retained"
       },
       {
         "for": "test names and suite sizes (data.macos_unique_failures.failing_tests_for_17_of_the_30, data.suite_size_and_growth.serial_macos_runs and latest_seen)",
         "by": "measuring agent and coordinator",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/runs/<run_id>/artifacts"],
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/runs/<run_id>/artifacts"],
         "parameters": "the adoption-bootstrap-full-suite-macos log artifact of each macOS-failed run, downloaded and streamed into memory, reading the failing test lines and the 'Ran N tests' summary",
-        "basis": "plan: 'the full-suite log artifact (streamed into memory)'; the listing and download commands were not retained and this endpoint is inferred"
+        "basis": "plan: 'the full-suite log artifact (streamed into memory)'; the client flags and the listing and download commands were not retained, and this endpoint is inferred"
       },
       {
         "for": "data.caches_and_artifacts.caches",
         "by": "measuring agent",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/cache/usage"],
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/cache/usage"],
         "parameters": "likely also the paginated cache listing repos/{owner}/{repo}/actions/caches?per_page=<n>&page=<k> for by_prefix",
         "basis": "not recorded; inferred from the field meanings and from the later reads of both endpoints (source.later_reads)"
       },
       {
         "for": "data.caches_and_artifacts.artifacts_created_in_the_7_days_before_2026-10-03T02:32Z",
         "by": "measuring agent",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/artifacts?per_page=<n>&page=<k>"],
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/artifacts?per_page=<n>&page=<k>"],
         "parameters": "artifacts created in the 7 days before 2026-10-03T02:32Z, grouped by name prefix (the table covers 4,500 of 4,630)",
         "basis": "not recorded; endpoint inferred from the fields (name, size, creation time)"
       },
       {
         "for": "data.push_versus_pull_request_duplication",
         "by": "measuring agent",
-        "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}/actions/runs/<run_id>/jobs"],
+        "template": ["gh", "api", "repos/{owner}/{repo}/actions/runs/<run_id>/jobs"],
         "parameters": "the first three successful runs per workflow and event at measurement time, with per-job minutes rounded up; the workflow files were read at 56473e4b",
-        "basis": "data and scope; endpoint inferred"
+        "basis": "data and scope; endpoint inferred; the client flags were not retained"
       },
       {
         "for": "data.suite_size_and_growth (def_test_lines_at_head_56473e4b, test_files, largest_file, fifteen_largest_files_share_of_def_test)",
-        "by": "measuring agent",
+        "by": "not recorded",
         "template": ["rg", "<pattern>", "tests/"],
-        "parameters": "a read of the checkout at 56473e4b, not an API call",
-        "basis": "plan: rg over tests/; the patterns were not retained"
+        "parameters": "the tests/ tree at 56473e4b, the head named in def_test_lines_at_head_56473e4b",
+        "basis": "data; the plan does not cover these figures (its rg over tests/ gives other suite-shape counts), so the tool in this template is inferred and the patterns were not recorded; definitions_reproduced reproduces the figures"
       },
       {
         "for": "the repository owner type (decision record, merge queues) and the retention setting",
         "by": "coordinator",
         "template": ["gh", "api", "--method", "GET", "repos/{owner}/{repo}", "--jq", ".owner.type"],
         "parameters": "returned User on 2026-10-03; the plan also records repos/{owner}/{repo}/actions/permissions/artifact-and-log-retention returning days 90, read again in source.later_reads",
-        "basis": "the decision record and the plan quote these forms"
+        "basis": "the decision record quotes the owner-type form; the plan quotes the retention form, also with --method GET"
       }
     ]
   },
@@ -387,7 +388,7 @@
         "adoption": "0 of 87",
         "security_scan": "2 of 71"
       },
-      "denominators": "96 and 87 are the failed Validate and Adoption runs over all events in the window: 88 and 75 pull_request, 6 and 10 push, 2 and 2 workflow_dispatch (later observation, source.later_reads, derived.failed_runs_all_events); 71 is security-scan's failures over all events (66 pull_request, 5 push). The later reads found the 8 Validate runs among the 88 pull_request failures (data.failure_anatomy_non_cancelled.coverage).",
+      "denominators": "96 and 87 are the failed Validate and Adoption runs over all events in the window: 88 and 75 pull_request, 6 and 10 push, 2 and 2 workflow_dispatch (later observation, source.later_reads, derived.failed_runs_all_events); 71 is security-scan's failures over all events (66 pull_request, 5 push). The later reads found 8 Validate pull_request failures with a later same-SHA success (data.failure_anatomy_non_cancelled.coverage.validate.runs_with_a_later_success), as many as the input's 8 of 96; the 6 push and 2 workflow_dispatch failures were not checked for a later success, so whether the input's 8 are those pull_request runs is not established.",
       "limit": "a re-run overwrites a run's conclusion, so re-run clearances are not visible in conclusion counts"
     },
     "failure_anatomy_non_cancelled": {
@@ -451,8 +452,8 @@
           "population_is": "the failed pull_request runs of data.pull_request_runs.validate_published_evidence.total",
           "classified": 80,
           "unclassified": 8,
-          "selection_reconstructed": "The 80 are the failed runs that no later run turned green: no Validate pull_request run on the same head SHA created after them concluded success (the rule of data.reruns_and_flake_proxies, which counts 8 such runs). Reconstructed, not recorded: a reclassification of all 88 on 2026-10-03 under classification_rule reproduces every recorded count for the other 80 exactly (86 instances, 65 real_test_or_gate, 21 policy_gate and each by_step cell) and finds exactly 8 runs with such a later success.",
-          "omitted_runs": "36321144471, 36327857622, 36329801105, 36334498783, 36337478230 and 36337741278 (2026-09-27), 36454195328 and 36467111805 (2026-09-28), on head SHAs 8c033240c771, 09c774638c6e, 07cc7b90ce63, 1e83b514eef3, 0aafd9c9eaa8, 77b83577b26a, a09daf5872f4 and 208ffb5d3a51; each failed only in the sota-sources job, and on each head SHA a later Validate pull_request run, created by 2026-09-29T00:49Z, concluded success",
+          "selection": "Not recorded, and not identified by the data. A reclassification of all 88 on 2026-10-03 under classification_rule gives 94 failing job instances, 21 of them sota-sources, against the recorded 86 and 13 for the 80, with every other cell equal. So the 8 runs left out hold 94 - 86 = 8 instances, of which 21 - 13 = 8 are sota-sources, and since every one of the 88 runs has at least one failing instance, each of the 8 failed only in sota-sources. 19 of the 88 failed only in sota-sources (1 created on 2026-09-25, 14 on 2026-09-27 and 4 on 2026-09-28), and leaving out any 8 of them reproduces every recorded count for the 80 (86 instances, 65 real_test_or_gate, 21 policy_gate and each by_step cell), so the counts do not single out the 8. The 8 of the 19 that a later Validate pull_request run on the same head SHA turned green (runs_with_a_later_success) are consistent with being the 8 left out: the input counts 8 failed Validate runs followed by a later same-SHA success (data.reruns_and_flake_proxies, 8 of 96). That does not establish it, because the 96 cover all events and the 6 push and 2 workflow_dispatch failures were not checked for a later success.",
+          "runs_with_a_later_success": "36321144471, 36327857622, 36329801105, 36334498783, 36337478230 and 36337741278 (2026-09-27), 36454195328 and 36467111805 (2026-09-28), on head SHAs 8c033240c771, 09c774638c6e, 07cc7b90ce63, 1e83b514eef3, 0aafd9c9eaa8, 77b83577b26a, a09daf5872f4 and 208ffb5d3a51; each failed only in the sota-sources job, and on each head SHA a later Validate pull_request run, created by 2026-09-29T00:49Z, concluded success. Consistent with being the 8 runs the anatomy left out, not established as them (selection).",
           "all_88": {
             "runs": 88,
             "instances": 94,
@@ -467,7 +468,7 @@
         "adoption": {
           "population": 75,
           "classified": 75,
-          "note": "complete: all 75 failed pull_request runs; none of Adoption's failed runs was followed by a later same-SHA success (0 of 87), so the same selection rule leaves none out; not reclassified later"
+          "note": "complete: all 75 failed pull_request runs; none of Adoption's failed runs was followed by a later same-SHA success (0 of 87), so the later-success selection that validate.selection finds consistent with the Validate counts would leave none out here either; not reclassified later"
         },
         "other_workflows": {
           "population": 76,
@@ -476,7 +477,7 @@
           "by_workflow": "security-scan 7 of 71 (its osv-scanner job), dependency-review 2 of 4, native-token-e2e 1 of 1 (recorded as native_token_tools_install)",
           "selection": "not recorded in the measurement input and not reconstructed; the 66 were not classified later"
         },
-        "effect_on_reductions": "R3 and R5 of the decision record use the Validate and validate-macos counts. The 8 omitted Validate runs are sota-sources failures that a later run on the same head SHA turned green, which fits R3 (a description edit fixes the gate and starts a new run on the same SHA; the runs API does not expose the action type, so that link is an inference). Including them raises sota-sources from 13 of 86 to 21 of 94 instances and leaves the unittest step (47) and the validator and lint steps (18) unchanged, so R3's basis grows and R5's ordering, in which the test steps dominate, holds. The 66 unclassified other-workflow failures are outside both counts; whether R5's pre-push check would reach any of them is unknown."
+        "effect_on_reductions": "R3 and R5 of the decision record use the Validate and validate-macos counts, and neither depends on which 8 Validate runs were left out: each of them failed only in sota-sources (validate.selection), so including them raises sota-sources from 13 of 86 to 21 of 94 instances and leaves the unittest step (47) and the validator and lint steps (18) unchanged; R3's basis grows and R5's ordering, in which the test steps dominate, holds. If the 8 are the runs that a later same-SHA run turned green (validate.runs_with_a_later_success), as the input's tally is consistent with, they also fit R3's mechanism (a description edit fixes the gate and starts a new run on the same SHA; the runs API does not expose the action type, so that link is an inference). The 66 unclassified other-workflow failures are outside both counts; whether R5's pre-push check would reach any of them is unknown."
       }
     },
     "validate_macos_step_medians_seconds": {
@@ -574,7 +575,7 @@
       "def_test_lines_at_head_56473e4b": 9698,
       "test_files": 233,
       "fifteen_largest_files_share_of_def_test": 0.268,
-      "largest_file": "tests/test_token_e2e_grader.py with 632 tests in 8,441 lines",
+      "largest_file": "tests/test_token_e2e_grader.py with 632 'def test' occurrences (624 test definitions) in 8,441 lines",
       "per_test_seconds_serial_macos": {
         "2026-09-25": 0.087,
         "2026-10-02": 0.193
@@ -795,7 +796,7 @@
         "count_by_prefix_sum_endpoint": "likely the paginated listing GET repos/{owner}/{repo}/actions/caches grouped by key prefix (not recorded)",
         "bytes": 11064664169,
         "mib": 10552,
-        "bytes_reconciliation": "11,064,664,169 bytes are 10,552.1 MiB, the by_prefix sum 10,253.3 + 298.8 to 0.1 MiB (per-prefix bytes were not recorded), so the byte total belongs with the 131-cache breakdown",
+        "bytes_reconciliation": "11,064,664,169 bytes are 10,552.1 MiB, equal to the by_prefix sum (10,253.3 + 298.8) to 0.1 MiB (per-prefix bytes were not recorded); the later reads show the usage endpoint's byte total also equals the full listing's sum while its count is one lower, so the byte total does not indicate which count is right",
         "by_prefix": {
           "codeql-overlay-base-database": {
             "count": 130,
@@ -806,7 +807,7 @@
             "mib": 298.8
           }
         },
-        "count_reconciliation": "Not reconciled: the measurement recorded 130 as active and 131 caches by prefix, and recorded neither the endpoints nor the capture times, so snapshot skew cannot be excluded for that pair and neither figure is preferred. Two later paired reads on 2026-10-03 (09:42Z and 09:50Z) found the same one-cache gap: the usage endpoint reported active_caches_count 128, while the listing's total_count and its 129 distinct entries summed to exactly the usage endpoint's active_caches_size_in_bytes. That makes skew an unlikely explanation for the later pairs; why the usage count is one lower is unknown.",
+        "count_reconciliation": "Not reconciled: the measurement recorded 130 as active and 131 caches by prefix, and recorded neither the endpoints nor the capture times, so snapshot skew cannot be excluded for that pair and neither figure is preferred. Two later paired reads on 2026-10-03 (09:42Z and 09:50Z) found the same one-cache gap: the usage endpoint reported active_caches_count 128, while the listing reported total_count 129 and returned 129 distinct entries whose size_in_bytes summed exactly to the usage endpoint's active_caches_size_in_bytes. That makes skew an unlikely explanation for the later pairs; why the usage count is one lower is unknown.",
         "later_observation": {
           "read_utc": ["2026-10-03T09:42:34Z", "2026-10-03T09:50:50Z"],
           "usage_active_caches_count": 128,
