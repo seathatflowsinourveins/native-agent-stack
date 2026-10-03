@@ -9354,8 +9354,8 @@
     },
     {
       "path": "blueprints/runtime-workers/README.md",
-      "sha256": "19ceafae91a9f5419f9e9f819b73f9354740ae727a2c25179a6c76932ab6ef58",
-      "bytes": 12084
+      "sha256": "08463a826d693bd1864b9027789f36a3898bbc6c1a3bb723b6aa0c86322ec313",
+      "bytes": 14442
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
@@ -15229,8 +15229,8 @@
     },
     {
       "path": "catalogs/foundation/runtime-jobs.json",
-      "sha256": "a2ab6710550aaf18d8067084ee0a9214c0b45b2211a11c4d9104adbce5d75344",
-      "bytes": 20353
+      "sha256": "0bc30cd872ebf0811a74aedfc0987553831e6ff8cf28647740fa87de86a635a7",
+      "bytes": 22082
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -16079,8 +16079,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-runtime-job-qualification.md",
-      "sha256": "47611e94bfb3583fa418fd0bea51639f5eb78957bff26aa99dcafa6b60b65eea",
-      "bytes": 23882
+      "sha256": "6039eed9bc2bb56b054fc83273d40abf8851cf91e6da50a4125b5f76be1d6472",
+      "bytes": 26707
     },
     {
       "path": "docs/direct-results.md",

@@ -25,11 +25,60 @@
     "native_auth": "Keep native sign-ins native; use the existing keyless gateway without reading or copying authentication stores.",
     "effective_route_qualified": false,
     "token_features_qualified": false,
-    "measurement_window": "Morning06:30-09:00Z workstation readiness only. Destination21128 conditional reservation13:00-16:00Z; coding block admission exceeds this window and no quality study is frozen.",
-    "wire_qualification_gate": ["delivered reasoning effort", "delivered parallel_tool_calls", "Chat correlation join; exclusive Responses window with per-attempt client-row mapping", "authoritative complete usage aggregate", "gateway intervention metadata"],
-    "target_build": {"status": "owner-observed wire control shapes; runtime roles and complete usage unqualified", "base_ref": "23a11484862b3bb589a55e85b00e4ac53ffeb234", "base_branch": "release/v3.8.52", "pr13788_commits": ["24bbadbad15eec0d598c908416e4b01be4e37671", "6c7990058c4ce9677de79452c8cefb10b4bf1b3d"], "pr15167_head_read": "0585aba5589d5a1f49243a13a8db249558e7c9e3", "endpoint": "http://127.0.0.1:21128/v1", "installed_composition_observed": false},
-    "fallback_build": {"ref": "c1e30b7676975feb298b49eff6ff58923c04b89e", "version": "v3.8.51", "status": "release source control; alone caps Sol at xhigh"},
-    "allocated_readiness_endpoint": "http://127.0.0.1:20128/v1"
+    "measurement_window": "Historical allocation only; earlier21128 window closed. No current owner-agreed comparison reservation is qualified.",
+    "wire_qualification_gate": [
+      "delivered reasoning effort",
+      "delivered parallel_tool_calls",
+      "Chat correlation join; exclusive Responses window with per-attempt client-row mapping",
+      "authoritative complete usage aggregate",
+      "gateway intervention metadata"
+    ],
+    "target_build": {
+      "status": "owner-observed wire control shapes; runtime roles and complete usage unqualified",
+      "base_ref": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "base_branch": "release/v3.8.52",
+      "pr13788_commits": [
+        "24bbadbad15eec0d598c908416e4b01be4e37671",
+        "6c7990058c4ce9677de79452c8cefb10b4bf1b3d"
+      ],
+      "pr15167_head_read": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "endpoint": "http://127.0.0.1:21128/v1",
+      "installed_composition_observed": false
+    },
+    "fallback_build": {
+      "ref": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "version": "v3.8.51",
+      "status": "release source control; alone caps Sol at xhigh"
+    },
+    "allocated_readiness_endpoint": "http://127.0.0.1:20128/v1",
+    "historical_measurement_window": "Morning06:30-09:00Z workstation readiness only. Destination21128 conditional reservation13:00-16:00Z; coding block admission exceeds this window and no quality study is frozen.",
+    "native_identity_record": {
+      "scope": "Clarification of existing runtime/model/effort identity, not a new mode or comparison gate.",
+      "effective_catalog_source": null,
+      "effective_catalog_pin": null,
+      "model_slug": null,
+      "supported_reasoning_levels": null,
+      "multi_agent_reasoning_effort": null,
+      "selected_native_mode": null,
+      "transport": null,
+      "gateway_suffix_or_forced_effort": null,
+      "normalized_inference_effort": null,
+      "actual_delivered_effort": null,
+      "pinned_source_catalog": {
+        "repository": "openai/codex",
+        "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+        "path": "codex-rs/models-manager/models.json",
+        "slug": "gpt-6.1-sol",
+        "multi_agent_reasoning_effort": "xhigh",
+        "actual_effective_catalog_observed": false
+      }
+    },
+    "transport_source_status": {
+      "codex_http": "Raw Ultra-to-Max mapping before Responses passthrough; does not establish native Ultra orchestration.",
+      "codex_app_server": "Literal effort reaches native turn/start, then model normalization applies. Text/dynamic-tool bridge does not preserve arbitrary SDK/Responses history; stock Compose image-stage conflict remains unresolved.",
+      "actual_transport_qualified": false
+    },
+    "identity_source_receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/native-ultra-gateway-source-qualification-20261003.json"
   },
   "layers": [
     {
