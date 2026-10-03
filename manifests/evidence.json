@@ -15968,6 +15968,11 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-gpt-lane-omniroute-failover.md",
+      "sha256": "fc541ea35372fed4256af2927371fbd366b365ccbb27096bf9ce4a7b3f041946",
+      "bytes": 23761
+    },
+    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
@@ -50679,8 +50684,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "9039d3fce9dfe4ffb3193be0c7b5976bf95acd3545db5b4f1b8318a1391fb4c0",
-      "bytes": 277381
+      "sha256": "a92a6da603ac650ad49ad4ff0cd116146b21ad929cbaa3f3a946e02e7e38ab69",
+      "bytes": 309351
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -51424,13 +51429,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "5952807786a23be219e69ee7ed417b5141a1384dec02ec33df818ec06a6b3316",
-      "bytes": 94421
+      "sha256": "70e9b928087eac704b20e255b63447adac719e1dca6df9c7f362a22c38a7a584",
+      "bytes": 101473
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "fdc098c00c50bfd6f094edc19a5ccde3658c70853714101c38c814594950bcf2",
-      "bytes": 49765
+      "sha256": "0fbd99b30bd5a1225b1a251691f7b7d3fdf935b3df3e501f1fd29be86e6da0b5",
+      "bytes": 51492
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
@@ -51444,13 +51449,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "3cf095cb0f21538b606470442f547c0a6077e2df1d952da78fb09997161667a3",
-      "bytes": 70018
+      "sha256": "beae25c90f40f9ccaed90f940507dfb63ca4737bcba3e8681540373a767cde32",
+      "bytes": 81310
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "37d4d396da385727ee6d571589e7aa162a030501660a37fac133caf8cbeebba3",
-      "bytes": 46424
+      "sha256": "4a70bb84855deda2b6125c4e8dacbfc686e667ecf506ac5684cd911c8637caf8",
+      "bytes": 47756
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",
