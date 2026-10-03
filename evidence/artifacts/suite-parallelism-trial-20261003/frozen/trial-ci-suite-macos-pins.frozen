@@ -1,0 +1,14 @@
+# Suite-parallelism trial lock (.github/workflows/macos-suite-parallel-trial.yml), macOS arm64 runners with the
+# CPython 3.13 line that actions/setup-python installs on macos-15. Installed in every arm, serial included, with
+# pip install --only-binary=:all: --require-hashes. Official PyPI wheels; each sha256 was checked on 2026-10-03
+# against https://pypi.org/pypi/<name>/<version>/json. The closure is complete: unittest-parallel 1.8.6 requires
+# only coverage>=5.1 (pyproject.toml at its release commit
+# craigahobbs/unittest-parallel@bda5d77dc1a2fa2df90f5f5a7de297ea375e345c, and its PyPI requires_dist), and
+# coverage 7.16.2 requires nothing outside its "toml" extra. The coverage wheel also installs a1_coverage.pth,
+# which starts measurement only when COVERAGE_PROCESS_START or COVERAGE_PROCESS_CONFIG is set.
+# coverage-7.16.2-cp313-cp313-macosx_11_0_arm64.whl
+coverage==7.16.2 \
+    --hash=sha256:0993d0e90858c03943d3cb152e068a20dd4707924deec84dd2230261baae3b1b
+# unittest_parallel-1.8.6-py3-none-any.whl (MIT)
+unittest-parallel==1.8.6 \
+    --hash=sha256:7f04b0ada502f6b3d655ef49ea2a785f0e37869f9d0ce7a075c1a18ec204ac93

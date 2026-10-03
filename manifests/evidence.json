@@ -15805,6 +15805,11 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-suite-parallelism-trial-outcome.md",
+      "sha256": "cde93415c90995bc0f76904b6194f276a6979fd1ff874a8050524e8cde35c5ac",
+      "bytes": 55653
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15936,8 +15941,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "d287f7a805406b916eea9408ecb50851cbf8b7deb92a8a3c7c0a584d2bd4b2a3",
-      "bytes": 143284
+      "sha256": "0db3796fe0c921fb1087d1ad20f3cc7096f8265cb2ef5e83bad8f9d007a9d246",
+      "bytes": 147960
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -44755,6 +44760,146 @@
       "bytes": 2639
     },
     {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/README.md",
+      "sha256": "0a9faceaf4268eb54b76c174609ea8e597d50a9ea39170317944f62caea474e4",
+      "bytes": 9207
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/checkout-status.json",
+      "sha256": "cf7037bb37995b6563e6f4ac26fe1c13080e18affe5506576a062a472aced23c",
+      "bytes": 2430
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/control-logs.txt",
+      "sha256": "e21ed422218924a05d4dec74d54fb880d16bad75c348e9c8bc163499a91c82d0",
+      "bytes": 17277
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4-r1.txt",
+      "sha256": "161a16e7e48323cd3ddd7e526cfd49c15366bd00a5029550bc916fde2f04f1e3",
+      "bytes": 1359
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4C-r1.txt",
+      "sha256": "20fdf36730c2106258e74d61708eccfa7a2c6d181a5b96577a8edc2534a1b7a3",
+      "bytes": 1632
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4F-r1.txt",
+      "sha256": "ee0c3d6a9213ff922b86c884aa5020245d4d06e92cf587ebd940be4ead301c33",
+      "bytes": 2365
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json",
+      "sha256": "0853aab40b7745a9afb54afb30589633ebbb387da730260f44e1274cff03c35b",
+      "bytes": 123174
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/github-workflows-macos-suite-parallel-trial.yml.txt",
+      "sha256": "0f0bb9e6aa523890c7c783afeb5569e251015fc1ab82f72a62b76fcb43af1db3",
+      "bytes": 56566
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/tests-test_native_maintenance.py.txt",
+      "sha256": "565ad15ac3f00618ac4504dd25f4764c44292ca246a5aea1ef1df71b8eecf8a1",
+      "bytes": 2389
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-README.md.txt",
+      "sha256": "6e221d59d5143f94738275e80b8698cbdd670e21e4412f1e154c347bc578f35f",
+      "bytes": 24695
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-ci-suite-linux-pins.frozen",
+      "sha256": "76f2a544d1d5c5724fa9607edfcfa2f5afd02bc7e013a0aef8bbcfb63135a92c",
+      "bytes": 1316
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-ci-suite-macos-pins.frozen",
+      "sha256": "673c36d4f323d4e412f61e893ab6183a750856869292b330e325090f9b10a5c3",
+      "bytes": 1136
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-compare.py.txt",
+      "sha256": "415d648bf76c0519571c993191f0c70eaa59c392e54908a5684d54607264a3ad",
+      "bytes": 79570
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-control_expectations.json.txt",
+      "sha256": "24ad74995d07e13dfd27217af9465390bd1cc3a3a9e510da8661b199eb18308a",
+      "bytes": 3131
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-crash_control-test_crash.py.txt",
+      "sha256": "b81adbf771eaa7ea789721812d9b98bd9a7f18374edb3662cbe1f59e344f661a",
+      "bytes": 476
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-test_zz_trial_controls.py.txt",
+      "sha256": "262e368ec33d3854179afc618a7b74f276507b7f403f7af183ba080f608222d1",
+      "bytes": 1975
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-fixtures-index.json.txt",
+      "sha256": "6b605c4d7bd5b8b4fa9a5343d23f8760d5ba49dbf7b6f11de15c8a5c73312a39",
+      "bytes": 11011
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-fixtures-inventory-controls.txt.txt",
+      "sha256": "111b7f2d8e3c0b22dd31f6b10bd00b7211aa1007cf4a2ad185c843b791a72d15",
+      "bytes": 492
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-ids.py.txt",
+      "sha256": "e5d416fb0f50f0d21aadadf0f1c8b3f181cd772f65a705f7db161173f8a9aa9a",
+      "bytes": 3438
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-make_fixtures.py.txt",
+      "sha256": "930e286d80cd5dc46e73d7f7d0845686f280984d7dc274eabe1be6ea8554e6b2",
+      "bytes": 12699
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-test_b1_failure_mode.py.txt",
+      "sha256": "3e9678ff0e2fe74557459c1cc06e8239a2fc3a3929533bc9cd5de757464472ca",
+      "bytes": 7586
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-test_compare.py.txt",
+      "sha256": "0b2dc0633e5e873f926323c97599d18a11c640d4eb133fb0e35a11f0bb0b93e3",
+      "bytes": 57574
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/local-reproductions.txt",
+      "sha256": "1875800ead9944345772cae4b31c782c90dec96308141b8cec60d8657e588f44",
+      "bytes": 18191
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/log-key-lines.txt",
+      "sha256": "7b8f8adf608fb36b5777448d510a28bd0c9b47aba19b2aab68ba0f1467c4eccc",
+      "bytes": 4599
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/preregistration-experiment.json.txt",
+      "sha256": "305fc2fa2ddd2c0a0eba4d85d748807db87302bde59a6b6489de866bee416c08",
+      "bytes": 43208
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/result-trimmed.json",
+      "sha256": "be82af38a075959f7a21d96e326e7f076abfaba283ed761603438e7342df332d",
+      "bytes": 71682
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/serial-durations-S.txt",
+      "sha256": "2a802072a19bf06adbc9ca9781bbd03d6c0adb5cf43d94ecd89b80a0da960c47",
+      "bytes": 13465
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/summary.md",
+      "sha256": "b1450c88a517fafbf7471af6b7f8c3f6051cb2c1952bbeb696038812503a142b",
+      "bytes": 1302
+    },
+    {
       "path": "evidence/artifacts/tavily-research-qualification-20260926/run.log",
       "sha256": "fdb738a4c9c28d554a79c8f07aba649b927aa3ffba1cf663cbc1f2f76c63a027",
       "bytes": 735
@@ -48420,6 +48565,11 @@
       "bytes": 4906
     },
     {
+      "path": "evidence/receipts/suite-parallelism-trial-20261003.json",
+      "sha256": "c3d5649cc0ebec5f660d182ba67d16f78327bba41eb59b18a1a367135905ea84",
+      "bytes": 135042
+    },
+    {
       "path": "evidence/receipts/tavily-research-qualification-20260926.json",
       "sha256": "a8bdb6e6dea4aa99938bce568ee86e8391fe33929a1940ae141ae519a7100b4a",
       "bytes": 8690
@@ -51046,6 +51196,7 @@
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
     "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
-    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
+    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
+    "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json"
   ]
 }
