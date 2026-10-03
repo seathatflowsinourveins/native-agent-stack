@@ -6,11 +6,13 @@ name: Suite parallelism trial (draft pull request only)
 # names is a required context in .github/main-ruleset.json, and it edits no other workflow. Record and oracle:
 # blueprints/convergence-practice/macos-suite-parallelism-20261003/ (ids.py, compare.py, controls/).
 #
-# Jobs: inventory lists the test ids of the trial head and of the base it was cut from; controls-macos and
-# controls-linux run each arm's exact command on the control file and on the crash control, each copied alone into
-# an empty directory, apart from the timed arms; arms-macos and arms-linux run the whole suite once per arm and
-# repeat on GitHub-hosted runners; compare runs compare.py over every artifact. The controls are two jobs, not one
-# job over a matrix of runner labels, because tests/test_workflow_hardening.py needs a literal ubuntu or macos
+# Jobs: inventory lists the test ids of the trial head and of the base it was cut from, with the trial lock
+# installed; controls-macos and controls-linux run each arm's exact command on the control file and on the crash
+# control, each copied alone into an empty directory, apart from the timed arms; arms-macos and arms-linux run the
+# whole suite once per arm and repeat on GitHub-hosted runners; compare runs the oracle's own tests on its
+# interpreter, then compare.py over every artifact with the pull request head as the frozen corpus, then requires a
+# clean checkout after every run (git-status.txt empty, the oracle's second part). The controls are two jobs, not
+# one job over a matrix of runner labels, because tests/test_workflow_hardening.py needs a literal ubuntu or macos
 # runs-on label in every job.
 #
 # Every job checks out the pull request head (a pull_request checkout is otherwise the merge commit) and asserts it.
@@ -87,6 +89,14 @@ jobs:
           fi
           git worktree add --detach "$RUNNER_TEMP/base" "$TRIAL_BASE_SHA"
           test "$(git -C "$RUNNER_TEMP/base" rev-parse HEAD)" = "$TRIAL_BASE_SHA"
+      - name: Install the hash-locked trial runner before collecting ids
+        # The oracle's README ("Limits") asks for the inventory to be generated on the runner after installing the
+        # lock, since module-level skips and import errors become ids of their own; the Linux arms install it too.
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci-suite-linux.txt
       - name: List the test ids of the base and of the trial head (collection only)
         run: |
           set -euo pipefail
@@ -961,7 +971,15 @@ jobs:
           pattern: control-*
           merge-multiple: true
           path: ${{ runner.temp }}/results
+      # The oracle was tested locally on CPython 3.13 and 3.14 (its README, "Run it"); this job runs it on the
+      # image's python3. An oracle that fails its own tests here gives no verdict: the step fails and compare.py is
+      # skipped (fail-closed), while every arm and control artifact stays downloadable for a rerun.
+      - name: Run the oracle's own tests on this interpreter (fail-closed)
+        run: python3 -m unittest discover -s "$TRIAL_DIR" -p test_compare.py -v
       - name: Compare every arm run with the serial arm of its runner (compare.py)
+        env:
+          # The frozen corpus: compare.py marks an arm run ineligible when its checkout_sha differs.
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/compare"
@@ -970,8 +988,49 @@ jobs:
             --results "$RUNNER_TEMP/results" \
             --inventory-base "$RUNNER_TEMP/inventory/inventory-base.txt" \
             --inventory-trial "$RUNNER_TEMP/inventory/inventory-trial.txt" \
+            --expected-sha "$PR_HEAD_SHA" \
             --out "$RUNNER_TEMP/compare/result.json" \
             --summary-md "$RUNNER_TEMP/compare/summary.md"
+      # The preregistered oracle's second part (the experiment record): compare.py does not read git-status.txt, so
+      # this step requires an empty `git status --porcelain=v1 --untracked-files=all` for every run directory. A
+      # missing file or the recorder's "git status failed" counts as dirty. A dirty run makes its arm ineligible.
+      - name: Check that every run left the checkout clean (git status, second part of the oracle)
+        if: always()
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, sys
+
+          results = os.path.join(os.environ["RUNNER_TEMP"], "results")
+          out_dir = os.path.join(os.environ["RUNNER_TEMP"], "compare")
+          os.makedirs(out_dir, exist_ok=True)
+          names = sorted(name for name in os.listdir(results) if os.path.isdir(os.path.join(results, name))) \
+              if os.path.isdir(results) else []
+          runs = []
+          for name in names:
+              path = os.path.join(results, name, "git-status.txt")
+              if not os.path.isfile(path):
+                  runs.append({"name": name, "clean": False, "status": None, "reason": "git-status.txt is missing"})
+                  continue
+              with open(path, encoding="utf-8", errors="replace") as handle:
+                  status = handle.read()
+              clean = status.strip() == ""
+              runs.append({"name": name, "clean": clean, "status": status[:4000],
+                           "reason": None if clean else "the checkout was not clean after the run"})
+          dirty = [run["name"] for run in runs if not run["clean"]]
+          report = {"schema": "suite-parallelism-checkout-status/1",
+                    "rule": "every run directory's git-status.txt exists and is empty",
+                    "runs": runs, "dirty": dirty, "ok": bool(runs) and not dirty}
+          with open(os.path.join(out_dir, "checkout-status.json"), "w", encoding="utf-8") as handle:
+              json.dump(report, handle, indent=2, sort_keys=True)
+              handle.write("\n")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              summary.write(f"\n### Clean checkout after every run\n\n{len(runs)} run directories; "
+                            f"dirty or unrecorded: {', '.join(dirty) if dirty else 'none'}\n")
+          if not runs:
+              sys.exit("no run directory was downloaded")
+          if dirty:
+              sys.exit(f"{len(dirty)} run directories without a clean checkout: {', '.join(dirty)}")
+          PYEOF
       - name: Write the summary and list the control runs (report only)
         if: always()
         run: |
