@@ -1749,7 +1749,11 @@ adds the [held state](../../adoption/skills/lifecycle.md#held).
   evals.
 - `tools/adoption/install_skills.py` skips a `held` skill as it skips a `pruned` one and refuses it under `--only`;
   `scripts/skills_status.py` reports it as `held`. A global entry may name `agents` and `copy`; the installer passes
-  `--copy -a claude-code` for skill-creator and reads the copy back from Claude Code's folder.
+  `--copy -a claude-code` for skill-creator and reads the copy back from Claude Code's folder. The copy counts as
+  installed only as a real folder there with no entry of its name in `~/.agents/skills`, where Codex loads skills; a
+  link at the Claude entry or a same-name shared entry is `misplaced`, refused in every mode (`--check-only`, which the
+  install plan's smoke check runs, included) with exit 1 and nothing deleted (added after the Codex root lane's source
+  read of `b6828c7d`, finding 3).
 - The Codex template disables Codex's bundled `.system/skill-installer` by its path, so skills reach a host only
   through the installer. Rules for an account's remote plugin skills (change 5) are per account: they are generated
   from the account's plugin cache on the host and are not in the template.

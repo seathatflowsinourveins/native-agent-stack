@@ -66,7 +66,10 @@ target's own skills folder instead of the shared canonical folder with links
 (skills 1.7.0 README:91, :141-142). The supported form is a copy for Claude Code
 only (`"agents": ["claude-code"], "copy": true`): `tools/adoption/install_skills.py`
 runs the add with `--copy -a claude-code` and reads the copy back from Claude
-Code's skills folder, `--print-codex-config` prints no rule for it, and
+Code's skills folder; it takes the copy for installed only as a real folder
+there with no entry of its name in `~/.agents/skills`, and reports a link or a
+same-name entry as `misplaced` (exit 1 in every mode, `--check-only`
+included, with nothing deleted). `--print-codex-config` prints no rule for it, and
 `scripts/skills_status.py` checks it there and fails when a same-name folder sits
 in `~/.agents/skills`, where Codex loads skills. `skill-creator` uses it, because
 Codex embeds its own (wave-2 skills ruling, 2026-10-03).

@@ -1604,6 +1604,71 @@ class HeldAndCopyTests(InstallSkillsTestCase):
         self.assertEqual(removes, [["remove", "copy-skill", "-g", "-y", "-a", "claude-code"]])
         self.assertFalse((self.home / ".claude" / "skills" / "copy-skill").exists())
 
+    def test_a_copy_is_ok_only_as_claude_codes_own_folder_with_no_shared_entry(self):
+        """Finding 3 of the Codex root lane's read of b6828c7d: --check-only, which the install plan's smoke check runs, took
+        the pinned bytes and a matching lock entry for 'ok' wherever the Claude entry led. A Claude-Code-only copy is 'ok'
+        only as a real folder in Claude Code's skills folder with no entry of its name in the shared canonical folder,
+        where Codex loads skills (scripts/skills_status.py fails the other layouts too). A link at the Claude entry, or a
+        shared same-name entry (a dangling link included), is 'misplaced' in every mode, exits 1, runs no add or remove and
+        changes nothing. Every layout holds the same pinned bytes and lock entry, so placement is the one difference: the
+        real folder is the positive control, and the link and shared layouts are the negative controls that the earlier
+        classify_skill passed as 'ok'."""
+        text = "# copy\n"
+        skill = dict(make_skill("copy-skill", text, tree_sha("copy"), codex_enabled=False), agents=["claude-code"],
+                     copy=True)
+        fake_bin = write_fake_skills_bin(self.bin_dir, {"copy-skill": {"skill_md": text, "tree_sha": tree_sha("copy")}})
+        manifest = self.write_manifest([skill])
+        claude = self.home / ".claude" / "skills" / "copy-skill"
+        shared = self.home / ".agents" / "skills" / "copy-skill"
+
+        def folder(path):
+            path.mkdir(parents=True)
+            (path / "SKILL.md").write_text(text, encoding="utf-8")
+
+        def layout(kind):
+            for path in (claude, shared):
+                if path.is_symlink():
+                    path.unlink()
+                elif path.exists():
+                    shutil.rmtree(path)
+            if kind == "link":   # a shared install's layout: the canonical folder, and a relative link onto it
+                folder(shared)
+                claude.parent.mkdir(parents=True, exist_ok=True)
+                os.symlink(os.path.relpath(shared, claude.parent), claude)
+            else:
+                folder(claude)
+                if kind == "shared":
+                    folder(shared)
+                elif kind == "dangling":
+                    shared.parent.mkdir(parents=True, exist_ok=True)
+                    os.symlink("no-such-folder", shared)
+            lock = self.home / ".agents" / ".skill-lock.json"   # the entry the CLI's add writes (fake bin above)
+            lock.parent.mkdir(parents=True, exist_ok=True)
+            lock.write_text(json.dumps({"lockfileVersion": 3, "skills": {"copy-skill": {
+                "source": "github", "sourceType": "github", "sourceUrl": skill["url"], "skillPath": "copy-skill",
+                "skillFolderHash": tree_sha("copy")}}}), encoding="utf-8")
+
+        def snapshot():
+            return {str(path.relative_to(self.home)): os.readlink(path) if path.is_symlink() else
+                    path.read_bytes() if path.is_file() else None for path in sorted(self.home.rglob("*"))}
+
+        layout("own")
+        result = self.run_install(manifest, "--check-only", "--json", fake_bin=fake_bin)
+        self.assertEqual((result.returncode, json.loads(result.stdout)["skills"]), (0, {"copy-skill": "ok"}), result.stderr)
+        for kind, problem in (("link", f"{claude} is a link, not Claude Code's own copy"),
+                              ("shared", f"{shared} exists, in the shared folder where Codex loads skills"),
+                              ("dangling", f"{shared} exists, in the shared folder where Codex loads skills")):
+            for mode in (("--check-only",), ("--dry-run",), (), ("--force",)):
+                with self.subTest(layout=kind, mode=mode):
+                    layout(kind)
+                    before = snapshot()
+                    result = self.run_install(manifest, *mode, "--json", fake_bin=fake_bin)
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertEqual(json.loads(result.stdout)["skills"], {"copy-skill": "misplaced"})
+                    self.assertIn(f"copy-skill: misplaced -- {problem}", result.stderr)
+                    self.assertEqual(snapshot(), before)
+        self.assertFalse([call for call in calls_log(fake_bin) if call and call[0] in ("add", "remove")])
+
     def test_a_copy_for_both_agents_or_a_malformed_agent_list_is_refused_before_any_add(self):
         for name, extra, message in (
                 ("both", {"copy": True}, "copy installs only into Claude Code's own folder"),

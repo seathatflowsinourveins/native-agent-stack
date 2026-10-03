@@ -86,7 +86,10 @@ instead of the shared canonical folder with links (skills@7407f389 README.md:91,
 one form this manifest uses is a Claude-Code-only copy (skill-creator: Codex keeps the copy it
 embeds, so no same-name folder may sit where Codex loads skills); the add and the rollback's remove
 name only the entry's agents, the installed folder read back is the Claude skills folder, and
---print-codex-config prints no rule for an entry Codex never receives.
+--print-codex-config prints no rule for an entry Codex never receives. Such a copy is 'ok' only as a
+real folder in Claude Code's skills folder with no entry of its name in the shared canonical folder:
+a link there, or a same-name entry in the shared folder, is 'misplaced', refused in every mode
+(--check-only, --dry-run and --force included) with exit status 1 and nothing deleted.
 
 --print-codex-config prints one `[[skills.config]]` table with `enabled = false` for
 every codex_enabled: false skill, selecting the installed SKILL.md by `path`, never by
@@ -247,6 +250,20 @@ def installed_skill_dir(skill: dict, home: Path, project_dir: Path | None = None
     return canonical_skill_dir(home, skill["name"], project_dir)
 
 
+def copy_placement_problem(skill: dict, home: Path) -> str | None:
+    """Why a global Claude-Code-only copy is not placed for Claude Code alone, else None. Its entry in Claude Code's skills
+    folder must be a real folder, not a link (a link reads another folder), and the shared canonical folder, where Codex
+    loads skills (codex-rs/ext/skills/src/host_roots.rs L103-108), must hold no entry of the same name, not even a
+    dangling link (os.path.lexists), since Codex keeps the copy it embeds. scripts/skills_status.py fails both layouts
+    the same way. Nothing here deletes either."""
+    claude, shared = installed_skill_dir(skill, home), canonical_skill_dir(home, skill["name"])
+    if claude.is_symlink():
+        return f"{claude} is a link, not Claude Code's own copy"
+    if os.path.lexists(shared):
+        return f"{shared} exists, in the shared folder where Codex loads skills"
+    return None
+
+
 # What JavaScript's String.prototype.trim removes (ECMA-262 WhiteSpace and LineTerminator): the 25 code points
 # node's trim() removed when run over every code point on 2026-09-28. str.strip() differs: it keeps U+FEFF and
 # strips U+001C-U+001F and U+0085.
@@ -362,11 +379,16 @@ def pinned_source_trees(source: str, ref: str) -> dict[str, str]:
 
 
 def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, agent: str = "universal") -> str:
-    """'ok' (a)), 'local-modified' (b), refused), or 'install' (needs an add:
-    either a fresh install, a locked-but-mismatched entry, or an unlocked
-    folder that already matches the manifest byte-for-byte)."""
+    """'ok' (a)), 'local-modified' (b), refused), 'misplaced' (a global
+    Claude-Code-only copy whose Claude entry is a link or whose name the shared
+    canonical folder also holds, copy_placement_problem: refused, never 'ok'),
+    or 'install' (needs an add: either a fresh install, a locked-but-mismatched
+    entry, or an unlocked folder that already matches the manifest
+    byte-for-byte)."""
     name = skill["name"]
     skill_dir = installed_skill_dir(skill, home, project_dir)
+    if project_dir is None and copy_mode(skill) and copy_placement_problem(skill, home):
+        return "misplaced"
     if project_dir is not None and agent == "claude-code":
         # skills@7407f389 src/installer.ts:254-264 replaces existing aliases,
         # including real directories. Protect them regardless of lock state.
@@ -451,6 +473,15 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
     if state == "ok":
         note(f"{name}: ok (pinned ref already installed and locked)")
         return "ok"
+    if state == "misplaced":
+        # In every mode, --force included: an add would leave the shared entry where Codex loads it, and the rollback
+        # after a failed verification would remove the Claude copy. Nothing is deleted; the person removes the entry.
+        print(f"{name}: misplaced -- {copy_placement_problem(skill, home)}; a Claude-Code-only copy needs a real folder "
+              f"at {installed_skill_dir(skill, home)} and no entry of its name at {canonical_skill_dir(home, name)}. "
+              "Nothing was changed: remove the extra entry with the skills CLI (docs/decisions/"
+              "2026-09-25-skills-trial-and-usage.md, Addendum 2026-09-28: M4 host removal and the scoped-remove "
+              "correction), then run again", file=sys.stderr)
+        return "misplaced"
     if check_only:
         status = "local-modified" if state == "local-modified" else "missing-or-drifted"
         note(f"{name}: {status}")
@@ -601,7 +632,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true",
                          help="Report planned actions without add/remove; project source lookups still run")
     parser.add_argument("--check-only", action="store_true",
-                         help="Read-only installed pin check; exit 1 for any missing/drifted skill")
+                         help="Read-only installed pin check; exit 1 for any missing/drifted skill or misplaced copy")
     parser.add_argument("--only", action="append", metavar="NAME",
                          help="Process only this manifest skill name; repeatable")
     parser.add_argument("--force", action="store_true",
