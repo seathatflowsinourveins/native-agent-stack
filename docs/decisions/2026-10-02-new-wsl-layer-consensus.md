@@ -448,7 +448,13 @@ dated decision (with the record that relays it) or a direct consensus with both 
 installed row owns the row's job; and an amendment cannot carry an interim. An owner's decision is resolved in the record
 it names: its `relayed_by` (`<records file> owner_decisions[<n>]`) must point at an entry of one of the interim's hashed
 records, dated as the authority is, that names the slot or the owner (the last part of the interim's repository), so the
-record itself keeps a hold the owner kept, such as the browser's (added 2026-10-03 after the branch review). The batch
+record itself keeps a hold the owner kept, such as the browser's (added 2026-10-03 after the branch review). A mention is
+not an authorization: the entry's `authorizes` must also list the interim's exact slot and repository under an
+affirmative action, `install` or `use`, the decision's own verb. The record lists `memory-owner` with
+`akitaonrails/ai-memory` and `code-search` with `MinishLab/semble` (`owner_decisions[0]`, `install`), and
+`context-supply` with `mksglu/context-mode` (`owner_decisions[1]`, `use`); crawl4ai, which the kept browser hold names
+as a candidate to measure first, is in no such list, so a browser interim relayed by that entry is refused (added
+2026-10-03 after the Codex root lane's source read of `b6828c7d`, finding 1). The batch
 needs its rule texts and its records, and `acknowledgements_owed` must name exactly the families without an
 acknowledgement. It stops with a message and a non-zero exit otherwise. Three readers use the interim: the install plan's
 checker compares the plan row's owner and repository with the interim's, requires the plan to install it and requires its

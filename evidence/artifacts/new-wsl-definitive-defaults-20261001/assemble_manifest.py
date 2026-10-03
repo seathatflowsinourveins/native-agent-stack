@@ -323,8 +323,8 @@ BATCH_FIELDS = (("date_utc", str), ("meaning", str), ("interim_rule", str), ("no
 # Amendment 3: an interim install, written to the row's `interim` field (outside PROTECTED), on a row whose decided default
 # installs nothing. It names what it installs and at which pin, what replaces or removes it (decided_by), the authority that
 # installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision
-# (as the record that relays it states it, with the owner's own words where that record quotes them) or a direct consensus
-# that carries both families' acknowledgements.
+# (as the record that relays it states it, with the owner's own words where that record quotes them, and with the exact
+# slot and repository pair it authorizes) or a direct consensus that carries both families' acknowledgements.
 INTERIM_FIELDS = ("date_utc", "default", "repository", "pin", "label", "decided_by", "authority", "reviews", "records")
 INTERIM_TEXT = ("date_utc", "default", "repository", "pin", "label", "decided_by")
 INTERIM_OPTIONAL = ("configuration", "open_acceptance_gates", "sources")
@@ -332,12 +332,17 @@ AUTHORITY_KINDS = {"owner_decision": ("date_utc", "decision", "relayed_by"), "di
 # How an owner's decision names the record that relays it: one of the interim's hashed records and an entry of its
 # owner_decisions list, e.g. "wave2-records.json owner_decisions[0]".
 RELAYED_BY = re.compile(r"(?P<name>[A-Za-z0-9._-]+\.json) owner_decisions\[(?P<index>[0-9]+)\]")
+# The affirmative actions with which a relayed decision authorizes an interim: the entry's `authorizes` lists each slot and
+# repository pair its decision installs or puts to use, under the decision's own verb. Any other action authorizes nothing.
+AUTHORIZING_ACTIONS = ("install", "use")
 
 
 def relayed_decision(sid, interim, authority):
     """The owner's decision an interim's authority relays, resolved in the hashed record it names: the entry must be dated
-    as the authority is and name the slot or the owner (the last part of the interim's repository), so the record, not
-    the batch's own text, says what the owner decided (a hold the owner kept cannot gain an interim this way)."""
+    as the authority is, name the slot or the owner (the last part of the interim's repository) in its text, and list
+    the interim's exact slot and repository in its `authorizes` under an affirmative action (AUTHORIZING_ACTIONS). So the
+    record, not the batch's own text, says what the owner decided: neither a hold the owner kept nor a tool the decision
+    only mentions (the browser hold's crawl4ai, to be measured first) can gain an interim this way."""
     match = RELAYED_BY.fullmatch(authority["relayed_by"].strip())
     if not match:
         raise ValueError(f"consensus {sid}: the owner's decision is relayed by '<records file> owner_decisions[<n>]', not "
@@ -355,6 +360,13 @@ def relayed_decision(sid, interim, authority):
     text = str(entry.get("decision", "")).lower()
     if not any(re.search(r"(?<![a-z0-9])" + re.escape(name) + r"(?![a-z0-9])", text) for name in (sid.lower(), owner)):
         raise ValueError(f"consensus {sid}: {match['name']} owner_decisions[{index}] names neither the slot nor {owner}")
+    grants = entry.get("authorizes")
+    if not (isinstance(grants, list) and any(
+            isinstance(grant, dict) and grant.get("action") in AUTHORIZING_ACTIONS and grant.get("slot_id") == sid
+            and isinstance(grant.get("repository"), str) and norm(grant["repository"]) == norm(interim["repository"])
+            for grant in grants)):
+        raise ValueError(f"consensus {sid}: {match['name']} owner_decisions[{index}] authorizes no "
+                         f"{' or '.join(AUTHORIZING_ACTIONS)} of {interim['repository']} in the slot {sid}")
     if entry.get("date_utc") != authority["date_utc"]:
         raise ValueError(f"consensus {sid}: the owner's decision is dated {authority['date_utc']}, and the entry it relays "
                          f"{entry.get('date_utc')}")

@@ -1092,10 +1092,80 @@ class Manifest(unittest.TestCase):
             ("an interim on the held browser row",
              lambda e, b: e["interim"].update(repository="https://github.com/microsoft/playwright-cli"), "playwright-cli",
              "consensus playwright-cli: wave2-records.json owner_decisions[0] names neither the slot nor playwright-cli"),
+            # A mention is not an authorization (the Codex root lane's read of b6828c7d, finding 1): the kept browser hold
+            # names crawl4ai as a candidate to measure first, which the mention check alone took for the owner's authority.
+            ("a browser interim for the tool the kept hold names to measure first",
+             lambda e, b: e["interim"].update(repository="https://github.com/unclecode/crawl4ai"), "playwright-cli",
+             "consensus playwright-cli: wave2-records.json owner_decisions[0] authorizes no install or use of "
+             "https://github.com/unclecode/crawl4ai in the slot playwright-cli"),
+            ("a repository the decision authorizes, in another slot it authorizes",
+             lambda e, b: e["interim"].update(repository="https://github.com/MinishLab/semble"), "memory-owner",
+             "consensus memory-owner: wave2-records.json owner_decisions[0] authorizes no install or use of "
+             "https://github.com/MinishLab/semble in the slot memory-owner"),
         ]
         for name, change, slot, message in cases:
             with self.subTest(case=name):
                 self.assertTrue(attempt(change, slot).startswith(message), attempt(change, slot))
+
+    def test_an_owner_decision_authorizes_only_the_exact_pairs_its_record_lists(self):
+        """An owner's decision authorizes an interim only where the record that relays it lists the interim's exact slot
+        and repository under an affirmative action (the Codex root lane's read of b6828c7d, finding 1). The negative
+        control: the browser interim that the mention check alone admitted is refused, and so is an entry whose grant is
+        missing, of another action, slot or repository, while the unchanged entry still admits its interim."""
+        assembler = load_assembler()
+        ref = self.wave2["records"]["wave2_records"]
+        record = load(ROOT / ref["path"])
+        # Each recorded interim is one listed pair of the entry its authority relays, under the decision's own verb.
+        for sid, interim in self.interims.items():
+            with self.subTest(slot=sid):
+                index = int(re.fullmatch(r"wave2-records\.json owner_decisions\[([0-9]+)\]",
+                                         interim["authority"]["relayed_by"]).group(1))
+                grants = [grant for grant in record["owner_decisions"][index]["authorizes"] if grant["slot_id"] == sid]
+                self.assertEqual([(grant["action"], grant["repository"]) for grant in grants],
+                                 [({"memory-owner": "install", "code-search": "install", "context-supply": "use"}[sid],
+                                   interim["repository"])])
+                self.assertIn(grants[0]["action"], assembler.AUTHORIZING_ACTIONS)
+        # The old input: the kept browser hold names crawl4ai as a token, which is all the mention check asked for, and no
+        # entry lists the browser slot or crawl4ai.
+        self.assertRegex(record["owner_decisions"][0]["decision"].lower(), r"(?<![a-z0-9])crawl4ai(?![a-z0-9])")
+        listed = [(grant["slot_id"], grant["repository"]) for entry in record["owner_decisions"] for grant in entry["authorizes"]]
+        self.assertFalse([pair for pair in listed if pair[0] == "playwright-cli" or "crawl4ai" in pair[1]], listed)
+        crawl = json.loads(json.dumps(self.interims["memory-owner"]))
+        crawl["repository"] = "https://github.com/unclecode/crawl4ai"
+        with self.assertRaises(ValueError) as caught:
+            assembler.relayed_decision("playwright-cli", crawl, crawl["authority"])
+        self.assertEqual(str(caught.exception), "consensus playwright-cli: wave2-records.json owner_decisions[0] authorizes "
+                                                "no install or use of https://github.com/unclecode/crawl4ai in the slot "
+                                                "playwright-cli")
+        # A scratch copy of the record, changed in the one grant the memory interim rests on.
+        interim = self.interims["memory-owner"]
+
+        def attempt(change):
+            with tempfile.TemporaryDirectory() as scratch:
+                copy = Path(scratch) / ref["path"]
+                copy.parent.mkdir(parents=True)
+                doc = json.loads(json.dumps(record))
+                change(doc["owner_decisions"][0])
+                copy.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+                assembler.ROOT = Path(scratch)
+                try:
+                    return assembler.relayed_decision("memory-owner", interim, interim["authority"])
+                finally:
+                    assembler.ROOT = ROOT
+
+        self.assertEqual(attempt(lambda entry: None), record["owner_decisions"][0])
+        refusal = ("consensus memory-owner: wave2-records.json owner_decisions[0] authorizes no install or use of "
+                   "https://github.com/akitaonrails/ai-memory in the slot memory-owner")
+        for name, change in (
+                ("no authorizes", lambda entry: entry.pop("authorizes")),
+                ("a hold, not an affirmative action", lambda entry: entry["authorizes"][0].update(action="hold")),
+                ("another slot", lambda entry: entry["authorizes"][0].update(slot_id="embedding-model")),
+                ("another repository", lambda entry: entry["authorizes"][0].update(
+                    repository="https://github.com/akitaonrails/ai-memory-fork"))):
+            with self.subTest(change=name):
+                with self.assertRaises(ValueError) as caught:
+                    attempt(change)
+                self.assertEqual(str(caught.exception), refusal)
 
 
 class InterimPlanChecks(unittest.TestCase):

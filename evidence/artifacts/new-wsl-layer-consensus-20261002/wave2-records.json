@@ -3,7 +3,7 @@
  "kind": "new-wsl-wave2-records",
  "date_utc": "2026-10-03",
  "meaning": "the records behind the wave-2 batch of consensus.json: per layer, the Claude dossier's default, the GPT family's check and the Claude ruling with the changes the repository records cite, and the synthesis items they rest on; selection records only, nothing measured and nothing changed on any host",
- "method": "Extracted by script from the result events of the private wave-2 workflow run wf_18aa601f-b71 (14 layers: an Opus dossier, a GPT-6 Astra check through codex exec at maximum effort, an Opus ruling), whose journal has the sha256 below. Each event's sha256 is taken over its result in canonical JSON (keys sorted, separators ',' and ':', UTF-8). Text is copied verbatim except that home-directory paths read '~/', the private workflow journal folder reads '<private workflow journal>/' and session identifiers read '<session>'. 'changes' keeps the numbering of the ruling's changes_to_dossier, from 1, as the synthesis cites them ('<layer> change n').",
+ "method": "Extracted by script from the result events of the private wave-2 workflow run wf_18aa601f-b71 (14 layers: an Opus dossier, a GPT-6 Astra check through codex exec at maximum effort, an Opus ruling), whose journal has the sha256 below. Each event's sha256 is taken over its result in canonical JSON (keys sorted, separators ',' and ':', UTF-8). Text is copied verbatim except that home-directory paths read '~/', the private workflow journal folder reads '<private workflow journal>/' and session identifiers read '<session>'. 'changes' keeps the numbering of the ruling's changes_to_dossier, from 1, as the synthesis cites them ('<layer> change n'). The owner_decisions are not from the run: each relays one decision of the owner as the coordinator's records state it, and its 'authorizes' lists the exact slot and repository pairs the decision installs or puts to use, with the decision's own verb, as the coordinator structures it; a hold the owner kept is in no such list.",
  "sources": {
   "journal": {
    "run": "wf_18aa601f-b71",
@@ -34,12 +34,31 @@
    "date_utc": "2026-10-03",
    "time_as_relayed": "recorded at 2026-10-03T05:10:03Z",
    "decision": "install ai-memory (fresh store) and semble now: decision 2 of the synthesis lifts those two holds; the browser hold stays, because the owner wants crawl4ai or another LLM-native browser practice measured first; move the local models to NativeStack2604; sign the accounts into the destination's own OmniRoute; Restic quick start on the E: drive, NAS later",
+   "authorizes": [
+    {
+     "action": "install",
+     "slot_id": "memory-owner",
+     "repository": "https://github.com/akitaonrails/ai-memory"
+    },
+    {
+     "action": "install",
+     "slot_id": "code-search",
+     "repository": "https://github.com/MinishLab/semble"
+    }
+   ],
    "relayed_by": "the coordinating Claude session's lane-tracker entry of 2026-10-03T05:10:03Z ('USER DECISIONS on wave 2 (first-hand)') and its brief for these records; private coordination records"
   },
   {
    "date_utc": "2026-10-03",
    "time_as_relayed": "said at about 01:10Z",
    "decision": "use context-mode in the destination's clients (the owner's pin that the wave-2 ruling for the context layer adopts)",
+   "authorizes": [
+    {
+     "action": "use",
+     "slot_id": "context-supply",
+     "repository": "https://github.com/mksglu/context-mode"
+    }
+   ],
    "verbatim": "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond simple action of web search",
    "relayed_by": "the wave-2 brief, 'Why (the user's words, 2026-10-03 ~01:10Z)', lines 8-10, quoting the owner's words in the destination; private coordination record"
   }

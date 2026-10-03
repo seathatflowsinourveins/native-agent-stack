@@ -164,7 +164,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "4a79ea32104a6cfcdfdf75e9e8131a3d1a4223781c4ce537ee50d10a29af7466"
+          "sha256": "e6897728fd866a4d17583109f0d48bcd578c59b237e7186e31ec8ff09e83abf4"
         },
         "convergence": {
           "file": "convergence.json",
@@ -1390,7 +1390,7 @@
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                  "sha256": "b7f618654f13d5651728424566937523b5bb7347262907dd8475673dc2759e91"
+                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
                 }
               ],
               "repository": "https://github.com/MinishLab/semble",
@@ -1651,7 +1651,7 @@
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                  "sha256": "b7f618654f13d5651728424566937523b5bb7347262907dd8475673dc2759e91"
+                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
                 }
               ],
               "repository": "https://github.com/akitaonrails/ai-memory",
@@ -2078,7 +2078,7 @@
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                  "sha256": "b7f618654f13d5651728424566937523b5bb7347262907dd8475673dc2759e91"
+                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
                 }
               ],
               "repository": "https://github.com/mksglu/context-mode",
@@ -6930,7 +6930,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "1a0d0302f61acefd9e811f77bb0011e3332d3532b3cc08627a8b333ba415a5a0"
+      "sha256": "7757707179b44461f684f3da341ca15bec8edad5be0ea24c2cc27dac42d64a31"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -6954,7 +6954,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "4a79ea32104a6cfcdfdf75e9e8131a3d1a4223781c4ce537ee50d10a29af7466"
+      "sha256": "e6897728fd866a4d17583109f0d48bcd578c59b237e7186e31ec8ff09e83abf4"
     }
   ],
   "stage_order": [

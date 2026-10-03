@@ -139,6 +139,13 @@ CONSENSUS_CASES = [
      lambda doc: doc["wave2"].update(acknowledgements_owed=[])),
     ("consensus: a wave-2 batch without its records", "consensus wave2: the batch names its hashed records",
      lambda doc: doc["wave2"].update(records={})),
+    # A mention is not an authorization (the Codex root lane's read of b6828c7d, finding 1): a browser interim for the tool
+    # that the kept browser hold names to measure first, relayed by that same entry and dated as it is.
+    ("consensus: a browser interim for the tool the kept browser hold names to measure first",
+     "consensus playwright-cli: wave2-records.json owner_decisions[0] authorizes no install or use of "
+     "https://github.com/unclecode/crawl4ai in the slot playwright-cli",
+     lambda doc: doc["wave2"]["interim_rows"].append({"slot_id": "playwright-cli", "interim": dict(
+         json.loads(json.dumps(interim(doc, "memory-owner"))), repository="https://github.com/unclecode/crawl4ai")})),
 ]
 CASES += [(case, "test_manifest_is_current", refusal) for case, refusal, _ in CONSENSUS_CASES]
 # Records that the assembler accepts but whose labels break the rule's label clause: the label test must fail.
