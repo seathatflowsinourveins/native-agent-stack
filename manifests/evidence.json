@@ -49629,13 +49629,13 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-alertmanager.yml.example",
-      "sha256": "693ecb28036e88fac500419009db4a88617377124c8ebe31e2764c7f1006bda7",
-      "bytes": 418
+      "sha256": "11cb872dd788bc26035213691580a19f779bb6d0f29d3a17c52a846c63290b64",
+      "bytes": 906
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
-      "sha256": "2acdccb25dbf82764da4024d7409a5b2bb6f7ea322b01940a6c400bd39cb29f2",
-      "bytes": 39356
+      "sha256": "313396f59fe56025d7ceb0bb4a76695327bb2fd583976085735c7424629bab8b",
+      "bytes": 47996
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana-dashboards.yml.example",
@@ -49669,8 +49669,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "25583ba47d5919759f569cc130c31374707dcfb992ed7faf692e620f4ada4947",
-      "bytes": 12864
+      "sha256": "2f0284939d4ad0c90dfc4d4f6e677d8c2b880a3d73c950b219a60b88b6cd88f4",
+      "bytes": 16292
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
@@ -49689,8 +49689,8 @@
     },
     {
       "path": "observability/collector/codex-identity-launcher.sh.example",
-      "sha256": "2942baca412b3cfed51e8e6d036bd6a3023dc8917fe295e9b74fc61b5f7d161a",
-      "bytes": 4066
+      "sha256": "ead8a934b90be6d6fef1ffa5ee06d32793e0af121cd9d1a04b2e2da06988c3f1",
+      "bytes": 4642
     },
     {
       "path": "observability/collector/codex.toml.example",
@@ -49699,8 +49699,8 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "3394aa992c06ed4d60d588c70112eb345695fdf8e7d3d7c13a277bf9b8666612",
-      "bytes": 24911
+      "sha256": "a6312ca3150dc8ef95e408adb6b4522bea0dc3e20d8351e394f7824b95d37de2",
+      "bytes": 26125
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -50834,8 +50834,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "944fb543cbb1ba5025a4d1df2a4ffd84a3323f3f67b591bb83a8bdd796fc1a0e",
-      "bytes": 16142
+      "sha256": "ffef5a77a903a12b6fea40fe78fb2db66716a8847ce2610402e50d3747a34156",
+      "bytes": 23733
     },
     {
       "path": "tests/test_observability_run_correlation.py",
@@ -50844,13 +50844,13 @@
     },
     {
       "path": "tests/test_observability_tool_names.py",
-      "sha256": "a6c2324600d817f1fdff5975f713fbd65d08735cc0410001211ff7ae98c07526",
-      "bytes": 24367
+      "sha256": "01643e542017a248c166302b90f7218e42c83eceb3e4084b1a99a4bb73617a89",
+      "bytes": 25617
     },
     {
       "path": "tests/test_observability_writer_identity.py",
-      "sha256": "ef64ba46907134593f0c05ea9376820f1524ccffc465396746c5a329920a91f4",
-      "bytes": 30907
+      "sha256": "3c5f3407365526b6ea5c60ac0c2272b252d9785c22c75ef481e4e07dddcaf92c",
+      "bytes": 32287
     },
     {
       "path": "tests/test_observability_writer_identity_host.py",
