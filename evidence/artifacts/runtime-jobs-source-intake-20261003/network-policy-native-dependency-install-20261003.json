@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "kind": "native-public-dependency-installation",
+  "date": "2026-10-03",
+  "scope": "Three anonymous pinned public image pulls, unchanged Harbor sidecar build and four native image identity observations. This is installation readiness, not a policy test, task/model run, execution freeze or measured default.",
+  "source_packet": {
+    "bytes": 25113,
+    "sha256": "fb82f76d7309478753f7ba8a2f9ac8c6450430588114f2dc88e525c8c1194c7f",
+    "parent_packet": {
+      "bytes": 10962,
+      "sha256": "a3a9da560752f5b0068c97823ddbe0c64436139e5ebad94e0a053d268dc5d82c"
+    },
+    "original_native_returns": "retained task-owned private original receipt; no host paths published"
+  },
+  "client_boundary": {
+    "docker_cli": {
+      "version": "29.8.2",
+      "pin": "7fc2dff9bceb96b266a3b2c3117c0955a0d9e616"
+    },
+    "buildx": {
+      "version": "0.37.1",
+      "pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a"
+    },
+    "new_empty_config": {
+      "bytes": 62,
+      "sha256": "7134e84a3f48cc49dbce7e04b2a41c4ba5d643763a25719136efd884b4693b50",
+      "auths": {},
+      "explicit_empty_hub_credential_helper": true,
+      "permissions": "0600 within new 0700 task-owned directory"
+    },
+    "invocation": "env -u DOCKER_AUTH_CONFIG -u BUILDX_CONFIG DOCKER_CONFIG=<new-empty-task-owned-config> docker --config <same> --host <qualified-local-daemon> ...",
+    "builder": "default/docker/running, explicitly --builder=default; pinned Buildx context source binding and native endpoint observation",
+    "claim": "The new explicit config bypasses existing client auth-store/helper discovery for these calls; ordinary public registry protocol may issue anonymous bearer tokens. No credential/auth file was read or copied.",
+    "sources": [
+      "https://github.com/docker/cli/blob/7fc2dff9bceb96b266a3b2c3117c0955a0d9e616/cli/config/config.go",
+      "https://github.com/docker/cli/blob/7fc2dff9bceb96b266a3b2c3117c0955a0d9e616/cli/config/configfile/file.go",
+      "https://github.com/docker/buildx/tree/0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a"
+    ]
+  },
+  "unchanged_sidecar": {
+    "repository": "harbor-framework/harbor",
+    "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+    "path": "src/harbor/environments/docker/harbor-docker-egress-control-sidecar",
+    "source": "https://github.com/harbor-framework/harbor/tree/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/environments/docker/harbor-docker-egress-control-sidecar",
+    "original_context_files": 5,
+    "all_original_bytes_matched": true,
+    "build": "Supported buildx form; default local Docker builder, linux/amd64, original Dockerfile/context, load local Docker output. No task image rebuild.",
+    "built_image": {
+      "id": "sha256:c3941e4f055ba95f423c684d262bea947bfe5ce41bb82252ef6890ce8a6b035d",
+      "repo_digests": [
+        "nas-network-policy-egress@sha256:c3941e4f055ba95f423c684d262bea947bfe5ce41bb82252ef6890ce8a6b035d"
+      ],
+      "os": "linux",
+      "architecture": "amd64"
+    }
+  },
+  "stages": [
+    {
+      "id": "pull-stock-probe",
+      "native_terminal_return": {
+        "chunk_id": "859314",
+        "wall_time_seconds": 0.967928217,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "pull-stock-probe.stdout",
+        "bytes": 520,
+        "sha256": "8a92abceb39dde3356c6abdb35d71a6de5c596604fb92f9b93911fe1a83e75c4"
+      },
+      "stderr": {
+        "file": "pull-stock-probe.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "pull-stock-canary",
+      "native_terminal_return": {
+        "chunk_id": "12ec8b",
+        "wall_time_seconds": 0.00001369,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "native_initial_return": {
+        "chunk_id": "aa5b68",
+        "wall_time_seconds": 1.000960997,
+        "session_id": 2601,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "pull-stock-canary.stdout",
+        "bytes": 781,
+        "sha256": "965076127067326cf2f8dfcd15eb68887d001b883b4bbb1320284eecccd51620"
+      },
+      "stderr": {
+        "file": "pull-stock-canary.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "pull-stock-sidecar-base",
+      "native_terminal_return": {
+        "chunk_id": "2a80e2",
+        "wall_time_seconds": 0.757121194,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "pull-stock-sidecar-base.stdout",
+        "bytes": 436,
+        "sha256": "c7b1adad4c652d5132704e339eeddc965c514410edaf224e06487ee658b0ce3e"
+      },
+      "stderr": {
+        "file": "pull-stock-sidecar-base.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "build-only-stock-sidecar",
+      "native_terminal_return": {
+        "chunk_id": "f9a100",
+        "wall_time_seconds": 0.00000933,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "native_initial_return": {
+        "chunk_id": "4212e9",
+        "wall_time_seconds": 1.001237575,
+        "session_id": 80623,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "build-only-stock-sidecar.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "build-only-stock-sidecar.stderr",
+        "bytes": 1764,
+        "sha256": "d0cbffe3f8475a60640c1682567d08e90322cbabc3b842262c266dcddf7b6b94"
+      }
+    },
+    {
+      "id": "freeze-installed-image-0",
+      "native_terminal_return": {
+        "chunk_id": "28719e",
+        "wall_time_seconds": 0.107669627,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "freeze-installed-image-0.stdout",
+        "bytes": 224,
+        "sha256": "282f45191abed185d651cb4bd6871fce1af266aa077ce6124034344182a79b2a",
+        "parsed_original": {
+          "id": "sha256:43366cd60f226c7655181a0f7e85c468a41d182fdd2dc2c1c3b872a2b9d05d7a",
+          "repo_digests": [
+            "curlimages/curl@sha256:43366cd60f226c7655181a0f7e85c468a41d182fdd2dc2c1c3b872a2b9d05d7a"
+          ],
+          "os": "linux",
+          "architecture": "amd64"
+        }
+      },
+      "stderr": {
+        "file": "freeze-installed-image-0.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "freeze-installed-image-1",
+      "native_terminal_return": {
+        "chunk_id": "ee071c",
+        "wall_time_seconds": 0.171851543,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "freeze-installed-image-1.stdout",
+        "bytes": 215,
+        "sha256": "01e087471ae0a6909fe5dd182c62d8638edcc0302d9b1f228281aea5628abed2",
+        "parsed_original": {
+          "id": "sha256:9901e0a8d75037d8242ed43155cbcb2d1f61be1356383d8054afb59fd50e39c4",
+          "repo_digests": [
+            "python@sha256:9901e0a8d75037d8242ed43155cbcb2d1f61be1356383d8054afb59fd50e39c4"
+          ],
+          "os": "linux",
+          "architecture": "amd64"
+        }
+      },
+      "stderr": {
+        "file": "freeze-installed-image-1.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "freeze-installed-image-2",
+      "native_terminal_return": {
+        "chunk_id": "1be83c",
+        "wall_time_seconds": 0.140883257,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "freeze-installed-image-2.stdout",
+        "bytes": 220,
+        "sha256": "ea2e325faff411a1cbb245c33c5e3d99fbf20ff6a9aab2b2a778fc794c381686",
+        "parsed_original": {
+          "id": "sha256:afc0137758ab4ce399d47a299f9abbacbf522b52a17e59cbb4b4e7a1a66e9196",
+          "repo_digests": [
+            "gogost/gost@sha256:afc0137758ab4ce399d47a299f9abbacbf522b52a17e59cbb4b4e7a1a66e9196"
+          ],
+          "os": "linux",
+          "architecture": "amd64"
+        }
+      },
+      "stderr": {
+        "file": "freeze-installed-image-2.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "freeze-installed-image-3",
+      "native_terminal_return": {
+        "chunk_id": "38db48",
+        "wall_time_seconds": 0.088133217,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "freeze-installed-image-3.stdout",
+        "bytes": 234,
+        "sha256": "5549ea40f6ca4e6acfc1ef8fa43b99e2a2da1874075d5aa2ae64d9c644ef4b99",
+        "parsed_original": {
+          "id": "sha256:c3941e4f055ba95f423c684d262bea947bfe5ce41bb82252ef6890ce8a6b035d",
+          "repo_digests": [
+            "nas-network-policy-egress@sha256:c3941e4f055ba95f423c684d262bea947bfe5ce41bb82252ef6890ce8a6b035d"
+          ],
+          "os": "linux",
+          "architecture": "amd64"
+        }
+      },
+      "stderr": {
+        "file": "freeze-installed-image-3.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "observed": {
+    "native_commands": 8,
+    "terminal_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "image_identity_reads": 4,
+    "container_services_started": 0,
+    "policy_enforcement_qualified": false,
+    "model_calls": 0,
+    "comparative_attempts": 0,
+    "measured_defaults": 0
+  }
+}

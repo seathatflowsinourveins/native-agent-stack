@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "kind": "pinned-original-coding-task-budget-bindings",
+  "date": "2026-10-03",
+  "evidence_level": "pinned-source-originals; not native effective deadline or benchmark acceptance",
+  "input_selection_source": "../../../blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
+  "source": {
+    "repository": "laude-institute/harbor-datasets",
+    "pin": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+    "files": "datasets/swebench-verified/<task_id>/task.toml"
+  },
+  "read_method": {
+    "command": [
+      "rtk",
+      "proxy",
+      "gh",
+      "api",
+      "repos/laude-institute/harbor-datasets/contents/datasets/swebench-verified/<task_id>/task.toml?ref=86723674f04e4209ac479d0fb75d9d9f44b4377e"
+    ],
+    "native_returns": 24,
+    "exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "stderr_bytes": 0,
+    "original_toml_bytes": 9948,
+    "retained_originals": {
+      "bytes": 28187,
+      "sha256": "593b9cabf6610ddecd9342c70cbaef27c33e269ed02932d49ee3408fdc4faf02",
+      "location": "task-owned private source receipt; no host paths published"
+    }
+  },
+  "facts": {
+    "all_selected_agent_timeout_sec": 3000,
+    "all_selected_verifier_timeout_sec": 3000,
+    "all_selected_build_timeout_sec": 1800,
+    "all_selected_cpus": 1,
+    "all_selected_memory": "4G",
+    "all_selected_storage": "10G",
+    "distinction": "Harbor framework default build timeout 600 is not the selected task value. No delivered build or deadline enforcement is qualified by this source read."
+  },
+  "tasks": [
+    {
+      "task_id": "django__django-14034",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-14034/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "django__django-15569",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-15569/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "django__django-11211",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-11211/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "django__django-15572",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-15572/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "sympy__sympy-23824",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-23824/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "sympy__sympy-13647",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-13647/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "sympy__sympy-24066",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-24066/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "sympy__sympy-12489",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/sympy__sympy-12489/task.toml",
+      "git_blob_sha1": "773bd7f28bce73fe02fbcc53c1d8071e75a80d36",
+      "bytes": 411,
+      "sha256": "c062317afc83dc6b0135001faf7fac6818014986409442efee9de6fa0fc7d414"
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-13496",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-13496/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-12585",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-12585/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-13328",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-13328/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-14983",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/scikit-learn__scikit-learn-14983/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "pytest-dev__pytest-6197",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-6197/task.toml",
+      "git_blob_sha1": "773bd7f28bce73fe02fbcc53c1d8071e75a80d36",
+      "bytes": 411,
+      "sha256": "c062317afc83dc6b0135001faf7fac6818014986409442efee9de6fa0fc7d414"
+    },
+    {
+      "task_id": "pytest-dev__pytest-7521",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-7521/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "pytest-dev__pytest-6202",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-6202/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "pytest-dev__pytest-5840",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pytest-dev__pytest-5840/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "pydata__xarray-7393",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-7393/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "pydata__xarray-2905",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-2905/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "pydata__xarray-4075",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-4075/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "pydata__xarray-4629",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/pydata__xarray-4629/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "matplotlib__matplotlib-25122",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-25122/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    },
+    {
+      "task_id": "matplotlib__matplotlib-24627",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-24627/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "matplotlib__matplotlib-24026",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-24026/task.toml",
+      "git_blob_sha1": "e81e844e8c7875221ff3e4a6e29f9e3aa926bff1",
+      "bytes": 417,
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1"
+    },
+    {
+      "task_id": "matplotlib__matplotlib-25332",
+      "source": "https://github.com/laude-institute/harbor-datasets/blob/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/matplotlib__matplotlib-25332/task.toml",
+      "git_blob_sha1": "d7e0879f293c2f31bc567ef48263ac9a23e7f414",
+      "bytes": 413,
+      "sha256": "e9a5d7dd94ed43a89396fc12e7b7b32578c9114806bf017620aa694525dd9cba"
+    }
+  ],
+  "remaining_gates": [
+    "Bind actual installed task originals, runtime overrides and timeout multipliers before execution.",
+    "Observe genuine agent/verifier/setup/build/outer deadlines and failure/cleanup disposition.",
+    "All other unchanged task/image/network/oracle/identity/retry/tool/owner-window gates remain required."
+  ],
+  "model_calls": 0,
+  "comparative_attempts": 0,
+  "measured_defaults": 0
+}

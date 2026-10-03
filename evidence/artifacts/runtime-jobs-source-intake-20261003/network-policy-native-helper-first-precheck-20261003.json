@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "kind": "native-metadata-first-precheck-failure",
+  "date": "2026-10-03",
+  "packet": {
+    "installed-input-helper-recipe.json": {
+      "bytes": 89954,
+      "sha256": "eab85f37fc0dc919d62e88a75a114c6bb526399f3d950ea0698c0fe5a9eece80"
+    },
+    "source-inventory.json": {
+      "bytes": 7822,
+      "sha256": "c74228990278387288d615beceacdeed0f324855dc5993697340c1c3145e6b31"
+    },
+    "compose.readiness.yaml": {
+      "bytes": 1937,
+      "sha256": "6d2475713882736b84ac9a63a333ec030ccdbac4a495fd5aca7163827420087c"
+    }
+  },
+  "source_method_acceptance": {
+    "reviewer": "Astra/max consequential source-method read",
+    "packet": {
+      "installed-input-helper-recipe.json": {
+        "bytes": 89954,
+        "sha256": "eab85f37fc0dc919d62e88a75a114c6bb526399f3d950ea0698c0fe5a9eece80"
+      },
+      "source-inventory.json": {
+        "bytes": 7822,
+        "sha256": "c74228990278387288d615beceacdeed0f324855dc5993697340c1c3145e6b31"
+      },
+      "compose.readiness.yaml": {
+        "bytes": 1937,
+        "sha256": "6d2475713882736b84ac9a63a333ec030ccdbac4a495fd5aca7163827420087c"
+      }
+    },
+    "verdict": "ACCEPT render and eleven bounded metadata helpers only",
+    "twenty_two_stage_policy": "HOLD",
+    "native_source_reads": "gh api 0, Harbor git show 0, custody 0; not native helper execution",
+    "root_original_reads": "Dockercreate and Composeconfig native0; both hashes and sizes match; staged1937-byteYAML exactlymatches"
+  },
+  "operations": [
+    {
+      "id": "compose-render",
+      "native_terminal": {
+        "chunk_id": "493f91",
+        "wall_time_seconds": 0.107681074,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "compose-render.stdout",
+        "bytes": 2284,
+        "sha256": "1e8e3c53e7720e714350bcedb8d5e8ce471b202b674419efc65c30caa32ae690",
+        "parsed_original": {
+          "name": "nas-network-policy-readiness-20261003-02",
+          "networks": {
+            "readiness": {
+              "driver": "bridge",
+              "internal": true,
+              "labels": {
+                "io.native-agent-stack.readiness.owner": "nas-network-policy-readiness-20261003-02"
+              },
+              "name": "nas-network-policy-readiness-20261003-02_readiness"
+            }
+          },
+          "services": {
+            "gateway": {
+              "command": [
+                "-m",
+                "http.server",
+                "8080",
+                "--bind",
+                "0.0.0.0",
+                "--directory",
+                "/tmp"
+              ],
+              "entrypoint": [
+                "/usr/local/bin/python3"
+              ],
+              "image": "docker.io/library/python@sha256:9901e0a8d75037d8242ed43155cbcb2d1f61be1356383d8054afb59fd50e39c4",
+              "networks": {
+                "readiness": null
+              }
+            },
+            "gateway-control": {
+              "command": [
+                "infinity"
+              ],
+              "depends_on": {
+                "gateway": {
+                  "condition": "service_started",
+                  "required": true
+                }
+              },
+              "entrypoint": [
+                "/bin/sleep"
+              ],
+              "image": "docker.io/curlimages/curl@sha256:43366cd60f226c7655181a0f7e85c468a41d182fdd2dc2c1c3b872a2b9d05d7a",
+              "network_mode": "service:gateway"
+            },
+            "harbor-docker-egress-control-sidecar": {
+              "cap_add": [
+                "NET_ADMIN",
+                "NET_RAW"
+              ],
+              "entrypoint": [
+                "/opt/egress-sidecar/entrypoint.sh"
+              ],
+              "healthcheck": {
+                "interval": "1s",
+                "retries": 30,
+                "test": [
+                  "CMD",
+                  "test",
+                  "-f",
+                  "/tmp/harbor-docker-egress-control-sidecar.ready"
+                ],
+                "timeout": "5s"
+              },
+              "image": "nas-network-policy-egress@sha256:c3941e4f055ba95f423c684d262bea947bfe5ce41bb82252ef6890ce8a6b035d",
+              "init": true,
+              "networks": {
+                "readiness": null
+              }
+            },
+            "main": {
+              "command": [
+                "infinity"
+              ],
+              "depends_on": {
+                "harbor-docker-egress-control-sidecar": {
+                  "condition": "service_healthy",
+                  "required": true
+                }
+              },
+              "entrypoint": [
+                "/bin/sleep"
+              ],
+              "image": "docker.io/curlimages/curl@sha256:43366cd60f226c7655181a0f7e85c468a41d182fdd2dc2c1c3b872a2b9d05d7a",
+              "network_mode": "service:harbor-docker-egress-control-sidecar"
+            }
+          }
+        }
+      },
+      "stderr": {
+        "file": "compose-render.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_utf8": ""
+      },
+      "predicate": "Native source-supported render returns exact declared service identities/topology and specified values; source defaults retained",
+      "verdict": "PASS; parser/topology metadata only"
+    },
+    {
+      "id": "curl-version-name-absence-before-first-create",
+      "native_terminal": {
+        "chunk_id": "5d4a3c",
+        "wall_time_seconds": 0.103264076,
+        "exit_code": 1,
+        "original_token_count": 0,
+        "output": ""
+      },
+      "stdout": {
+        "file": "curl-version.pre-name.stdout",
+        "bytes": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "original_utf8": "\n"
+      },
+      "stderr": {
+        "file": "curl-version.pre-name.stderr",
+        "bytes": 106,
+        "sha256": "7254982fffe0038e9e3b7b84b862148bf9c8cb66b48afa7dc202d28ef11cf341",
+        "original_utf8": "Error response from daemon: No such container: nas-network-policy-readiness-20261003-02-tool-curl-version\n"
+      },
+      "frozen_predicate": {
+        "native_exit": 1,
+        "stdout_exact": "",
+        "stderr": "explicit exact-name No such container or No such object"
+      },
+      "actual": {
+        "native_exit": 1,
+        "stdout_exact": "\n",
+        "stderr_exact": "Error response from daemon: No such container: nas-network-policy-readiness-20261003-02-tool-curl-version\n",
+        "cidfile_absent": true
+      },
+      "verdict": "FAIL frozen literal-stdout predicate; no helper create attempted"
+    }
+  ],
+  "disposition": {
+    "helper_containers_launched": 0,
+    "services_launched": 0,
+    "policy_transitions": 0,
+    "model_calls": 0,
+    "comparison_attempts": 0,
+    "measured_defaults": 0,
+    "quality_score": null,
+    "next": "Original failure/captures retained. A separate pinned-source prospective exact empty-or-one-LF predicate repair and new capture/CID namespace is required before helper admission. No normalization or retrospective PASS."
+  }
+}

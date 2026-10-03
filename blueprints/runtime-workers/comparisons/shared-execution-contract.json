@@ -24,7 +24,7 @@
         "token-feature adoption",
         "complete-provider accounting from partial counters"
       ],
-      "preserved_gates": "Keep native budget/tool enforcement and breach disposition, retries, deadlines, recovery, lifecycle, images/content identity, network/allowlist, task/oracle/negative controls, no-prompt, credential isolation, extensions and owner pool/window admission. The proposed 200000-token cap remains unenforced and a freeze gate; this patch introduces no uncapped exception. An uncapped study requires a separate source-bound prospective proposal and acceptance.",
+      "preserved_gates": "Keep native time/tool enforcement and frozen breach disposition, all trial/model/helper retries, matched-block recovery, attempt ceilings, deadlines, lifecycle, images/content identity, network/allowlist, task/oracle/negative controls, no-prompt, credential isolation, extensions and owner pool/window admission. Only a new explicitly accepted and preregistered quality_only coding/research study may omit the proposed 200000-token ceiling under this source-bound proposal. All other unsupported or unqualified limits still prevent admission. full_usage, absent/null selections, historical attempts and all prior failures remain unchanged.",
       "required_reads": "Exact amended shared/job contracts and preregistration require both-family and consequential reads plus existing owner admission before freeze. The source-proposal acceptance is not acceptance of this patch, study freeze, run admission or a measured default."
     }
   },
