@@ -1425,7 +1425,9 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
     refreshInterval 5 when absent; the acceptance runs the configured command. Review of 2026-10-03 at 99a2e3c6: the
     helper keeps an earlier claude-hud statusLine with its refreshInterval (setup.mjs L94), and the acceptance, which
     required exactly 5, rejected that installed configuration; it now takes any positive integer, the settings schema's
-    integer with minimum 1, and install then acceptance run on one scratch home. Each program here is the row's own string
+    integer with minimum 1, and install then acceptance run on one scratch home. Review of 2026-10-03 at 06f6259f (macOS
+    run 37141171758): the exact-one check of the cached versions compared the `wc -l` count as a string, which BSD and
+    macOS wc pad; it now compares numbers, and stand-ins print both formats. Each program here is the row's own string
     in install-plan.json, run as install.sh and accept.sh run it (bash -euo pipefail -c), with a scratch HOME, a PATH of
     links to the system tools the programs use and a stand-in runtime that records its arguments and, as node does for a
     script file that is not there, fails unless its argument exists, else prints two lines. The fixtures are our own:
@@ -1434,6 +1436,11 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
 
     INTERVAL_CHECK = '(.statusLine.refreshInterval | type == "number" and . >= 1 and . == floor)'
     INTERVAL_CHECK_BEFORE_REVIEW = ".statusLine.refreshInterval == 5"
+    COUNT_CHECK = '"$versions" -eq 1'
+    COUNT_CHECK_BEFORE_REVIEW = '"$versions" == 1'
+    # The two printf formats of a `wc -l` count read from stdin: GNU coreutils prints the bare number; BSD and macOS wc
+    # print " %7ju" (apple-oss-distributions/text_cmds@592aaf8a wc/wc.c L214-215), so one line reads "       1".
+    WC_FORMATS = {"unpadded": "%d\\n", "padded": " %7d\\n"}
 
     TOOLS = ("bash", "sh", "jq", "ls", "wc", "cmp", "readlink", "mktemp", "chmod", "mv", "rm", "cat")
     LAUNCHER = "// claude-hud 0.10.0 launcher (stand-in)\n"
@@ -1554,11 +1561,23 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
         settings.write_text(json.dumps({"theme": "dark", "statusLine": status_line}), encoding="utf-8")
         return settings
 
-    def acceptance(self, program=None, **state):
-        """The acceptance's exit status and stderr for one state of a scratch home."""
+    def stand_in_wc(self, bin_dir, form):
+        """A wc in <bin_dir> that takes only -l on stdin, counts with the system wc and prints the count in WC_FORMATS[form],
+        whatever the system wc's own format; run_program keeps it in place of the link to the system wc."""
+        bin_dir.mkdir(exist_ok=True)
+        (bin_dir / "wc").write_text(
+            '#!/bin/sh\n[ "$#" -eq 1 ] && [ "$1" = -l ] || { echo "stand-in wc: only -l on stdin" >&2; exit 2; }\n'
+            f"""printf '{self.WC_FORMATS[form]}' "$(( $('{self.tools["wc"]}' -l) ))"\n""", encoding="utf-8")
+        (bin_dir / "wc").chmod(0o755)
+
+    def acceptance(self, program=None, wc=None, **state):
+        """The acceptance's exit status and stderr for one state of a scratch home; `wc`, a key of WC_FORMATS, runs it with
+        the stand-in wc that prints that format."""
         with tempfile.TemporaryDirectory() as scratch:
             scratch = Path(scratch)
             self.plant(scratch, **state)
+            if wc is not None:
+                self.stand_in_wc(scratch / "bin", wc)
             status, stderr, _ = self.run_program(program or self.program, scratch)
             return status, stderr
 
@@ -1622,6 +1641,27 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
             with self.subTest(case=name):
                 status, stderr = self.acceptance(**case)
                 self.assertNotEqual(status, 0, stderr)
+
+    def test_the_acceptance_takes_the_count_padded_or_not_and_still_requires_one_version(self):
+        """macOS run 37141171758 (at 2f5d8b01): the wired state with refreshInterval 5, 1 and 3 exited 1 there, with an empty
+        stderr. Here each wc format runs through its stand-in, so the case does not rest on the host's own wc."""
+        self.assertEqual(self.program.count(self.COUNT_CHECK), 1)
+        for form in self.WC_FORMATS:
+            for refresh in (5, 1, 3):
+                with self.subTest(wc=form, passes=f"refreshInterval {refresh}"):
+                    status, stderr = self.acceptance(wc=form, refresh=refresh)
+                    self.assertEqual(status, 0, stderr)
+            with self.subTest(wc=form, fails="a second cached version"):
+                status, stderr = self.acceptance(wc=form, second_version=True)
+                self.assertNotEqual(status, 0, stderr)
+
+    def test_the_count_check_before_the_review_rejected_the_padded_count(self):
+        """Negative control: the wired state, with the exact-one check as it was at 06f6259f (a string comparison)."""
+        before_review = self.program.replace(self.COUNT_CHECK, self.COUNT_CHECK_BEFORE_REVIEW)
+        for form, passes in (("unpadded", True), ("padded", False)):
+            with self.subTest(wc=form):
+                status, stderr = self.acceptance(before_review, wc=form)
+                self.assertEqual(status == 0, passes, stderr)
 
 
 class LocalModelAcceptance(unittest.TestCase):
