@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "kind": "historical_source_retirement_assessment",
+  "status": "retired_historical_source",
+  "assessed_date_utc": "2026-10-03",
+  "source_base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "scope": "Retire this historical fixture's supported replay and npm installation entry points; retain offline consistency checks and all original evidence.",
+  "evidence_class": "offline_artifact_check",
+  "archived_artifacts": {
+    "package-original.json.txt": {
+      "original_path": "package.json",
+      "bytes": 174,
+      "sha256": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8",
+      "role": "Original install manifest, resolved by the offline audit for every historical package.json binding."
+    },
+    "run-recording-aid.py.txt": {
+      "original_path": "run.py",
+      "bytes": 16427,
+      "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
+      "role": "Future recording aid from the source base; no historical native execution is attributed to these bytes."
+    }
+  },
+  "retained_lock": {
+    "path": "package-lock.json",
+    "bytes": 82463,
+    "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+    "role": "Immutable historical dependency evidence at its original path; still included in scanner inventory."
+  },
+  "current_entrypoints": {
+    "run.py": {
+      "sha256": "0df1c6873b8514cb08af2efebe479dfe46c35ad1e6b05d73796bee0d7cca702e",
+      "role": "Both old source and QMD modes fail with a retirement diagnostic before subprocess or output-directory creation."
+    },
+    "package.json": {
+      "sha256": "69ed6c37f8517e712ce64e1550c363926bdf25e42d8bfb30efa02b71197f3485",
+      "role": "Private dependency-free retirement manifest with devEngines.runtime.name=retired-wsl-retrieval and onFail=error."
+    }
+  },
+  "historical_evidence_policy": "Historical receipts, declared key/check sets, failed attempts, source-review.json, verification.json and prior runner archives are unchanged. The resolver does not add fields to the original receipts.",
+  "historical_native_acceptance_established": false,
+  "native_npm_guard_acceptance_established": false,
+  "npm_guard_scope": "npm 11.19.0 checks devEngines before supported install/ci entry points, including --ignore-scripts; independent native controls are recorded separately by the coordinator. This offline assessment does not establish their execution.",
+  "guard_limitations": [
+    "This is a supported-entry-point guard, not an installation sandbox. Explicit --force, other package managers and restored historical files are outside its claim.",
+    "Removing package.json alone is insufficient: npm Arborist can load root metadata from a standalone lock.",
+    "Retirement does not establish a patched dependency, repair missing historical invocation evidence, qualify a current QMD setup or adopt a scanner exception."
+  ],
+  "active_qmd_advisory": {
+    "id": "GHSA-vfj7-8cjw-p6xm",
+    "status": "unresolved"
+  },
+  "primary_sources_and_pins": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/blueprints/convergence-practice/wsl-retrieval/audit.py"
+    },
+    {
+      "repository": "npm/cli",
+      "revision": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+      "url": "https://github.com/npm/cli/blob/v11.19.0/docs/lib/content/configuring-npm/package-json.md#L1117"
+    },
+    {
+      "repository": "npm/cli",
+      "revision": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+      "url": "https://github.com/npm/cli/blob/v11.19.0/lib/base-cmd.js#L201"
+    },
+    {
+      "repository": "npm/cli",
+      "revision": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+      "url": "https://github.com/npm/cli/blob/v11.19.0/workspaces/arborist/lib/arborist/load-virtual.js#L50"
+    },
+    {
+      "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+      "role": "Primary unresolved advisory; no safe-version claim."
+    }
+  ],
+  "whole_task_provider_usage": null
+}

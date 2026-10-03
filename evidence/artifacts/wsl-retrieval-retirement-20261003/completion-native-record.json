@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_cli_integration_controls",
+  "source_base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "scanner_revision": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+  "scanner_binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+  "workflow_run_block_sha256": "15ffbe6a824fb4bf041310488f17134adb79eadabda4a1407122d6f6a42c5d9e",
+  "input_bindings": [
+    {
+      "path": ".github/workflows/security-scan.yml",
+      "bytes": 13965,
+      "sha256": "b7f1ba386dde30312b11713b41009a5fe75a9d52fd10a4b8db294eb24d207241"
+    },
+    {
+      "path": ".github/osv-scanner-lockfiles.json",
+      "bytes": 10704,
+      "sha256": "51dae9e9907bda6c3a5de21c1c3dfdea79c5e0a379494ba4c6e42906abc6e114"
+    },
+    {
+      "path": ".github/osv-scanner.toml",
+      "bytes": 7252,
+      "sha256": "dc6c8e8a535f78314525b8845d64f12bb743457147c9db0cae6d84c9297f9f87"
+    },
+    {
+      "path": ".github/osv-scanner-frozen-macos.toml",
+      "bytes": 2547,
+      "sha256": "6b093b4320cc481c4b1d5722648ab37fba4a5b50d0553c62c936e1a78e0edbf2"
+    },
+    {
+      "path": ".github/osv-scanner-frozen-wsl-retrieval.toml",
+      "bytes": 2330,
+      "sha256": "8931d59b82ce8326ea0028adef428a1262f3e16800d1b744341960513a139887"
+    },
+    {
+      "path": "tests/test_osv_lockfile_coverage.py",
+      "bytes": 65234,
+      "sha256": "a5cb994e66138fdad5da76abaaf6e4645266b575eaf722cfb239cc78fe6d6da9"
+    },
+    {
+      "path": "tests/test_wsl_retrieval.py",
+      "bytes": 18897,
+      "sha256": "b4e1abcc70ed75d302ca3ecabfba23bda9f53ab4a460a1d0fc16fd47453ea7fa"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/retirement-assessment.json",
+      "bytes": 4162,
+      "sha256": "88f1919546dcf8b9fda7b425c7d3ea2ea114b975ccdc6356e0775a3f4e81a9f0"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "bytes": 82463,
+      "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb"
+    }
+  ],
+  "commands": [
+    {
+      "case": "integration",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_osv_lockfile_coverage",
+        "tests.test_wsl_retrieval",
+        "tests.test_workflow_hardening",
+        "-v"
+      ],
+      "cwd": "${REPOSITORY}",
+      "exit_code": 0,
+      "tests_run": 161,
+      "skipped": 2
+    },
+    {
+      "case": "scan",
+      "argv": [
+        "bash",
+        "--noprofile",
+        "--norc",
+        "-e",
+        "-o",
+        "pipefail",
+        "${RUN_DIR}/workflow-scan.sh"
+      ],
+      "cwd": "${REPOSITORY}",
+      "environment": {
+        "RUNNER_TEMP": "${RUN_DIR}/runner-temp",
+        "WRITE_SARIF": "true"
+      },
+      "exit_code": 0,
+      "partition_counts": [
+        48,
+        1,
+        1
+      ],
+      "primary_exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "sarif_exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "sarif_runs": [
+        1,
+        1,
+        1
+      ],
+      "sarif_results": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case": "active-control",
+      "argv": [
+        "${OSV_RELEASE}/osv-scanner_linux_amd64",
+        "scan",
+        "source",
+        "--config",
+        ".github/osv-scanner.toml",
+        "--no-resolve",
+        "--format",
+        "json",
+        "--lockfile=${ACTIVE_CONTROL}/package-lock.json"
+      ],
+      "cwd": "${REPOSITORY}",
+      "exit_code": 1,
+      "advisory_ids": [
+        "GHSA-vfj7-8cjw-p6xm"
+      ]
+    },
+    {
+      "case": "expiry-control",
+      "argv": [
+        "${OSV_RELEASE}/osv-scanner_linux_amd64",
+        "scan",
+        "source",
+        "--config",
+        "${RUN_DIR}/expired-final-config.toml",
+        "--no-resolve",
+        "--format",
+        "json",
+        "--lockfile=blueprints/convergence-practice/wsl-retrieval/package-lock.json"
+      ],
+      "cwd": "${REPOSITORY}",
+      "exit_code": 1,
+      "advisory_ids": [
+        "GHSA-vfj7-8cjw-p6xm"
+      ]
+    },
+    {
+      "case": "validate-before-scan",
+      "argv": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "cwd": "${REPOSITORY}",
+      "exit_code": 1,
+      "finding": "Stale registration for already-empty integrated-osv-tests.stdout.txt; actual original and published bytes are empty."
+    }
+  ],
+  "output_files": [
+    {
+      "path": "completion-workflow-scan.sh",
+      "bytes": 4308,
+      "sha256": "15ffbe6a824fb4bf041310488f17134adb79eadabda4a1407122d6f6a42c5d9e"
+    },
+    {
+      "path": "completion-scan.stdout.txt",
+      "bytes": 18271,
+      "sha256": "4931d246717288ba22376c2c8a441134830c1a3849594cc6aac40bbf1c672d00"
+    },
+    {
+      "path": "completion-scan.stderr.txt",
+      "bytes": 18215,
+      "sha256": "bb02db7b0614851f0847b822f0128259bab9afe37b68972499c3a9c603307209"
+    },
+    {
+      "path": "completion-scan.exit.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "completion-scan.time.txt",
+      "bytes": 786,
+      "sha256": "d2d4bfd44026a121efa8ad7b722c2c1af1aad0e264b29ccafb927d1fc99fbe80"
+    },
+    {
+      "path": "completion-active-control.stdout.json",
+      "bytes": 4223,
+      "sha256": "4e08808f3ea453c25570a5fec746899c7ad4051564c167e5fe3505a167abe0d8"
+    },
+    {
+      "path": "completion-active-control.stderr.txt",
+      "bytes": 350,
+      "sha256": "cea7753846753213dc346b68771a0426205224c064b69faca0b2df5059f100b1"
+    },
+    {
+      "path": "completion-active-control.exit.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "completion-expiry-control.stdout.json",
+      "bytes": 4265,
+      "sha256": "b34c8fcb7422d6bd507fb17bb4ca0da0bb982665d575ed005ebeb62da19367e1"
+    },
+    {
+      "path": "completion-expiry-control.stderr.txt",
+      "bytes": 335,
+      "sha256": "5a4aad966dbd274a4dcc658af74a3b1a7adb53e7a635d01f081852aa71ea26ea"
+    },
+    {
+      "path": "completion-expiry-control.exit.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "completion-expired-final-config.toml",
+      "bytes": 2330,
+      "sha256": "4e9718c24a588f33b3d6d8d88ede1ec02c6bf8c8228303bfd057bd200299b143"
+    },
+    {
+      "path": "completion-integration.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "completion-integration.stderr.txt",
+      "bytes": 28398,
+      "sha256": "ee349610c711adaa7a64da850fa7c8fd36a7447c8a3df2062acf446c4f119c21"
+    },
+    {
+      "path": "completion-integration.exit.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "completion-validate-before-scan.stdout.txt",
+      "bytes": 240,
+      "sha256": "cada4ef85786da5a8e8c4ae7486cac1cf47fc43f5ebf34c5fdc7356c34b6d36f"
+    },
+    {
+      "path": "completion-validate-before-scan.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "completion-validate-before-scan.exit.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "completion-osv-scanner-frozen-macos.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "completion-osv-scanner-frozen-wsl-retrieval.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "completion-osv-scanner.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    }
+  ],
+  "sanitization": "Task and host paths replaced by role markers. Content and empty outputs otherwise preserved. SHA256 values in output_files bind sanitized published bytes; original outputs remain private. Exact argv from coordinator invocation; not a process trace. Native scan wrapped by RTK proxy and /usr/bin/time; scan.time retains the observed child command.",
+  "limitations": [
+    "Local integration controls and native OSV operations, not upstream test suites or host/model/GPU acceptance.",
+    "The prior scan/controls remain separately preserved. This record supersedes their current-workflow wording only for the exact listed input bindings.",
+    "Active QMD still has the advisory. No active input gains this dedicated ignore; supported archive guard is not a general installation sandbox.",
+    "A preparation hash lookup targeted the osv260 directory and returned exit1; corrected to the released executable and verified its digest before scanning.",
+    "Provider usage is unknown; no provider inference is part of these checks."
+  ],
+  "whole_task_provider_usage": null
+}
