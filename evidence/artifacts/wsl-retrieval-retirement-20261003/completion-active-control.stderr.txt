@@ -1,0 +1,8 @@
+Starting filesystem walk for root: /
+Scanned ${ACTIVE_CONTROL}/package-lock.json file and found 170 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 5.337764ms elapsed, 5.337844ms wall time
+.github/osv-scanner.toml has unused ignores:
+ - GHSA-8mgp-746c-j5xp
+ - GHSA-h35f-9h28-mq5c
+ - GHSA-hj66-6f7g-4r5v
+ - GHSA-xpv3-w29h-x7cv
