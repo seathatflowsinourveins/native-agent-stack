@@ -137,6 +137,9 @@ class BlindCheckoutFixture(unittest.TestCase):
         self.write("evidence/artifacts/new-wsl-definitive-round-20261002/selection.json", {"units": []})
         self.write("evidence/artifacts/new-wsl-definitive-round-20261002/audit-of-manifest.json", {"rows": []})
         self.write("evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/owner__repo.json", {"dossier": {}})
+        self.write("evidence/artifacts/new-wsl-definitive-round-20261002/assemble.py",
+                   'USER_PINS = {"slot": "owner/pinned"}\n')
+        self.write("evidence/artifacts/new-wsl-definitive-round-20261002/README.md", "# Round\n")
         self.write("docs/decisions/2026-10-03-definitive-round-audit.md", "# Round\n")
 
         git(["add", "-A"], self.source)
@@ -179,8 +182,8 @@ class RemovedFilesTests(BlindCheckoutFixture):
         manifest = self.run_checkout()
         self.addCleanup(self.remove_worktree)
         folder = "evidence/artifacts/new-wsl-definitive-round-20261002"
-        for removed in (f"{folder}/selection.json", f"{folder}/audit-of-manifest.json",
-                        "docs/decisions/2026-10-03-definitive-round-audit.md"):
+        for removed in (f"{folder}/selection.json", f"{folder}/audit-of-manifest.json", f"{folder}/assemble.py",
+                        f"{folder}/README.md", "docs/decisions/2026-10-03-definitive-round-audit.md"):
             self.assertIn(removed, manifest["removed_files"])
             self.assertFalse((self.dest / removed).exists())
         # A dossier names no pick and stays.

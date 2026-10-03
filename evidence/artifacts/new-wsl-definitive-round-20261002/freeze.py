@@ -52,6 +52,10 @@ def check(recorded: dict) -> dict:
             expected[ch["file"]] = ch["sha256_after"]
             amended.append(f"{ch['file']} (amendment {a['amendment']})")
         for add in a.get("added") or []:
+            # Amendment 5: an addition may not replace a file that is already frozen; that must be a change.
+            if add["file"] in expected:
+                breaks.append(f"{add['file']}: amendment {a['amendment']} adds a file that is already frozen")
+                continue
             expected[add["file"]] = add["sha256"]
             amended.append(f"{add['file']} (added by amendment {a['amendment']})")
     changed = [f for f, sha in expected.items() if not (HERE / f).is_file() or digest(HERE / f) != sha]

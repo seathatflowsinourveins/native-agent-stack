@@ -13,8 +13,9 @@ goes to the user, and the memory result goes to the head-to-head (#526).
 sha256).
 
 **Method.**
-- Every one of the 177 candidates got a dossier written from its upstream README and code at its release tag. Sonnet 5.5
-  wrote it at max; Opus 5.5 verified it at max against 5 cited claims, with at most one repair.
+- Every one of the 177 candidates got a dossier written from its upstream README and code: 148 at a tagged release, 23
+  at a snapshot without a tag, and 6 from page sources. Sonnet 5.5 wrote it at max; Opus 5.5 verified it at max against
+  5 cited claims, with at most one repair.
   - 176 dossiers pass verification. One still fails after its repair, and the judges saw that verdict.
 - Both families then decided every unit in two seeded candidate orders, and a critic followed each family's deciders:
   - Claude Opus 5.5 at max, through `claude -p --safe-mode --restricted --strict-mcp-config`;
@@ -28,14 +29,18 @@ sha256).
 - Slots where the families differed, or where one family was undetermined, went to four adjudicators: one per family, in
   both A/B orders.
 
-**Preregistration.** The plan was frozen before the first dossier and amended four times.
+**Preregistration.** The plan was frozen before the first dossier and amended five times.
 - Amendments 1 to 3 came before any decision: the runner's prompt fix, the retargeting to an audit of #602, and the
   re-verification of 13 dossiers that lost their verification to usage-limit stops.
-- Amendment 4 came after the results. It is a defect fix in the comparison script, described under Limits.
+- Amendments 4 and 5 came after the results. Both are defect fixes, described under Limits.
 - Every amendment is hashed, and `freeze.py --check` verifies the chain.
 
-**Round outcome** (`selection.json`): 35 definitive slots (34 where the families agreed and 1 adjudicated four of
-four), 7 left to measurement and 1 user-pin conflict. The contamination audit of the raw returns has 0 hits.
+**Round outcome** (`selection.json`): 43 slots.
+- 35 definitive: 33 where the families agreed, and 2 adjudicated four of four (the deep-research harness and memory).
+- 7 left to measurement.
+- 1 user-pin conflict, where the families agreed on a repository other than the pin.
+
+The contamination audit of the raw returns has 0 hits.
 
 ## Result against the definitive manifest
 
@@ -50,7 +55,7 @@ verdict, state or pick differs. #620 adds five rows the round does not cover.
 | Cross-check | Memory. All four adjudicators chose ai-memory. The head-to-head (#526) stands; this is a nomination for it, not a decision |
 | Pin agree | Deep-research harness: gpt-researcher, adjudicated four of four, which is one of the two pinned harnesses |
 | Pin conflict | Agent runtime worker. Both families picked openai/codex over the pinned OpenHands software-agent-sdk. The pin stays until the user decides |
-| Not settled | 7. Client-native LSP (plugin or none), GPT gateway (OmniRoute or none; the pin stands unconfirmed), document ingestion (MinerU), local model server (#598's gate stands), workflow engine (Prefect or Dagu), usage meter (agent-console or ccusage) and page-text extraction (trafilatura or none) |
+| Not settled | 7. Client-native LSP (plugin or none), GPT gateway (OmniRoute or none; the pin stands unconfirmed), document ingestion (Docling or MinerU), local model server (#598's gate stands), workflow engine (Prefect or Dagu), usage meter (agent-console or ccusage) and page-text extraction (trafilatura or none) |
 
 **How to read the contests.** Every contested slot asked "which single tool does this job, or none?", and "none" was
 allowed in each.
@@ -88,6 +93,17 @@ allowed in each.
   contradicts amendment 2's rule text, under which a row's pick is the repository it names.
   - The fix turned build provenance (attest) and dependency updates (Dependabot) from contest into agree.
   - The pre-fix output is kept as `audit-of-manifest.before-amendment-4.json`.
+- **Amendment 5 also came after the results.** It answers the cross-family review of #663 and changes no outcome
+  status or verdict:
+  - An undetermined family's two decider picks now count as finalists. Document ingestion therefore lists Docling as
+    well as MinerU, the two its settling measurement compares.
+  - The run record now includes every dossier call.
+  - `compare.py` parses URLs instead of matching them as text; its output is byte-identical.
+  - `freeze.py` rejects an amendment that re-adds a frozen file.
+- **A runner defect cost three GPT calls.** The runner created a GPT answer folder only after the call returned.
+  - The first GPT call of each stage lost its answer and was retried successfully.
+  - Cost: 1,763 seconds, 2.37 million input tokens and 43 thousand output tokens.
+  - No outcome changed. The runner is kept as it ran (`run-notes.json`, `runner_defect`).
 - **Adjudicator anonymity.** The returns were shown as A and B in both orders. Their text can still carry family signals,
   such as contender names that coincide with the families; the returns were not audited one by one.
 - **Evidence class.** These are model judgments on source review. Nothing was installed or measured.

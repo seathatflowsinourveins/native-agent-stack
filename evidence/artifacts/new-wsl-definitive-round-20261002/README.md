@@ -30,6 +30,7 @@ GPT side: codex listed the user's skills and its own system skills to the GPT ju
 | `preregistration-amendment-1.json`, `preregistration-amendment-2.json` | The runner's prompt fix (before the decide stage), and the retargeting to an audit of #602 with the comparison rule, the row mapping, the audit labels and the run notes (before any packet or decision) |
 | `selection.json`, `run-record.json`, `dossiers/` | The assembled outcome per slot under the decision rule, every attempt with its usage and the sha256 of each private original, and the 177 verified dossiers (sanitized) |
 | `audit-of-manifest.json`, `audit-of-manifest.before-amendment-4.json`, `preregistration-amendment-4.json` | The comparison with #602, and the defect fix of amendment 4 (made with the results known) with the output before it |
+| `preregistration-amendment-5.json` | The fixes after the cross-family review of #663 and its CI (made with the results known): finalists of an undetermined family, dossier calls in the run record, URL parsing in compare.py, freeze.py additions |
 | `run-notes.json` | The coordinator's run facts: timeline, the ordering that kept a family's decisions away from the other family's deciders, the unequal live web evidence, usage, the usage-limit stops |
 | `reverify.py`, `preregistration-amendment-3.json` | The frozen verification loop re-run on the 13 dossiers whose verifier attempts a usage-limit stop ended, with no dossier repaired twice (before any packet or decision) |
 
@@ -39,4 +40,5 @@ sha256. One change to the committed copies: in three dossiers (`anthropics__clau
 (3, 3 and 7 values). The repository's secret scanner reads a 40-character value in a file that mentions Sourcegraph
 as an access token. The values still resolve, and no other field changed. The assembled copies had sha256
 `7cb10c9c…`, `8d448c0a…` and `b7007f33…` before the change. The judges read the private originals, which keep the
-full hashes. This is source review by model judges with adversarial critics: no candidate is installed or measured here.
+full hashes. In the betterleaks dossier the quoted inline-allow marker is written `betterleaks[:]allow`:
+the repository's tests forbid the literal marker in any tracked file, because betterleaks would honor it. This is source review by model judges with adversarial critics: no candidate is installed or measured here.

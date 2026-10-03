@@ -657,6 +657,7 @@
             "status": "measurement",
             "basis": "unsettled after adjudication",
             "finalists": [
+              "F05",
               "F07"
             ],
             "settling_measurement": "Measure the paired difference in format-macro-averaged, structure-aware extraction error between F05 and F07 on one sealed corpus of difficult PDFs, scans, Office formats, EPUB and HTML, on the stated WSL2 Ubuntu/RTX 4090 host. Pin the packet source commits, resolved dependencies and model hashes. Run Docling's standard conversion and MinerU's automatic Standard-for-PDF/Flash-for-native routing through each client's CLI access, exporting native JSON. Before examining outputs, fix independent reference annotations and one canonical serialization preserving text, reading order and table row/cell/span structure. Score normalized edit distance on that serialization, assign maximum error to missing conversions, installation failures or resource failures, and weight the five document families equally. Use randomized repeated runs and a paired, document-level bootstrap confidence interval for E(Docling)-E(MinerU). An interval wholly below zero selects Docling; wholly above zero selects MinerU; overlap retains unsettled. Do not introduce a latency veto or an arbitrary percentage-improvement threshold."

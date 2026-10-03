@@ -45,7 +45,19 @@ def key_to_contender(unit: dict) -> dict:
     return {f["key"]: f["contender"] for f in unit["field"]}
 
 
-def outcome(unit: dict, slot: dict, picks: dict, adjudications: list) -> dict:
+def decider_defaults(work: Path, family: str, unit_id: str, slot_id: str) -> set:
+    """The defaults a family's two deciders named for a slot (amendment 5: the alternatives of an undetermined family)."""
+    found = set()
+    for order in (1, 2):
+        path = work / "decisions" / family / f"{rr.safe(unit_id)}.order-{order}.json"
+        if path.is_file():
+            for s in (rr.load(path).get("decision") or {}).get("slots") or []:
+                if s.get("slot_id") == slot_id and s.get("default"):
+                    found.add(s["default"])
+    return found
+
+
+def outcome(unit: dict, slot: dict, picks: dict, adjudications: list, alternatives: set | None = None) -> dict:
     keys = key_to_contender(unit)
     c, g = picks["claude"], picks["gpt"]
     if c is not None and c == g:
@@ -55,7 +67,8 @@ def outcome(unit: dict, slot: dict, picks: dict, adjudications: list) -> dict:
         if len(adjudications) == 4 and len(resolved) == 4 and len(set(resolved)) == 1 and resolved[0] is not None:
             result = {"status": "definitive", "basis": "adjudicated (four of four)", "default": resolved[0]}
         else:
-            finalists = sorted({x for x in (c, g) if x})
+            # Amendment 5: an undetermined family contributes the defaults its two deciders split on.
+            finalists = sorted({x for x in (c, g) if x} | set(alternatives or ()))
             measurement = next((a["result"].get("settling_measurement") for a in adjudications
                                 if a.get("result") and a["result"].get("settling_measurement")), None)
             result = {"status": "measurement", "basis": "unsettled after adjudication", "finalists": finalists,
@@ -85,11 +98,15 @@ def main(argv=None) -> int:
                     p = work / "adjudications" / fam / f"{rr.safe(unit['unit_id'])}.{slot['slot_id']}.{order}.json"
                     if p.is_file():
                         adj.append(rr.load(p))
+            alternatives = set()
+            for fam in ("claude", "gpt"):
+                if picks[fam] is None:
+                    alternatives |= decider_defaults(work, fam, unit["unit_id"], slot["slot_id"])
             slots.append({"slot_id": slot["slot_id"], "question": slot["question"], "picks": picks,
                           "agreement": "agree" if picks["claude"] is not None and picks["claude"] == picks["gpt"] else "differ",
                           "adjudications": [{k: a.get(k) for k in ("family", "order", "return_a_family", "resolved_default")}
                                             | {"choice": (a.get("result") or {}).get("choice")} for a in adj],
-                          "outcome": outcome(unit, slot, picks, adj)})
+                          "outcome": outcome(unit, slot, picks, adj, alternatives)})
         selection.append({"unit_id": unit["unit_id"], "field": [{k: f[k] for k in ("key", "name", "contender")}
                                                                 for f in unit["field"]], "slots": slots})
     for path in sorted(work.rglob("*.json")):
@@ -104,6 +121,13 @@ def main(argv=None) -> int:
                 continue
             if isinstance(record, dict) and "attempts" in record:
                 attempts.append({"file": rel, "attempts": record["attempts"]})
+            elif isinstance(record, dict) and rel.startswith("dossiers/") and "writer" in record:
+                # Amendment 5: dossier calls (writer and repair attempts, verification rounds, and the rounds a
+                # usage-limit stop lost before re-verification) are kept in the record too.
+                attempts.append({"file": rel, "writer": record.get("writer") or [],
+                                 "verification": [v.get("attempts") or [] for v in record.get("verification") or []],
+                                 "verification_lost": [v.get("attempts") or []
+                                                       for v in record.get("verification_lost") or []]})
     leaks = []
     for raw in sorted((work / "raw").rglob("*")) if (work / "raw").exists() else []:
         if raw.is_file():

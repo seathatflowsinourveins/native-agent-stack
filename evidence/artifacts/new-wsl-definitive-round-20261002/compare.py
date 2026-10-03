@@ -27,10 +27,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
@@ -43,12 +43,18 @@ RESOLVED = ("definitive", "resolved")
 
 
 def norm(url: str | None) -> str:
-    u = re.sub(r"^https?://", "", (url or "").strip().lower())
-    u = re.sub(r"^www\.", "", u)
-    if u.startswith("github.com/"):
-        u = u[len("github.com/"):]
-    u = u.rstrip("/")
-    return u[:-4] if u.endswith(".git") else u
+    """owner/name for a GitHub repository URL, host/path for any other URL (amendment 5: parsed, not matched as text)."""
+    raw = (url or "").strip()
+    parsed = urlparse(raw if "://" in raw else "https://" + raw)
+    host = (parsed.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[len("www."):]
+    path = parsed.path.strip("/").lower()
+    if path.endswith(".git"):
+        path = path[:-4]
+    if host == "github.com":
+        return path
+    return f"{host}/{path}" if path else host
 
 
 def manifest_rows(ref: str) -> tuple[dict, str]:

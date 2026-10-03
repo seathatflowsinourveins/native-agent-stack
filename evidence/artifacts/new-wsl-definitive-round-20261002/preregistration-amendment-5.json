@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_preregistration_amendment",
+  "amendment": 5,
+  "recorded_at_utc": "2026-10-03T15:29:05+00:00",
+  "after": "every decision, critic and adjudication, and amendment 4; made with the results known and disclosed as such",
+  "why": "the cross-family review of #663 (GPT-6.1 Sol at max through the gateway, read-only, on a clean checkout of 5fdeec3f) and the pull request's CI (CodeQL; the betterleaks marker test)",
+  "changes": [
+    {
+      "file": "compare.py",
+      "sha256_before": "31b72cacc33bdd311b72caa0341c3bfd7b29c894041403e4623fac27d0f78902",
+      "sha256_after": "0c37d5933077e16b314b832409f24c7b49a7640c4a76527b67d3afc32d48bd27",
+      "what": "norm() parses URLs (urllib.parse) instead of matching text (CodeQL py/incomplete-url-substring-sanitization); audit-of-manifest.json was byte-identical before the finalist change below"
+    }
+  ],
+  "tooling": [
+    {
+      "file": "freeze.py",
+      "sha256_before": "856057bcff046a83edf947d303858e09fdad5ed830e093ebf67b735f7f0d94ab",
+      "sha256_after": "894b938d245683aa79505f6d45cf4e426a90f21a6fcefda6a7979749c083fbcc",
+      "what": "an amendment may not add a file that is already frozen"
+    },
+    {
+      "file": "assemble.py",
+      "sha256_before": "775306476185d7eeb76c16a1bee059f61e57be56027b9be19d6db2719517c76c",
+      "sha256_after": "0ba2d74b870f78e55a9d0be955538b70d7f1635cc36c3f47dc139f22ad68a4e3",
+      "what": "an undetermined family's two decider picks join the finalists of a slot left to measurement; the run record keeps every dossier call (writer, repair, verification and the rounds lost before re-verification)"
+    }
+  ],
+  "effect": {
+    "selection": "one slot changed: document-retrieval/document-ingestion finalists F07 -> F05, F07 (Docling and MinerU, the pair its settling measurement compares); every outcome status unchanged (35 definitive, 7 measurement, 1 pin conflict)",
+    "audit": "the same slot's finalists; every verdict unchanged (agree 22, contest 7, nominates 4, cross-check 1, pin agree 1, pin conflict 1, not settled 7)",
+    "run_record": "groups: decisions 76, critics 38, adjudications 36, dossiers 177 (dossiers were absent before)"
+  },
+  "corrections": [
+    "Amendment 4's effect note says compare.py reads selection.json and the pinned manifest only; it also reads the frozen units.json for the slot mapping and repository identities (unchanged).",
+    "The decision record's split of the 35 definitive slots is 33 agreements and 2 adjudicated four of four (the deep-research harness and memory); the pin conflict is a third agreement counted separately."
+  ],
+  "committed_copy": "the betterleaks dossier writes the quoted inline-allow marker as betterleaks[:]allow (the repository's tests forbid the literal marker in tracked files)",
+  "runner_defect": "disclosed in run-notes.json (runner_defect); run_round.py is kept as it ran"
+}

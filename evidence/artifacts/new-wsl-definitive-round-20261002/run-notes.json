@@ -45,7 +45,7 @@
       },
       "cause": "the gateway's search route has no credentialed search provider and falls back to a keyless provider that returned nothing from this host (docs/decisions/2026-10-02-omniroute-mac-rebuild.md, Limits)"
     },
-    "consequence": "The two families had the same dossiers and source clones, but not the same live web evidence: the Claude judges searched (their results are not retained, so whether every search returned results is unverified), the GPT judges' searches returned nothing and their direct network attempts were blocked. The live web also carries this repository's public records, which name the manifest's picks; a result read but not cited would not show in the contamination audit. Agreement between the families rests on the shared dossiers and clones; where they differed, this asymmetry is one possible factor."
+    "consequence": "The two families had the same dossiers and source clones, but not the same live web evidence: the Claude judges searched (their results are not retained, so whether every search returned results is unverified), the GPT judges' searches returned nothing except 2 items in adjudication and their direct network attempts were blocked. The live web also carries this repository's public records, which name the manifest's picks; a result read but not cited would not show in the contamination audit. Agreement between the families rests on the shared dossiers and clones; where they differed, this asymmetry is one possible factor."
   },
   "adjudicator_anonymity": "Adjudicators saw the two families' critic returns as A and B in both orders. A return's text can still name contenders whose names coincide with the families (claude-code, codex and similar) or carry a family's style; the returns were not audited one by one for such signals.",
   "usage_provider_returned": {
@@ -109,5 +109,26 @@
       "cross:runtime-workers: codex's own system skills, which openai/codex ships (the pin conflict picks openai/codex)"
     ],
     "consequence": "On these slots the GPT vote is not independent of the user's installed tools; the Claude vote is. Elsewhere the skill listing named no contender of the unit (generic skill names that many repositories vendor, such as skill-creator or tdd, are not counted)."
+  },
+  "runner_defect": {
+    "what": "run_round.py passes codex exec an answer file (-o ...last.json) whose folder it creates only after the call returns, so the first GPT call of each stage could not write its answer and was retried; the retry succeeded. Each retry also overwrote the first attempt's raw event stream.",
+    "lost_attempts": [
+      "decisions/gpt/cross_gpt6-harnesses.order-2.json",
+      "critics/gpt/cross_wsl-distro.json",
+      "adjudications/gpt/code-navigation.client-native-lsp.AB.json"
+    ],
+    "cost": {
+      "seconds": 1763.3,
+      "input_tokens": 2370695,
+      "cached_input_tokens": 2069376,
+      "output_tokens": 42986
+    },
+    "effect": "none on the outcomes (the retries produced the answers); the runner is kept as it ran, and a re-use must create the folder before the call (found by the cross-family review of #663)"
+  },
+  "dossier_revisions": {
+    "tagged_release": 148,
+    "snapshot_without_tag": 23,
+    "page_sources": 6,
+    "note": "a multi-repository contender counts as tagged only when every repository is at a tag"
   }
 }
