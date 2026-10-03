@@ -4033,6 +4033,24 @@
         "With a server-wide context of 64,000 the embedder loaded at its full context and took 5.78 GB (Part A, A1b); the measured system sets the context per model (qwen3-embedding-8k, 8,192 tokens), never server-wide."
       ],
       "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json"
+    },
+    {
+      "id": "omniroute-sdk-worker-fast-tier-20261003",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "omniroute"
+      ],
+      "claim": "A recorded fast-tier A/B probe at 2026-10-03T22:25:23Z ran the packaged Codex SDK worker (openai-codex 0.160.0) on cx/gpt-6.1-sol-max through the OmniRoute loopback gateway on port 20128, read-only, with an identical 60-line prompt and two private worker homes that differed only in service_tier. All four interleaved runs completed with closed cleanup and requested effort max. Native output tokens per turn second were 61.05 and 61.26 on the fast tier against 32.63 and 32.79 on the standard tier, about 1.87 times; the probe's own wall times were 102.8-118.5 s against 194.2-211.3 s.",
+      "limitations": [
+        "Two rounds per tier on one prompt: no variance estimate, no task-quality comparison and no other model, route or prompt.",
+        "Every run requested effort max through the previous worker revision; the tier was not measured at ultra, which this repository's worker now uses by default.",
+        "Rates divide each run's native cumulative output tokens by its native turn duration_ms. Wall times are quoted as the probe receipt wrote them; it lists no separate std-1 row, and its standard range 194.2-211.3 s includes that run.",
+        "The gateway-forwarded service tier, the gateway-forwarded effort and the backend identity were not observed in these records. The probe's note that the gateway honours the tier is an inference from the rate difference, not a gateway log.",
+        "The fast tier draws more pool usage per token (the bundled Codex catalog describes it as 2x speed with increased usage); pool usage and limits were not measured.",
+        "Copied from the probe's private state for coordinator session native-agent-stack-c5 on 2026-10-03: raw outputs, the prompt, final answers, thread and request identifiers and host paths stay private; only metrics, statuses and output hashes are published."
+      ],
+      "path": "evidence/receipts/omniroute-sdk-worker-fast-tier-20261003.json"
     }
   ],
   "files": [
@@ -4043,8 +4061,8 @@
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
-      "sha256": "feacd5b6324649e3fff16d4f7f469f994e2984dccbb462f84e6fa8bf8e93da48",
-      "bytes": 3840
+      "sha256": "d8b775a376829b9059ab912d82317e8f8ce43f844d5e1984984f7a9829347ce3",
+      "bytes": 4593
     },
     {
       "path": ".gitattributes",
@@ -4208,8 +4226,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "40595dfcde0dea50175380e773d78ff5aca00be901a290ea634fef8b84fe64a1",
-      "bytes": 13787
+      "sha256": "79b0b04ce8d22c6d424854286f9e67b49fceb0c9d6e8eb2f597bd89ab4ba740c",
+      "bytes": 13977
     },
     {
       "path": "CLAUDE.md",
@@ -4543,8 +4561,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "6de588ac1fb849452370f9cd8891d5ff70e179505fda6f1355461c090184522d",
-      "bytes": 8180
+      "sha256": "d643d9f35120aff85bab6d082579386597f5ee15141e3008730ce073ab53d150",
+      "bytes": 8307
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -16001,6 +16019,11 @@
       "path": "docs/decisions/2026-10-03-retire-pr508-token-stack-winner.md",
       "sha256": "59f58e14e624f1783b5182ae0ea0bd3caa92298b4b5b6ebab556eae26d76c70d",
       "bytes": 21398
+    },
+    {
+      "path": "docs/decisions/2026-10-03-sol-ultra-workhorse.md",
+      "sha256": "2fed4bd0108f87319eea311dc0d98a1fabe503af0aaceeb6b7041305ab10f8cf",
+      "bytes": 12211
     },
     {
       "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
@@ -49078,6 +49101,11 @@
       "bytes": 149558
     },
     {
+      "path": "evidence/receipts/omniroute-sdk-worker-fast-tier-20261003.json",
+      "sha256": "54ed0ad9c5ab97991ccb6b1fe9f5b5c697fd7cb49525350e70f0ab9c0881e4c6",
+      "bytes": 8408
+    },
+    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
@@ -49309,8 +49337,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "e35358c4eb22a9ed155061e0ec2dd577ab5488f82c9436c8daa82da976bee3db",
-      "bytes": 13577
+      "sha256": "d46dedde5bbca42c04bc2342c2427048f5430482d14b53c2a661b019c33c19d5",
+      "bytes": 13704
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -49519,8 +49547,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "082bb1714e51f99114b5dbb3858833d25f43b62229be62c90fba331e8aceeb75",
-      "bytes": 16427
+      "sha256": "e3daedcd65b4cff6f234ab58a9e9baa4318604fa615784aef62ce5f63481e9ff",
+      "bytes": 20024
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -49539,8 +49567,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/enhancements.md",
-      "sha256": "034a8e301e0f14014e744b5bb46226db79b199079ba23ffc9ae1bdfd98fcd64b",
-      "bytes": 10255
+      "sha256": "d236c5b687570adab6494a6bf38fbdca90e977d260aa387e56af8661a81b6e2b",
+      "bytes": 10970
     },
     {
       "path": "examples/omniroute-codex-sdk/rerun-plan.json",
@@ -49559,8 +49587,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py",
-      "sha256": "14018bd65c39f18683ce83833abe23c9238419c7c1fde99f5521ae752dbd1c43",
-      "bytes": 38441
+      "sha256": "0fabe71bf06a8a91f80b5f698f166913fadbefa80fc410c76a11d72d812691e5",
+      "bytes": 44574
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
@@ -49569,8 +49597,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
-      "bytes": 25542
+      "sha256": "b5808ab3ca328cf5fce25ab80f52439de1915ce18a3824d449c5f032c5280c95",
+      "bytes": 26558
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
@@ -50599,8 +50627,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "1f63efdc8a1d2dd14507eedaa9603cd4a382b4b7e4835fbb982923d669360abd",
-      "bytes": 155728
+      "sha256": "7ad574d51b777b7c6d2ce823789f60ea13b9feda7082071fdd65e307b2444171",
+      "bytes": 156097
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -50774,8 +50802,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "ca72ad1ad78e20d9524dface39eb91a0f6d49ac9fcd465623303a3463ed7d138",
-      "bytes": 99427
+      "sha256": "67d22e0dcb2295e5a9b75ab30244e0d8d5e8c577236a5988d936fdf9b46cd7e9",
+      "bytes": 99565
     },
     {
       "path": "tests/test_install_skills.py",

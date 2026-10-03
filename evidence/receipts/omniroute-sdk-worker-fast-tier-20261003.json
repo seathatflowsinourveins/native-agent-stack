@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "id": "omniroute-sdk-worker-fast-tier-20261003",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "omniroute"
+  ],
+  "recorded_at_utc": "2026-10-03T22:54:41Z",
+  "observed_at_utc": "2026-10-03T22:25:23Z",
+  "evidence_class": "recorded_native_sdk_worker_runs",
+  "claim": "A recorded fast-tier A/B probe at 2026-10-03T22:25:23Z ran the packaged Codex SDK worker (openai-codex 0.160.0) on cx/gpt-6.1-sol-max through the OmniRoute loopback gateway on port 20128, read-only, with an identical 60-line prompt and two private worker homes that differed only in service_tier. All four interleaved runs completed with closed cleanup and requested effort max. Native output tokens per turn second were 61.05 and 61.26 on the fast tier against 32.63 and 32.79 on the standard tier, about 1.87 times; the probe's own wall times were 102.8-118.5 s against 194.2-211.3 s.",
+  "limitations": [
+    "Two rounds per tier on one prompt: no variance estimate, no task-quality comparison and no other model, route or prompt.",
+    "Every run requested effort max through the previous worker revision; the tier was not measured at ultra, which this repository's worker now uses by default.",
+    "Rates divide each run's native cumulative output tokens by its native turn duration_ms. Wall times are quoted as the probe receipt wrote them; it lists no separate std-1 row, and its standard range 194.2-211.3 s includes that run.",
+    "The gateway-forwarded service tier, the gateway-forwarded effort and the backend identity were not observed in these records. The probe's note that the gateway honours the tier is an inference from the rate difference, not a gateway log.",
+    "The fast tier draws more pool usage per token (the bundled Codex catalog describes it as 2x speed with increased usage); pool usage and limits were not measured.",
+    "Copied from the probe's private state for coordinator session native-agent-stack-c5 on 2026-10-03: raw outputs, the prompt, final answers, thread and request identifiers and host paths stay private; only metrics, statuses and output hashes are published."
+  ],
+  "probe": {
+    "worker": "examples/omniroute-codex-sdk/worker.py before the 2026-10-03 ultra default, which requested max at launch and turn start",
+    "sdk_and_native_runtime": "openai-codex 0.160.0 with its bundled native 0.160.0 runtime",
+    "route": "cx/gpt-6.1-sol-max",
+    "gateway": "OmniRoute loopback port 20128",
+    "sandbox": "read-only",
+    "prompt": "one identical 60-line task for every run; its text stays private",
+    "design": "interleaved standard and fast runs, two rounds per tier; the two private worker homes differed only in service_tier",
+    "fast_tier_request": "Codex 0.160.0 sends a fast service tier as the request id priority (protocol/src/config_types.rs:528-551)"
+  },
+  "runs": [
+    {
+      "run": "fast-1",
+      "tier": "fast",
+      "output_record": "fast-1.jsonl",
+      "output_record_sha256": "60a9cebce1ba5d03d5038d62f3203947c330b19e0a44ecb4bfd73c82927b8a1d",
+      "status": "completed",
+      "cleanup_status": "closed",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "native_runtime_version": "0.160.0",
+      "usage_scope": "native_thread_cumulative",
+      "turn_duration_ms": 101540,
+      "output_tokens": 6199,
+      "reasoning_output_tokens": 5043,
+      "input_tokens": 16426,
+      "cached_input_tokens": 0,
+      "output_tokens_per_turn_second": 61.05,
+      "probe_wall_seconds": 102.8
+    },
+    {
+      "run": "std-1",
+      "tier": "standard",
+      "output_record": "std-1.jsonl",
+      "output_record_sha256": "da47054a90f172a841a3dbec90b03128c5be3d5bf6ae8642e638b0fa22876efc",
+      "status": "completed",
+      "cleanup_status": "closed",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "native_runtime_version": "0.160.0",
+      "usage_scope": "native_thread_cumulative",
+      "turn_duration_ms": 210020,
+      "output_tokens": 6852,
+      "reasoning_output_tokens": 5696,
+      "input_tokens": 16428,
+      "cached_input_tokens": 0,
+      "output_tokens_per_turn_second": 32.63,
+      "probe_wall_seconds": null
+    },
+    {
+      "run": "fast-2",
+      "tier": "fast",
+      "output_record": "fast-2.jsonl",
+      "output_record_sha256": "5f04c28d36b50ba7223d5c5d9b4c08d89d3b948761379ffcd7cc3ac26c15eaef",
+      "status": "completed",
+      "cleanup_status": "closed",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "native_runtime_version": "0.160.0",
+      "usage_scope": "native_thread_cumulative",
+      "turn_duration_ms": 117255,
+      "output_tokens": 7183,
+      "reasoning_output_tokens": 6023,
+      "input_tokens": 16426,
+      "cached_input_tokens": 0,
+      "output_tokens_per_turn_second": 61.26,
+      "probe_wall_seconds": 118.5
+    },
+    {
+      "run": "std-2",
+      "tier": "standard",
+      "output_record": "std-2.jsonl",
+      "output_record_sha256": "87dc120015ba53ca7f0bf8c27be0b33491c6afe70bfef0540b4ba645deb088af",
+      "status": "completed",
+      "cleanup_status": "closed",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "native_runtime_version": "0.160.0",
+      "usage_scope": "native_thread_cumulative",
+      "turn_duration_ms": 192897,
+      "output_tokens": 6325,
+      "reasoning_output_tokens": 5178,
+      "input_tokens": 16428,
+      "cached_input_tokens": 0,
+      "output_tokens_per_turn_second": 32.79,
+      "probe_wall_seconds": 194.2
+    }
+  ],
+  "summary": {
+    "fast_output_tokens_per_turn_second": [61.05, 61.26],
+    "standard_output_tokens_per_turn_second": [32.63, 32.79],
+    "fast_to_standard_mean_ratio": 1.87,
+    "probe_wall_seconds_as_written": {
+      "fast": "102.8-118.5",
+      "standard": "194.2-211.3"
+    }
+  },
+  "sanitized_probe_receipt": {
+    "original_sha256": "7158f122d1bf8fe26785316ceecc04ce08e54c0f4b0817d9b681532fc16f93a7",
+    "sanitization": "Host paths reduced to bare output file names; no other change.",
+    "lines": [
+      "Fast-tier A/B probe, 2026-10-03T22:25:23Z: packaged Codex SDK worker (openai-codex 0.160.0), cx/gpt-6.1-sol-max through OmniRoute 20128, read-only, identical 60-line prompt, interleaved std/fast, homes differing only in service_tier.",
+      "fast r1: status=completed wall=102.8s turn=101.5s out=6199 rate=61.0 tok/s",
+      "std r2: status=completed wall=194.2s turn=192.9s out=6325 rate=32.8 tok/s",
+      "fast r2: status=completed wall=118.5s turn=117.3s out=7183 rate=61.3 tok/s",
+      "Result: fast = 61.0-61.3 output tok/s vs std 32.6-32.8 (about 1.87x); wall 102.8-118.5 s vs 194.2-211.3 s. The gateway honours service_tier priority. Kept in the worker home. Costs more pool usage per token (Codex: increased usage), accepted by the user's max-speed directive.",
+      "60a9cebce1ba5d03d5038d62f3203947c330b19e0a44ecb4bfd73c82927b8a1d fast-1.jsonl",
+      "5f04c28d36b50ba7223d5c5d9b4c08d89d3b948761379ffcd7cc3ac26c15eaef fast-2.jsonl",
+      "da47054a90f172a841a3dbec90b03128c5be3d5bf6ae8642e638b0fa22876efc std-1.jsonl",
+      "87dc120015ba53ca7f0bf8c27be0b33491c6afe70bfef0540b4ba645deb088af std-2.jsonl"
+    ]
+  },
+  "primary_sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/config_types.rs#L528-L551",
+      "use": "ServiceTier: fast is sent as the request id priority; fast and priority both parse as the fast tier"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/config.schema.json#L7632-L7635",
+      "use": "service_tier configuration key: default, priority or flex, with fast as the legacy value"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/models.json#L340-L349",
+      "use": "gpt-6.1-sol advertises the priority tier, named Fast: 2x speed, increased usage"
+    }
+  ],
+  "decision_record": "docs/decisions/2026-10-03-sol-ultra-workhorse.md",
+  "whole_task_provider_usage": null
+}

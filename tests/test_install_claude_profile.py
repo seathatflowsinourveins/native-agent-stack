@@ -1411,8 +1411,9 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "lifecycle task.",
         "The harness exists to build complex systems, projects and the north-star R&D; each coordinator unit names the "
         "north-star action it serves.",
-        "Codex CLI is the second native client. For unpinned work, `gpt-6.1-sol` at ultra coordinates and at max runs "
-        "workers; `gpt-6-astra` at ultra coordinates a complex workflow that needs Astra, and at max takes a single "
+        "Codex CLI is the second native client. For unpinned work, `gpt-6.1-sol` at ultra coordinates and runs workers, "
+        "and at max takes a single judgment, a blind or one-model lane (ultra delegates to sub-agents) and the bounded "
+        "`stack-worker` profile; `gpt-6-astra` at ultra coordinates a complex workflow that needs Astra, and at max takes a single "
         "consequential judgment (conflicting primary evidence, consequential architecture, complex changes across "
         "systems, or a failure unresolved after one bounded Sol repair). Where a launch pins the model and effort "
         "(`-m`, `-c model_reasoning_effort`), children inherit that pin and a spawn call names neither. Preserve "

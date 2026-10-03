@@ -40,6 +40,15 @@ SDK_VERSION = "0.160.0"
 PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
 DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
+# Ultra selects native proactive multi-agent mode (a956835d core/src/session/multi_agents.rs:96-104;
+# V2 from the Sol/Astra catalog entries, models-manager/models.json:195 and config/mod.rs:1606-1613)
+# and sends the catalog multi-agent effort, xhigh for Sol 6.1 and Astra, on root requests
+# (protocol/src/openai_models/reasoning_effort.rs:10-40; models.json:22,196). A gateway -max suffix
+# outranks that request effort in OmniRoute v3.8.51 (diegosouzapw/OmniRoute 2f42a9ac1,
+# open-sse/executors/codex.ts:1419-1441). Max sends max and delegates only on request: single
+# judgments and blind or one-model convergence lanes.
+EFFORTS = ("ultra", "max")
+DEFAULT_EFFORT = "ultra"
 CLEANUP_TIMEOUT = 5.0
 _CLEANUP_TASKS: set[asyncio.Task] = set()
 
@@ -122,7 +131,7 @@ def runtime_config(args: argparse.Namespace) -> CodexConfig:
     overrides = (
         "model_provider=" + quoted(PROVIDER),
         "model=" + quoted(args.model),
-        'model_reasoning_effort="max"',
+        "model_reasoning_effort=" + quoted(args.effort),
         # Native curated-plugin startup sync is unused by this worker.
         # a956835d core-plugins/src/manager.rs:748-763; core/config.schema.json:7038.
         "features.plugins=false",
@@ -190,7 +199,7 @@ def initial_record(args: argparse.Namespace) -> dict:
     return {
         "request_id": args.request_id,
         "requested_model": args.model,
-        "requested_effort": "max",
+        "requested_effort": args.effort,
         "provider": PROVIDER,
         "model_inference_submitted": False,
         "usage_status": "unknown",
@@ -434,7 +443,7 @@ async def run_worker(
             # Codex owns tools, MCP discovery, skills, caching and compaction.
             # There is no extra skill carrier or Responses prompt rewrite here.
             record["model_inference_submitted"] = True
-            turn = await thread.turn(prompt, model=args.model, effort=ReasoningEffort.max)
+            turn = await thread.turn(prompt, model=args.model, effort=ReasoningEffort(args.effort))
             phase = "turn_run"
             result = await turn.run()
             record.update(result_record(result))
@@ -524,7 +533,14 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument(
         "--model",
         default=DEFAULT_MODEL,
-        help="explicit native/gateway model id; default Sol/max route",
+        help="explicit native/gateway model id; default Sol route with the gateway -max suffix",
+    )
+    parser.add_argument(
+        "--effort",
+        choices=EFFORTS,
+        default=DEFAULT_EFFORT,
+        help="ultra (default): proactive native sub-agents, root requests forwarded at max by a -max "
+        "route; max: single judgments and blind or one-model lanes",
     )
     parser.add_argument("--base-url", type=gateway_url, default=DEFAULT_BASE_URL)
     parser.add_argument("--request-id", type=request_id, default=uuid.uuid4().hex)

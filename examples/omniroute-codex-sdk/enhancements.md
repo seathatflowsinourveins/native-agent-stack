@@ -2,8 +2,9 @@
 
 Use this kit by default for foundation OmniRoute workers dispatched by Claude,
 with selected skills, MCP tools, native agents and a readiness gate. The official
-SDK owns execution, tools, compaction, resume and interruption. The worker retains
-Sol/Max on port 20128; native parent sessions retain their accounts.
+SDK owns execution, tools, compaction, resume and interruption. The worker defaults
+to Sol at ultra on port 20128, with `--effort max` for single judgments and blind
+or one-model lanes ([effort choice](README.md)); native parent sessions retain their accounts.
 
 ## Prepare an owned worker
 
@@ -30,12 +31,21 @@ keep its native tool/plugin/hook configuration and apply only reviewed selected
 keys through its native config writer; do not replace its configuration with
 this starter. Optional services use their existing native recipes.
 
+For speed, a private home may add `service_tier = "fast"` to its `config.toml`.
+It is optional and leaves the starter unchanged. The
+[2026-10-03 tier probe](../../evidence/receipts/omniroute-sdk-worker-fast-tier-20261003.json)
+measured about 1.9 times the standard tier's output rate at requested `max`,
+at higher pool usage per token; the README states its numbers and limits.
+
 The starter selects maintained Context Mode with a required startup, native
 Serena read tools with worker-scoped state, live web search, native hook
-support and at most three concurrent child threads. Generic children use Sol/Max;
-the bounded consequential judge explicitly uses Astra/Max. The child's native
-provider remains the scoped OmniRoute provider. Generic children inherit the
-explicit parent model and effort. Leave native `default_subagent_model` and
+support and at most three concurrent child threads. Generic children inherit the
+explicit parent model and effort: Sol at ultra by default, Sol/Max under
+`--effort max`. In multi-agent V2 an ultra child keeps the collaboration tools
+and may delegate further; the three-child limit counts concurrently spawned
+agents across the whole tree, not depth. The bounded consequential judge
+explicitly uses Astra/Max through its role file. The child's native provider
+remains the scoped OmniRoute provider. Leave native `default_subagent_model` and
 `default_subagent_reasoning_effort` unset in this scoped kit: spawn validates
 default names against its native catalog before applying a role's gateway alias.
 Enabling native hooks does not
