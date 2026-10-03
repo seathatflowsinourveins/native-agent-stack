@@ -24,7 +24,8 @@
       "path": "blueprints/convergence-practice/application-delivery/uv.lock"
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "config": ".github/osv-scanner-frozen-wsl-retrieval.toml"
     },
     {
       "path": "blueprints/memory-stack/native-qualification/uv.lock"

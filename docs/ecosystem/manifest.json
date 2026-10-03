@@ -725,9 +725,9 @@
     },
     {
       "id": "wsl-retrieval-20260920",
-      "title": "Incomplete historical WSL retrieval reference",
-      "status": "Native acceptance incomplete",
-      "body": "Retained source and QMD fixture receipts lack command argv/cwd; raw logs could not be recovered. Historical npm --ignore-scripts is not the supported fresh-install recipe. Selected facts and the failed attempt remain inspectable, but do not qualify native E2E or adoption. Future runs must retain invocation provenance and use supported QMD installation controls.",
+      "title": "Retired historical WSL retrieval reference",
+      "status": "Retired; historical native acceptance incomplete",
+      "body": "Supported replay and npm installation entry points are retired; original receipts, archives and lock bytes remain available for offline inspection. Historical command argv/cwd and raw logs remain missing. Eight native npm guard controls and isolated scanner ignore/expiry controls are recorded separately in wsl-retrieval-retirement-20261003; they do not qualify active QMD, repair the braces advisory or establish new-host acceptance.",
       "path": "blueprints/convergence-practice/wsl-retrieval/README.md"
     }
   ],
