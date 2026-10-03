@@ -1,0 +1,662 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "prospective-coding-image-owned-builder-amendment",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "SOURCE_SUPPORTED_PREREGISTRATION_ONLY_HOLD",
+  "scope": "ONE image-readiness task. This prospective amendment replaces the previously unresolved supervisor and unspecified builder source carriers. It does not change task files, task bounds, ordered task selection, quality protocol, client sign-ins or any active client configuration.",
+  "review_basis": {
+    "parent_assignment": "Owned-builder amendment requested after source-only Buildx/GNU review.",
+    "prior_astra": "Parent reported conditional acceptance of the original ONE-task image-readiness preregistration; that disposition is not acceptance of this new daemon config, resolved inputs or an executed build.",
+    "consequential_amendment_review": "PENDING"
+  },
+  "inherited_records": {
+    "image_preregistration": {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-readiness-preregister.json",
+      "bytes": 18304,
+      "sha256": "26780082f3cbe27e38bef322880775aa157a422f90edb3a8b4f4802c56837d46",
+      "treatment": "Original bytes and recorded failures preserved. Source-only native rendering, create-without-start and identity criteria remain applicable."
+    },
+    "parent_native_identity": {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-parent-native-identity.json",
+      "bytes": 4092,
+      "sha256": "1bd92851efd6f6b409bec29660912a3bc2b4c511e8ce80f279482366598e8791",
+      "custody": "Parent-owned private readiness record, not a new image pull or build."
+    }
+  },
+  "immutable_task": {
+    "repository": "laude-institute/harbor-datasets",
+    "commit": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+    "task_id": "django__django-14034",
+    "path": "datasets/swebench-verified/django__django-14034",
+    "task_tree_oid": "4c5cb0cbeae063509d74b57d5d409911db37fe45",
+    "environment_tree_oid": "3d6176918b64535451cc87c18efb75cda2108efd",
+    "task_toml_sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+    "dockerfile": {
+      "bytes": 2059,
+      "sha256": "42f8fa6f8b44f70bbf34b4c943eb10f35344776258f96c3a59321755d6c1cf66",
+      "git_blob": "6c72ad9da8b0038630310094576514b7e9ac0515"
+    },
+    "context_inventory": [
+      {
+        "path": "Dockerfile",
+        "mode": "100644",
+        "bytes": 2059,
+        "sha256": "42f8fa6f8b44f70bbf34b4c943eb10f35344776258f96c3a59321755d6c1cf66"
+      }
+    ],
+    "native_bounds_seconds": {
+      "build": 1800,
+      "agent": 3000,
+      "verifier": 3000
+    },
+    "task_or_context_mutation": false
+  },
+  "parent_image": {
+    "mutable_from": "docker.io/swebench/sweb.eval.x86_64.django_1776_django-14034:latest",
+    "source_policy_conversion": "docker.io/swebench/sweb.eval.x86_64.django_1776_django-14034:latest@sha256:a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc",
+    "manifest": {
+      "media_type": "application/vnd.oci.image.manifest.v1+json",
+      "bytes": 2199,
+      "sha256": "a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc"
+    },
+    "config_digest": "sha256:57c4a75e0ef575a605e87fa14e17c49b0ce1e7b611951467de3d6fb09bbaa361",
+    "platform": "linux/amd64",
+    "layers": 10,
+    "compressed_layer_bytes": 1193335216,
+    "limitation": "Parent conversion is not a hermetic build. Original Dockerfile line 41 downloads https://astral.sh/uv/0.7.13/install.sh with curl; download bytes and other build ingress remain outside this parent identity."
+  },
+  "native_pins": {
+    "harbor": {
+      "version": "0.23.0",
+      "repository": "harbor-framework/harbor",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729"
+    },
+    "compose": {
+      "version": "5.5.1",
+      "repository": "docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de"
+    },
+    "buildx": {
+      "version": "0.37.1",
+      "repository": "docker/buildx",
+      "commit": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a"
+    },
+    "buildkit": {
+      "version": "0.33.1",
+      "repository": "moby/buildkit",
+      "tag": "v0.33.1",
+      "tag_object": "7971c95baa2fbd3987a34cbb86115750cbb48676",
+      "commit": "8c91502cf280bd70a0c50912ce251c46a8881d9f",
+      "image": "moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+      "registry_only_observation": {
+        "native_exit": 0,
+        "stderr_bytes": 0,
+        "index_bytes": 5296,
+        "index_sha256": "cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+        "linux_amd64_manifest_digest": "sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5"
+      },
+      "daemon_started": false,
+      "distinction": "Registry index and amd64 child manifest identify the proposed driver image. Actual daemon container image/config identity, server version and platform remain unobserved."
+    },
+    "supervisor": {
+      "version": "GNU coreutils 9.7",
+      "repository": "coreutils/coreutils",
+      "tag": "v9.7",
+      "tag_object": "f8f3e758110c31ed20a682841c86e54ddeb9f449",
+      "commit": "8e075ff8ee11692c5504d8e82a48ed47a7f07ba9",
+      "native_path": "/usr/bin/gnutimeout",
+      "installed_package": "gnu-coreutils 9.7-3ubuntu2.1",
+      "distribution_source_package": "coreutils 9.7-3ubuntu2.1",
+      "binary_sha256": "1ba715580334044dbd32873bddd7f8a19687cda1cf5e9f44be7266af6c048766",
+      "native_version": {
+        "exit": 0,
+        "stdout_bytes": 343,
+        "stdout_sha256": "a31183ceff880e611c6d9283f32fb941a2e52bb6e136c4fdc131f534696fcdb9",
+        "stderr_bytes": 0
+      },
+      "native_help": {
+        "exit": 0,
+        "stdout_bytes": 2152,
+        "stdout_sha256": "dffcac209c86a55a499307c1615b103cf8691b1c42652511ed964b9bb8f1f34d",
+        "stderr_bytes": 0
+      },
+      "timer_executed": false,
+      "distribution_patch_equivalence": "Not established; installed help/version and pinned GNU semantics are separate observations."
+    }
+  },
+  "daemon_config": {
+    "classification": "New explicit first-party-schema BuildKit daemon configuration for this owned readiness builder; no active client config imported.",
+    "utf8": "[worker.oci]\n  enabled = true\n  max-parallelism = 1\n\n[worker.containerd]\n  enabled = false\n",
+    "bytes": 91,
+    "sha256": "30ffe91e40adb7423c85ffea3fb850cc84be4f522d733c4b72168ee864f57f2a",
+    "derived_values": {
+      "worker.oci.enabled": true,
+      "worker.oci.max-parallelism": 1,
+      "worker.containerd.enabled": false
+    },
+    "native_carrier": "docker buildx create --buildkitd-config <OWNED_BUILDKITD_TOML>",
+    "source_contract": "Explicit config path precedes Buildx default BuildKit-config discovery. OCI max-parallelism > 0 becomes a weighted semaphore; containerd enabled=false suppresses that worker.",
+    "limitation": "This bounds OCI parallel build steps, not total CPU/memory, model tools or task execution. Config parsing and daemon effectiveness have not been natively executed.",
+    "materialized": false,
+    "absolute_path": null,
+    "activation": "HOLD"
+  },
+  "owned_builder": {
+    "name": "nas-coding-readiness-20261003-14034",
+    "node": "nas-coding-readiness-20261003-14034-node0",
+    "container": "buildx_buildkit_nas-coding-readiness-20261003-14034-node0",
+    "state_volume": "buildx_buildkit_nas-coding-readiness-20261003-14034-node0_state",
+    "driver": "docker-container",
+    "driver_image": "moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+    "driver_options": {
+      "image": "moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+      "restart-policy": "no"
+    },
+    "node_declared_platform": "linux/amd64",
+    "native_driver_properties": {
+      "privileged": true,
+      "init": true
+    },
+    "observed_before_creation": {
+      "builder_inspect": {
+        "exit": 1,
+        "stdout_bytes": 0,
+        "stderr_bytes": 62,
+        "stderr_sha256": "16e97a83c21b62a4d924dd0924264c678a45ef1845cba2d42c465ec607cac1ca",
+        "result": "No named builder found."
+      },
+      "container_inspect": {
+        "exit": 1,
+        "stdout_bytes": 1,
+        "stderr_bytes": 105,
+        "stderr_sha256": "ff9b268b867ce844283ffb957858ed3aed42e1625c786d750e17203476ad9143",
+        "result": "No such named container."
+      },
+      "volume_inspect": {
+        "exit": 1,
+        "stdout_bytes": 1,
+        "stderr_bytes": 112,
+        "stderr_sha256": "5820c3541e92793ce92dca238174199adc94d2b5b64997ccbd235760b98647dd",
+        "result": "No such named volume."
+      },
+      "scope": "Earlier read-only precreation observations, not post-cleanup acceptance. Exact-name ownership must be requalified before creation."
+    },
+    "default_builder_selection_changed": false,
+    "created": false,
+    "bootstrapped": false,
+    "limitation": "Create --platform declares node capabilities; actual daemon platform must be observed. No --use or --bootstrap is planned."
+  },
+  "launch_inputs": {
+    "project_name": "nas-coding-image-readiness-20261003",
+    "compose_order": [
+      "<HARBOR_BUILD>",
+      "identical reviewed overlay via native --file -"
+    ],
+    "harbor_build_path": "src/harbor/environments/docker/docker-compose-build.yaml",
+    "harbor_build_sha256": "e363cbb606a6a2b9781b8e7c26fb31a83140536d4d55c4a3cb937e3d176b762f",
+    "overlay": {
+      "utf8": "services:\n  main:\n    image: harbor-readiness-django-14034:20261003-86723674f04e\n    platform: linux/amd64\n    build:\n      platforms:\n        - linux/amd64\n      no_cache: true\n      pull: true\n",
+      "bytes": 195,
+      "sha256": "25ef2a8d1c8e94d1335ef9032aa992d0c5026710cb214673ecd65c37d1dfc988",
+      "changed": false
+    },
+    "source_policy": {
+      "path": "blueprints/runtime-workers/comparisons/coding-source-policy.json",
+      "sha256": "a82998d636ab0f645cdfe426015bbd7c9ae411562f693b55b5f995ca1abe26c2",
+      "convert_rules": 24,
+      "changed": false,
+      "native_carrier": "EXPERIMENTAL_BUILDKIT_SOURCE_POLICY=<POLICY_FILE>",
+      "contract": "ReadSourcePolicy opens a pathname with os.ReadFile; use the exact reviewed regular-file bytes. No invented policy-stdin switch or shared-stdin multiplexing.",
+      "transitive_task_lock": false,
+      "consumed_file_absolute_path": null,
+      "consumption_observed": false
+    },
+    "bake_stdin_contract": "Buildx bake --file - reads Bake configuration from stdin. It does not permit context/Dockerfile stdin. Policy must remain a separate reviewed pathname when Bake stdin is used.",
+    "compose_stdin_contract": "Compose --file - reads the overlay from stdin; relative paths are based on current working directory. Explicit project-directory and frozen native CWD/context remain required.",
+    "rendered_bake_sha256": null,
+    "private_absolute_bindings": {
+      "native_cwd": null,
+      "docker_executable": null,
+      "task_context": null,
+      "harbor_build": null,
+      "owned_buildkitd_toml": null,
+      "policy_file": null,
+      "resolved_bake_file": null,
+      "metadata_file": null,
+      "owned_created_container_cleanup": null
+    },
+    "expected_bake": {
+      "target": "main",
+      "platforms": [
+        "linux/amd64"
+      ],
+      "no_cache": true,
+      "pull": true,
+      "output": "type=docker",
+      "tag": "harbor-readiness-django-14034:20261003-86723674f04e"
+    },
+    "side_band": {
+      "builder": "nas-coding-readiness-20261003-14034",
+      "provenance_argument": "--provenance=mode=max",
+      "metadata_environment": "BUILDX_METADATA_PROVENANCE=max",
+      "entitlement": "--allow fs.read=<TASK_CONTEXT>",
+      "other_entitlements": []
+    },
+    "max_provenance_limitation": "Bake native metadata must retain provenance and parent materials. The single-platform Docker exporter may not retain attestations in the image store; no exporter fallback or claim of stored attestation is made.",
+    "frozen": false
+  },
+  "prospective_native_recipe": [
+    {
+      "phase": "Render only; HOLD until concrete bindings and overlay bytes are accepted.",
+      "argv": [
+        "env",
+        "CONTEXT_DIR=<TASK_CONTEXT>",
+        "<DOCKER>",
+        "compose",
+        "--project-directory",
+        "<TASK_CONTEXT>",
+        "--project-name",
+        "nas-coding-image-readiness-20261003",
+        "--env-file",
+        "/dev/null",
+        "--file",
+        "<HARBOR_BUILD>",
+        "--file",
+        "-",
+        "build",
+        "--print",
+        "main"
+      ],
+      "stdin": "Exact unchanged 195-byte overlay.",
+      "stdout_retention": "<RESOLVED_BAKE_JSON>; freeze exact bytes/hash and native exit before any build."
+    },
+    {
+      "phase": "Create only the named owned builder; HOLD. No bootstrap, no default selection.",
+      "argv": [
+        "<DOCKER>",
+        "buildx",
+        "create",
+        "--name",
+        "nas-coding-readiness-20261003-14034",
+        "--node",
+        "nas-coding-readiness-20261003-14034-node0",
+        "--driver",
+        "docker-container",
+        "--platform",
+        "linux/amd64",
+        "--driver-opt",
+        "image=moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+        "--driver-opt",
+        "restart-policy=no",
+        "--buildkitd-config",
+        "<OWNED_BUILDKITD_TOML>"
+      ]
+    },
+    {
+      "phase": "ONE supervised native build; HOLD. Driver bootstrap/image ingress is inside this client command.",
+      "argv": [
+        "/usr/bin/gnutimeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "1800s",
+        "env",
+        "EXPERIMENTAL_BUILDKIT_SOURCE_POLICY=<POLICY_FILE>",
+        "BUILDX_METADATA_PROVENANCE=max",
+        "<DOCKER>",
+        "buildx",
+        "bake",
+        "--builder",
+        "nas-coding-readiness-20261003-14034",
+        "--file",
+        "<RESOLVED_BAKE_JSON>",
+        "--allow",
+        "fs.read=<TASK_CONTEXT>",
+        "--provenance=mode=max",
+        "--metadata-file",
+        "<BUILD_METADATA_JSON>",
+        "main"
+      ],
+      "stdin_variant": "Replace only --file <RESOLVED_BAKE_JSON> with --file - and deliver the already frozen exact Bake bytes on stdin; regular-file policy remains separate.",
+      "retain": "Actual OS exit/stdout/stderr, input hashes before/after, native metadata bytes, build reference, parent materials, output manifest/config digests and daemon image/platform identity.",
+      "automatic_retry": false
+    },
+    {
+      "phase": "After accepted build, create main without rebuilding/pulling/starting; HOLD.",
+      "argv": [
+        "env",
+        "CONTEXT_DIR=<TASK_CONTEXT>",
+        "<DOCKER>",
+        "compose",
+        "--project-directory",
+        "<TASK_CONTEXT>",
+        "--project-name",
+        "nas-coding-image-readiness-20261003",
+        "--env-file",
+        "/dev/null",
+        "--file",
+        "<HARBOR_BUILD>",
+        "--file",
+        "-",
+        "create",
+        "--no-build",
+        "--pull",
+        "never",
+        "main"
+      ],
+      "stdin": "The same exact unchanged 195-byte overlay used during render.",
+      "retain": "Native Compose created-container ID; inspect consumed .Image and compare with built local image .Id/config digest."
+    },
+    {
+      "phase": "Native image and consumed identity observations; HOLD.",
+      "argv_examples": [
+        [
+          "<DOCKER>",
+          "image",
+          "inspect",
+          "--format",
+          "{{.Id}} {{.Os}} {{.Architecture}}",
+          "harbor-readiness-django-14034:20261003-86723674f04e"
+        ],
+        [
+          "env",
+          "CONTEXT_DIR=<TASK_CONTEXT>",
+          "<DOCKER>",
+          "compose",
+          "--project-directory",
+          "<TASK_CONTEXT>",
+          "--project-name",
+          "nas-coding-image-readiness-20261003",
+          "--env-file",
+          "/dev/null",
+          "--file",
+          "<HARBOR_BUILD>",
+          "--file",
+          "-",
+          "ps",
+          "--all",
+          "--quiet",
+          "main"
+        ],
+        [
+          "<DOCKER>",
+          "container",
+          "inspect",
+          "--format",
+          "{{.Image}} {{.State.Status}}",
+          "<CREATED_CONTAINER_ID>"
+        ]
+      ],
+      "stdin_for_compose": "The identical overlay.",
+      "identity_roles": "Parent distribution manifest, parent config digest, builder image index/amd64 manifest, built manifest, built config/local .Id and consumed container .Image are distinct identities. Compose config/staleness digest is not an image digest."
+    },
+    {
+      "phase": "Independent native owned-builder cleanup after GNU returns, on success or failure; HOLD.",
+      "argv": [
+        "<DOCKER>",
+        "buildx",
+        "rm",
+        "--force",
+        "nas-coding-readiness-20261003-14034"
+      ],
+      "omit": [
+        "--keep-daemon",
+        "--keep-state",
+        "--all-inactive",
+        "--all"
+      ],
+      "contract": "Named driver Stop then Rm targets only its container and matching state volume. --force bypasses the CLI confirmation; driver forced removal is hardcoded independently.",
+      "independent_absence_argv": [
+        [
+          "<DOCKER>",
+          "buildx",
+          "inspect",
+          "nas-coding-readiness-20261003-14034"
+        ],
+        [
+          "<DOCKER>",
+          "container",
+          "inspect",
+          "--format",
+          "{{.Name}}",
+          "buildx_buildkit_nas-coding-readiness-20261003-14034-node0"
+        ],
+        [
+          "<DOCKER>",
+          "volume",
+          "inspect",
+          "--format",
+          "{{.Name}}",
+          "buildx_buildkit_nas-coding-readiness-20261003-14034-node0_state"
+        ]
+      ],
+      "orphan_recovery_carrier": [
+        "<DOCKER>",
+        "volume",
+        "rm",
+        "buildx_buildkit_nas-coding-readiness-20261003-14034-node0_state"
+      ],
+      "recovery_condition": "Only after independently proving this exact volume belongs to the owned lifecycle and is unused. No force, prune or broad deletion.",
+      "limitation": "If the container is already inactive/absent, driver Rm can skip volume removal; builder store entries can be removed despite driver errors. Builder absence is insufficient. Cleanup has no established hard duration and must be separately observed; no daemon signal/restart or automatic cleanup is claimed."
+    }
+  ],
+  "supervisor_contract": {
+    "initial_signal": "TERM",
+    "duration_seconds": 1800,
+    "kill_after_seconds": 10,
+    "foreground": false,
+    "preserve_status": false,
+    "known_statuses": {
+      "timed_out": 124,
+      "timeout_internal_failure": 125,
+      "invoke_failure": 126,
+      "command_not_found": 127,
+      "sigkill_ambiguous": 137
+    },
+    "semantics": "The +10s timer starts when the initial timeout signal is sent; actual duration depends on scheduling/system conditions. This is not a hard 1810s wall-clock guarantee. Exit 137 does not identify whether the command or timeout received KILL.",
+    "coverage_limit": "GNU targets the supervised process and its process group. Escaped descendant groups and Docker daemon-side BuildKit work are not proven terminated by client timeout. Owned-builder cleanup is a separate native lifecycle operation.",
+    "client_timer_behavior_observed": false,
+    "daemon_cleanup_observed": false
+  },
+  "admission": {
+    "render": "HOLD",
+    "policy": "HOLD",
+    "build": "HOLD",
+    "output_identity": "HOLD",
+    "cleanup": "HOLD",
+    "exact_remaining_gate": "Freeze and accept the ONE-task RuntimeLab launch packet: actual paths/CWD, unchanged TOML/policy/overlay bytes, rendered Bake bytes, named-builder ownership/platform, metadata output path and independent cleanup/absence contract (including any created main container). Every phase remains HOLD on these placeholders.",
+    "prospective_acceptance_only": "After an accepted freeze, native build/output/cleanup outcomes must be retained separately. This source packet supplies command carriers and expected identities, not executed acceptance.",
+    "unchanged_original_task_consequence": "Original task has no docker_image; stock Harbor start follows its native build branch. This image-only amendment makes no future cross-arm reuse, coding-study admission or model-default claim."
+  },
+  "source_read_failures_preserved": [
+    {
+      "scope": "Original preregistration",
+      "reference": "inherited_records.image_preregistration; original failures_preserved unchanged"
+    },
+    {
+      "scope": "Prior owned-builder source read",
+      "message": "PREPRINT_GUARD:3773",
+      "processor_exit": 1,
+      "stdout_bytes": 0,
+      "recovery": "Narrowed bounded extraction returned successfully."
+    },
+    {
+      "scope": "Prior owned-builder source discovery",
+      "path": "docker/buildx@0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a/builder/create.go",
+      "native_exit": 22,
+      "message": "HTTP 404",
+      "correction": "Actual create implementation is builder/builder.go; exact pinned read returned native 0."
+    },
+    {
+      "scope": "Prior GNU source read",
+      "message": "Canonical Savannah manual fetch HTTP 502; curl exit 22.",
+      "correction": "Exact peeled-pin GitHub mirror read returned 0; timeout.c canonical/mirror hashes matched."
+    },
+    {
+      "scope": "This amendment derivation",
+      "message": "Execution timed out after 60ms",
+      "cause": "ctx_execute timeout=60 was milliseconds, not seconds.",
+      "native_exit": null,
+      "correction": "Repeated read-only derivation with timeout=10000; native HEAD/status each returned 0 and original receipt hash matched. No activation/write occurred in the failed computation."
+    },
+    {
+      "scope": "This amendment apply_patch preparation",
+      "message": "ReferenceError: TextEncoder is not defined",
+      "cause": "Unsupported isolate-global byte-count helper before apply_patch call.",
+      "native_exit": null,
+      "correction": "Removed the unsupported helper; actual UTF-8 byte/hash verification uses native Python after apply_patch. Failed call wrote no file."
+    },
+    {
+      "scope": "This amendment compacting patches",
+      "messages": ["apply_patch verification failed: Failed to find expected lines", "apply_patch verification failed: Failed to find expected lines: metadata_file null"],
+      "causes": ["Cached objects were mutated before constructing expected old text.", "Recovery hunks were ordered after the source table but targeted earlier fields."],
+      "file_after_failures": {"bytes": 28271, "sha256": "d202b924267468d46cda4d653f4f082079733a870e767c242c8c6fdc5aaaab6f"},
+      "correction": "No file changed in either rejected patch; recovery uses narrow hunks in file order. Native JSON/hash/scope checks follow. The first oversized public-JSON diagnostic remains a processing failure."
+    }
+  ],
+  "primary_sources": {
+    "buildkit": {
+      "repository_url": "https://github.com/moby/buildkit",
+      "commit": "8c91502cf280bd70a0c50912ce251c46a8881d9f",
+      "files": [
+        {
+          "path": "docs/buildkitd.toml.md",
+          "sha256": "086b004b379bcddce01a886f7990e531d6a385817f30193470bac7bb358cae5c",
+          "lines": "74-107,136-160"
+        },
+        {
+          "path": "cmd/buildkitd/config/config.go",
+          "sha256": "0b45a57bc510058e36d2ece38c12e51ac991ccc98a4586d29ee5b5c7f30f524a",
+          "lines": "126-161"
+        },
+        {
+          "path": "cmd/buildkitd/main_oci_worker.go",
+          "sha256": "37cd8038301d2f461c80a545a2254a04e0b979c8ed286854080052abb220b9ec",
+          "lines": "327-332"
+        },
+        {
+          "path": "cmd/buildkitd/main_containerd_worker.go",
+          "sha256": "024ca2534289c5df197ec41b19a8c7e6b48dcbbfc7a1ca3491f656277bb59ca2",
+          "lines": "282-283"
+        }
+      ],
+      "url_rule": "<repository_url>/blob/<commit>/<path>"
+    },
+    "buildx": {
+      "repository_url": "https://github.com/docker/buildx",
+      "commit": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "files": [
+        {
+          "path": "builder/builder.go",
+          "sha256": "d0d0c73ac8a54083131a55cc2f1ff43bc419ac444e95e8751f79aaefb3de0811",
+          "lines": "509-518"
+        },
+        {
+          "path": "driver/docker-container/factory.go",
+          "sha256": "6517cc03d64c2e23790c3799915f1659faf754aad6eb9dc1a0d3e95749110792",
+          "lines": "65-66,99"
+        },
+        {
+          "path": "driver/docker-container/driver.go",
+          "sha256": "d7fc0ef706b398f5c2fd9e3d1f3ea4fef5c08daf40f89e74809944eedfd2220b",
+          "lines": "156-172,470-509"
+        },
+        {
+          "path": "commands/create.go",
+          "sha256": "1e8051482524d2ba25364ca49b650ce595335cf8647966b77b344f0429245f2d",
+          "lines": "57-80"
+        },
+        {
+          "path": "commands/rm.go",
+          "sha256": "b70ed983663c9e295473ac050ab59ca1a844e29b7ca56a76a0a177b39507745d",
+          "lines": "69-95,143-161"
+        },
+        {
+          "path": "bake/bake.go",
+          "sha256": "b44eb688eefcc9f1f6494c6cf5ba222127724e52563b90184e7f1ff49e53c303",
+          "lines": "72-90,1649-1652"
+        },
+        {
+          "path": "build/build.go",
+          "sha256": "9a940ebd99fad80d7b552f52018b6f12c00076aa0fd667cb39eacbb1ad03feeb",
+          "lines": "1379-1390"
+        },
+        {
+          "path": "docs/reference/buildx_bake.md",
+          "sha256": "0c0f90f1d839aad29550d99195dec7e4c1f72b77ec6fd024265310aaf12441b3",
+          "lines": "295-364"
+        }
+      ],
+      "url_rule": "<repository_url>/blob/<commit>/<path>"
+    },
+    "compose": {
+      "repository_url": "https://github.com/docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "files": [
+        {
+          "path": "docs/reference/compose.md",
+          "sha256": "6f1e26115a4d2b3824a189d39ef794c2ea2227587128278e3c3ab7be124c0ce5",
+          "lines": "112-113"
+        },
+        {
+          "path": "pkg/compose/build_bake.go",
+          "sha256": "d70bedb44c898aa09e24ebb0177e4567669e5e3b7db2997c7add70770262b80d",
+          "lines": "154-160,268-294,347-352,392-408"
+        }
+      ],
+      "url_rule": "<repository_url>/blob/<commit>/<path>"
+    },
+    "gnu": {
+      "repository_url": "https://github.com/coreutils/coreutils",
+      "commit": "8e075ff8ee11692c5504d8e82a48ed47a7f07ba9",
+      "files": [
+        {
+          "path": "NEWS",
+          "sha256": "3086cb7bb986fd8a09df51a8cc2ded61996db2c93a2dba2bd754156939c3f093",
+          "lines": "3,26-30"
+        },
+        {
+          "path": "src/timeout.c",
+          "sha256": "e11dc2897e468a2fc4bcf44dc3643f08f9ae063b7ce03b88def9dd866250c8ad",
+          "lines": "198-232,534"
+        },
+        {
+          "path": "doc/coreutils.texi",
+          "sha256": "39b126752866fff675e462bd44d76f3e034abafe462a069cebd53ef39fc53eca",
+          "lines": "18858,18871,18922-18933"
+        }
+      ],
+      "url_rule": "<repository_url>/blob/<commit>/<path>"
+    },
+    "inherited_harbor": "Original preregistration primary_sources binds pinned DockerEnvironment/build definition, native Compose create and TaskLock/ExtraComposeLock. Those source identities and limitations are preserved.",
+    "task": "https://github.com/laude-institute/harbor-datasets/tree/86723674f04e4209ac479d0fb75d9d9f44b4377e/datasets/swebench-verified/django__django-14034"
+  },
+  "native_authoring_checks": {
+    "classification": "Artifact consistency only; not upstream runtime, build or model acceptance.",
+    "json_toml_and_input_binding_assertions": {"exit": 0},
+    "original_preregistration_bytes_unchanged": true,
+    "git_diff_no_index_check": {"exit": 1, "stdout_bytes": 0, "stderr_bytes": 0, "interpretation": "New file differs from /dev/null; the nonzero result is retained, not relabeled as a passing native command."},
+    "owned_leaf_git_intent_to_add": {"exit": 0, "stdout_bytes": 0, "stderr_bytes": 0, "staged_content": false},
+    "owned_leaf_git_diff_check": {"exit": 0, "stdout_bytes": 0, "stderr_bytes": 0},
+    "required_repository_validator": "Not run: no commit/publish/registry change authorized in this task. Parent owns registry integration."
+  },
+  "execution": {
+    "source_and_native_help_reads_only": true,
+    "new_native_supervisor_run": false,
+    "new_daemon_config_activated": false,
+    "new_builder_created": false,
+    "image_pulled": false,
+    "image_built": false,
+    "container_created": false,
+    "container_started": false,
+    "provider_called": false,
+    "model_called": false,
+    "frozen_quality_task_run": false,
+    "authored_helper": false,
+    "task_files_changed": false,
+    "client_auth_or_active_config_read": false,
+    "registry_edited": false,
+    "committed": false,
+    "published": false
+  }
+}

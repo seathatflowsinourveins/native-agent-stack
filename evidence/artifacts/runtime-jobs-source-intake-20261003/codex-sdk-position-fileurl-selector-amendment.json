@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "codex_sdk_stock_debugger_protocol_selector_amendment",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "SOURCE_CORRECTION; ONE_OFFLINE_SOURCE_POSITION_PILOT_ADMITTED",
+  "scope": "Offline SDK source-position binding only. No positive fixture callback, provider/model comparison or measured default.",
+  "prior_failures_retained": [
+    "codex-sdk-position-pilot-transport-failure.json",
+    "codex-sdk-position-pilot-global-getter-failure.json",
+    "codex-sdk-position-pilot-adapter-pause-failure.json"
+  ],
+  "correction": {
+    "previous_error": "Frozen CDP selectors used bare filesystem paths, inferred from stock REPL display. That display removes file:// and is not an exact protocol-URL witness.",
+    "source_proven": "Node converts absolute resource filenames to file URLs. Bundled V8 matches the supplied URL against script.sourceURL() exactly.",
+    "adapter_cdp_url": "file:///state/codex-source/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js",
+    "per_file_selectors": "Four explicit cdp_url fields, separately frozen beside unchanged filesystem url fields.",
+    "stock_repl_changed_stages": [
+      "controller_constants",
+      "adapter_pending_breakpoint",
+      "resolve_each_sdk_file",
+      "set_real_false_breakpoint"
+    ],
+    "unchanged": "Filesystem paths, source/map/code hashes, source-map roundtrips, adapter condition, zero-selected (?!) filter, original 5000 ms fixture, protected environment/mount/network prefix, nominal 180 s TERM/+10 s KILL, stock protocol method selection.",
+    "actual_pause_resolution": "UNOBSERVED; source correction alone does not prove it fully resolves the third failure.",
+    "output_ownership": "All six native output paths (including before/after PID-namespace snapshots) now bind the distinct fourth-attempt directory; source-only boundary names all three retained failures."
+  },
+  "private_operational_freeze": {
+    "relative_path": "work/native-sdk-position-fileurl-v2-owned-20261003/operational-recipe.json",
+    "bytes": 36534,
+    "sha256": "06a6e8fcb75e34818e8353ec7233f57384c8150ec4534377d7a8015590062141",
+    "parent": {
+      "relative_path": "work/native-sdk-position-crypto-owned-20261003/operational-recipe.json",
+      "bytes": 34438,
+      "sha256": "169625702f54b976b5673b0385139f2cc71de6dbe09adab3013f15acfae33d15"
+    },
+    "root_native_read": {
+      "recipe_json": true,
+      "changed_stage_indexes": [
+        0,
+        1,
+        5,
+        10
+      ],
+      "output_only_argv_normalization_equal": true,
+      "filesystem_targets_exact": true,
+      "new_status_stdout_stderr_absent": true,
+      "all_six_distinct_owned_native_output_paths": true,
+      "all_six_absent": true
+    },
+    "prior_prospective_rejection": {
+      "relative_path": "work/native-sdk-position-fileurl-owned-20261003/operational-recipe.json",
+      "bytes": 35594,
+      "sha256": "3d3172604e05d48f9b4cd29fa4997608cb9a6dc870c2f07a59cb7046629dc56a",
+      "verdict": "REJECT BEFORE EXECUTION",
+      "finding": "Both cleanup capture paths targeted the third failure's retained process witnesses; stale review-boundary wording.",
+      "prior_freeze_preserved": true,
+      "execution_started": false
+    }
+  },
+  "root_primary_reads": [
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "src/inspector_agent.cc",
+      "lines": "493-495,806-814",
+      "native_exit": 0,
+      "bytes": 44029,
+      "sha256": "dc7e7d2cece374482bb66f61ea05b4dd3920adfea71ebe8cae1aca6786ca12e0"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "deps/v8/src/inspector/v8-debugger-agent-impl.cc",
+      "lines": "591-595,641-648",
+      "native_exit": 0,
+      "bytes": 96579,
+      "sha256": "3146c84ba00f4ccf073fb8dc6dc3436dd2c453ab5f08d947741466a6d2cc854b"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/internal/debugger/inspect_repl.js",
+      "lines": "134-144",
+      "native_exit": 0,
+      "bytes": 38085,
+      "sha256": "44921d05caa0947caa30dcfe4e1c11e707732ba0cdb96746ab2f597525f15e65"
+    },
+    {
+      "repository": "jestjs/jest",
+      "pin": "4e56991693da7cd4c3730dc3579a1dd1403ee630",
+      "file": "packages/jest-runtime/src/index.ts",
+      "lines": "1661-1669",
+      "native_exit": 0,
+      "bytes": 79668,
+      "sha256": "95813539b997c94729612a6a57a219c0cfcab74849ccb65204ed8f071e06a440"
+    }
+  ],
+  "review": {
+    "trigger": "Third offline pilot missed the adapter pause after one bounded metadata-binding repair; consequential exact source adjudication.",
+    "astra_source_read": "SOURCE_CORRECTION_ACCEPTED; prior acceptance omission corrected. No fourth execution admitted.",
+    "exact_new_recipe_read": "ACCEPT exactly one offline source-position pilot at36534B SHA06a6e8fcb75e34818e8353ec7233f57384c8150ec4534377d7a8015590062141; actual positions/positive SDK/provider acceptance HOLD",
+    "actual_delivered_model": null,
+    "provider_usage": null,
+    "admitted_scope": "Existing stock 12 stages, zero-selected (?!) callbacks/original5000ms/protected104argv/TTY ECHO-off/GNU180+10; native prompt/gate observed before every dependent input, exact mismatch/error stop, independent complete native post-ps; no adaptive retry"
+  },
+  "input_observation_correction": {
+    "third_attempt": "The first two inputs were transmitted sequentially before reading the returned native file prompt. The later file read showed a prompt and valid pending-breakpoint metadata. Future dependent inputs require an observed prompt/gate before transmission.",
+    "evidence_limits": "Does not reconstruct unobserved intermediate prompts or claim the third attempt complied with every declared prompt observation."
+  },
+  "quality_result": null,
+  "provider_usage": null,
+  "token_savings": null
+}

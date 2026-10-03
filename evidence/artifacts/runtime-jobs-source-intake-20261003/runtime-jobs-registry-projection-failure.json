@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "runtime_jobs_registry_projection_failure",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "FAILED_NATIVE_VALIDATION_PRESERVED; REPAIR_REQUIRES_FRESH_VALIDATION",
+  "scope": "Owned evidence registration packaging only; no model/provider comparison or default qualification.",
+  "failure": {
+    "original_native_validate_exit": 1,
+    "original_completion_chunk": "a89dcb",
+    "original_output_truncated": true,
+    "reported_original_token_count": 213621,
+    "failed_registry": {
+      "bytes": 2524616,
+      "sha256": "773a75f49d26760312d13d9e4eb9495c8a6b919f84fa4386eb2decc931e07878",
+      "error": "JSONDecodeError Extra data",
+      "line": 51427,
+      "column": 7
+    },
+    "cause": "The derived patch used zero surrounding context and removed numeric hunk positions. Its pure insertion placed new rows outside the JSON array; in-memory register_file output had valid JSON. Whitespace-only validation did not catch this."
+  },
+  "recovery_custody": {
+    "native_git_diff_exit": 0,
+    "native_git_diff_chunk": "f75905",
+    "same_input_validate_replay_exit": 1,
+    "replay_launch_chunk": "88be76",
+    "replay_completion_chunk": "dd4edc",
+    "classification": "Full native failure-stream recovery against the same failed input; separate from the earlier truncated return.",
+    "private_relative_directory": "work/registry19-repair-20261003",
+    "files": {
+      "failed-registry-native.diff": {
+        "bytes": 5696,
+        "sha256": "1efec3081df2f7f6272aa8f84d94e67283900f09a9d247300f80d34ac56761e5",
+        "lines": 129
+      },
+      "failed-validate-native.stdout.txt": {
+        "bytes": 854484,
+        "sha256": "30210932a833cf8d36810e8f3d8231e620cbaffa5cd369c48708d9fe82d03bbe",
+        "lines": 6977
+      },
+      "failed-validate-native.stderr.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "lines": 0
+      }
+    }
+  },
+  "repair_rule": "Recompute only owned rows from the exact5763 registry with unchanged register_file; apply a contextual patch. Require JSON parse, foreign row/content/order equality, unchanged receipts/convergence records, native validate.py and whitespace checks before publication.",
+  "repair_validation_result": null,
+  "provider_usage": null,
+  "quality_result": null,
+  "token_savings": null
+}

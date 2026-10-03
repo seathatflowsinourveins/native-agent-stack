@@ -45,6 +45,16 @@
     "block": "One task-repeat across all arms, including its separate grading phase",
     "window": "Only a recorded owner allocation; unresolved isolation/coexistence terms prevent quality freeze",
     "claude_read": "Exact accepted protocol head plus scoped amendments before freeze",
+    "current_owner_allocation": {
+      "start_utc": "2026-10-03T13:00:00Z",
+      "end_utc": "2026-10-03T19:00:00Z",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5969406829",
+      "original_comment_bytes": 3639,
+      "original_comment_sha256": "5815886b8c4cc87b3bbd71b6762459e67c5be3204103d891e1d60eab3c0d6d83",
+      "status": "Owner allocation only; runtime, original-counter and both-family freeze gates remain HOLD. No runtime-worker comparison has started.",
+      "scope": "21128 pipeline capture ON; raw chunk capture OFF. Owner allocation does not establish original token operands or attempt completeness.",
+      "historical_proposal": "The earlier 13:00-16:00 proposed window below remains retained with its failed 195-minute coding-block condition; it is not the current owner allocation."
+    },
     "proposed_window": {
       "start_utc": "2026-10-03T13:00:00Z",
       "end_utc": "2026-10-03T16:00:00Z",

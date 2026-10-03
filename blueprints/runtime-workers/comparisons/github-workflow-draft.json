@@ -109,7 +109,7 @@
     "quality_tie": "Require at least5 percent lower paired median uncached-input-plus-output tokens (reported gross input minus reported cache reads, plus reported output including reasoning), complete counters and no greater paired median agent time",
     "rank": [
       "successful trials descending",
-      "paired median uncached-input-plus-output tokens ascending, with complete authoritative same-scope cache subsets",
+      "paired median uncached-input-plus-output tokens ascending, with complete authoritative same-scope original gross-input/cache-read/output operands",
       "paired median agent time ascending"
     ],
     "fallback": "Keep the measured native baseline; record invalid/unqualified comparisons separately from task failures"

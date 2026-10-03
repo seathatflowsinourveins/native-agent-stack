@@ -29,7 +29,7 @@
   },
   "decision_rule": {
     "quality": "Require every frozen useful-task and declared lifecycle gate; no per-task regression, plus a quality improvement or the predeclared efficiency tie rule",
-    "efficiency_tie": "At least5 percent lower paired median uncached-input-plus-output tokens, complete authoritative counters/cache subsets and no greater paired median agent time",
+    "efficiency_tie": "At least5 percent lower paired median uncached-input-plus-output tokens, complete authoritative original gross-input/cache-read/output operands and no greater paired median agent time",
     "fallback": "Keep the measured Dagu baseline; source fixtures on different semantics cannot produce a comparative scheduler win"
   },
   "required_before_freeze": [

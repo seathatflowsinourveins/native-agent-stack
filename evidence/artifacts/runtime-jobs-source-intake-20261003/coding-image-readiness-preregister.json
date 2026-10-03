@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "coding-image-readiness-preregistration",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "HOLD: rendered native inputs, timer and lifecycle bindings remain pending",
+  "scope": "One image-only readiness build and subsequent stopped-container identity check. This record defines inputs and criteria before execution; it reports no build, pull, container, provider/model, coding outcome, study freeze or default.",
+  "review_basis": {
+    "reviewer": "Astra/max",
+    "result": "Parent-reported conditional acceptance of ONE readiness-build preregistration only",
+    "custody": "Inline team answer; parent must retain its original review before build admission"
+  },
+  "task": {
+    "id": "django__django-14034",
+    "repository": "laude-institute/harbor-datasets",
+    "pin": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+    "path": "datasets/swebench-verified/django__django-14034",
+    "task_tree_oid": "4c5cb0cbeae063509d74b57d5d409911db37fe45",
+    "environment_tree_oid": "3d6176918b64535451cc87c18efb75cda2108efd",
+    "context_inventory": [
+      {
+        "path": "Dockerfile",
+        "mode": "100644",
+        "blob_oid": "6c72ad9da8b0038630310094576514b7e9ac0515",
+        "bytes": 2059,
+        "sha256": "42f8fa6f8b44f70bbf34b4c943eb10f35344776258f96c3a59321755d6c1cf66"
+      }
+    ],
+    "task_toml_sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+    "original_bounds_seconds": {
+      "build": 1800,
+      "agent": 3000,
+      "verifier": 3000
+    },
+    "native_source_checkout": {
+      "git_version": "2.53.0",
+      "init_exit": 0,
+      "remote_add_exit": 0,
+      "fetch_exact_pin_exit": 0,
+      "sparse_init_exit": 0,
+      "sparse_set_exit": 0,
+      "detached_checkout_exit": 0,
+      "head_and_two_tree_queries_exit": 0,
+      "diff_exit": 0,
+      "status_exit": 0,
+      "status_stdout_bytes": 0,
+      "context_inventory_exit": 0,
+      "projection_sha256": "3a97da81d4e172503c262fad01f414f00aee72af0731e69c13d33f1c77b3ea38"
+    }
+  },
+  "parent": {
+    "reference": "docker.io/swebench/sweb.eval.x86_64.django_1776_django-14034:latest@sha256:a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc",
+    "descriptor_kind": "single OCI image manifest, not an index",
+    "manifest_sha256": "a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc",
+    "manifest_bytes": 2199,
+    "config_digest": "sha256:57c4a75e0ef575a605e87fa14e17c49b0ce1e7b611951467de3d6fb09bbaa361",
+    "layer_count": 10,
+    "compressed_layer_bytes": 1193335216,
+    "platform": "linux/amd64",
+    "primary_receipt": {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-parent-native-identity.json",
+      "sha256": "1bd92851efd6f6b409bec29660912a3bc2b4c511e8ce80f279482366598e8791",
+      "bytes": 4092,
+      "custody": "Parent-owned private uncommitted receipt; original read this turn"
+    },
+    "boundary": "Parent conversion only. Original Dockerfile line41 curl-downloads the mutable uv0.7.13 installer; this is not a hermetic build."
+  },
+  "input_specification": {
+    "private_bindings": "Operator-owned absolute context, pinned Harbor source, overlay, policy, working-directory, native Docker executable, builder name and output paths must be retained before build. No personal paths or active client configuration are published here.",
+    "project_name": "nas-coding-image-readiness-20261003",
+    "compose_order": [
+      {
+        "binding": "HARBOR_BUILD",
+        "path": "src/harbor/environments/docker/docker-compose-build.yaml",
+        "sha256": "e363cbb606a6a2b9781b8e7c26fb31a83140536d4d55c4a3cb937e3d176b762f"
+      },
+      {
+        "binding": "READINESS_OVERLAY",
+        "logical_name": "coding-image-readiness-overlay.yaml",
+        "utf8": "services:\n  main:\n    image: harbor-readiness-django-14034:20261003-86723674f04e\n    platform: linux/amd64\n    build:\n      platforms:\n        - linux/amd64\n      no_cache: true\n      pull: true\n",
+        "bytes": 195,
+        "sha256": "25ef2a8d1c8e94d1335ef9032aa992d0c5026710cb214673ecd65c37d1dfc988"
+      }
+    ],
+    "overlay_class": "Separate declarative Compose integration for image readiness, based on the pinned native carrier. It does not edit the task, Dockerfile, instruction, verifier or stock agent.",
+    "context_binding": "CONTEXT_DIR must point to the unchanged task environment directory whose exact tree and file bytes are recorded above",
+    "service_and_bake_target": "main",
+    "expected_platforms": [
+      "linux/amd64"
+    ],
+    "expected_output": "type=docker; local-only new readiness tag; no push",
+    "expected_tag": "harbor-readiness-django-14034:20261003-86723674f04e",
+    "no_cache": true,
+    "pull": true,
+    "source_policy": {
+      "path": "blueprints/runtime-workers/comparisons/coding-source-policy.json",
+      "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+      "sha256": "a82998d636ab0f645cdfe426015bbd7c9ae411562f693b55b5f995ca1abe26c2",
+      "rule_count": 24,
+      "selected_rule_index": 0,
+      "carrier": "EXPERIMENTAL_BUILDKIT_SOURCE_POLICY=<POLICY>",
+      "boundary": "The actual consumed file and launch binding need independent byte hashes before/after the native Bake command. TaskLock/ExtraDockerComposeLock does not transitively bind this external file."
+    },
+    "bake_side_band": {
+      "builder": "Private exact name; must match observed name SHA25612b961af5feb3e9d39f93b2cefb9a1a944f18d02cca0cac2f04f5a982240605f",
+      "provenance_argument": "--provenance=mode=max",
+      "metadata_environment": "BUILDX_METADATA_PROVENANCE=max",
+      "filesystem_entitlement": "--allow fs.read=<TASK_CONTEXT>",
+      "privileged_entitlements": [],
+      "secrets_and_ssh": [],
+      "metadata_file": "New private retained file, not Compose's temporary metadata"
+    },
+    "rendered_bake_sha256": null,
+    "all_absolute_bindings_frozen": false
+  },
+  "native_commands": [
+    {
+      "phase": "before-build render only",
+      "argv": [
+        "env",
+        "CONTEXT_DIR=<TASK_CONTEXT>",
+        "<DOCKER>",
+        "compose",
+        "--project-directory",
+        "<TASK_CONTEXT>",
+        "--project-name",
+        "nas-coding-image-readiness-20261003",
+        "--env-file",
+        "/dev/null",
+        "--file",
+        "<HARBOR_BUILD>",
+        "--file",
+        "<READINESS_OVERLAY>",
+        "build",
+        "--print",
+        "main"
+      ],
+      "retain_stdout_as": "<RESOLVED_BAKE_JSON>"
+    },
+    {
+      "phase": "ONE build; held",
+      "argv": [
+        "env",
+        "EXPERIMENTAL_BUILDKIT_SOURCE_POLICY=<POLICY>",
+        "BUILDX_METADATA_PROVENANCE=max",
+        "<DOCKER>",
+        "buildx",
+        "bake",
+        "--builder",
+        "<FROZEN_BUILDER>",
+        "--file",
+        "<RESOLVED_BAKE_JSON>",
+        "--allow",
+        "fs.read=<TASK_CONTEXT>",
+        "--provenance=mode=max",
+        "--metadata-file",
+        "<BUILD_METADATA_JSON>",
+        "main"
+      ]
+    },
+    {
+      "phase": "after accepted single build; create without start; held",
+      "argv": [
+        "env",
+        "CONTEXT_DIR=<TASK_CONTEXT>",
+        "<DOCKER>",
+        "compose",
+        "--project-directory",
+        "<TASK_CONTEXT>",
+        "--project-name",
+        "nas-coding-image-readiness-20261003",
+        "--env-file",
+        "/dev/null",
+        "--file",
+        "<HARBOR_BUILD>",
+        "--file",
+        "<READINESS_OVERLAY>",
+        "create",
+        "--no-build",
+        "--pull",
+        "never",
+        "main"
+      ]
+    },
+    {
+      "phase": "native identity observations; held",
+      "argv_examples": [
+        [
+          "<DOCKER>",
+          "image",
+          "inspect",
+          "--format",
+          "{{.Id}} {{.Os}} {{.Architecture}}",
+          "harbor-readiness-django-14034:20261003-86723674f04e"
+        ],
+        [
+          "env",
+          "CONTEXT_DIR=<TASK_CONTEXT>",
+          "<DOCKER>",
+          "compose",
+          "--project-directory",
+          "<TASK_CONTEXT>",
+          "--project-name",
+          "nas-coding-image-readiness-20261003",
+          "--env-file",
+          "/dev/null",
+          "--file",
+          "<HARBOR_BUILD>",
+          "--file",
+          "<READINESS_OVERLAY>",
+          "ps",
+          "--all",
+          "--quiet",
+          "main"
+        ],
+        [
+          "<DOCKER>",
+          "container",
+          "inspect",
+          "--format",
+          "{{.Image}} {{.State.Status}}",
+          "<CREATED_CONTAINER_ID>"
+        ]
+      ]
+    }
+  ],
+  "native_readiness_observations": {
+    "help": {
+      "all_native_exit": 0,
+      "all_stderr_bytes": 0,
+      "stdout_sha256": {
+        "buildx inspect": "94ccb383ec649756f2a8910203d993eb78176acbf9b6f15e93fad596586df34f",
+        "buildx bake": "903ae96a9863582e7bcf5e4629994b9001d8ad993e465407fd37efac7f5daeab",
+        "compose build": "4cdfb1144972686335f2a57a8a74f8f5d649f5fb4e2f75f440b28df0c53852bf",
+        "compose create": "57d3560abff941b39aab351c681c843f783a2b04a48ea606cfcb65cb188d9897",
+        "compose global": "454d8921e6de703331f6429885aea28a91739934823f9a918c1eebf57d5fb012"
+      }
+    },
+    "builder_inspect": {
+      "bootstrap_requested": false,
+      "native_exit": 0,
+      "stdout_bytes": 1363,
+      "stdout_sha256": "5ff053423f0ed64a05f2f06ecfa5a2235c86c840ae81a67cba6cf89ce4a4f185",
+      "stderr_bytes": 0,
+      "name_sha256": "12b961af5feb3e9d39f93b2cefb9a1a944f18d02cca0cac2f04f5a982240605f",
+      "driver": "docker",
+      "node_status": "running",
+      "reported_buildkit_version": "v0.33.1",
+      "platforms": [
+        "linux/amd64",
+        "linux/amd64/v2",
+        "linux/amd64/v3"
+      ],
+      "server_binary_or_source_identity_verified": false
+    },
+    "custody": "Returned public-source/native-interface observations in this task's tool history; raw builder endpoints and personal paths withheld. No filesystem copy of help/inspect streams was created."
+  },
+  "acceptance_criteria": [
+    "Before build: retain reviewed preregistration, all private path/name bindings, ordered Compose bytes/hashes, unchanged context HEAD/tree/file/diff evidence, exact native resolved Bake bytes/hash and separate CLI/env settings. Stop if any differs.",
+    "Rendered main must have only the recorded local context/Dockerfile, single amd64 platform, new fixed local tag, type=docker output, no-cache true and pull true. Declare every rendered field; no silent additional context, cache export, SSH, secret, entitlement or push.",
+    "Before build: qualify a native 1800s supervisor/termination and descendant/process-cleanup contract on this runtime. No custom timer/helper, fabricated calendar deadline or assumed WSL-parent kill propagation. This remains HOLD.",
+    "Retain the ONE native build's OS exit, full private stdout/stderr, duration, actual builder/version/identity, exact source-policy bytes and launch path, native metadata/provenance and failures. An absent metadata/material field stays unknown; no exporter/platform/builder fallback or automatic retry.",
+    "Confirm recorded parent identity in actual build provenance/materials, distinguish parent manifest/config from built image manifest/config and local image ID. Max provenance/type=docker support remains a native gate; client version or print output does not prove it.",
+    "After build: native Compose create --no-build --pull never with identical reviewed inputs must return0. The stopped container must reference the exact local built image ID/config digest; compare local image.Id to native container.Image and available metadata containerimage.config.digest. Preserve absent RepoDigests and manifest-format differences without inventing equivalence.",
+    "Capture the Compose config/staleness label separately from image IDs. Retain created-container state, owned containers/networks/volumes and task source diff, plus explicit verified operator cleanup or remaining inventory. No automatic cleanup success is claimed."
+  ],
+  "remaining_gates": [
+    "Actual rendered Bake bytes/path bindings and reviewed preregistration receipt are not yet frozen.",
+    "Native 1800s supervisor/termination and lifecycle recovery on this runtime are unqualified.",
+    "Actual policy consumption/conversion, metadata/provenance and output-image/platform/consumed-image identity have no build evidence.",
+    "The observed builder is not an attested server binary/source identity. No bootstrap, daemon change or source-policy build occurred.",
+    "Build ingress and mutable RUN downloads remain separate from runtime task allowlist/sidecar evidence.",
+    "Original task has no docker_image; stock Harbor start follows its native build branch. This image-only plan makes no future cross-arm reuse or task-comparison admission claim."
+  ],
+  "failures_preserved": [
+    {
+      "operation": "git diff --no-index --check /dev/null new-receipt",
+      "native_exit": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "classification": "Nonzero differing-new-file result retained; no check diagnostics returned",
+      "recovery": "Own-file intent-to-add followed by native git diff --check; final result retained in tool history"
+    },
+    {
+      "operation": "Native git sparse-checkout -h",
+      "native_exit": 129,
+      "stdout_bytes": 108,
+      "stdout_sha256": "b81aac67a64eba16335f1163ad8907589338305f86651d39657427d29487fad3",
+      "stderr_bytes": 0,
+      "classification": "Usage/help status retained; subsequent exact native sparse commands all0"
+    },
+    {
+      "operation": "Compact source projection",
+      "processor_exit": 1,
+      "stdout_bytes": 0,
+      "error": "RuntimeError: PREPRINT_GUARD:3885",
+      "recovery": "One narrowed projection succeeded0; nothing was indexed or printed before the guard"
+    },
+    {
+      "operation": "Parent receipt earlier platform template",
+      "native_exit": 1,
+      "returned_error": "can't evaluate field os in type *v1.Image",
+      "custody": "Inherited failure retained in the hash-bound parent receipt; corrected exported fields yielded native0. Original missing stream hashes remain unknown."
+    }
+  ],
+  "primary_sources": [
+    {
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/environments/docker/docker-compose-build.yaml",
+      "sha256": "e363cbb606a6a2b9781b8e7c26fb31a83140536d4d55c4a3cb937e3d176b762f",
+      "lines": "1-6",
+      "purpose": "Original context substitution and build pull policy"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/environments/docker/docker.py",
+      "sha256": "8757d3fbc19e58c7ccd14c9b613a0d00dccd1b514375fa0e546ff41ca963a15e",
+      "lines": "369-408;953-981",
+      "purpose": "Ordered native overrides and build path"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/environments/definition.py",
+      "sha256": "025580b1cbb70e143a8ae623c6c7d1a21860e6d8e6e6a1819f756403760a1dd0",
+      "lines": "26-36",
+      "purpose": "No task docker_image means prebuilt false"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/models/job/lock.py",
+      "sha256": "b22ee0fb2941d0455f088a98071d285e88e0a12f6fbfba276b02e5df43f5a4da",
+      "lines": "247-263",
+      "purpose": "Extra Compose content digest"
+    },
+    {
+      "repository": "docker/compose",
+      "pin": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "cmd/compose/build.go",
+      "sha256": "52cfc8a064587af0698c8da860fe3ccf7e7deda94c2d2d7bd3bb2ac310b1e0dd",
+      "lines": "75-90;152-177",
+      "purpose": "Installed print flag carrier"
+    },
+    {
+      "repository": "docker/compose",
+      "pin": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "pkg/compose/build_bake.go",
+      "sha256": "d70bedb44c898aa09e24ebb0177e4567669e5e3b7db2997c7add70770262b80d",
+      "lines": "154-160;268-294;347-352;392-408",
+      "purpose": "Print exits before Bake; output and side-band options"
+    },
+    {
+      "repository": "docker/compose",
+      "pin": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "cmd/compose/create.go",
+      "sha256": "7647136427be06077993cd1607e862a33d9676b2b41df0df0d46d05098e89580",
+      "lines": "80-81;104-125",
+      "purpose": "No-build and pull-never carrier"
+    },
+    {
+      "repository": "docker/buildx",
+      "pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "commands/inspect.go",
+      "sha256": "4ee7e5a857fb9886c702a6e2be5bdc07025f35f1bf22853ac18c33def7598b8c",
+      "lines": "49-51;98-103;196",
+      "purpose": "Bootstrap is opt-in"
+    },
+    {
+      "repository": "docker/buildx",
+      "pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "build/build.go",
+      "sha256": "9a940ebd99fad80d7b552f52018b6f12c00076aa0fd667cb39eacbb1ad03feeb",
+      "lines": "1379-1398",
+      "purpose": "Reads exact policy path from launch environment"
+    },
+    {
+      "repository": "docker/buildx",
+      "pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "bake/bake.go",
+      "sha256": "b44eb688eefcc9f1f6494c6cf5ba222127724e52563b90184e7f1ff49e53c303",
+      "lines": "1844-1847",
+      "purpose": "Bake binds policy to build options"
+    },
+    {
+      "repository": "docker/buildx",
+      "pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "build/opt.go",
+      "sha256": "cb994bd0799557fbc891f5096565b1597686d67201f9b4805df9e3fed7765d76",
+      "lines": "313",
+      "purpose": "Policy reaches SolveOpt"
+    },
+    {
+      "repository": "docker/buildx",
+      "pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "docs/reference/buildx_bake.md",
+      "sha256": "0c0f90f1d839aad29550d99195dec7e4c1f72b77ec6fd024265310aaf12441b3",
+      "lines": "295-364",
+      "purpose": "Persistent metadata and max build-record provenance"
+    }
+  ],
+  "execution": {
+    "build": false,
+    "pull": false,
+    "container": false,
+    "provider_or_model": false,
+    "comparison_freeze": false,
+    "measured_default": false
+  }
+}

@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "kind": "codex-sdk-source-position-pilot-preregister",
+  "recorded_date": "2026-10-03",
+  "repository_base": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "evidence_class": "source-qualified prospective native operation; NOT executed",
+  "status": "preregistered_pending_Astra_max_review_and_actual_position_cleanup_gates",
+  "review": {
+    "trigger": "Native SDK local mock integration remained failed after one bounded Sol companion repair; cause and lifecycle timing unproven.",
+    "prior_verdict": "HOLD positive SDK execution. Stock REPL position source accepted conditionally; executable recipe previously rejected without finite supervision and independent cleanup.",
+    "current_acceptance": "PENDING for this exact recipe; source preparation is not runtime acceptance."
+  },
+  "scope": {
+    "pilot": "zero-selected positions only",
+    "test_name_pattern": "(?!)",
+    "selected_positive_fixtures": 0,
+    "original_fixture_timeout_ms": 5000,
+    "unchanged_source_fixtures_node_options": true,
+    "provider_requests_launched": 0,
+    "pilot_observer_or_fixture_launched": false,
+    "new_observer_shim": false,
+    "installation": false,
+    "registry_publication_or_commit": false
+  },
+  "source_pins": {
+    "codex_sdk": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc; SDK0.160.0",
+    "node": "nodejs/node@955266bfdd854cd280dffd47548673914484e4c0; Node24.21.0",
+    "jest": "Jest29.7.0; unchanged owned locked compiled packages",
+    "trace_mapping": "jridgewell/sourcemaps@74fc8e11d30641b82e3ca3532cd89477671afeab; @jridgewell/trace-mapping0.3.31",
+    "timeout": "coreutils/coreutils@9530a14420fc1a267e90d45e8a0d710c3668382d; v9.4 annotated tag4806575c05b79eae40b2dfd334327ead9b1cf32b",
+    "bwrap": "containers/bubblewrap@2a76602a8c71f36c1527cf9fc3417d9149822e0c; owned0.12.0",
+    "ps": "procps-ng/procps@4ddcef2fd843170c8e2d59a83042978f41037a2b; v4.0.4"
+  },
+  "frozen_recipe": {
+    "original_protected_prefix": {
+      "bytes": 44711,
+      "sha256": "3016ed5c03b3c7ed8955839bcf2818f107f5d876042251571d2c5cda6524a6ab",
+      "scope": "retained private original, exact prefix argument subsequence preserved"
+    },
+    "private_operational_recipe": {
+      "bytes": 32568,
+      "sha256": "b8dca1778ac4a3e6beaa47efe77ee979f8bca6c749a428ec655fede6865e0f18",
+      "locator": "coordinator-held owned private recipe; personal paths excluded from this public artifact",
+      "json_and_prefix_static_check_exit": 0
+    },
+    "only_deltas": [
+      "GNU timeout9.4 outer TERM180s, KILL-after10s",
+      "bwrap native --json-status-fd13, retained synthetic FD11/12 unchanged",
+      "stock Node inspector REPL tail --port=0, same Jest source/pattern/cache and fresh result paths"
+    ],
+    "namespace": {
+      "unshare_all": true,
+      "die_with_parent": true,
+      "new_session": true,
+      "as_pid_1": false,
+      "fd13_noncolliding_with_retained_prefix": true,
+      "auth_home_mounts": false,
+      "network_or_mount_expansion": false,
+      "home_or_codex_home_override": false,
+      "node_options_change": false
+    },
+    "runtime_binary_identities": [
+      {
+        "name": "bwrap",
+        "bytes": 194848,
+        "sha256": "75d6e611c1d41cf3a183a54085d4e83342901b91d058dd2c655692ff13207216"
+      },
+      {
+        "name": "node",
+        "bytes": 126595440,
+        "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+      },
+      {
+        "name": "timeout",
+        "bytes": 39880,
+        "sha256": "12690a043dfd555a6c14ccc1564f5649c18f1762c0d6ff66729948130898ec52"
+      },
+      {
+        "name": "ps",
+        "bytes": 146424,
+        "sha256": "26a77f641ef5d6799195675dc4d23fc8de4a0ca04e3955637faf0d84f87554fd"
+      }
+    ],
+    "native_version_help_reuse": {
+      "timeout": {
+        "observer": "coordinator/current SDK host",
+        "version_exit": 0,
+        "version_stdout_bytes": 306,
+        "version_stdout_sha256": "ff0f4c965d2d640806351e804ad066a3348226669f02adbc0c6d5b2249904a33",
+        "help_exit": 0,
+        "help_stdout_bytes": 2146,
+        "help_stdout_sha256": "5d66a7ae507a4e647c32e62b64231f45697a00aa9b7e7de3dcaf4702424aa1ea"
+      },
+      "ps": {
+        "observer": "coordinator/current SDK host",
+        "version_exit": 0,
+        "help_exit": 0
+      },
+      "limits": "Version/help and byte identity are not a running pilot or provider binding."
+    }
+  },
+  "target_sources": [
+    {
+      "file_id": 0,
+      "path": "sdk/typescript/src/exec.ts",
+      "source_sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79",
+      "emitted_code_sha256": "f93de4dc6fec0a6166f1b39b9a291e4b5132d5450a5c67b33e174c30d589bd0d",
+      "wrapped_code_sha256": "33e12dfd4e31fc5618bceb6a0afb0e414283958ce72f76692e5404854aea258c",
+      "map_sha256": "b63e01d83279a62584341446c279424a9f3ca3e29a5e1e52681a1c2e0e04bb2e",
+      "wrapper_length": 82,
+      "column_offset_requested": 82,
+      "original_anchors": [
+        237,
+        243,
+        250
+      ]
+    },
+    {
+      "file_id": 1,
+      "path": "sdk/typescript/src/thread.ts",
+      "source_sha256": "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c",
+      "emitted_code_sha256": "c4a8b11323ef9adba1bdf7336aceee8a8d50596e1a03792fe93520e21ea6f77e",
+      "wrapped_code_sha256": "13ca3c4792d516dd00a6ce602fa360f38556979953de189a59464720c80e5ddc",
+      "map_sha256": "ef2d3b0540f0ab7a4243df72be1ca4996f0ff2b3a50bca8fedf2bcb4f82818b8",
+      "wrapper_length": 82,
+      "column_offset_requested": 82,
+      "original_anchors": [
+        124,
+        140
+      ]
+    },
+    {
+      "file_id": 2,
+      "path": "sdk/typescript/tests/run.test.ts",
+      "source_sha256": "2ebd05b461504a53c0a9453efb877f3fee06202284fd6dc5ddef035f3be33255",
+      "emitted_code_sha256": "87f1c95accd7fc5eefe62055607ac72a1ee7750faa64144d1e9f21a7cc9340f0",
+      "wrapped_code_sha256": "cd26d8cd979527aec4acd35b458b9ddecbafff91d0a2a982963122d1083aeb4c",
+      "map_sha256": "47ced8b69acf7ac83936effc09547b0dbbf7c17f43696bfa78cad9184ab8bd08",
+      "wrapper_length": 82,
+      "column_offset_requested": 82,
+      "original_anchors": [
+        29,
+        38
+      ]
+    },
+    {
+      "file_id": 3,
+      "path": "sdk/typescript/tests/responsesProxy.ts",
+      "source_sha256": "53f86d2a5c313966a9e5c9dd9fc69676755f7dbf50be530558d254571424b0f6",
+      "emitted_code_sha256": "ae48388400e9984ad3d316ed61f3f69de0147536067a2778fcddb8d1e67bd1f8",
+      "wrapped_code_sha256": "b4ebe66ab3e250919b3775f22700d0e7574e83337da19cd8d07a2d312bf9e11f",
+      "map_sha256": "8b250446fd22c89eaa48e7c384233fcaaab41e051728a5aecb1befd186581a91",
+      "wrapper_length": 82,
+      "column_offset_requested": 82,
+      "original_anchors": [
+        138
+      ]
+    }
+  ],
+  "native_source_identities": [
+    {
+      "path": "installed jestAdapter.js",
+      "bytes": 3678,
+      "sha256": "5decde9c87b3ef7946ca7b45068bf99f55a266333873adf8b3c99ba86b4ebc82"
+    },
+    {
+      "path": "installed jest-runtime/build/index.js",
+      "bytes": 76254,
+      "sha256": "4afb88009e1b907c4d5b098930834a0f09115ebf5a2fe0551349d5a17bc3ef03"
+    },
+    {
+      "path": "installed ScriptTransformer.js",
+      "bytes": 30828,
+      "sha256": "e07cd7a88714d6600d2d0cf88071f2df5635ece2bab9428bf5ae5b396d8d36ff"
+    },
+    {
+      "path": "installed trace-mapping.umd.js",
+      "bytes": 18670,
+      "sha256": "5ad4ec0709f78aa806c70965d4c162270e1df605f5572aa3a1ced31fe73dd07a"
+    },
+    {
+      "path": "Node inspect_repl.js",
+      "bytes": 38085,
+      "sha256": "44921d05caa0947caa30dcfe4e1c11e707732ba0cdb96746ab2f597525f15e65"
+    },
+    {
+      "path": "Node inspect.js",
+      "bytes": 9875,
+      "sha256": "ec378a59d544640d9e649d33127019ed1e51173c129459358b4cbb90f920e3e9"
+    },
+    {
+      "path": "Node js_protocol.pdl",
+      "bytes": 70146,
+      "sha256": "9541b1454d1c352ef852dc0b6321569438271731068c803f980afb65def58982"
+    },
+    {
+      "path": "GNU src/timeout.c",
+      "bytes": 18932,
+      "sha256": "a527b6105864d5cb5676c7ea42a43fa16cfbb447599304767d6b339db8c050a4"
+    },
+    {
+      "path": "GNU doc/coreutils.texi",
+      "bytes": 660691,
+      "sha256": "6890fa80a0fc7a7a1157cfc6d3f420a9aa586c1495f1a20b31134ceb6b465298"
+    },
+    {
+      "path": "bwrap bubblewrap.c",
+      "bytes": 113001,
+      "sha256": "3f17ee26057cae9d660801ca8d9ba84722f1bafdcd072d5151ee1c64eeeb15f4"
+    },
+    {
+      "path": "procps src/ps/output.c",
+      "bytes": 102447,
+      "sha256": "7f42e72f7e91dd02fa2ad85215de715b631b5f9a5112e9a9498fb71024e24e82"
+    },
+    {
+      "path": "procps NEWS",
+      "bytes": 37593,
+      "sha256": "e8767399e7b06eb2e9b2a46523f79c98397982f918f39c68a1d91ec0a201f97c"
+    },
+    {
+      "path": "trace-mapping src/trace-mapping.ts",
+      "bytes": 15414,
+      "sha256": "f37d9db53896dd9adb199cb75b79ab33c8c588b5a25793b714e20dad2f77187b"
+    }
+  ],
+  "native_recipe": {
+    "launch": "rtk proxy /usr/bin/timeout --signal=TERM --kill-after=10s --verbose 180s <exact retained env-i/owned-bwrap prefix + native statusFD13> /node/bin/node inspect --port=0 <unchanged Jest29.7 CLI> --runInBand --runTestsByPath tests/run.test.ts --testNamePattern '(?!)' --cacheDirectory <retained owned native cache> --json --outputFile <fresh owned result>",
+    "input": "Native non-TTY exec-session stdin pipe. Stock bare controller expressions issued after returned native prompt/stage gate; no debugger exec target-evaluation command, scripted observer module, background/detached launch or SDK/test edit.",
+    "steps": [
+      "At initial pause, direct Debugger.setBreakpointByUrl on installed adapter zero-based78 with the frozen testPath/globalConfig (?!) condition; record real pending/resolved protocol locations. sb() fake/requested locations never qualify.",
+      "cont once; require actual adapter backtrace pause before runner79, then bind current scriptId/source embedding: pinned compiled body appears exactly once in getScriptSource, with newline-free prefix. Hash only; never print source.",
+      "At that pause, direct setBreakpointByUrl for each of four SDK/test/proxy URLs with literal false; require four distinct current scriptId strings. getScriptSource whole wrapped-source SHA must match each retained constructor hash.",
+      "Read only the four hash-bound owned native map files. Installed upstream trace-mapping allGeneratedPositionsFor gives candidates for the eight declared original anchors; originalPositionFor must roundtrip actual native location to the same source/anchor.",
+      "Direct getPossibleBreakpoints for a one-generated-line, same-scriptId, end-exclusive range. Direct setBreakpointByUrl at returned pausable coordinates, literal false; require returned resolved location equals that native point. No offset guessed or 82-column blanket subtraction.",
+      "After positions, stay paused: native kill then .exit intentionally terminate. Do not resume the adapter runner. No final Jest-success/child-zero claim.",
+      "Outside sandbox, capture exact rtk proxy ps -e -o pid=,pidns= before and after returned supervision/stop. Preserve native stream/status independently; bind starting FD13 child-pid/PID-namespace and evaluate the visible-process cleanup endpoint."
+    ],
+    "output": "Each configured native expression validates required typed fields and JSON.stringify UTF8 <=2048B before returning; allow declared stages, hashes, booleans, safe numeric counts/coordinates and decimal current scriptIDs. Full native REPL pause context stays in private capture; public evidence contains metadata only.",
+    "forbidden": [
+      "source/body/scope/module/environment/profile/auth dumps",
+      "Runtime.evaluate or call-frame local inspection",
+      "provider/model/gateway requests",
+      "source/fixture/timeout/namespace repairs or a second attempt"
+    ]
+  },
+  "deadline_and_cleanup": {
+    "nominal_TERM_seconds": 180,
+    "nominal_KILL_grace_seconds": 10,
+    "hard_190_second_guarantee": false,
+    "foreground": false,
+    "preserve_status": false,
+    "signal_limit": "GNU timer starts after fork; verbose is a send attempt. 137 cannot distinguish command KILL from supervisor KILL. new-session escapes GNU group coverage; bwrap PDEATHSIG chain can KILL earlier, so ten seconds of sandbox graceful cleanup is not promised.",
+    "native_status_contract": "FD13 child-pid and available pid-namespace identify sandbox PID1; exit-code reports COMMAND/Node REPL. Native bwrap event fast path can return before PID1 finishes; missing terminal document or EOF is unknown.",
+    "exact_ps_argv": [
+      "rtk",
+      "proxy",
+      "/usr/bin/ps",
+      "-e",
+      "-o",
+      "pid=,pidns="
+    ],
+    "before_gate": "Native ps0/stderr0; complete stdout has exactly two positive decimal fields per row and contains captured owned child-pid/PIDns pair. Otherwise metadata/visibility unknown.",
+    "after_gate": "Native ps0/stderr0 and complete field validity; zero rows for captured PID namespace and owned PID+namespace pair. This proves only the observed visible-process endpoint; matching/unreadable rows or incomplete status remains HOLD.",
+    "correction": {
+      "initial_rtk_exit": 0,
+      "initial_rows": 32,
+      "incompatible_rows": 2,
+      "cause": "RTK condensation; no namespace absence inferred",
+      "native_proxy_exit": 0,
+      "proxy_stdout_bytes": 7049,
+      "proxy_stdout_sha256": "273cd98d3831c21e12681e16c6267a7b6d816d077a5c50777887c0e9ad3fe2fb",
+      "proxy_rows": 371,
+      "all_two_decimal_fields": true,
+      "stderr_bytes": 0,
+      "meaning": "native field carrier only, no owned cleanup"
+    },
+    "actual_owned_child_namespace_cleanup": null
+  },
+  "prospective_gate": {
+    "required": "Actual real pause + four current script/source/code/map bindings + native pausable/resolved point for each eight anchors + metadata bounds + separately returned status and identity-bound cleanup endpoint.",
+    "stop": "Any pending-only/missing module, unexpected native embedding/branch, empty or off-anchor mapping, hash/location mismatch, overflow, metadata exception, deadline or uncertain cleanup: preserve and STOP. No repair/rerun without bounded Astra adjudication.",
+    "actual_current_script_ids": null,
+    "actual_pausable_positions": null,
+    "actual_supervisor_exit": null,
+    "actual_bwrap_command_exit": null,
+    "independently_returned_jest_exit": null,
+    "actual_final_jest_json": null,
+    "actual_cleanup": null,
+    "intentional_stop_is_Jest_completion": false,
+    "SDK_positive_role_provider_Ultra_usage_quality_savings_acceptance": "HOLD"
+  },
+  "prior_evidence": {
+    "artifacts": [
+      {
+        "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json",
+        "bytes": 32167,
+        "sha256": "29264e4ddce1c05ec41ea7ee90b95e5560a9ea33dae664aba81d97cd31f6e068"
+      },
+      {
+        "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-diagnostics.json",
+        "bytes": 32768,
+        "sha256": "31d433c2a0ae0fabfb0aabd8206cdcdc943b63d384cf99e6979a3c456c29fa1a"
+      },
+      {
+        "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-preflight.json",
+        "bytes": 17142,
+        "sha256": "aca0cc66e5fdf573f322a4de74f74e30f3a3cfc74a5ca3d1ec6be6e0972407ba"
+      },
+      {
+        "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-primitive-preflight.json",
+        "bytes": 27166,
+        "sha256": "1c63f491a66e553c3e9efb98e6a4d4a292769ec79c5e1815fd085148e51347c1"
+      }
+    ],
+    "scopes": [
+      "Historical unchanged exec mock controls14pass/0fail; local proxy integration26fail/6pass; bounded companion retry1fail/22filtered skips retained.",
+      "Historical diagnostic observer0/Jest1 showed child POST/turn events/exit0; it did not establish SDK consumption, EOF, return or cleanup causality.",
+      "First zero-selected binding attempt had eight object descriptions but no values/hashes: failed binding gate.",
+      "Corrected primitive attempt established CJS four constructor/four transform metadata/cache bindings and0pass/0fail/23pending; no pausable SDK positions or positive acceptance."
+    ]
+  },
+  "preserved_source_preparation_errors": [
+    "GNU NEWS heading extractor1 corrected; GraphQL fetch itself0. Two source-output guards1 narrowed to0. GraphQL texi512000B truncation replaced by complete660691B raw original0.",
+    "Browser TextEncoder postprocessing failed after successful source browsing; no pilot ran.",
+    "Current preregistration initial JS regex parse failed before tools; corrected read0. REPL source-output guard1 at4174B narrowed read0. One retained-metadata print exceeded intended compact scope; subsequent reads used byte guards."
+  ],
+  "primary_sources": [
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect_repl.js#L625",
+      "meaning": "bare controller Promise-aware eval, domain exposure972–980; exec1032–1033 evaluates debuggee"
+    },
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/deps/v8/include/js_protocol.pdl#L223",
+      "meaning": "native same-script/end-exclusive possible locations; getScriptSource237 and real setBreakpointByUrl429"
+    },
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect.js#L107",
+      "meaning": "REPL exit/SIGTERM can return0; killChild147–152 sends signal without wait"
+    },
+    {
+      "url": "https://github.com/jridgewell/sourcemaps/blob/74fc8e11d30641b82e3ca3532cd89477671afeab/packages/trace-mapping/src/trace-mapping.ts#L197",
+      "meaning": "upstream originalPositionFor1-based line/0-based column, allGeneratedPositionsFor249"
+    },
+    {
+      "url": "https://github.com/coreutils/coreutils/blob/9530a14420fc1a267e90d45e8a0d710c3668382d/src/timeout.c#L203",
+      "meaning": "TERM/KILL signal scheduling; group/direct-child wait519–614"
+    },
+    {
+      "url": "https://github.com/coreutils/coreutils/blob/9530a14420fc1a267e90d45e8a0d710c3668382d/doc/coreutils.texi#L18595",
+      "meaning": "180s/+10s options/status137 ambiguity; no guaranteed wall-clock completion"
+    },
+    {
+      "url": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/bubblewrap.c#L541",
+      "meaning": "native status event can precede complete PID1 reaping619–640"
+    },
+    {
+      "url": "https://gitlab.com/procps-ng/procps/-/blob/4ddcef2fd843170c8e2d59a83042978f41037a2b/src/ps/output.c#L1430",
+      "meaning": "pidns decimal inode or '-' unknown"
+    },
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/doc/api/crypto.md#L3767",
+      "meaning": "native createHash; input source stays private"
+    },
+    {
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/doc/api/fs.md#L6569",
+      "meaning": "native readFileSync of explicit owned public map/source artifacts only"
+    }
+  ],
+  "provider_usage": null,
+  "quality_result": null,
+  "token_savings": null
+}

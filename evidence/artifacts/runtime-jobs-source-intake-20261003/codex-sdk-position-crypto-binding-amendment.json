@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "prospective-native-crypto-binding-amendment",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "HOLD pending exact amended-recipe Astra read",
+  "amends": "codex-sdk-position-tty-carrier-amendment.json",
+  "preserved_failures": [
+    "codex-sdk-position-pilot-transport-failure.json",
+    "codex-sdk-position-pilot-global-getter-failure.json"
+  ],
+  "private_amended_recipe": {
+    "bytes": 34438,
+    "sha256": "169625702f54b976b5673b0385139f2cc71de6dbe09adab3013f15acfae33d15"
+  },
+  "minimal_changes": {
+    "declaration": "var sdkPositionCrypto=require('node:crypto')",
+    "declaration_replacements": 1,
+    "createHash_receiver": "sdkPositionCrypto.createHash",
+    "receiver_replacements": 8,
+    "module_literal_unchanged": "node:crypto",
+    "outputs": "Distinct third task-owned FD13/stdout/stderr/Jest JSON/process-snapshot paths"
+  },
+  "unchanged": {
+    "supervised_prefix104_exact": true,
+    "Jest_target_filter_and_flags_except_result_path_exact": true,
+    "TTY_stty_carrier": true,
+    "all_other_Debugger_expressions_order_and_gates": true,
+    "nominal_TERM_seconds": 180,
+    "nominal_KILL_grace_seconds": 10,
+    "original_fixture_timeout_ms": 5000,
+    "test_name_pattern": "(?!)",
+    "metadata_return_maximum_utf8_bytes": 2048,
+    "all_stop_conditions": true
+  },
+  "root_pinned_source_read": {
+    "http_statuses": [
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+    "repository": "nodejs/node",
+    "sources": [
+      {
+        "path": "lib/repl.js",
+        "bytes": 45940,
+        "sha256": "d8924013575a5f7d856765194c8de4b1bd3a14d715a58bc7a17725e5f1cd7a71",
+        "lines": "1098-1105"
+      },
+      {
+        "path": "lib/internal/bootstrap/web/exposed-window-or-worker.js",
+        "bytes": 4511,
+        "sha256": "f1c4629daa9b7e89f1e57114230bf0f3a0843c0435726743df0a15e345e0c302",
+        "lines": "105-117"
+      },
+      {
+        "path": "lib/internal/util.js",
+        "bytes": 27664,
+        "sha256": "4aa900feab2a6cdb84060c0358c569578d31b6f0831224792868ece9b8899951",
+        "lines": "631-670"
+      },
+      {
+        "path": "lib/internal/modules/helpers.js",
+        "bytes": 16403,
+        "sha256": "3d6d6d7c7257610dcee83c76f29d6314ba56af5560faf50650a025fd9a56bbb3",
+        "lines": "240-246"
+      },
+      {
+        "path": "doc/api/crypto.md",
+        "bytes": 238887,
+        "sha256": "9646e88af153e838d9d07c52c5572f646e5d396b55cc89b67ef301b050eba96b",
+        "lines": "1949-1954"
+      }
+    ]
+  },
+  "diagnosis": {
+    "correction": "The host crypto accessor is copied into the native REPL context, not merely inherited. It has no setter, checks its receiver, and blocks replacement under the old var binding.",
+    "protocol_failure_scope": "Source inference from the frozen expression: setBreakpointByUrl fulfilled before its metadata callback read crypto.createHash; record failed metadata emission rather than zero Debugger requests.",
+    "minimal_fix_scope": "Native hashing receiver name only; no SDK/fixture/cache/sandbox/source-map/model/provider change"
+  },
+  "review": {
+    "trigger": "Second native position-only pilot failed after one bounded input-carrier repair",
+    "proposal_result": "Astra/max SOURCE-ACCEPT minimal metadata-binding correction; unchanged-recipe rerun rejected",
+    "exact_frozen_result": "PENDING",
+    "execution_admitted": false,
+    "analysis_failure_preserved": "Reviewer JS projection SyntaxError before target action; Python stdlib JSONDecoder recovery0. Not a runtime/model attempt."
+  },
+  "execution": null,
+  "actual_positions": null,
+  "actual_cleanup": null,
+  "SDK_positive_role_provider_quality_savings": "HOLD"
+}

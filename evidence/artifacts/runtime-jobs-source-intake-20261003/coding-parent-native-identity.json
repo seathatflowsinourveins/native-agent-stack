@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "native_registry_parent_identity_read",
+  "scope": "Read-only parent manifest and platform evidence for one proposed image-readiness build; no pull, build, container, provider/model or comparison execution",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "task": {
+    "id": "django__django-14034",
+    "dataset_repository": "laude-institute/harbor-datasets",
+    "dataset_pin": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+    "task_tree_oid": "4c5cb0cbeae063509d74b57d5d409911db37fe45",
+    "dockerfile": "datasets/swebench-verified/django__django-14034/environment/Dockerfile",
+    "root_primary_http_status": 200,
+    "dockerfile_bytes": 2059,
+    "dockerfile_sha256": "42f8fa6f8b44f70bbf34b4c943eb10f35344776258f96c3a59321755d6c1cf66",
+    "source_boundary": "Dockerfile downloads the uv0.7.13 installer via curl|sh. Parent-only conversion does not establish hermetic reproduction."
+  },
+  "native_interface": {
+    "client": "docker buildx imagetools inspect",
+    "qualified_client_version_reference": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-native-controls.json",
+    "native_help_exit": 0,
+    "source_repository": "docker/buildx",
+    "source_pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+    "documentation": "docs/reference/buildx_imagetools_inspect.md",
+    "documentation_bytes": 22126,
+    "documentation_sha256": "e6e5c6f92a4c18c7a39347a17780d99e73357807e78e1a0e77368950ae6d893b",
+    "root_primary_http_status": 200,
+    "private_client_state": "Native custody; no config/auth file or credential value read or copied"
+  },
+  "native_manifest": {
+    "reference": "docker.io/swebench/sweb.eval.x86_64.django_1776_django-14034:latest@sha256:a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc",
+    "arguments": ["--raw"],
+    "native_exit": 0,
+    "stdout_bytes": 2199,
+    "stdout_sha256": "a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc",
+    "stderr_bytes": 0,
+    "exact_native_stdout_digest_matches_policy": true,
+    "schema_version": 2,
+    "media_type": "application/vnd.oci.image.manifest.v1+json",
+    "index_platform_descriptors": [],
+    "config_descriptor": {"mediaType": "application/vnd.oci.image.config.v1+json", "digest": "sha256:57c4a75e0ef575a605e87fa14e17c49b0ce1e7b611951467de3d6fb09bbaa361", "size": 4214},
+    "layer_count": 10,
+    "compressed_layer_bytes_declared_by_manifest": 1193335216,
+    "observation": "Actual returned native bytes hash to the pinned single-image manifest. This is not an image download, unpacked size or build result."
+  },
+  "native_platform": {
+    "format": "{{.Image.OS}} {{.Image.Architecture}}",
+    "native_exit": 0,
+    "stdout": "linux amd64",
+    "stdout_bytes": 11,
+    "stdout_sha256": "ca40350362516cc30c839fd3e0f04e9bbb7703698fd5c57f12f3b87f07d866e9",
+    "stderr_bytes": 0,
+    "original_field_definition_sources": [
+      {"file": "vendor/github.com/opencontainers/image-spec/specs-go/v1/config.go", "http_status": 200, "bytes": 4548, "sha256": "b88c5220009106090d760c4589704a950b45e6c0f676427be9537b2abaf2a763"},
+      {"file": "vendor/github.com/opencontainers/image-spec/specs-go/v1/descriptor.go", "http_status": 200, "bytes": 3110, "sha256": "0861d8687b818f7045ca3f076e8f8a1ef92497514235fbaea4c6af0c075f1c3a"}
+    ]
+  },
+  "failures_preserved": [{"kind": "Native platform-template lookup", "format": "{{.Image.os}} {{.Image.architecture}}", "native_exit": 1, "tool_chunk": "6c9b0b", "returned_error": "ERROR: template: :1:8: executing \"\" at <.Image.os>: can't evaluate field os in type *v1.Image", "repair": "One bounded pinned-source field-definition read corrected Go exported fields before the native0 query. Original streams were not retained separately; no missing stdout/stderr hash is fabricated."}],
+  "image_readiness_build": "HOLD until concrete source-supported recipe, context, builder/policy, bounds and acceptance fields are frozen",
+  "comparison_freeze": false,
+  "measured_default": null,
+  "provider_or_model_execution": false
+}
