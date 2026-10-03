@@ -270,3 +270,99 @@ Rollback removes only owned example/integration artifacts and diagnostic state;
 global configurations, native accounts, human sessions and other-owner work are
 preserved. Future source drift reopens the relevant task gate rather than making
 this dated result universally current.
+
+## Status at landing, 2026-10-03
+
+The checks below were repeated during the custody build against main
+`9b0b8d6d25f9e3fb8f71770500e774170423315e` and live read-only GitHub metadata.
+They update the dated interpretation of the text above; the examples, original
+observations and failed drafts remain unchanged. This evidence handoff supports
+native research workers for the north star without advancing a broker or host gate.
+
+- **Timing guard.** [#556](https://github.com/seathatflowsinourveins/native-agent-stack/pull/556)
+  merged at 2026-09-30T19:53:05Z (`7d7dcd08b6bfbb534a272b65e1f36e693f9674fa`).
+  [#600](https://github.com/seathatflowsinourveins/native-agent-stack/pull/600)
+  subsequently repaired the K4 timing guard and merged as
+  `6080214e0718e074698babedb2fb10cb2941a0db` at 2026-10-02T04:33:26Z.
+  The timing-ownership and proposed rebase lines above are historical; this
+  refresh uses the coordinator's merge of current main, preserving the original history.
+- **Dependency and reviewed PRs.**
+  [#546](https://github.com/seathatflowsinourveins/native-agent-stack/pull/546)
+  merged at 2026-09-30T18:39:19Z (`8fc86119eacfd5be9b8a139e1ed167d85748091b`),
+  [#542](https://github.com/seathatflowsinourveins/native-agent-stack/pull/542)
+  at 2026-09-30T19:54:23Z (`1f2cdce5a3cdf3f965d45196d8158d12431394d2`), and
+  [#540](https://github.com/seathatflowsinourveins/native-agent-stack/pull/540)
+  at 2026-10-01T00:57:25Z (`46365ea812c3a680b19c8c8c9c3bb198bf3b38ab`).
+  The #542 P2 was repaired within #542 by
+  [commit 12a1afd2](https://github.com/seathatflowsinourveins/native-agent-stack/commit/12a1afd2007cd710e066d50109a902c7d6359667):
+  the shared template's two model fields use `CODEX_MODEL`, resolved from the
+  platform's Codex pin; the Mac 0.155.1 render keeps `gpt-6-astra`.
+  Current [renderer source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/tools/adoption/render_config.py)
+  and the unchanged `tests.test_render_config.CodexModelTests` confirm the repair
+  (6 local tests passed, exit 0). This render check does not qualify a Mac model run.
+- **SDK and Codex pins.**
+  [#560](https://github.com/seathatflowsinourveins/native-agent-stack/pull/560)
+  merged `runtime-sdk-20260930` onto main as
+  `aeff2489786c6d147a50b091759fa2af4ea4d86f` at 2026-10-01T10:38:10Z.
+  [#580](https://github.com/seathatflowsinourveins/native-agent-stack/pull/580)
+  qualified its scoped Codex 0.159.3 operations and SDK pair, merging as
+  `85543efe5abcddb7b7cddb14e8774e83b6758616` at 2026-10-01T21:18:12Z.
+  Main's stack pin is 0.159.3. The 0.160.0 pin
+  [#626](https://github.com/seathatflowsinourveins/native-agent-stack/pull/626)
+  was OPEN and unmerged at build time, head
+  `75a2ada1eb4db08568b75c5457d2a0b61a949bbb`. Its state must be read again
+  immediately before the coordinator lands this PR.
+- **Scope of the native controls.** The interrupt, fresh-process same-thread
+  recovery and actual approval-decline observations remain qualified only at
+  Codex CLI/Python SDK 0.159.2 on the original Linux/WSL host, as recorded in
+  [the unchanged native-controls receipt](../../evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls.json).
+  They transfer no qualification to 0.159.3, 0.160.0 or another host; see the
+  Codex row and WSL amendment in
+  [the two-host architecture record](2026-10-02-two-host-north-star-architecture.md).
+  A rerun would be a new frozen experiment on the current Sol default, with
+  Astra used only for a recorded trigger under
+  [the Sol-primary routing contract](2026-09-30-sol-primary-quality-defaults.md).
+  Backend identity, provider cancellation, interrupted usage and complete
+  attempt usage remain unknown; no savings or quality comparison is claimed.
+- **#551.** [#551](https://github.com/seathatflowsinourveins/native-agent-stack/pull/551)
+  closed without merge at 2026-10-03T03:43:42Z.
+  [#628](https://github.com/seathatflowsinourveins/native-agent-stack/pull/628)
+  explicitly supersedes it and was OPEN at build time. The `ef90678` links
+  above remain branch evidence.
+- **Host gates.** U6 completion and the single B1 host acceptance remain open.
+  U6's initial source packet
+  [#575](https://github.com/seathatflowsinourveins/native-agent-stack/pull/575)
+  merged at 2026-10-01T14:54:12Z (`75c83d80ae31b49b3e24f584bf14010e94ad50cf`),
+  with remaining gaps in every layer; that is not complete item-4 acceptance.
+  B1 is re-targeted at the new distribution, under
+  [the program's ownership split and independent-review section](2026-10-01-definitive-sota-wsl-program.md#ownership-split)
+  (ownership line 178 at the checked main). The current
+  [open-work record](../../blueprints/convergence-practice/clean-resolution-20261002/open-work.json)
+  and [WSL scope amendment](2026-10-02-two-host-north-star-architecture.md#amendment-2026-10-03-wsl-scope)
+  retain native client, role and host-lifecycle gates. Landing this PR grants no host go.
+- **Upstream currency.** Read-only `gh api repos/openai/codex-action/tags`
+  still lists [v1.12](https://github.com/openai/codex-action/tree/86365089eb2b84e0a8fb0717b304f8bdcb13b20e)
+  (`86365089eb2b84e0a8fb0717b304f8bdcb13b20e`) as the newest tag on 2026-10-03.
+  `gh api repos/rtk-ai/rtk/releases/latest` confirms
+  [v0.51.0](https://github.com/rtk-ai/rtk/releases/tag/v0.51.0), published
+  2026-10-02T13:33:54Z, while main's stack pin and this example stay at 0.50.0.
+  `gh api repos/openai/codex/releases/tags/rust-v0.160.0` confirms
+  [Codex 0.160.0](https://github.com/openai/codex/releases/tag/rust-v0.160.0),
+  published 2026-10-01T20:19:13Z, source
+  `a956835d020762cb2b570053af06f643a11c0ecc`. Release discovery changes none
+  of this packet's execution pins or results.
+- **Claude Code versions.** The source table's 2.1.285 is the authoring pin.
+  The 2026-10-01 coordination used installed 2.1.286, retained in
+  [the source-resolution receipt](../../evidence/artifacts/gpt-lifecycle-convergence-20260930/resolution-20261001.json).
+- **Hosted workflow.** It remains inactive. Read-only repository metadata
+  (`gh api .../actions/variables`, `.../actions/secrets`, `.../actions/runners`)
+  shows none of its three required variables (`GPT_NATIVE_ACTION_ENABLED`,
+  `RESPONSES_ENDPOINT`, `CODEX_REQUEST_MODEL`), no `RESPONSES_BEARER_KEY`
+  secret and zero self-hosted runners. There is no Codex Action reference or
+  copy of this example under `.github/workflows/`, checked against the
+  [example's exact settings contract](../../examples/gpt-native-github/README.md).
+  **Currency correction:** the repository now has one unrelated variable,
+  `CATALOG_FRESHNESS_PROPOSE`; the older blanket absence of repository
+  variables does not describe current metadata. Secret-name metadata was
+  checked without reading a credential value. The historical Action result
+  remains 143 passes and one skip, with no new hosted or provider execution.
