@@ -14956,8 +14956,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "a32f78a8292ca1043e00e10e0e9218f94bce15a720f3386786b73b4ca83edf40",
-      "bytes": 27592
+      "sha256": "5b0944f7c937758704abeeeef61ebebac302f580ee720b8e09170ac50f8d0952",
+      "bytes": 28021
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -15006,8 +15006,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "dbe5f84728502ecc7a09857f23ae7ea003964d322679d7266d818849ac067667",
-      "bytes": 477868
+      "sha256": "a5640b1d1628b7c05d58ccfd858b9bb4b9d17bc89ef6858b77ce7044f90fd5ab",
+      "bytes": 476789
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -15281,8 +15281,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "058c0b08700367288d8ba04eb380f59f621c5a0e6594b74a71f191afa5523251",
-      "bytes": 755876
+      "sha256": "4b62678bee9f238e0df6179a44f88860ed5b3d4b96b3505fdcb82a539d6db004",
+      "bytes": 757289
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
-      "sha256": "84eb9d10a158761f29661403fa38459e884e18304795ac9b5bec8e878938f15f",
-      "bytes": 9391
+      "sha256": "1f25adcf7b2379710ff9160a92ed460a5f9e45e6dfb2e370588ddd4d62d9134e",
+      "bytes": 10480
     },
     {
       "path": "docs/direct-results.md",
