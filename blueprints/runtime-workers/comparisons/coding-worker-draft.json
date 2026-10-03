@@ -44,7 +44,25 @@
   },
   "proposed_decision_rule": {
     "quality": "Use only unchanged upstream task reward after FAIL_TO_PASS and PASS_TO_PASS. Provider/tool-task failures and timeouts score0; source/image/route/evaluator mismatches invalidate qualification rather than fabricate a reward. Retain all attempted conditions.",
-    "selection": "A challenger can replace native Codex when its two-repeat success count is no lower on every task and greater on at least one. With identical per-task success counts, require at least5% lower paired median gross input-plus-output tokens, complete same-scope native usage and no greater paired median agent time. Multiple qualifying challengers rank by total successful trials, then paired median gross tokens, then paired median agent time. Otherwise retain the measured native baseline and report sampled failures/incomparability explicitly.",
+    "selection": {
+      "baseline": "native Codex",
+      "quality": {
+        "measure": "two-repeat success count per frozen task",
+        "minimum": "No task lower than the baseline",
+        "improvement": "At least one task greater than the baseline"
+      },
+      "quality_tie": {
+        "minimum_paired_median_gross_token_reduction_percent": 5,
+        "usage": "Complete same-scope native input-plus-output counters",
+        "agent_time": "Paired median no greater than baseline"
+      },
+      "qualifying_challenger_order": [
+        "total successful trials descending",
+        "paired median gross tokens ascending",
+        "paired median agent time ascending"
+      ],
+      "otherwise": "Retain the measured native baseline; report sampled failures and incomparability"
+    },
     "limitations": "This 24-task screen supports only the measured workload. It establishes no universal or statistically significant superiority; further confirmation follows any material fit/confidence gap."
   },
   "required_before_freeze": [
