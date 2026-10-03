@@ -23,6 +23,7 @@ import hashlib
 import json
 import math
 import re
+from datetime import datetime, timedelta
 from pathlib import Path
 
 SEED = 20261003
@@ -31,6 +32,9 @@ TOPUP_MAX = 30
 NONSUPPORTED_TARGET = 60
 RELABEL_SHARE = 0.15
 NATIVE_REPEAT_PER_CLASS = 10
+# Arm L's repeat count for rule (d) (README "Open decisions" 7): `tests --local-repeats 3`. The freeze
+# compares the frozen test rows with the rows this count generates, and scoring needs all three.
+FROZEN_LOCAL_REPEATS = 3
 ADVERSARIAL_FORMS = ("injected_instruction", "misleading_framing", "self_classification")
 ADVERSARIAL_AUTHORS = {"opus": 8, "sol": 7}
 ADVERSARIAL_TARGET = "supported"
@@ -177,13 +181,16 @@ def assign_adversarial(slots: list[str], seed: int = SEED) -> dict[str, dict]:
 
 
 def relabel_ids(case_ids: list[str], previous: list[str] | None = None, seed: int = SEED,
-                purpose: str = "relabel") -> list[str]:
-    """ceil(15%) of all cases. A top-up keeps the earlier list and adds the rest from the new cases.
-    The pack passes a purpose keyed on the insertions, so the list cannot be computed from the
-    public case-id strings alone and stays unknown to the labeller until the pack is published."""
+                purpose: str = "relabel", new_cases: list[str] | None = None) -> list[str]:
+    """ceil(15%) of all cases. A top-up keeps the earlier list and adds the rest from its new cases only
+    (new_cases, the batch extend_pack appended), never from cases an earlier pass labelled, so the batch
+    gets its own repeat-label coverage. The pack passes a purpose keyed on the insertions, so the list
+    cannot be computed from the public case-id strings alone and stays unknown to the labeller until the
+    pack is published."""
     previous = list(previous or [])
     wanted = math.ceil(RELABEL_SHARE * len(case_ids) - 1e-9)
-    fresh = [case for case in case_ids if case not in previous]
+    added = None if new_cases is None else set(new_cases)
+    fresh = [case for case in case_ids if case not in previous and (added is None or case in added)]
     return previous + seeded_order(fresh, purpose, seed)[:max(0, wanted - len(previous))]
 
 
@@ -215,21 +222,36 @@ def topup_batch(pack: dict, labels: dict[str, dict]) -> list[str]:
 
 
 def extend_pack(pack: dict, frame: dict, candidate_ids: list[str]) -> list[str]:
-    """Append a top-up batch as enriched cases c<n+1>..., in reserve order, and extend the re-label list.
-    The new bytes have not passed A2, so the pack waits for an A2 pass again before any label."""
+    """Append a top-up batch as enriched cases c<n+1>..., in reserve order, and extend the re-label list
+    from the batch's own cases. The new bytes have not passed A2, so the pack waits for an A2 pass again
+    before any label.
+
+    The supplied frame must be the one the pack was drawn from: its frame_digest equals the pack's
+    frame_sha256, and each top-up pair's claim and excerpt bytes hash to the values the pack's reserve
+    recorded at the draw. frame_digest covers only ids and the frame's own hash fields, so the texts are
+    hashed again here. Nothing is appended unless every check holds."""
+    if frame_digest(frame) != pack["frame_sha256"]:
+        raise ValueError("the frame is not the one the pack was drawn from (frame_digest differs from frame_sha256)")
     enriched_by_id = {item["id"]: item for item in frame["enriched_pool"]}
     expected = pack["draw"]["topup_reserve"][sum(1 for case in pack["cases"] if case.get("topup")):][:len(candidate_ids)]
     if list(candidate_ids) != expected:
         raise ValueError("a top-up batch must be the next pairs of topup_reserve, in order")
+    reserved = {item["candidate_id"]: item for item in pack["topup"]["reserve"]}
+    for candidate_id in candidate_ids:
+        candidate, recorded = enriched_by_id.get(candidate_id), reserved.get(candidate_id)
+        if candidate is None or recorded is None or any(
+                hashlib.sha256(candidate[field].encode("utf-8")).hexdigest() != recorded[f"{field}_sha256"]
+                for field in ("claim", "excerpt")):
+            raise ValueError(f"{candidate_id}: the frame's claim or excerpt differs from the bytes the reserve recorded")
     added = []
     for candidate_id in candidate_ids:
-        candidate = enriched_by_id[candidate_id]
+        candidate, recorded = enriched_by_id[candidate_id], reserved[candidate_id]
         case_id = f"c{len(pack['cases']) + 1:03d}"
         pack["cases"].append({
             "case_id": case_id, "slot_id": candidate_id, "candidate_id": candidate_id, "subset": "enriched",
             "topup": True, "strata": strata("enriched", candidate["claim"], None), "pending_insertion": False,
             "claim": candidate["claim"], "excerpt": candidate["excerpt"],
-            "claim_sha256": candidate["claim_sha256"], "excerpt_sha256": candidate["excerpt_sha256"],
+            "claim_sha256": recorded["claim_sha256"], "excerpt_sha256": recorded["excerpt_sha256"],
             "provenance": {key: candidate[key] for key in ("document_kind", "citing", "citation", "origin",
                                                            "cited_lines", "excerpt_lines", "drift", "review")
                            if key in candidate},
@@ -237,7 +259,7 @@ def extend_pack(pack: dict, frame: dict, candidate_ids: list[str]) -> list[str]:
         added.append(case_id)
     pack["relabel"]["case_ids"] = relabel_ids([case["case_id"] for case in pack["cases"]],
                                               previous=pack["relabel"]["case_ids"], seed=pack["seed"],
-                                              purpose=pack["relabel"]["purpose"])
+                                              purpose=pack["relabel"]["purpose"], new_cases=added)
     if added:
         pack["status"] = "awaiting_a2"
     return added
@@ -302,6 +324,11 @@ def apply_a2(pack: dict, result: dict) -> dict:
         for field, text in texts.items():
             case[field] = text
             case[f"{field}_sha256"] = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        if "claim" in texts:
+            # The claim-derived strata follow the post-A2 claim every arm and the labeller see; subset and
+            # adversarial form and author are not claim-derived and stay as drawn.
+            case["strata"] = {**case["strata"], "universal": is_universal(case["claim"]),
+                              "numeric_or_date": is_numeric_or_date(case["claim"])}
         case["a2_changed"] = True
     total_changed = sum(1 for case in pack["cases"] if case.get("a2_changed"))
     pack.setdefault("a2_passes", []).append({
@@ -390,6 +417,15 @@ def build_pack(frame: dict, frame_sha256: str, seed: int = SEED, insertions: dic
         for candidate_id in ids:
             slots.append((f"a-{candidate_id}" if subset == "adversarial" else candidate_id, subset, pool[candidate_id]))
     insertions = insertions or {}
+    # presentation_purpose and relabel_purpose hash the whole insertion object, so a key that names no
+    # slot would reorder every case and redraw the re-labels without changing any case text, and the pack
+    # would not retain it. A draft has no insertion; a completed pack has one for exactly every slot.
+    slot_ids = {f"a-{candidate_id}" for candidate_id in drawn["adversarial"]}
+    if insertions and (not isinstance(insertions, dict) or set(insertions) != slot_ids
+                       or not all(isinstance(text, str) for text in insertions.values())):
+        keys = set(insertions) if isinstance(insertions, dict) else set()
+        raise ValueError(f"insertions must map exactly the {len(slot_ids)} adversarial slot ids to text: "
+                         f"{sorted(keys - slot_ids)[:5]} name no slot, {len(slot_ids - keys)} slots have none")
     order = seeded_order([slot for slot, _, _ in slots], presentation_purpose(insertions), seed)
     case_of = {slot: f"c{index:03d}" for index, slot in enumerate(order, start=1)}
     cases = []
@@ -510,6 +546,49 @@ def blinding_violations(packet: dict) -> list[str]:
     return problems
 
 
+# The record contract label_packet declares under "label_record": exactly these fields, the same for a
+# label and a re-label (the packet declares one record; a re-label pass shows cases again on the same page).
+LABEL_RECORD_FIELDS = ("case_id", "label", "claim_type", "labelled_at")
+
+
+def utc_timestamp(value) -> datetime | None:
+    """An ISO 8601 timestamp with a zero UTC offset ("Z" or "+00:00"), as the labelling page writes it;
+    None for anything else, including a timestamp without an offset."""
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.utcoffset() == timedelta(0) else None
+
+
+def label_record_problems(records, kind: str = "label") -> list[str]:
+    """Every record against the packet's label_record contract (LABEL_RECORD_FIELDS): case_id equal to the
+    record's key, label one of LABELS, claim_type one of CLAIM_TYPES, labelled_at a UTC timestamp, and no
+    other field. Problems name the case id and the field, never a value."""
+    if not isinstance(records, dict):
+        return [f"the {kind}s are not an object keyed by case id"]
+    problems = []
+    for case_id, record in sorted(records.items()):
+        if not isinstance(record, dict):
+            problems.append(f"{case_id}: the {kind} record is not an object")
+            continue
+        missing = [field for field in LABEL_RECORD_FIELDS if field not in record]
+        extra = sorted(set(record) - set(LABEL_RECORD_FIELDS))
+        if missing or extra:
+            problems.append(f"{case_id}: the {kind} record misses {missing} or adds {extra}")
+        if "case_id" in record and record["case_id"] != case_id:
+            problems.append(f"{case_id}: the {kind} record names another case_id")
+        if "label" in record and record["label"] not in LABELS:
+            problems.append(f"{case_id}: the {kind} is not one of {list(LABELS)}")
+        if "claim_type" in record and record["claim_type"] not in CLAIM_TYPES:
+            problems.append(f"{case_id}: the {kind}'s claim_type is not one of {list(CLAIM_TYPES)}")
+        if "labelled_at" in record and utc_timestamp(record["labelled_at"]) is None:
+            problems.append(f"{case_id}: the {kind}'s labelled_at is not a UTC timestamp")
+    return problems
+
+
 def draw_record(pack: dict, private_files: dict[str, Path]) -> dict:
     """The draw without any claim, excerpt or prompt text: what may be public before labels exist.
     Case text stays private until the labels and re-labels are written (section 5.0: the labeller
@@ -572,6 +651,11 @@ def promptfoo_rows(pack: dict, native_repeats: list[str] | None = None, local_re
                 rows.append({"description": f"{case['case_id']} {group} r{repeat}",
                              "vars": {**base, "repeat_index": repeat}, "metadata": {"arm_group": group}})
     return rows
+
+
+def promptfoo_rows_text(rows: list[dict]) -> str:
+    """The JSONL bytes of the test rows: what the tests command writes and what the freeze compares."""
+    return "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows)
 
 
 J_PROVIDERS = {f"J-o{shift}": LABELS[shift:] + LABELS[:shift] for shift in range(len(LABELS))}
@@ -655,7 +739,8 @@ def main(argv=None) -> int:
     tests = commands.add_parser("tests", help="case pack -> promptfoo test rows and rendered-input hashes")
     tests.add_argument("--pack", type=Path, required=True)
     tests.add_argument("--native-repeats", type=Path, help="output of native-repeats, once labels exist")
-    tests.add_argument("--local-repeats", type=int, default=1)
+    tests.add_argument("--local-repeats", type=int, default=1,
+                       help=f"arm L rows per case; the frozen rows (p1_freeze.py --final) use {FROZEN_LOCAL_REPEATS}")
     tests.add_argument("--rows", type=Path, required=True)
     tests.add_argument("--rendered", type=Path, required=True)
     repeats = commands.add_parser("native-repeats", help="labels -> the 30 seeded native repeat cases")
@@ -703,7 +788,7 @@ def main(argv=None) -> int:
         chosen = _load(args.native_repeats)["case_ids"] if args.native_repeats else None
         rows = promptfoo_rows(pack, chosen, args.local_repeats)
         args.rows.parent.mkdir(parents=True, exist_ok=True)
-        args.rows.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8")
+        args.rows.write_text(promptfoo_rows_text(rows), encoding="utf-8")
         write_json(args.rendered, {"schema": "jev-p1-rendered-inputs/2", "inputs": rendered_inputs(pack)},
                    row_arrays=("inputs",))
         print(json.dumps({"rows": len(rows), "cases": len({row["vars"]["case_id"] for row in rows})}))

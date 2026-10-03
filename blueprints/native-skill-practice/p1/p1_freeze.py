@@ -8,18 +8,24 @@ in a pushed commit reachable from main before the first call. File mtimes do not
 
 draft (default) records what exists and lists every missing role. --final refuses a missing role,
 a pending adversarial insertion, a pack whose current bytes are not the output of its last A2 pass,
-a label packet that does not show exactly the pack's cases, an unlabelled case, a re-label list that
-differs from the drawn one, a re-label written less than 24 hours after its first label, rendered
-inputs that differ from the case pack, and a render check that does not reproduce them. External
-(private) files are recorded by a caller-chosen name, sha256 and size only, never by host path.
+A2 custody files that are not the original results of the recorded passes (item i is pass i, matched
+by the canonical result_sha256 the pass recorded; a missing, extra, duplicate or mismatched original
+is refused), a label packet that is not label_packet(pack) in full (cases, rules, criteria, claim
+types and instructions), a label or re-label record outside the packet's label_record contract, an
+unlabelled case, a re-label list that differs from the drawn one, a re-label written less than 24
+hours after its first label, promptfoo test rows that differ from the rows the pack, the labels'
+native repeats and three local repeats generate, rendered inputs that differ from the case pack, and
+a render check that does not reproduce them. External (private) files are recorded by a caller-chosen
+name, sha256 and size only, never by host path.
 """
 
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -30,9 +36,11 @@ BASE = "blueprints/native-skill-practice"
 REQUIRED_ROLES = {
     "case_pack": "drawn cases, strata, provenance, seed, frame commit and frame sha256",
     "label_packet": "the blind packet the user labelled, with the frozen labelling rules",
-    "labels": "the user's blind labels (label and claim type per case)",
-    "relabels": "the seeded 15% re-labels, written at least 24 hours later and before any model call",
-    "promptfoo_tests": "the generated test rows (case_id, repeat_index, source, claim, arm_group)",
+    "labels": "the user's blind labels (label and claim type per case), each in the packet's label_record contract",
+    "relabels": "the seeded 15% re-labels, written at least 24 hours later and before any model call, in the "
+                "same record contract",
+    "promptfoo_tests": "the generated test rows (case_id, repeat_index, source, claim, arm_group): the bytes "
+                       "p1_casepack.py tests writes from the pack, the labels' native repeats and three local repeats",
     "rendered_inputs": "sha256 of the exact bytes per case and arm input, after the A2 pass: the native "
                        "prompt (O, S, G), the jev-state prompt (L) and each J provider's HTTP request body",
     "render_check": "promptfoo output reproducing every rendered input with no model call: the echo provider "
@@ -41,8 +49,9 @@ REQUIRED_ROLES = {
     "draw_and_scoring_code": "frame extractor, case pack, scoring code and its hash-locked requirements",
     "native_launch_contexts": "hash of each native arm's init event (O, S, G) from the smoke checks",
     "arm_l_checkpoint": "arm L checkpoint name, full revision and file hashes",
-    "a2_custody": "each A2 result the case pack records (gitleaks 8.30.1, the host-path and identity rule "
-                  "and the home-directory and user-name canary over the exact bytes)",
+    "a2_custody": "each A2 result the case pack records, in pass order: item i is the original result of "
+                  "a2_passes[i], whose canonical sha256 is that pass's result_sha256 (gitleaks 8.30.1, the "
+                  "host-path and identity rule and the home-directory and user-name canary over the exact bytes)",
     "canary": "the A1 canary: 10 frozen cases and their stored answers",
 }
 REPOSITORY_DEFAULTS = {
@@ -106,45 +115,7 @@ def compare_render(rendered: dict, echo_output: dict) -> dict:
             "missing": missing, "passed": not mismatched and not missing}
 
 
-def final_checks(pack: dict, labels: dict, relabels: dict, rendered: dict | None, render: dict | None,
-                 rendered_now: list[dict], packet: dict | None = None, case_bytes_now: str | None = None) -> list[str]:
-    problems = []
-    if any(case["pending_insertion"] for case in pack["cases"]):
-        problems.append("the case pack still has a pending adversarial insertion")
-    passes = pack.get("a2_passes") or []
-    if pack.get("status") != "ready_for_labels" or not passes or passes[-1].get("output_sha256") != case_bytes_now:
-        problems.append("the case pack's bytes are not the output of a recorded A2 pass")
-    shown = sorted((entry.get("case_id"), entry.get("claim"), entry.get("excerpt")) for entry in (packet or {}).get("cases", []))
-    if (packet or {}).get("status") != "ready" or shown != sorted(
-            (case["case_id"], case["claim"], case["excerpt"]) for case in pack["cases"]):
-        problems.append("the label packet is not the ready packet of exactly the pack's post-A2 cases")
-    case_ids = {case["case_id"] for case in pack["cases"]}
-    if set(labels) != case_ids:
-        problems.append("labels do not cover exactly the drawn cases")
-    if set(relabels) != set(pack["relabel"]["case_ids"]):
-        problems.append("re-labels do not cover exactly the drawn re-label list")
-    for case, record in relabels.items():
-        first, second = labels.get(case, {}).get("labelled_at"), record.get("labelled_at")
-        if not first or not second:
-            problems.append(f"{case}: a label without labelled_at")
-            continue
-        gap = datetime.fromisoformat(second.replace("Z", "+00:00")) - datetime.fromisoformat(first.replace("Z", "+00:00"))
-        if gap < timedelta(hours=24):
-            problems.append(f"{case}: re-label written {gap} after the first label")
-    if rendered is None or rendered.get("inputs") != rendered_now:
-        problems.append("rendered inputs differ from the case pack and prompt templates")
-    if render is None or not render.get("passed"):
-        problems.append("the render check did not reproduce every rendered input")
-    return problems
-
-
-def _load_role(spec: dict, role: str, root: Path):
-    item = spec[role][0]
-    path = root / item if isinstance(item, str) else Path(item["file"] if "file" in item else root / item["path"])
-    data = json.loads(path.read_text(encoding="utf-8"))
-    return data.get("labels", data) if role in ("labels", "relabels") and isinstance(data, dict) else data
-
-
+@functools.cache
 def _casepack_module():
     import importlib.util
 
@@ -152,6 +123,105 @@ def _casepack_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def a2_custody_problems(passes: list[dict], originals: list) -> list[str]:
+    """Bind the a2_custody files to the recorded A2 passes. Item i is the original result of pass i: its
+    canonical sha256 (p1_casepack.canonical_sha256, the domain apply_a2 records as result_sha256) equals
+    that pass's result_sha256, and it names that pass's input bytes and shows every check passed. A
+    missing, extra, duplicate or mismatched original is refused; None stands for a file that is not JSON."""
+    casepack = _casepack_module()
+    given = [None if item is None else casepack.canonical_sha256(item) for item in originals]
+    recorded = [item.get("result_sha256") for item in passes]
+    problems = []
+    if len(given) < len(recorded):
+        problems.append(f"A2 custody: {len(recorded) - len(given)} recorded pass(es) have no original result")
+    if len(given) > len(recorded):
+        problems.append(f"A2 custody: {len(given) - len(recorded)} original(s) beyond the {len(recorded)} recorded pass(es)")
+    repeated = [index + 1 for index, value in enumerate(given) if value is not None and given.count(value) > 1]
+    if repeated:
+        problems.append(f"A2 custody: items {repeated} are the same result")
+    mismatched = [index + 1 for index, (value, expected) in enumerate(zip(given, recorded)) if value != expected]
+
+    def names_the_pass(item: dict, record: dict) -> bool:
+        checks = item.get("checks") or {}
+        return (item.get("schema") == casepack.A2_RESULT_SCHEMA and item.get("input_sha256") == record.get("input_sha256")
+                and all((checks.get(name) or {}).get("passed") is True for name in casepack.A2_CHECKS))
+
+    unbound = [index + 1 for index, (item, record) in enumerate(zip(originals, passes))
+               if isinstance(item, dict) and given[index] == record.get("result_sha256") and not names_the_pass(item, record)]
+    if mismatched or unbound:
+        problems.append(f"A2 custody: items {sorted(mismatched + unbound)} are not the original result of the "
+                        "recorded pass at that position")
+    return problems
+
+
+def final_checks(pack: dict, labels, relabels, rendered: dict | None, render: dict | None,
+                 packet: dict | None, a2_originals: list, test_rows: str | None) -> list[str]:
+    """The --final consistency checks. Every expected value comes from p1_casepack and the pack itself."""
+    casepack = _casepack_module()
+    problems = []
+    if any(case["pending_insertion"] for case in pack["cases"]):
+        problems.append("the case pack still has a pending adversarial insertion")
+    passes = pack.get("a2_passes") or []
+    if (pack.get("status") != "ready_for_labels" or not passes
+            or passes[-1].get("output_sha256") != casepack.case_bytes_sha256(pack)):
+        problems.append("the case pack's bytes are not the output of a recorded A2 pass")
+    problems += a2_custody_problems(passes, a2_originals)
+    # The whole packet, not only its cases: the labelling rules, criteria, claim types and instructions
+    # the user labelled under are frozen inputs too (section 5.0).
+    expected_packet = casepack.label_packet(pack)
+    if (expected_packet["status"] != "ready" or not isinstance(packet, dict)
+            or casepack.canonical_sha256(packet) != casepack.canonical_sha256(expected_packet)):
+        problems.append("the label packet is not label_packet(pack) for the ready post-A2 pack: cases, rules, "
+                        "criteria, claim types and instructions")
+    record_problems = casepack.label_record_problems(labels, "label") + casepack.label_record_problems(relabels, "re-label")
+    problems += record_problems
+    labels = labels if isinstance(labels, dict) else {}
+    relabels = relabels if isinstance(relabels, dict) else {}
+    case_ids = {case["case_id"] for case in pack["cases"]}
+    if set(labels) != case_ids:
+        problems.append("labels do not cover exactly the drawn cases")
+    if set(relabels) != set(pack["relabel"]["case_ids"]):
+        problems.append("re-labels do not cover exactly the drawn re-label list")
+    for case, record in sorted(relabels.items()):
+        earlier = labels.get(case)
+        first = casepack.utc_timestamp(earlier.get("labelled_at")) if isinstance(earlier, dict) else None
+        second = casepack.utc_timestamp(record.get("labelled_at")) if isinstance(record, dict) else None
+        if first is None or second is None:
+            continue        # label_record_problems or the coverage check has named the record
+        if second - first < timedelta(hours=24):
+            problems.append(f"{case}: re-label written {second - first} after the first label")
+    if record_problems or set(labels) != case_ids:
+        problems.append("the promptfoo test rows were not checked: they depend on valid labels for every case")
+    else:
+        native = casepack.native_repeat_ids(labels)["case_ids"]
+        expected_rows = casepack.promptfoo_rows_text(casepack.promptfoo_rows(pack, native, casepack.FROZEN_LOCAL_REPEATS))
+        if test_rows != expected_rows:
+            problems.append("the promptfoo test rows are not the rows the pack, the labels' native repeats and "
+                            f"{casepack.FROZEN_LOCAL_REPEATS} local repeats generate")
+    if rendered is None or rendered.get("inputs") != casepack.rendered_inputs(pack):
+        problems.append("rendered inputs differ from the case pack and prompt templates")
+    if render is None or not render.get("passed"):
+        problems.append("the render check did not reproduce every rendered input")
+    return problems
+
+
+def _role_paths(spec: dict, role: str, root: Path) -> list[Path]:
+    return [root / item if isinstance(item, str) else Path(item["file"]) if "file" in item else root / item["path"]
+            for item in spec[role]]
+
+
+def _load_role(spec: dict, role: str, root: Path):
+    data = json.loads(_role_paths(spec, role, root)[0].read_text(encoding="utf-8"))
+    return data.get("labels", data) if role in ("labels", "relabels") and isinstance(data, dict) else data
+
+
+def _json_or_none(path: Path):
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return None
 
 
 def build_manifest(spec: dict, root: Path, final: bool) -> dict:
@@ -168,11 +238,13 @@ def build_manifest(spec: dict, root: Path, final: bool) -> dict:
         pack = _load_role(spec, "case_pack", root)
         rendered = _load_role(spec, "rendered_inputs", root)
         render = compare_render(rendered, _load_role(spec, "render_check", root))
-        casepack = _casepack_module()
+        originals = [_json_or_none(path) for path in _role_paths(spec, "a2_custody", root)]
+        test_rows = _role_paths(spec, "promptfoo_tests", root)[0].read_bytes().decode("utf-8", "replace")
         problems = final_checks(pack, _load_role(spec, "labels", root), _load_role(spec, "relabels", root),
-                                rendered, render, casepack.rendered_inputs(pack), _load_role(spec, "label_packet", root),
-                                casepack.case_bytes_sha256(pack))
-        manifest["checks"] = {"render": render, "problems": problems}
+                                rendered, render, _load_role(spec, "label_packet", root), originals, test_rows)
+        manifest["checks"] = {"render": render, "a2_custody": {"recorded_passes": len(pack.get("a2_passes") or []),
+                                                               "originals": len(originals)},
+                              "problems": problems}
         if problems:
             raise SystemExit("cannot freeze: " + "; ".join(problems))
     return manifest

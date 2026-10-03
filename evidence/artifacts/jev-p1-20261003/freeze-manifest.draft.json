@@ -4,16 +4,16 @@
  "required_roles": {
   "case_pack": "drawn cases, strata, provenance, seed, frame commit and frame sha256",
   "label_packet": "the blind packet the user labelled, with the frozen labelling rules",
-  "labels": "the user's blind labels (label and claim type per case)",
-  "relabels": "the seeded 15% re-labels, written at least 24 hours later and before any model call",
-  "promptfoo_tests": "the generated test rows (case_id, repeat_index, source, claim, arm_group)",
+  "labels": "the user's blind labels (label and claim type per case), each in the packet's label_record contract",
+  "relabels": "the seeded 15% re-labels, written at least 24 hours later and before any model call, in the same record contract",
+  "promptfoo_tests": "the generated test rows (case_id, repeat_index, source, claim, arm_group): the bytes p1_casepack.py tests writes from the pack, the labels' native repeats and three local repeats",
   "rendered_inputs": "sha256 of the exact bytes per case and arm input, after the A2 pass: the native prompt (O, S, G), the jev-state prompt (L) and each J provider's HTTP request body",
   "render_check": "promptfoo output reproducing every rendered input with no model call: the echo provider for the prompts, loopback copies of the J providers for the request bodies",
   "harness": "promptfoo config, prompts (question text and option orders), provider adapters",
   "draw_and_scoring_code": "frame extractor, case pack, scoring code and its hash-locked requirements",
   "native_launch_contexts": "hash of each native arm's init event (O, S, G) from the smoke checks",
   "arm_l_checkpoint": "arm L checkpoint name, full revision and file hashes",
-  "a2_custody": "each A2 result the case pack records (gitleaks 8.30.1, the host-path and identity rule and the home-directory and user-name canary over the exact bytes)",
+  "a2_custody": "each A2 result the case pack records, in pass order: item i is the original result of a2_passes[i], whose canonical sha256 is that pass's result_sha256 (gitleaks 8.30.1, the host-path and identity rule and the home-directory and user-name canary over the exact bytes)",
   "canary": "the A1 canary: 10 frozen cases and their stored answers"
  },
  "roles": {
@@ -92,23 +92,23 @@
   "draw_and_scoring_code": [
    {
     "path": "blueprints/native-skill-practice/p1/p1_frame.py",
-    "sha256": "c351eeae046ce0b1310546ae30d1887b257b3cd853d7883bf609d7f76f9ad7b5",
-    "bytes": 48900
+    "sha256": "662d7756f82c3a85bc99139fc86a88f41505deac493dc9ef06b53531a3fcc078",
+    "bytes": 50384
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_casepack.py",
-    "sha256": "f0a22b74078487bc80f13221aa74752c526ab488396cf1cc889c163d74f4dc31",
-    "bytes": 43493
+    "sha256": "2d0b1425f419608b8d7b5016fff95beb6bf743cfc0f1f0ca1df52470022e18f9",
+    "bytes": 49148
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_scoring.py",
-    "sha256": "b410a77117d1434c3b89fc5777a24883b5f5a95c4f66edb95a824b4bcf1f6e58",
-    "bytes": 37606
+    "sha256": "a0fb3e05d960b8115cb66b69c9d9e05eb19347e07d4d980111932b27ddb1240f",
+    "bytes": 45560
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_freeze.py",
-    "sha256": "4c882208697260ccc8c9ec62a523cf0a91af33751e66e361e90b1500b3d5231d",
-    "bytes": 12416
+    "sha256": "d3c956d53e425c4181b56096e0beada211977e17fe18c35df9aa1761d7abd620",
+    "bytes": 17241
    },
    {
     "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",

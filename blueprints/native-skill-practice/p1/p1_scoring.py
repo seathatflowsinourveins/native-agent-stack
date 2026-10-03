@@ -49,8 +49,15 @@ JEV_MODEL = "jev-1.13.0"
 J_ORDERS = (0, 1, 2)
 J_REPEATS = (0, 1, 2)
 # Arm L scores one premise-hypothesis pair and has no option order, so rule (d)'s order-flip part does
-# not apply to it (README "Open decisions"); its repeat disagreement is measured over repeated L calls.
+# not apply to it (README "Open decisions"); its repeat disagreement is measured over repeated L calls,
+# three per case (p1_casepack.FROZEN_LOCAL_REPEATS, `tests --local-repeats 3`).
 NOT_APPLICABLE = "not_applicable"
+L_REPEATS = (0, 1, 2)
+CANARY_CASES = 10           # section 5.0: stop if the A1 canary flips more than 2 of 10 cases
+# promptfooconfig.yaml's run commands: J-o0, J-o1 and J-o2 on the jev rows, O, S and G on the native rows,
+# L on the local rows; render rows reach no arm. Each (arm, order) is one call per row.
+ARM_GROUPS = {"jev": tuple(("J", order) for order in J_ORDERS), "native": (("O", 0), ("S", 0), ("G", 0)),
+              "local": (("L", 0),)}
 # The suffix p1/response-model.cjs adds when ../response.cjs refuses a response.
 MODEL_IN_ERROR = re.compile(r'\[response model: (null|"(?:[^"\\]|\\.)*")\]')
 
@@ -204,7 +211,11 @@ def jev_views(calls: list[dict], case_ids: list[str]) -> dict:
                           "probabilities": mean_probabilities([call.get("probabilities") for call in deployed])}
             latencies = [call.get("latency_s") for call in deployed]
             if all(isinstance(value, (int, float)) for value in latencies):
-                view["j3_latency_s"] = max(latencies)     # wall time of three concurrent calls
+                # Section 5.1 "Definitions": a J-3 decision's latency is "the wall time of three concurrent
+                # calls", the deployed configuration. The J run is serialized (--max-concurrency 1), so each
+                # call's latency is uncontended and the slowest of the three is that wall time, not their
+                # serial sum (README "Open decisions" 8 keeps this estimate a choice to confirm at freeze).
+                view["j3_latency_s"] = max(latencies)
         every = list(grid.values())
         if all(answered(call) for call in every):
             answer, confidence = plurality([call["answer"] for call in every], [call.get("probabilities") for call in every])
@@ -363,26 +374,24 @@ def prescreen_qualifies(false_closes: int, nonsupported: int, closure_rate: floa
     return {"qualifies": qualifies, "rules": rules, "values": values}
 
 
-def single_arm_repeat_disagreement(calls: list[dict], arm: str, case_ids: list[str]) -> dict | None:
-    """For an arm without option orders (L), each case is one pair: it disagrees when its repeats are
-    not all equal. The rate is over all cases. A case with fewer answered repeats than the run's repeat
-    count is incomplete (bounded_rate). None when the run did not repeat the arm: (d) stays open."""
+def single_arm_repeat_disagreement(calls: list[dict], arm: str, case_ids: list[str],
+                                   repeats: tuple[int, ...] = L_REPEATS) -> dict | None:
+    """For an arm without option orders (L), each case is one unit over its frozen repeats (three L calls,
+    repeat_index 0-2): it disagrees when they are not all equal. The rate is over all cases. A case without
+    an answered call at every frozen repeat is incomplete (bounded_rate). The repeat count is the frozen
+    one, never the count the run happens to hold: None when no case holds a call at every frozen repeat,
+    because the run did not repeat the arm as frozen, so (d) stays open rather than pass on fewer repeats."""
     table = index_calls(calls, arm)
-    per_case = {case: [] for case in case_ids}
-    for (call_case, _, _), call in table.items():
-        if call_case in per_case:
-            per_case[call_case].append(call)
-    repeats = max((len(found) for found in per_case.values()), default=0)
-    if repeats < 2:
+    grids = {case: [table.get((case, 0, repeat)) for repeat in repeats] for case in case_ids}
+    if not any(all(call is not None for call in grid) for grid in grids.values()):
         return None
     disagreements = incomplete = 0
-    for found in per_case.values():
-        answers = [call["answer"] for call in found if answered(call)]
-        if len(answers) < repeats:
+    for grid in grids.values():
+        if not all(answered(call) for call in grid):
             incomplete += 1
             continue
-        disagreements += len(set(answers)) > 1
-    return {"disagreements": disagreements, "pairs": len(case_ids), "repeats": repeats, "incomplete": incomplete,
+        disagreements += len({call["answer"] for call in grid}) > 1
+    return {"disagreements": disagreements, "pairs": len(case_ids), "repeats": len(repeats), "incomplete": incomplete,
             **bounded_rate(disagreements, incomplete, len(case_ids))}
 
 
@@ -392,21 +401,52 @@ def attempts_of(call: dict) -> int | None:
     return value if isinstance(value, int) and not isinstance(value, bool) and value >= 1 else None
 
 
-def stop_checks(calls: list[dict], canary_flips: int | None) -> dict:
-    """Section 5.0 stop rules: service errors above 5% of calls (a resend counts), a moved Jev
-    model, or more than 2 of 10 canary flips; and every Jev result must be live, not cached.
+def service_error_shares(calls: list[dict], missing: int = 0) -> dict:
+    """Section 5.0: "Stop if service errors exceed 5% of calls ... Any call that needed a resend counts
+    toward the 5%." Both readings of "calls" are computed, and the stop fires when either is above 5%:
+    - per_call, section 5.1's unit (9 J calls per case, 180 calls per native arm): a scheduled call counts
+      when it failed or needed a resend (more than one recorded attempt), once;
+    - per_request, where every resend is itself a call: a call with k recorded attempts sent k requests,
+      the first k-1 of which were resent, and its last request's outcome is the call's. Per-attempt
+      outcomes are not recorded and are not inferred: a resent request counts because the rule counts it.
+    A call without an attempt record sent at least one request and an unknown number of resends; it is
+    never taken as one attempt. A scheduled call with no result row (missing) has an unknown outcome. Each
+    share is therefore a pair of bounds: "low" counts only failures and recorded resends, the share the
+    evidence shows, and the stop fires on it; "high" also counts every call whose resends or outcome are
+    unknown. per_request has no upper bound once a call's attempts are unknown or a call is missing (None)."""
+    attempts = [attempts_of(call) for call in calls]
+    failed = [bool(call.get("error")) or call.get("answer") not in LABELS for call in calls]
+    scheduled = len(calls) + missing
+    events = sum(1 for count, bad in zip(attempts, failed) if bad or (count is not None and count > 1))
+    unknown = sum(1 for count, bad in zip(attempts, failed) if count is None and not bad) + missing
+    per_call = {"calls": scheduled, "failed_or_resent": events, "unknown": unknown,
+                "low": events / scheduled if scheduled else math.nan,
+                "high": (events + unknown) / scheduled if scheduled else math.nan}
+    requests = sum(1 if count is None else count for count in attempts) + missing
+    resent = sum(count - 1 for count in attempts if count is not None)
+    attempts_unknown = sum(1 for count in attempts if count is None)
+    request_events = resent + sum(failed)
+    per_request = {"requests_known": requests, "resent": resent, "failed": sum(failed),
+                   "calls_attempts_unknown": attempts_unknown, "missing": missing,
+                   "low": request_events / requests if requests else math.nan,
+                   "high": request_events / requests if requests and not attempts_unknown and not missing else None}
+    return {"per_call": per_call, "per_request": per_request,
+            "above": RULES["stop"]["service_error_share_above"], "fires_on": "low"}
+
+
+def stop_checks(calls: list[dict], canary_flips: int | None, missing: int = 0) -> dict:
+    """Section 5.0 stop rules: service errors above 5% of calls (a resend counts; service_error_shares),
+    a moved Jev model, or more than 2 of 10 canary flips; and every Jev result must be live, not cached.
     A failed call whose response never reached the contract check has no model (unknown), which is
     not a move; an answered Jev call must carry the pinned model, or its model went unverified."""
-    total = len(calls)
-    failed = sum(1 for call in calls if call.get("error") or call.get("answer") not in LABELS
-                 or (attempts_of(call) or 1) > 1)
+    shares = service_error_shares(calls, missing)
     jev = [call for call in calls if call["arm"] == "J"]
     moved = sorted({str(call["model"]) for call in jev if call.get("model") is not None and call["model"] != JEV_MODEL})
     unverified = sum(1 for call in jev if answered(call) and call.get("model") is None)
     not_live = sum(1 for call in jev if not call.get("error") and call.get("inference") != "live")
-    share = failed / total if total else math.nan
     reasons = []
-    if total and share > RULES["stop"]["service_error_share_above"]:
+    if any(not math.isnan(share["low"]) and share["low"] > shares["above"]
+           for share in (shares["per_call"], shares["per_request"])):
         reasons.append("service_errors")
     if moved:
         reasons.append("jev_model_moved")
@@ -416,9 +456,8 @@ def stop_checks(calls: list[dict], canary_flips: int | None) -> dict:
         reasons.append("jev_result_not_live")
     if canary_flips is not None and canary_flips > RULES["stop"]["canary_flips_above"]:
         reasons.append("canary_flips")
-    return {"stop": bool(reasons), "reasons": reasons, "calls": total, "failed_or_resent": failed,
-            "attempts_unknown": sum(1 for call in calls if attempts_of(call) is None),
-            "share": share, "unexpected_jev_models": moved, "jev_models_unverified": unverified,
+    return {"stop": bool(reasons), "reasons": reasons, "calls": len(calls), "missing": missing,
+            "service_errors": shares, "unexpected_jev_models": moved, "jev_models_unverified": unverified,
             "jev_failed_model_unknown": sum(1 for call in jev if not answered(call) and call.get("model") is None),
             "jev_results_not_live": not_live, "canary_flips": canary_flips}
 
@@ -444,16 +483,68 @@ def operations(calls: list[dict]) -> dict:
     return report
 
 
+def schedule_from_rows(rows: list[dict]) -> set[tuple[str, str, int, int]]:
+    """The frozen call schedule: every (arm, case, order, repeat) key the frozen promptfoo test rows (the
+    promptfoo_tests role p1_freeze.py --final checks) produce under the arm-group filters (ARM_GROUPS)."""
+    schedule = set()
+    for row in rows:
+        variables = row.get("vars") or {}
+        for arm, order in ARM_GROUPS.get((row.get("metadata") or {}).get("arm_group"), ()):
+            key = (arm, variables["case_id"], order, int(variables.get("repeat_index", 0)))
+            if key in schedule:
+                raise ValueError(f"the test rows repeat the call {key}")
+            schedule.add(key)
+    return schedule
+
+
+def call_matrix(calls: list[dict], schedule: set) -> dict:
+    """The calls against the frozen schedule. A call outside it, or two calls with one key, is refused: the
+    calls are not this run's. A scheduled key without a call is missing (a truncated output or a crashed
+    run): its outcome is unknown, so it is counted in the stop shares' bounds and the run decides nothing."""
+    seen = Counter((call["arm"], call["case_id"], int(call.get("order", 0)), int(call.get("repeat", 0)))
+                   for call in calls)
+    repeated = sorted(key for key, count in seen.items() if count > 1)
+    unexpected = sorted(set(seen) - set(schedule))
+    if repeated or unexpected:
+        raise ValueError(f"the calls do not match the frozen schedule: {len(unexpected)} unscheduled "
+                         f"{unexpected[:3]}, {len(repeated)} repeated {repeated[:3]}")
+    missing = sorted(set(schedule) - set(seen))
+    return {"expected": len(schedule), "present": len(seen), "missing": len(missing),
+            "missing_by_arm": dict(sorted(Counter(key[0] for key in missing).items())),
+            "missing_keys": [list(key) for key in missing[:20]]}
+
+
+def canary_count(value) -> int | None:
+    """None (no canary result) or a count of the 10 A1 canary cases that flipped, 0 through 10."""
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= CANARY_CASES:
+        raise ValueError(f"canary flips are a count of the {CANARY_CASES} canary cases, 0 through {CANARY_CASES}")
+    return value
+
+
 # --------------------------------------------------------------------------- report
 
 
-def score(pack: dict, labels: dict[str, dict], calls: list[dict], relabels: dict[str, dict] | None = None,
-          canary_flips: int | None = None) -> dict:
+def score(pack: dict, labels: dict[str, dict], calls: list[dict], schedule: set,
+          relabels: dict[str, dict] | None = None, canary_flips: int | None = None) -> dict:
+    """Score a run against its frozen schedule (schedule_from_rows). No verdict is issued, and arm L does
+    not qualify, while a hold applies: a stop rule fired ("stopped"), a scheduled call has no result
+    ("incomplete_call_matrix"), or the A1 canary result is absent ("canary_missing"). The partial results
+    stay in the report (section 5.0)."""
+    canary_flips = canary_count(canary_flips)
     cases = {case["case_id"]: case for case in pack["cases"]}
     case_ids = sorted(cases)
-    missing = [case for case in case_ids if case not in labels]
-    if missing:
-        raise ValueError(f"unlabelled cases: {missing[:5]}")
+    unlabelled = [case for case in case_ids if case not in labels]
+    if unlabelled:
+        raise ValueError(f"unlabelled cases: {unlabelled[:5]}")
+    # An unknown label would score as ERROR_CODE and leave the non-supported denominator; refuse it.
+    invalid = [case for case in case_ids if not isinstance(labels[case], dict) or labels[case].get("label") not in LABELS]
+    invalid += [f"re-label {case}" for case, record in sorted((relabels or {}).items())
+                if not isinstance(record, dict) or record.get("label") not in LABELS]
+    if invalid:
+        raise ValueError(f"labels outside {list(LABELS)}: {invalid[:5]}")
+    matrix = call_matrix(calls, schedule)
     truth_labels = [labels[case]["label"] for case in case_ids]
     truth = codes(truth_labels)
     claims = {case: cases[case]["claim"] for case in case_ids}
@@ -491,12 +582,14 @@ def score(pack: dict, labels: dict[str, dict], calls: list[dict], relabels: dict
                 "wilson_false_close_rate": wilson_interval(false, nonsupported) if nonsupported else None,
                 "escalation_rate": 1 - len(closed) / len(case_ids)}
 
-    stop = stop_checks(calls, canary_flips)
+    stop = stop_checks(calls, canary_flips, matrix["missing"])
+    holds = (["stopped"] if stop["stop"] else []) + (["incomplete_call_matrix"] if matrix["missing"] else []) \
+        + (["canary_missing"] if canary_flips is None else [])
     report = {"schema": "jev-p1-score/1", "frozen": {"seed": SEED, "n_resamples": N_RESAMPLES,
               "confidence_level": CONFIDENCE_LEVEL, "bootstrap_method": BOOTSTRAP_METHOD,
               "close_threshold": CLOSE_THRESHOLD, "ece_bins": ECE_BINS, "rules": RULES},
               "cases": len(case_ids), "nonsupported": nonsupported,
-              "label_counts": dict(Counter(truth_labels)), "stop": stop,
+              "label_counts": dict(Counter(truth_labels)), "call_matrix": matrix, "stop": stop, "holds": holds,
               "operations": operations(calls)}
     primary_c = primary(routes["C"])
     report["primary_C"] = primary_c
@@ -508,10 +601,11 @@ def score(pack: dict, labels: dict[str, dict], calls: list[dict], relabels: dict
                                       (repeats["rate_low"], repeats["rate_high"]), median_latency)
     else:
         report["decision_C"] = {"verdict": "inconclusive", "reason": "arm O missing"}
-    if stop["stop"]:
-        # Section 5.0: a stopped run reports its partial results and decides nothing.
-        report["decision_C"] = {"verdict": "inconclusive", "reason": "stopped", "stop_reasons": stop["reasons"],
-                                "partial": report["decision_C"]}
+    if holds:
+        # Section 5.0: a stopped run reports its partial results and decides nothing; so does a run with a
+        # scheduled call missing, or without the canary result the stop rules need.
+        report["decision_C"] = {"verdict": "inconclusive", "reason": holds[0], "reasons": holds,
+                                "stop_reasons": stop["reasons"], "partial": report["decision_C"]}
     report["order_flips"] = flips
     report["repeat_disagreement"] = repeats
     report["j3_latency"] = {"median_s": median_latency, "cases": len(latencies)}
@@ -519,16 +613,16 @@ def score(pack: dict, labels: dict[str, dict], calls: list[dict], relabels: dict
         primary_l = primary(routes["C_L"])
         l_vs_o = paired_bootstrap(ba_difference, [truth, predicted["C_L"], predicted["O"]])
         # L scores one premise-hypothesis pair, so the order-flip part of (d) does not apply; repeat
-        # disagreement is measured over repeated L calls (README "Open decisions"). Without repeats it
-        # stays None, and so does qualifies: an unmeasured rule is never a pass.
+        # disagreement is measured over the three frozen L calls per case (README "Open decisions" 7).
+        # With fewer it stays None, and so does qualifies: an unmeasured rule is never a pass.
         l_repeats = single_arm_repeat_disagreement(calls, "L", case_ids)
         prescreen = {"primary": primary_l, "bootstrap": l_vs_o, "order_flips": NOT_APPLICABLE,
                      "repeat_disagreement": l_repeats,
                      **prescreen_qualifies(primary_l["false_closes"], nonsupported, primary_l["closure_rate"],
                                            l_vs_o["low"], NOT_APPLICABLE,
                                            None if l_repeats is None else (l_repeats["rate_low"], l_repeats["rate_high"]))}
-        if stop["stop"]:
-            prescreen.update({"qualifies": None, "reason": "stopped", "stop_reasons": stop["reasons"]})
+        if holds:
+            prescreen.update({"qualifies": None, "reason": holds[0], "reasons": holds, "stop_reasons": stop["reasons"]})
         report["prescreen_L"] = prescreen
     descriptive = {"balanced_accuracy": {name: balanced_accuracy(truth, values) for name, values in predicted.items()}}
     if {"O", "S"} <= set(predicted):
@@ -674,20 +768,31 @@ def _read_records(path: Path) -> dict[str, dict]:
     return data["labels"] if isinstance(data, dict) and "labels" in data else data
 
 
+def _canary_argument(text: str) -> int:
+    try:
+        return canary_count(int(text))
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(str(error)) from error
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--pack", type=Path, required=True)
     parser.add_argument("--labels", type=Path, required=True)
     parser.add_argument("--relabels", type=Path)
     parser.add_argument("--calls", type=Path, required=True, help="normalized calls, one JSON object per line")
-    parser.add_argument("--canary-flips", type=int)
+    parser.add_argument("--tests", type=Path, required=True,
+                        help="the frozen promptfoo test rows (promptfoo_tests role): the schedule every call is checked against")
+    parser.add_argument("--canary-flips", type=_canary_argument, required=True,
+                        help=f"how many of the {CANARY_CASES} A1 canary cases flipped (0-{CANARY_CASES}), from the canary run")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
     pack = json.loads(args.pack.read_text(encoding="utf-8"))
     labels = _read_records(args.labels)
     relabels = _read_records(args.relabels) if args.relabels else None
     calls = [json.loads(line) for line in args.calls.read_text(encoding="utf-8").splitlines() if line.strip()]
-    report = score(pack, labels, calls, relabels, args.canary_flips)
+    rows = [json.loads(line) for line in args.tests.read_text(encoding="utf-8").splitlines() if line.strip()]
+    report = score(pack, labels, calls, schedule_from_rows(rows), relabels, args.canary_flips)
     args.out.write_text(json.dumps(report, indent=1, default=str) + "\n", encoding="utf-8")
     print(json.dumps({"verdict_C": report["decision_C"]["verdict"], "stop": report["stop"]["stop"]}))
     return 0

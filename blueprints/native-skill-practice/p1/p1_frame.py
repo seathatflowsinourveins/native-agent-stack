@@ -14,7 +14,9 @@ adversarial_verification records). The review's verdict is provenance only; it
 is never a label (the user's blind label decides each class).
 
 Everything here is deterministic for a given frame commit. Blobs are read with
-git, never from the working tree. A citation is cut at the revision it cited:
+git, never from the working tree; that includes the private-content exclusion
+rules, PRIVATE_CONTENT in scripts/validate.py at the frame commit, read from its
+source without running that module. A citation is cut at the revision it cited:
 its own pin when it carries one, otherwise the commit that introduced the
 citation text to the citing document (git log -S), or for a citation built from
 record fields the commit that last changed the citing line (git blame). The
@@ -28,8 +30,8 @@ raw.githubusercontent.com (public bytes at a commit id; no case text is sent);
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
-import importlib.util
 import json
 import os
 import posixpath
@@ -439,19 +441,33 @@ def line_of_offset(text: str, offset: int) -> int:
     return text.count("\n", 0, offset) + 1
 
 
-def _load_private_patterns():
-    spec = importlib.util.spec_from_file_location("p1_validate_patterns", REPO_ROOT / "scripts" / "validate.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module.PRIVATE_CONTENT
+PRIVATE_CONTENT_SOURCE = "scripts/validate.py"
 
 
-PRIVATE_CONTENT = _load_private_patterns()
+def private_patterns_from_source(source: str) -> tuple:
+    """PRIVATE_CONTENT as one revision of scripts/validate.py defines it. Only the assignment's value is
+    evaluated, with nothing but the re module in scope; the rest of that module never runs."""
+    for node in ast.parse(source).body:
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target] if isinstance(node, ast.AnnAssign) else []
+        if any(isinstance(target, ast.Name) and target.id == "PRIVATE_CONTENT" for target in targets) and node.value:
+            expression = ast.Expression(node.value)
+            return tuple(eval(compile(expression, f"<{PRIVATE_CONTENT_SOURCE}: PRIVATE_CONTENT>", "eval"),
+                              {"__builtins__": {}, "re": re}))
+    raise ValueError(f"{PRIVATE_CONTENT_SOURCE} defines no PRIVATE_CONTENT")
 
 
-def screen_text(text: str) -> str | None:
-    """The first exclusion reason for a claim or excerpt, or None."""
-    for _description, pattern in PRIVATE_CONTENT:
+def private_patterns_at(snapshot: "GitSnapshot") -> tuple:
+    """The private-content exclusion rules at the frame commit, read from its blob like every other frame
+    input, so the same --commit gives the same exclusions whatever the working tree holds."""
+    source = snapshot.read_text(PRIVATE_CONTENT_SOURCE)
+    if source is None:
+        raise SystemExit(f"{PRIVATE_CONTENT_SOURCE} is absent at the frame commit; its PRIVATE_CONTENT rules are a frame input")
+    return private_patterns_from_source(source)
+
+
+def screen_text(text: str, private_patterns: tuple) -> str | None:
+    """The first exclusion reason for a claim or excerpt, or None. private_patterns: private_patterns_at."""
+    for _description, pattern in private_patterns:
         if pattern.search(text):
             return "private_content_pattern"
     if HARNESS_UNSAFE.search(text) or text.lstrip().startswith(HARNESS_UNSAFE_PREFIXES):
@@ -629,7 +645,7 @@ def claim_from(sentence: str, start: int, end: int) -> str:
     return claim
 
 
-def claim_problem(claim: str) -> str | None:
+def claim_problem(claim: str, private_patterns: tuple) -> str | None:
     words = len(claim.split())
     if words < MIN_CLAIM_WORDS:
         return "claim_too_short"
@@ -637,7 +653,7 @@ def claim_problem(claim: str) -> str | None:
         return "claim_too_long"
     if claim.rstrip("*_`\"') ").endswith("?"):
         return "claim_is_question"
-    return screen_text(claim)
+    return screen_text(claim, private_patterns)
 
 
 def citing_line_in_markdown(text: str, first_line: int, citation_text: str) -> int:
@@ -660,6 +676,7 @@ class Extractor:
     def __init__(self, snapshot: GitSnapshot, fetcher: UpstreamFetcher):
         self.snapshot = snapshot
         self.fetcher = fetcher
+        self.private_patterns = private_patterns_at(snapshot)
 
     def resolve_repo_path(self, cited: str, citing_path: str, citing_text: str, revision: str) -> str | None:
         files, by_basename = self.snapshot.tree(revision)
@@ -735,7 +752,7 @@ class Extractor:
         excerpt, span, problem = cut_window(text, ranges)
         if problem:
             return None, problem
-        problem = screen_text(excerpt)
+        problem = screen_text(excerpt, self.private_patterns)
         if problem:
             return None, problem
         if parses_as_json(excerpt):
@@ -783,7 +800,7 @@ class Extractor:
                 continue
             citation = citations[0]
             claim = claim_from(sentence, citation["start"], citation["end"])
-            problem = claim_problem(claim)
+            problem = claim_problem(claim, self.private_patterns)
             if problem:
                 stats[f"excluded:{problem}"] += 1
                 continue
@@ -915,7 +932,7 @@ class Extractor:
             if len(inside) == 1:
                 claim = claim_from(claim_text, inside[0]["start"], inside[0]["end"])
                 attempts.append(("claim", inside[0]))
-        problem = claim_problem(claim)
+        problem = claim_problem(claim, self.private_patterns)
         if problem:
             stats[f"excluded:{problem}"] += 1
             return []

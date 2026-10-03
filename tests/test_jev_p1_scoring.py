@@ -11,9 +11,11 @@ that must fail or differ, in the same test; FrozenConstantsTests.test_frozen_val
 from __future__ import annotations
 
 import importlib.util
+import io
 import math
 import os
 import random
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -40,6 +42,16 @@ except ImportError as error:  # pragma: no cover - depends on the interpreter
 def probabilities(answer: str, top: float = 0.9) -> dict:
     rest = (1 - top) / 2
     return {label: (top if label == answer else rest) for label in ("supported", "contradicted", "insufficient")}
+
+
+def schedule_of(calls: list[dict]) -> set:
+    """A fixture's own call design as a schedule: exactly the keys its calls hold."""
+    return {(call["arm"], call["case_id"], int(call.get("order", 0)), int(call.get("repeat", 0))) for call in calls}
+
+
+_casepack_spec = importlib.util.spec_from_file_location("jev_p1_casepack_for_scoring", P1 / "p1_casepack.py")
+casepack = importlib.util.module_from_spec(_casepack_spec)
+_casepack_spec.loader.exec_module(casepack)        # standard library only
 
 
 @unittest.skipIf(MISSING, f"scoring dependencies missing ({MISSING}); install requirements-scoring.lock")
@@ -283,6 +295,40 @@ class DefinitionTests(unittest.TestCase):
         cached = calls[:95] + [{"arm": "J", "answer": "supported", "model": "jev-1.13.0", "inference": "cache"}]
         self.assertEqual(scoring.stop_checks(cached, 0)["reasons"], ["jev_result_not_live"])
 
+    def test_resends_count_as_calls(self):
+        live = {"model": "jev-1.13.0", "inference": "live"}
+        clean = [{"arm": "J", "answer": "supported", "attempts": 1, **live} for _ in range(99)]
+        # One call resent nine times: 1 of 100 calls (1%), but 9 of 109 requests (8.3%) were resent.
+        retried = clean + [{"arm": "J", "answer": "supported", "attempts": 10, **live}]
+        shares = scoring.service_error_shares(retried)
+        self.assertEqual((shares["per_call"]["failed_or_resent"], shares["per_call"]["low"]), (1, 0.01))
+        self.assertEqual((shares["per_request"]["requests_known"], shares["per_request"]["resent"]), (109, 9))
+        self.assertAlmostEqual(shares["per_request"]["low"], 9 / 109, places=12)
+        self.assertEqual(scoring.stop_checks(retried, 0)["reasons"], ["service_errors"])
+        # The other reading binds too: 51 of 1,000 calls resent once is 5.1% of calls, 4.85% of requests.
+        many = [{"arm": "J", "answer": "supported", "attempts": 2 if index < 51 else 1, **live} for index in range(1000)]
+        shares = scoring.service_error_shares(many)
+        self.assertGreater(shares["per_call"]["low"], 0.05)
+        self.assertLess(shares["per_request"]["low"], 0.05)
+        self.assertEqual(scoring.stop_checks(many, 0)["reasons"], ["service_errors"])
+        # Negative control: with no resend neither share moves and nothing stops.
+        self.assertFalse(scoring.stop_checks(clean + [dict(clean[0])], 0)["stop"])
+
+    def test_unknown_attempts_stay_unknown(self):
+        live = {"model": "jev-1.13.0", "inference": "live"}
+        unknown = [{"arm": "J", "answer": "supported", **live} for _ in range(100)]
+        shares = scoring.service_error_shares(unknown)
+        self.assertEqual((shares["per_call"]["low"], shares["per_call"]["high"]), (0.0, 1.0))
+        self.assertEqual((shares["per_request"]["low"], shares["per_request"]["high"]), (0.0, None))
+        self.assertEqual(shares["per_request"]["calls_attempts_unknown"], 100)
+        self.assertFalse(scoring.stop_checks(unknown, 0)["stop"])           # the stop fires on what is recorded
+        # A scheduled call without a result row is unknown too, never a clean call.
+        missing = scoring.service_error_shares(unknown[:90], missing=10)
+        self.assertEqual((missing["per_call"]["calls"], missing["per_call"]["unknown"]), (100, 100))
+        # Negative control: recorded single attempts close both bounds at the observed share.
+        known = scoring.service_error_shares([dict(call, attempts=1) for call in unknown])
+        self.assertEqual((known["per_call"]["high"], known["per_request"]["high"]), (0.0, 0.0))
+
     def test_a_failed_call_without_a_model_is_not_a_move(self):
         live = {"model": "jev-1.13.0", "inference": "live"}
         calls = [{"arm": "J", "answer": "supported", **live} for _ in range(99)]
@@ -364,11 +410,13 @@ class EndToEndTests(unittest.TestCase):
             calls.append({"arm": "L", "case_id": case, "order": 0, "repeat": 0, "answer": label,
                           "probabilities": probabilities(label), "confidence": 0.9})
         with mock.patch.object(scoring, "N_RESAMPLES", 200):
-            report = scoring.score({"cases": cases}, labels, calls, relabels={"c001": labels["c001"]})
+            report = scoring.score({"cases": cases}, labels, calls, schedule_of(calls),
+                                   relabels={"c001": labels["c001"]}, canary_flips=0)
         self.assertEqual(report["decision_C"]["verdict"], "inconclusive")     # 20 non-supported < 60
         self.assertFalse(report["decision_C"]["rules"]["a"])
         self.assertEqual(report["primary_C"]["false_closes"], 0)
         self.assertEqual(report["order_flips"]["flips"], 0)
+        self.assertEqual((report["call_matrix"]["missing"], report["holds"]), (0, []))
         for section in ("balanced_accuracy", "J3_minus_best_native", "confusion_matrices", "mcnemar_vs_O",
                         "calibration", "strata", "natural_prevalence"):
             self.assertIn(section, report["descriptive"])
@@ -376,7 +424,12 @@ class EndToEndTests(unittest.TestCase):
         unlabelled = dict(labels)
         del unlabelled["c001"]
         with self.assertRaises(ValueError):
-            scoring.score({"cases": cases}, unlabelled, calls)
+            scoring.score({"cases": cases}, unlabelled, calls, schedule_of(calls), canary_flips=0)
+        # An unknown label would score as an error code and leave the non-supported denominator.
+        for records, relabels in (({**labels, "c002": {"label": "insuficient"}}, None),
+                                  (labels, {"c001": {"lable": "supported"}})):
+            with self.assertRaises(ValueError):
+                scoring.score({"cases": cases}, records, calls, schedule_of(calls), relabels=relabels, canary_flips=0)
 
     @staticmethod
     def l_fixture(repeats: int, disagreeing: int = 0):
@@ -397,11 +450,18 @@ class EndToEndTests(unittest.TestCase):
                               "probabilities": probabilities(answer), "confidence": 0.9})
         return {"cases": cases}, labels, calls
 
-    def test_arm_l_qualifies_once_l_is_repeated(self):
+    @classmethod
+    def scored(cls, repeats: int = 3, disagreeing: int = 0, canary_flips=0, drop=None):
+        """Score l_fixture against its own design; drop removes one call to leave the matrix incomplete."""
+        pack, labels, calls = cls.l_fixture(repeats, disagreeing)
+        design = schedule_of(calls)
+        if drop:
+            calls = [call for call in calls if (call["arm"], call["case_id"], call["order"], call["repeat"]) != drop]
         with mock.patch.object(scoring, "N_RESAMPLES", 200):
-            repeated = scoring.score(*self.l_fixture(repeats=3))
-            single = scoring.score(*self.l_fixture(repeats=1))
-            noisy = scoring.score(*self.l_fixture(repeats=3, disagreeing=3))
+            return scoring.score(pack, labels, calls, design, canary_flips=canary_flips)
+
+    def test_arm_l_qualifies_once_l_is_repeated(self):
+        repeated, single, noisy = self.scored(repeats=3), self.scored(repeats=1), self.scored(repeats=3, disagreeing=3)
         self.assertEqual(repeated["prescreen_L"]["primary"]["false_closes"], 0)
         self.assertEqual((repeated["prescreen_L"]["rules"]["d"], repeated["prescreen_L"]["qualifies"]), (True, True))
         self.assertEqual(repeated["prescreen_L"]["repeat_disagreement"]["pairs"], 90)
@@ -409,13 +469,87 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual((single["prescreen_L"]["rules"]["d"], single["prescreen_L"]["qualifies"]), (None, None))
         self.assertEqual((noisy["prescreen_L"]["rules"]["d"], noisy["prescreen_L"]["qualifies"]), (False, False))
 
+    def test_arm_l_needs_all_three_frozen_repeats(self):
+        two = self.scored(repeats=2)
+        # Two agreeing repeats per case measured (d) and qualified L before; three are frozen, so (d) stays open.
+        self.assertIsNone(two["prescreen_L"]["repeat_disagreement"])
+        self.assertEqual((two["prescreen_L"]["rules"]["d"], two["prescreen_L"]["qualifies"]), (None, None))
+        # A run that holds all three for some cases bounds the rest as incomplete; (d) must hold at the high bound.
+        pack, labels, calls = self.l_fixture(repeats=3)
+        partial = [call for call in calls if not (call["arm"] == "L" and call["repeat"] == 2 and call["case_id"] == "c001")]
+        measured = scoring.single_arm_repeat_disagreement(partial, "L", sorted(labels))
+        self.assertEqual((measured["repeats"], measured["incomplete"]), (3, 1))
+        # Negative control: three repeats per case qualify L (test_arm_l_qualifies_once_l_is_repeated).
+        self.assertTrue(self.scored(repeats=3)["prescreen_L"]["qualifies"])
+
+    def test_the_call_matrix_is_checked_against_the_frozen_schedule(self):
+        complete = self.scored()
+        self.assertEqual((complete["decision_C"]["verdict"], complete["call_matrix"]["missing"]), ("adopt", 0))
+        # One O call missing from a truncated output: no verdict and no qualification, partial results kept.
+        missing = self.scored(drop=("O", "c045", 0, 0))
+        self.assertEqual((missing["decision_C"]["verdict"], missing["decision_C"]["reason"]),
+                         ("inconclusive", "incomplete_call_matrix"))
+        self.assertEqual(missing["call_matrix"]["missing_by_arm"], {"O": 1})
+        self.assertIn("rules", missing["decision_C"]["partial"])
+        self.assertIsNone(missing["prescreen_L"]["qualifies"])
+        # The missing call stays in the stop share's scheduled denominator, as an unknown outcome.
+        self.assertEqual(missing["stop"]["missing"], 1)
+        self.assertEqual(missing["stop"]["service_errors"]["per_call"]["calls"],
+                         complete["stop"]["service_errors"]["per_call"]["calls"])
+        # A call the schedule does not hold, or a repeated key, means the calls are not this run's.
+        pack, labels, calls = self.l_fixture(repeats=3)
+        stray = calls + [{"arm": "O", "case_id": "c001", "order": 0, "repeat": 1, "answer": "supported"}]
+        with self.assertRaises(ValueError):
+            scoring.score(pack, labels, stray, schedule_of(calls), canary_flips=0)
+        with self.assertRaises(ValueError):
+            scoring.call_matrix(calls + [dict(calls[0])], schedule_of(calls))
+
+    def test_the_schedule_is_the_frozen_rows(self):
+        cases = [{"case_id": f"c{index:03d}", "pending_insertion": False, "excerpt": "e", "claim": "c"}
+                 for index in range(1, 121)]
+        rows = casepack.promptfoo_rows({"cases": cases}, [case["case_id"] for case in cases[:30]],
+                                       casepack.FROZEN_LOCAL_REPEATS)
+        schedule = scoring.schedule_from_rows(rows)
+        per_arm = {arm: sum(1 for key in schedule if key[0] == arm) for arm in ("J", "O", "S", "G", "L")}
+        self.assertEqual(per_arm, {"J": 1080, "O": 180, "S": 180, "G": 180, "L": 360})   # section 5.1's design
+        self.assertEqual(len(schedule), sum(per_arm.values()))                            # render rows reach no arm
+        self.assertEqual(casepack.FROZEN_LOCAL_REPEATS, len(scoring.L_REPEATS))
+        # Negative control: a repeated row is refused rather than silently merged.
+        with self.assertRaises(ValueError):
+            scoring.schedule_from_rows(rows + rows[:1])
+
+    def test_a_verdict_needs_a_valid_canary_result(self):
+        self.assertEqual(self.scored(canary_flips=0)["decision_C"]["verdict"], "adopt")
+        absent = self.scored(canary_flips=None)
+        self.assertEqual((absent["decision_C"]["verdict"], absent["decision_C"]["reason"]), ("inconclusive", "canary_missing"))
+        self.assertIsNone(absent["prescreen_L"]["qualifies"])
+        self.assertEqual(self.scored(canary_flips=3)["decision_C"]["reason"], "stopped")
+        for impossible in (-1, 11, True, 2.0):
+            with self.subTest(canary_flips=impossible), self.assertRaises(ValueError):
+                self.scored(canary_flips=impossible)
+        # The command refuses to score without a canary count, or with one outside 0-10.
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            for name in ("pack", "labels", "calls", "tests"):
+                (root / name).write_text("{}" if name != "calls" and name != "tests" else "")
+            base = ["--pack", str(root / "pack"), "--labels", str(root / "labels"), "--calls", str(root / "calls"),
+                    "--tests", str(root / "tests"), "--out", str(root / "out")]
+            for extra in ([], ["--canary-flips", "11"], ["--canary-flips", "x"]):
+                with self.subTest(arguments=extra), mock.patch("sys.stderr", io.StringIO()), \
+                        self.assertRaises(SystemExit) as raised:
+                    scoring.main(base + extra)
+                self.assertEqual(raised.exception.code, 2)                    # argparse usage error
+            without_tests = [item for item in base if item not in ("--tests", str(root / "tests"))]
+            with mock.patch("sys.stderr", io.StringIO()), self.assertRaises(SystemExit):
+                scoring.main(without_tests + ["--canary-flips", "0"])
+
     def test_a_stopped_run_decides_nothing(self):
         pack, labels, calls = self.l_fixture(repeats=3)
         calls = [dict(call, model="jev-latest") if call["arm"] == "J" and call["case_id"] == "c001" else call
                  for call in calls]
         with mock.patch.object(scoring, "N_RESAMPLES", 200):
-            stopped = scoring.score(pack, labels, calls)
-            running = scoring.score(*self.l_fixture(repeats=3))
+            stopped = scoring.score(pack, labels, calls, schedule_of(calls), canary_flips=0)
+        running = self.scored(repeats=3)
         self.assertEqual((stopped["decision_C"]["verdict"], stopped["decision_C"]["reason"]), ("inconclusive", "stopped"))
         self.assertIn("jev_model_moved", stopped["decision_C"]["stop_reasons"])
         self.assertIn("rules", stopped["decision_C"]["partial"])                  # partial results stay reported

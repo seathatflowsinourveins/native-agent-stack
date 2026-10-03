@@ -65,8 +65,9 @@ after they were cited (each candidate's `drift` field in the private `frame.json
 files are fetched once from `raw.githubusercontent.com` at the pinned commit (31 fetched, 2
 private-repository files excluded); only an HTTP 404 is cached as missing, and any other fetch
 failure stops the build. Both cached 404s were fetched again at 2026-10-03T21:26:31Z and still
-returned 404. Claims and excerpts that match `scripts/validate.py` private-content patterns or
-promptfoo template syntax are excluded.
+returned 404. Claims and excerpts that match the private-content patterns of `scripts/validate.py`
+at the frame commit (read from that blob like every other frame input, never from the working tree;
+only the `PRIVATE_CONTENT` assignment is evaluated) or promptfoo template syntax are excluded.
 
 The enriched pool takes `claim` records that a retained review refuted or corrected (`refuted`,
 `verifier_verdict` partly or refuted, `verdict` refuted, `result` contradicted, a `correction` or
@@ -91,7 +92,11 @@ below 60 non-supported labels, at most 30 in total. Adversarial slots get five p
 Sol 7, balanced 3-3-2 across forms, all by seed; code places each insertion after the cited span.
 The presentation order and the 18 re-label positions (15%) are keyed on the insertions as well, so
 the completed packet's ids and re-label set share nothing with the draft's, and neither can be
-computed from public data before the pack is published.
+computed from public data before the pack is published. Because those keys hash the whole insertion
+object, `build` refuses an insertion file whose keys are not exactly the 15 slot ids. A top-up batch
+adds its re-label share from its own new cases, and `topup` refuses a frame whose digest differs from
+the pack's `frame_sha256` or whose reserved claim and excerpt bytes differ from the hashes the reserve
+recorded at the draw.
 
 ## Label packet and the A2 gate
 
@@ -109,11 +114,18 @@ A2 result must name; gitleaks 8.30.1 scans that file, and the host-path and iden
 home-directory and user-name canary run over each claim and excerpt. `p1_casepack.py a2` then takes
 the result (`jev-p1-a2-result/1`: `input_sha256`, a `passed` flag for each of the three checks, and
 the post-A2 claim or excerpt of every case the rule changed). It refuses a result over other bytes, a
-failed check, or a change to a case an earlier pass froze; it applies the changed texts, records the
+failed check, or a change to a case an earlier pass froze; it applies the changed texts (a changed
+claim's universal and numeric-or-date strata are computed again from the post-A2 claim), records the
 pass (input, output and result sha256, and the share of cases changed) and only then marks the pack
 `ready_for_labels` and the packet `ready`. A top-up batch sends the pack back to `awaiting_a2`.
-`p1_freeze.py --final` refuses a pack whose bytes are not the output of its last A2 pass and a label
-packet that is not the ready packet of exactly those cases.
+`p1_freeze.py --final` refuses a pack whose bytes are not the output of its last A2 pass; A2 custody
+files that are not, in pass order, the original results of the recorded passes (canonical
+`result_sha256`, the pass's input bytes and every check passed; a missing, extra, duplicate or
+mismatched original is refused); a label packet that is not `label_packet(pack)` in full (cases,
+rules, criteria, claim types and instructions); a label or re-label record outside the packet's
+`label_record` contract (exactly `case_id`, `label`, `claim_type` and `labelled_at` as a UTC
+timestamp); and test rows that are not the bytes `tests` writes from the pack, the labels' native
+repeats and three local repeats.
 
 ## Scoring
 
@@ -132,18 +144,31 @@ frozen denominators. A case or pair that lost an answer to a failed call is inco
 is reported as bounds (incomplete units counted as agreeing, then as disagreeing): rule (d) must hold
 at the high bound and the reject rule fires at the low bound, so a failed call never helps either
 verdict; with nothing incomplete both bounds equal the frozen rate (open decision 9). For arm L the
-order-flip part of (d) does not apply, and repeat disagreement is measured over repeated L calls
-(`tests --local-repeats 3`), over all cases; without repeats (d) stays open and L cannot qualify
-(open decision 7).
+order-flip part of (d) does not apply, and repeat disagreement is measured over the three frozen L
+calls per case (`tests --local-repeats 3`), over all cases; a run that holds fewer than three for every
+case leaves (d) open, never measured on fewer repeats, and L cannot qualify (open decision 7).
+
+Scoring reads the frozen test rows (`--tests`, the rows the freeze checked) as the call schedule:
+every call must be an (arm, case, order, repeat) key those rows produce under the config's arm-group
+filters (1,080 J keys, 180 per native arm and 360 L keys for 120 cases), or scoring refuses the calls;
+a scheduled key without a call (a truncated output or a crashed run) leaves the run without a verdict.
 
 The section 5.0 stop rules (service errors above 5% with resends counted, a moved model, more than 2
 of 10 canary flips, any Jev result that is not `live`) and the usage, latency, error, attempt and
-request-id summary per arm are reported with every score. A failed call whose response never reached
-the contract check has an unknown model, which is not a move; a refused response's model is read from
-the error `response-model.cjs` writes; an answered Jev call without the pinned model stops the run as
+request-id summary per arm are reported with every score. "5% of calls" is computed in both readings,
+and the run stops when either is above 5%: per scheduled call, section 5.1's unit, where a call that
+failed or needed a resend counts once; and per request, where every resend is itself a call, so a call
+with k recorded attempts is k requests of which k-1 were resent. A call without an attempt count is
+never taken as one attempt, and a scheduled call without a result has an unknown outcome: each share
+is reported as bounds, the stop fires on the low bound (what was recorded), and the report counts the
+calls whose resends are unknown (open decision 12). A failed call whose response never reached the
+contract check has an unknown model, which is not a move; a refused response's model is read from the
+error `response-model.cjs` writes; an answered Jev call without the pinned model stops the run as
 `jev_model_unverified`. Attempt counts come from provider metadata and are unknown where it records
-none (no arm records them today; J's `maxRetries: 0` sends one request per call). A stopped run's
-verdicts are `inconclusive` with reason `stopped`, and the rule values stay in `partial`.
+none (no arm records them today; J's `maxRetries: 0` sends one request per call). The A1 canary count
+is required (`--canary-flips`, 0 to 10). A stopped run, a missing scheduled call or a missing canary
+count gives `inconclusive` with reason `stopped`, `incomplete_call_matrix` or `canary_missing` (all
+that apply in `reasons`), the rule values stay in `partial`, and arm L does not qualify.
 
 ## Reproduce (no model call)
 
@@ -222,9 +247,11 @@ resulting state.
 7. Arm L: choose and hash the checkpoint; its premise is truncated past 512 tokens (recorded per
    call). Default to confirm: the order-flip part of (d) is not applicable to L (one premise-hypothesis
    pair, no option order), and (d) is L's repeat disagreement over three repeated calls per case, over
-   all cases, at most 3%. Without repeats (d) stays open and L cannot qualify.
+   all cases, at most 3%. With fewer than three repeats (d) stays open and L cannot qualify.
 8. Interval method (percentile) and the J-3 latency estimate (the slowest of the three order calls,
-   the wall time if they run concurrently) are frozen choices to confirm.
+   the wall time if they run concurrently) are frozen choices to confirm. The J run is serialized
+   (`--max-concurrency 1`), so each call's latency is uncontended; section 5.1 defines the decision
+   latency as "the wall time of three concurrent calls", the deployed configuration, not their sum.
 9. Missing-data rule, a default to confirm: the order-flip and repeat-disagreement denominators stay
    at all cases and all pairs; incomplete units bound the rate, (d) is judged at the high bound and the
    reject rule at the low bound (section "Scoring").
@@ -235,6 +262,12 @@ resulting state.
     served model is not in the OmniRoute call log (section 5.0 then records "unknown"); routing S
     through OmniRoute needs the provider block in that home, frozen with it. Check `unified_exec` and
     any exec tool in the smoke check.
+12. Resend evidence. Section 5.0 counts resends, but no arm records an attempt count today: J sends
+    one request per call by configuration (`maxRetries: 0`), and the native SDK providers may retry
+    inside their clients without reporting it. Scoring therefore checks resends only where a call
+    records its attempts, gives both stop shares as bounds, and stops on the recorded evidence. Whether
+    a run whose resends are unknown for some calls may still issue a verdict, or the harness must
+    record attempts per call first, is a decision before freeze.
 
 ## Gated steps, in order
 
@@ -266,4 +299,5 @@ none has run.
     from main before the first call. The user's section 6.2 decisions (the TypeSafe key's delivery and
     the spend) come before step 13.
 13. (model) The A1 canary first: stop if more than 2 of 10 cases flip.
-14. (model) Arm calls (J 1,080; O, S and G 180 each; L local), then `p1_scoring.py`.
+14. (model) Arm calls (J 1,080; O, S and G 180 each; L local), then `p1_scoring.py --tests <frozen
+    rows> --canary-flips <A1 count>`.
