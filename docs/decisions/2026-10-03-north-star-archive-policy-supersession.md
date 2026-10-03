@@ -1,0 +1,9 @@
+# Historical WSL archive policy supersession
+
+Canonical PR622 was squash-merged as `dcae68bd08a191f37ba564eceda9fc4a9d6d4a6e`. Its retirement controls supersede PR615's earlier active archive-policy implementation. Both `source` and `qmd` entry points now refuse execution; the package has no executable dependency installation path. The separate frozen archive scan and its `2026-10-17` exception expiry remain canonical. No executor, package installation or benchmark was run by this source reconciliation.
+
+The earlier dated `archive-policy-20261002.json`, `run-future-before-archive-20261002.py.txt`, `2026-10-02-wsl-retrieval-archive.md` and receipt `north-star-publication-security-convergence-20261002` remain unchanged historical evidence. Their source hashes, conditional Claude policy agreement, original failures and longer historical deadline describe that earlier revision. They do not authorize the retired entry points, establish a current exception deadline or qualify a destination host. PR615's obsolete active `scripts/wsl_retrieval_archive.py` helper and its dedicated test are removed; the canonical convergence validator supplies the current archive attribution.
+
+PR615's two native stress requirements locks remain in the scanner inventory alongside canonical main's archive configuration. Existing SPY receipts, source seals, input/oracle/tolerance files and native failure records are preserved at their recorded revisions. The earlier exact-head CI evidence at `bf43e12270c558aabfd8129a1621ddd1946e26f8` does not qualify the reconciled source; current-head checks remain required.
+
+Source integration does not establish workstation deployment, safe comparative execution, built-in maintenance parity, broker paper acceptance or full-stack readiness. Whole-task usage and net savings remain unknown.

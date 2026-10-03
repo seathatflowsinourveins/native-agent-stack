@@ -1,4 +1,18 @@
-# Incomplete historical WSL retrieval reference
+# Retired historical WSL retrieval reference
+
+This directory is retired for installation and source/QMD replay. [run.py](run.py)
+fails both old modes before launching a subprocess or creating an output directory.
+The dependency-free [package.json](package.json) is a retirement guard; the original
+manifest and recording aid are preserved as text artifacts. The retained lock
+stays at its original path and remains in scanner inventory. Retirement neither
+patches the dependency nor establishes a scanner exception.
+
+The separate current QMD recipe is in [recipes/README.md](../../../recipes/README.md#component-catalog-install-and-check),
+with current native fixture guidance in [docs/native-token-ci.md](../../../docs/native-token-ci.md).
+Active QMD's [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+advisory remains unresolved; this historical retirement does not qualify or change
+that setup. [retirement-assessment.json](retirement-assessment.json) records the
+current source disposition separately from the original receipts.
 
 The retained September 20, 2026 receipts are an **incomplete historical fixture
 reference**. They do not establish native E2E or adoption acceptance. Per-command
@@ -45,6 +59,17 @@ The successful QMD receipt originally mapped `run.py` directly; the offline audi
 now resolves that historical name to the archived bytes. Neither receipt was
 rewritten to pretend it recorded today's file or missing invocation metadata.
 
+[package-original.json.txt](package-original.json.txt) preserves the original
+174-byte manifest with SHA-256
+`7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8`.
+Every historical `package.json` binding resolves to that archive without rewriting
+the receipts' frozen-input names or declared runner mappings.
+[run-recording-aid.py.txt](run-recording-aid.py.txt) preserves the later 16,427-byte
+recording aid with SHA-256
+`be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12`.
+It was a future recording aid, and is not attributed to the original execution.
+All original receipts, source review and earlier runner archives remain unchanged.
+
 The [install receipt](install-receipt.json) still records the actual historical
 `npm ci --ignore-scripts --omit=optional` action. Its contents and digest are
 unchanged. The [inventory](install-inventory.json) reports no optional llama
@@ -78,35 +103,30 @@ omitted inputs and same-count replacement checks as well as incorrect spans,
 source bodies, URI scope, stale updates, erased failures and unsupported claims.
 A zero audit exit means retained facts are consistent; its result explicitly
 reports `native_acceptance_established: false`. It cannot repair missing evidence.
+The companion `current_retirement_assessment` checks the exact new archives,
+retained lock, retirement manifest and current entrypoint hashes. Regressions reject
+changed recording-aid or manifest archives, restored dependencies/scripts and a
+missing runtime guard. Both old modes must stop before output or subprocess work.
+These are local integration and artifact checks; they do not establish native npm
+guard acceptance or a scanner exception.
 
-## Inactive archive and command capture
+## Supported entrypoint retirement
 
-[run.py](run.py) refuses `--mode qmd` before any effects. An independent read-only
-archive preflight validates metadata, the recorder hash, lock and expiry before
-any recorder mode can create state or launch commands. The harmless offline
-[audit](audit.py) remains available. Its source-only recording helper retains each attempted command's
-sanitized argument vector and working directory before launch, preserves argument
-boundaries, and records failed launches and timeouts. Private path roots become
-scope markers such as `<RUN>` and `<NODE>`; original historical facts receive no
-fabricated fields. Mocked regressions exercise this recording without invoking
-native retrieval. Both previously executed runner versions remain archived.
+The retained private manifest has no dependencies or lifecycle/replay scripts. Its
+`devEngines.runtime` names `retired-wsl-retrieval` with `onFail: error`. In the reviewed
+[npm 11.19.0 supported behavior](https://github.com/npm/cli/blob/v11.19.0/lib/base-cmd.js#L201),
+that runtime name is rejected before ordinary `install` and `ci`, including
+`--ignore-scripts`. The [tagged manifest documentation](https://github.com/npm/cli/blob/v11.19.0/docs/lib/content/configuring-npm/package-json.md#L1117)
+describes the check. Independent native controls belong to the separate retirement
+acceptance record; the offline audit checks the guard's artifacts only.
 
-The original future recorder remains byte-exact in
-[run-future-before-archive-20261002.py.txt](run-future-before-archive-20261002.py.txt).
-The unchanged experiment's original evaluation hash resolves only to that inert
-snapshot under [archive-policy-20261002.json](archive-policy-20261002.json).
-Production validation independently verifies the guarded current source and all
-historical fingerprints before the single-lock archival scanner exception.
+Removing a manifest alone would leave [npm Arborist's root-lock fallback](https://github.com/npm/cli/blob/v11.19.0/workspaces/arborist/lib/arborist/load-virtual.js#L50).
+The guard protects supported npm entry points. It is not an installation sandbox:
+explicit `--force`, other package managers and restored historical files are
+outside its claim. The text archives are evidence for offline review; this
+directory provides no supported replay or installation route.
 
-This archive provides no active QMD installation or activation recipe. A future
-independent trial requires a separate normally scanned qualified source and lock
-with supported installation and complete command capture. It must not restore this
-archive as its runtime environment. See the
-[dated archival decision](../../../docs/decisions/2026-10-02-wsl-retrieval-archive.md)
-for exact scope, owner, UTC expiry and fail-closed controls.
-
-Acceptance requires recovered verifiable historical invocation evidence or a
-separately authorized reachable-host trial with supported installation and complete
-command capture. Preserve native accounts, model/effort settings, caching and
-compaction. No automatic history capture is introduced. Whole-task provider,
-parent/child/retry/cache usage remains unknown; no savings claim is made.
+Recovered historical invocation evidence could reopen the incomplete acceptance
+assessment. A current QMD trial belongs to the separate maintained recipe and
+current status, with supported installation and complete command capture. Whole-task
+provider, parent/child/retry/cache usage remains unknown; no savings claim is made.

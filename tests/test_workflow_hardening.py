@@ -274,7 +274,7 @@ class SecurityScanTests(unittest.TestCase):
 
     def test_the_write_token_never_reaches_an_installed_tool(self):
         self.assertIn("GH_TOKEN: ${{ github.token }}", jobs(self.text)["zizmor-online"])
-        # The ordinary, macOS archive and WSL archive reports each retain their own category.
+        # OSV uploads the ordinary, frozen macOS and retired WSL reports under separate categories.
         for tool_job, upload_job, uploads in (("osv-scanner", "osv-sarif-upload", 3), ("zizmor-online", "zizmor-sarif-upload", 1)):
             upload = jobs(self.text)[upload_job]
             self.assertIn(f"needs: {tool_job}", upload, upload_job)
@@ -299,14 +299,12 @@ class SecurityScanTests(unittest.TestCase):
         self.assertIn("category: osv-scanner\n", upload)
         self.assertIn("category: osv-scanner-frozen-macos", upload)
         self.assertIn("category: osv-scanner-frozen-wsl-retrieval", upload)
-        # All partitions retain reports, and production preflight precedes their scans.
-        self.assertIn('python3 scripts/wsl_retrieval_archive.py --root . --json || exit $?', job)
-        self.assertLess(job.index('python3 scripts/wsl_retrieval_archive.py'), job.index('"${scan[@]}"'))
+        # Every group writes a report; all primary and SARIF statuses participate in the final status.
         for report in ("osv-scanner.sarif", "osv-scanner-frozen-macos.sarif", "osv-scanner-frozen-wsl-retrieval.sarif"):
             self.assertIn(report, job)
             self.assertIn(report, upload)
         self.assertIn("frozen_status", job)
-        self.assertIn("wsl_status", job)
+        self.assertIn("frozen_wsl_status", job)
 
     def test_zizmor_online_skips_pull_requests_and_reports_without_failing(self):
         job = jobs(self.text)["zizmor-online"]

@@ -3979,6 +3979,26 @@
         "No production-quality or token-efficiency comparison is claimed, and no unrelated session or authentication store was read."
       ],
       "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
+    },
+    {
+      "id": "wsl-retrieval-retirement-20261003",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "qmd"
+      ],
+      "claim": "The historical WSL retrieval fixture's supported run/install entry points are retired while its original records and lock bytes remain inspectable. Eight npm 11.19.0 controls refuse with EBADDEVENGINES. The strengthened exact workflow scans all 50 inventoried inputs in disjoint groups (48 ordinary, one macOS archive, one retired WSL archive): all three primary and three SARIF invocations return 0 under OSV 2.6.0, with zero SARIF results. The unchanged active-copy input under ordinary config and the final archive config with an expired date both return 1 for GHSA-vfj7-8cjw-p6xm. The integrated source/policy suite runs 161 tests, passing with two skips. The lock stays unchanged at its original path. Active QMD remains affected; current-head hosted CI and independent integration review are separate gates.",
+      "limitations": [
+        "Native CLI integration controls and offline artifact checks, not unchanged upstream test suites, model/provider execution, new-host acceptance or a general installation sandbox.",
+        "Preserve the original incomplete20260920 assessment, historical command facts, five failed commands and all original archives/lock byte-for-byte. Missing historical argv/cwd/raw logs remain unresolved. The former future recording aid is archived without historical execution attribution.",
+        "npm controls cover eight supported npm11.19 install/ci/prefix/ignore-scripts combinations only. --force, other package managers and restored historical sources remain outside the guard. Removing package.json alone does not prevent standalone-lock interpretation.",
+        "Original quoted-TOML-date scanner controls returned127 parse errors. Their outputs/configs are retained; one supported unquoted-date correction preceded the successful prospective/expiry controls.",
+        "Prospective scratch configs test native ignore/expiry behavior only. Dedicated configs affect every invocation input; explicit workflow inventory partitions, exact lock hashes, evidence binding and expiry controls enforce scope. Final repository partition/full-scan/current-head CI and review are separate evidence.",
+        "The frozen lock retains braces3.0.3 affected by GHSA-vfj7-8cjw-p6xm/CVE-2026-93687. No patch or active QMD acceptance is claimed; current general QMD use requires separate resolution.",
+        "All output digests bind published sanitized bytes only. Private task paths are role markers; original native output remains outside the checkout. Selected npm debug-log lines observe original argv/cwd with sanitized paths. No exhaustive filesystem audit or kernel trace.",
+        "No OS/security grants, target setup, service/timer operation, credential inspection, broker call or model run occurred. Whole-task provider usage and billing are unknown.",
+        "The earlier final-native-scan-record.json remains historical output for its bound earlier workflow/config. completion-native-record.json records the strengthened partition, shortened 2026-10-17 expiry, fresh active/expired controls and 161-test run; neither is an unchanged upstream test suite. The first completion validation failed on a stale hash row for an already-empty output and is retained, with the corrected diagnosis in publication-correction.md."
+      ],
+      "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
     }
   ],
   "files": [
@@ -4024,8 +4044,8 @@
     },
     {
       "path": ".github/osv-scanner-frozen-wsl-retrieval.toml",
-      "sha256": "949738750fff3878608d44b873001a91bdb903661bf46bc1b7fb2ad0becff2cc",
-      "bytes": 1291
+      "sha256": "8931d59b82ce8326ea0028adef428a1262f3e16800d1b744341960513a139887",
+      "bytes": 2330
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
@@ -4109,8 +4129,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "3a390947f34d0b244dee7adfe97ade5b4e22cc9cc130dde94c2d852d39aeb7da",
-      "bytes": 12714
+      "sha256": "76219f352b6eee1e498e7bcea91daaffc52a235ebf908e53fbf1e2e75e6a607a",
+      "bytes": 14553
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -6725,8 +6745,8 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/README.md",
-      "sha256": "31da660adfe46c73759af86458a20c32dc144c317988558ecde291579cf717ae",
-      "bytes": 6844
+      "sha256": "0c521bfbee47c91382f20b8cdf1bfcb7377d16cc981354f3da9690ba8435a4dd",
+      "bytes": 8389
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/archive-policy-20261002.json",
@@ -6735,13 +6755,13 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
-      "sha256": "46cbcaecafe6d4bba3b09a26aa9770667eefbc26d7bbb806d4f0ab98078e86fd",
-      "bytes": 11713
+      "sha256": "da2c4d58d7012febb1ce70d49111ecdbf22f46867fe84c098e01c75c7af0eabd",
+      "bytes": 14819
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json",
-      "sha256": "a029dc2d8de56dd387202e5bffc341ad9d0a163e93f7bc01954b932f4ecf0244",
-      "bytes": 11528
+      "sha256": "fb67f4143ffdb3593caba0f725a1a264cb13cb05bba23ec9bd2ecb0d5a4db669",
+      "bytes": 14342
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/install-inventory.json",
@@ -6764,9 +6784,14 @@
       "bytes": 82463
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-original.json.txt",
       "sha256": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8",
       "bytes": 174
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+      "sha256": "69ed6c37f8517e712ce64e1550c363926bdf25e42d8bfb30efa02b71197f3485",
+      "bytes": 283
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/pins.json",
@@ -6784,6 +6809,11 @@
       "bytes": 12226
     },
     {
+      "path": "blueprints/convergence-practice/wsl-retrieval/retirement-assessment.json",
+      "sha256": "88f1919546dcf8b9fda7b425c7d3ea2ea114b975ccdc6356e0775a3f4e81a9f0",
+      "bytes": 4162
+    },
+    {
       "path": "blueprints/convergence-practice/wsl-retrieval/run-future-before-archive-20261002.py.txt",
       "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
       "bytes": 16427
@@ -6799,9 +6829,14 @@
       "bytes": 15192
     },
     {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-recording-aid.py.txt",
+      "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
+      "bytes": 16427
+    },
+    {
       "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
-      "sha256": "728f4e52d6929cde6ef64c731f9c6aeb06e21703616ceb2face33ee10996c116",
-      "bytes": 17150
+      "sha256": "0df1c6873b8514cb08af2efebe479dfe46c35ad1e6b05d73796bee0d7cca702e",
+      "bytes": 722
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/decoy/other.md",
@@ -15775,8 +15810,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "a39d7d1dc38a537693e7bbbe3ee1c190c87414c659e4162f50c3f2200890ce16",
-      "bytes": 144342
+      "sha256": "82695fb0f06eb10ab874ecc1f592b0f8baf4c793547c3b4d52719a5c4c91867f",
+      "bytes": 147084
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -16024,6 +16059,11 @@
       "bytes": 4839
     },
     {
+      "path": "docs/decisions/2026-10-03-north-star-archive-policy-supersession.md",
+      "sha256": "50b2b2582885ba329fe7089176d9a0757efa5e68fc21ee0c8c62a4640b8ee90e",
+      "bytes": 1825
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -16050,8 +16090,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "0885a5ef19e36623e41104fd8d32286ad875bcf1f1e49fcf8a8313db09600fa5",
-      "bytes": 41473
+      "sha256": "905756238461861c5d2a8ca3b762e836ce0f1915abf4050e6b86690573668c4a",
+      "bytes": 41562
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -46549,6 +46589,441 @@
       "bytes": 12602
     },
     {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive-expired-invalid-attempt1.toml",
+      "bytes": 804,
+      "sha256": "2ac5bf924d35b1b986ca8da16edbb98d0870de7e8f2ce93506edeb4447227461"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive-expired.toml",
+      "bytes": 802,
+      "sha256": "cd3582604c56c2710df4054ba10d64ca092974c7edcfbdc744bdee0465582b42"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive-invalid-attempt1.toml",
+      "bytes": 956,
+      "sha256": "e9d061af04f9ad915ae903091eed0b5c38959a69b21f2645e8d18b00417d7c6c"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive.toml",
+      "bytes": 954,
+      "sha256": "bdf702621ea05990da2c6f57cdf76beb81dad3dadaaf9cf879c950419c57f22a"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/ci-correction.md",
+      "sha256": "27a2d3ca147c79e41ebbd5e1a9cc952b0d6891e6482fd6ae3b7c566751d8916a",
+      "bytes": 2488
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-active-control.exit.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-active-control.stderr.txt",
+      "bytes": 350,
+      "sha256": "cea7753846753213dc346b68771a0426205224c064b69faca0b2df5059f100b1"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-active-control.stdout.json",
+      "bytes": 4223,
+      "sha256": "4e08808f3ea453c25570a5fec746899c7ad4051564c167e5fe3505a167abe0d8"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-expired-final-config.toml",
+      "bytes": 2330,
+      "sha256": "4e9718c24a588f33b3d6d8d88ede1ec02c6bf8c8228303bfd057bd200299b143"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-expiry-control.exit.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-expiry-control.stderr.txt",
+      "bytes": 335,
+      "sha256": "5a4aad966dbd274a4dcc658af74a3b1a7adb53e7a635d01f081852aa71ea26ea"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-expiry-control.stdout.json",
+      "bytes": 4265,
+      "sha256": "b34c8fcb7422d6bd507fb17bb4ca0da0bb982665d575ed005ebeb62da19367e1"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-integration.exit.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-integration.stderr.txt",
+      "bytes": 28398,
+      "sha256": "ee349610c711adaa7a64da850fa7c8fd36a7447c8a3df2062acf446c4f119c21"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-integration.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-native-record.json",
+      "bytes": 8982,
+      "sha256": "140fe548dbeb2f9e3b520f40316c35ae8de4c698831ab23ceb390703bac34802"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-osv-scanner-frozen-macos.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-osv-scanner-frozen-wsl-retrieval.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-osv-scanner.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-scan.exit.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-scan.stderr.txt",
+      "bytes": 18215,
+      "sha256": "bb02db7b0614851f0847b822f0128259bab9afe37b68972499c3a9c603307209"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-scan.stdout.txt",
+      "bytes": 18271,
+      "sha256": "4931d246717288ba22376c2c8a441134830c1a3849594cc6aac40bbf1c672d00"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-scan.time.txt",
+      "bytes": 786,
+      "sha256": "d2d4bfd44026a121efa8ad7b722c2c1af1aad0e264b29ccafb927d1fc99fbe80"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-validate-before-scan.exit.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-validate-before-scan.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-validate-before-scan.stdout.txt",
+      "bytes": 240,
+      "sha256": "cada4ef85786da5a8e8c4ae7486cac1cf47fc43f5ebf34c5fdc7356c34b6d36f"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-workflow-scan.sh",
+      "bytes": 4308,
+      "sha256": "15ffbe6a824fb4bf041310488f17134adb79eadabda4a1407122d6f6a42c5d9e"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/controls.json",
+      "bytes": 12146,
+      "sha256": "d13f3f30f5f903305708a054af4b7f9f7d5b16d23baa0f2175dac571cd8ce48e"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive-attempt2.stderr.txt",
+      "bytes": 319,
+      "sha256": "fbda52df16997854cca318d7b1c11500610161cfc6c5c8229ed17a157e7d492e"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive-attempt2.stdout.json",
+      "bytes": 4238,
+      "sha256": "977a6e94151eadfc050710483f14683896a8b072585076f1a34844fd71845cfe"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive.stderr.txt",
+      "bytes": 294,
+      "sha256": "d3f5e81d6d698b0ae93a28c9bfeec7098ed95ad8d719e7da64dc2c8afec42b2e"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/final-native-scan-record.json",
+      "bytes": 10898,
+      "sha256": "edddd3f4fdddc2d30b7c9c4dd3c9ba858ebe02d5fb86d6714ada547f1042fb97"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-final-config-expired.toml",
+      "bytes": 2330,
+      "sha256": "a820c6eff5eed054a1d1b407e7fb186b1501bbf98b246fb0bb80fc846a5718da"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-final-expired.stderr.txt",
+      "bytes": 347,
+      "sha256": "e45f599be0d3d0dd13a76c710466aeb34a308e2ba634286b1530b4cb50cdf821"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-final-expired.stdout.json",
+      "bytes": 4268,
+      "sha256": "12e0886391e92655365a6e1dd67c99739fe4d1fa177207e98ef5e2a7adfabb12"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-stderr.txt",
+      "bytes": 18363,
+      "sha256": "9063e604c63e35a3888e392a3cacc577bff8e7ad2ba65c221eabfdb5117f7a00"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-stdout.txt",
+      "bytes": 18417,
+      "sha256": "15bd287f37de30aef9dd02294dcb3445160f288eac9572d809a506123e7d678a"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-workflow-scan.sh",
+      "bytes": 4304,
+      "sha256": "f55f319bcfd2a1bf5fbbe19c1cd0b2155b75a8086b34586465b67c1db0d06625"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-controls-red-2.json",
+      "bytes": 13589,
+      "sha256": "134eb82d5e4ea09cbba659f55ab095b760b1ed7eff60678eb7ba30a8171f8a2b"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-controls-red.json",
+      "bytes": 6190,
+      "sha256": "16f39aa625e6b278a3a8e9866c61067308580aca768305c8fbee04ab1730a5b2"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-audit-corrected.json",
+      "bytes": 1147,
+      "sha256": "00fc95b6825f98ab647338b1d9a569e83932a05162d398880705a09b8065ece2"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-convergence-corrected.json",
+      "bytes": 1202,
+      "sha256": "37ac83973ce8964b38ab3d39015f87239fa6a30787b4bb00af01401754e18d54"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-convergence.json",
+      "bytes": 1007,
+      "sha256": "c02b9a8cb52f1b9260e9f226798a460e2ee3d35a20ab430a873e4b6851afb8a7"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-registry-validation.json",
+      "bytes": 1416,
+      "sha256": "b774599996dceabfcafef0b048762310b33a39a09a0ad10e7b78fbc25c23e7d8"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-tests-corrected.json",
+      "bytes": 5878,
+      "sha256": "2cfed079ea30283412fc8221bb1618342b0c48f8ff7571af9b9e9cabb74a16de"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-runner-controls.json",
+      "bytes": 2429,
+      "sha256": "3d0d0533b74526b54b89e668c0e5bc53a0487425de5c087d74375b620d8b4ae6"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/independent-source-review.md",
+      "bytes": 2277,
+      "sha256": "690c99ab20795d8ac5dac47b25d524de4f597bce019e27f2bc68ad5dc232e614"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/integrated-osv-tests.stderr.txt",
+      "bytes": 7766,
+      "sha256": "266207212c8b17dfdd323d0ab321fcefd27ac03d5d70c6655ce1ceeccab80488"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/integrated-osv-tests.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/macos-portability-correction.md",
+      "sha256": "a5e818c83f779137dec59e0dc1d5d2742552742055de770519e554d15ce68f02",
+      "bytes": 5617
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/macos-portability-integration.stdout.txt",
+      "sha256": "c6a0fc5f9311456adab5889d9dec5921c006fea6533071a90d1f7c4d33d20619",
+      "bytes": 276
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-ignore.native-command.txt",
+      "bytes": 288,
+      "sha256": "1654f7d1ed9773f268e4f984aca1cd950b378690a1bdc20777b217a452754841"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-ignore.stderr.txt",
+      "bytes": 639,
+      "sha256": "0e2a6f0dfbc8166331bd4e4e62f03dd76aae4e938dc3916e4503b362279e9c24"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-ignore.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix-ignore.native-command.txt",
+      "bytes": 325,
+      "sha256": "13cddf30b430b728b0eccd38a08b116ec87941bf851d7b84e3d087ab540b2a05"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix-ignore.stderr.txt",
+      "bytes": 646,
+      "sha256": "4265db3c389d726228062ba7d1a91d10462aca40cf8d71e34a4345ece225d0ab"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix-ignore.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix.native-command.txt",
+      "bytes": 299,
+      "sha256": "00613e888df6ccca4c05e3ddfedbf070b1b70a1ced962efe3f3469fb8356809a"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix.stderr.txt",
+      "bytes": 639,
+      "sha256": "417b69b6d42f8960cd37baaaebeb48c28fececb9c72d289aad15cb20a192b0a3"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci.native-command.txt",
+      "bytes": 262,
+      "sha256": "78e902a357299fdc7b2a79b7512084ca83fc2c112cd69e7e4e2da1a85513cb7e"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci.stderr.txt",
+      "bytes": 632,
+      "sha256": "12dd3fb22d309e147f2b5e5fcb06040c645487b6996c846925bda70b52247852"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-ignore.native-command.txt",
+      "bytes": 298,
+      "sha256": "351569d470470479f317374dc31ce440bf20ec97f80a8e4db9465fc0fe01891c"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-ignore.stderr.txt",
+      "bytes": 644,
+      "sha256": "3df09a18c83259eb852943e8801ded30e3d070adb19f96df0715e6ca03160682"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-ignore.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix-ignore.native-command.txt",
+      "bytes": 335,
+      "sha256": "714336d9bd268dec7e70329219ee4483ebbf7272cfffaacba20e03083fc366a5"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix-ignore.stderr.txt",
+      "bytes": 651,
+      "sha256": "46b7816e3ccca428816bb99ab777f86b098c11359890d4d89c148276050b7ed5"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix-ignore.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix.native-command.txt",
+      "bytes": 309,
+      "sha256": "a3f6d02228d6d8f7b705410c0c7f16ee3a67dbbd83e74bf44cc63c1e7151b5e8"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix.stderr.txt",
+      "bytes": 644,
+      "sha256": "db82ddd782c6966f9546348d032ae3c5311ee8e53f15f04660673c14f4c2f5e9"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install.native-command.txt",
+      "bytes": 272,
+      "sha256": "591050f725b226fceacb6dd41a607fe2465def6c0432edc08051e92e1894229f"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install.stderr.txt",
+      "bytes": 637,
+      "sha256": "813228f309860963e373f19fe5dce00ebee8aa83e7d406ccd0e63bd233524e94"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/ordinary-active.stderr.txt",
+      "bytes": 382,
+      "sha256": "910710222f50d1e2e0436a5ae85c7eabaa69cfcac730e1047454f4e0ad10a971"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/ordinary-active.stdout.json",
+      "bytes": 4238,
+      "sha256": "977a6e94151eadfc050710483f14683896a8b072585076f1a34844fd71845cfe"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/osv-scanner-frozen-macos.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/osv-scanner-frozen-wsl-retrieval.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/osv-scanner.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive-attempt2.stderr.txt",
+      "bytes": 968,
+      "sha256": "500d6eb187a05311b37d0cb6d03ea2752b365cf869d44fb98bfc37930d876b11"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive-attempt2.stdout.json",
+      "bytes": 124,
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive.stderr.txt",
+      "bytes": 294,
+      "sha256": "51d1d7bf8dd549a7e1e7fec51000cb7010e626455904fc852033c6d05f64d26f"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/publication-correction.md",
+      "bytes": 1671,
+      "sha256": "b833498956e275154205a4ce17fda3d47b0c7155001207230de1429e2dddc2a5"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/receipt-binding-correction.md",
+      "sha256": "91a3be1712b4ab7e495e8420fbc05611351c7811faf45ccef14d2f8bf329a6a6",
+      "bytes": 2896
+    },
+    {
       "path": "evidence/artifacts/wsl-terminal-defaults-20260929/README.md",
       "sha256": "4416d422a5ec3064dd14f7c27a9b09191a5568f1b7c8bade742f0bc351089d27",
       "bytes": 4408
@@ -48254,6 +48729,11 @@
       "bytes": 2455
     },
     {
+      "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json",
+      "sha256": "332fe3c68b7a376caaf72af1976fff213fd604702b326ae85586c7d6c602a91b",
+      "bytes": 6608
+    },
+    {
       "path": "evidence/receipts/wsl-terminal-defaults-20260929.json",
       "sha256": "5747e6c7323ed3ed94aca51dce6984e823b8950c8a2854576b1627280744dd33",
       "bytes": 15471
@@ -49050,8 +49530,8 @@
     },
     {
       "path": "scripts/validate_convergence.py",
-      "sha256": "c49751ef44c8e30324dae87f7939678a30003c24cca6f6d3c5d73c60c1907aa7",
-      "bytes": 16429
+      "sha256": "f8087ceb7a103130808b0cdc2b071cac02edf5fc6dd3e21870618b99c7678367",
+      "bytes": 14985
     },
     {
       "path": "scripts/validate_foundation.py",
@@ -49062,11 +49542,6 @@
       "path": "scripts/verify_nautilus_ci.py",
       "sha256": "e14e3372815747eefa800f3538f30eabfb4fab7025ccc507bb0b946e67d2292f",
       "bytes": 8608
-    },
-    {
-      "path": "scripts/wsl_retrieval_archive.py",
-      "sha256": "0a72c6f465ce259104743969d7034c639c2a9602f75238298530a4e739fcd9a6",
-      "bytes": 9233
     },
     {
       "path": "tests/__init__.py",
@@ -49915,8 +50390,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "998fb13fb290a3dc953debf9a3d1dc6eaad773ee37cbbe2fb923e2641153532d",
-      "bytes": 47055
+      "sha256": "a5cb994e66138fdad5da76abaaf6e4645266b575eaf722cfb239cc78fe6d6da9",
+      "bytes": 65234
     },
     {
       "path": "tests/test_path_safety.py",
@@ -50175,8 +50650,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "0e4ef22bbf2f3a225c6ffc4710869b4b72e1f2c0b111883c2bd1a315f355fcdb",
-      "bytes": 87715
+      "sha256": "44392072d04e137e45c8d92f99b9f7ce650e75c39446731b016e3150a4c9424d",
+      "bytes": 87539
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -50210,13 +50685,8 @@
     },
     {
       "path": "tests/test_wsl_retrieval.py",
-      "sha256": "83353f3ccaa8bc01518f529846bf92167f7e21023e430ef8523af3e129afd903",
-      "bytes": 12720
-    },
-    {
-      "path": "tests/test_wsl_retrieval_archive.py",
-      "sha256": "ffd93b454808bf6dd929c2bdbfc9012c6e14cfb051d09c0b319c7d99f1320fc0",
-      "bytes": 21361
+      "sha256": "b4e1abcc70ed75d302ca3ecabfba23bda9f53ab4a460a1d0fc16fd47453ea7fa",
+      "bytes": 18897
     },
     {
       "path": "tests/test_zizmor_negative_control.py",
