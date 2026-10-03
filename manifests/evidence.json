@@ -4070,8 +4070,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "9e0877d9dc04647fe350a6ad37b87abbae2f745d51e14f9964f87239c9b56fcf",
-      "bytes": 13808
+      "sha256": "40595dfcde0dea50175380e773d78ff5aca00be901a290ea634fef8b84fe64a1",
+      "bytes": 13787
     },
     {
       "path": "CLAUDE.md",
@@ -15738,6 +15738,11 @@
       "path": "docs/decisions/2026-09-29-key-management.md",
       "sha256": "76d68d3e49eff51bc471539b57baca672afa000233d5ebe447c39b9a74cca357",
       "bytes": 93607
+    },
+    {
+      "path": "docs/decisions/2026-09-29-retire-polaris.md",
+      "sha256": "77a716f97b8bc5a2ed0ed372a9ffbbf179a56407d32eb557b49706d06130187c",
+      "bytes": 5291
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
