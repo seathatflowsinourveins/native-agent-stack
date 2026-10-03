@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "kind": "repository_integration_acceptance",
+  "scope": "Actual returned output from all twelve contract-required repository checks after pin integration, receipt indexing and source/report registration, before this acceptance artifact is added. Native repository tests and deterministic validation, not unchanged upstream component suites or new live provider/browser/host-service acceptance. A final validate.py run after registering this artifact verifies its publication integrity.",
+  "preparation_commands": [
+    {
+      "command": "rtk python3 scripts/component_matrix.py --write",
+      "exit_code": 0,
+      "stdout": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}\n"
+    },
+    {
+      "command": "rtk python3 scripts/new_host_grand_list.py --write",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}\n"
+    }
+  ],
+  "commands": [
+    {
+      "id": "validate",
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "stdout": "{\"components\": 69, \"hashed_files\": 9424, \"profiles\": 4, \"receipts\": 189, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stdout_sha256": "fd6bbf39fa6023903a434a5bbb59ccc0e34aa124ede12e5ca7a983d717696f40",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "convergence",
+      "command": "rtk python3 scripts/validate_convergence.py --all-recorded --root . --json",
+      "exit_code": 0,
+      "stdout": "{\"records\": [{\"errors\": [], \"observations\": 3, \"path\": \"blueprints/blind-catalog-convergence/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/blind-catalog-convergence/memory-experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 4, \"path\": \"blueprints/catalog-runtime-review/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 15, \"path\": \"blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/application-delivery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/ci-security/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/document-ingestion/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 0, \"path\": \"blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/gpu-inference/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-macos.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 7, \"path\": \"blueprints/convergence-practice/local-inference-latest-20260926/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/mac-memory-patch/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/claude/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/native-worker/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 20, \"path\": \"blueprints/convergence-practice/omniroute-routing-20260928/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-memory-maintenance/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 0, \"path\": \"blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-retrieval/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/wsl-transport-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 8, \"path\": \"blueprints/us-equities/sim-capacity/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 6, \"path\": \"evidence/artifacts/local-model-workloads-20260924/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 24, \"path\": \"evidence/artifacts/memory-stack-20260925/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json\", \"valid\": true}], \"valid\": true}\n",
+      "stdout_sha256": "672ad5b6c96651f6d613a584d812f00e78339b7db50fec643a27aaaf148c906c",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "landscape",
+      "command": "rtk python3 scripts/landscape.py --root .",
+      "exit_code": 0,
+      "stdout": "{\"counts\": {\"applied_skills\": 3, \"comparison_candidates\": 365, \"comparison_repositories\": 161, \"current_public_stars\": 343, \"dispositions\": {\"conditional\": 164, \"measured_tradeoff\": 9, \"out_of_scope\": 9, \"overlap\": 14, \"selected\": 136, \"unqualified\": 33}, \"domain_layers\": 4, \"explained_components\": 69, \"foundation_decisions\": 54, \"foundation_layers\": 20, \"foundation_statuses\": {\"accepted_within_scope\": 44, \"partial_acceptance\": 2, \"source_review\": 8}, \"historical_candidate_cards\": 154, \"layers\": 32, \"quality_review_repositories\": 16, \"research_queue_layers\": 32, \"research_repositories\": 875, \"selected_components\": 69}, \"scope\": \"Coverage and reference integrity; no new runtime or ranking acceptance.\", \"status\": \"passed\"}\n",
+      "stdout_sha256": "f2ffcf6bb1442024fdf17236278925740ad8416a239fe8aa8133c7b75cabeadb",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "unit-suite",
+      "command": "rtk python3 -B -m unittest tests.test_stack_lifecycle tests.test_render_config tests.test_adoption_contract tests.test_grand_dashboard tests.test_landscape_sweep_harness",
+      "exit_code": 0,
+      "stdout": "Installed dashboard and two units; service activation remains explicit.\nstarted start-race\nnot started launch-refused: the job runner could not start\n",
+      "stdout_sha256": "218009ef7d10a4a842bbb74f17cacb1afed3ca4cf06f2e084ebf9d7c2a9ec82d",
+      "stderr": "........................................................................................................................................s.................................................................................................ss............................\n----------------------------------------------------------------------\nRan 264 tests in 46.532s\n\nOK (skipped=3)\n",
+      "stderr_sha256": "c2216b5258a9a7d0d8ebc0bc775fc8c626864b948eb90fd2bd1e3ddfb3e59b6d"
+    },
+    {
+      "id": "catalogs",
+      "command": "rtk python3 scripts/validate_catalogs.py",
+      "exit_code": 0,
+      "stdout": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n",
+      "stdout_sha256": "8f241daedb4f7a5eaaff358e5653981120ee9436a8959c7b968eedb30dbe9a01",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "foundation",
+      "command": "rtk python3 scripts/validate_foundation.py --root . --json",
+      "exit_code": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"counts\": {\n    \"layers\": 20,\n    \"decisions\": 54,\n    \"foundation_components\": 61,\n    \"domain_components\": 7,\n    \"evidence_receipts\": 84,\n    \"candidates\": 3\n  },\n  \"errors\": []\n}\n",
+      "stdout_sha256": "b6535ffab61c1faafa85b93dbe965f253fa479ac0c58dfb6af61c0094a001d3f",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "component-matrix",
+      "command": "rtk python3 scripts/component_matrix.py --check",
+      "exit_code": 0,
+      "stdout": "{\"rows\": 32, \"status\": \"checked\"}\n",
+      "stdout_sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "grand-list",
+      "command": "rtk python3 scripts/new_host_grand_list.py --check",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}\n",
+      "stdout_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "ecosystem",
+      "command": "rtk python3 scripts/build_ecosystem.py --check",
+      "exit_code": 0,
+      "stdout": "{\"architecture_pin_drift\": [{\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/native-clients\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"agent-browser\", \"edition_pin\": \"0.38.1\", \"row\": \"foundation/web-research\", \"stack_pin\": \"0.38.2\"}, {\"component_id\": \"nextjs\", \"edition_pin\": \"16.3.6\", \"row\": \"foundation/hosting-services\", \"stack_pin\": \"16.3.8\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/agent-sdks\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"cross/cross:gpt6-harnesses\", \"stack_pin\": \"0.159.3\"}], \"bytes\": 15087303, \"input_sha256\": \"853a4768d978fc689a00646d165d6639961166104200803fb4a5dbcdd2a70c52\", \"output_sha256\": \"1c65834862f56928a48fb07cf60e8f6773586eb424f8c04209a58ecbceb37584\", \"status\": \"passed\"}\n",
+      "stdout_sha256": "5dd7e44476b0f753b1ab5473c3ec935972edcbfc2c2988474c60d2f3c8dd65ea",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "registry-lockfiles",
+      "command": "rtk python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed",
+      "exit_code": 0,
+      "stdout": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.039s\n\nOK\n",
+      "stderr_sha256": "50123f26e6d30940556cc448291d77c1880d497121f6c91559a6a7bdb8620941"
+    },
+    {
+      "id": "registry-blueprints",
+      "command": "rtk python3 -B -m unittest tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified",
+      "exit_code": 0,
+      "stdout": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.195s\n\nOK\n",
+      "stderr_sha256": "64ef6a1d5dbc4246f2f0b78e2a4fad11112a3c5229a99dfafe49b4cbbccda2ef"
+    },
+    {
+      "id": "registry-workflows",
+      "command": "rtk python3 -B -m unittest tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "stdout": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "stderr_sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5"
+    }
+  ],
+  "known_check_output": "build_ecosystem.py --check passes and reports twelve architecture_pin_drift rows. Four concern the two newly moved components (agent-browser once, grafana three times); eight concern pre-existing codex/nextjs differences. These configuration-owner editions are outside this contract."
+}

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "grafana",
+    "version": "13.2.3",
+    "repository": "https://github.com/grafana/grafana",
+    "license": "AGPL-3.0-only",
+    "url": "https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz",
+    "sha256": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235",
+    "checksum_source": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux",
+    "strip_root": true,
+    "source_commit": "6193dc03311b631b9727b560d24369e683dc396e",
+    "verified_sha256": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235",
+    "prefix": "<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem-grafana-13.2.3"
+  }
+]

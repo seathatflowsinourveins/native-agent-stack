@@ -28,7 +28,7 @@ notifications. [Machine-readable evidence](receipt.json) records the exact scope
 | Context and accounting | mksglu/context-mode; rtk-ai/rtk; ccusage/ccusage | Context/output estimates separate from native usage; scoped retrieval rather than full-log ingestion |
 | Memory and retrieval | akitaonrails/ai-memory; SocratiCode; qdrant/qdrant; vllm-project/vllm; QMD | Prior memory/RAG acceptance plus current service metrics; no new universal memory index |
 | Collection | open-telemetry/opentelemetry-collector-contrib 0.161.0 | One Collector process using core/contrib components; selected private correlation IDs retained |
-| Storage and viewing | prometheus/prometheus 3.14.0; grafana/loki 3.7.8; grafana/grafana 13.2.2 | Native queries, dashboard, bounded retention and restart acceptance |
+| Storage and viewing | prometheus/prometheus 3.14.0; grafana/loki 3.7.8; grafana/grafana 13.2.3 | Native queries, dashboard, bounded retention and restart acceptance |
 | Alert delivery | prometheus/alertmanager 0.34.1; binwiederhier/ntfy 2.28.0 | Native webhook and bundled ntfy template; local inbox only |
 | Workflow/research | Dagu; DeerFlow; native Astra SDK; LEAN | Existing execution receipts plus local service observation; no connected broker |
 

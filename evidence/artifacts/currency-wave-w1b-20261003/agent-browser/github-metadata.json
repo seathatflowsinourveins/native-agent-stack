@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "methodology_source": "catalogs/landscape/upstream-snapshot.json#/methodology",
+  "raw_stdout_preserved_privately": true,
+  "observation": {
+    "component_id": "agent-browser",
+    "repository": "https://github.com/vercel-labs/agent-browser",
+    "selected_repository_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+    "selected_version": "0.38.2",
+    "selected_source_pin": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+    "checks": [
+      {
+        "endpoint": "repos/vercel-labs/agent-browser",
+        "exit_code": 0,
+        "started_at": "2026-10-03T07:15:37.870837+00:00",
+        "ended_at": "2026-10-03T07:15:38.293371+00:00",
+        "stdout_sha256": "f8ece5872fc9bed2e63e611de0e361d83f55f56024dbcc2ab00202d999481113",
+        "status": "ok"
+      },
+      {
+        "endpoint": "repos/vercel-labs/agent-browser/releases/latest",
+        "exit_code": 0,
+        "started_at": "2026-10-03T07:15:37.871125+00:00",
+        "ended_at": "2026-10-03T07:15:38.219460+00:00",
+        "stdout_sha256": "5a1e45fb31cc1d29df29e030af5ce312af9b6beed640433255ae61b1e7028189",
+        "status": "ok"
+      },
+      {
+        "endpoint": "repos/vercel-labs/agent-browser/commits/39a74c70d7759d5a6de7a22c04570bb626bbd081",
+        "exit_code": 0,
+        "started_at": "2026-10-03T07:15:37.871559+00:00",
+        "ended_at": "2026-10-03T07:15:38.210703+00:00",
+        "stdout_sha256": "563d5b972227872122e12f5b59f14313e1b5fd0de6870b28cbd7e4a399ead76c",
+        "status": "ok"
+      },
+      {
+        "endpoint": "repos/vercel-labs/agent-browser/commits/v0.38.2",
+        "exit_code": 0,
+        "started_at": "2026-10-03T07:15:37.872108+00:00",
+        "ended_at": "2026-10-03T07:15:38.200337+00:00",
+        "stdout_sha256": "563d5b972227872122e12f5b59f14313e1b5fd0de6870b28cbd7e4a399ead76c",
+        "status": "ok"
+      }
+    ],
+    "canonical_repository": "https://github.com/vercel-labs/agent-browser",
+    "archived": false,
+    "disabled": false,
+    "default_branch": "main",
+    "pushed_at": "2026-10-03T06:28:26Z",
+    "license_spdx": "Apache-2.0",
+    "latest_stable_release": {
+      "tag_name": "v0.38.2",
+      "published_at": "2026-10-01T21:44:28Z",
+      "html_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+      "target_commitish": "main",
+      "prerelease": false,
+      "draft": false
+    },
+    "latest_release_source": {
+      "ref": "v0.38.2",
+      "sha": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "html_url": "https://github.com/vercel-labs/agent-browser/commit/39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "committed_at": "2026-10-01T20:12:51Z"
+    },
+    "status": "metadata_checked",
+    "adoption_recommendation": "retain_selected_pending_capability_comparison",
+    "source_pin_kind": "git_commit",
+    "primary_repository": "https://github.com/vercel-labs/agent-browser",
+    "release_relationship": "selected_version_matches_latest_stable",
+    "selected_pin_matches_latest_release_commit": true,
+    "checked_at": "2026-10-03T07:15:38.293371+00:00",
+    "selected_pin_source": {
+      "ref": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "sha": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "html_url": "https://github.com/vercel-labs/agent-browser/commit/39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "committed_at": "2026-10-01T20:12:51Z"
+    }
+  }
+}

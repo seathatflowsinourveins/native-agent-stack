@@ -1,0 +1,102 @@
+[ns] ip link set lo up exit=0
+[ns] interfaces: lo(127.0.0.1/8) 
+[ns] listeners before start: 0
+[candidate-fresh] /api/health up after ~21s: {"database":"ok","version":"13.2.3","commit":"90ffed056f0884267356c12a0eeb72a022af53f1"}
+[candidate-fresh] manifest command: curl --fail --silent http://127.0.0.1:13000/api/health exit=0 output={"database":"ok","version":"13.2.3","commit":"90ffed056f0884267356c12a0eeb72a022af53f1"}
+[candidate-fresh] listening sockets in the namespace:
+   tcp 127.0.0.1:13000 users:(("grafana",pid=11,fd=72))
+[candidate-fresh] basic:
+{
+  "admin_folders": {
+    "http": 200,
+    "titles": [
+      "Ecosystem"
+    ]
+  },
+  "admin_get_datasources": {
+    "http": 200,
+    "readOnly": [
+      true
+    ],
+    "types": [
+      "alertmanager",
+      "loki",
+      "prometheus"
+    ],
+    "uids": [
+      "ecosystem-alertmanager",
+      "ecosystem-loki",
+      "ecosystem-prometheus"
+    ]
+  },
+  "anonymous_get_dashboard": {
+    "canSave": false,
+    "folderTitle": "Ecosystem",
+    "http": 200,
+    "panels": 26,
+    "provisioned": true,
+    "title": "Native agent ecosystem",
+    "uid": "ecosystem-native",
+    "version": 1
+  },
+  "anonymous_post_datasource": {
+    "http": 403,
+    "rejected": true
+  },
+  "anonymous_search": {
+    "http": 200,
+    "uids": [
+      "ecosystem-native"
+    ]
+  },
+  "health": {
+    "body": {
+      "commit": "90ffed056f0884267356c12a0eeb72a022af53f1",
+      "database": "ok",
+      "version": "13.2.3"
+    },
+    "http": 200
+  }
+}
+[candidate-fresh] smoke_checks basic exit=0
+[candidate-fresh] unprovision:
+{
+  "canSave": true,
+  "folderTitle": "Ecosystem",
+  "http": 200,
+  "panels": 26,
+  "provisioned": false,
+  "seconds_to_unprovision": 30.1,
+  "title": "Native agent ecosystem",
+  "uid": "ecosystem-native",
+  "version": 1
+}
+[candidate-fresh] smoke_checks unprovision exit=0
+[candidate-fresh] graceful stop (SIGTERM) -> grafana exit=0
+[candidate-fresh] listeners after stop: 0
+[candidate-fresh] log lines=27 warn=10 error=16
+   logger=migrator t=2026-10-03T01:52:52.568416223-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop unique orgID index on alert_configuration if exists"
+   logger=migrator t=2026-10-03T01:52:54.99033242-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop index UQE_dashboard_public_config_uid - v1"
+   logger=migrator t=2026-10-03T01:52:55.009582183-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop index IDX_dashboard_public_config_org_id_dashboard_uid - v1"
+   logger=migrator t=2026-10-03T01:52:55.856427566-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key to file table if my_row_id exists (auto-generate
+   logger=migrator t=2026-10-03T01:52:55.970385428-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key to file_meta table if my_row_id exists (auto-gen
+   logger=migrator t=2026-10-03T01:52:58.484261401-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns snapshot_uid,resource_type,partitio
+   logger=secret-migrator t=2026-10-03T01:53:01.821361146-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns namespace,name,version to ta
+   logger=resource-migrator t=2026-10-03T01:53:02.382373511-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns group,resource to table re
+   t=2026-10-03T01:53:04.839996913-04:00 level=warn caller=logger.go:224 time=2026-10-03T01:53:04.839986163-04:00 msg="skipped registering status sub-resource that does not support dual writing" resource=recordingrules.rules.alerting
+   t=2026-10-03T01:53:04.840041794-04:00 level=warn caller=logger.go:224 time=2026-10-03T01:53:04.840039264-04:00 msg="skipped registering status sub-resource that does not support dual writing" resource=alertrules.rules.alerting.gra
+   logger=provisioning.plugins t=2026-10-03T01:53:05.36200458-04:00 level=error msg="Failed to read plugin provisioning files from directory" path=<QUALIFICATION_ROOT>/grafa
+   logger=provisioning.alerting t=2026-10-03T01:53:05.362075872-04:00 level=error msg="can't read alerting provisioning files from directory" path=<QUALIFICATION_ROOT>/grafa
+   logger=plugin.zipkin t=2026-10-03T01:53:36.528930759-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosyste
+   logger=plugin.elasticsearch t=2026-10-03T01:53:36.530662043-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/e
+   logger=plugin.prometheus t=2026-10-03T01:53:36.532116935-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecos
+   logger=plugin.mssql t=2026-10-03T01:53:36.533038972-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem
+   logger=plugin.grafana-pyroscope-datasource t=2026-10-03T01:53:36.536251302-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installe
+   logger=plugin.tempo t=2026-10-03T01:53:36.536248909-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem
+   logger=plugin.loki t=2026-10-03T01:53:36.536442769-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem-
+   logger=plugin.stackdriver t=2026-10-03T01:53:36.536615404-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/eco
+   logger=plugin.mysql t=2026-10-03T01:53:36.537111911-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem
+   logger=plugin.grafana-postgresql-datasource t=2026-10-03T01:53:36.536925406-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-install
+   logger=plugin.jaeger t=2026-10-03T01:53:36.536757589-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosyste
+   logger=plugin.opentsdb t=2026-10-03T01:53:36.539113737-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosys
+   logger=plugin.influxdb t=2026-10-03T01:53:36.540997759-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosys

@@ -34,8 +34,8 @@
     },
     {
       "id": "agent-browser",
-      "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
-      "version": "0.38.1",
+      "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+      "version": "0.38.2",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Local native browser snapshot/ref interaction",
@@ -54,13 +54,15 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "agent-browser-0382-qualification-20261003"
       ],
       "upstream_sources": [
-        "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
+        "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+        "https://github.com/vercel-labs/agent-browser/tree/39a74c70d7759d5a6de7a22c04570bb626bbd081"
       ],
-      "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "source_pin": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "freshness": "Qualified in an isolated Linux x86_64 prefix on 2026-10-03; W1b integrates the recorded W1-r2 qualification. Host activation remains separate."
     },
     {
       "id": "agentsview",
@@ -1193,8 +1195,8 @@
     },
     {
       "id": "grafana",
-      "repository": "https://github.com/grafana/grafana",
-      "version": "13.2.2",
+      "repository": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+      "version": "13.2.3",
       "license": "AGPL-3.0-only",
       "profile": "observability",
       "role": "Local native observation dashboard",
@@ -1216,13 +1218,18 @@
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "grafana-1323-qualification-20261003"
       ],
-      "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+      "source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
       "upstream_sources": [
-        "https://github.com/grafana/grafana"
+        "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+        "https://github.com/grafana/grafana/tree/6193dc03311b631b9727b560d24369e683dc396e",
+        "https://grafana.com/security/security-advisories/cve-2026-13719",
+        "https://grafana.com/security/security-advisories/cve-2026-13720",
+        "https://grafana.com/security/security-advisories/cve-2026-81841"
       ],
-      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+      "freshness": "Qualified in an isolated Linux x86_64 prefix on 2026-10-03; W1b integrates the recorded W1-r2 qualification. Host activation remains separate."
     },
     {
       "id": "alertmanager",

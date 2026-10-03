@@ -216,11 +216,11 @@
     },
     {
       "id": "agent-browser",
-      "version": "0.38.1",
+      "version": "0.38.2",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/agent-browser/-/agent-browser-0.38.1.tgz",
-      "sha256": "89a7df4761ff335e4dd5367e4cf04cecb9ba4e2cc130a0220f798d188414dc6c",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had agent-browser 0.38.1 installed on 2026-09-23 (confirmed there with `agent-browser --version`). That is one host's state, not evidence about any other Linux host. npm registry tarball re-downloaded independently; npm dist.integrity sha512-k58FCz0yUOCANoNkMiqJe+H2y6r6sUZazqXsWF+MYq1iRC42PjtLcBoag6SSTOD/FRQppvPDvE5HDYEhclvnhw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/agent-browser-0.38.1 agent-browser@0.38.1`. That host's installed copy placed its own platform binary at `node_modules/agent-browser/bin/agent-browser-linux-x64`, resolved by the package's own postinstall/bin dispatch; `install_npm`'s existing generic `bin/*` symlink loop covers this the same way it covers every other npm-kind pin here.",
+      "url": "https://registry.npmjs.org/agent-browser/-/agent-browser-0.38.2.tgz",
+      "sha256": "2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49",
+      "install_note": "2026-10-03 W1-r2 isolated-prefix qualification: npm dist.integrity sha512-b/7hvo2RrqocvybjB9kwpX12kGkxkFvtdJ4XPDoott5TLK2n3aPX+lYg7ALd+2YvPi2LrTKGzQYu/rxZC2Y7ZA== matches the verified tarball; registry shasum 3eeb49e7d02a31be255a0462830dd8a147fc5f29. npm audit signatures recorded one verified registry signature and one verified attestation; all seven bundled binaries matched the GitHub release asset digests. `npm install --global --prefix tools/agent-browser-0.38.2 agent-browser@0.38.2` exited 0; --version returned agent-browser 0.38.2. Offline skills/config smoke only; live browser workflow and browser download not run. The package postinstall/bin dispatch places the platform binary in bin/; install_npm retains its generic bin/* symlink loop. Qualification: evidence/receipts/agent-browser-0382-qualification-20261003.json.",
       "version_probe": {
         "method": "exec",
         "command": "agent-browser",
