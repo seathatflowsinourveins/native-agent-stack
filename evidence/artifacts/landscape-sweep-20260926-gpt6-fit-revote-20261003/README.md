@@ -33,8 +33,14 @@ wrapper prompt for workers had 240 lines against 239 here. This record does not 
 
 1. **Completion gate.** At 09:46:10Z this stage ran `codex_call.sh --work-dir <lane> result gpt6-fit-<layer>` for the
    nine native jobs, `result gpt6-fit-<layer>-omni` in the OmniRoute lane and `result gpt6-probe`, and saved each JSON
-   line unchanged. A job counts only when its status is done, its exit is 0 and `last.json` parses. A layer's votes
-   come from its native job when that job counts, else from its OmniRoute job.
+   line unchanged in the private work directory, which is not published. `jobs.json` keeps every field of each line as
+   `result` except two. `output_text` is replaced by `output`, the parsed `last.json` of a counted job (equal to the
+   parsed `output_text`), and `output_sha256`, the sha256 of the `last.json` bytes; the never-started OmniRoute jobs
+   have a null `output_text` and neither field. `stderr_tail` is not retained; `stderr` summarizes it. A review-round
+   check at 2026-10-03T16:48:45Z re-serialized each `output` as compact JSON (`separators=(",", ":")`,
+   `ensure_ascii=False`) and reproduced all ten counted lines' `output_text` byte for byte. A job counts only when its
+   status is done, its exit is 0 and `last.json` parses. A layer's votes come from its native job when that job counts,
+   else from its OmniRoute job.
 2. **Votes.** `convert.gpt6_out` and `convert.votes_by_slug` (a refuting vote wins a duplicate) over `last.json`. The
    proposals of `props/<layer>.json` pair in order with the sealed indices whose `fit.gpt6` is missing; the
    `sweep_common.slug` of each pair matched (71 of 71). The new `gpt6` member takes `convert.py`'s fields (lines
