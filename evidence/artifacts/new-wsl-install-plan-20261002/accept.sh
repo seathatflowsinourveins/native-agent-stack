@@ -354,12 +354,12 @@ statusline() {
   # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/commands/setup.md#L72 (sample input through the configured command, run through bash as Claude Code runs it, L10: two HUD lines); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/setup.mjs#L79 (the launcher copy the command runs); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L29 (the launcher runs the highest cached version)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/commands/setup.md#L72 (sample input through the configured command, run through bash as Claude Code runs it, L10: two HUD lines); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/setup.mjs#L79 (the launcher copy the command runs); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L29 (the launcher runs the highest cached version); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/setup.mjs#L94 (install keeps an earlier claude-hud statusLine with its refreshInterval, and the install adds 5 only when absent, so any valid interval passes); https://raw.githubusercontent.com/SchemaStore/schemastore/de76181a2ab215431d3e9314bc14f83cc3b01ad2/src/schemas/json/claude-code-settings.json#L2454 (refreshInterval: an integer, minimum 1, in the settings schema https://code.claude.com/docs/en/settings.md names)
       check statusline smoke 'config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 jq -e '\''[.plugins["claude-hud@claude-hud"][] | select(.scope == "user") | .version] == ["0.10.0"]'\'' "$config_dir/plugins/installed_plugins.json" >/dev/null
 versions="$(ls -d "$config_dir"/plugins/cache/*/claude-hud/*/ | wc -l)"
 cmp -s "$config_dir/plugins/claude-hud/statusline.mjs" "$(ls -d "$config_dir"/plugins/cache/*/claude-hud/0.10.0)/scripts/statusline.mjs"
-jq -e '\''.statusLine.type == "command" and .statusLine.refreshInterval == 5'\'' "$config_dir/settings.json" >/dev/null
+jq -e '\''.statusLine.type == "command" and (.statusLine.refreshInterval | type == "number" and . >= 1 and . == floor)'\'' "$config_dir/settings.json" >/dev/null
 configured="$(jq -r '\''.statusLine.command'\'' "$config_dir/settings.json")"
 lines="$(echo '\''{"model":{"display_name":"Opus"},"context_window":{"used_percentage":12,"context_window_size":200000}}'\'' | bash -c "$configured" | wc -l)"
 [[ "$versions" == 1 && "$lines" -ge 2 && "$configured" == *"$config_dir/plugins/claude-hud/statusline.mjs"* ]]'

@@ -1391,12 +1391,18 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
     install, while the status line Claude Code runs names the launcher that upstream's helper copies to
     <config dir>/plugins/claude-hud/statusline.mjs, and the acceptance ran the cached launcher directly, so it passed with
     that copy missing. The row now runs the helper (scripts/setup.mjs inspect, then install, with --shell posix) and adds
-    refreshInterval 5 when absent; the acceptance runs the configured command. Each program here is the row's own string
+    refreshInterval 5 when absent; the acceptance runs the configured command. Review of 2026-10-03 at 99a2e3c6: the
+    helper keeps an earlier claude-hud statusLine with its refreshInterval (setup.mjs L94), and the acceptance, which
+    required exactly 5, rejected that installed configuration; it now takes any positive integer, the settings schema's
+    integer with minimum 1, and install then acceptance run on one scratch home. Each program here is the row's own string
     in install-plan.json, run as install.sh and accept.sh run it (bash -euo pipefail -c), with a scratch HOME, a PATH of
     links to the system tools the programs use and a stand-in runtime that records its arguments and, as node does for a
     script file that is not there, fails unless its argument exists, else prints two lines. The fixtures are our own:
     upstream's helper and launcher do not run here.
     """
+
+    INTERVAL_CHECK = '(.statusLine.refreshInterval | type == "number" and . >= 1 and . == floor)'
+    INTERVAL_CHECK_BEFORE_REVIEW = ".statusLine.refreshInterval == 5"
 
     TOOLS = ("bash", "sh", "jq", "ls", "wc", "cmp", "readlink", "mktemp", "chmod", "mv", "rm", "cat")
     LAUNCHER = "// claude-hud 0.10.0 launcher (stand-in)\n"
@@ -1464,10 +1470,13 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
                 self.assertIn(message, stderr)
                 self.assertEqual(calls, [])
 
-    def test_refresh_interval_5_is_added_only_when_absent_in_the_file_itself(self):
+    def skip_without_gnu_coreutils(self):
         chmod = subprocess.run([self.tools["chmod"], "--version"], capture_output=True, text=True)
         if "GNU coreutils" not in chmod.stdout:
             self.skipTest("the command uses GNU chmod --reference and readlink -f, as on the plan's Ubuntu")
+
+    def test_refresh_interval_5_is_added_only_when_absent_in_the_file_itself(self):
+        self.skip_without_gnu_coreutils()
         status_line = {"type": "command", "command": "'/x/node' '/x/statusline.mjs'"}
         for name, before, link in (("absent", status_line, False), ("absent, through a link", status_line, True),
                                    ("present", dict(status_line, refreshInterval=3), False)):
@@ -1492,35 +1501,88 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
                 self.assertEqual((config / "settings.json").is_symlink(), link)
                 self.assertEqual(sorted(p.name for p in target.parent.iterdir()), ["settings.json"])  # no temporary left
 
-    def acceptance(self, launcher="same", refresh=5, second_version=False, run_cached=False):
+    def plant(self, scratch, launcher="same", refresh=5, second_version=False, run_cached=False):
+        """A scratch home as the plugin install and upstream's helper leave it: the cached 0.10.0, its user-scope entry, the
+        launcher copy (setup.mjs L79-80) and a statusLine that runs it, with an earlier claude-hud statusLine's other keys
+        kept (L94), here refreshInterval. Returns the settings.json path."""
+        config = scratch / "home/.claude"
+        scripts = self.cache(scratch)
+        if second_version:
+            self.cache(scratch, version="0.9.0")
+        (config / "plugins/installed_plugins.json").write_text(json.dumps(
+            {"version": 2, "plugins": {"claude-hud@claude-hud": [{"scope": "user", "version": "0.10.0"}]}}), encoding="utf-8")
+        copy = config / "plugins/claude-hud/statusline.mjs"
+        if launcher is not None:
+            copy.parent.mkdir(parents=True)
+            copy.write_text(self.LAUNCHER if launcher == "same" else "// another version's launcher\n", encoding="utf-8")
+        runs = scripts / "statusline.mjs" if run_cached else copy
+        status_line = {"type": "command", "command": f"'{scratch}/bin/node' '{runs}'"}
+        if refresh is not None:
+            status_line["refreshInterval"] = refresh
+        settings = config / "settings.json"
+        settings.write_text(json.dumps({"theme": "dark", "statusLine": status_line}), encoding="utf-8")
+        return settings
+
+    def acceptance(self, program=None, **state):
         """The acceptance's exit status and stderr for one state of a scratch home."""
         with tempfile.TemporaryDirectory() as scratch:
             scratch = Path(scratch)
-            config = scratch / "home/.claude"
-            scripts = self.cache(scratch)
-            if second_version:
-                self.cache(scratch, version="0.9.0")
-            (config / "plugins/installed_plugins.json").write_text(json.dumps(
-                {"version": 2, "plugins": {"claude-hud@claude-hud": [{"scope": "user", "version": "0.10.0"}]}}), encoding="utf-8")
-            copy = config / "plugins/claude-hud/statusline.mjs"
-            if launcher is not None:
-                copy.parent.mkdir(parents=True)
-                copy.write_text(self.LAUNCHER if launcher == "same" else "// another version's launcher\n", encoding="utf-8")
-            runs = scripts / "statusline.mjs" if run_cached else copy
-            status_line = {"type": "command", "command": f"'{scratch}/bin/node' '{runs}'"}
-            if refresh is not None:
-                status_line["refreshInterval"] = refresh
-            (config / "settings.json").write_text(json.dumps({"theme": "dark", "statusLine": status_line}), encoding="utf-8")
-            status, stderr, _ = self.run_program(self.program, scratch)
+            self.plant(scratch, **state)
+            status, stderr, _ = self.run_program(program or self.program, scratch)
             return status, stderr
 
+    def install_then_accept(self, before, program=None):
+        """(settings.json as planted, as install leaves it, the acceptance's exit status and stderr) on one scratch home.
+
+        The helper's writes are planted (see plant; refreshInterval `before`, None for absent); then the row's helper
+        command (the stand-in runtime) and its refreshInterval command run as install.sh runs them, and the acceptance
+        reads the file they leave."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            settings = self.plant(scratch, refresh=before)
+            planted = settings.read_text(encoding="utf-8")
+            for step in (self.helper, self.refresh):
+                status, stderr, _ = self.run_program(step, scratch)
+                self.assertEqual(status, 0, stderr)
+            installed = settings.read_text(encoding="utf-8")
+            status, stderr, _ = self.run_program(program or self.program, scratch)
+            return planted, installed, status, stderr
+
+    def test_the_acceptance_passes_what_install_leaves_an_added_5_or_a_kept_earlier_value(self):
+        self.skip_without_gnu_coreutils()
+        for name, before, after in (("absent before install: 5 added", None, 5), ("an earlier claude-hud 3: kept", 3, 3)):
+            with self.subTest(case=name):
+                planted, installed, status, stderr = self.install_then_accept(before)
+                expected = json.loads(planted)
+                expected["statusLine"]["refreshInterval"] = after
+                self.assertEqual(json.loads(installed), expected)
+                if before is not None:
+                    self.assertEqual(installed, planted)  # the refreshInterval command leaves the file as it was
+                self.assertEqual(status, 0, stderr)
+
+    def test_the_interval_check_before_the_review_rejected_the_kept_value(self):
+        """Negative control: the same install-then-acceptance run with the check as it was at 99a2e3c6 (exactly 5)."""
+        self.skip_without_gnu_coreutils()
+        self.assertEqual(self.program.count(self.INTERVAL_CHECK), 1)
+        before_review = self.program.replace(self.INTERVAL_CHECK, self.INTERVAL_CHECK_BEFORE_REVIEW)
+        for before, passes in ((None, True), (3, False)):
+            with self.subTest(before=before):
+                _, _, status, stderr = self.install_then_accept(before, before_review)
+                self.assertEqual(status == 0, passes, stderr)
+
     def test_the_acceptance_passes_the_wired_state_and_fails_each_planted_condition(self):
-        status, stderr = self.acceptance()
-        self.assertEqual(status, 0, stderr)
+        for refresh in (5, 1, 3):
+            with self.subTest(passes=f"refreshInterval {refresh}"):
+                status, stderr = self.acceptance(refresh=refresh)
+                self.assertEqual(status, 0, stderr)
         cases = {
             "the copied launcher the configured command runs is missing (the reviewed case)": dict(launcher=None),
             "no refreshInterval": dict(refresh=None),
-            "another refreshInterval": dict(refresh=3),
+            "a non-numeric refreshInterval": dict(refresh="five"),
+            "a refreshInterval in a string": dict(refresh="5"),
+            "a zero refreshInterval": dict(refresh=0),
+            "a negative refreshInterval": dict(refresh=-5),
+            "a fractional refreshInterval": dict(refresh=2.5),
             "the copied launcher is another version's": dict(launcher="other"),
             "a second cached version": dict(second_version=True),
             "the configured command runs the cached launcher, not the copy": dict(run_cached=True),
