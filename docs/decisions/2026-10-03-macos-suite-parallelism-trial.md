@@ -40,9 +40,35 @@ Integrating the three units aligned the workflow with the oracle's run contract:
 
 - the compare job passes `--expected-sha` with the pull request head;
 - it runs `test_compare.py` on its own interpreter first, fail-closed;
-- it requires a clean checkout after every run (`checkout-status.json`), because `compare.py` never reads
-  `git-status.txt`;
+- it requires a clean checkout after every run (`checkout-status.json`); `compare.py` did not read `git-status.txt`
+  then, and since the fix round below it applies that rule itself, with the step kept as a second check;
 - the inventory job installs the lock before collecting ids.
+
+### Fix round before the first push (2026-10-03)
+
+A final verifier, an evidence reviewer and a security reviewer found the frozen oracle looser than the record. Each
+fix below landed before any push, with tests in `test_compare.py` that fail against the oracle at `b0b89d1d`. Then
+`experiment.json` was refrozen.
+
+1. **Speed rule.** `compare.py` compared ratios rounded to four decimals, so true ratios up to 0.60005 and 0.75005
+   passed. It now compares exact fractions of the recorded seconds, the 1.10 unpooled preference too, and rounds only
+   for display.
+2. **Commands.** The check skipped every token before `-m`. It now requires each arm's exact command, token for token;
+   only S may append `--durations N`.
+3. **Id mapping.** A partial rewrite or another prefix per module passed. The inventories may now differ only by the
+   prefix `tests.test_native_maintenance.` on exactly the 29 base ids of the six B1 classes, and a failed mapping gives
+   every OS `no verdict` inside `compare.py`.
+4. **Clean checkout.** `compare.py` now applies the oracle's second part to every run directory, the control runs
+   included: a missing, failed or non-empty `git-status.txt` makes the run ineligible.
+5. **Re-runs.** Every upload set `overwrite: true`, so a job re-run could silently replace an attempt's artifact. Every
+   upload now sets `overwrite: false`. Every run directory, the control runs included, records `run_attempt` in
+   `runtime.json`, and `compare.py` voids an attempt above 1 or an unrecorded one. The trial is repeated only by a new
+   synchronize of the draft pull request, never by re-running jobs, and every attempt is reported.
+6. **Fixture tool.** `make_fixtures.py` refuses a `--work` at or inside the checkout, or a non-empty one, and deletes
+   no directory it did not create.
+7. **B1 failure mode.** A blueprint that fails to load at import time no longer aborts a named run. The wrapper keeps
+   the exception, leaves no partial module in `sys.modules` and raises it from `load_tests`. The loader turns it into
+   one failing test, as at base, and a named multi-module run still prints its `Ran` line and runs the other modules.
 
 ### What PR-A and PR-A2 change if the trial passes
 
@@ -60,12 +86,15 @@ through the required checks.
    `runs_whole_suite` (`:814`) must also recognize `unittest_parallel`, and `adoption-bootstrap.yml:validate-macos`
    joins the assertIn list (`:847-848`).
 5. Carry the B1 fix and re-pin `tests/test_native_maintenance.py` in `manifests/evidence.json` through the hot-file
-   protocol.
+   protocol. The fix keeps the base failure mode for named runs (fix round, item 7).
 6. Decide the environment difference. The trial's macOS arms install the two npm pins (tree-sitter-bash, yaml) that
    `validate.yml` installs, because their tripwires fail in any job that is not a recorded gap. `validate-macos` is a
    recorded gap (`tests/test_shell_parser_ci.py`, `KNOWN_UNPROVISIONED`), so those tests skip in production. PR-A either
    adds the pins and removes the gap, or records that the adopted arm was measured with those tests running.
-7. Add the observed record and update this record.
+7. State the log-format change, including the warnings difference. `python3 -m unittest` applies the warnings filter
+   `default` and unittest-parallel 1.8.6 does not, so the production log would lose the `DeprecationWarning` and
+   `ResourceWarning` text the serial run prints (record limitations).
+8. Add the observed record and update this record.
 
 **PR-A2, Linux (`validate`):**
 
@@ -93,20 +122,25 @@ The record holds the full text; in short:
   - A control file with a pass, a skip, a failure, an error, a failing subtest, an expected failure, an unexpected
     success, a multi-line docstring and a `setUpClass` error, which every arm must report exactly.
   - A crash control (`os._exit(3)`) under a 300 s bound, which must exit non-zero with no `OK` summary.
-- **Oracle**, in two parts:
-  - Part 1 is `compare.py`'s rules. An arm-run is ineligible for any malformed input, a wrong command, SHA or
-    interpreter, a log that is truncated or not self-consistent, a wrong header or worker count, an id set other than
-    the trial inventory, or any `(test id, outcome)` record that differs from S outside the ids that flake among the S
-    repeats.
-  - Part 2 is the workflow's clean-checkout check.
-  - The id mapping must hold as a bijection that changes only the six B1 classes.
+- **Oracle**, in two parts, both applied by `compare.py`:
+  - Part 1 is `compare.py`'s rules. An arm-run is ineligible for any malformed input, a command other than the arm's
+    exact one, a wrong SHA or interpreter, a log that is truncated or not self-consistent, a wrong header or worker
+    count, an id set other than the trial inventory, any `(test id, outcome)` record that differs from S outside the
+    ids that flake among the S repeats, or a `run_attempt` other than 1 in `runtime.json`.
+  - Part 2 is a clean checkout after every run: each run directory's `git-status.txt` exists and is empty. The
+    workflow's clean-checkout step repeats it as a second check.
+  - The id mapping must hold: the single prefix `tests.test_native_maintenance.` on exactly the 29 base ids of the six
+    B1 classes, as a bijection. Otherwise every OS gets `no verdict`.
+- **Re-runs.** The trial is repeated only as a whole, by a new synchronize of the draft pull request. A job re-run
+  voids the affected arm-run, which is reported as a failed attempt; uploads never overwrite.
 - **Metrics.** The selection metric is the test step's seconds (`step_seconds`). The Actions jobs API's step and job
   timestamps are kept beside it and are not used by the rule.
 - **Decision rule.**
-  1. An arm is eligible only with at least three runs, zero oracle mismatches in every run, and passing controls.
+  1. An arm is eligible only with at least three runs, zero oracle mismatches in every run under both parts, and
+     passing controls.
   2. Adopt the fastest eligible arm by median only if its median is at most 0.60 times S's median and its maximum is at
-     most 0.75 times S's fastest run.
-  3. Prefer P3F over P3 (L4F over L4) if its median is within 10%.
+     most 0.75 times S's fastest run, compared as exact ratios.
+  3. Prefer P3F over P3 (L4F over L4) if its median is within 10%, also compared exactly.
   4. Otherwise reject, with no fall-through to a slower arm, and keep the record as a failed attempt.
 
 ### Handoff for PR-T
@@ -124,9 +158,19 @@ The record holds the full text; in short:
 - Before every push, run `python3 scripts/validate.py` and
   `python3 scripts/validate_convergence.py --all-recorded --root . --json`. The workflow, the locks, the controls, the
   oracle and the B1 fix are frozen inputs of the record.
+- Never re-run a job of the trial. To repeat the trial, push a new head commit (a new synchronize). A job re-run voids
+  the affected arm-run, and the observed record reports every workflow run and every attempt from the jobs API.
 - After the compare job, write the observed record from `result.json`, `checkout-status.json` and sanitized logs. Logs
   carry runner home paths, which `scripts/validate.py` rejects. Keep durable receipts in the repository, because
   artifacts expire after 30 days.
+- **One observed record per adopting OS.** `adopt_within_scope` needs each qualifying run's scope to equal the record's
+  `decision_and_scope.scope` (`scripts/validate_convergence.py:136-146`), and the planned record gives one scope text
+  per OS. If both runners adopt, each gets its own observed record, and each record decides only its own adoption: PR-A
+  for macos-15, PR-A2 for ubuntu-24.04.
+- **Triage of a `no verdict`.** Read the S runs' `git-status.txt` first: their entries in `checkout-status.json` and
+  in `result.json`'s `runs[].checkout_clean`. S leaving the checkout dirty is the likeliest cause unrelated to
+  parallelism, because production never checks it. It voids that OS under the preregistered rule. Then read the S
+  runs' other reasons, the id mapping and the controls. Do not change the rule after the run.
 - Stopgap while the trial runs: if `validate` nears its 2,400 s limit, raise its `timeout-minutes` first, as on
   2026-09-26 and 2026-09-29.
 
@@ -174,6 +218,16 @@ Revisit this record when any of these happens:
     - The base-to-trial mapping: 29 ids, 6 classes, ok.
     - All eight Linux control runs pass `compare.py`'s checks under 3.12.3, with a 30 s crash bound.
   - actionlint, offline zizmor and the workflow hardening tests on the edited workflow.
+  - From the fix round:
+    - `test_compare.py`: 44 tests OK on CPython 3.13.16, on 3.12.3 with the lock, and on bare 3.12.3 (the compare
+      job's interpreter). The same file run against `b0b89d1d`'s oracle fails every new test.
+    - The production id rule on the integrator's real inventories: ok (29 ids, 6 classes, one prefix). Identical
+      inventories and a 28-of-29 rewrite of the real head both fail.
+    - `ids.py` on the fixed head: 9,800 ids, byte-identical to the integrator's head inventory.
+    - `tests.test_native_maintenance`: 29 tests OK serially, with unchanged ids. Under unittest-parallel 1.8.6 it gives
+      the same 29 records at module level (`-j 2`) and at class level, pooled and unpooled.
+    - A scratch probe with a blueprint that raises at import: the fixed wrapper reports one failing `load_tests` test,
+      prints `Ran 2 tests`, exits 1 and still runs the co-listed module, exactly as the base wrapper does.
 - **No GitHub-hosted run** exists for this record. The hosted runs will be `native_cli_execution` evidence on
   GitHub-hosted runners.
 
@@ -199,6 +253,13 @@ Revisit this record when any of these happens:
   [events that trigger workflows](https://github.com/github/docs/blob/63859c481b2195607ff94c4dda765fb131a34759/content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md)
   (`pull_request` `GITHUB_SHA`, merge conflicts) and the
   [workflow jobs REST API](https://github.com/github/docs/blob/3c82d55225dacd8085eff49ad51ab7a928dc9c59/content/rest/actions/workflow-jobs.md).
+  The contexts page also defines `github.run_attempt`: 1 for a run's first attempt, one more for each re-run.
+- actions/upload-artifact v7.0.1 at `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`:
+  [`action.yml`](https://github.com/actions/upload-artifact/blob/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml)
+  lines 37-42. `overwrite` defaults to `false`, and then the action fails if an artifact of that name already exists.
+- CPython 3.13.16 [`Lib/unittest/main.py`](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/unittest/main.py):
+  the discovery defaults (`:122-126`, `:231-234`) and the `warnings='default'` rule (`:87-91`). CPython 3.12.3 has the
+  same rule at `Lib/unittest/main.py:88-92` and applies it in `runner.py:231-234`.
 - pytest 9.1.1 (commit `cf470ec0bf7eb89cd97dd56df4859eae5db46447`):
   [`doc/en/how-to/unittest.rst`](https://github.com/pytest-dev/pytest/blob/cf470ec0bf7eb89cd97dd56df4859eae5db46447/doc/en/how-to/unittest.rst).
 - In-repository records: `docs/lanes.md` (hot-file protocol), `docs/acceptance-evidence-policy.md`,
