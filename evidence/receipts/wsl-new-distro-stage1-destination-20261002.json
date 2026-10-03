@@ -1,0 +1,1668 @@
+{
+  "schema_version": 1,
+  "artifact_class": "local_integration_check",
+  "id": "wsl-new-distro-stage1-destination-20261002",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "systemd"
+  ],
+  "claim": "P1 printed 'Good signature' by RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092 for 26.04.1 and 24.04.5, P2 printed 'Valid schema', P3 counted 3 hv_storvsc lines with the newest 13436 s old, W2 printed one hash 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 as computed, published and listed for a 418495746-byte image, W4's install and W5's first launch exited 0, and cloud-init made <WSL_USER> (uid 1000) the default user, with 'cloud-init schema --system' printing 'Valid schema user-data'. W5's paired record showed uid 1000 in both distributions, cgroup:[4026532183] and cgroup:[4026532410], both user managers 'active' and systemd-binfmt.service as the new distribution's only failed unit; W7 read 1000:1000, F1 printed 'degraded' with that one unit and its 'Read-only file system' flush message, F2 printed 'yes' and F3 printed '<WSL_USER> socket' and 'running'.",
+  "limitations": [
+    "One run on one Windows host: a new distribution on the existing WSL 3.0.1 kernel and Windows installation, not a new physical machine.",
+    "The claim covers stage 1 and first boot (P1 to F8). F9 to F11, the native sign-ins and the SDK examples ran later on the destination distribution and are recorded in stage_2 and the F9 to F11 fields; persistent service units, restart, backup and restore are not covered.",
+    "Not run on the destination distribution: F2's twelve idle polls (idle_observation) and F3's two rootless-container commands (rootless_container: owed), which the page asks for before F9. The install plan's own docker run hello-world check is a different command and is not F3's proof.",
+    "The rehearsal block cites two earlier runs on throwaway distributions (run 3 before the recipe merged, run 4 with the merged recipe) and their removal by R1; their observations sit beside this run's, not in place of them. The 24.04.5 rollback arm, path B and the uv and Node comparison probes are owed.",
+    "The client configuration ran after the sign-ins: first from an earlier head of pull request 608 (a372ab3b), then at 20:41:44Z from 099ead33b68f with --with-authorization-settings at the owner's request, before that head's last two checks and the Codex read finished; that head merged as #608. The Codex lane records this configuration as owner-reported, separately from independent whole-host acceptance.",
+    "The client-configuration tool's managed PATH block has a reported root-directory defect (the root directory written as an empty PATH entry); its fix, pull request 619, is not merged, and the destination's PATH block has not been read back after it.",
+    "No independent reviewer has inspected the private raw outputs that this receipt quotes; each is bound here by its SHA-256.",
+    "Sanitized: Windows and Linux user names, the computer name, every distribution name, home and profile paths, temporary directories, the checkout path and device ids are replaced by placeholders, and session identifiers are left out; the raw transcript and outputs stay private on the host.",
+    "PowerShell cmdlet lines record 0 or 1 from the $? value the step printed (True or False), and assignments and guards record 0 when their block completed; native commands record their own printed exit code, and an exit marked derived follows from the script's structure and its recorded exit.",
+    "jcodemunch_registration records F11's state only (not installed); a registration would not show that a session or subagent uses jCodeMunch.",
+    "related_observations and addendum_20261003 list another lane's reported results and later changes for traceability; they are not part of this receipt's claim.",
+    "Local integration check of the repository's recipe with actual native returned output; not an upstream test, new-host acceptance, role qualification, or a fresh model or GPU run."
+  ],
+  "recorded_at_utc": "2026-10-03T02:09:06Z",
+  "recipe": {
+    "path": "adoption/platforms/linux-wsl2-new-distro.md",
+    "recipe_commit": "3a8dc31a67115f85b69709d7ad8c2c5f6ea9f40e (main, pull request 593); the recipe and adoption/templates/wsl/ are unchanged from it to the catalog revision",
+    "catalog_revision": "6652b78e272b92d31842b4791a130e4339be8609",
+    "creation_path": "A"
+  },
+  "provenance": {
+    "owner_go": "The coordinator recorded the owner's go for the final distribution at 2026-10-02T14:38:10Z (a fresh distribution from the merged recipe); P1 started at 14:38:12Z.",
+    "builder": "the Claude coordinator of the new-WSL lane, through step scripts that ran each recipe step natively in the workstation distribution, through Windows PowerShell, or inside the new distribution through wsl.exe, and saved each output with its start and end time",
+    "review": "No independent reviewer has inspected the private raw outputs. The Codex lane records the destination's configuration as owner-reported, separately from independent whole-host acceptance.",
+    "host_label": "destination (a neutral label; the distribution's and the computer's names are withheld)"
+  },
+  "timeline": [
+    "P1 2026-10-02T14:38:12Z to 2026-10-02T14:38:13Z rc=0",
+    "P2 2026-10-02T14:38:13Z to 2026-10-02T14:38:14Z rc=0",
+    "P3 2026-10-02T14:38:14Z to 2026-10-02T14:38:14Z rc=0",
+    "W1 2026-10-02T14:38:14Z to 2026-10-02T14:38:15Z rc=0",
+    "W1-baseline 2026-10-02T14:38:15Z to 2026-10-02T14:38:15Z rc=0",
+    "W2 2026-10-02T14:38:15Z to 2026-10-02T14:38:21Z rc=0",
+    "W3 2026-10-02T14:38:21Z to 2026-10-02T14:38:22Z rc=0",
+    "W4 2026-10-02T14:38:22Z to 2026-10-02T14:38:31Z rc=0",
+    "W5 2026-10-02T14:38:31Z to 2026-10-02T14:38:40Z rc=0",
+    "W5-cgroup 2026-10-02T14:38:40Z to 2026-10-02T14:38:40Z rc=0",
+    "W5-paired 2026-10-02T14:38:41Z to 2026-10-02T14:38:41Z rc=0",
+    "W5-count 2026-10-02T14:38:41Z to 2026-10-02T14:38:41Z rc=0",
+    "W7 2026-10-02T14:38:41Z to 2026-10-02T14:38:54Z rc=0",
+    "F1 2026-10-02T14:39:05Z to 2026-10-02T14:39:05Z rc=0",
+    "F2 2026-10-02T14:39:05Z to 2026-10-02T14:39:05Z rc=0",
+    "F3 2026-10-02T14:39:05Z to 2026-10-02T14:39:05Z rc=0",
+    "F4 2026-10-02T14:39:05Z to 2026-10-02T14:39:14Z rc=0",
+    "F5 2026-10-02T14:39:14Z to 2026-10-02T14:39:14Z rc=0",
+    "F6 2026-10-02T14:39:25Z to 2026-10-02T14:39:25Z rc=0",
+    "F7 2026-10-02T14:48:46Z to 2026-10-02T14:48:54Z rc=0",
+    "F8 2026-10-02T14:48:54Z to 2026-10-02T14:48:54Z rc=0",
+    "F8 2026-10-02T14:50:20Z to 2026-10-02T14:50:20Z rc=0",
+    "I1-install 2026-10-02T14:50:50Z to 2026-10-02T14:54:30Z rc=0",
+    "I2-accept 2026-10-02T14:54:30Z to 2026-10-02T15:07:30Z rc=0",
+    "I5-services 2026-10-02T15:07:49Z to 2026-10-02T15:08:04Z rc=0",
+    "F10-path 2026-10-02T15:08:04Z to 2026-10-02T15:08:05Z rc=0",
+    "A1-after-signin 2026-10-02T16:02:45Z to 2026-10-02T16:03:17Z rc=0",
+    "A2-sdk-results 2026-10-02T16:44:50Z to 2026-10-02T16:45:25Z rc=0",
+    "G1-config-dryrun 2026-10-02T17:39:03Z to 2026-10-02T17:39:05Z rc=0",
+    "G2-config-apply 2026-10-02T17:39:17Z to 2026-10-02T17:39:21Z rc=0",
+    "G3-verify 2026-10-02T17:39:32Z to 2026-10-02T17:39:36Z rc=0"
+  ],
+  "raw_outputs": {
+    "P1": "bc3df15df8b254a2e0c22ad73f5215cc19abbb2d6de41cc9817ef83eb33cde72",
+    "P2": "a30705c81a7e11b203c1c540b6a301f52284438a73eb6cc2950b8908e4d0671a",
+    "P3": "b5d9d7204db1685a90db2050f625b29baa57478584b3293ee2967c5db9eb68a3",
+    "W1": "117a15de228153375bbc2548ad83e89c0d36de172823631fbe5baf44a0d8ac5e",
+    "W1-baseline": "649e47c0665c43762e110e6b50cd7a0d40615bd31e2dc06a4cfe49adcabb5ab2",
+    "W2": "7808d1e2e8ffd4048e7a3e2e67b8948569fe4dfe170503922da8db38508916e1",
+    "W3": "b1430eb79d80e860b9c0dfd98b8979f0076297be81ff18c0be64042ae7785da1",
+    "W4": "9ca68c6674f0239a85ad4c502cb60aab5eb97b87d74f53898a1a359c089913ed",
+    "W5": "fb49c0242f285b5c935b5fb8683ee5ee3b711e753e6f6f953e4bd943f6b07893",
+    "W5-cgroup": "8b33179bfd2e3a36b1e6ab094cb7af028577d1f43f416af8a3f4b0990a4c7321",
+    "W5-paired": "8adbed3238f1e9ff8f52ec41e7fbaff0b6478759ee5532f7d0589d7591d9b48c",
+    "W5-second-count": "d94c2e5ec9bd923eea26d65bd4653cb7194ba26523dc6493af81378d8e163374",
+    "W7": "4ef8f3744f01a321fdad88aa9bd99eef2ed0eb3872b4852552c486fd04134a8d",
+    "F1": "ee4e5fdf43d8e5a582e0ebef3dc81a793d6f4795514db88ad6c72b8f488b0a5f",
+    "F2": "ae07205c94ffc756996cb2dd3c243da2f96071a411736570688363756f364e45",
+    "F3": "e00254fe004008d60eb4e73377a5976ec9b5d45c62bb541071838a79c5d84a6f",
+    "F4": "5272c9eeba2cbcfd3c0cddf04c237820897bec5478aad3e973a327d8e0179c9a",
+    "F5": "0660e8b650ff6109c52a573c68deca499af8e9436caf5e7a3fa05eac281adfd7",
+    "F6": "27549a149865bb5b39ce88073cf7c678d1d0f1cf488f9df795c585032ecbe9fe",
+    "F7": "ad8b4fe5aaadea388c01a3264fda9ba64319492ef338848690145e3137b45675",
+    "F8-first-attempt": "867bea916ff939d160ea27daaf79851ea6f9cf4218b2cca7a0aa78a3354c752b",
+    "F8": "69ffd9384e969999124692e8a5510abc961bb1fdfa0fe09237275fefc19ba015",
+    "I1-install": "c8365b0e44081726467d659b85d08b6f34296b90b83fb86f6bd1790017fff3e0",
+    "I2-accept": "7f94623385839cf68c67e376a796b22529f36167d522bbf56d246eb40e2a32fc",
+    "I5-services": "7b2635a28ed47b7c089c38ce089199396d76fb514e856b8f6f13d3fcb1790b6d",
+    "F10-path": "7e5bddc48085eb356f5f2fbcd93944506c517e29b6ebd1e65c1a28c37eb2f9dd",
+    "A1-after-signin": "2d579f07008aaa4349089811a7019ff3ab77e9479bb960d713c68ae2f638f7ee",
+    "A2-sdk-results": "665ebf78b097c3f5d237a236e3e55e632a91d6872d52335f1c58e338c5f29127",
+    "G1-config-dryrun": "020e3abd6a36f384eacc650cd46fc4f99f50624ffffe40fd0a58f6ace94439d3",
+    "G2-config-apply": "a4fc23ce61ff0347c958767dab7a567a41a1cac772827792727225f5af4ed605",
+    "G3-verify": "b0503905b1afc7db53de1db7bd7175bbff0006219627e7ceaf4f6e7e721c069e",
+    "G4-codex-apply": "2ed6e7716ca1ab98cb6906ad3cae37ef010e3028746d4e025d8c6189031a027e",
+    "F10-fragment": "175242f9bb967d570598b0cbf3c1d5bdd4245a6bbfdc93a6ef191ff610b7ec87",
+    "F11-jcodemunch": "4344bcef6e8b878b6fa75469d41408a55fb8367a9eb33528b9d07a70edc75b51",
+    "W1-skills-plugins": "4755c6444897286d65b00e510ad76f57a9dcd9b0c010ceae7bbb1814cc7df91f",
+    "W1b-qmd-collections": "5d6b20e89fc9074e8542a55abb0c66bbf64acafcba5c512dba496f2e48dcb0f9",
+    "W1c-qmd-embed": "928a55cdc63bb655e75c77d0202f326f9541f2f330486e6124cb4409bae83feb",
+    "_timeline": "65a768b81489b5613f241acdad2cd266040b9195ad235de22922feecc590a4d7",
+    "R1-remove (run 3)": "ea080c6c6bc8025f2ca2f1fd566b657e969bb3037f489e5d928a59e039abac01",
+    "R1-remove (run 4)": "2b6aac2a888d117bc0d42c588d490ead9498859ad6897662066cd091451b961c"
+  },
+  "raw_outputs_scope": "Private files kept outside the repository; their SHA-256 values bind them for a later inspection. Every excerpt in this receipt is sanitized from them. Seven short outputs (P1, W1-baseline, W5-cgroup, W5-second-count, F2, F3 and F5) are byte-identical to the rehearsal runs' outputs, because they print the same values (the same signed sums, workstation baseline, unit states, storage lines, linger, bus owner and id ranges), so their hashes equal those in the two rehearsal records; the timeline entries are this run's.",
+  "supported_images": {
+    "26.04.1": {
+      "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+      "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+      "catalog_name": "Ubuntu-26.04",
+      "bytes": 418495746
+    },
+    "24.04.5": {
+      "file": "ubuntu-24.04.5-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+      "sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+      "catalog_name": "Ubuntu-24.04",
+      "bytes": 388975696
+    }
+  },
+  "rehearsal": {
+    "name": "two throwaway distributions, names withheld (run 3 and run 4); neither is the destination's or the workstation's name",
+    "result": "run 3 (recipe b4653663, pull request 593 before its merge; 2026-10-02T10:54:04Z to 11:01:42Z) passed P1 to F5 and printed 'Hello from Docker!' from a rootless container; run 4 (merged recipe 3a8dc31a; 12:55:30Z to 13:18:18Z) passed P1 to P3, W1 to W5, W7 and F1 to F5 and ran the install plan; R1's removal block removed each (11:47:21Z and 13:18:04Z)",
+    "creation_path": "A (both runs)",
+    "schema_system": "both runs: 'Valid schema user-data', exit 0",
+    "ownership_probe": "both runs: 1000:1000 after one terminate",
+    "idle_observation": "run 3: the throwaway distribution was in all twelve lists, 10:56:51 to 10:58:42 UTC; run 4: not run",
+    "storage_readings": "run 3: P3 baseline 2, newest line at kernel time 7678.647875 s with uptime 15561.21 s (7883 s old), W5 second count 3 (one new line at 15573.834020 s, inside its install window); run 4: P3 baseline 3, newest line at 15573.834020 s with uptime 22847.98 s (7274 s old), W5 second count 3 (unchanged)",
+    "export": {
+      "file": null,
+      "sha256": null,
+      "bytes": null
+    },
+    "records": [
+      "evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json (run 3)",
+      "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json (run 4)",
+      "R1's removal outputs of both runs are private; their hashes are in raw_outputs"
+    ]
+  },
+  "pre_checks": {
+    "signed_sums": "P1 exit 0. 26.04.1: 'using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092', 'Good signature from \"Ubuntu CD Image Automatic Signing Key (2012) <address left out>\"', signed line '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 *ubuntu-26.04.1-wsl-amd64.wsl'. 24.04.5: the same key and Good signature, signed line 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e *ubuntu-24.04.5-wsl-amd64.wsl'.",
+    "user_data_schema": "P2 in the workstation distribution (/usr/bin/cloud-init 26.1-0ubuntu1~24.04.1, exit 0): render exit 0, 'Valid schema <tmp>/<Name>.user-data' (exit 0) after the warning 'datasource not detected, using default instance-data/user-data paths.', render sha256 6eebab9fe9892c48931e4eccb1935411203ee27286edb7d6a6b535864f104e7e, equal to W3's Get-FileHash; the selected image's own check is W5's."
+  },
+  "storage_errors": {
+    "baseline": 3,
+    "newest_line_time": "P3: the newest line at kernel time 15573.834020 s ([15573.834020] kernel: hv_storvsc <device-id>: tag#628 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1); /proc/uptime read right after: 29010.04 1368301.23; age 13436.21 s (3.7 h), not under 3600 s, so the run continued",
+    "swap": [
+      "NAME     TYPE      SIZE USED PRIO",
+      "/dev/sdc partition  24G  64K   -2"
+    ],
+    "second_count": 3,
+    "new_lines": null
+  },
+  "host": {
+    "wsl_version": [
+      "WSL version: 3.0.1.0",
+      "Kernel version: 6.18.40.1-1",
+      "WSLg version: 1.0.79",
+      "MSRDC version: 1.2.7214",
+      "Direct3D version: 1.611.1-81528511",
+      "DXCore version: 10.0.26100.1-240331-1435.ge-release",
+      "Windows version: 10.0.26200.9168"
+    ],
+    "default_distribution_before": "* <workstation> Running 2",
+    "default_distribution_after": "* <workstation> Running 2 (W5; whitespace normalized)",
+    "z_free_bytes": 2502399971328,
+    "idle_keys": "instanceIdleTimeout=-1 ([general]); vmIdleTimeout=-1 ([wsl2]); line 27: [wsl2] | line 165: vmIdleTimeout=-1 | line 192: [experimental] | line 234: [general] | line 265: instanceIdleTimeout=-1",
+    "workstation_baseline": {
+      "uid": "1000",
+      "system_state": "degraded (exit 1); the failed set {getty@tty1.service, systemd-binfmt.service} is contained in the allowed set",
+      "failed_units": "getty@tty1.service, systemd-binfmt.service",
+      "user_manager": "active",
+      "cgroup_namespace": "cgroup:[4026532183]",
+      "getty_tty1_result": "Result=start-limit-hit, NRestarts=6 (exit 0)"
+    }
+  },
+  "image": {
+    "release": "26.04.1",
+    "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+    "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+    "bytes": 418495746,
+    "sha256_published": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+    "sha256_distributioninfo": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+    "sha256_computed": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104"
+  },
+  "first_launch": {
+    "user_prompt_marker": false,
+    "oobe_failed_marker": false,
+    "schema_system": "Valid schema user-data (exit 0)",
+    "cloud_init_version": "/bin/cloud-init 26.1-0ubuntu3~26.04.1 (exit 0)",
+    "cloud_init_status": "status: disabled, boot_status_code: disabled-by-marker-file, detail: DataSourceWSL, errors: []; the expected recoverable error 'Failed to wait for network' (systemd-networkd-wait-online.service is masked), listed twice; exit 2",
+    "result_json": "{\"v1\": {\"datasource\": \"DataSourceWSL\", \"errors\": []}}",
+    "cgroup_isolation": "W5, 2026-10-02T14:38:40Z to 14:38:41Z, with both distributions running: common unit systemd-journald.service active in both (exit 0 each); its cgroup.procs in the workstation read 43 (no 0 entry); the new distribution's user@1000.service active (exit 0); the paired five-value record is paired_isolation",
+    "systemd_user_session_warning": "absent: no 'wsl: Failed to start the systemd user session' line in W5's launch output or in the later --exec calls",
+    "getty_mask": {
+      "is_enabled": "masked (exit 1)",
+      "load_state": "LoadState=masked",
+      "active_state": "ActiveState=inactive",
+      "n_restarts": "NRestarts=0"
+    }
+  },
+  "paired_isolation": {
+    "recorded_with": "WSL version 3.0.1.0 and kernel 6.18.40.1-1 (W1's wsl.exe --version); image 26.04.1, sha256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 (W2); recorded 2026-10-02T14:38:41Z",
+    "workstation": {
+      "uid": "1000",
+      "system_state": "degraded (exit 1)",
+      "failed_units": "getty@tty1.service, systemd-binfmt.service",
+      "user_manager": "active",
+      "cgroup_namespace": "cgroup:[4026532183]"
+    },
+    "new_distribution": {
+      "uid": "1000",
+      "system_state": "degraded (exit 1)",
+      "failed_units": "systemd-binfmt.service",
+      "user_manager": "active",
+      "cgroup_namespace": "cgroup:[4026532410]"
+    }
+  },
+  "ownership_probe": "1000:1000 (W7: stat -c %u:%g of an empty file created from Windows under the user's home after one terminate; exit 0)",
+  "idle_observation": "not run: F2's twelve polls were not run on the destination distribution (W1 read instanceIdleTimeout=-1 under [general] and vmIdleTimeout=-1 under [wsl2]); the rehearsal's run 3 listed its throwaway distribution in all twelve polls",
+  "subordinate_ids": "/etc/subuid:<WSL_USER>:100000:65536 and /etc/subgid:<WSL_USER>:100000:65536, present before F5's usermod and unchanged after it; usermod was skipped, so the lines come from the user's creation at first boot",
+  "jcodemunch_registration": "not installed: F11's test -x of ${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp exited 1 at 2026-10-02T22:55:08Z; the rest of F11 was skipped",
+  "authorization_settings": "--with-authorization-settings, asked for by the owner on 2026-10-02 (a workflow without permission prompts), on the apply of 20:41:44Z from 099ead33b68f, the pull-request-608 head under review, before that head's last two checks and the Codex read finished (it merged as #608 at 20:58Z, commit 99d5b122c4d6). That apply printed 'authorization settings: applied (--with-authorization-settings; added: Codex approval_policy, Codex sandbox_mode; already the same: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt)', and the same command again printed 'authorization settings: kept (--with-authorization-settings; already the same: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode)'. The two Claude Code values were already in place from the 17:39Z apply at a372ab3b, an earlier head of the same pull request, which printed no authorization line and wrote ~/.claude/settings.json (its keys at 16:03Z were extraKnownMarketplaces and theme; read back at 17:39Z: permissions.defaultMode bypassPermissions, skipDangerousModePermissionPrompt true). Read back at 20:41Z: Codex approval_policy never, sandbox_mode danger-full-access.",
+  "failed_attempt_export": {
+    "file": null,
+    "sha256": null,
+    "bytes": null
+  },
+  "steps": [
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'",
+      "exit": 0,
+      "output_excerpt": "<WSL_USER>,directory\n<WSL_USER>,socket",
+      "note": "rehearsal run 3 (throwaway distribution; public record evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json); in this unquoted form (its step Q-quoting); the first attempt, with an embedded double quote, printed 'stat: missing operand' (exit 1)"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait",
+      "exit": 0,
+      "output_excerpt": "running",
+      "note": "rehearsal run 3 (throwaway distribution; public record evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json)"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec test -c /dev/dxg",
+      "exit": 0,
+      "output_excerpt": "(no output)",
+      "note": "rehearsal run 3 (throwaway distribution; public record evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json)"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi",
+      "exit": 0,
+      "output_excerpt": "NVIDIA-SMI 615.65.07, KMD Version: 616.64, CUDA UMD Version: 13.4; one GPU listed (NVIDIA GeForce RTX 4090)",
+      "note": "rehearsal run 3 (throwaway distribution; public record evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json)"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'",
+      "exit": 0,
+      "output_excerpt": "Python 3.14.4",
+      "note": "rehearsal run 3 (throwaway distribution; public record evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json); the system interpreter"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'",
+      "exit": 127,
+      "output_excerpt": "bash: line 1: uv: command not found",
+      "note": "rehearsal run 3 (throwaway distribution; public record evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json); stage 2 had not run in that throwaway distribution, so this criterion is owed"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'node --version'",
+      "exit": 127,
+      "output_excerpt": "bash: line 1: node: command not found",
+      "note": "rehearsal run 3 (throwaway distribution; public record evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json); stage 2 had not run in that throwaway distribution, so this criterion is owed"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)",
+      "note": "rehearsal runs 3 and 4 (throwaway distributions), R1's removal block at 11:47Z and 13:18Z, the same outcome in both (private raw outputs, hashes in raw_outputs)"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "<workstation>\n<another-distribution>\n<throwaway>",
+      "note": "rehearsal runs 3 and 4 (throwaway distributions), R1's removal block at 11:47Z and 13:18Z, the same outcome in both (private raw outputs, hashes in raw_outputs); the step script printed no exit marker for this line"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": 0,
+      "output_excerpt": "The operation completed successfully.",
+      "note": "rehearsal runs 3 and 4 (throwaway distributions), R1's removal block at 11:47Z and 13:18Z, the same outcome in both (private raw outputs, hashes in raw_outputs)"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": 0,
+      "output_excerpt": "The operation completed successfully.",
+      "note": "rehearsal runs 3 and 4 (throwaway distributions), R1's removal block at 11:47Z and 13:18Z, the same outcome in both (private raw outputs, hashes in raw_outputs)"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": 0,
+      "output_excerpt": "Microsoft Windows [Version 10.0.26200.9168]",
+      "note": "rehearsal runs 3 and 4 (throwaway distributions), R1's removal block at 11:47Z and 13:18Z, the same outcome in both (private raw outputs, hashes in raw_outputs); <Survivor> is the workstation distribution"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": 0,
+      "output_excerpt": "(no output: the guard did not throw)",
+      "note": "rehearsal runs 3 and 4 (throwaway distributions), R1's removal block at 11:47Z and 13:18Z, the same outcome in both (private raw outputs, hashes in raw_outputs)"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "  NAME                STATE           VERSION\n* <workstation>       Running         2\n  <another-distribution>    Stopped         2",
+      "note": "rehearsal runs 3 and 4 (throwaway distributions), R1's removal block at 11:47Z and 13:18Z, the same outcome in both (private raw outputs, hashes in raw_outputs); the throwaway is no longer listed and the starred line is W1's"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar'",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Length",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": null,
+      "output_excerpt": "not applicable: both rehearsals passed, so no rehearsal export was made"
+    },
+    {
+      "step": "R1",
+      "cmd": "test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver",
+      "exit": null,
+      "output_excerpt": "not run: every interop check after an unregister exited 0"
+    },
+    {
+      "step": "R1",
+      "cmd": "ls /proc/sys/fs/binfmt_misc",
+      "exit": null,
+      "output_excerpt": "not run: every interop check after an unregister exited 0"
+    },
+    {
+      "step": "R1",
+      "cmd": "systemctl status systemd-binfmt.service --no-pager",
+      "exit": null,
+      "output_excerpt": "not run: every interop check after an unregister exited 0"
+    },
+    {
+      "step": "P1",
+      "cmd": "for RELEASE in 26.04.1 24.04.5; do",
+      "exit": 0,
+      "output_excerpt": "(loop over both releases; derived: P1.sh exited 0)"
+    },
+    {
+      "step": "P1",
+      "cmd": "SUMS_DIR=\"$(mktemp -d)\"",
+      "exit": 0,
+      "output_excerpt": "(no output; derived)"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS\" || exit 1",
+      "exit": 0,
+      "output_excerpt": "(no output; derived: '|| exit 1' did not fire)"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS.gpg\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS.gpg\" || exit 1",
+      "exit": 0,
+      "output_excerpt": "(no output; derived: '|| exit 1' did not fire)"
+    },
+    {
+      "step": "P1",
+      "cmd": "gpgv --homedir \"$SUMS_DIR\" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg \"$SUMS_DIR/SHA256SUMS.gpg\" \"$SUMS_DIR/SHA256SUMS\"",
+      "exit": 0,
+      "output_excerpt": "26.04.1: gpgv: Signature made Thu Aug 27 18:43:09 2026 EDT / using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092 / Good signature from \"Ubuntu CD Image Automatic Signing Key (2012) <address left out>\"\n24.04.5: Signature made Tue Sep 15 15:11:12 2026 EDT, the same key and Good signature",
+      "note": "exit derived: the guard on the next line did not fire"
+    },
+    {
+      "step": "P1",
+      "cmd": "if [ \"$?\" -ne 0 ]; then exit 1; fi",
+      "exit": 0,
+      "output_excerpt": "(no output: the guard did not fire)"
+    },
+    {
+      "step": "P1",
+      "cmd": "grep -F \" *ubuntu-$RELEASE-wsl-amd64.wsl\" \"$SUMS_DIR/SHA256SUMS\" || exit 1",
+      "exit": 0,
+      "output_excerpt": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 *ubuntu-26.04.1-wsl-amd64.wsl\nbb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e *ubuntu-24.04.5-wsl-amd64.wsl",
+      "note": "exit derived: '|| exit 1' did not fire"
+    },
+    {
+      "step": "P1",
+      "cmd": "done",
+      "exit": 0,
+      "output_excerpt": "(P1.sh exit 0)"
+    },
+    {
+      "step": "P2",
+      "cmd": "RENDER_DIR=\"$(mktemp -d)\"",
+      "exit": 0,
+      "output_excerpt": "(no output; derived: the render into it exited 0)"
+    },
+    {
+      "step": "P2",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": 0,
+      "output_excerpt": "(no output)",
+      "note": "printed exit marker 0; rendered with the Linux user name, written here as <WSL_USER>"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init --version",
+      "exit": 0,
+      "output_excerpt": "/usr/bin/cloud-init 26.1-0ubuntu1~24.04.1",
+      "note": "the workstation's cloud-init"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init schema -c \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": 0,
+      "output_excerpt": "schema.py[WARNING]: datasource not detected, using default instance-data/user-data paths.\nValid schema <tmp>/<Name>.user-data"
+    },
+    {
+      "step": "P2",
+      "cmd": "sha256sum \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": 0,
+      "output_excerpt": "6eebab9fe9892c48931e4eccb1935411203ee27286edb7d6a6b535864f104e7e  <tmp>/<Name>.user-data"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'",
+      "exit": 0,
+      "output_excerpt": "3"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -Ev 'registering driver hv_storvsc|[Cc]ommand line:' | tail -n 1",
+      "exit": 0,
+      "output_excerpt": "[15573.834020] kernel: hv_storvsc <device-id>: tag#628 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1"
+    },
+    {
+      "step": "P3",
+      "cmd": "cat /proc/uptime",
+      "exit": 0,
+      "output_excerpt": "29010.04 1368301.23"
+    },
+    {
+      "step": "P3",
+      "cmd": "swapon --show",
+      "exit": 0,
+      "output_excerpt": "NAME     TYPE      SIZE USED PRIO\n/dev/sdc partition  24G  64K   -2"
+    },
+    {
+      "step": "W1",
+      "cmd": "New-Item -ItemType Directory -Force -Path 'Z:\\WSL\\downloads'",
+      "exit": 0,
+      "output_excerpt": "Directory: Z:\\WSL; d----- 10/2/2026 8:55 AM downloads; $? True"
+    },
+    {
+      "step": "W1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --version",
+      "exit": 0,
+      "output_excerpt": "WSL version: 3.0.1.0\nKernel version: 6.18.40.1-1\nWSLg version: 1.0.79\nMSRDC version: 1.2.7214\nDirect3D version: 1.611.1-81528511\nDXCore version: 10.0.26100.1-240331-1435.ge-release\nWindows version: 10.0.26200.9168"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "  NAME                STATE           VERSION\n* <workstation>       Running         2\n  <another-distribution>    Stopped         2"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": 0,
+      "output_excerpt": "<workstation>\n<another-distribution>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath 'Z:\\WSL\\<Name>'",
+      "exit": 0,
+      "output_excerpt": "False",
+      "note": "$? True"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\<Name>.user-data')",
+      "exit": 0,
+      "output_excerpt": "False",
+      "note": "$? True"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml')",
+      "exit": 0,
+      "output_excerpt": "False",
+      "note": "$? True"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue",
+      "exit": 1,
+      "output_excerpt": "(no output; $? False: the file does not exist, as the line above shows)"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\\s*\\[', '^\\s*instanceIdleTimeout\\s*=', '^\\s*vmIdleTimeout\\s*=' -ErrorAction SilentlyContinue",
+      "exit": 0,
+      "output_excerpt": "%USERPROFILE%\\.wslconfig: line 27 [wsl2]; line 165 vmIdleTimeout=-1; line 192 [experimental]; line 234 [general]; line 265 instanceIdleTimeout=-1",
+      "note": "$? True"
+    },
+    {
+      "step": "W1",
+      "cmd": "Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free",
+      "exit": 0,
+      "output_excerpt": "Name : Z\nUsed : 1498368352256\nFree : 2502399971328",
+      "note": "$? True"
+    },
+    {
+      "step": "W1",
+      "cmd": "id -u",
+      "exit": 0,
+      "output_excerpt": "1000"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl is-system-running",
+      "exit": 1,
+      "output_excerpt": "degraded"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": 0,
+      "output_excerpt": "getty@tty1.service     loaded failed failed Getty on tty1\nsystemd-binfmt.service loaded failed failed Set Up Additional Binary Formats"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl is-active \"user@$(id -u).service\"",
+      "exit": 0,
+      "output_excerpt": "active"
+    },
+    {
+      "step": "W1",
+      "cmd": "readlink /proc/self/ns/cgroup",
+      "exit": 0,
+      "output_excerpt": "cgroup:[4026532183]"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl show getty@tty1.service -p Result -p NRestarts",
+      "exit": 0,
+      "output_excerpt": "Result=start-limit-hit\nNRestarts=6",
+      "note": "ran because the baseline has a failed getty"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ProgressPreference = 'SilentlyContinue'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Release = '26.04.1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "switch ($Release) {",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "'26.04.1' { $Expected = '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104'; $CatalogName = 'Ubuntu-26.04' }",
+      "exit": 0,
+      "output_excerpt": "(no output; this branch ran)"
+    },
+    {
+      "step": "W2",
+      "cmd": "'24.04.5' { $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'; $CatalogName = 'Ubuntu-24.04' }",
+      "exit": 0,
+      "output_excerpt": "(not taken: the release is 26.04.1)"
+    },
+    {
+      "step": "W2",
+      "cmd": "default { throw 'unsupported release: do not download or install' }",
+      "exit": 0,
+      "output_excerpt": "(not taken: no throw)"
+    },
+    {
+      "step": "W2",
+      "cmd": "}",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Image = \"ubuntu-$Release-wsl-amd64.wsl\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImagePath = \"Z:\\WSL\\downloads\\$Image\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImageUrl = \"https://releases.ubuntu.com/$Release/$Image\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$SumsPath = \"Z:\\WSL\\downloads\\$Release-SHA256SUMS\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath",
+      "exit": 0,
+      "output_excerpt": "(no output; the hash check below matched the downloaded file)"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri \"https://releases.ubuntu.com/$Release/SHA256SUMS\" -OutFile $SumsPath",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \\*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq $CatalogName",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "\"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)\"",
+      "exit": 0,
+      "output_excerpt": "computed 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 published 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 listed 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 url https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl"
+    },
+    {
+      "step": "W2",
+      "cmd": "if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }",
+      "exit": 0,
+      "output_excerpt": "(no output: the guard did not throw; the step then printed 'W2 completed without throw')"
+    },
+    {
+      "step": "W2",
+      "cmd": "(Get-Item -LiteralPath $ImagePath).Length",
+      "exit": 0,
+      "output_excerpt": "418495746"
+    },
+    {
+      "step": "W3",
+      "cmd": "New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.cloud-init')",
+      "exit": 0,
+      "output_excerpt": "Directory: %USERPROFILE%; d----- 10/2/2026 8:55 AM .cloud-init; $? True"
+    },
+    {
+      "step": "W3",
+      "cmd": "$Text = [System.IO.File]::ReadAllText('<checkout>\\adoption\\templates\\wsl\\cloud-init.user-data.template').Replace('${WSL_USER}', '<WSL_USER>')",
+      "exit": 0,
+      "output_excerpt": "(no output; $? True)",
+      "note": "read from the workstation's read-only checkout of main through \\\\wsl.localhost, written here as <checkout>"
+    },
+    {
+      "step": "W3",
+      "cmd": "[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data'), $Text)",
+      "exit": 0,
+      "output_excerpt": "(no output; $? True)"
+    },
+    {
+      "step": "W3",
+      "cmd": "Get-Content -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -TotalCount 1",
+      "exit": 0,
+      "output_excerpt": "#cloud-config"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -Pattern '^- name: ', '^    default='",
+      "exit": 0,
+      "output_excerpt": "LineNumber 13: - name: <WSL_USER>\nLineNumber 25:     default=<WSL_USER>"
+    },
+    {
+      "step": "W3",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data')).Hash.ToLowerInvariant()",
+      "exit": 0,
+      "output_excerpt": "6eebab9fe9892c48931e4eccb1935411203ee27286edb7d6a6b535864f104e7e (equal to P2's sha256sum)"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -SimpleMatch -Pattern '${'",
+      "exit": 0,
+      "output_excerpt": "(no output: no placeholder left)"
+    },
+    {
+      "step": "W4",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --install --from-file 'Z:\\WSL\\downloads\\ubuntu-26.04.1-wsl-amd64.wsl' --name '<Name>' --location 'Z:\\WSL\\<Name>' --no-launch",
+      "exit": 0,
+      "output_excerpt": "Installing: Z:\\WSL\\downloads\\ubuntu-26.04.1-wsl-amd64.wsl\nDistribution successfully installed. It can be launched via 'wsl.exe -d <Name>'"
+    },
+    {
+      "step": "W4",
+      "cmd": "$LASTEXITCODE",
+      "exit": 0,
+      "output_excerpt": "0"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "  NAME                STATE           VERSION\n* <workstation>       Running         2\n  <Name>              Stopped         2\n  <another-distribution>    Stopped         2"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W5",
+      "cmd": "cmd.exe /d /c \"wsl.exe -d <Name> < NUL\"",
+      "exit": 0,
+      "output_excerpt": "Provisioning the new WSL instance <Name>\nThis might take a while...",
+      "note": "exit from the $LASTEXITCODE line below; no user prompt, no OOBE failure and no systemd user session warning"
+    },
+    {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": 0,
+      "output_excerpt": "0"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": 0,
+      "output_excerpt": "<WSL_USER>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec id -u",
+      "exit": 0,
+      "output_excerpt": "1000"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl is-enabled getty@tty1.service",
+      "exit": 1,
+      "output_excerpt": "masked"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl show getty@tty1.service -p LoadState -p ActiveState -p NRestarts",
+      "exit": 0,
+      "output_excerpt": "LoadState=masked\nActiveState=inactive\nNRestarts=0"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init --version",
+      "exit": 0,
+      "output_excerpt": "/bin/cloud-init 26.1-0ubuntu3~26.04.1"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --long",
+      "exit": 2,
+      "output_excerpt": "status: disabled\nextended_status: disabled\nboot_status_code: disabled-by-marker-file\nlast_update: Thu, 01 Jan 1970 08:03:51 +0000\ndetail: DataSourceWSL\nerrors: []\nrecoverable_errors:\nERROR:\n\t- Failed to wait for network: Unexpected error while running command. Command: ['systemctl', 'start', 'systemd-networkd-wait-online.service'] Exit code: 1 Reason: - Stdout:  Stderr: Failed to start systemd-networkd-wait-online.service: Unit systemd-networkd-wait-online.service is masked.\n\t- Failed to wait for network: Unexpected error while running command. Command: ['systemctl', 'start', 'systemd-networkd-wait-online.service'] Exit code: 1 Reason: - Stdout:  Stderr: Failed to start systemd-networkd-wait-online.service: Unit systemd-networkd-wait-online.service is masked.",
+      "note": "exit 2: recoverable errors only, the one the page expects with the template's bootcmd"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json",
+      "exit": 0,
+      "output_excerpt": "{\"v1\": {\"datasource\": \"DataSourceWSL\", \"errors\": []}}"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json",
+      "exit": 0,
+      "output_excerpt": "datasource DataSourceWSL; init-local 29028.74 to 29029.26 errors []; init 29029.32 to 29030.08 errors [] with recoverable ERROR 'Failed to wait for network' (systemd-networkd-wait-online.service is masked); modules-config 29030.16 to 29030.22 errors [] with the same recoverable error; modules-final 29031.46 to 29031.52 errors []; stage null"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init schema --system",
+      "exit": 0,
+      "output_excerpt": "Valid schema user-data"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf",
+      "exit": 0,
+      "output_excerpt": "[boot]\nsystemd=true\n[user]\ndefault=<WSL_USER>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled",
+      "exit": 0,
+      "output_excerpt": "-rw-r--r-- 1 root root 0 Oct  2 10:38 /etc/cloud/cloud-init.disabled"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'",
+      "exit": 0,
+      "output_excerpt": "User <WSL_USER> may run the following commands on <computer>:\n    (ALL : ALL) ALL\n    (ALL) NOPASSWD: ALL"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "  NAME                STATE           VERSION\n* <workstation>       Running         2\n  <Name>              Running         2\n  <another-distribution>    Stopped         2"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-active 'systemd-journald.service'",
+      "exit": 0,
+      "output_excerpt": "active",
+      "note": "<COMMON_UNIT> is systemd-journald.service; run natively in the workstation distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active 'systemd-journald.service'",
+      "exit": 0,
+      "output_excerpt": "active"
+    },
+    {
+      "step": "W5",
+      "cmd": "cat '/sys/fs/cgroup/system.slice/systemd-journald.service/cgroup.procs'",
+      "exit": 0,
+      "output_excerpt": "43",
+      "note": "the workstation's own unit, read natively: no 0 entry"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "exit": 0,
+      "output_excerpt": "active"
+    },
+    {
+      "step": "W5",
+      "cmd": "id -u",
+      "exit": 0,
+      "output_excerpt": "1000"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-system-running",
+      "exit": 1,
+      "output_excerpt": "degraded"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": 0,
+      "output_excerpt": "getty@tty1.service     loaded failed failed Getty on tty1\nsystemd-binfmt.service loaded failed failed Set Up Additional Binary Formats"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-active \"user@$(id -u).service\"",
+      "exit": 0,
+      "output_excerpt": "active"
+    },
+    {
+      "step": "W5",
+      "cmd": "readlink /proc/self/ns/cgroup",
+      "exit": 0,
+      "output_excerpt": "cgroup:[4026532183]"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec id -u",
+      "exit": 0,
+      "output_excerpt": "1000"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-system-running",
+      "exit": 1,
+      "output_excerpt": "degraded"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl --failed --no-legend --plain",
+      "exit": 0,
+      "output_excerpt": "systemd-binfmt.service loaded failed failed Set Up Additional Binary Formats"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "exit": 0,
+      "output_excerpt": "active"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec readlink /proc/self/ns/cgroup",
+      "exit": 0,
+      "output_excerpt": "cgroup:[4026532410]"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar'",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Length",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": null,
+      "output_excerpt": "not run: every W5 proof held, so nothing was exported or removed"
+    },
+    {
+      "step": "W5",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'",
+      "exit": 0,
+      "output_excerpt": "3\n[ 7118.513211] kernel: hv_storvsc <device-id>: tag#2558 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1\n[ 7678.647875] kernel: hv_storvsc <device-id>: tag#2472 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1\n[15573.834020] kernel: hv_storvsc <device-id>: tag#628 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1",
+      "note": "the step also printed the newest three lines with device ids replaced; none is newer than P3's newest"
+    },
+    {
+      "step": "W6",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-failed.tar'",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Length",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --import '<Name>' 'Z:\\WSL\\<Name>' 'Z:\\WSL\\downloads\\ubuntu-26.04.1-wsl-amd64.wsl' --version 2",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "systemctl mask --now getty@tty1.service",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "id -u '<WSL_USER>' || useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "printf '%s ALL=(ALL) NOPASSWD:ALL\\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "chmod 0440 /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "visudo -cf /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "grep -q '^\\[user\\]' /etc/wsl.conf || printf '\\n[user]\\ndefault=%s\\n' '<WSL_USER>' >> /etc/wsl.conf",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "touch /etc/cloud/cloud-init.disabled",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --running",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": null,
+      "output_excerpt": "not run: path A (neither W5 marker appeared), so W6 did not apply"
+    },
+    {
+      "step": "W7",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": 0,
+      "output_excerpt": "The operation completed successfully."
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --list --running --quiet",
+      "exit": 0,
+      "output_excerpt": "<workstation>",
+      "note": "<Name> is absent"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": 0,
+      "output_excerpt": "<WSL_USER>"
+    },
+    {
+      "step": "W7",
+      "cmd": "New-Item -ItemType File -Path '\\\\wsl.localhost\\<Name>\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "Directory: \\\\wsl.localhost\\<Name>\\home\\<WSL_USER>; ------ 10/2/2026 10:38 AM 0 wsl-owner-probe; $? True"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d '<Name>' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "1000:1000"
+    },
+    {
+      "step": "W7",
+      "cmd": "Remove-Item -LiteralPath '\\\\wsl.localhost\\<Name>\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "(no output; $? True)"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl is-system-running --wait",
+      "exit": 1,
+      "output_excerpt": "degraded"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": 0,
+      "output_excerpt": "systemd-binfmt.service loaded failed failed Set Up Additional Binary Formats"
+    },
+    {
+      "step": "F1",
+      "cmd": "journalctl -b 0 -t systemd-binfmt --no-pager -n 4",
+      "exit": 0,
+      "output_excerpt": "Oct 02 10:38:32 <computer> systemd-binfmt[105]: Failed to flush binfmt_misc rules, ignoring: Read-only file system\nOct 02 10:38:52 <computer> systemd-binfmt[89]: Failed to flush binfmt_misc rules, ignoring: Read-only file system",
+      "note": "run as <WSL_USER> without sudo; journal times are the host's local time (UTC-4)"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl list-unit-files --type=service --no-pager",
+      "exit": 0,
+      "output_excerpt": "201 unit files listed; masked: cryptdisks-early, cryptdisks, getty@tty1, hwclock, screen-cleanup, sudo, x11-common; masked-runtime: console-getty, NetworkManager-wait-online, systemd-networkd-wait-online"
+    },
+    {
+      "step": "F1",
+      "cmd": "sudo journalctl -b 0 -t systemd-binfmt --no-pager -n 4",
+      "exit": null,
+      "output_excerpt": "not needed: the call without sudo above printed the unit's messages"
+    },
+    {
+      "step": "F1",
+      "cmd": "id -nG",
+      "exit": 0,
+      "output_excerpt": "<WSL_USER> adm cdrom sudo dip plugdev",
+      "note": "added by the step script; not a recipe command"
+    },
+    {
+      "step": "F2",
+      "cmd": "sudo loginctl enable-linger \"$(id -un)\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "F2",
+      "cmd": "loginctl show-user \"$(id -un)\" --property=Linger --value",
+      "exit": 0,
+      "output_excerpt": "yes"
+    },
+    {
+      "step": "F2",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not run: the idle observation was not run"
+    },
+    {
+      "step": "F2",
+      "cmd": "foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::UtcNow.ToString('HH:mm:ss'); wsl.exe --list --running --quiet }",
+      "exit": null,
+      "output_excerpt": "not run: F2's twelve polls were not run on the destination distribution"
+    },
+    {
+      "step": "F3",
+      "cmd": "stat -c '%U %F' \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"",
+      "exit": 0,
+      "output_excerpt": "<WSL_USER> directory\n<WSL_USER> socket"
+    },
+    {
+      "step": "F3",
+      "cmd": "systemctl --user is-system-running --wait",
+      "exit": 0,
+      "output_excerpt": "running"
+    },
+    {
+      "step": "F3",
+      "cmd": "docker --context rootless info --format '{{json .SecurityOptions}}'",
+      "exit": null,
+      "output_excerpt": "not run on the destination distribution: owed (rootless_container)"
+    },
+    {
+      "step": "F3",
+      "cmd": "docker --context rootless run --rm hello-world",
+      "exit": null,
+      "output_excerpt": "not run on the destination distribution: owed (rootless_container)"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get update",
+      "exit": 0,
+      "output_excerpt": "Fetched 31.8 MB in 3s (10.6 MB/s)"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get install -y --no-install-recommends ca-certificates curl git tar gzip xz-utils jq libatomic1 uidmap",
+      "exit": 0,
+      "output_excerpt": "3 upgraded, 5 newly installed, 0 to remove and 95 not upgraded."
+    },
+    {
+      "step": "F4",
+      "cmd": "dpkg-query -W -f='${Package} ${Version}\\n' jq libatomic1 uidmap",
+      "exit": 0,
+      "output_excerpt": "jq 1.8.1-4ubuntu2\nlibatomic1 16-20260322-1ubuntu1\nuidmap 1:4.17.4-2ubuntu3"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": 0,
+      "output_excerpt": "/etc/subuid:<WSL_USER>:100000:65536\n/etc/subgid:<WSL_USER>:100000:65536",
+      "note": "exit derived: two lines printed"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep -q \"^$(id -un):\" /etc/subuid || sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 \"$(id -un)\"",
+      "exit": 0,
+      "output_excerpt": "(usermod skipped: a range exists)",
+      "note": "the step script's equivalent if/else form"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": 0,
+      "output_excerpt": "/etc/subuid:<WSL_USER>:100000:65536\n/etc/subgid:<WSL_USER>:100000:65536"
+    },
+    {
+      "step": "F6",
+      "cmd": "test -e ~/.bash_profile || printf '%s\\n' 'if [ -r \"$HOME/.profile\" ]; then . \"$HOME/.profile\"; fi' > ~/.bash_profile",
+      "exit": 0,
+      "output_excerpt": "(no output: ~/.bash_profile did not exist and was written)",
+      "note": "exit derived; the step script prints a marker when the file existed, and none printed"
+    },
+    {
+      "step": "F6",
+      "cmd": "cat ~/.bash_profile",
+      "exit": 0,
+      "output_excerpt": "if [ -r \"$HOME/.profile\" ]; then . \"$HOME/.profile\"; fi"
+    },
+    {
+      "step": "F7",
+      "cmd": "mkdir -p ~/code",
+      "exit": 0,
+      "output_excerpt": "(no output; derived: the clone into it exited 0)"
+    },
+    {
+      "step": "F7",
+      "cmd": "git clone https://github.com/seathatflowsinourveins/native-agent-stack.git ~/code/native-agent-stack",
+      "exit": 0,
+      "output_excerpt": "(no output; run with -q)"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack rev-parse HEAD",
+      "exit": 0,
+      "output_excerpt": "6652b78e272b92d31842b4791a130e4339be8609",
+      "note": "exit derived: the hash printed"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack ls-remote origin refs/heads/main",
+      "exit": 0,
+      "output_excerpt": "6652b78e272b92d31842b4791a130e4339be8609\trefs/heads/main",
+      "note": "exit derived: the line printed"
+    },
+    {
+      "step": "F7",
+      "cmd": "test -f ~/code/native-agent-stack/evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "exit": 0,
+      "output_excerpt": "(no output)",
+      "note": "added by the step script; not a recipe command"
+    },
+    {
+      "step": "F8",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": 0,
+      "output_excerpt": "(no output; derived: the script continued)"
+    },
+    {
+      "step": "F8",
+      "cmd": "ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'",
+      "exit": 0,
+      "output_excerpt": "(no output: no listener on the host file's four ports)",
+      "note": "after the port edit below; a first attempt with the template's ports at that revision listed listeners on 127.0.0.1:26333 and 127.0.0.1:24318 (deviations)"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template \"$(id -un)\" > 'adoption/hosts/<host>.json'",
+      "exit": 0,
+      "output_excerpt": "(no output)",
+      "note": "written to adoption/hosts/<host>.json"
+    },
+    {
+      "step": "F8",
+      "cmd": "(edit of the rendered host file by the page's rule for a template port with a listener)",
+      "exit": 0,
+      "output_excerpt": "\"OTEL_ENDPOINT\": \"127.0.0.1:21318\",\n\"AI_MEMORY_URL\": \"127.0.0.1:29374\",\n\"QDRANT_URL\": \"127.0.0.1:21633\",\n\"EMBED_URL\": \"127.0.0.1:28231\"",
+      "note": "a short python3 edit of adoption/hosts/<host>.json; see deviations"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -m json.tool 'adoption/hosts/<host>.json'",
+      "exit": 0,
+      "output_excerpt": "(valid JSON; the step counted 9 key lines)",
+      "note": "exit derived: piped into grep -c"
+    },
+    {
+      "step": "F8",
+      "cmd": "git check-ignore 'adoption/hosts/<host>.json'",
+      "exit": 0,
+      "output_excerpt": "adoption/hosts/<host>.json"
+    },
+    {
+      "step": "F9",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": 0,
+      "output_excerpt": "(no output; derived: the script continued)"
+    },
+    {
+      "step": "F9",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "exit": 0,
+      "output_excerpt": "38 result lines: 35 exit 0, 3 measurement-only owners skipped (grafana, loki, playwright-cli), none failed",
+      "note": "I1, 2026-10-02T14:50:50Z to 14:54:30Z at 6652b78e; the exit is the driver's recorded exit status, because the step script's own exit marker line did not print"
+    },
+    {
+      "step": "F9",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "exit": 0,
+      "output_excerpt": "64 result lines: 35 exit 0, 29 skipped, none failed",
+      "note": "I2 at 6652b78e"
+    },
+    {
+      "step": "F9",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --stage service_health",
+      "exit": 1,
+      "output_excerpt": "container-engine 0 and dagu 0; otel-collector-contrib, prometheus, alerting, gpt-gateway and research-harnesses 28 (curl could not connect); local-model-server 1",
+      "note": "I2; the six failing owners' services are not started by the install. I5 (15:07:49Z to 15:08:04Z) started otel-collector-contrib, prometheus, alerting and local-model-server with the plan's documented commands: service_health 0 each, then stopped"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --check",
+      "exit": 0,
+      "output_excerpt": "check passed",
+      "note": "at 099ead33b68f (20:41Z); also 'check passed' at a372ab3b (17:39Z)"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'",
+      "exit": null,
+      "output_excerpt": "not run as written: the client configuration ran as the F9 entries that follow"
+    },
+    {
+      "step": "F9",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot> --stage after_sign_in",
+      "exit": 0,
+      "output_excerpt": "codex | after_sign_in | 0\nclaude-agent-sdk | after_sign_in | 0\ncodex-sdk-and-codex-exec-app-server | after_sign_in | 0",
+      "note": "2026-10-02T16:03Z, after the owner's native sign-ins; local-model-server, agent-runtime-worker and research-harnesses were not run"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>' --skip codex-config",
+      "exit": 0,
+      "output_excerpt": "summary: claude-hooks applied; claude-agents applied; claude-mcp applied; claude-settings applied; claude-launcher applied; claude-md applied; codex-config skipped; codex-files applied; codex-md applied; login-path applied; verify verified",
+      "note": "2026-10-02T17:39:17Z at a372ab3b, a head of pull request 608 under review, after the sign-ins; codex-config skipped because a Codex session was open; this head printed no authorization line"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>' --dry-run --with-authorization-settings",
+      "exit": 0,
+      "output_excerpt": "authorization settings: would be applied (--with-authorization-settings; added: Codex approval_policy, Codex sandbox_mode; already the same: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt)",
+      "note": "2026-10-02T20:41Z at 099ead33b68f; no Codex or Claude process ran"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>' --with-authorization-settings",
+      "exit": 0,
+      "output_excerpt": "codex-config: applied: merged into ~/.codex/config.toml (backup ~/.codex/config.toml.bak.20261002T204144Z)\nauthorization settings: applied (--with-authorization-settings; added: Codex approval_policy, Codex sandbox_mode; already the same: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt)\nsummary: claude-hooks current; claude-agents current; claude-mcp current; claude-settings current; claude-launcher current; claude-md current; codex-config applied; codex-files current; codex-md current; login-path current; verify verified",
+      "note": "2026-10-02T20:41:44Z at 099ead33b68f (see authorization_settings)"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>' --with-authorization-settings",
+      "exit": 0,
+      "output_excerpt": "authorization settings: kept (--with-authorization-settings; already the same: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode)\nsummary: every step current; verify verified",
+      "note": "the same command again, 2026-10-02T20:41Z"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'",
+      "exit": 0,
+      "output_excerpt": "~/.local/share/codex-ecosystem/bin/claude\n~/.local/bin/codex",
+      "note": "2026-10-02T22:55Z, after the fragment with five profiles was written; at 15:08Z, before the client configuration, the same command printed ~/.local/bin/claude and ~/.local/bin/codex (exit 0)"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'",
+      "exit": 0,
+      "output_excerpt": "executable: ~/.local/share/codex-ecosystem/bin/claude\nexecutable: ~/.local/bin/codex",
+      "note": "2026-10-02T22:55Z"
+    },
+    {
+      "step": "F11",
+      "cmd": "test -x \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": 1,
+      "output_excerpt": "(no output)",
+      "note": "2026-10-02T22:55:08Z"
+    },
+    {
+      "step": "F11",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "skipped: not installed (test -x exited 1)"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp add --scope local jcodemunch -e \"CODE_INDEX_PATH=$HOME/.code-index\" -e JCODEMUNCH_SHARE_SAVINGS=0 -- \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": null,
+      "output_excerpt": "skipped: not installed (test -x exited 1)"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp get jcodemunch",
+      "exit": null,
+      "output_excerpt": "skipped: not installed (test -x exited 1)"
+    }
+  ],
+  "comparison_arms": {
+    "26.04.1": {
+      "status": "partial: rehearsal runs 3 and 4 on throwaway distributions; the uv and Node probes are owed",
+      "name": "throwaway distributions, names withheld (run 3 and run 4)",
+      "first_boot": "both runs: W5 exit 0 without the user or OOBE markers, uid 1000, cloud-init's result.json without errors, schema --system 'Valid schema user-data' exit 0, F1 'degraded' with systemd-binfmt.service only (F1's pass condition)",
+      "systemd_user_from_second_instance": "run 3: probe 1 in the unquoted form printed '<WSL_USER>,directory' and '<WSL_USER>,socket' (exit 0; the quoted first attempt printed 'stat: missing operand', exit 1), probe 2 'running' (exit 0); F2 Linger yes and all twelve idle polls listed the throwaway",
+      "wsl_gpu": "run 3: test -c /dev/dxg exit 0; /usr/lib/wsl/lib/nvidia-smi exit 0 (NVIDIA-SMI 615.65.07, KMD Version: 616.64, CUDA UMD Version: 13.4; one GPU listed)",
+      "uv_cpython_3_13": "run 3: 'bash: line 1: uv: command not found' (exit 127), stage 2 had not run there: owed; the system python3 printed 'Python 3.14.4' (exit 0)",
+      "node_24": "run 3: 'bash: line 1: node: command not found' (exit 127): owed"
+    },
+    "24.04.5": {
+      "status": "unrun",
+      "name": null,
+      "first_boot": "not run",
+      "systemd_user_from_second_instance": "not run",
+      "wsl_gpu": "not run",
+      "uv_cpython_3_13": "not run",
+      "node_24": "not run"
+    }
+  },
+  "w5_failure_export": {
+    "file": null,
+    "sha256": null,
+    "bytes": null,
+    "cause": null
+  },
+  "interop_after_unregister": "No unregister in the destination run (path A, every W5 proof held). Before it, R1's removal block removed the two throwaway distributions: after each --unregister, the check in the surviving workstation distribution printed 'Microsoft Windows [Version 10.0.26200.9168]' with exit 0 (run 3 at 11:47Z, run 4 at 13:18Z), and --list --verbose no longer listed the throwaway",
+  "rootless_container": "owed: F3's two rootless-context commands were not run on the destination distribution, before or after F9. Related, and not F3's proof: the install plan installed the container engine in F9 (I1), and accept.sh's container-engine service_health check 'docker run hello-world' returned 0 at about 15:07Z (only the image pull lines were kept, not the container's own output); the rehearsal's run 3 printed name=rootless and 'Hello from Docker!' through the rootless context.",
+  "stop": null,
+  "deviations": [
+    "F2's idle observation (the twelve polls) was not run on the destination distribution.",
+    "F3's rootless-container check was not run, though the page asks for it before F9 on the first run after the WSL update: owed.",
+    "F8: the rendered host file's two template ports at that revision (24318 and 26333) had listeners of the workstation's collector and Qdrant in the shared network namespace (first attempt: ss listed 127.0.0.1:26333 and 127.0.0.1:24318). By the page's rule the rendered file was edited to 127.0.0.1:21318 (the install plan's OTLP/HTTP port) and 127.0.0.1:21633, and ss over the host file's four ports then printed nothing (exit 0). The host template on main carries these ports since #608.",
+    "F9: the install plan's install.sh and accept.sh ran from the clone at 6652b78e (2026-10-02T14:50:50Z to 15:07:30Z); the client-configuration tool was not on main yet. It ran after the native sign-ins, where the page puts it before them: at 17:39:17Z from a372ab3b with --skip codex-config (a Codex session was open), and at 20:41:44Z from 099ead33b68f with --with-authorization-settings (authorization_settings).",
+    "F9's after-sign-in checks ran for codex, claude-agent-sdk and codex-sdk-and-codex-exec-app-server (exit 0 each, 16:03Z); local-model-server, agent-runtime-worker and research-harnesses were not run.",
+    "F10 ran twice: at 15:08Z before the client configuration, and at 22:55Z after the fragment with five profiles (Shell, Codex, Codex resume, Claude, Claude resume) was written. The fragment was saved in the existing fragments folder that holds the workstation's profiles, whose name differs from the folder the platform page names (a recipe finding).",
+    "Added instrumentation only: exit-code markers, one transcript per PowerShell block, a groups line after F1 and a plan-present check after F7; F5 and F6 ran as equivalent if/else forms that print which branch ran."
+  ],
+  "stage_2": {
+    "install": "I1, 2026-10-02T14:50:50Z to 14:54:30Z at 6652b78e: 38 result lines, 35 exit 0 and the three measurement-only owners skipped (grafana, loki, playwright-cli), none failed; driver exit 0",
+    "post_install_acceptance": "I2 at 6652b78e: accept.sh exit 0: 35 exit 0 and 29 skipped of 64 rows, none failed",
+    "service_health": "I2: --stage service_health exit 1: container-engine 0 and dagu 0 as installed; otel-collector-contrib, prometheus, alerting, gpt-gateway and research-harnesses 28 and local-model-server 1, services the install does not start. I5 (15:07:49Z to 15:08:04Z): otel-collector-contrib, prometheus, alerting and local-model-server 0 each after the plan's documented start commands, then stopped; one 21xxx listener stayed (Dagu's 21080)",
+    "failed_units_after_install": "systemd-binfmt.service only (system); none listed for the user manager",
+    "versions_15_08Z": "Claude Code 2.1.287, codex-cli 0.160.0, git version 2.53.0, Docker version 29.8.2 (build 7fc2dff), kernel 6.18.40.1-microsoft-standard-WSL2; gh not yet on the login PATH (command not found)",
+    "sign_in": "the owner's native sign-ins inside the destination distribution, after the 15:09Z hand-over and before 16:03Z (the clients were launched interactively at the owner's request); no credential was copied; at 16:03Z codex login status exit 0 and claude auth status loggedIn true",
+    "after_sign_in": "16:03Z: codex 0, claude-agent-sdk 0, codex-sdk-and-codex-exec-app-server 0",
+    "sdk_examples": "16:44Z, the plan's own after-sign-in commands extracted unchanged at 6652b78e: the Claude Agent SDK example answered '2 + 2 = 4.' (ResultMessage subtype success, is_error False, one turn, exit 0); the Codex SDK example exited 0 with two command executions and an agent message that reported 'Missing script: \"test\"' (the example has no failing-test fixture). A real turn with tool use, not task quality",
+    "client_configuration": "17:39:17Z at a372ab3b (codex-config skipped) and 20:41:44Z at 099ead33b68f (codex-config applied, every other step current, verify verified; a second run left every step current). Read back at 20:41Z: Codex MCP servers qmd and serena, codex-cli 0.160.0, codex login status exit 0, Claude Code 2.1.287; claude mcp list at 17:39Z: serena and qmd Connected",
+    "path_proof": "F10 at 22:55Z: claude is the ecosystem launcher (~/.local/share/codex-ecosystem/bin/claude) and codex ~/.local/bin/codex, both executable",
+    "jcodemunch": "not installed (F11)"
+  },
+  "related_observations": {
+    "scope": "Reported by the SDK execution lane for the destination distribution; not observed by this run and not part of this receipt's claim. Listed so that the grand-dashboard gate citing this receipt traces to its public sources.",
+    "sources": [
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5963830390 (2026-10-03T00:53:25Z)",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5964120696 (2026-10-03T01:29:58Z)",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/617 (open; head f7c813a7e556)"
+    ],
+    "runtime": "official Claude Code 2.1.288 staged by the SDK lane, with Claude Agent SDK 0.2.163",
+    "accepted_bounded_case_observations": [
+      "reviewer: query exit 0 in 231.436 s; one foreground handoff (Sonnet 5.5 child, Opus 5.5 parent), candidate unchanged; independent Sol ACCEPT",
+      "researcher, declared concise follow-up: query exit 0 in 182.366 s; one attributed Opus 5.5 child, 13 matched source-tool calls, successful parent terminal; independent Astra ACCEPT",
+      "minimal in-process MCP: query exit 0 in 6.085 s; an actual echo callback and native tool result, successful terminal, SDK context exit; independent Sol ACCEPT",
+      "native deny-rule pair, once per condition: armed exit 0 with the echo attempt denied and no echo callback; disarmed exit 1 at the same upstream exclusion assertion; independent Astra ACCEPT"
+    ],
+    "failures_kept": [
+      "both earlier researcher attempts failed: the first returned zero findings within four child turns; the search-first repair returned supported findings but timed out before a parent terminal result",
+      "the first Claude useful-task trial failed (query exit 0, oracle exit 1, three passes and one error); a separate informed Codex repair passed (query and oracle exit 0, four passes); the Claude failure stays failed"
+    ],
+    "gaps": "These are bounded case observations: complete role qualification (the utility oracle's negative controls do not test reviewer grading; the researcher failures cover missing findings and terminal completion, not wrong facts or citations), recovery and the host lifecycle stay open; the researcher follow-up's whole-query usage and cost are unknown; the deny pair supports no visibility, containment or recovery claim."
+  },
+  "addendum_20261003": {
+    "scope": "Later changes on the destination distribution on 2026-10-03, recorded beside stage 1 and not part of this receipt's claim.",
+    "skills_and_plugins": "01:15:48Z to 01:16:21Z (Claude Code 2.1.288): skills@1.7.0 exited 0 for each source: trailofbits/skills 82fe8226 (9 skills), mattpocock/skills v1.2.3 (2), vercel-labs/skills 7407f389 (1), openai/skills 49f948fa (4), affaan-m/ECC ef648e01 (2), anthropics/skills 8a1541c4 (2, plus skill-creator for Claude Code only), cloudflare/security-audit-skill c1c8a8c1 (1), typesafe-ai/skills 65a39f39 (1), for claude-code and codex; plugins context-mode 1.0.169, claude-hud 0.10.0 and codex 1.0.6 installed at user scope and enabled (context-mode noted that the packages it lists were not installed because bun is not installed); the claude-hud statusLine written; the checkout moved to main 56473e4b840f. Result: 30 Claude Code skills, 28 Codex skills",
+    "qmd_collections": "01:17:05Z to 01:17:09Z: the four collections created (us-equities-catalog 24 files, us-equities-foundation 114, foundation-adoption 37, foundation-docs 172), the ecosystem/ ignore added under foundation-docs, update exit 0, and a search returned a result",
+    "qmd_embed": "01:17:18Z to 01:43:27Z: embed exit 0, 3763 chunks from 347 documents in 26 min 7 s with embeddinggemma-300M (GGUF)",
+    "not_established": "No session or subagent use of these skills, plugins or the QMD index is recorded here."
+  }
+}
