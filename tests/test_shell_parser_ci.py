@@ -62,7 +62,7 @@ PROVISIONING_JOB = "validate"
 PROVISIONING_KEY = f"{PROVISIONING_WORKFLOW}:{PROVISIONING_JOB}"
 # Whole-suite jobs that do not provision the parser yet: adoption-bootstrap.yml runs the suite on macOS in its
 # validate-macos job (step "Run the full test suite (gating on macOS)"; the job is a required check in
-# .github/main-ruleset.json) and catalog-freshness.yml runs it weekly in its freshness job (step "Run project test
+# .github/main-ruleset.json) and catalog-freshness.yml runs it daily in its freshness job (step "Run project test
 # suite"). Their lane tests skip today, and the runtime tripwire skips in exactly these jobs and says so. To close a
 # gap, add a provisioning step to that job in its own workflow and delete its entry here, nothing else: until the entry
 # is deleted the ratchet reports it as stale (test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap),

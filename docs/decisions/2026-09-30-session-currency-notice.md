@@ -151,9 +151,9 @@ only. See the [current behavior and bounded schedule decision](2026-10-02-daily-
 3. **The startup rule.** Item 4 of `docs/token-practice.md` now allows exactly one read-only SessionStart line from
    that file, printed fail-open; the checks never run at startup. `AGENTS.md:28` still reads "Do not rerun the full
    audit or model trials at startup", which this design keeps. Any change to that wording is unit F1's.
- 4. **The historical proposed contract for the hook in unit F2, which this change does not contain:**
-    The correction above identifies the implemented age limit and output format; this list preserves the original
-    proposal and its unmeasured acceptance gate.
+4. **The historical proposed contract for the hook in unit F2, which this change does not contain:**
+   The correction above identifies the implemented age limit and output format; this list preserves the original
+   proposal and its unmeasured acceptance gate.
    - Read only that file and print its `summary_line` as plain stdout. Exit 0 in every case.
    - Print nothing when the file is missing, unreadable or not a JSON object, when `summary_line` is not one line
      of at most 160 characters, or when `generated_at` is more than 48 hours old, because a failing timer leaves

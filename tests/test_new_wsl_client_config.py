@@ -435,7 +435,8 @@ class ManifestRuleTests(unittest.TestCase):
         planned = {slot for slot, row in plan.items() if row["installed"]}
         self.assertEqual(installing - planned, {"mcp-inspector", "base-distribution"})
         self.assertEqual(planned - installing, set())
-        self.assertEqual(len(planned), 36)
+        # 36 rows of the 64-row plan, and the two rows of the layer consensus that install (skill-discovery, skill-authoring).
+        self.assertEqual(len(planned), 38)
 
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1456,6 +1457,35 @@ class ApplyTests(ApplyCase):
         self.assertEqual(code, 2)
         self.assertIn("CLAUDE_CONFIG_DIR or CODEX_HOME is set", err)
         self.assertEqual(list(self.home.iterdir()), [])
+
+    def test_a_host_value_file_whose_home_is_the_root_is_refused_and_nothing_is_moved_or_written(self):
+        # The example host's values with its home at the root: HOME "/" (or "//"), its home paths written from the root
+        # and HOST_PATH as it is. Without its trailing slashes such a HOME is empty, a prefix of every absolute path:
+        # the code before the fix moved /usr/local/sbin, HOST_PATH's first entry, under the new home and applied that.
+        example = json.loads((render_config.HOSTS / f"{EXAMPLE_HOST}.json").read_text(encoding="utf-8"))
+        hosts = self.base / "hosts"
+        hosts.mkdir()
+        plan = cfg.analyse(ROOT)[2]
+        for declared in ("/", "//"):
+            root_home = {k: (declared if k == "HOME" else v.replace(example["HOME"], "")) for k, v in example.items()}
+            (hosts / "root-home.json").write_text(json.dumps(root_home, indent=2) + "\n", encoding="utf-8")
+            with self.subTest(declared=declared), mock.patch.object(render_config, "HOSTS", hosts):
+                code, out, err = run_main("--apply", "--host", "root-home", "--home", str(self.home), "--claude-bin",
+                                          str(self.claude), "--codex-bin", str(self.codex), "--codex-process-name",
+                                          NO_PROCESS)
+                self.assertEqual(code, 1, out[-600:])
+                self.assertTrue(err.startswith(f"apply failed: the host value file declares HOME as {declared!r}"), err)
+                self.assertEqual(list(self.home.iterdir()), [])
+                self.assertFalse(self.marker.exists(), "a client ran")
+                with self.assertRaises(cfg.ConfigError):
+                    cfg.host_values("root-home", plan, self.home, [])
+                # With the new home at the root as well nothing moves: the values are those of a render without --home.
+                self.assertEqual(cfg.host_values("root-home", plan, Path("/"), []),
+                                 cfg.host_values("root-home", plan, None, []))
+        # A home below the root moves the paths under it and leaves the system's directories where they are.
+        values = cfg.host_values(EXAMPLE_HOST, plan, self.home, [])
+        self.assertEqual((values["HOME"], values["ECO_ROOT"], values["HOST_PATH"]),
+                         (str(self.home), str(self.eco), example["HOST_PATH"]))
 
 
 def leaves(node, prefix=()):
