@@ -79,9 +79,23 @@ jobs:
           # An entry without a parser lets OSV-Scanner infer it from the file name (":<path>").
           # An explicit --config applies to every input of one invocation (OSV-Scanner docs/configuration.md),
           # so each frozen group has its own invocation, and ordinary entries use the config with no archive exception.
-          mapfile -t lockfiles < <(jq -r '.lockfiles[] | select(has("config") | not) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
-          mapfile -t frozen < <(jq -r --arg config "$frozen_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
-          mapfile -t frozen_wsl < <(jq -r --arg config "$frozen_wsl_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+          # Read in the current shell without relying on mapfile, which older Bash lacks.
+          lockfiles=()
+          while IFS= read -r lockfile; do
+            lockfiles+=("$lockfile")
+          done < <(jq -r '.lockfiles[] | select(has("config") | not) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+          frozen=()
+          while IFS= read -r lockfile; do
+            frozen+=("$lockfile")
+          done < <(jq -r --arg config "$frozen_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+          frozen_wsl=()
+          while IFS= read -r lockfile; do
+            frozen_wsl+=("$lockfile")
+          done < <(jq -r --arg config "$frozen_wsl_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+          # Older Bash treats empty arrays as unset under -u; guard before expanding lengths.
+          test -n "${lockfiles[0]+set}" || exit 1
+          test -n "${frozen[0]+set}" || exit 1
+          test -n "${frozen_wsl[0]+set}" || exit 1
           test "${#lockfiles[@]}" -gt 0 || exit 1
           test "${#frozen[@]}" -gt 0 || exit 1
           test "${#frozen_wsl[@]}" -gt 0 || exit 1
