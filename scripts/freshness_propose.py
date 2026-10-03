@@ -104,7 +104,7 @@ RUNTIME_ONLY_REPOSITORIES_FIELD = "runtime_only_repositories"
 # The line after the runtime table that names the rows on a runtime-only repository whose
 # fetch failed this run (each is also a row with no reliable upstream data).
 RUNTIME_ONLY_FAILURE_SENTENCE = (
-    "runtime row(s) whose upstream only this table tracks could not be fetched this run (counted in "
+    "runtime row(s) whose repository no other working file names could not be fetched this run (counted in "
     "`github-freshness.json`'s `runtime_only_errors` or `runtime_only_partial_errors`, never in the `errors` "
     "or `partial_errors` that hold the propose job)"
 )
