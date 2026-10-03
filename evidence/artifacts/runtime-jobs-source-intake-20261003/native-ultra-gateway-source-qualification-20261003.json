@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-03",
+  "evidence_kind": "source_review",
+  "status": "native Ultra supported; actual route and roles unqualified",
+  "requested_identity": {
+    "model": "gpt-6.1-sol",
+    "native_effort": "ultra",
+    "consequential_model": "gpt-6-astra",
+    "consequential_effort": "max"
+  },
+  "installed_cli_metadata": {
+    "version": "0.160.0",
+    "version_exit": 0,
+    "app_server_help_exit": 0,
+    "help_bytes": 3214,
+    "help_sha256": "4226dbf080b9d3a620385fba067bd3b8ac3c76654f28c3bd4d92ae20df2b03d2",
+    "model_run": false
+  },
+  "codex_source": {
+    "repository": "openai/codex",
+    "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "native_originals_rechecked": 28,
+    "evidence_scope": "28 combined native Ultra and carrier source originals, including other repositories; all exit0 and matched complete bytes.",
+    "selected_native_mode": "Ultra selects proactive multi-agent instructions under the native V2/config/catalog-message conditions; actual mode and delegation are unobserved.",
+    "native_resolver": "Supported model-specific non-Ultra override; else advertised Max; else last supported non-Ultra effort; else Medium.",
+    "bundled_model": {
+      "slug": "gpt-6.1-sol",
+      "multi_agent_reasoning_effort": "xhigh",
+      "catalog_bytes": 472512,
+      "catalog_sha256": "fd219bd9f061278275f528939f82f54d2eb97df4b25c23b022adbe48813d920b"
+    },
+    "sources": [
+      "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/openai_models/reasoning_effort.rs#L9",
+      "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/client.rs#L863",
+      "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/session/multi_agents.rs#L77",
+      "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/models.json#L178"
+    ]
+  },
+  "gateway_source": {
+    "repository": "diegosouzapw/OmniRoute",
+    "latest_published_release": "v3.8.51",
+    "release_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "default_branch": "release/v3.8.52",
+    "head_pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+    "owner_effort_head_read": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+    "http_path": "Raw Ultra becomes Max before Responses passthrough at each checked pin; a suffix or forced-effort setting can override incoming effort.",
+    "app_server_path": "Stock dispatch can select the app-server before HTTP conversion. Literal effort reaches turn/start, after which native Codex can normalize it.",
+    "runtime_preservation": "The app-server bridge starts a native thread, flattens text and relays selected dynamic tools. It does not establish lossless Responses history or preservation of an arbitrary calling runtime.",
+    "stock_profile": "Documented Compose profile remains HOLD: omniroute:base selects runner-base; Codex0.156.1 is installed in runner-cli. This is a source conflict, not a executed container failure.",
+    "health": "Native readyz is HTTP200. Gateway health can return valid when account state is unknown; neither proves authenticated model delivery.",
+    "credentials": "Native app-server owns native model requests; stock profile shares its writable native home with OmniRoute. Capability-token generation is source-supported, distinct from native sign-in. No auth store was read/copied or app-server launched."
+  },
+  "consequential_review": {
+    "role": "Astra/max",
+    "trigger": "Conflicting native Ultra/HTTP normalization and guide/source architecture evidence.",
+    "result": "SOURCE-supported native intent distinction; HOLD stock-profile launch, runtime preservation and actual admission.",
+    "accepted_as_runtime_default": false
+  },
+  "source_originals": [
+    {
+      "id": "head-http",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/executors/codex.ts",
+      "bytes": 63310,
+      "sha256": "b057daa3064ebb7a9b63cec3bbf41484e769c1e9dfc6d1fa5093b0c48de11f76",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/executors/codex.ts"
+    },
+    {
+      "id": "head-app-server",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/executors/codex-app-server.ts",
+      "bytes": 19481,
+      "sha256": "8c895549d03272f82dc43615f315a935c506ee5922679c086ebe220cd098c543",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/executors/codex-app-server.ts"
+    },
+    {
+      "id": "head-app-config",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/executors/codex/appServerConfig.ts",
+      "bytes": 8647,
+      "sha256": "e3fc974c72b507089bb57aa3690275ceddbe8c4b9989eea0c47096e76de5225d",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/executors/codex/appServerConfig.ts"
+    },
+    {
+      "id": "head-guide",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "docs/guides/CODEX-APP-SERVER-PROVIDER.md",
+      "bytes": 4711,
+      "sha256": "61b7030eadc90ca97ef26373f991ed720c3fe7d4b6a6b53884859e8b0c493de3",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/docs/guides/CODEX-APP-SERVER-PROVIDER.md"
+    },
+    {
+      "id": "release-http",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/executors/codex.ts",
+      "bytes": 63338,
+      "sha256": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts"
+    },
+    {
+      "id": "release-app-server",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/executors/codex-app-server.ts",
+      "bytes": 19481,
+      "sha256": "8c895549d03272f82dc43615f315a935c506ee5922679c086ebe220cd098c543",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex-app-server.ts"
+    },
+    {
+      "id": "owner-http",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "path": "open-sse/executors/codex.ts",
+      "bytes": 63338,
+      "sha256": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex.ts"
+    },
+    {
+      "id": "owner-app-server",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "path": "open-sse/executors/codex-app-server.ts",
+      "bytes": 19481,
+      "sha256": "8c895549d03272f82dc43615f315a935c506ee5922679c086ebe220cd098c543",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex-app-server.ts"
+    },
+    {
+      "id": "head-compose",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "docker-compose.yml",
+      "bytes": 19278,
+      "sha256": "e38b850aacadce3ead484b38fda3ba2261d49ae2ea2f41a443c8c544c4f71c46",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/docker-compose.yml"
+    },
+    {
+      "id": "head-dockerfile",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "Dockerfile",
+      "bytes": 22465,
+      "sha256": "47045eaeb08d8ae105d648d5b071e2b3324886d6c6ffbe4357f491c7685e331f",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/Dockerfile"
+    },
+    {
+      "id": "head-health",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "src/app/api/providers/[id]/test/codexAppServerHealth.ts",
+      "bytes": 6361,
+      "sha256": "af125690a73dbcbebf511889a5aa56934c12128c11dd0522502b01f55e45388b",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/src/app/api/providers/[id]/test/codexAppServerHealth.ts"
+    },
+    {
+      "id": "head-auth-probe",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/executors/codex/appServerAuthProbe.ts",
+      "bytes": 4074,
+      "sha256": "212640fb8a0c91b3affbc1a80eb48fc114fab89ca6f29cf1e2ff64b3c8fe7230",
+      "native_exit": 0,
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/executors/codex/appServerAuthProbe.ts"
+    },
+    {
+      "id": "native-websocket",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/app-server-transport/src/transport/websocket.rs",
+      "bytes": 14037,
+      "sha256": "e1a5fe9b1bb865daa376bac587b3afdec0e791e4d83926a4432ecb3b046a98dd",
+      "native_exit": 0,
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server-transport/src/transport/websocket.rs"
+    },
+    {
+      "id": "native-account",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/app-server-protocol/src/protocol/v2/account.rs",
+      "bytes": 31165,
+      "sha256": "f52c03c9f98f8fd496824616ec1669954f35470cbd2ff15101ce4b7e6a57b2ad",
+      "native_exit": 0,
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server-protocol/src/protocol/v2/account.rs"
+    }
+  ],
+  "actual_identity": {
+    "effective_catalog_pin": null,
+    "native_orchestration_mode": null,
+    "normalized_inference_effort": null,
+    "gateway_transport": null,
+    "delivered_model": null,
+    "delivered_effort": null
+  },
+  "preservation": {
+    "active_modes_unselected": true,
+    "full_usage_unchanged": true,
+    "comparative_model_runs": 0,
+    "measured_defaults": 0
+  },
+  "corrections": [
+    "The canonical rule previously generalized HTTP Ultra-to-Max conversion to the whole gateway. It is now scoped to that transport; native model normalization and orchestration remain distinct.",
+    "The documentation's claimed stock Codex sidecar installation conflicts with its selected Dockerfile stage. All sources and the failed condition remain retained."
+  ]
+}
