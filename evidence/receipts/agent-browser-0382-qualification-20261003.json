@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "agent-browser-0382-qualification-20261003",
+  "kind": "compatibility_attempt",
+  "recorded_at_utc": "2026-10-03T07:21:55.083556Z",
+  "component_ids": [
+    "agent-browser"
+  ],
+  "claim": "W1-r2 records install exit 0, version output \"agent-browser 0.38.2\", and offline smoke output \"All four positive commands exit 0 on 0.38.2 (and 0.38.1)\"; \"skills list\" and \"skills get core\" are recorded as byte-identical to 0.38.1. W1b independently repeated --version and skills list (both exit 0) and rehashed the qualified tarball to 2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49.",
+  "limitations": [
+    "UNTESTED: live fixture workflow, `agent-browser install`, Chrome launch on WSL2, any model run; darwin, arm64, musl and win32 binaries are hash-checked only. This is a version check plus offline smoke on one host, not live acceptance.",
+    "NOT run: the live fixture workflow (open file://.../fixtures/greeting.html, snapshot -i -c --json, fill, click, get text '#status', close) and `agent-browser install` (Chrome download); that is the untested boundary.",
+    "W1b reuses recorded W1-r2 install and offline comparison evidence. The integration commands are additional native observations; they do not replay the installation or establish live browser or model acceptance."
+  ],
+  "host_scope": {
+    "platform": "Linux x86_64",
+    "scope": "Existing isolated W1-r2 qualification prefix; W1b read-only native CLI checks and repository integration"
+  },
+  "data": {
+    "previous_version": "0.38.1",
+    "version": "0.38.2",
+    "release": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+    "source_pin": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+    "artifact": {
+      "url": "https://registry.npmjs.org/agent-browser/-/agent-browser-0.38.2.tgz",
+      "sha256": "2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49",
+      "integrity_checked": true,
+      "integrity_source": "Independent re-download (curl, exit 0, 52,980,321 bytes): openssl sha512/base64 = npm dist.integrity sha512-b/7hvo2RrqocvybjB9kwpX12kGkxkFvtdJ4XPDoott5TLK2n3aPX+lYg7ALd+2YvPi2LrTKGzQYu/rxZC2Y7ZA== exactly; sha1sum = dist.shasum 3eeb49e7d02a31be255a0462830dd8a147fc5f29 exactly. The npm SLSA v1 attestation subject sha512 (hex 6ffee1be...b663b64) equals the tarball digest; it names .github/workflows/release.yml at refs/heads/main, commit 39a74c70d7759d5a6de7a22c04570bb626bbd081, which is the commit the v0.38.2 tag resolves to (gh api git/ref/tags/v0.38.2). `npm audit signatures` in a throwaway project: 1 verified registry signature, 1 verified attestation (exit 0). GitHub release v0.38.2 ships no checksum sidecar, only 7 binaries with GitHub asset digests: all 7 platform binaries inside the npm tarball match those digests (7/7, same 7/7 for the 0.38.1 control), and the installed linux-x64 binary is sha256 a54b765192db774666f0513fa8b545a298753b6f29e73bcdf4a1e78f18e7c0e1 = the release asset digest. Method control: re-downloading the 0.38.1 tarball reproduced the repo's recorded pin exactly (sha256 89a7df4761ff335e4dd5367e4cf04cecb9ba4e2cc130a0220f798d188414dc6c; sha512 k58FCz0y...hnvw==)."
+    },
+    "qualification_record": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/qualification-record.json",
+    "metadata_record": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/github-metadata.json",
+    "integration_commands": "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
+    "independent_review_decision": "move",
+    "host_switched": false,
+    "overturn_when": "A publisher digest mismatch, an applicable security advisory or a regression on the documented native recipe invalidates this qualification; require a freshly qualified maintained replacement.",
+    "repository_acceptance": "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
+    "retained_stdout": [
+      {
+        "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.1.stdout.txt",
+        "command": "HOME=<QUALIFICATION_ROOT>/agent-browser/home <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.1/bin/agent-browser skills list",
+        "exit_code": 0,
+        "provenance": "Retained W1-r2 0.38.1 control output; qualification-record.json#/facts/smoke records this command family and the control. This was not a W1b execution."
+      },
+      {
+        "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.2.stdout.txt",
+        "command": "rtk proxy <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.2/bin/agent-browser skills list",
+        "exit_code": 0,
+        "provenance": "W1b integration-commands.json command id agent-browser-skills-list; published stdout matches its retained output exactly."
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "grafana-1323-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T07:21:55.083556Z",
+  "component_ids": [
+    "grafana"
+  ],
+  "claim": "W1-r2 records install exit 0 and native synthetic integration results: /api/health returned {\"database\":\"ok\",\"version\":\"13.2.3\",\"commit\":\"90ffed056f0884267356c12a0eeb72a022af53f1\"}; anonymous POST /api/datasources returned 403; the query output reports 36 targets, 36 http_ok, 36 result_ok, 36 frames and errors []. The upgrade record reports migration_log rows 719 before and after. W1b independently repeated --version (\"grafana version 13.2.3\", exit 0) and server --version (\"Version 13.2.3 (commit: 90ffed056f0884267356c12a0eeb72a022af53f1, branch: release-13.2.3#patched)\", exit 0), and rehashed the archive to 6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235.",
+  "limitations": [
+    "SMOKE EVIDENCE CLASS: locally authored synthetic integration checks run in a private user/net/pid namespace (unshare ... --mount-proc), not upstream acceptance and not check_persistence.py (which restarts host units and was deliberately not run). No real credentials (inline synthetic GF_SECURITY_* constants; the configure.py-generated scratch ecosystem-grafana.env files were never read or used), no live service reachable (the namespace has only its own loopback).",
+    "LIMITS: not tested: browser rendering (stat/table/Loki issues #132901, #132502 and #132879 are unverified here), real Prometheus/Loki data or production cardinality, Grafana-managed alerting, a restart onto the host's real database, Grafana's own upstream test suite.",
+    "W1b reuses the recorded W1-r2 synthetic integration outputs; it does not replay the namespace smoke or activate the host service. The tarball build commit and public tag commit are recorded separately.",
+    "All three CVE reachability statements concern repository provisioning only. The upgrade preserves the database; existing users/Editor memberships, Grafana-managed alert rules, shared dashboards/sharing tokens, and additional datasources/stored credential configuration were not inspected. The live-database check remains an open host item."
+  ],
+  "host_scope": {
+    "platform": "Linux x86_64",
+    "scope": "Existing isolated W1-r2 qualification prefix; W1b read-only native CLI checks and repository integration"
+  },
+  "data": {
+    "previous_version": "13.2.2",
+    "version": "13.2.3",
+    "release": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+    "source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
+    "artifact": {
+      "url": "https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz",
+      "sha256": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235",
+      "integrity_checked": true,
+      "integrity_source": "Four agreeing channels: (1) the dl.grafana.com .sha256 sidecar (grafana_13.2.3_36482603486_linux_amd64.tar.gz.sha256); (2) the grafana.com download-page JSON at https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux, which is the checksum_source form the repo's install.py greps and which lists this exact URL beside the sha256; (3) local sha256sum of two independent downloads (curl, then install.py urlretrieve; cmp identical); (4) storage etag and x-goog-hash md5 b6b85b47ff82498a00c65781a2a2e0f6 and size 460956549. Control: the 13.2.2 sidecar equals the pinned 9662c838a09824fdb072e5f6fbdd45b62cf541b20f3d609ea5011e6e5f544c8f and the 13.2.2 download page contains it. No detached signature (.asc, .sig, .sigstore.json, .intoto.jsonl all HTTP 404) and no GitHub attestation (404) exist, so integrity rests on publisher-hosted checksums over HTTPS."
+    },
+    "qualification_record": "evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json",
+    "metadata_record": "evidence/artifacts/currency-wave-w1b-20261003/grafana/github-metadata.json",
+    "integration_commands": "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
+    "independent_review_decision": "move",
+    "host_switched": false,
+    "overturn_when": "A publisher digest mismatch, an applicable security advisory or a regression on the documented native recipe invalidates this qualification; require a freshly qualified maintained replacement.",
+    "repository_acceptance": "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
+    "retained_stdout": [
+      {
+        "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-fresh.stdout.txt",
+        "command": "unshare --user --map-root-user --net --pid --fork --kill-child --mount-proc /bin/bash <QUALIFICATION_ROOT>/grafana/smoke-scripts/lifecycle.sh fresh",
+        "exit_code": 0,
+        "provenance": "Retained W1-r2 locally authored synthetic integration output; qualification-record.json#/facts/smoke records the namespace wrapper and all three modes. Not replayed by W1b or R645."
+      },
+      {
+        "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-upgrade.stdout.txt",
+        "command": "unshare --user --map-root-user --net --pid --fork --kill-child --mount-proc /bin/bash <QUALIFICATION_ROOT>/grafana/smoke-scripts/lifecycle.sh upgrade",
+        "exit_code": 0,
+        "provenance": "Retained W1-r2 locally authored synthetic integration output; qualification-record.json#/facts/smoke records the namespace wrapper and all three modes. Not replayed by W1b or R645."
+      },
+      {
+        "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-queries.stdout.txt",
+        "command": "unshare --user --map-root-user --net --pid --fork --kill-child --mount-proc /bin/bash <QUALIFICATION_ROOT>/grafana/smoke-scripts/lifecycle.sh queries",
+        "exit_code": 0,
+        "provenance": "Retained W1-r2 locally authored synthetic integration output; qualification-record.json#/facts/smoke records the namespace wrapper and all three modes. Not replayed by W1b or R645."
+      }
+    ],
+    "open_host_items": [
+      "Inspect the preserved live Grafana database for users and Editor memberships, Grafana-managed alert rules, shared dashboards and sharing tokens, and additional datasource/credential configuration before assessing host CVE reachability."
+    ]
+  }
+}

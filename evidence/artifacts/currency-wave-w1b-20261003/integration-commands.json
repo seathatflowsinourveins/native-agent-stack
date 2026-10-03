@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_integration_observations",
+  "scope": "W1b actual returned command outputs. Paths are role markers. W1-r2 install/synthetic smoke are retained separately and were not rerun. A failed npm default-cache read is retained before the supported --cache correction. retained_output_provenance documents the earlier W1-r2 0.38.1 control; it is not an additional W1b execution.",
+  "commands": [
+    {
+      "id": "agent-browser-version",
+      "component_id": "agent-browser",
+      "command": "rtk proxy <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.2/bin/agent-browser --version",
+      "exit_code": 0,
+      "output": "agent-browser 0.38.2\n"
+    },
+    {
+      "id": "agent-browser-skills-list",
+      "component_id": "agent-browser",
+      "command": "rtk proxy <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.2/bin/agent-browser skills list",
+      "exit_code": 0,
+      "output": "  agentcore                     Run agent-browser on AWS Bedrock AgentCore cloud browsers. Use when...\n  core                          Core agent-browser usage guide. Read this before running any...\n  derive-client                 Reverse-engineer a website's internal API by recording browser...\n  dogfood                       Systematically explore and test a web application to find bugs, UX...\n  electron                      Automate Electron desktop apps (VS Code, Slack, Discord, Figma,...\n  protected-vercel-deployments  Access and test Vercel deployments protected by Vercel...\n  slack                         Interact with Slack workspaces using browser automation. Use when the...\n  vercel-sandbox                Run agent-browser + Chrome inside Vercel Sandbox microVMs for browser...\n  webmcp-gen                    Build and validate experimental WebMCP tools for an existing web...\n"
+    },
+    {
+      "id": "grafana-version",
+      "component_id": "grafana",
+      "command": "rtk proxy <QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem-grafana-13.2.3/bin/grafana --version",
+      "exit_code": 0,
+      "output": "grafana version 13.2.3\n"
+    },
+    {
+      "id": "grafana-server-version",
+      "component_id": "grafana",
+      "command": "rtk proxy <QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem-grafana-13.2.3/bin/grafana server --version",
+      "exit_code": 0,
+      "output": "Version 13.2.3 (commit: 90ffed056f0884267356c12a0eeb72a022af53f1, branch: release-13.2.3#patched)\n"
+    },
+    {
+      "id": "npm-default-cache-failed",
+      "component_id": "agent-browser",
+      "command": "rtk proxy npm view agent-browser@0.38.2 dist --json",
+      "exit_code": 1,
+      "output": "npm error code EROFS\nnpm error syscall open\nnpm error path <NPM_DEFAULT_CACHE>/_cacache/tmp/***\nnpm error errno EROFS\nnpm error rofs Invalid response body while trying to fetch https://registry.npmjs.org/agent-browser: EROFS: read-only file system, open '<NPM_DEFAULT_CACHE>/_cacache/tmp/***'\nnpm error rofs Often virtualized file systems, or other file systems that don't support symlinks, give this error.\n{\n  \"error\": {\n    \"code\": \"EROFS\",\n    \"summary\": \"Invalid response body while trying to fetch https://registry.npmjs.org/agent-browser: EROFS: read-only file system, open '<NPM_DEFAULT_CACHE>/_cacache/tmp/***'\",\n    \"detail\": \"Often virtualized file systems, or other file systems that don't support symlinks, give this error.\"\n  }\n}\nnpm error Log files were not written due to an error writing to the directory: <NPM_DEFAULT_CACHE>/_logs\nnpm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal\n"
+    },
+    {
+      "id": "npm-scoped-cache",
+      "component_id": "agent-browser",
+      "command": "rtk proxy npm view agent-browser@0.38.2 dist --json --cache <INTEGRATION_TMP>/npm-cache",
+      "exit_code": 0,
+      "output": "{\n  \"shasum\": \"3eeb49e7d02a31be255a0462830dd8a147fc5f29\",\n  \"tarball\": \"https://registry.npmjs.org/agent-browser/-/agent-browser-0.38.2.tgz\",\n  \"fileCount\": 45,\n  \"integrity\": \"sha512-b/7hvo2RrqocvybjB9kwpX12kGkxkFvtdJ4XPDoott5TLK2n3aPX+lYg7ALd+2YvPi2LrTKGzQYu/rxZC2Y7ZA==\",\n  \"signatures\": [\n    {\n      \"sig\": \"MEUCIE7GCZxl/71+An0sWaNcWGlzomGUTlINwt4aEmbFgXE8AiEAzvMmmj8MIgAKRJhpMDhS5NwHffSQ7DTYIzILvFx5RWU=\",\n      \"keyid\": \"SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U\"\n    },\n    {\n      \"keyid\": \"SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U\",\n      \"sig\": \"MEUCIA95zotp7xK6MR++6S4vPpKPKTrTSEQxlQp1yK6SLIhjAiEAr9EqgqcM29Gs2Y+onnlTE1zmXP072emnChWn8wXbohM=\"\n    }\n  ],\n  \"attestations\": {\n    \"url\": \"https://registry.npmjs.org/-/npm/v1/attestations/agent-browser@0.38.2\",\n    \"provenance\": {\n      \"predicateType\": \"https://slsa.dev/provenance/v1\"\n    }\n  },\n  \"unpackedSize\": 117855861\n}\n"
+    },
+    {
+      "id": "grafana-live-checksum",
+      "component_id": "grafana",
+      "command": "rtk proxy curl --fail --silent https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz.sha256",
+      "exit_code": 0,
+      "output": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235\n"
+    },
+    {
+      "id": "qualified-artifact-digests",
+      "component_id": null,
+      "command": "rtk proxy sha256sum <QUALIFICATION_ROOT>/agent-browser/agent-browser-0.38.2.tgz <QUALIFICATION_ROOT>/grafana/grafana_13.2.3_36482603486_linux_amd64.tar.gz",
+      "exit_code": 0,
+      "output": "2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49  <QUALIFICATION_ROOT>/agent-browser/agent-browser-0.38.2.tgz\n6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235  <QUALIFICATION_ROOT>/grafana/grafana_13.2.3_36482603486_linux_amd64.tar.gz\n"
+    }
+  ],
+  "source_collection_limitation": "The web open operation returned HTTP 400 (unsupported operation). Installed gh api checks and the publisher checksum URL supplied the current primary evidence.",
+  "retained_output_provenance": [
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.1.stdout.txt",
+      "command": "HOME=<QUALIFICATION_ROOT>/agent-browser/home <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.1/bin/agent-browser skills list",
+      "exit_code": 0,
+      "provenance": "Retained W1-r2 0.38.1 control output; qualification-record.json#/facts/smoke records this command family and the control. This was not a W1b execution."
+    }
+  ]
+}

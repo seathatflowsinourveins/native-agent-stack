@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "methodology_source": "catalogs/landscape/upstream-snapshot.json#/methodology",
+  "raw_stdout_preserved_privately": true,
+  "observation": {
+    "component_id": "grafana",
+    "repository": "https://github.com/grafana/grafana",
+    "selected_repository_url": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+    "selected_version": "13.2.3",
+    "selected_source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
+    "checks": [
+      {
+        "endpoint": "repos/grafana/grafana",
+        "exit_code": 0,
+        "started_at": "2026-10-03T07:15:38.200705+00:00",
+        "ended_at": "2026-10-03T07:15:38.592069+00:00",
+        "stdout_sha256": "20c828adae1e7e00cf17eddd6d091e99bbb1f1cde0ac6eff551a7634249e6a92",
+        "status": "ok"
+      },
+      {
+        "endpoint": "repos/grafana/grafana/releases/latest",
+        "exit_code": 0,
+        "started_at": "2026-10-03T07:15:38.211231+00:00",
+        "ended_at": "2026-10-03T07:15:38.558280+00:00",
+        "stdout_sha256": "5267ee018a849e68b8fce649d154ed6170a6fef012ef45856805f7b03ff0ef1e",
+        "status": "ok"
+      },
+      {
+        "endpoint": "repos/grafana/grafana/commits/6193dc03311b631b9727b560d24369e683dc396e",
+        "exit_code": 0,
+        "started_at": "2026-10-03T07:15:38.219818+00:00",
+        "ended_at": "2026-10-03T07:15:38.593972+00:00",
+        "stdout_sha256": "2aa7523d47863cee8569fefffbce6539d3485b4200f15360f2a683431cc97599",
+        "status": "ok"
+      },
+      {
+        "endpoint": "repos/grafana/grafana/commits/v13.2.3",
+        "exit_code": 0,
+        "started_at": "2026-10-03T07:15:38.293706+00:00",
+        "ended_at": "2026-10-03T07:15:38.637092+00:00",
+        "stdout_sha256": "2aa7523d47863cee8569fefffbce6539d3485b4200f15360f2a683431cc97599",
+        "status": "ok"
+      }
+    ],
+    "canonical_repository": "https://github.com/grafana/grafana",
+    "archived": false,
+    "disabled": false,
+    "default_branch": "main",
+    "pushed_at": "2026-10-03T05:26:04Z",
+    "license_spdx": "AGPL-3.0",
+    "latest_stable_release": {
+      "tag_name": "v13.2.3",
+      "published_at": "2026-09-29T09:02:18Z",
+      "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+      "target_commitish": "main",
+      "prerelease": false,
+      "draft": false
+    },
+    "selected_pin_source": {
+      "ref": "6193dc03311b631b9727b560d24369e683dc396e",
+      "sha": "6193dc03311b631b9727b560d24369e683dc396e",
+      "html_url": "https://github.com/grafana/grafana/commit/6193dc03311b631b9727b560d24369e683dc396e",
+      "committed_at": "2026-09-29T09:01:04Z"
+    },
+    "latest_release_source": {
+      "ref": "v13.2.3",
+      "sha": "6193dc03311b631b9727b560d24369e683dc396e",
+      "html_url": "https://github.com/grafana/grafana/commit/6193dc03311b631b9727b560d24369e683dc396e",
+      "committed_at": "2026-09-29T09:01:04Z"
+    },
+    "status": "metadata_checked",
+    "adoption_recommendation": "retain_selected_pending_capability_comparison",
+    "source_pin_kind": "git_commit",
+    "primary_repository": "https://github.com/grafana/grafana",
+    "release_relationship": "selected_version_matches_latest_stable",
+    "selected_pin_matches_latest_release_commit": true,
+    "checked_at": "2026-10-03T07:15:38.637092+00:00"
+  }
+}

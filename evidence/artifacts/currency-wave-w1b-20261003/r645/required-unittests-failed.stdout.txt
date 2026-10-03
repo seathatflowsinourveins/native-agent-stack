@@ -1,0 +1,3 @@
+Installed dashboard and two units; service activation remains explicit.
+started start-race
+not started launch-refused: the job runner could not start

@@ -188,8 +188,8 @@
     },
     {
       "component_id": "agent-browser",
-      "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
-      "version": "0.38.1",
+      "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+      "version": "0.38.2",
       "profile": "core",
       "role": "Local native browser snapshot/ref interaction",
       "installation_assessment": "runtime present at retained native operation date",
@@ -264,6 +264,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "agent-browser-0382-qualification-20261003",
+            "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json",
+            "kind": "compatibility_attempt"
           }
         ],
         "retained_operation_ids": [
@@ -275,7 +280,7 @@
           "fresh-browser-result",
           "fresh-browser-close"
         ],
-        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings. The 0.38.2 receipt is compatibility_attempt for installation, version and offline readiness only; the retained browser workflow evidence predates 0.38.2 and does not establish browser acceptance for the current pin."
       },
       "artifact_baselines": [
         {
@@ -294,12 +299,12 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Owned browser open/fill/click/result/close fixture passed.",
+        "scope": "Retained browser open/fill/click/result/close fixture evidence predates 0.38.2. The 0.38.2 compatibility_attempt covers installation, version and offline readiness; no browser installation, Chrome launch or browser workflow was run for 0.38.2.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -316,7 +321,7 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Owned browser open/fill/click/result/close fixture passed; no personal profile was used.",
+          "scope": "Owned browser open/fill/click/result/close fixture passed; no personal profile was used. This is retained evidence from before 0.38.2, not acceptance of the current pin.",
           "evidence_refs": [
             "evidence/receipts/token-practice-gap-followup-20260920.json"
           ]
@@ -333,7 +338,7 @@
         },
         "cleanup": {
           "status": "accepted_within_scope",
-          "scope": "Owned browser open/fill/click/result/close fixture passed; no personal profile was used.",
+          "scope": "Owned browser open/fill/click/result/close fixture passed; no personal profile was used. This is retained evidence from before 0.38.2, not acceptance of the current pin.",
           "evidence_refs": [
             "evidence/receipts/token-practice-gap-followup-20260920.json"
           ]
@@ -3555,8 +3560,8 @@
     },
     {
       "component_id": "grafana",
-      "repository": "https://github.com/grafana/grafana",
-      "version": "13.2.2",
+      "repository": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+      "version": "13.2.3",
       "profile": "observability",
       "role": "Local native observation dashboard",
       "installation_assessment": "runtime present at retained native operation date",
@@ -3642,6 +3647,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "grafana-1323-qualification-20261003",
+            "path": "evidence/receipts/grafana-1323-qualification-20261003.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3660,7 +3670,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+      "source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
