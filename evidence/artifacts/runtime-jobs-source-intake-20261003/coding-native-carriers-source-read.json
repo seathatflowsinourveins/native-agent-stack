@@ -1,0 +1,1035 @@
+{
+  "schema_version": 1,
+  "artifact_id": "coding-native-carriers-source-read-20261003",
+  "recorded_on": "2026-10-03",
+  "status": "source-only-conditional-readiness-carriers",
+  "evidence_level": "pinned-upstream-source-review",
+  "publication_base": "65a0d370ed8c075d922ff60857287e33d3a14788",
+  "scope": {
+    "owned_artifact": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-carriers-source-read.json",
+    "task": "Read original source and publish conditional native carrier contracts for Codex 0.160.0 and Pi 1.0.0 through Harbor 0.23.0.",
+    "source_review_only": true,
+    "provider_calls": 0,
+    "model_calls": 0,
+    "container_operations": 0,
+    "install_operations": 0,
+    "auth_or_active_client_configuration_reads": 0,
+    "comparative_trials": 0,
+    "registry_edits": 0,
+    "push_performed": false
+  },
+  "source_pins": {
+    "codex": {
+      "repository": "openai/codex",
+      "tag": "rust-v0.160.0",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc"
+    },
+    "pi": {
+      "repository": "earendil-works/pi",
+      "tag": "v1.0.0",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32"
+    },
+    "harbor": {
+      "repository": "harbor-framework/harbor",
+      "tag": "v0.23.0",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729"
+    },
+    "gateway": {
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "0585aba5589d5a1f49243a13a8db249558e7c9e3"
+    }
+  },
+  "sources": [
+    {
+      "id": "codex-catalog",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/models-manager/models.json",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/models.json",
+      "sha256": "fd219bd9f061278275f528939f82f54d2eb97df4b25c23b022adbe48813d920b",
+      "line_ranges": [],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "codex-catalog-loader",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/config/mod.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs",
+      "sha256": "854f5a6b184714740500b8d3eae2bb04cb88172efccf11d38a74f2f6189c0341",
+      "line_ranges": [
+        [
+          2143,
+          2161
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "codex-manager-factory",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/model-provider/src/provider.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/model-provider/src/provider.rs",
+      "sha256": "adabad97f59dbc593431a9c47911e74d1fd9d48648b874026a23db86b32ec5a1",
+      "line_ranges": [
+        [
+          421,
+          430
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "codex-manager-prefix",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/models-manager/src/manager.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/src/manager.rs",
+      "sha256": "d998bb2768561c761f83a77ce60d3be4b5d1a453e4a7afb10c5f86d314d76a80",
+      "line_ranges": [
+        [
+          232,
+          240
+        ],
+        [
+          373,
+          377
+        ],
+        [
+          456,
+          470
+        ],
+        [
+          794,
+          807
+        ],
+        [
+          855,
+          918
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "codex-effort",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/protocol/src/openai_models/reasoning_effort.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/openai_models/reasoning_effort.rs",
+      "sha256": "62089cb92996bb0030d4a219a6ba06b3bcf8f2f45e95ef7204bc8632d07ea08d",
+      "line_ranges": [
+        [
+          10,
+          38
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "codex-client",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/client.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/client.rs",
+      "sha256": "605ced35cd853fcc4e23f6edd724c96f96f74c736a45e6ea95bf5300f3ab814c",
+      "line_ranges": [
+        [
+          863,
+          880
+        ],
+        [
+          988,
+          1005
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "codex-features",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/features/src/lib.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/features/src/lib.rs",
+      "sha256": "124c76d1fbad7b05fd78a62b89a28282c7ecab1de7426ac18696987024ddeae0",
+      "line_ranges": [
+        [
+          1336,
+          1340
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "codex-provider-auth",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/model-provider-info/src/lib.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/model-provider-info/src/lib.rs",
+      "sha256": "941a8ec0e8be4b45080cac3df3d052999a4cb104811575634b1a9ed510690958",
+      "line_ranges": [
+        [
+          184,
+          190
+        ],
+        [
+          471,
+          489
+        ]
+      ],
+      "read_phase": "prior_same_session_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "codex-exec-flags",
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/exec/src/cli.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/exec/src/cli.rs",
+      "sha256": "6abb86feb8fac2a192b34a617634527d0747b6d7fa09ee4827c0dc95abbe2f75",
+      "line_ranges": [
+        [
+          35,
+          45
+        ]
+      ],
+      "read_phase": "prior_same_session_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "harbor-codex",
+      "repository": "harbor-framework/harbor",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/installed/codex.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py",
+      "sha256": "ee0ca8ec43617f3909d2195afe8f9e7cbd7313a8b3b558b01fde388f65b7c39c",
+      "line_ranges": [
+        [
+          39,
+          41
+        ],
+        [
+          1158,
+          1205
+        ],
+        [
+          1207,
+          1225
+        ],
+        [
+          1299,
+          1327
+        ],
+        [
+          1336,
+          1448
+        ]
+      ],
+      "read_phase": "prior_same_session_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "harbor-pi",
+      "repository": "harbor-framework/harbor",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/installed/pi.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/pi.py",
+      "sha256": "09bd67c9bad21ed5faf76382153c0b8527166a94c18fe4663f07a328a39bcbbc",
+      "line_ranges": [
+        [
+          36,
+          48
+        ],
+        [
+          88,
+          98
+        ],
+        [
+          115,
+          144
+        ],
+        [
+          170,
+          178
+        ],
+        [
+          182,
+          232
+        ],
+        [
+          249,
+          271
+        ]
+      ],
+      "read_phase": "prior_same_session_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "harbor-installed-base",
+      "repository": "harbor-framework/harbor",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/installed/base.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/base.py",
+      "sha256": "4ad4d5891db891645dcdb044566cb150502fb7d2ee5fdaef80eabd652d6bf6a9",
+      "line_ranges": [
+        [
+          560,
+          605
+        ],
+        [
+          924,
+          926
+        ],
+        [
+          986,
+          997
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "harbor-model-connection",
+      "repository": "harbor-framework/harbor",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/model_connection.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/model_connection.py",
+      "sha256": "c42fcea5e76f3f952707131a218090b100468134207197c2e2fbf8af59500444",
+      "line_ranges": [
+        [
+          180,
+          199
+        ],
+        [
+          209,
+          244
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-agent-directory",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/config.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/config.ts",
+      "sha256": "d941b87802bd76804ce8681ad5e8f17b1c044351ab45018b7a4f60c04983b4dc",
+      "line_ranges": [
+        [
+          542,
+          544
+        ],
+        [
+          563,
+          588
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-model-schema",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/model-config.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/model-config.ts",
+      "sha256": "fda5acc6e80ed31750efd33cacb417f012f19ff22b2e24fcc1bed2d03261513c",
+      "line_ranges": [
+        [
+          55,
+          64
+        ],
+        [
+          191,
+          238
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-model-selector",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/model-resolver.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/model-resolver.ts",
+      "sha256": "6fa438617c6bf1862ae5aee53e99df845b008131f0f107662e6b96dd3224decd",
+      "line_ranges": [
+        [
+          204,
+          238
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-cli-precedence",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/main.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/main.ts",
+      "sha256": "d5f850220fa7ed946b6e6d21593fee33e2ab7ce815cc40fb380c47a856e0301f",
+      "line_ranges": [
+        [
+          488,
+          495
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-thinking-support",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/ai/src/models.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/ai/src/models.ts",
+      "sha256": "4739010c7e4f7596607b1dd495b9d5ab6cd921e29f55c5c331259a04b7253269",
+      "line_ranges": [
+        [
+          1215,
+          1246
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-native-model-defaults",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/provider-composer.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/provider-composer.ts",
+      "sha256": "8e0739b7a4b1512c9d3f4380f858538099eb4515ee5b141cd89c51cc8ea58371",
+      "line_ranges": [
+        [
+          199,
+          228
+        ]
+      ],
+      "read_phase": "prior_same_session_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-settings",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/settings-manager.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/settings-manager.ts",
+      "sha256": "535c679f41f769d9129ffec5521508241162c9dfe0a9c7782157b193eb0e5664",
+      "line_ranges": [
+        [
+          135,
+          137
+        ],
+        [
+          803,
+          825
+        ],
+        [
+          867,
+          868
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-resource-loader",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/resource-loader.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/resource-loader.ts",
+      "sha256": "45daa19ad4aa08856cf1eb9b026230b918eb25e163c7dc9ab5cf8add6825955a",
+      "line_ranges": [
+        [
+          154,
+          155
+        ],
+        [
+          421,
+          425
+        ],
+        [
+          764,
+          774
+        ],
+        [
+          982,
+          982
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-subagent-install",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/examples/extensions/subagent/README.md",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/examples/extensions/subagent/README.md",
+      "sha256": "6a888330bf974657751e09f5d375a9039872d59d6606fc217c5105c7eca51b1a",
+      "line_ranges": [
+        [
+          32,
+          46
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-subagent-code",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/examples/extensions/subagent/index.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/examples/extensions/subagent/index.ts",
+      "sha256": "4facaa61c9c781748dd000eb5d2ec0a75289986d1a6e11ce13971ca5653dc252",
+      "line_ranges": [
+        [
+          300,
+          307
+        ],
+        [
+          346,
+          350
+        ],
+        [
+          363,
+          378
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-subagent-discovery",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/examples/extensions/subagent/agents.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/examples/extensions/subagent/agents.ts",
+      "sha256": "cc85ecd33b89aa575bea3d2a9a9da7654a6305da4de02e5041aa5342a1de29b4",
+      "line_ranges": [
+        [
+          128,
+          141
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-worker-original",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/examples/extensions/subagent/agents/worker.md",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/examples/extensions/subagent/agents/worker.md",
+      "sha256": "ca2b2298fcbd8bfafcfe61977dc8075001a64b9c4d8c289c3b5eaa896efe6238",
+      "line_ranges": [
+        [
+          1,
+          5
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-reviewer-original",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/examples/extensions/subagent/agents/reviewer.md",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/examples/extensions/subagent/agents/reviewer.md",
+      "sha256": "b5c3f13b67207e8e32de631f8cd52a373d9b956028e2f8c1fd8b737b5f239265",
+      "line_ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-cache-semantics",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/ai/src/api/openai-responses-shared.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/ai/src/api/openai-responses-shared.ts",
+      "sha256": "09100e0bfe8fa4ad212312956930f4a9e70cd29ca823d2e1f1c97f87b4541afe",
+      "line_ranges": [
+        [
+          561,
+          574
+        ]
+      ],
+      "read_phase": "prior_same_session_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "harbor-trial-exec-env",
+      "repository": "harbor-framework/harbor",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/trial/trial.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/trial/trial.py",
+      "sha256": "757f34424e35ea6e924484bff9ae75464e94acd5dec3d769bc65a9518ada79a8",
+      "line_ranges": [[512, 544]],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "harbor-capabilities",
+      "repository": "harbor-framework/harbor",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/capabilities.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/capabilities.py",
+      "sha256": "adb113c338db3ba8211c38455a7325dfd37fa8b452199cf9a6505777acfcbba3",
+      "line_ranges": [[33, 36]],
+      "read_phase": "prior_same_session_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "pi-openai-provider",
+      "repository": "earendil-works/pi",
+      "commit": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/ai/src/providers/openai.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/ai/src/providers/openai.ts",
+      "sha256": "6d2aa4a30a13ed9359e3f711baa2549ab8d5aa2c555e6a03ffece4bcc55fb6e6",
+      "line_ranges": [[7, 23]],
+      "read_phase": "prior_same_session_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "gateway-ultra",
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "path": "open-sse/executors/codex.ts",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex.ts",
+      "sha256": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+      "line_ranges": [
+        [
+          182,
+          210
+        ],
+        [
+          1428,
+          1441
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    },
+    {
+      "id": "gateway-suffix-models",
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "path": "open-sse/executors/codex/reasoningSuffix.ts",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts",
+      "sha256": "e6709380c42b76fe115861df83afc9a00be64bba3e5fdf615ec910094d5901c9",
+      "line_ranges": [
+        [
+          20,
+          26
+        ],
+        [
+          40,
+          59
+        ]
+      ],
+      "read_phase": "production_original_read",
+      "original_read_exit_code": 0
+    }
+  ],
+  "source_review_method": {
+    "original_bytes": "Pinned GitHub contents responses with the raw media type, or native git show from the clean pinned Harbor source.",
+    "command_carrier": "rtk proxy gh api / rtk proxy git show",
+    "processing": "Complete bytes processed outside model context; compact excerpts, hashes and native exit codes returned.",
+    "upstream_modifications": false,
+    "models_catalog_bytes": 472512,
+    "models_catalog_count": 11,
+    "registry_registration": "Root-owned follow-up; this artifact does not register itself."
+  },
+  "architecture_review": {
+    "trigger": "Consequential conflict between native model metadata, Ultra effort normalization, Responses Lite transport and common model/effort bindings.",
+    "reviewer_model": "gpt-6-astra",
+    "reviewer_effort": "max",
+    "review_provenance": "Parent-relayed final from the current thread's Astra source review; cited originals re-read here. A separate retained Astra review artifact is not yet bound.",
+    "reviewer_artifact": null,
+    "acceptance_result": "ACCEPT conditional native readiness carriers; REJECT comparative freeze.",
+    "scope": "Source-supported declarative carriers only. No runtime activation, quality, counter completeness, cap enforcement or default was accepted.",
+    "cited_hashes_rechecked": true,
+    "decisive_source_refs": [
+      "codex-manager-factory",
+      "codex-manager-prefix",
+      "codex-client",
+      "pi-model-selector",
+      "pi-thinking-support",
+      "gateway-suffix-models",
+      "gateway-ultra"
+    ]
+  },
+  "codex_carrier": {
+    "disposition": "Source-conditional readiness carrier; unmaterialized and unexecuted.",
+    "native_agent_kwargs": {
+      "version": "0.160.0",
+      "config": "Inline JSON object or an explicitly supplied native TOML file, supported by Harbor."
+    },
+    "required_native_config_fields": {
+      "model_provider": "omniroute",
+      "model_reasoning_effort": "ultra",
+      "model_catalog_json": "An absolute container-local path to the unchanged pinned Codex models-manager/models.json.",
+      "model_providers.omniroute.wire_api": "responses",
+      "model_providers.omniroute.requires_openai_auth": false,
+      "model_providers.omniroute.env_key": "Omitted for the keyless provider.",
+      "model_providers.omniroute.base_url": "The qualified container address for the proposed 21128 gateway; actual connectivity remains unobserved."
+    },
+    "catalog_contract": {
+      "source_ref": "codex-catalog",
+      "unchanged_source_required": true,
+      "sha256": "fd219bd9f061278275f528939f82f54d2eb97df4b25c23b022adbe48813d920b",
+      "factory_precedence": "Configured model_catalog is loaded first into StaticModelsManager, before provider discovery.",
+      "static_alias_resolution": "The default get_model_info implementation uses candidate prefix lookup; a bare gpt-6.1-sol-ultra alias can retain its requested slug while inheriting gpt-6.1-sol metadata.",
+      "model_metadata": {
+        "sol": "gpt-6.1-sol",
+        "astra": "gpt-6-astra",
+        "multi_agent_reasoning_effort": "xhigh",
+        "use_responses_lite": true
+      },
+      "native_ultra_request_effort": "xhigh on this unchanged native catalog; API Ultra alias delivery is a separate binding.",
+      "native_max_request_effort": "max remains max.",
+      "source_refs": [
+        "codex-catalog-loader",
+        "codex-manager-factory",
+        "codex-manager-prefix",
+        "codex-catalog",
+        "codex-effort"
+      ]
+    },
+    "transport_contract": {
+      "native_lite_parallel_tool_calls": false,
+      "explanation": "Native request construction applies prompt.parallel_tool_calls && !model_info.use_responses_lite. With the catalog Lite flag true, the constructed field is false.",
+      "gateway_ultra_exception": "For recognized Sol/Astra Ultra suffixes the Lite parallel-tool-call normalizer returns the incoming body unchanged. This preserves the caller's field; it does not make an absent or false field true.",
+      "gateway_wire_effort": "Recognized Ultra suffix effort takes precedence over ordinary request effort and is sent upstream as max.",
+      "actual_native_lite_request_observed": false,
+      "delivered_parallel_tool_calls": null,
+      "source_refs": [
+        "codex-client",
+        "gateway-ultra",
+        "gateway-suffix-models"
+      ]
+    },
+    "native_workflow_gate": {
+      "feature": "multi_agent_v2",
+      "upstream_default_enabled": false,
+      "effective_native_feature_value": null,
+      "effective_native_ultra_or_delegation_hint": null,
+      "acceptance": "Pending native effective V2/hint observation; source support and an API alias do not qualify the native workflow.",
+      "source_refs": [
+        "codex-features"
+      ]
+    },
+    "state_and_auth_contract": {
+      "host_auth_upload_controls": [
+        "--ae CODEX_AUTH_JSON_PATH=",
+        "--ae CODEX_FORCE_AUTH_JSON=false"
+      ],
+      "placeholder": "An explicitly supplied nonsecret placeholder can prevent Harbor key lookup from falling back to a host key. No credential is supplied or copied by this receipt.",
+      "provider_keyless_rule": "requires_openai_auth=false with env_key omitted; if env_key is selected, the native provider requires a nonempty value.",
+      "state_owner": "Harbor initializes its own container-local Codex state and sandbox auth/config. No external HOME or CODEX_HOME repurposing is proposed.",
+      "host_auth_mount_allowed": false,
+      "native_config_and_sessions_required": true,
+      "rejected_blind_flags": [
+        "--ignore-user-config",
+        "--ephemeral"
+      ],
+      "rejection_reason": "ignore-user-config skips the generated native config; ephemeral removes the session files used by Harbor's native collector. Native help also says auth still uses its native location.",
+      "source_refs": [
+        "codex-provider-auth",
+        "codex-exec-flags",
+        "harbor-codex"
+      ]
+    },
+    "remaining_gates": [
+      "Unchanged catalog replica hash and native load observation.",
+      "Native effective role/model/effort and V2/hint observation.",
+      "Acceptance of Harbor's emitted bare alias by the bound 21128 route.",
+      "Actual native Responses Lite field/effort wire receipt.",
+      "Complete parent/child usage and cap enforcement."
+    ]
+  },
+  "pi_carrier": {
+    "disposition": "Source-conditional readiness carrier using a disposable native agent directory; unmaterialized and unexecuted.",
+    "carrier": "Harbor agent env PI_CODING_AGENT_DIR selects an isolated container-local native Pi directory. Trial's scoped exec-env carrier applies agent extra_env; native Pi getAgentDir honors its own agent-directory variable.",
+    "directory_carrier_source_refs": ["harbor-trial-exec-env", "harbor-installed-base", "harbor-model-connection", "harbor-pi", "pi-agent-directory"],
+    "native_agent_kwargs": {
+      "version": "1.0.0",
+      "model_api": null,
+      "thinking": null
+    },
+    "connection_condition": "Harbor model_connection.configured_base_url must remain None so _build_custom_models_json returns None and does not replace the supplied native agent directory/catalog.",
+    "native_model_selector_example": "omniroute/cx/gpt-6.1-sol-ultra:max",
+    "native_directory_contents": [
+      "models.json",
+      "settings.json",
+      "extensions/subagent/index.ts",
+      "extensions/subagent/agents.ts",
+      "agents/worker.md",
+      "agents/reviewer.md"
+    ],
+    "native_models_contract": {
+      "provider_id_example": "omniroute",
+      "endpoint": "Qualified container address for the proposed 21128 gateway, placed in the native provider's baseUrl.",
+      "api": "openai-responses",
+      "keyless_auth": "A nonsecret literal dummy key in the native provider definition, without host auth stores or credential commands.",
+      "required_model_ids": [
+        "cx/gpt-6.1-sol-ultra",
+        "cx/gpt-6-astra-max"
+      ],
+      "required_metadata": {
+        "reasoning": true,
+        "thinkingLevelMap": {
+          "max": "max",
+          "xhigh": "xhigh"
+        }
+      },
+      "metadata_reason": "reasoning=true enables thinking; max/xhigh are supported only when their explicit thinkingLevelMap entries are defined. Otherwise native clamping changes the selected effort.",
+      "supported_settings_keys": [
+        "defaultProvider",
+        "defaultModel",
+        "defaultThinkingLevel"
+      ],
+      "actual_catalog_and_settings_hashes": null,
+      "source_refs": [
+        "pi-agent-directory",
+        "pi-model-schema",
+        "pi-thinking-support",
+        "pi-settings",
+        "pi-openai-provider"
+      ]
+    },
+    "role_bundle_contract": {
+      "upstream_org_bundle": "earendil-works/pi packages/coding-agent/examples/extensions/subagent at the pinned Pi commit.",
+      "unchanged_extension_code_required": true,
+      "unchanged_code_source_refs": [
+        "pi-subagent-code",
+        "pi-subagent-discovery"
+      ],
+      "declarative_role_frontmatter_modification": true,
+      "body_and_non_model_frontmatter_change_proposed": false,
+      "proposed_model_bindings": {
+        "worker": "omniroute/cx/gpt-6.1-sol-ultra:max",
+        "reviewer": "omniroute/cx/gpt-6-astra-max:max"
+      },
+      "rejected_unchanged_sample_bindings": "Both sample roles select claude-sonnet-4-5, outside the user-selected GPT pool.",
+      "selector_contract": "Native role model strings are passed to child pi --model; <provider>/<model>:max is handled by native model-pattern parsing.",
+      "thinking_precedence": "An explicit role model disables parent-thinking inheritance in the unchanged extension. Native CLI --thinking overrides a :thinking selector, so the Harbor thinking override remains unset.",
+      "native_loader": "Native agent-directory extension discovery plus agents discovery through getAgentDir; supported upstream README installation is declarative placement/symlinks.",
+      "runtime_loader_observation": "Native resource-loader interfaces expose getExtensions results/errors and getSkills diagnostics; actual native noninteractive activation and child role observations remain pending.",
+      "resulting_role_file_hashes": null,
+      "activated": false,
+      "source_refs": [
+        "pi-subagent-install",
+        "pi-resource-loader",
+        "pi-subagent-discovery",
+        "pi-subagent-code",
+        "pi-worker-original",
+        "pi-reviewer-original",
+        "pi-model-selector",
+        "pi-cli-precedence"
+      ]
+    },
+    "rejected_stock_endpoint_carrier": {
+      "path": "Harbor generated custom-provider endpoint branch",
+      "rejection_reason": "Generated models entries contain only id. Native custom-model construction defaults reasoning=false; thinking=xhigh alone cannot establish the intended native reasoning contract.",
+      "config_kwarg": "Pi's Harbor native_config capability is not enabled; the base constructor rejects config= for that capability. The conditional alternative uses Pi's own directory and bypasses the generated endpoint branch.",
+      "skills_dir_limit": "Harbor copies skill content to .agents/skills. That action does not activate the first-party TypeScript extension.",
+      "source_refs": [
+        "harbor-pi",
+        "harbor-installed-base",
+        "harbor-capabilities",
+        "pi-native-model-defaults"
+      ]
+    },
+    "actual_agent_directory_hash": null,
+    "remaining_gates": [
+      "Materialized native catalog/settings and modified frontmatter hashes.",
+      "Observed configured_base_url=None, model_api unset and thinking override unset.",
+      "Native extension/role activation and effective mapped effort for every child.",
+      "Host-auth isolation and actual gateway reachability.",
+      "Complete child/provider usage and native limit enforcement."
+    ]
+  },
+  "usage_and_limits": {
+    "gross_counter_equivalence": "REJECTED as an established measurement claim.",
+    "codex": "Harbor uses native session JSONL and cumulative usage fields. Complete parent/child/provider scope still requires the authoritative aggregate and retained native logs.",
+    "pi": "Native Responses input subtracts cacheRead and cacheWrite. Harbor's summary adds back cacheRead only; gross input cannot be reconstructed from that summary alone when cacheWrite is nonzero. The first-party extension separately accumulates child usage, which must not be silently omitted or double-counted.",
+    "required_metric": "Complete authoritative uncached input plus output, with gross input and cache/read/write/reasoning subsets retained separately.",
+    "authoritative_usage_aggregate": null,
+    "actual_usage": null,
+    "unknown_usage_preserved": true,
+    "tool_token_time_enforcement": "Source support for these carriers does not establish comparative caps or allowlist enforcement. Effective native bounds and complete counters remain freeze blockers.",
+    "source_refs": [
+      "harbor-codex",
+      "harbor-pi",
+      "pi-cache-semantics",
+      "pi-subagent-code"
+    ]
+  },
+  "source_corrections": [
+    {
+      "preliminary_claim": "An alias missing as an exact catalog slug might use unknown-model metadata and normalize Ultra to Medium.",
+      "correction": "Not established for the native default/static catalog branch: longest-prefix lookup can inherit Sol metadata. With the unchanged explicit catalog selected before discovery, StaticModelsManager uses the candidate-prefix path; native Ultra resolves xhigh.",
+      "verification_path": [
+        "codex-manager-prefix",
+        "codex-manager-factory",
+        "codex-catalog",
+        "codex-effort"
+      ]
+    },
+    {
+      "preliminary_claim": "A nonsecret placeholder is universally required by a keyless Codex custom provider.",
+      "correction": "The native provider returns no key when env_key is omitted; selecting env_key requires a nonempty value. A placeholder can separately suppress Harbor host-env fallback.",
+      "verification_path": [
+        "codex-provider-auth",
+        "harbor-codex"
+      ]
+    },
+    {
+      "preliminary_claim": "Stock Pi generated endpoint plus thinking=xhigh establishes common native reasoning.",
+      "correction": "Generated id-only metadata defaults reasoning=false. The accepted conditional alternative requires native model metadata, explicit max/xhigh mappings, and no overriding Harbor thinking flag.",
+      "verification_path": [
+        "harbor-pi",
+        "pi-native-model-defaults",
+        "pi-thinking-support",
+        "pi-cli-precedence"
+      ]
+    }
+  ],
+  "retained_failures": [
+    {
+      "kind": "source-locator",
+      "actor": "root coordinator",
+      "provenance": "Parent-relayed source-read correction; original failed request output was not independently retained by this worker.",
+      "http_status": 404,
+      "native_exit_code": null,
+      "failed_repository": "diegoauper/OmniRoute",
+      "failed_path": "src/lib/executors/codex.ts",
+      "correction": "Canonical repository is diegosouzapw/OmniRoute and pinned executor path is open-sse/executors/codex.ts.",
+      "corrected_source_ref": "gateway-ultra",
+      "corrected_original_read_exit_code": 0,
+      "protocol_or_published_head_changed": false
+    },
+    {
+      "kind": "source-locator",
+      "actor": "root coordinator",
+      "provenance": "Parent-relayed source-read correction; original failed request output was not independently retained by this worker.",
+      "http_status": 404,
+      "native_exit_code": null,
+      "failed_repository": "diegoauper/OmniRoute",
+      "failed_path": "open-sse/executors/codex.ts",
+      "correction": "The corrected file path still used the wrong repository owner; canonical diegosouzapw/OmniRoute original bytes were then re-read.",
+      "corrected_source_ref": "gateway-ultra",
+      "corrected_original_read_exit_code": 0,
+      "protocol_or_published_head_changed": false
+    },
+    {
+      "kind": "local-source-locator",
+      "actor": "root coordinator",
+      "provenance": "Parent-relayed source-read correction; private host paths and the original combined-read output are omitted.",
+      "error": "FileNotFound",
+      "native_exit_code": null,
+      "affected_source": "shared-execution-contract.json",
+      "cause": "The combined read guessed a blueprint-root location.",
+      "correction": "The actual source was located under the owned run directory. This receipt does not change or substitute that contract.",
+      "protocol_or_published_head_changed": false
+    },
+    {
+      "kind": "oversized-source-output",
+      "actor": "root coordinator",
+      "provenance": "Parent-relayed correction; complete tracker output was not read or copied by this worker.",
+      "reported_size": 8500,
+      "reported_size_unit": null,
+      "native_exit_code": null,
+      "correction": "Future extraction is processed outside model context and capped below 5 KB.",
+      "protocol_or_published_head_changed": false
+    },
+    {
+      "kind": "oversized-json-check-output",
+      "actor": "this worker",
+      "native_exit_code": 0,
+      "cause": "Native JSON formatter stdout was sent through a 500-token shell result and explicitly truncated from 10961 tokens and 970 lines.",
+      "complete_output_retained": false,
+      "recovery": "Native JSON parsing was repeated with /dev/null as formatter output and returned complete empty stdout/stderr through compact outside-model processing.",
+      "recovery_native_exit_code": 0,
+      "artifact_bytes_changed_by_check": false
+    },
+    {
+      "kind": "publication-validator-processor-timeout",
+      "actor": "this worker",
+      "processor_timeout_ms": 20000,
+      "native_validator_exit_code": null,
+      "returned_result": "timed out after 20000ms - partial output shown; no native repository-validator result was returned",
+      "other_completed_checks": {"json": 0, "staged_whitespace": 0},
+      "recovery": "Repository validator was re-run as a native yielding session and completed with the retained result below.",
+      "recovery_native_exit_code": 1,
+      "recovery_output": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-carriers-source-read.json: evidence file is not hash-listed\n",
+      "limitation": "Root owns registry registration. No registry or shared file was edited by this worker."
+    },
+    {
+      "kind": "source-excerpt-processor",
+      "native_exit_code": 1,
+      "error": "IndexError: list index out of range",
+      "cause": "A requested excerpt extended beyond the complete pinned Codex adapter's 1479 lines.",
+      "source_ref": "harbor-codex",
+      "source_bytes_complete_before_error": true,
+      "recovery": "Subsequent processing bounded iteration by the original file length.",
+      "recovery_native_exit_code": 0,
+      "source_hash_unchanged": true
+    }
+  ],
+  "qualification": {
+    "source_carriers": "conditionally supported",
+    "native_runtime_activation": "unrun",
+    "actual_native_transport": "unrun",
+    "actual_role_and_effort": "unrun",
+    "candidate_readiness_execution": "unrun",
+    "model_or_quality_comparison": "unrun",
+    "comparative_freeze": false,
+    "measured_default": null,
+    "native_usage": null,
+    "benchmark_outcomes": null,
+    "user_goal_completion_claim": false
+  },
+  "publication_checks": {
+    "json_check": {
+      "command": "rtk proxy python3 -m json.tool evidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-carriers-source-read.json /dev/null",
+      "native_exit_code": 0,
+      "returned_stdout": "",
+      "returned_stderr": "",
+      "scope": "Native JSON parser; publication metadata only."
+    },
+    "whitespace_check": {
+      "command": "rtk proxy git diff --cached --check",
+      "native_exit_code": 0,
+      "returned_stdout": "",
+      "returned_stderr": ""
+    },
+    "repository_validator": {
+      "command": "rtk proxy python3 scripts/validate.py",
+      "native_exit_code": 1,
+      "returned_output": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-carriers-source-read.json: evidence file is not hash-listed\n",
+      "blocking_condition": "New owned artifact awaits root-owned hash registration.",
+      "upstream_or_provider_acceptance": false
+    },
+    "registry_registration": "pending root-owned integration"
+  }
+}
