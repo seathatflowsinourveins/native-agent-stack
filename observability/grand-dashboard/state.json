@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-03T12:30:57Z",
-  "meaning": "Recorded checkpoint adding one gate for the new WSL distribution: its source selection on main is stated apart from its host qualification, which is open. Every other entry is carried over unchanged from the checkpoint of 2026-10-01T19:18:16Z, whose meaning was: Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held. This checkpoint adds the gpt-native-lifecycle-convergence gate for the dated native review and SDK controls, inactive hosted workflow, and open B1 and backend qualification.",
+  "recorded_at_utc": "2026-10-03T13:07:50Z",
+  "meaning": "Recorded checkpoint adding one gate, gpt-native-lifecycle-convergence, for the dated native review and SDK controls, the inactive hosted workflow and open B1 and backend qualification. Every other entry is carried over unchanged from the checkpoint of 2026-10-02T22:57:25Z, whose meaning was: Recorded checkpoint adding one gate for the new WSL distribution: its source selection on main is stated apart from its host qualification, which is open. Every other entry is carried over unchanged from the checkpoint of 2026-10-01T19:18:16Z, whose meaning was: Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held.",
   "lanes": [
     {
       "kind": "lane",
