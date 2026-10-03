@@ -230,6 +230,18 @@ def main():
     loop = re.search(r"^for slot in ([^;]*); do\n  if \[\[ -z \"\$only\" \|\| \"\$only\" == \"\$slot\" \]\]; then skipped", accept_text, re.M)
     if not loop or [s.strip("'") for s in loop.group(1).split()] != [r["slot"] for r in excluded]:
         bad("dispatch", "accept.sh: the skipped-slot loop is not the rows that are neither installed nor measurement-only")
+    # An installed row that install.sh runs only when named (the default run skips it) has its checks gated the same way.
+    named_only = [r for r in selected
+                  if re.search(r"^if named '" + re.escape(r["slot"]) + r"'; then run_slot '" + re.escape(r["slot"]) + r"';", install_text, re.M)]
+    for r in named_only:
+        slot = r["slot"]
+        if f'if [[ "$only" == {slot} ]]; then {slot}; elif [[ -z "$only" ]]; then skipped {slot}; fi' not in accept_text:
+            bad("dispatch", f"accept.sh checks row {slot} in the default run, but install.sh installs it only when named")
+    # ... and the converse: accept.sh skips no installed row in the default run that install.sh installs by default.
+    for r in selected:
+        slot = r["slot"]
+        if r not in named_only and f'if [[ "$only" == {slot} ]]; then {slot}; elif [[ -z "$only" ]]; then skipped {slot}; fi' in accept_text:
+            bad("dispatch", f"accept.sh skips row {slot} in the default run, but install.sh installs it by default")
 
     # --list prints exactly the rows of install-plan.json
     proc = subprocess.run(["bash", str(plan_dir / "install.sh"), "--list"], capture_output=True, text=True, cwd=plan_dir, timeout=120)
@@ -286,7 +298,8 @@ def main():
         print("\n".join(problems))
         print(f"FAILED: {len(problems)} problem(s)")
         return 1
-    print(f"OK: {len(rows)} rows: {len(selected)} installed by default, {len(measured)} measurement-only, {len(excluded)} not installed; "
+    print(f"OK: {len(rows)} rows: {len(selected)} installed ({len(selected) - len(named_only)} by the default run, {len(named_only)} only when named), "
+          f"{len(measured)} measurement-only, {len(excluded)} not installed; "
           f"{sum(len(r['commands']) for r in rows)} commands and {sum(len(r['acceptance']) for r in rows)} acceptance entries agree with the scripts")
     return 0
 

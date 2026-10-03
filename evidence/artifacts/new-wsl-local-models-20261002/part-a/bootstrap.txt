@@ -1,0 +1,11 @@
+c6911453b2aecb18b96a698950189c92b0a5def47f9805fbe776deb8cdbc5bef s2o-chat/validity.jsonl
+4a63f0780064a195512e1ed9618ead16bf72a991cf43c7d3c4b57db27eb32684 c-chat/validity.jsonl
+0e86ee059055a712527018881ec3172542f4272117463ccc279969e7a6c0b50b s2o-responses/validity.jsonl
+37bc16cecb4e4e114b29b55ad7f7bba9a3f1ddd72810a601343c66232a2edf38 c-responses/validity.jsonl
+{"arms": ["S2o", "C"], "surfaces": ["chat", "responses"], "cases": 100, "share": {"S2o": 1.0, "C": 0.875}, "difference": 0.125, "interval_95": [0.065, 0.19], "resamples": 10000, "seed": 20260927, "tie": false}
+bootstrap exit 0
+s2o-chat | invalid reasons: none | valid and also correct by the package: 97 | ids: 100
+c-chat | invalid reasons: {'no tool call in the first answer': 4, 'arguments do not satisfy the schema': 9} | valid and also correct by the package: 80 | ids: 100
+s2o-responses | invalid reasons: none | valid and also correct by the package: 95 | ids: 100
+c-responses | invalid reasons: {'arguments do not satisfy the schema': 9, 'no tool call in the first answer': 3} | valid and also correct by the package: 82 | ids: 100
+2026-10-02T20:28:28Z

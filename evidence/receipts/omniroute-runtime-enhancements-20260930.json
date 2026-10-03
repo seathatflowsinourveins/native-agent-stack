@@ -1,0 +1,731 @@
+{
+  "schema_version": 1,
+  "id": "omniroute-runtime-enhancements-20260930",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "omniroute",
+    "context-mode",
+    "serena",
+    "dagu"
+  ],
+  "claim": "A scoped native Codex SDK Sol-Max worker completed skill use, selected Context Mode/Serena MCP calls, one Astra-Max native judge and an unchanged oracle through OmniRoute in a successful bounded Dagu graph.",
+  "limitations": [
+    "One unchanged arithmetic fixture and bounded integration; no universal highest-quality model, framework or SDK ranking.",
+    "169 enabled skills were visible through native discovery. This run read using-superpowers and exercised three selected MCP calls; it does not qualify every installed skill, tool, language server, plugin or hook.",
+    "Native hook support and live web search are configured, but their execution is unmeasured here. No scheduler, schedule, hook or global account configuration was installed by this kit.",
+    "Native parent and child cumulative usage are separate scopes. Cached input and reasoning are subsets; observer response counters corroborate the same usage and must not be added. Failed/interrupted and complete provider usage, billing and token savings remain unknown.",
+    "Each observed completed stream also has an unclassified flow_error record. Native results completed; transport is not described as error-free, and requested model/provider labels are not backend identity attestation.",
+    "The separate Claude SDK Devin bridge retains its failed/unqualified status. Earlier native Claude-to-SDK acceptance is a historical separate callsite, not a rerun against this source.",
+    "The follow-up native Claude cooperation session was stopped after no confirmed SendMessage/final packet; no peer approval or new owner-contact count is claimed.",
+    "The isolated kit is a scoped private worker configuration. Live owners retain shared worker policy, host-wide catalogs/defaults and dashboard checkpoint ownership."
+  ],
+  "recorded_at": "2026-09-30T19:33:03Z",
+  "sources": {
+    "codex": {
+      "repository": "https://github.com/openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "sdk_and_native_cli": "0.159.2",
+      "typed_preflight": "sdk/python/src/openai_codex/{async_client,generated/v2_all}.py",
+      "native_spawn": "codex-rs/core/src/agent/child_config.rs:50-84,196-235; role.rs:177-191"
+    },
+    "context_mode": {
+      "repository": "https://github.com/mksglu/context-mode",
+      "revision": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "version": "1.0.169"
+    },
+    "serena": {
+      "repository": "https://github.com/oraios/serena",
+      "revision": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+    },
+    "dagu": {
+      "repository": "https://github.com/dagucloud/dagu",
+      "revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "version": "2.16.6",
+      "root_env": "internal/spec/dag.go:694-710; internal/spec/variables.go:98-155"
+    },
+    "observer": {
+      "repository": "https://github.com/mitmproxy/mitmproxy",
+      "revision": "6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+      "version": "12.2.3",
+      "integration": "tools/runtime-worker-evidence/gateway_observer.py"
+    },
+    "fixture": {
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "revision": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/fixtures/devin-bridge/e2e-workspace",
+      "baseline": "evidence/receipts/omniroute-runtime-workers-20260930.json post-fix"
+    },
+    "native_claude_workflows": "examples/claude-native/workflows/README.md; vendored agent-lab scripts retain their reviewed pins",
+    "rtk": "https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md",
+    "skills": "blueprints/runtime-workers/skills/manifest.json and supported tools/adoption/install_skills.py; task bodies on demand"
+  },
+  "source_hashes": {
+    "examples/omniroute-codex-sdk/worker.py": "d93e4bb0e54f436d15b6c06375126eba51289f8b1513e5ef52dfacaa8a65a074",
+    "examples/omniroute-codex-sdk/test_worker.py": "b31d70450151925ac506e9cd018740e9d3d4ca4529a70f3a9d4f8b845d7e8da8",
+    "examples/omniroute-codex-sdk/worker.py.lock": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44",
+    "examples/omniroute-codex-sdk/runtime.config.template.toml": "3602da96a99c2cc4a6f211695dcf0b8f46cd408cd10290b8b54537e38f0258d6",
+    "examples/omniroute-codex-sdk/runtime-worker.yaml": "b3093a32ad708f09b81893f9d65975f9f01f99078976929e82830e6ec1b6a7b4",
+    "examples/omniroute-codex-sdk/agents/runtime-judge.toml": "0a0b549d3007c75ccb35be3a1d765de31d0504abdd35dfad1e3d68ad4daead55",
+    "examples/omniroute-codex-sdk/acceptance-plan.json": "5b046e6e30802bbe66d837030ae3c215d6fd401d524d48f51302269450d65d94",
+    "examples/omniroute-codex-sdk/rerun-plan.json": "3f4e9c441ca1b34c9a425cc3e8344e979b99757370506970fd7f760ac55d8730"
+  },
+  "fixture": {
+    "post_run_sha256": {
+      "math.js": "5b63136552577a64d788dc3cd4552739d0d60f9e1adb63ec4dfb6932d56fc75d",
+      "math.test.js": "0a60a61022b4d9333882981dda4d09faf41cc36fd2e9406921fdf6e77b8821de",
+      "package.json": "7fa8fd86ba4b048bc7395cece337513c65936af275348074eadb443614b387d6"
+    },
+    "unchanged": true,
+    "oracle_source_unchanged": true
+  },
+  "integration_checks": {
+    "classification": "Locally authored integration checks using the pinned native app-server and loopback SSE fixtures; not unchanged upstream acceptance.",
+    "full_before_compact_cli": {
+      "tests": 12,
+      "exit_code": 0,
+      "duration_seconds": 15.595
+    },
+    "focused_after_compact_cli": {
+      "tests": 4,
+      "exit_code": 0,
+      "duration_seconds": 3.034
+    },
+    "upstream_suite_scope": "Earlier unchanged upstream suite results remain historical separate evidence; no new full-upstream-suite claim."
+  },
+  "readiness": {
+    "initial_compact": {
+      "status": "ready",
+      "bytes": 1361,
+      "records": 1,
+      "enabled_skills": 169,
+      "scope": "Before spawn-default repair; native catalog discovery only."
+    },
+    "repaired": {
+      "event": "result",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "provider": "omniroute_runtime",
+      "model_inference_submitted": false,
+      "usage_status": "unknown",
+      "usage_scope": null,
+      "usage": null,
+      "preflight": true,
+      "evidence_scope": "native_catalog_discovery",
+      "native_runtime": {
+        "name": "omniroute_codex_runtime_worker",
+        "version": "0.159.2",
+        "metadata_source": "userAgent"
+      },
+      "effective_config": {
+        "model": "cx/gpt-6.1-sol-max",
+        "model_provider": "omniroute_runtime",
+        "model_reasoning_effort": "max"
+      },
+      "agent_defaults": {
+        "enabled": true,
+        "max_concurrent_threads_per_session": 3,
+        "default_subagent_model": null,
+        "default_subagent_reasoning_effort": null
+      },
+      "configured_roles": [
+        {
+          "name": "runtime-judge"
+        }
+      ],
+      "mcp_servers": [
+        {
+          "name": "context-mode",
+          "configured": true,
+          "enabled": true,
+          "runtime_status": null,
+          "auth_status": "unsupported",
+          "tools_error": false,
+          "tool_count": 9,
+          "catalog_ready": true
+        },
+        {
+          "name": "serena",
+          "configured": true,
+          "enabled": true,
+          "runtime_status": null,
+          "auth_status": "unsupported",
+          "tools_error": false,
+          "tool_count": 5,
+          "catalog_ready": true
+        }
+      ],
+      "skills": {
+        "total_count": 169,
+        "enabled_count": 169,
+        "required": {
+          "using-superpowers": true
+        }
+      },
+      "skill_error_count": 0,
+      "requirements": {
+        "mcp": [
+          "context-mode"
+        ],
+        "skills": [
+          "using-superpowers"
+        ],
+        "unavailable_mcp": [],
+        "unavailable_skills": []
+      },
+      "status": "ready",
+      "cleanup_status": "closed"
+    },
+    "missing_mcp": {
+      "exit_code": 2,
+      "status": "unavailable",
+      "cleanup_status": "closed",
+      "usage_status": "unknown",
+      "usage": null,
+      "model_inference_submitted": false,
+      "requirements": {
+        "mcp": [
+          "no-such-runtime-server"
+        ],
+        "skills": [],
+        "unavailable_mcp": [
+          "no-such-runtime-server"
+        ],
+        "unavailable_skills": []
+      }
+    },
+    "missing_skill": {
+      "exit_code": 2,
+      "status": "unavailable",
+      "cleanup_status": "closed",
+      "usage_status": "unknown",
+      "usage": null,
+      "model_inference_submitted": false,
+      "requirements": {
+        "mcp": [],
+        "skills": [
+          "no-such-runtime-skill"
+        ],
+        "unavailable_mcp": [],
+        "unavailable_skills": [
+          "no-such-runtime-skill"
+        ]
+      }
+    },
+    "scope": "Native catalogs and typed config/read, no model turn; runtimeStatus:null remains unknown. Observer saw no SDK provider request before the model trial. The private home also sees native global skill directories."
+  },
+  "native_execution": {
+    "requested_model": "cx/gpt-6.1-sol-max",
+    "requested_effort": "max",
+    "provider": "omniroute_runtime",
+    "model_inference_submitted": true,
+    "usage_status": "reported",
+    "usage_scope": "native_thread_cumulative",
+    "usage": {
+      "scope": "See native_threads latest_cumulative_usage; each thread counted once.",
+      "status": "reported"
+    },
+    "native_runtime": {
+      "name": "omniroute_codex_runtime_worker",
+      "version": "0.159.2",
+      "metadata_source": "serverInfo"
+    },
+    "thread_mode": "started",
+    "status": "completed",
+    "duration_ms": 181548,
+    "item_counts": {
+      "userMessage": 1,
+      "commandExecution": 1,
+      "reasoning": 6,
+      "mcpToolCall": 3,
+      "subAgentActivity": 2,
+      "collabAgentToolCall": 1,
+      "agentMessage": 1
+    },
+    "final_marker": "ENHANCED_RUNTIME_ACCEPTED",
+    "private_original_sha256": "02da6a94913d592bd3c0e3a7171b3df098893b0730f5561897652c09c920a9f0",
+    "skill_read": [
+      {
+        "command": "/bin/bash -lc 'rtk proxy cat .agents/skills/using-superpowers/SKILL.md'",
+        "exitCode": 0,
+        "status": "completed",
+        "returned_output_sha256": "82c5c8866ad7f5dd4440ce66bd7806ba48a2f13771beae5cf112e53f08fe36ba"
+      }
+    ],
+    "mcp_execution": [
+      {
+        "server": "serena",
+        "tool": "initial_instructions",
+        "status": "completed",
+        "error": null,
+        "durationMs": 18,
+        "returned_result_sha256": "e79e20dfa46793983cf0c2168b7428f841618322b9c7f34e9c3c19a491b6795a"
+      },
+      {
+        "server": "context-mode",
+        "tool": "ctx_execute",
+        "status": "completed",
+        "error": null,
+        "durationMs": 396,
+        "returned_result_sha256": "595775ad7c743a984e889d75d656dc267e3c8668a777cdff425287b39b63a389",
+        "returned_contract_output": null
+      },
+      {
+        "server": "serena",
+        "tool": "get_symbols_overview",
+        "status": "completed",
+        "error": null,
+        "durationMs": 36,
+        "returned_result_sha256": "3771099affe513ed811966ad18b8b25f1cf179743538933548ad3e468d754873",
+        "returned_contract_output": {
+          "_meta": null,
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"Function\": [\"add\"]}"
+            }
+          ],
+          "structuredContent": {
+            "result": "{\"Function\": [\"add\"]}"
+          }
+        }
+      }
+    ],
+    "cleanup_status": "closed",
+    "native_threads": [
+      {
+        "scope": "deadline300-parent",
+        "model_provider": "omniroute_runtime",
+        "model": "cx/gpt-6.1-sol-max",
+        "effort": "max",
+        "sandbox_policy": {
+          "type": "read-only"
+        },
+        "approval_policy": "never",
+        "terminal_event": "turn_aborted",
+        "latest_cumulative_usage": {
+          "input_tokens": 209699,
+          "cached_input_tokens": 178816,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 3365,
+          "reasoning_output_tokens": 1625,
+          "total_tokens": 213064
+        },
+        "spawn_calls": [
+          {
+            "agent_type": "runtime-judge",
+            "fork_turns": "none"
+          },
+          {
+            "agent_type": "runtime-judge",
+            "fork_turns": "none",
+            "model": "gpt-6-astra",
+            "reasoning_effort": "max"
+          }
+        ],
+        "private_original_sha256": "84e39181b74d74d2f28a1bdbe1f76224a43bd03d43b79f6e52b5f8ab441997a4"
+      },
+      {
+        "scope": "deadline300-judge",
+        "model_provider": "omniroute_runtime",
+        "model": "cx/gpt-6-astra-max",
+        "effort": "max",
+        "sandbox_policy": {
+          "type": "read-only"
+        },
+        "approval_policy": "never",
+        "terminal_event": "task_complete",
+        "latest_cumulative_usage": {
+          "input_tokens": 105465,
+          "cached_input_tokens": 76160,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1908,
+          "reasoning_output_tokens": 1050,
+          "total_tokens": 107373
+        },
+        "spawn_calls": [],
+        "private_original_sha256": "e1a65718928923fb987983a34dc7705497f26fc34af62741747349460547f491",
+        "role": "runtime-judge"
+      },
+      {
+        "scope": "repaired-parent",
+        "model_provider": "omniroute_runtime",
+        "model": "cx/gpt-6.1-sol-max",
+        "effort": "max",
+        "sandbox_policy": {
+          "type": "read-only"
+        },
+        "approval_policy": "never",
+        "terminal_event": "task_complete",
+        "latest_cumulative_usage": {
+          "input_tokens": 151525,
+          "cached_input_tokens": 131712,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 2288,
+          "reasoning_output_tokens": 1122,
+          "total_tokens": 153813
+        },
+        "spawn_calls": [
+          {
+            "agent_type": "runtime-judge",
+            "fork_turns": "none"
+          }
+        ],
+        "private_original_sha256": "e498fe016bf340e5cf5d80267377fd38dfe60d8bd61347619acaffe726fc685b"
+      },
+      {
+        "scope": "repaired-judge",
+        "model_provider": "omniroute_runtime",
+        "model": "cx/gpt-6-astra-max",
+        "effort": "max",
+        "sandbox_policy": {
+          "type": "read-only"
+        },
+        "approval_policy": "never",
+        "terminal_event": "task_complete",
+        "latest_cumulative_usage": {
+          "input_tokens": 64556,
+          "cached_input_tokens": 61952,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1488,
+          "reasoning_output_tokens": 878,
+          "total_tokens": 66044
+        },
+        "spawn_calls": [],
+        "private_original_sha256": "762481faf13375f3a11a4ffe24dc48936ed44ba925a806f36ea7126b9626dfb1",
+        "role": "runtime-judge"
+      }
+    ],
+    "oracle_returns": [
+      {
+        "scope": "deadline300-judge",
+        "command": "rtk npm test",
+        "exit_code": 0,
+        "wall_time_seconds": 0.205897791,
+        "returned_output_artifact": "evidence/artifacts/omniroute-runtime-enhancements-20260930/deadline300-judge-oracle-output.txt"
+      },
+      {
+        "scope": "repaired-judge",
+        "command": "rtk npm test",
+        "exit_code": 0,
+        "wall_time_seconds": 0.106420631,
+        "returned_output_artifact": "evidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt"
+      }
+    ],
+    "dagu_runs": [
+      {
+        "attempt": 1,
+        "status_native_code": 2,
+        "startedAt": "2026-09-30T15:04:09-04:00",
+        "finishedAt": "2026-09-30T15:04:10-04:00",
+        "nodes": [
+          {
+            "name": "readiness",
+            "status_native_code": 2,
+            "error": "exit status 2",
+            "doneCount": 1
+          },
+          {
+            "name": "worker",
+            "status_native_code": 3,
+            "error": "upstream failed",
+            "doneCount": null
+          }
+        ],
+        "private_original_sha256": "a95dc6827d1c7f2ba335f1900997ed7700466428c4b19840806679b67f363150"
+      },
+      {
+        "attempt": 2,
+        "status_native_code": 2,
+        "startedAt": "2026-09-30T15:14:17-04:00",
+        "finishedAt": "2026-09-30T15:19:21-04:00",
+        "nodes": [
+          {
+            "name": "readiness",
+            "status_native_code": 4,
+            "error": null,
+            "doneCount": 1
+          },
+          {
+            "name": "worker",
+            "status_native_code": 2,
+            "error": "exit status 2",
+            "doneCount": 1
+          }
+        ],
+        "private_original_sha256": "deefed177523529011002411c8bf4ba767510e672f7e1436236622957c16f7fd"
+      },
+      {
+        "attempt": 3,
+        "status_native_code": 4,
+        "startedAt": "2026-09-30T15:25:17-04:00",
+        "finishedAt": "2026-09-30T15:28:23-04:00",
+        "nodes": [
+          {
+            "name": "readiness",
+            "status_native_code": 4,
+            "error": null,
+            "doneCount": 1
+          },
+          {
+            "name": "worker",
+            "status_native_code": 4,
+            "error": null,
+            "doneCount": 1
+          }
+        ],
+        "private_original_sha256": "f63a5b3560a5d9b45f43e266b4d2d9619286767ccffc8cf08e2718df68ac80ea"
+      }
+    ]
+  },
+  "independent_observation": {
+    "original_sha256": "6961a59ade6632a9c9a091f7d2abaaa1b45d1103a2ff6a8954d8ce101b197569",
+    "event_counts": {
+      "request": 23,
+      "response_headers": 23,
+      "response_completed": 21,
+      "flow_error": 23
+    },
+    "request_groups": [
+      {
+        "scope": "provider-request-group-1",
+        "requested_model": "cx/gpt-6.1-sol-max",
+        "effort": "max",
+        "request_count": 10,
+        "response_completed_count": 8,
+        "flow_error_count": 10,
+        "completed_response_usage_sum": {
+          "input_tokens": 209699,
+          "output_tokens": 3365,
+          "total_tokens": 213064,
+          "cached_input_tokens": 178816,
+          "reasoning_output_tokens": 1625
+        },
+        "http_status_counts": {
+          "200": 10
+        }
+      },
+      {
+        "scope": "provider-request-group-2",
+        "requested_model": "cx/gpt-6-astra-max",
+        "effort": "max",
+        "request_count": 4,
+        "response_completed_count": 4,
+        "flow_error_count": 4,
+        "completed_response_usage_sum": {
+          "input_tokens": 105465,
+          "output_tokens": 1908,
+          "total_tokens": 107373,
+          "cached_input_tokens": 76160,
+          "reasoning_output_tokens": 1050
+        },
+        "http_status_counts": {
+          "200": 4
+        }
+      },
+      {
+        "scope": "provider-request-group-3",
+        "requested_model": "cx/gpt-6.1-sol-max",
+        "effort": "max",
+        "request_count": 6,
+        "response_completed_count": 6,
+        "flow_error_count": 6,
+        "completed_response_usage_sum": {
+          "input_tokens": 151525,
+          "output_tokens": 2288,
+          "total_tokens": 153813,
+          "cached_input_tokens": 131712,
+          "reasoning_output_tokens": 1122
+        },
+        "http_status_counts": {
+          "200": 6
+        }
+      },
+      {
+        "scope": "provider-request-group-4",
+        "requested_model": "cx/gpt-6-astra-max",
+        "effort": "max",
+        "request_count": 3,
+        "response_completed_count": 3,
+        "flow_error_count": 3,
+        "completed_response_usage_sum": {
+          "input_tokens": 64556,
+          "output_tokens": 1488,
+          "total_tokens": 66044,
+          "cached_input_tokens": 61952,
+          "reasoning_output_tokens": 878
+        },
+        "http_status_counts": {
+          "200": 3
+        }
+      }
+    ],
+    "usage_scope": "Derived sum of actual returned usage for nonoverlapping completed flows within each request/cache scope. Cache and reasoning counters are subsets. Separate corroboration of native thread counters; no whole-task coverage, savings, backend or billing attestation."
+  },
+  "failures": {
+    "first_port": {
+      "port": 25283,
+      "exit_code": 1,
+      "reason": "Address already in use; selected a free owned loopback port without stopping another process."
+    },
+    "native_config_doctor": {
+      "exit_code": 1,
+      "config_load": "ok",
+      "scope": "Default native OpenAI auth not provided in this new private home; the SDK's process-scoped OmniRoute route was not present in doctor. Not a full doctor pass or an account-absence claim."
+    },
+    "initial_native_test_attempts": [
+      {
+        "attempt": 1,
+        "exit_code": 1,
+        "reason": "TransportClosedError before explicit start."
+      },
+      {
+        "attempt": 2,
+        "exit_code": 1,
+        "reason": "Missing serverInfo metadata after start; required source-backed normalization."
+      }
+    ],
+    "first_graph": {
+      "cli_exit_code": 1,
+      "readiness_exit_code": 2,
+      "worker": "aborted",
+      "reason": "Task binding exports excluded by native Dagu environment filter; no model submitted."
+    },
+    "second_graph": {
+      "cli_exit_code": 1,
+      "worker_exit_code": 2,
+      "sdk_return": {
+        "status": "deadline_exceeded",
+        "cleanup_status": "closed",
+        "interrupt_status": "requested",
+        "usage_status": "unknown",
+        "usage": null,
+        "model_inference_submitted": true
+      },
+      "reason": "Readiness/MCP and native judge oracle passed, but parent exceeded300 seconds; component success did not qualify graph completion."
+    },
+    "cooperation_followup": {
+      "native_model": "Claude Opus5.5",
+      "effort": "max",
+      "completed": false,
+      "stop_exit_code": 0,
+      "usage_status": "unknown",
+      "scope": "Only owned follow-up session stopped; no new confirmed owner SendMessage or approval."
+    }
+  },
+  "correction_log": [
+    {
+      "mistake": "Assumed low-level initialize starts the client.",
+      "correction": "Explicit public start() precedes initialize().",
+      "verification": "First transport-closed test failure, pinned async_client.py and subsequent actual native checks."
+    },
+    {
+      "mistake": "Expected low-level initialize to populate serverInfo name/version.",
+      "correction": "Prefer populated serverInfo; fill absent metadata from native userAgent and validate exact native version.",
+      "verification": "Original initialize return and pinned client/api/_initialize_metadata source; Astra review after one bounded Sol repair."
+    },
+    {
+      "mistake": "Treated SDK launch profile as effective app-server configuration.",
+      "correction": "Use worker-home base config plus supported process overrides.",
+      "verification": "Pinned Codex CLI app-server LoaderOverrides::default() and native config/read."
+    },
+    {
+      "mistake": "Treated gateway-prefixed default_subagent_model as a native catalog name.",
+      "correction": "Leave scoped spawn model/effort defaults unset; inherit explicit parent before native role applies Astra gateway alias.",
+      "verification": "Actual rejected first spawn, pinned child_config ordering, one successful unmodified role spawn in repaired run; Astra acceptance."
+    },
+    {
+      "mistake": "Expected exported task variables to reach Dagu steps automatically; proposed allow_env key.",
+      "correction": "Use native root env imports for six task bindings; supported filter key is env_passthrough.",
+      "verification": "Initial readiness exit2, pinned Dagu filtering/evaluation source, repaired native readiness and complete graph."
+    },
+    {
+      "mistake": "Expected ordinary RTK filtering to preserve JSONL machine output.",
+      "correction": "Recover the actual failure result through rtk recall and use rtk proxy uv in the graph.",
+      "verification": "Retained truncated stdout, recovered original deadline/cleanup fields and complete repaired JSONL."
+    }
+  ],
+  "cleanup": {
+    "observer_owned_match": true,
+    "observer_stop_signal": "SIGINT",
+    "observer_stop_command_exit_code": 0,
+    "observer_listener_after_stop": false,
+    "sdk_cleanup_status": "closed",
+    "other_owners_services_unchanged": true
+  },
+  "retained_private_originals": {
+    "sdk-preflight-tests-full.log": {
+      "sha256": "8eaae6c66d3796da82df722019ab160886beb0e364a97625ffce40f27ce9773f",
+      "bytes": 11060
+    },
+    "sdk-preflight-tests-after-start-full.log": {
+      "sha256": "fba9d77170997a6ca1d23978edab4c84fac7ce61dea0b653770ed3c5d7615f11",
+      "bytes": 11608
+    },
+    "sdk-preflight-tests-after-metadata-normalization-full.log": {
+      "sha256": "a0afe8542eb408db54e9789fbd5c1c79251e8ca886dc167041525ae9c377359b",
+      "bytes": 6189
+    },
+    "sdk-native-initialize-metadata.log": {
+      "sha256": "63b710a5cc8d819c74060a35ec8ca2e762ac038ae88f99e413e0073b2d8047b3",
+      "bytes": 126
+    },
+    "sdk-enhanced-worker-full-tests-original.log": {
+      "sha256": "d923fb43bd72040028fff23dd287e4ccd06bd407604e5a14f963001d22c6aa45",
+      "bytes": 1955
+    },
+    "sdk-enhanced-worker-compact-cli-tests-original.log": {
+      "sha256": "90edf09b885292634a3c9a4e35eaf1963e5eaf64cafc399dd2afd72b6c1440f6",
+      "bytes": 2237
+    },
+    "enhancement-preflight-negative.json": {
+      "sha256": "a9e3f82db007fbf7b223e5160c1cc481262cab3579dbf649fcf2a1b15d6ed7d4",
+      "bytes": 23771
+    },
+    "enhancement-preflight-negative-skill.jsonl": {
+      "sha256": "5ac66368c42b7121042fe8a0e7690b6634d7d44b50e2a70eb7bedd32f401bde8",
+      "bytes": 23767
+    },
+    "enhancement-preflight-compact.jsonl": {
+      "sha256": "b2787b3f10a773c383a4e147b35034bb5ea2fddd3e7281caf916ce4f99974a33",
+      "bytes": 1361
+    },
+    "enhancement-dagu.log": {
+      "sha256": "5117ae8830dc3cb7b499b6d16a737c4ca9acca4e0b6a78563eb245fb2d1bdc3b",
+      "bytes": 1075
+    },
+    "enhancement-dagu.stderr": {
+      "sha256": "6f0ce24c50eb4a44f7934fbb85ad347defe561ad524e536b59efa36d7d076f36",
+      "bytes": 1017
+    },
+    "enhancement-dagu-after-env-import.log": {
+      "sha256": "df80ba2aa573178a5becab8f2ffd259f06b673f06ed496904868ab906c67be62",
+      "bytes": 3300
+    },
+    "enhancement-dagu-after-env-import.stderr": {
+      "sha256": "1aeddce5ee9dd14a998b7b65e9a6d09ff8bd8b6db63225f7c151a47269341eaf",
+      "bytes": 1188
+    },
+    "enhancement-failed-sdk-recovered.jsonl": {
+      "sha256": "571c2a17f62d592392a25cecd414389726fc6a0b837a70a6d16f769fd0cc228d",
+      "bytes": 986
+    },
+    "enhancement-native-result-repaired.json": {
+      "sha256": "02da6a94913d592bd3c0e3a7171b3df098893b0730f5561897652c09c920a9f0",
+      "bytes": 26215
+    },
+    "enhancement-dagu-after-spawn-repair.stderr": {
+      "sha256": "3290f97fd0889761f23a4951e1406ae986434d8fb0bbc33b44a777f243ebf16a",
+      "bytes": 917
+    },
+    "repaired-sdk-stdout": {
+      "sha256": "b0ab3c35e61035f3637b4cb0385362b7b6767fa1d3e852befb2886e6d83e0453",
+      "bytes": 2214
+    },
+    "repaired-dagu-readiness": {
+      "sha256": "97283f651d6564347ded4dae209be3160d5035cdc6b2185cdd1a6a98802c2259",
+      "bytes": 1335
+    }
+  },
+  "evidence_policy": "Public fields are sanitized selections of actual returned metadata, commands and oracle output plus independent observation; full original native transcripts remain private. Consistency validation does not certify truth."
+}

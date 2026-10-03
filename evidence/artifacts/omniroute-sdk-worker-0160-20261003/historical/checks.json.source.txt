@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration_synthetic_provider",
+  "checked_on": "2026-09-30",
+  "scope": "Real official SDK and bundled native CLI against an authored loopback SSE fixture. No live model/provider execution and no SDK comparison-winner claim.",
+  "sources": [
+    {
+      "repository": "https://github.com/openai/codex",
+      "ref": "rust-v0.159.2",
+      "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "paths": [
+        "sdk/python/src/openai_codex/client.py",
+        "sdk/python/src/openai_codex/api.py",
+        "sdk/python/src/openai_codex/_run.py",
+        "codex-rs/core/src/client.rs",
+        "codex-rs/core/tests/common/responses.rs",
+        "codex-rs/models-manager/src/manager.rs"
+      ]
+    }
+  ],
+  "versions": {
+    "sdk": "0.159.2",
+    "native_cli": "0.159.2",
+    "python": "3.13.15",
+    "uv": "0.12.17",
+    "ruff": "0.15.8",
+    "host_scope": "Linux x86_64 glibc"
+  },
+  "source_closure": {
+    "executed_worker_commit": "3c51e33",
+    "executed_worker_sha256": "aa960eca54f3cb098d74deb63673f6ecf4bcf747ef030b16ee00e4a093c40763",
+    "formatted_worker_sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651",
+    "ast_identical": true,
+    "worker_lock_sha256": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44",
+    "worker_lock_unchanged": true
+  },
+  "attempts": [
+    {
+      "id": "original-tool-oracle",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 1,
+      "actual_returned_excerpt": "Ran 6 tests in 9.356s\nFAILED (errors=1)\nKeyError: 'tools'",
+      "correction": "Original tagged core/src/client.rs:902-933 and actual local request inspection show native ResponsesLite tools in input[].type=additional_tools. A missing top-level tools key is not tool absence."
+    },
+    {
+      "id": "corrected-tool-oracle",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "actual_returned_excerpt": "Ran 6 tests in 9.293s\nOK"
+    },
+    {
+      "id": "independent-owned-child-observation",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "actual_returned_excerpt": "Ran 6 tests in 11.615s\nOK",
+      "additional_observation": "Each observed owned SDK app-server PID returned ProcessLookupError from os.kill(pid, 0) after native close. No private SDK transport mutation."
+    },
+    {
+      "id": "initial-import-order-lint",
+      "command": "rtk uvx --from ruff==0.15.8 ruff check --select E,F,I,B,C4 --ignore E501 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 1,
+      "actual_returned_excerpt": "I001 [*] Import block is un-sorted or un-formatted\nFound 1 error.",
+      "correction": "Supported ruff check --select I --fix organized the local test imports; worker source was unchanged."
+    },
+    {
+      "id": "final-lint",
+      "command": "rtk uvx --from ruff==0.15.8 ruff check --select E,F,I,B,C4 --ignore E501 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "actual_returned_excerpt": "All checks passed!"
+    },
+    {
+      "id": "final-format",
+      "command": "rtk uvx --from ruff==0.15.8 ruff format --check --line-length 100 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "actual_returned_excerpt": "2 files already formatted"
+    }
+  ],
+  "negative_controls": [
+    "A provider stream missing response.completed is rejected by the same completed-result check, with usage unknown and native child closed.",
+    "Unsupported wire_api=chat is rejected during native initialization, before any provider request.",
+    "An existing native-result artifact is rejected without overwriting its original bytes."
+  ],
+  "limitations": [
+    "Fixture token values are authored data for cumulative/subset accounting; they are not measured provider usage or billing.",
+    "The pinned SDK emits ResourceWarning for unclosed stdout/stderr file handles during repeated same-Python-process fixture calls. Native child termination is independently observed. A long-lived in-process SDK pool remains unqualified.",
+    "MCP/tool/skill availability follows caller-native configuration and loading policies. This isolated fixture does not qualify the complete optional stack.",
+    "The existing unchanged upstream SDK qualification retains one formatter-driver test failure; these local checks do not replace it."
+  ]
+}
