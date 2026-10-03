@@ -1,0 +1,69 @@
+{
+  "study": "token-context-20261003",
+  "operation": "Fresh read-only Codex lane exact-head partial-evidence publication review",
+  "north_star_action": "Preserve unknown native counters and faithful evidence for token/context adoption",
+  "reviewed_head": "0f28fdeda99feed81f6f513ccc968fd2a8ba7085",
+  "accepted_main": "d2777ee76a6ca14e020856fcd76421ceebc1e4f0",
+  "requested_worker": "gpt-6.1-sol/max fresh context",
+  "verdict": "BLOCK partial publication; no other blocker found in bounded review",
+  "finding": {
+    "severity": "P2",
+    "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
+    "original_lines": [
+      1748,
+      1810
+    ],
+    "observations": [
+      "forge-native-pilot-typed-claude",
+      "astra-settings-startup-failure"
+    ],
+    "problem": "cache_creation0 while native total/other categories unknown and no independent zero basis",
+    "correction": "Both cells null; all original failed attempts and other native counter categories retained"
+  },
+  "source_locators": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "path": "src/providers/claude-agent-sdk.ts",
+      "line": 1674
+    },
+    {
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/protocol/src/protocol.rs",
+      "line": 1929
+    }
+  ],
+  "read_checks": {
+    "44_owned_hashes_match": true,
+    "all_observation_artifact_anchors_match": true,
+    "all_foreign_metadata_and_order_equal_main": true,
+    "prior_study_observations_unchanged_at_reviewed_head": true,
+    "completed_usage_and_alternative_timeout_arithmetic_consistent": true,
+    "scoped_diff_check_zero": true,
+    "targeted_privacy_markers_absent": true
+  },
+  "declined_to_judge": [
+    "Private packet truth or fresh upstream source byte retrieval",
+    "Wire identity/invoice/final interrupted usage and complete confinement",
+    "Protection/natural rates/comparative winners/installation/final freeze/whole goal completion"
+  ],
+  "completeness_critic": [
+    "CircuitEval public reference and correlated equiv oracle",
+    "Immutable same-session trajectory and natural compaction/resume",
+    "Helper/transport/retry/interrupted accounting and concurrent lifecycle observations",
+    "Fair focused reads and large external MCP/noncode filing/PDF/browser/image/audio modalities"
+  ],
+  "native_model_usage": "UNKNOWN for this app-hosted review; no native CLI usage record is bound; never reported as zero",
+  "limits": [
+    "Reviewer is a source/evidence lead, not user approval or final adoption acceptance",
+    "Corrected exact-head delta read still required; original BLOCK remains preserved"
+  ],
+  "root_primary_source_verification_after_review": {
+    "codex_protocol_sha256": "d3d3d384da91b2824c10091de4331a2bc26ec5474887ed0aef1e3f3c4ae110f4",
+    "codex_lines": "1929\u20131936 optional exact completion usage",
+    "promptfoo_claude_provider_sha256": "a665f19033beab38c09ce9e3f79a952bebe9190c856919dd6635ff296e73e7f7",
+    "promptfoo_lines": "1668\u20131686 native SDK settings forwarding",
+    "failure_receipts": "Both native usage endpoints/categories unknown, no independent zero basis; source optionality is not zero usage"
+  }
+}

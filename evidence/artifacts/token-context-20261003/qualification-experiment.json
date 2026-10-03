@@ -1745,7 +1745,7 @@
       ],
       "usage": {
         "uncached_input": null,
-        "cache_creation": 0,
+        "cache_creation": null,
         "cache_read": null,
         "output": null,
         "reasoning_in_output": null,
@@ -1807,7 +1807,7 @@
       ],
       "usage": {
         "uncached_input": null,
-        "cache_creation": 0,
+        "cache_creation": null,
         "cache_read": null,
         "output": null,
         "reasoning_in_output": null,

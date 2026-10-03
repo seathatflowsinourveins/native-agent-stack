@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
-      "sha256": "1743a5f94fe1292e2074240bf506524b4c30428f187e966fb802c8cbfda9a3c1",
-      "bytes": 59728
+      "sha256": "db91f3dce42da2bc0c84b3b3cca7282089b092896a9fa0b90cc469d91c717b18",
+      "bytes": 60670
     },
     {
       "path": "docs/direct-results.md",
@@ -45546,8 +45546,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "4f97d5f5c37ccabf0273a42aeba659a8d4f9f5dc118d0dd83408a060f54b68a7",
-      "bytes": 89730
+      "sha256": "9d2e680cdd9076fa2bcd7eb77da5fb07c1c51103a07ebf4bf08859f5fa1fc1f0",
+      "bytes": 89736
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -45583,6 +45583,11 @@
       "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
       "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c",
       "bytes": 2544
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",
+      "sha256": "f7559e3aebd1460da9ab17a8fa65634fbd61fd60072a28789e19c1baaa2a431c",
+      "bytes": 3286
     },
     {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
