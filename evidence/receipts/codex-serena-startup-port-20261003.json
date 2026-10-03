@@ -34,7 +34,7 @@
     ]
   },
   "arms": {
-    "control": "unchanged main profile",
+    "control": "main's stack-worker profile: in initial_trial byte-exact main template (profile_sha256 f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e); in the capture-refinement runs this port's template without required = true (profile_sha256 d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1), TOML-equal to main's profile but carrying the new comments",
     "A": "mcp_servers.serena.required=true",
     "B": "mcp_optional_startup_grace_ms=0",
     "C": {
@@ -1695,7 +1695,10 @@
     "Independent Opus and cross-family Sol reviews, Gate A and configuration-owner ACKs, required CI, publication, merge and #436 close are coordinator-only.",
     "Destination configuration suite has two stale assertions in owner-controlled files; both must be repaired by that owner before final acceptance.",
     "Initial trial has relative timings only; the retained metadata-refinement repeat includes per-run UTC timestamps. All 36 runs remain retained.",
-    "Concurrent origin/main advanced to 463a57b983eec540ae90eb45c2b1a7c6fc469aed while builder HEAD remained cac8700ba914950266272347468bff7ad630a4bf. Sandbox forbids rebase; latest-main manifest registration must be repeated after coordinator rebase."
+    "Concurrent origin/main advanced to 463a57b983eec540ae90eb45c2b1a7c6fc469aed while builder HEAD remained cac8700ba914950266272347468bff7ad630a4bf. Sandbox forbids rebase; latest-main manifest registration must be repeated after coordinator rebase.",
+    "Resolution note 2026-10-03 for the previous residual and registry_checks[4]: in coordinator custody the content was rebased onto 6112d14d40f741855f0b961124d98939daaad00e (build_args.py citation L355-356 moved to L356-357) and the registry redone at fd252afcac09fbe49fcc31dfed789e314f47d9d6, where the independent review reproduced scripts/validate.py and scripts/evidence_manifest.py --check with exit 0 and status passed. The post-#626 rebase, 0.160.0 rerun and final registration (first residual) remain open.",
+    "Driver deviation from #436's race test: no process-group kill after proc.wait, and the bwrap wrapper unshares only the network, so a codex reaching the 120 s timeout, or a background child it leaves, can outlive the test. No retained run reached the timeout (longest 8.433619 s). Restoring the kill is due with the 0.160.0 rerun.",
+    "The apply_codex_lane.py dry run's required-serena read-back has run only against a fixture serena; a real --dry-run belongs in the post-merge capability-gate rerun, and relaxed_required_flags is ported only if that run fails."
   ],
   "integration_checks": [
     {

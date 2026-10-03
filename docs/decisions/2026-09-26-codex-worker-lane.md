@@ -845,12 +845,14 @@ these restrictions be enforced instead of instructed. A run in which a spawned r
 developer text exactly once, or does not run at the pinned model and effort, would reopen the carriers.
 A later change to either file's bytes needs a new dated section and new digest rows in `SHA256SUMS`, the
 test and the examples README.
+
 ## Addendum 2026-10-03: serena at the first turn (port of #436)
 
 **Status: Arm A selected by the preregistered trial; repository port, no host apply.** North-star action: make the native
 Codex worker's exact-symbol lane available on its first turn while building the foundation for research and
 historical simulation. This addendum answers the unmeasured startup knobs at L364-365 without rewriting that
-dated passage. The port source is #436's pinned head `b18d9f031fdf854e74f59586529df1022e805975`; its historical
+dated passage; the third knob deferred there, a pinned `model_reasoning_summary`, was not trialled and remains
+unmeasured. The port source is #436's pinned head `b18d9f031fdf854e74f59586529df1022e805975`; its historical
 observations remain historical.
 
 **Preregistered criteria (written before the trials).** Control is the current main stack-worker profile,
@@ -874,6 +876,19 @@ failure over silent degradation. Keep the existing startup allowances. Do not re
 wins, run the configuration-map check and stop if its new root key is unmapped. Port rehearsal relaxation only
 if a failing-first native test proves that scratch HOME prevents Serena from starting.
 
+**Disclosures added 2026-10-03 after the independent review (the preregistered text above is unchanged).**
+The control's bytes differ between the two trial passes. In the initial trial the control is main's template
+byte for byte (profile sha256 `f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e`). In the
+capture refinement it is this port's template without `required = true` (profile sha256
+`d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1`), which is TOML-equal to main's profile
+but carries the new comments. The driver also deviates from #436's race test: besides adding timestamps, it drops
+#436's cleanup after `proc.wait`, `os.killpg(proc.pid, signal.SIGKILL)` followed by a second `proc.wait()`. The
+`bwrap` wrapper unshares only the network, with no `--unshare-pid` or `--die-with-parent`, so a codex that
+reaches the driver's 120 s timeout, or a background child it leaves, can keep running orphaned after the test.
+The removal followed the builder run's no-process-killing constraint, not a product reason. None of the 36
+retained runs reached the timeout (the longest took 8.433619 s). Restoring the process-group kill of the driver's
+own child is due with the 0.160.0 rerun, which records its driver hash with its new rows.
+
 **Source verification before code.** The installed client and current base pin are `codex-cli 0.159.3`;
 #626 remains open and the coordinator owns the subsequent 0.160.0 rebase and rerun. GitHub release reads on
 2026-10-03 identify `rust-v0.160.0` as both that target and the latest stable tag. Read both the installed
@@ -882,7 +897,7 @@ cache, MCP types, per-step timeout implementation and selected MCP tests are byt
 The schema/config and session files differ elsewhere; the facts below were re-read at the target tag:
 
 - Shared grace: `openai/codex@rust-v0.160.0:codex-rs/core/config.schema.json:7394-7398` defines 1000 ms and zero
-  as waiting for each server's configured startup timeout. `codex-rs/core/src/config/mod.rs:4343-4347` consumes
+  as waiting for each server's configured startup timeout. `codex-rs/core/src/config/mod.rs:4343-4346` consumes
   the setting and `:1836` passes it into MCP configuration. `codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs:270-334`
   consumes it; `:309-311` starts the shared deadline at the first catalog build, after the required-server wait.
 - Required semantics: `openai/codex@rust-v0.160.0:codex-rs/config/src/mcp_types.rs:248-256` and
@@ -943,9 +958,8 @@ first-request latency is 3.051511 s, adding 1.490831 s to the control's 1.560680
 The preference for an existing map entry precedes the initial measured 0.064272 s latency difference.
 The complete-capture medians were 1.568545 s for control, 3.174493 s for A and 2.986330 s for B; the same
 owner-map preference selects A, and the first-request added latency in that repeat is 1.605948 s.
-A also fails
-explicitly before a request when Serena cannot start, while B silently continues; B would wait for every
-enabled optional server, including the existing longer allowances. Do not increase the shared grace.
+A also fails explicitly before a request when Serena cannot start, while B silently continues; B would wait
+for every enabled optional server, including the existing longer allowances. Do not increase the shared grace.
 Cached readiness does not solve fresh-process startup. A per-prompt `mcp://` mention remains an unmeasured
 alternative that would require every brief to name Serena.
 
@@ -1023,10 +1037,10 @@ fixture, retaining all runs and owner-map effects. Reopen the decision if real S
 The optional live route was skipped outside the runtime lane's 06:30-09:00Z window; no provider, model, gateway,
 real Serena, token or other-host acceptance is claimed. No Rust upstream tests were run. The initial trial
 lacked absolute per-run timestamps; its preserved capture refinement includes them and instrument hashes.
-Gate A owns the final-head
-review: the repository templates are not themselves items in `list-frozen`, but the installed stack-worker
-profile's presence and SHA256 are frozen (`codex.stack_worker_profile.present` and `.sha256`), alongside role
-tables and the effective MCP server set. No omniroute profile item is listed. No host apply occurred.
+Gate A owns the final-head review: the repository templates are not themselves items in `list-frozen`, but the
+installed stack-worker profile's presence and SHA256 are frozen (`codex.stack_worker_profile.present` and
+`.sha256`), alongside role tables and the effective MCP server set. No omniroute profile item is listed. No host
+apply occurred.
 
 **Completeness critic.** Covered the installed pin and target/latest source, required and optional starts,
 fresh-process cache limits, per-step timeouts, first-turn tool names, failed-start controls, owner-map propagation,
@@ -1045,3 +1059,11 @@ Both required report generators returned exit 0 (`status: written`). Publication
 the latest main manifest returned exit 1 for those unrelated missing/stale files; its initial own-receipt
 privacy findings were repaired as recorded above. This is not a passed final publication gate. The coordinator
 must rebase, register the actual final content, regenerate reports and obtain `status: passed` before committing.
+
+**Resolution 2026-10-03 (coordinator custody, after the builder run).** The builder's state above stays as recorded.
+The coordinator rebased the port's content onto `6112d14d40f741855f0b961124d98939daaad00e`; that rebase moved one
+cited range, `build_args.py` L355-356 to L356-357, which the omniroute comment and this addendum now cite. The
+registry was then redone as the last commit, `fd252afcac09fbe49fcc31dfed789e314f47d9d6`, and the independent
+review of that head reproduced `python3 scripts/validate.py` and `python3 scripts/evidence_manifest.py --check`
+with exit 0 and `status: passed`. That base still precedes #626, so the 0.160.0 rebase, native rerun and final
+registration remain open, and each later registry commit's exact-head results are recorded on the PR.

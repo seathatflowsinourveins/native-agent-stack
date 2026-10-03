@@ -610,11 +610,12 @@ class TemplateTests(unittest.TestCase):
 
     def test_landscape_sweep_lane_home_matches_the_omniroute_profile(self):
         # The sweep's gateway lane cannot use `-p omniroute` (its one --profile slot is stack-worker), so its lane
-        # home writes the route itself. Every model, provider and feature key it writes must equal the profile's, or
-        # one of them drifted. Its config.toml has no env_key_instructions, key filter or web_search: web_search =
-        # "live" comes from the stack-worker profile and the runner's -c flag, and without the filter a real key in
-        # the sweep's environment reaches the model's commands (recipes/README.md, "Codex through OmniRoute"). No
-        # assertion here pins those absences, so the sweep lane can add the filter without breaking this test.
+        # home writes the route itself. Every model, provider, feature and key-filter setting it writes must equal the
+        # profile's, or one of them drifted. Since #393 its config.toml writes the profile's
+        # [shell_environment_policy.filters] (build_args.py stage_lane_home), which keeps a real key in the sweep's
+        # environment out of the model's commands (recipes/README.md, "Codex through OmniRoute"). It has no
+        # env_key_instructions or web_search: web_search = "live" comes from the stack-worker profile and the runner's
+        # -c flag. No assertion here pins those two absences.
         spec = importlib.util.spec_from_file_location(
             "landscape_sweep_build_args_for_lane_test", ROOT / "tools/sota-convergence/landscape-sweep/build_args.py")
         build_args = importlib.util.module_from_spec(spec)
@@ -637,6 +638,7 @@ class TemplateTests(unittest.TestCase):
         for key, value in staged["model_providers"]["omniroute"].items():
             self.assertEqual(value, provider.get(key), f"model_providers.omniroute.{key}")
         self.assertEqual(staged["features"], profile["features"])
+        self.assertEqual(staged.get("shell_environment_policy"), profile["shell_environment_policy"])
         self.assertEqual(build_args.OMNIROUTE_KEY_ENV, provider["env_key"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_URL, provider["base_url"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_MODEL, profile["model"])

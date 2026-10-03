@@ -46,6 +46,10 @@ Modes:
               (it is 1 in a scratch home, where auth.credentials fails) and startup warnings that rise with the
               role files fail the rehearsal, while an unreadable config.load is only a warning.
               Nothing under the target Codex home is written; the scratch home is removed afterwards.
+              The stack-worker profile marks serena required, so each `-p stack-worker` read starts it as a
+              worker's session start does; where the scratch HOME cannot start serena, the rehearsal fails
+              ("the rehearsal failed; do not apply"). No relaxation flags are ported, and this path has so far
+              run only against a fixture serena, not the real server.
   --apply     refuses while a `codex` process runs or when a file differs from the --expect-* hash the dry run
               printed. Writes a run record and 0600 backups of config.toml and AGENTS.md first (never auth.json
               or any other file), prints the rollback command, then makes the changes, each read back.
