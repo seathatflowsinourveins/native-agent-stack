@@ -16,17 +16,18 @@
     "The client-configuration tool's managed PATH block has a reported root-directory defect (the root directory written as an empty PATH entry); its fix, pull request 619, is not merged, and the destination's PATH block has not been read back after it.",
     "No independent reviewer has inspected the private raw outputs that this receipt quotes; each is bound here by its SHA-256.",
     "Sanitized: Windows and Linux user names, the computer name, every distribution name, home and profile paths, temporary directories, the checkout path and device ids are replaced by placeholders, and session identifiers are left out; the raw transcript and outputs stay private on the host.",
-    "PowerShell cmdlet lines record 0 or 1 from the $? value the step printed (True or False), and assignments and guards record 0 when their block completed; native commands record their own printed exit code, and an exit marked derived follows from the script's structure and its recorded exit.",
+    "PowerShell cmdlet lines record 0 or 1 from the $? value the step printed (True or False), and assignments and guards record 0 when their block completed; native commands record their own printed exit code. An exit marked derived was not printed for its line: it follows from the script's structure, the step's recorded exit or a printed result, and its note states the basis.",
     "jcodemunch_registration records F11's state only (not installed); a registration would not show that a session or subagent uses jCodeMunch.",
     "related_observations and addendum_20261003 list another lane's reported results and later changes for traceability; they are not part of this receipt's claim.",
     "Local integration check of the repository's recipe with actual native returned output; not an upstream test, new-host acceptance, role qualification, or a fresh model or GPU run."
   ],
-  "recorded_at_utc": "2026-10-03T02:09:06Z",
+  "recorded_at_utc": "2026-10-03T03:18:16Z",
   "recipe": {
     "path": "adoption/platforms/linux-wsl2-new-distro.md",
     "recipe_commit": "3a8dc31a67115f85b69709d7ad8c2c5f6ea9f40e (main, pull request 593); the recipe and adoption/templates/wsl/ are unchanged from it to the catalog revision",
     "catalog_revision": "6652b78e272b92d31842b4791a130e4339be8609",
-    "creation_path": "A"
+    "creation_path": "A",
+    "steps_follow": "P1 to F8 follow the recipe at recipe_commit, with one addition: F8's second ss line, over the edited host file's ports 21318 and 21633, is the line that pull request 608 later put in the receipt template (merge 99d5b122c4d6 at 20:58Z, after these steps ran); the recipe's own ss line, ports 24318 and 26333, is the F8 entry before it (the first attempt). F9's install-plan and client-configuration lines also follow the template as pull request 608 changed it. The recipe's two F9 lines at recipe_commit, adoption/bootstrap-linux.sh --profile and the same with --configure-full-profile, were not run; steps lists them with exit null (deviations)."
   },
   "provenance": {
     "owner_go": "The coordinator recorded the owner's go for the final distribution at 2026-10-02T14:38:10Z (a fresh distribution from the merged recipe); P1 started at 14:38:12Z.",
@@ -65,8 +66,15 @@
     "A2-sdk-results 2026-10-02T16:44:50Z to 2026-10-02T16:45:25Z rc=0",
     "G1-config-dryrun 2026-10-02T17:39:03Z to 2026-10-02T17:39:05Z rc=0",
     "G2-config-apply 2026-10-02T17:39:17Z to 2026-10-02T17:39:21Z rc=0",
-    "G3-verify 2026-10-02T17:39:32Z to 2026-10-02T17:39:36Z rc=0"
+    "G3-verify 2026-10-02T17:39:32Z to 2026-10-02T17:39:36Z rc=0",
+    "G4-codex-apply 2026-10-02T20:41:36Z to 2026-10-02T20:41:51Z (the start and end lines G4 printed)",
+    "F10-fragment about 2026-10-02T22:55Z (no printed time: its output file was written at 22:55:03Z, and F11 printed 22:55:08Z)",
+    "F11-jcodemunch 2026-10-02T22:55:08Z (the one time F11 printed)",
+    "W1-skills-plugins 2026-10-03T01:15:48Z to 2026-10-03T01:16:21Z (addendum; the start and end lines it printed)",
+    "W1b-qmd-collections 2026-10-03T01:17:05Z to 2026-10-03T01:17:09Z (addendum; the start and end lines it printed)",
+    "W1c-qmd-embed 2026-10-03T01:17:18Z to 2026-10-03T01:43:27Z (addendum; the start and end lines it printed)"
   ],
+  "timeline_scope": "The entries through G3-verify are the driver's private _timeline.txt (start, end and the exit status the driver recorded; its hash is in raw_outputs). The later entries carry the times each output printed, or its file time where it printed none, and no driver exit status.",
   "raw_outputs": {
     "P1": "bc3df15df8b254a2e0c22ad73f5215cc19abbb2d6de41cc9817ef83eb33cde72",
     "P2": "a30705c81a7e11b203c1c540b6a301f52284438a73eb6cc2950b8908e4d0671a",
@@ -227,7 +235,7 @@
   "ownership_probe": "1000:1000 (W7: stat -c %u:%g of an empty file created from Windows under the user's home after one terminate; exit 0)",
   "idle_observation": "not run: F2's twelve polls were not run on the destination distribution (W1 read instanceIdleTimeout=-1 under [general] and vmIdleTimeout=-1 under [wsl2]); the rehearsal's run 3 listed its throwaway distribution in all twelve polls",
   "subordinate_ids": "/etc/subuid:<WSL_USER>:100000:65536 and /etc/subgid:<WSL_USER>:100000:65536, present before F5's usermod and unchanged after it; usermod was skipped, so the lines come from the user's creation at first boot",
-  "jcodemunch_registration": "not installed: F11's test -x of ${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp exited 1 at 2026-10-02T22:55:08Z; the rest of F11 was skipped",
+  "jcodemunch_registration": "not installed: F11's test -x of ${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp exited 1 at 2026-10-02T22:55:08Z; the rest of F11 was skipped. No step script was kept: the raw output holds only the line 'jcodemunch binary test exit 1' and that time",
   "authorization_settings": "--with-authorization-settings, asked for by the owner on 2026-10-02 (a workflow without permission prompts), on the apply of 20:41:44Z from 099ead33b68f, the pull-request-608 head under review, before that head's last two checks and the Codex read finished (it merged as #608 at 20:58Z, commit 99d5b122c4d6). That apply printed 'authorization settings: applied (--with-authorization-settings; added: Codex approval_policy, Codex sandbox_mode; already the same: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt)', and the same command again printed 'authorization settings: kept (--with-authorization-settings; already the same: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode)'. The two Claude Code values were already in place from the 17:39Z apply at a372ab3b, an earlier head of the same pull request, which printed no authorization line and wrote ~/.claude/settings.json (its keys at 16:03Z were extraKnownMarketplaces and theme; read back at 17:39Z: permissions.defaultMode bypassPermissions, skipDangerousModePermissionPrompt true). Read back at 20:41Z: Codex approval_policy never, sandbox_mode danger-full-access.",
   "failed_attempt_export": {
     "file": null,
@@ -707,31 +715,36 @@
       "step": "W2",
       "cmd": "Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath",
       "exit": 0,
-      "output_excerpt": "(no output; the hash check below matched the downloaded file)"
+      "output_excerpt": "(no output; the hash check below matched the downloaded file)",
+      "note": "exit derived: W2 printed no $? for this cmdlet; the block ran to '[W2 completed without throw]', and the computed hash of the downloaded file equalled the published and listed ones"
     },
     {
       "step": "W2",
       "cmd": "Invoke-WebRequest -UseBasicParsing -Uri \"https://releases.ubuntu.com/$Release/SHA256SUMS\" -OutFile $SumsPath",
       "exit": 0,
-      "output_excerpt": "(no output)"
+      "output_excerpt": "(no output)",
+      "note": "exit derived: W2 printed no $? for this cmdlet; the block ran to '[W2 completed without throw]', and the published hash read from this file is printed below"
     },
     {
       "step": "W2",
       "cmd": "$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \\*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]",
       "exit": 0,
-      "output_excerpt": "(no output)"
+      "output_excerpt": "(no output)",
+      "note": "exit derived: W2 printed no $? for Select-String; the block ran to '[W2 completed without throw]', and the published hash it read is printed below"
     },
     {
       "step": "W2",
       "cmd": "$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq $CatalogName",
       "exit": 0,
-      "output_excerpt": "(no output)"
+      "output_excerpt": "(no output)",
+      "note": "exit derived: W2 printed no $? for this Invoke-WebRequest; the block ran to '[W2 completed without throw]', and the listed hash and URL it read are printed below"
     },
     {
       "step": "W2",
       "cmd": "$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()",
       "exit": 0,
-      "output_excerpt": "(no output)"
+      "output_excerpt": "(no output)",
+      "note": "exit derived: W2 printed no $? for Get-FileHash; the block ran to '[W2 completed without throw]', and the computed hash is printed below"
     },
     {
       "step": "W2",
@@ -749,7 +762,8 @@
       "step": "W2",
       "cmd": "(Get-Item -LiteralPath $ImagePath).Length",
       "exit": 0,
-      "output_excerpt": "418495746"
+      "output_excerpt": "418495746",
+      "note": "exit derived: W2 printed no $? for Get-Item; it printed the length, and the block ran to '[W2 completed without throw]'"
     },
     {
       "step": "W3",
@@ -1440,10 +1454,17 @@
     },
     {
       "step": "F8",
+      "cmd": "ss -ltnH '( sport = :24318 or sport = :29374 or sport = :26333 or sport = :28231 )'",
+      "exit": 0,
+      "output_excerpt": "LISTEN 0      1024   127.0.0.1:26333 0.0.0.0:*\nLISTEN 0      4096   127.0.0.1:24318 0.0.0.0:*",
+      "note": "the recipe's line at recipe_commit, run in the first attempt (2026-10-02T14:48:54Z, raw F8-first-attempt): two of the template's ports had listeners in the shared network namespace, so the page's proof (ss prints nothing) did not hold and the rendered file was edited (deviations)"
+    },
+    {
+      "step": "F8",
       "cmd": "ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'",
       "exit": 0,
       "output_excerpt": "(no output: no listener on the host file's four ports)",
-      "note": "after the port edit below; a first attempt with the template's ports at that revision listed listeners on 127.0.0.1:26333 and 127.0.0.1:24318 (deviations)"
+      "note": "the second attempt (2026-10-02T14:50:20Z), after the port edit below, over the edited host file's four ports; the receipt template carries this line since pull request 608 (99d5b122c4d6)"
     },
     {
       "step": "F8",
@@ -1480,10 +1501,22 @@
     },
     {
       "step": "F9",
+      "cmd": "adoption/bootstrap-linux.sh --profile '<id>'",
+      "exit": null,
+      "output_excerpt": "not run: the recipe's first F9 line at recipe_commit. The install plan's install.sh and accept.sh (below) ran as stage 2 in its place, the change that pull request 608 (99d5b122c4d6) later wrote into the recipe"
+    },
+    {
+      "step": "F9",
+      "cmd": "adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'",
+      "exit": null,
+      "output_excerpt": "not run: the recipe's second F9 line at recipe_commit. The client-configuration tool (below) configured the clients in its place, as pull request 608 later wrote into the recipe"
+    },
+    {
+      "step": "F9",
       "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
       "exit": 0,
       "output_excerpt": "38 result lines: 35 exit 0, 3 measurement-only owners skipped (grafana, loki, playwright-cli), none failed",
-      "note": "I1, 2026-10-02T14:50:50Z to 14:54:30Z at 6652b78e; the exit is the driver's recorded exit status, because the step script's own exit marker line did not print"
+      "note": "I1, 2026-10-02T14:50:50Z to 14:54:30Z at 6652b78e. Exit derived: the step script's '[install exit=...]' marker and closing date never printed, most likely because a child of install.sh read the rest of the step script from the standard input of bash -s. bash then exits with the status of the last command it ran, install.sh, and the driver recorded 0; only on that reading is 0 install.sh's own exit. The 38 result lines are the evidence that nothing failed"
     },
     {
       "step": "F9",
@@ -1517,7 +1550,7 @@
       "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot> --stage after_sign_in",
       "exit": 0,
       "output_excerpt": "codex | after_sign_in | 0\nclaude-agent-sdk | after_sign_in | 0\ncodex-sdk-and-codex-exec-app-server | after_sign_in | 0",
-      "note": "2026-10-02T16:03Z, after the owner's native sign-ins; local-model-server, agent-runtime-worker and research-harnesses were not run"
+      "note": "2026-10-02T16:03Z, after the owner's native sign-ins; local-model-server, agent-runtime-worker and research-harnesses were not run. Exit derived: the step piped each accept.sh run into tail -n 12 and printed no exit code; each slot's row printed '| after_sign_in | 0'"
     },
     {
       "step": "F9",
@@ -1552,21 +1585,21 @@
       "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'",
       "exit": 0,
       "output_excerpt": "~/.local/share/codex-ecosystem/bin/claude\n~/.local/bin/codex",
-      "note": "2026-10-02T22:55Z, after the fragment with five profiles was written; at 15:08Z, before the client configuration, the same command printed ~/.local/bin/claude and ~/.local/bin/codex (exit 0)"
+      "note": "about 2026-10-02T22:55Z (this output printed no time: its file was written at 22:55:03Z, and F11 printed 22:55:08Z), after the fragment with five profiles was written; at 15:08Z, before the client configuration, the same command printed ~/.local/bin/claude and ~/.local/bin/codex (exit 0)"
     },
     {
       "step": "F10",
       "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'",
       "exit": 0,
       "output_excerpt": "executable: ~/.local/share/codex-ecosystem/bin/claude\nexecutable: ~/.local/bin/codex",
-      "note": "2026-10-02T22:55Z"
+      "note": "about 2026-10-02T22:55Z, as the entry before"
     },
     {
       "step": "F11",
       "cmd": "test -x \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
       "exit": 1,
       "output_excerpt": "(no output)",
-      "note": "2026-10-02T22:55:08Z"
+      "note": "2026-10-02T22:55:08Z. No step script was kept: the raw output holds only the line 'jcodemunch binary test exit 1' and that time, so this command line is the recipe's, not a recorded one"
     },
     {
       "step": "F11",
@@ -1614,28 +1647,29 @@
     "cause": null
   },
   "interop_after_unregister": "No unregister in the destination run (path A, every W5 proof held). Before it, R1's removal block removed the two throwaway distributions: after each --unregister, the check in the surviving workstation distribution printed 'Microsoft Windows [Version 10.0.26200.9168]' with exit 0 (run 3 at 11:47Z, run 4 at 13:18Z), and --list --verbose no longer listed the throwaway",
-  "rootless_container": "owed: F3's two rootless-context commands were not run on the destination distribution, before or after F9. Related, and not F3's proof: the install plan installed the container engine in F9 (I1), and accept.sh's container-engine service_health check 'docker run hello-world' returned 0 at about 15:07Z (only the image pull lines were kept, not the container's own output); the rehearsal's run 3 printed name=rootless and 'Hello from Docker!' through the rootless context.",
+  "rootless_container": "owed: F3's two rootless-context commands were not run on the destination distribution, before or after F9. Related, and not F3's proof: the install plan installed the container engine in F9 (I1), and accept.sh's container-engine service_health check 'docker run hello-world' returned 0 during I2 (14:54:30Z to 15:07:30Z), between about 15:01Z and 15:03Z by the row order and curl's printed timeouts (only the image pull lines were kept, not the container's own output); the rehearsal's run 3 printed name=rootless and 'Hello from Docker!' through the rootless context.",
   "stop": null,
   "deviations": [
     "F2's idle observation (the twelve polls) was not run on the destination distribution.",
     "F3's rootless-container check was not run, though the page asks for it before F9 on the first run after the WSL update: owed.",
     "F8: the rendered host file's two template ports at that revision (24318 and 26333) had listeners of the workstation's collector and Qdrant in the shared network namespace (first attempt: ss listed 127.0.0.1:26333 and 127.0.0.1:24318). By the page's rule the rendered file was edited to 127.0.0.1:21318 (the install plan's OTLP/HTTP port) and 127.0.0.1:21633, and ss over the host file's four ports then printed nothing (exit 0). The host template on main carries these ports since #608.",
-    "F9: the install plan's install.sh and accept.sh ran from the clone at 6652b78e (2026-10-02T14:50:50Z to 15:07:30Z); the client-configuration tool was not on main yet. It ran after the native sign-ins, where the page puts it before them: at 17:39:17Z from a372ab3b with --skip codex-config (a Codex session was open), and at 20:41:44Z from 099ead33b68f with --with-authorization-settings (authorization_settings).",
+    "F9 against the named recipe: at recipe_commit, F9 is two adoption/bootstrap-linux.sh lines (--profile '<id>', then the same with --configure-full-profile --host '<host>'). Neither ran (exit null in steps): the install plan's install.sh and accept.sh, and later the client-configuration tool, ran in their place as stage 2, before pull request 608 (merge 99d5b122c4d6 at 20:58Z) wrote that change into the recipe and the receipt template. F9's other step entries and F8's second ss line follow that template, not the recipe at recipe_commit (recipe.steps_follow).",
+    "F9: the install plan's install.sh and accept.sh ran from the clone at 6652b78e (2026-10-02T14:50:50Z to 15:07:30Z); the client-configuration tool was not on main yet. It ran after the native sign-ins, where the page as pull request 608 changed it puts it before them: at 17:39:17Z from a372ab3b with --skip codex-config (a Codex session was open), and at 20:41:44Z from 099ead33b68f with --with-authorization-settings (authorization_settings).",
     "F9's after-sign-in checks ran for codex, claude-agent-sdk and codex-sdk-and-codex-exec-app-server (exit 0 each, 16:03Z); local-model-server, agent-runtime-worker and research-harnesses were not run.",
-    "F10 ran twice: at 15:08Z before the client configuration, and at 22:55Z after the fragment with five profiles (Shell, Codex, Codex resume, Claude, Claude resume) was written. The fragment was saved in the existing fragments folder that holds the workstation's profiles, whose name differs from the folder the platform page names (a recipe finding).",
+    "F10 ran twice: at 15:08Z before the client configuration, and at about 22:55Z (its output file's time and F11's printed time; the output printed none) after the fragment with five profiles (Shell, Codex, Codex resume, Claude, Claude resume) was written. The fragment was saved in the existing fragments folder that holds the workstation's profiles, whose name differs from the folder the platform page names (a recipe finding).",
     "Added instrumentation only: exit-code markers, one transcript per PowerShell block, a groups line after F1 and a plan-present check after F7; F5 and F6 ran as equivalent if/else forms that print which branch ran."
   ],
   "stage_2": {
-    "install": "I1, 2026-10-02T14:50:50Z to 14:54:30Z at 6652b78e: 38 result lines, 35 exit 0 and the three measurement-only owners skipped (grafana, loki, playwright-cli), none failed; driver exit 0",
+    "install": "I1, 2026-10-02T14:50:50Z to 14:54:30Z at 6652b78e: 38 result lines, 35 exit 0 and the three measurement-only owners skipped (grafana, loki, playwright-cli), none failed; the driver recorded exit 0, which is install.sh's own exit only on the reading in its F9 step note (the step's exit marker never printed)",
     "post_install_acceptance": "I2 at 6652b78e: accept.sh exit 0: 35 exit 0 and 29 skipped of 64 rows, none failed",
     "service_health": "I2: --stage service_health exit 1: container-engine 0 and dagu 0 as installed; otel-collector-contrib, prometheus, alerting, gpt-gateway and research-harnesses 28 and local-model-server 1, services the install does not start. I5 (15:07:49Z to 15:08:04Z): otel-collector-contrib, prometheus, alerting and local-model-server 0 each after the plan's documented start commands, then stopped; one 21xxx listener stayed (Dagu's 21080)",
     "failed_units_after_install": "systemd-binfmt.service only (system); none listed for the user manager",
     "versions_15_08Z": "Claude Code 2.1.287, codex-cli 0.160.0, git version 2.53.0, Docker version 29.8.2 (build 7fc2dff), kernel 6.18.40.1-microsoft-standard-WSL2; gh not yet on the login PATH (command not found)",
-    "sign_in": "the owner's native sign-ins inside the destination distribution, after the 15:09Z hand-over and before 16:03Z (the clients were launched interactively at the owner's request); no credential was copied; at 16:03Z codex login status exit 0 and claude auth status loggedIn true",
+    "sign_in": "the owner's native sign-ins inside the destination distribution, after the 15:09Z hand-over and before 16:03Z; the coordinator's private checkpoint note records the hand-over and that no credential was copied, and no raw record of the sign-in sessions is kept. A1 (16:02:45Z to 16:03:17Z) listed one claude and two codex processes and printed codex login status exit 0 and claude auth status loggedIn true",
     "after_sign_in": "16:03Z: codex 0, claude-agent-sdk 0, codex-sdk-and-codex-exec-app-server 0",
-    "sdk_examples": "16:44Z, the plan's own after-sign-in commands extracted unchanged at 6652b78e: the Claude Agent SDK example answered '2 + 2 = 4.' (ResultMessage subtype success, is_error False, one turn, exit 0); the Codex SDK example exited 0 with two command executions and an agent message that reported 'Missing script: \"test\"' (the example has no failing-test fixture). A real turn with tool use, not task quality",
+    "sdk_examples": "16:44Z, the plan's own after-sign-in commands extracted unchanged at 6652b78e: the Claude Agent SDK example answered '2 + 2 = 4.' (ResultMessage subtype success, is_error False, one turn, exit 0); the Codex SDK example exited 0; the step kept only the last 40 lines of its output, which show at least two command executions (the last, npm --logs-max=0 test, exit 1) and an agent message that reported 'Missing script: \"test\"' (the example has no failing-test fixture). A real turn with tool use, not task quality",
     "client_configuration": "17:39:17Z at a372ab3b (codex-config skipped) and 20:41:44Z at 099ead33b68f (codex-config applied, every other step current, verify verified; a second run left every step current). Read back at 20:41Z: Codex MCP servers qmd and serena, codex-cli 0.160.0, codex login status exit 0, Claude Code 2.1.287; claude mcp list at 17:39Z: serena and qmd Connected",
-    "path_proof": "F10 at 22:55Z: claude is the ecosystem launcher (~/.local/share/codex-ecosystem/bin/claude) and codex ~/.local/bin/codex, both executable",
+    "path_proof": "F10 at about 22:55Z: claude is the ecosystem launcher (~/.local/share/codex-ecosystem/bin/claude) and codex ~/.local/bin/codex, both executable",
     "jcodemunch": "not installed (F11)"
   },
   "related_observations": {
@@ -1643,9 +1677,10 @@
     "sources": [
       "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5963830390 (2026-10-03T00:53:25Z)",
       "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5964120696 (2026-10-03T01:29:58Z)",
-      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/617 (open; head f7c813a7e556)"
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/617 (open; head f7c813a7e556)",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/621 (draft, open; head 8ad5378b160f; created 2026-10-03T02:02:12Z): the public record of the accepted reviewer, researcher, MCP and deny-pair observations"
     ],
-    "runtime": "official Claude Code 2.1.288 staged by the SDK lane, with Claude Agent SDK 0.2.163",
+    "runtime": "for the accepted observations: official Claude Code 2.1.288 staged by the SDK lane, with Claude Agent SDK 0.2.163. The first Claude useful-task trial in failures_kept ran on Claude Code 2.1.287 (pull request 617 calls its captures historical 2.1.287)",
     "accepted_bounded_case_observations": [
       "reviewer: query exit 0 in 231.436 s; one foreground handoff (Sonnet 5.5 child, Opus 5.5 parent), candidate unchanged; independent Sol ACCEPT",
       "researcher, declared concise follow-up: query exit 0 in 182.366 s; one attributed Opus 5.5 child, 13 matched source-tool calls, successful parent terminal; independent Astra ACCEPT",

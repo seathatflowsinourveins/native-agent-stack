@@ -3897,7 +3897,7 @@
         "The client-configuration tool's managed PATH block has a reported root-directory defect (the root directory written as an empty PATH entry); its fix, pull request 619, is not merged, and the destination's PATH block has not been read back after it.",
         "No independent reviewer has inspected the private raw outputs that this receipt quotes; each is bound here by its SHA-256.",
         "Sanitized: Windows and Linux user names, the computer name, every distribution name, home and profile paths, temporary directories, the checkout path and device ids are replaced by placeholders, and session identifiers are left out; the raw transcript and outputs stay private on the host.",
-        "PowerShell cmdlet lines record 0 or 1 from the $? value the step printed (True or False), and assignments and guards record 0 when their block completed; native commands record their own printed exit code, and an exit marked derived follows from the script's structure and its recorded exit.",
+        "PowerShell cmdlet lines record 0 or 1 from the $? value the step printed (True or False), and assignments and guards record 0 when their block completed; native commands record their own printed exit code. An exit marked derived was not printed for its line: it follows from the script's structure, the step's recorded exit or a printed result, and its note states the basis.",
         "jcodemunch_registration records F11's state only (not installed); a registration would not show that a session or subagent uses jCodeMunch.",
         "related_observations and addendum_20261003 list another lane's reported results and later changes for traceability; they are not part of this receipt's claim.",
         "Local integration check of the repository's recipe with actual native returned output; not an upstream test, new-host acceptance, role qualification, or a fresh model or GPU run."
@@ -48009,8 +48009,8 @@
     },
     {
       "path": "evidence/receipts/wsl-new-distro-stage1-destination-20261002.json",
-      "sha256": "569eabe879ec3831f95d7bdcfa5480aacddcd6be71b38218ec7fdb943d27fa66",
-      "bytes": 86141
+      "sha256": "b34553234940a7ac44663d7f16c2f865a282d418306ccf7f90c4c9a37f2ccce6",
+      "bytes": 92542
     },
     {
       "path": "evidence/receipts/wsl-retrieval-20260920.json",
@@ -48549,8 +48549,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "f71cb5a7b254ecdb2854f08dc1bb54d58311c01551c8fab562a86293f15b2f78",
-      "bytes": 19845
+      "sha256": "859bfc6ee7a2716738a38dd3ac60893a62543b31809611d82236437c11314fbd",
+      "bytes": 20189
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
