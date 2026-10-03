@@ -15,20 +15,74 @@
   },
   "web_evidence": {
     "allowed": "both families: Claude judges had WebSearch and WebFetch; GPT judges ran codex exec with web_search=live through the OmniRoute gateway",
-    "claude": {"web_searches": {"decide": 88, "critic": 21, "adjudicate": 8}, "runs_that_searched": {"decide": "37 of 38", "critic": "12 of 19", "adjudicate": "8 of 18"},
-               "note": "Claude Code runs WebSearch (and WebFetch processing) through a helper model, claude-haiku-4-5; the judge model's own server-side search counter stays 0. The search results themselves are not in the retained envelopes."},
-    "gpt": {"search_items": {"decide": {"empty_results": 83, "with_results": 0}, "critic": {"empty_results": 30, "with_results": 0}, "adjudicate": {"empty_results": 42, "with_results": 2}},
-            "cause": "the gateway's search route has no credentialed search provider and falls back to a keyless provider that returned nothing from this host (docs/decisions/2026-10-02-omniroute-mac-rebuild.md, Limits)"},
-    "consequence": "The two families had the same dossiers and source clones, but not the same live web evidence: the Claude judges could consult web results, the GPT judges in effect could not. Agreement between the families rests on the shared dossiers and clones; where they differed, this asymmetry is one possible factor."
+    "claude": {
+      "web_searches": {
+        "decide": 88,
+        "critic": 21,
+        "adjudicate": 8
+      },
+      "runs_that_searched": {
+        "decide": "37 of 38",
+        "critic": "12 of 19",
+        "adjudicate": "8 of 18"
+      },
+      "note": "Claude Code runs WebSearch (and WebFetch processing) through a helper model, claude-haiku-4-5; the judge model's own server-side search counter stays 0. The search results themselves are not in the retained envelopes."
+    },
+    "gpt": {
+      "search_items": {
+        "decide": {
+          "empty_results": 83,
+          "with_results": 0
+        },
+        "critic": {
+          "empty_results": 30,
+          "with_results": 0
+        },
+        "adjudicate": {
+          "empty_results": 42,
+          "with_results": 2
+        }
+      },
+      "cause": "the gateway's search route has no credentialed search provider and falls back to a keyless provider that returned nothing from this host (docs/decisions/2026-10-02-omniroute-mac-rebuild.md, Limits)"
+    },
+    "consequence": "The two families had the same dossiers and source clones, but not the same live web evidence: the Claude judges searched (their results are not retained, so whether every search returned results is unverified), the GPT judges' searches returned nothing and their direct network attempts were blocked. The live web also carries this repository's public records, which name the manifest's picks; a result read but not cited would not show in the contamination audit. Agreement between the families rests on the shared dossiers and clones; where they differed, this asymmetry is one possible factor."
   },
   "adjudicator_anonymity": "Adjudicators saw the two families' critic returns as A and B in both orders. A return's text can still name contenders whose names coincide with the families (claude-code, codex and similar) or carry a family's style; the returns were not audited one by one for such signals.",
   "usage_provider_returned": {
     "note": "Sums of the usage each call returned. A lower bound: attempts whose records were deleted after a usage-limit stop are not counted, and the coordinator's own usage and the separate repair workflow are outside these figures.",
-    "dossiers": {"claude-sonnet-5-5 (writers)": {"input_incl_cache": 3229072546, "cache_read": 3163800780, "output": 23728477},
-                 "claude-opus-5-5 (verifiers)": {"input_incl_cache": 159337784, "cache_read": 143799350, "output": 5108468},
-                 "claude-haiku-4-5 (helper)": {"input_incl_cache": 911197, "output": 66790}},
-    "claude_judges": {"claude-opus-5-5": {"input_incl_cache": 401334449, "output": 4112833}, "claude-haiku-4-5 (helper)": {"input_incl_cache": 7300037, "output": 187505}},
-    "gpt_judges": {"cx/gpt-6-astra": {"input": 109185613, "cached_input": 98054144, "output": 1593483}}
+    "dossiers": {
+      "claude-sonnet-5-5 (writers)": {
+        "input_incl_cache": 3229072546,
+        "cache_read": 3163800780,
+        "output": 23728477
+      },
+      "claude-opus-5-5 (verifiers)": {
+        "input_incl_cache": 159337784,
+        "cache_read": 143799350,
+        "output": 5108468
+      },
+      "claude-haiku-4-5 (helper)": {
+        "input_incl_cache": 911197,
+        "output": 66790
+      }
+    },
+    "claude_judges": {
+      "claude-opus-5-5": {
+        "input_incl_cache": 401334449,
+        "output": 4112833
+      },
+      "claude-haiku-4-5 (helper)": {
+        "input_incl_cache": 7300037,
+        "output": 187505
+      }
+    },
+    "gpt_judges": {
+      "cx/gpt-6-astra": {
+        "input": 109185613,
+        "cached_input": 98054144,
+        "output": 1593483
+      }
+    }
   },
   "usage_limit_stops": [
     "Claude session limits stopped the dossier stage on 2026-10-02 at about 04:40Z, 19:46Z and 22:03Z and on 2026-10-03 at about 02:26Z and 05:00Z, and the Claude decide stage at 08:29Z.",
@@ -37,5 +91,23 @@
   "orchestration": "Wrappers outside this folder started the frozen runner after a usage reset, stopped it when three or more records failed within ten seconds, ordered the stages as above, and deleted records without a result. They changed no prompt, model, tool, schema or decision.",
   "coordinator_incident": "Adjudication started 25 minutes after the critics finished: the coordinator's progress monitor had the critics chain's script name in its own command line, so the adjudication chain's process check waited for the monitor to expire. No output changed.",
   "committed_copy_changes": "Three committed dossier copies carry 12-character commit hashes for the repository's secret scanner (README).",
-  "amendments": "1 (prompt after --), 2 (audit of #602), 3 (re-verification), 4 (compare.py defect fix made with the results known)"
+  "amendments": "1 (prompt after --), 2 (audit of #602), 3 (re-verification), 4 (compare.py defect fix made with the results known)",
+  "gpt_read_audit": {
+    "commands_audited": {
+      "decide": 1218,
+      "critic": 688,
+      "adjudicate": 598
+    },
+    "other_family_records": "no command named or read decisions/, critics/, adjudications/, adjudication-dirs/ (other than its own) or raw/",
+    "reads_outside_working_folder": "25 reads of skill files by absolute path: the system skill openai-docs that codex installed under the isolated CODEX_HOME, and the user-level skills verification-before-completion and ecosystem-catalog under ~/.agents/skills; 2 searches for AGENTS.md up the directory tree and 1 listing of AGENTS.md files in the run directory, all of which found none outside the clones",
+    "network": "101 commands named a URL; none returned live data (the sandbox does not resolve hosts; errors were caught inside the commands)",
+    "skill_listing": "Codex lists the skills it discovers to the model: the 30 skills under ~/.agents/skills (which an isolated CODEX_HOME does not hide) and the 5 system skills it installed in the isolated CODEX_HOME. The clean-room probe tested instruction files, not skills. The Claude judges ran in safe mode, which disables skills.",
+    "exposed_slots": [
+      "web-research/browser-interaction: a user skill named agent-browser, shipped by the contender vercel-labs/agent-browser (the round's nomination)",
+      "instructions-skills/task-scoped-skill-pack: user skills shipped by trailofbits/skills (9), mattpocock/skills (8) and typesafe-ai/skills, openai/skills and affaan-m/ecc (the round's pick, trailofbits/skills, agrees with #602)",
+      "ci-supply-chain/findings-publication: a user skill named codeql (from trailofbits/skills), next to the contender github/codeql-action (a contest)",
+      "cross:runtime-workers: codex's own system skills, which openai/codex ships (the pin conflict picks openai/codex)"
+    ],
+    "consequence": "On these slots the GPT vote is not independent of the user's installed tools; the Claude vote is. Elsewhere the skill listing named no contender of the unit (generic skill names that many repositories vendor, such as skill-creator or tdd, are not counted)."
+  }
 }

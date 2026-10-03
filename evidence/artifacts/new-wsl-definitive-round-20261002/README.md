@@ -11,7 +11,9 @@ hand-off to the manifest's owner and a pin conflict goes to the user (amendment 
 Why a clean room: `codex exec` loads `$CODEX_HOME/AGENTS.md`, and workflow subagents receive the global `CLAUDE.md`;
 both files name candidates of this field, so the earlier two-family agreement on those layers was not independent
 (`evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/instruction-probe.json`). Here no judge, writer or verifier
-sees an instruction file, hook, skill or MCP server (`clean-room.json`, with its probes).
+sees an instruction file, hook or MCP server (`clean-room.json`, with its probes). Skills are the exception on the
+GPT side: codex listed the user's skills and its own system skills to the GPT judges, which exposes four slots
+(`run-notes.json`, `gpt_read_audit`); the Claude side ran in safe mode without skills.
 
 | File | What it is |
 | --- | --- |

@@ -20,6 +20,11 @@ sha256).
   - Claude Opus 5.5 at max, through `claude -p --safe-mode --restricted --strict-mcp-config`;
   - GPT-6 Astra at max, through `codex exec` with an isolated `CODEX_HOME` on the OmniRoute gateway.
 - Probes show that no instruction file reached either family (`clean-room.json`).
+- Skills are the exception on the GPT side. Codex listed the user's installed skills and its own system skills to the
+  GPT judges, and some read skill files by path. That exposes four slots on the GPT side (Limits); the Claude side ran
+  in safe mode without skills.
+- No GPT judge read the other family's records: an audit of all 2,504 GPT shell commands found none (`run-notes.json`,
+  `gpt_read_audit`).
 - Slots where the families differed, or where one family was undetermined, went to four adjudicators: one per family, in
   both A/B orders.
 
@@ -60,8 +65,21 @@ allowed in each.
 
 ## Limits
 
+- **GPT-side skill exposure.** An isolated `CODEX_HOME` does not hide `~/.agents/skills`, and codex lists the skills it
+  finds. The GPT judges therefore saw the names of the user's installed skills. On four slots the GPT vote is not
+  independent of the user's installed tools; the Claude vote is:
+  - browser interaction: an `agent-browser` skill, shipped by that contender;
+  - the task-scoped skill pack: skills from trailofbits/skills, mattpocock/skills and others;
+  - findings publication: a `codeql` skill;
+  - the runtime-worker slots: codex's own system skills.
+
+  The clean-room probe tested instruction files, not skills. A re-run should point codex's skill discovery at an empty
+  folder.
 - **Unequal live web evidence.** Both families had the same dossiers and source clones.
   - The Claude judges ran 117 web searches through Claude Code's WebSearch tool, which uses a helper model (Haiku 4.5).
+    The results are not retained, so whether every search returned results is unverified. The live web also carries
+    this repository's public records, which name the manifest's picks, and a result read but not cited would not show
+    in the contamination audit.
   - The GPT judges' 157 searches through the gateway came back empty, except 2 in adjudication. The gateway has no
     credentialed search provider (the Mac gateway record, Limits).
   - Agreement rests on the shared evidence. Where the families differed, this asymmetry is one possible factor
