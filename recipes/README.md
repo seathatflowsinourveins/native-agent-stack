@@ -122,15 +122,20 @@ source commit `cc326e45a6213360266dda4b30cc68095946d676`.
 Download the Linux amd64 archive and its publisher checksums into an explicit
 scratch directory, check the archive before extracting into a versioned prefix,
 and invoke that executable directly. These are the native archive and validation
-commands retained in the [W1 receipt](../evidence/receipts/syft-1540-qualification-20261003.json):
+commands retained in the [W1 receipt](../evidence/receipts/syft-1540-qualification-20261003.json).
+The commands are joined with `&&`: each one runs only after the previous one
+succeeded. A failed download, a checksum mismatch, or a checksum file that names
+no downloaded file (`--ignore-missing` then reports that no file was verified
+and exits 1) stops the chain before anything is extracted or executed. The
+chain does not depend on the shell's `errexit` setting.
 
 ```sh
 SYFT_W1_DOWNLOAD="$STACK_HOME/downloads/syft-1.54.0"
 SYFT_W1_PREFIX="$STACK_HOME/tools/syft-1.54.0"
-mkdir -p "$SYFT_W1_DOWNLOAD" "$SYFT_W1_PREFIX"
-gh release download v1.54.0 --repo anchore/syft --dir "$SYFT_W1_DOWNLOAD" --pattern syft_1.54.0_linux_amd64.tar.gz --pattern syft_1.54.0_checksums.txt
-(cd "$SYFT_W1_DOWNLOAD" && sha256sum --check --ignore-missing syft_1.54.0_checksums.txt)
-tar --no-same-owner -xzf "$SYFT_W1_DOWNLOAD/syft_1.54.0_linux_amd64.tar.gz" -C "$SYFT_W1_PREFIX"
+mkdir -p "$SYFT_W1_DOWNLOAD" "$SYFT_W1_PREFIX" &&
+gh release download v1.54.0 --repo anchore/syft --dir "$SYFT_W1_DOWNLOAD" --pattern syft_1.54.0_linux_amd64.tar.gz --pattern syft_1.54.0_checksums.txt &&
+(cd "$SYFT_W1_DOWNLOAD" && sha256sum --check --ignore-missing syft_1.54.0_checksums.txt) &&
+tar --no-same-owner -xzf "$SYFT_W1_DOWNLOAD/syft_1.54.0_linux_amd64.tar.gz" -C "$SYFT_W1_PREFIX" &&
 "$SYFT_W1_PREFIX/syft" version -o json
 ```
 
