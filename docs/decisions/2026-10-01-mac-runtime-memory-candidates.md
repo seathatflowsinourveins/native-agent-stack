@@ -45,20 +45,29 @@ The canonical NAS owner records this dated delta without rewriting historical ex
 ## Status on 2026-10-03
 
 The October 1 next gate, reproducing C3/C4 on official 2.5.2 and preregistering
-a surviving host, is no longer queued work. The Mac memory decision unit closed
-on October 2, retaining official ai-memory 2.5.2 as the single shared-memory
-owner and queuing no candidate experiment, holdout or canary
+a surviving host, is no longer queued work for this Mac record. The Mac memory
+decision unit closed on October 2, retaining official ai-memory 2.5.2 as the
+single shared-memory owner and queuing no candidate experiment, holdout or
+canary
 ([closed qualification verdict](../../blueprints/memory-stack/native-qualification/VERDICT.md),
+[closure record](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4ced2923063db6a6dcafa9f25af5ee05a4153c75/blueprints/memory-stack/native-qualification/closure.json#L4-L8),
 [Mac Claude resolution](2026-10-02-mac-claude-resolution.md#acceptance-boundaries)).
 A replacement requires a new, explicitly scoped decision unit
 ([replacement boundary](../../blueprints/memory-stack/native-qualification/VERDICT.md#known-limits-are-final-dispositions-not-running-tests)).
 
-The two-host architecture retains the Mac owner's 2.5.2 runtime beside the
-older main component lock at 2.4.1
-([two-host architecture](2026-10-02-two-host-north-star-architecture.md#current-sources-accepted-pins-and-upgrade-decisions)).
-The new-WSL destination's ai-memory 2.5.2 selection belongs to its
-[source profile](../../adoption/new-wsl-profile.md) and that profile's own
-acceptance; nothing in this Mac record transfers acceptance to it.
+The two-host architecture records the Mac owner's 2.5.2 runtime beside the
+older main component lock at 2.4.1, whose pin update stays open
+([two-host architecture](2026-10-02-two-host-north-star-architecture.md#current-sources-accepted-pins-and-upgrade-decisions),
+[2026-10-03 amendment](2026-10-02-two-host-north-star-architecture.md#amendment-2026-10-03-wsl-scope)).
+On the new-WSL destination, ai-memory 2.5.2 is only the source profile's pinned,
+unprovisioned head-to-head comparison arm
+([source profile](../../adoption/new-wsl-profile.md),
+[definitive defaults](2026-10-01-new-wsl-definitive-defaults.md)).
+That destination's memory owner waits for its own head-to-head and acceptance,
+and nothing in this Mac record transfers selection or acceptance to it
+([profile entry](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4ced2923063db6a6dcafa9f25af5ee05a4153c75/adoption/new-wsl-profile.json#L2407-L2455),
+[memory-owner slot](2026-10-01-new-wsl-definitive-defaults.md#the-six-slots-of-the-foundations-decision-round),
+[durable-memory layer](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4ced2923063db6a6dcafa9f25af5ee05a4153c75/catalogs/foundation/new-wsl-architecture-20261001.json#L576-L604)).
 
 The original lifecycle failures, 20-second rerank mismatch, invalid synthesis
 JSON and stale pure-compaction recall remain preserved
