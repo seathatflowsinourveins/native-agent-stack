@@ -128,6 +128,14 @@ The [host and paper activation packet](2026-10-02-north-star-host-paper-activati
 records supported next steps and missing destination/account prerequisites.
 These additions preserve the 21 carried gate dispositions above.
 
+The corrected-harness update on2026-10-03 retains the original source results
+and adds new prospective two-process qualifications: stress142/142 each with a
+case-consistent receipt ID, and native refusal98/98 each with exact retained
+cached/callback event agreement. The production historical CLI separately
+verifies136/136 checks against eight unchanged archived sources, without a new
+engine. See the dated stress/refusal receipts in the runtime record; these
+repairs do not change the21foundation dispositions or grant host/paper admission.
+
 Full production/full-stack readiness remains **false**. Optional exclusions do
 not reduce that claim to a passed subset. Separate research data, realistic
 simulation and broker-specific paper faults remain trading acceptance gates;

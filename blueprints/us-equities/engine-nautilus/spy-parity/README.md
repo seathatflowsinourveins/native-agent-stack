@@ -297,3 +297,44 @@ remain preserved. This qualifies only the frozen economic refusal; native
 `MARKET`/`DENIED` labels do not provide general LEAN MOO execution equivalence.
 Maintenance/liquidation/adaptive cases, surviving workstation activation, data
 fitness and actual paper brokers keep their separate gates.
+
+## Corrected harness qualification — 2026-10-03
+
+The current [stress receipt](receipt-stress-review-fixes-20261003.json) binds
+corrected source `ae6778e850d5fd05e510d9cef65c0988ec849ef2`: two new fenced
+processes each pass 142/142 checks, with four equal UUID-normalized exports.
+The raw stress ID is now `spy-parity-one-stress-v2`. The old raw stress receipts
+retain their contradictory `one_zero` ID as historical evidence; the current
+comparator refuses that contradiction. Stress-only cost code loads lazily,
+preserving the zero-cost case's original eight-file source set.
+
+The current [refusal receipt](receipt-over-limit-review-fixes-20261003.json)
+binds `e73af98d5eea2325113a64fc62d7981303757287` and the separately named
+[successor manifest](mapping-manifest-over-limit-review-fixes-20261003.json).
+After independent review of thirteen exact sources and four exact commands,
+two new native processes each pass 98/98 checks. Every strategy callback stream
+matches the original cached order events exactly: `OrderInitialized`, then
+`OrderDenied`, including IDs, timestamps and the native denial reason.
+Missing, empty, lost, reordered or mutated streams fail comparison.
+All four native exports match after the declared UUID-only normalization.
+No fills, fees or positions occur; free/total cash remains 100000.00 USD.
+
+The original refusal manifest remains byte-identical and refuses the changed
+source seal. Both current `over_limit.py run` and `compare` commands require
+`--mapping-manifest /harness/mapping-manifest-over-limit-review-fixes-20261003.json`.
+Its ten-source stress seal binds the newly qualified stress receipts. The oracle,
+inputs, configuration, locks and tolerances remain unchanged.
+
+The production historical comparator also passed 136/136 checks against the
+unchanged v2 receipt and all eight archived sources, without running an engine:
+
+```text
+/opt/north-star-runtime/bin/python -I /harness/compare.py --receipt /harness/receipt-v2.json --oracle /historical-simulation/receipt.json --lean-data /data --case one_zero --source-dir /repo/blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a --verdict /out/verdict.json
+```
+
+`--source-dir` requires the actual directory; the symlink `/harness` is refused.
+The thirteen-file refusal binder supports only its current reviewed harness,
+not the eight-file historical archive. Original receipts, failures and seals
+remain historical. These Linux ARM64 simulations on the Mac do not qualify
+a changed-source `one_zero` engine replay, a surviving WSL2 host, the remaining
+margin/adaptive cases, production data or paper accounts.

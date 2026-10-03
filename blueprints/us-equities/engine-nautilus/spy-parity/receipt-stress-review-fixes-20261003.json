@@ -1,0 +1,198 @@
+{
+  "schema": "spy-parity-qualified-summary/1",
+  "schema_version": 1,
+  "id": "nautilus-spy-stress-review-fixes-two-processes-20261003",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "Corrected source ae6778e passes142/142 strict checks in each of two fresh fenced native rc5 stress processes, with case-specific receipt identity, four matching UUID-normalized exports, zero skips/failures and unchanged cash tolerance.",
+  "limitations": [
+    "Task-owned Linux ARM64 simulation on the Mac; no surviving NativeStack WSL2 or broker acceptance.",
+    "Native per-order Money rounding yields90357.99USD versus Decimal90357.995840 under the unchanged0.01USD allowance.",
+    "One frozen stress case; changed-source one_zero engine replay, maintenance/liquidation/adaptive, production data fitness and paper gates remain separate.",
+    "Original contradictory stress receipt IDs, historical failed attempts and719 CI are preserved at their own source and scope.",
+    "No model, account or provider call; full-stack readiness is false; whole-task usage and net savings unknown."
+  ],
+  "case": "one_stress",
+  "evidence_class": "HIST: actual pinned native BacktestEngine; offline frozen-data simulation",
+  "harness_commit": "ae6778e850d5fd05e510d9cef65c0988ec849ef2",
+  "engine": {
+    "package": "nautilus_trader",
+    "version": "2.0.0rc5",
+    "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "python": "3.13.16",
+    "official_container_image": "docker.io/library/python@sha256:110e8d1de526341568b8fcdb1773b0d47ad63309df21980c6028803226a2dab0",
+    "platform": "Linux ARM64 in a task-owned macOS VM; not NativeStack WSL2 acceptance",
+    "extension_sha256": "d03e4ac01a3675f91a3c7edde999735fefcc89bfb910f1fdaab946ab5e0beed3"
+  },
+  "prospective_review": {
+    "completed_utc": "2026-10-03T03:46:32.336266+00:00",
+    "verdict": "PASS",
+    "unresolved_findings": 0,
+    "original_record_sha256": "5073de37dd70fad5cdc1ba4050730d66197dfb29a6dbc2863d77b3dd8ef18e9e",
+    "scope": "Independent Stage1 corrected-source review and exact revised argv completed before both new engine processes.",
+    "reviewed_source_sha256": {
+      "PREREGISTRATION-stress-20261002.md": "c7c80352d49296fd7fcb30040605e175077dbe76bb25d48a37a661931cbc7799",
+      "compare.py": "64bc8e2812a3a70a38bf25f0efdf0df5f3f44753d87663f004ccd92f943c17fa",
+      "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "cost_models.py": "5b46bbe7042d60851eb22bde4a00430c9e7e793356e1460fd32672424a163b92",
+      "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "fixture_strategy.py": "90ed38609de9082c5a8ba3f3fd13967b1520a371b970a04c523b8ebdfe70df4e",
+      "mapping-manifest-stress-20261002.json": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039",
+      "requirements-stress-linux-arm64-py313.lock": "8d6564b26f093a9da4383f74d06a47e0b212fbae2fd3058fbc7b9ca4a1e5a878",
+      "requirements-stress-macos-arm64-py313.lock": "2f8e40e1b75a4fe28b13da8f054d838c3fdee746d16603bb350e63fed7226539",
+      "run.py": "8918c8f776557dc078c91f2f8638ad2fe783753a04febf2a3371c665e743b0bc"
+    }
+  },
+  "isolation": {
+    "zero_engine_fence_passed": 10,
+    "zero_engine_fence_failed": 0,
+    "fence_receipt_sha256": "52fa54805c89816493f621075dde8eb74b2badf2121222b2477e47c4ec2990aa",
+    "frozen_argv_sha256": "9750896098dce2456fe6c8fc649af261c2b8132d8b44f59ad05e796c00427adb",
+    "boundary": "Read-only source/runtime/data mounts, new PID/user namespaces, Python -I, cleared environment, loopback-only network; no host HOME or broker secrets",
+    "preserved_failed_attempts": "C1 mount-propagation denial; C2 proc-mount denial; C3 uses task-container systempaths=unconfined with the inner strict bubblewrap fence",
+    "foreign_sentinel_sha256": "c9e731585d0af9294f0361e08fb6510aa10a2f96b136f2a1b89f524167353dd3",
+    "fresh_preflight": {
+      "started_at_utc": "2026-10-03T03:39:14.393665+00:00",
+      "completed_at_utc": "2026-10-03T03:39:14.785449+00:00",
+      "child_exit_code": 0,
+      "controller_exit_code": 0,
+      "log_sha256": "c44b0d1d6489d9653fb4a02c387ba1abbfbc9f5340651a2141f3a1f6f2e76e7c",
+      "freeze_sha256": "0640b1b2cbea4356280f35abab505bfbbe0e3175a87e67f82010f84627edee49"
+    }
+  },
+  "frozen_inputs_sha256": {
+    "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899",
+    "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+    "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+    "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+    "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf"
+  },
+  "fresh_processes": [
+    {
+      "process": 1,
+      "started_utc": "2026-10-03T03:49:39.447065+00:00",
+      "native_exit": 0,
+      "comparison_exit": 0,
+      "strict_verdict": "PASS",
+      "execution_checks_passed": 123,
+      "preconditions_passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "complete": true,
+      "preregistration_qualifying": true,
+      "original_receipt_sha256": "4383ee16167533dd7071073ca262a373695b18d11ce5534e377ff7c5c2375b9d",
+      "original_verdict_sha256": "0984e5fbf411441e446656c313a130ca2fb3777a8834ff550dda236d0f0e94cc",
+      "receipt_id": "spy-parity-one-stress-v2"
+    },
+    {
+      "process": 2,
+      "started_utc": "2026-10-03T03:50:06.815326+00:00",
+      "native_exit": 0,
+      "comparison_exit": 0,
+      "strict_verdict": "PASS",
+      "execution_checks_passed": 123,
+      "preconditions_passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "complete": true,
+      "preregistration_qualifying": true,
+      "original_receipt_sha256": "bb4d6112469c79056280391be42fe747d22f4db80942f55597faf498ba9660cb",
+      "original_verdict_sha256": "42526eeb56efc46fef5fe245f7db81e647d20800ff9dc4117329292d82ec39d8",
+      "receipt_id": "spy-parity-one-stress-v2"
+    }
+  ],
+  "economics_equal_between_processes": true,
+  "currency_rounding": {
+    "native_entry_notional_usd": "98565.06",
+    "native_exit_notional_usd": "88496.41",
+    "unchanged_absolute_cash_tolerance_usd": "0.01",
+    "note": "Native per-order Money rounding differs from the prospectively predicted cent display90358.00. The measured90357.99 is published unchanged; the frozen oracle and tolerance are unchanged."
+  },
+  "determinism": {
+    "fresh_native_engine_exports": 4,
+    "normalization": "Declared native UUID-only normalization",
+    "all_four_normalized_sha256": "3b8b00986de055ad7b8d5a22be81598c68d313f16a4253403023eea957948f79",
+    "bars_per_engine": 725,
+    "error_log_lines_per_engine": 0,
+    "negative_cash_events": 0,
+    "final_open_orders": 0,
+    "final_open_positions": 0,
+    "final_pending_intents": 0,
+    "strategy_callback_errors": 0
+  },
+  "limits": {
+    "0": "This summary publishes selected exact facts and original evidence digests; full receipts, logs, review and controller records remain in private task evidence.",
+    "1": "This is one frozen cost-and-rounding stress case. It does not qualify margin/adaptive cases, research data fitness, NativeStack WSL2, paper brokers or shared inference lifecycle.",
+    "2": "No account, model or provider operation occurred. Whole-task usage and net savings remain unknown.",
+    "full_stack_readiness": false
+  },
+  "raw_receipt_id": "spy-parity-one-stress-v2",
+  "receipt_source_sha256": {
+    "PREREGISTRATION-stress-20261002.md": "c7c80352d49296fd7fcb30040605e175077dbe76bb25d48a37a661931cbc7799",
+    "compare.py": "64bc8e2812a3a70a38bf25f0efdf0df5f3f44753d87663f004ccd92f943c17fa",
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "cost_models.py": "5b46bbe7042d60851eb22bde4a00430c9e7e793356e1460fd32672424a163b92",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "fixture_strategy.py": "90ed38609de9082c5a8ba3f3fd13967b1520a371b970a04c523b8ebdfe70df4e",
+    "mapping-manifest-stress-20261002.json": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039",
+    "mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+    "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+    "requirements-stress-linux-arm64-py313.lock": "8d6564b26f093a9da4383f74d06a47e0b212fbae2fd3058fbc7b9ca4a1e5a878",
+    "requirements-stress-macos-arm64-py313.lock": "2f8e40e1b75a4fe28b13da8f054d838c3fdee746d16603bb350e63fed7226539",
+    "run.py": "8918c8f776557dc078c91f2f8638ad2fe783753a04febf2a3371c665e743b0bc",
+    "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+  },
+  "controller_evidence_sha256": [
+    {
+      "process": 1,
+      "stage": "run",
+      "record_sha256": "6208802073a4d7dc3fcc680f62203a5140ce9e0bb92169b1c5542850ec352a26",
+      "log_sha256": "8fa80b8e75b413db76a65b4ac70330749514a69b63fdbfdd3b308fb61e1fb54e",
+      "child_exit_code": 0,
+      "controller_exit_code": 0
+    },
+    {
+      "process": 1,
+      "stage": "compare",
+      "record_sha256": "b542659dc12a601fcb2fa9b33afce487e6efff3c258e93de58982bd30867c21c",
+      "log_sha256": "a2301cc2d7edecae82f2158bd95204a0b15cb035456c3c97b8e4208e8e7f5f8f",
+      "child_exit_code": 0,
+      "controller_exit_code": 0
+    },
+    {
+      "process": 2,
+      "stage": "run",
+      "record_sha256": "fab9f55f8780b6be9fc588dd573dae8365ec17ca187f3ee6f810b1a4f0a67d20",
+      "log_sha256": "8fa80b8e75b413db76a65b4ac70330749514a69b63fdbfdd3b308fb61e1fb54e",
+      "child_exit_code": 0,
+      "controller_exit_code": 0
+    },
+    {
+      "process": 2,
+      "stage": "compare",
+      "record_sha256": "5524bdf5598ac00169c607c5a451e34ee3bf05abf8c42d84805221fa8f14a19e",
+      "log_sha256": "c2ab4ee8e3e29082574e85e1739a8e13e6d43d95537f9681760025230968496a",
+      "child_exit_code": 0,
+      "controller_exit_code": 0
+    }
+  ],
+  "historical_v2_cli": {
+    "case": "one_zero",
+    "archived_source_directory": "historical-source-v2-a2ad39a",
+    "source_files": 8,
+    "checks_passed": 136,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "verdict_sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4",
+    "new_engine_execution": false,
+    "scope": "Current production compare.py --source-dir binds the unchanged historical receipt and all eight archived files."
+  },
+  "corrected_source_scope": [
+    "Stress-only lazy cost_models.py execution preserves one_zero's original eight-file source set.",
+    "Schema2 receipt IDs now agree with one_zero/one_stress; contradictory or missing IDs are refused.",
+    "The production --source-dir CLI exposes the strict archived receipt/source binder."
+  ]
+}

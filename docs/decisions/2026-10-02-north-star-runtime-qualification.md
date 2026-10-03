@@ -1,10 +1,69 @@
 # North Star offline runtime qualification
 
-Date: 2026-10-02. Scope: deterministic frozen-data simulation and source-level
+Date: 2026-10-02; corrected-harness update 2026-10-03. Scope: deterministic frozen-data simulation and source-level
 paper-recovery contracts. The [foundation execution record](2026-10-02-north-star-readiness-execution.md)
 and [two-host architecture](2026-10-02-two-host-north-star-architecture.md)
 retain the selected repositories, native clients and all twenty layers.
 This record reports observed execution and the remaining admission gates.
+
+## Corrected-harness qualification, 2026-10-03
+
+Four valid PR review findings required fresh source acceptance: an unbound
+stress-cost import in the zero-cost case, a fixed stress receipt ID, an archived
+source binder missing from the production CLI, and unchecked native denial
+callback evidence. Corrected source loads cost models only for the stress case,
+derives case-consistent IDs, exposes strict `--source-dir` binding and refuses
+missing, empty, reordered, retimed or mutated callback streams.
+The original receipts, eight archived files and original refusal seal remain
+byte-identical; their dated results below preserve their original scope.
+
+The independent Stage 1 review completed at 03:46:32 UTC before new stress
+starts at 03:49:39 and 03:50:06. At source
+`ae6778e850d5fd05e510d9cef65c0988ec849ef2`, each strict comparison passes
+**142/142**, zero failures/skips, with the correct raw ID
+`spy-parity-one-stress-v2`. All four normalized exports match. Cash remains
+90357.99 USD against Decimal90357.995840 under the unchanged0.01 USD allowance.
+The [dated stress receipt](../../blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-review-fixes-20261003.json)
+binds original private receipt/verdict/review/controller digests and the actual
+ten reviewed/thirteen exported source hashes.
+
+The separately committed
+[successor manifest](../../blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-over-limit-review-fixes-20261003.json)
+seals those newly qualified ten stress sources. The original manifest defaults
+to its old seal and fails closed against changed source. Run and comparison must
+both explicitly select the successor name and digest. At source
+`e73af98d5eea2325113a64fc62d7981303757287`, Stage 2 independently accepted
+thirteen sources and four exact commands at 04:10:13 UTC, before fresh refusal
+starts at 04:11:22 and 04:11:29. Both strict comparisons pass **98/98**.
+All four original exports retain callback events exactly equal to cached native
+order events: `OrderInitialized`, then `OrderDenied`, with unchanged IDs,
+timestamps and initial-margin denial reason. Native economics remain the
+1217-share no-fill refusal with free/total100000.00 USD and zero fees/positions.
+The [dated refusal receipt](../../blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-review-fixes-20261003.json)
+binds the selected successor, reviews, source hashes and raw evidence.
+
+The current production comparator separately verified the unchanged historical
+v2 receipt against all eight archived sources: **136/136**, exit0, no new engine.
+Its explicit `--source-dir` must name the real archived directory. The initial
+prospective command candidate incorrectly named symlink `/harness`; that finding
+was corrected before any engine and remains retained. Original contradictory
+stress IDs are preserved rather than retrospectively relabelled.
+
+All eight new native run/comparison commands exited0. The fresh zero-engine
+fence passed10/10; runtime, source and data remained read-only in the same strict
+namespace/environment boundary. Source locks, inputs, oracle and tolerances
+were unchanged. Six public-evidence contracts pass; their first run caught a
+missing summary verdict field, corrected from the actual review's PASS value.
+The original failed test output remains retained. No native receipt or review
+was changed to correct publication metadata.
+
+The task container and owned VM profile are stopped again, with disks/artifacts
+retained. Before shutdown, the namespace held its sleeping controller and ten
+defunct bubblewrap wrappers, with no running engine. The minimal image lacked
+`ps` (exit127); the retained native `/proc` read confirmed every wrapper was a
+zombie. Docker stopped the sleeping controller with exit137; this is separate
+from successful native exits0. The memory-qualification profile remains stopped.
+These corrected-source results retain every broader admission gate below.
 
 ## Cost and rounding stress
 
@@ -126,9 +185,9 @@ must rebind actual measured source; synthetic tests do not replace that step.
 
 | Required scope | Current observed disposition | Remaining action |
 | --- | --- | --- |
-| Frozen `one_zero` | Historical receipt at its original source; no new replay here | Preserve its exact scope. A changed harness/host needs prospective qualification. |
-| Frozen `one_stress` | Two fresh processes qualify the new reviewed stress mapping as above | Carry the measured receipt; do not broaden it to other cases. |
-| Frozen `over_limit` | Two fresh processes qualify native initial-margin refusal:86/86 strict checks each, four matching normalized exports | Carry this exact economic refusal scope; native execution labels are retained and provide no general MOO or maintenance/liquidation equivalence. |
+| Frozen `one_zero` | Historical receipt verified by the current production CLI:136/136 against eight archived sources; no new engine replay | Preserve its exact scope. Changed-source engine qualification remains separate. |
+| Frozen `one_stress` | Corrected source ae6778e:two fresh processes each142/142; correct case ID and four matching normalized exports | Carry the dated20261003 receipt; earlier source/IDs remain historical. |
+| Frozen `over_limit` | Corrected source e73af98:selected successor; two fresh processes each98/98; four exact cached/callback denial streams | Carry this exact economic refusal scope; native execution labels provide no general MOO or maintenance/liquidation equivalence. |
 | Frozen `two_zero`, `two_stress`, `adaptive_stress` | Blocked by pinned native maintenance-margin and liquidation mapping gaps | Reproduce frozen mark-to-market maintenance and partial-liquidation economics with an upstream-supported, reviewed mapping. No invented fills/cash or tolerance widening. |
 | Surviving NativeStack WSL2 | Destination/transport not enrolled in this task | Follow the [activation packet](2026-10-02-north-star-host-paper-activation.md); qualify the actual workstation and its platform artifact lock. Mac Linux simulation is insufficient. |
 | Alpaca paper | Required Keychain entries absent; no account call | Store credentials in the native Keychain, perform supported read-only preflight, then separately admit the paper/fault run. |

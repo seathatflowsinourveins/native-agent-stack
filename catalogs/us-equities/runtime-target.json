@@ -33,7 +33,7 @@
     "install_command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre \"nautilus_trader==2.0.0rc5\"",
     "supported_python": ">=3.12,<3.15; vanilla CPython",
     "linux_support": "Official installation guide: Ubuntu22.04+ and glibc>=2.35; wheel platform tags are not a broader tested-host claim.",
-    "acceptance": "Retained upstream synthetic EURUSD quickstart and GitHub installation/replay acceptance; September21 native local AAPL diagnostic adds15 retained bars and two five-roundtrip baseline/fee-slippage scenarios with exact cash accounting. Historical SPY one_zero retains its original gate/verdict-v2.json scope. On2026-10-02, the independently reviewed one_stress mapping passed142/142 strict checks in each of two fresh isolated Linux ARM64 processes, with four matching UUID-normalized native exports (receipt-stress-20261002.json). Native cash90357.99 matches Decimal90357.995840 within the unchanged0.01USD tolerance. The separately reviewed over_limit mapping atdeff844 passed86/86 strict checks in each of two fresh processes, with four matching normalized exports (receipt-over-limit-20261002.json): native initial-margin risk denied1217shares with no fills/fees/positions and100000.00USD free/total cash. Original native MARKET/DENIED/OrderDenied labels and failed first API attempt remain preserved. These are frozen-case agreements, not general market-on-open, maintenance/liquidation/adaptive, strategy-merit or NativeStack WSL2 acceptance. Realistic liquidity and rc5 native broker adapter acceptance remain open.",
+    "acceptance": "Retained upstream synthetic EURUSD quickstart and GitHub installation/replay acceptance; September21 native local AAPL diagnostic adds15 retained bars and two five-roundtrip baseline/fee-slippage scenarios with exact cash accounting. Historical SPY one_zero retains its original gate/verdict-v2.json scope. On2026-10-02, the independently reviewed one_stress mapping passed142/142 strict checks in each of two fresh isolated Linux ARM64 processes, with four matching UUID-normalized native exports (receipt-stress-20261002.json). Native cash90357.99 matches Decimal90357.995840 within the unchanged0.01USD tolerance. The separately reviewed over_limit mapping atdeff844 passed86/86 strict checks in each of two fresh processes, with four matching normalized exports (receipt-over-limit-20261002.json): native initial-margin risk denied1217shares with no fills/fees/positions and100000.00USD free/total cash. Original native MARKET/DENIED/OrderDenied labels and failed first API attempt remain preserved. These are frozen-case agreements, not general market-on-open, maintenance/liquidation/adaptive, strategy-merit or NativeStack WSL2 acceptance. Realistic liquidity and rc5 native broker adapter acceptance remain open. Corrected-source update2026-10-03: ae6778e stress passes142/142 in each of two fresh fenced processes with raw ID spy-parity-one-stress-v2; e73af98 selected successor refusal passes98/98 in each of two fresh processes, with original Initialized/Denied callback streams exactly equal to cached native order events. Four normalized exports agree per case. New dated receipts retain current source/review/original evidence hashes; older IDs and seals remain historical. The production historical one_zero CLI passes136/136 against eight unchanged archived files without a new engine replay. Full-stack, two-host, data-fitness, remaining cases and paper gates remain unqualified.",
     "retained_comparison_engine": "LEAN native source-build and dated historical simulation receipts",
     "sources": [
       "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
@@ -191,6 +191,18 @@
     "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
   ],
   "next_acceptance": [
+    {
+      "id": "frozen-cost-rounding-stress-review-fixes-20261003",
+      "status": "corrected_one_stress_two_fresh_processes_strict_pass",
+      "scope": "Reviewed source ae6778e850d5fd05e510d9cef65c0988ec849ef2; two fresh fenced Linux ARM64 processes each pass142/142 with zero failures/skips, correct raw stress ID and four equal normalized native exports. Native90357.99USD versus Decimal90357.995840 passes unchanged0.01USD tolerance. Historical one_zero production CLI136/136 verifies eight archived sources with no new engine. Original contradictory stress IDs remain historical; broader admission unchanged.",
+      "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-review-fixes-20261003.json"
+    },
+    {
+      "id": "frozen-native-initial-margin-refusal-review-fixes-20261003",
+      "status": "corrected_over_limit_two_fresh_processes_strict_pass",
+      "scope": "Reviewed source e73af98d5eea2325113a64fc62d7981303757287; selected separately sealed successor mapping. Two fresh processes each pass98/98, four normalized exports agree, and complete raw Initialized/Denied callback dictionaries exactly match cached native order events. Original native initial-margin reason, no-fill economics and100000.00USD cash remain. Missing/lost/mutated callback evidence is refused. Original receipts/seals/API failures are historical; no broader host/data/paper or adaptive qualification.",
+      "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-review-fixes-20261003.json"
+    },
     {
       "id": "frozen-cost-rounding-stress-20261002",
       "status": "one_stress_two_fresh_processes_strict_pass",

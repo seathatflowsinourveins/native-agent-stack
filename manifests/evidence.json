@@ -2,6 +2,37 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "nautilus-spy-stress-review-fixes-two-processes-20261003",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "Corrected source ae6778e passes142/142 strict checks in each of two fresh fenced native rc5 stress processes, with case-specific receipt identity, four matching UUID-normalized exports, zero skips/failures and unchanged cash tolerance.",
+      "limitations": [
+        "Task-owned Linux ARM64 simulation on the Mac; no surviving NativeStack WSL2 or broker acceptance.",
+        "Native per-order Money rounding yields90357.99USD versus Decimal90357.995840 under the unchanged0.01USD allowance.",
+        "One frozen stress case; changed-source one_zero engine replay, maintenance/liquidation/adaptive, production data fitness and paper gates remain separate.",
+        "Original contradictory stress receipt IDs, historical failed attempts and719 CI are preserved at their own source and scope.",
+        "No model, account or provider call; full-stack readiness is false; whole-task usage and net savings unknown."
+      ],
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-review-fixes-20261003.json"
+    },
+    {
+      "id": "nautilus-spy-initial-margin-refusal-review-fixes-two-processes-20261003",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "Corrected source e73af98 passes98/98 strict frozen over_limit checks in each of two fresh fenced native rc5 processes. Four matching UUID-normalized exports retain Initialized/Denied callback events exactly equal to cached native order events, the original initial-margin denial reason, zero fills/fees/positions and100000.00USD free/total cash.",
+      "limitations": [
+        "Frozen economic refusal only; no general MOO execution, maintenance/liquidation/adaptive, strategy merit, production data fitness or paper acceptance.",
+        "Task-owned Linux ARM64 VM on the Mac; no surviving NativeStack WSL2 activation by this receipt.",
+        "Original callback/API failures, two20261002 receipts and old seals remain immutable and historical. The original manifest defaults to its unchanged seal and refuses corrected source; use this selected successor in both run and compare.",
+        "No model/account/provider call; full-stack readiness false; whole-task usage and net savings unknown."
+      ],
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-review-fixes-20261003.json"
+    },
+    {
       "id": "north-star-publication-security-convergence-20261002",
       "kind": "artifact_measurement",
       "component_ids": [
@@ -13284,8 +13315,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "80c80731b290ad498ddb8416856065187ddb4e863c7d4044292254ab57466797",
-      "bytes": 16330
+      "sha256": "3f29505b7f9aa8e38a4d1908c90678a2c4c370040eda6386cced3435295cc6b2",
+      "bytes": 18960
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
@@ -13538,9 +13569,19 @@
       "bytes": 11516
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-review-fixes-20261003.json",
+      "sha256": "99bc8654c620cc43168ece101b524e6b3108bb53e9c516397c08c685901995ce",
+      "bytes": 14688
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-20261002.json",
       "sha256": "71c8696bea88d89be9cecd86e9fa637027c8a96ed6334a30bd1c7fc1a65ef415",
       "bytes": 7384
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-review-fixes-20261003.json",
+      "sha256": "93f0481545ffb8e583dada2b9e9215b35a8008d06d7808f43a8b9a9b28570e40",
+      "bytes": 10903
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
@@ -15544,8 +15585,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "1ec669d9bbf3471f19a7d3e083022326ee95f5d7a3cea9de4ade25a02a822b9f",
-      "bytes": 25180
+      "sha256": "821876ddac90057b1b3e82d5b55963e2ad6fb2eac2adead0f4cba56783db4dae",
+      "bytes": 27430
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -15959,13 +16000,13 @@
     },
     {
       "path": "docs/decisions/2026-10-02-north-star-readiness-execution.md",
-      "sha256": "3ba2f96a51300fdabf3f5c995cbb4ad90943335004b64ad527a285f2ce53cba5",
-      "bytes": 14941
+      "sha256": "1f1b3aca7f8bfd25db1d5197e0c8a44d93dafce4d607421370005ec39f4f9793",
+      "bytes": 15486
     },
     {
       "path": "docs/decisions/2026-10-02-north-star-runtime-qualification.md",
-      "sha256": "8b0c2094473f1d657bfcc793d742e72a1438c2be784e61170c54a5fe1a6ecae5",
-      "bytes": 11133
+      "sha256": "a15e0106884676cecf783cdfb92b2eba1773b2cceaaae8768a36bfdee6ef7e43",
+      "bytes": 15218
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -50046,6 +50087,11 @@
       "path": "tests/test_spy_parity.py",
       "sha256": "ad509627042721ee634776da3975fa9c116ade924f9a9d3a34583c763990afdc",
       "bytes": 139519
+    },
+    {
+      "path": "tests/test_spy_review_fix_publication.py",
+      "sha256": "7b15faac9f60758e8bbea0c5752d3951cd97ec730828268e35f000c8e3bd1c14",
+      "bytes": 12188
     },
     {
       "path": "tests/test_stack_lifecycle.py",
