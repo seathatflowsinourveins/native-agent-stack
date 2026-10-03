@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "native-sdk-route-lifecycle-qualification",
+  "evidence_class": "coordinator-recorded local native installation and provider-backed route integration",
+  "checked_at": "2026-10-03",
+  "status": "native_account_and_gateway_pair_qualified_on_this_host",
+  "scope": "Coupled SDK/CLI 0.160.0 installation and native-account SDK, gateway SDK and gateway CLI marker canaries on the existing host. Not new-host or model-quality acceptance.",
+  "provenance": {
+    "recorded_by": "coordinator-run qualification commands",
+    "input": "coordinator-supplied qualification-facts.json",
+    "repository_change_ran_new_model_requests": false,
+    "stdout_stderr_hashes": null,
+    "missing_output_note": "The supplied facts retain marker responses, usage and the CLI exit status, but no raw stdout/stderr hashes."
+  },
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "ref": "rust-v0.160.0",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "paths": [
+        "sdk/python",
+        ".github/workflows/python-sdk-build.yml",
+        "scripts/install/install.sh",
+        "codex-rs/app-server-daemon/README.md"
+      ]
+    },
+    {
+      "url": "https://pypi.org/pypi/openai-codex/0.160.0/json"
+    },
+    {
+      "url": "https://pypi.org/pypi/openai-codex-cli-bin/0.160.0/json"
+    },
+    {
+      "repository": "astral-sh/uv",
+      "ref": "0.12.17",
+      "url": "https://docs.astral.sh/uv/pip/compile/#adding-constraints"
+    },
+    {
+      "url": "https://registry.npmjs.org/@openai%2fcodex/0.160.0"
+    }
+  ],
+  "installation": {
+    "python": "3.13.15",
+    "platform": "Linux x86_64 glibc",
+    "uv": "0.12.17",
+    "sdk": "0.160.0",
+    "bundled_cli": "0.160.0",
+    "selected_native_cli": "0.160.0",
+    "lock": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+    "lock_sha256": "3a17fa09d3c598e30ed8a6e833eb061ca84cad8a3af99fd975a4024c4031cddc",
+    "distribution_count": 36,
+    "artifact_hash_count": 867,
+    "compile_command": "uv pip compile blueprints/us-equities/workers/requirements.txt \\\n  --constraints adoption/sdk/accepted-constraints.txt \\\n  --python \"$PYTHON_BIN\" --python-version 3.13.15 \\\n  --python-platform x86_64-unknown-linux-gnu --generate-hashes --no-build \\\n  --no-sources --default-index https://pypi.org/simple --no-header \\\n  --output-file adoption/sdk/requirements-linux-x86_64-py313.lock --quiet",
+    "strict_hash_sync_exit": 0,
+    "pip_check": "All installed packages are compatible",
+    "npm_wrapper": {
+      "package": "@openai/codex@0.160.0",
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0.tgz",
+      "dist_integrity": "sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg==",
+      "computed_integrity_matches": true,
+      "sha256": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a",
+      "bytes": 4902
+    },
+    "native_binary_version": "codex-cli 0.160.0",
+    "native_binary_sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+    "bundled_cli_version": "codex-cli 0.160.0",
+    "bundled_cli_sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+    "bundled_cli_matches_npm_platform_binary": true,
+    "lock_copy_note": "The coordinator recompiled this lock from the repository root with the exact adoption/sdk/README.md command using uv 0.12.17. Only the openai-codex and openai-codex-cli-bin version lines and their artifact-hash lines differ from main; input-locator comments remain repository-relative. Strict-hash sync and pip check were re-run on these bytes in a fresh environment, both exit 0, and the bundled CLI SHA256 is unchanged."
+  },
+  "canaries": {
+    "sdk_native_account": {
+      "marker_exact_match": true,
+      "final_response": "SDK_01600_NATIVE_CANARY_OK",
+      "item_types": [
+        "ThreadItem"
+      ],
+      "usage": {
+        "last": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 7168,
+          "input_tokens": 21418,
+          "output_tokens": 12,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 21430
+        },
+        "model_context_window": 258400,
+        "total": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 7168,
+          "input_tokens": 21418,
+          "output_tokens": 12,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 21430
+        }
+      },
+      "seconds": 5.8,
+      "provider": "openai (native sign-in, default CODEX_HOME)",
+      "model": "gpt-6.1-sol",
+      "effort": "low",
+      "marker": "SDK_01600_NATIVE_CANARY_OK"
+    },
+    "sdk_gateway": {
+      "marker_exact_match": true,
+      "final_response": "SDK_01600_GATEWAY_CANARY_OK",
+      "usage": {
+        "last": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 15137,
+          "output_tokens": 36,
+          "reasoning_output_tokens": 21,
+          "total_tokens": 15173
+        },
+        "model_context_window": 258400,
+        "total": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 15137,
+          "output_tokens": 36,
+          "reasoning_output_tokens": 21,
+          "total_tokens": 15173
+        }
+      },
+      "seconds": 3.9,
+      "provider": "omniroute 127.0.0.1:20128 (private CODEX_HOME)",
+      "model": "cx/gpt-6.1-sol",
+      "effort": "max",
+      "marker": "SDK_01600_GATEWAY_CANARY_OK"
+    },
+    "cli_exec_gateway": {
+      "exit": 0,
+      "last_message": "CLI_01600_GATEWAY_CANARY_OK",
+      "model": "cx/gpt-6.1-sol",
+      "effort": "max",
+      "private_codex_home": true
+    }
+  },
+  "usage_scope": "Per-canary native last and total are the same cumulative snapshot; count total once per SDK canary. CLI gateway usage is unrecorded.",
+  "gateway_backend_model": null,
+  "gateway_backend_effort": null,
+  "cli_gateway_usage": null,
+  "shared_host_state": {
+    "launcher": "0.159.3",
+    "daemon": "0.159.3",
+    "production_prefix": "0.159.3",
+    "switch": "separate coordinated step"
+  },
+  "state_db_note": "git diff rust-v0.159.3 rust-v0.160.0 -- codex-rs/state shows no new SQL migration files (runtime, reclamation and tests only)",
+  "retained_evidence": {
+    "historical_receipt": "evidence/artifacts/runtime-sdk-20261001/receipt.json"
+  },
+  "unchanged_upstream_checks": [],
+  "limits": [
+    "Coordinator-recorded native-account and gateway qualification on the existing host only; not new-host or model-quality acceptance.",
+    "Gateway backend model and effort were not read from the call log; configured/requested routes and efforts do not prove backend selection.",
+    "The shared host launcher, daemon and production prefix still run 0.159.3 until a separate coordinated switch.",
+    "The 0.159.3 queue, Hindsight and October 1 SDK receipts retain their original scope; they do not qualify 0.160.0.",
+    "No stdout/stderr hashes, SDK caller exit codes, CLI token usage, gateway backend usage or monetary cost were supplied in the qualification facts; these remain unrecorded.",
+    "SDK last and total usage snapshots match for each canary and must be counted once; cached input and reasoning output are subsets, not additional tokens.",
+    "No unchanged upstream test suite, shared daemon restart, cleanup/recovery acceptance, package signature or provenance attestation verification is recorded here.",
+    "The move is inside the seven-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as the prior 0.159.2 and 0.159.3 moves were (docs/decisions/2026-09-27-model-currency.md).",
+    "This repository change records existing coordinator qualification; it performs no new model run or shared-host switch."
+  ],
+  "source_fact_correction": "The first compile ran in a private directory and changed input-locator comments. The coordinator corrected this with a repository-root recompile using the README command; the new lock SHA256 is the sdk_pair.lock_sha256_repo_root_compile value in the updated qualification facts. The coordinator re-ran strict-hash sync and pip check on the new bytes in a fresh environment, both exit 0, with the bundled CLI SHA256 unchanged. The 34 other distributions retain their versions and artifact hashes. An exact comparison with the base commit 56473e4b lock (git show HEAD:adoption/sdk/requirements-linux-x86_64-py313.lock) shows two package-version lines and ten artifact-hash lines per side: 24 changed lines total, rather than 24 hash lines.",
+  "north_star_action": "Keep the native Codex foundation and paired workers reproducible for complex-system development and US-equities research/historical simulation.",
+  "repository_integration_correction": {
+    "scope": "Local repository pin consistency; separate from coordinator native pair qualification.",
+    "initial_result": "The initial required unit run failed StackLifecycleTests.test_every_selected_component_has_current_identity_and_receipts because an extra stack evidence ID was absent from the unchanged audit evidence-ID set.",
+    "correction": "Link runtime-sdk-20261003 from the Codex component evidence_ids in manifests/stack.json and its matching native_cli_e2e public_receipts entry in blueprints/token-native-focus/saturation-audit.json. The receipt is linked and the two evidence-ID sets remain synchronized; historical receipt IDs and scope are retained.",
+    "verification": "Rerun the required unit command including tests.test_stack_lifecycle."
+  }
+}

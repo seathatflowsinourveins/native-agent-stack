@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-01T19:18:16Z",
-  "meaning": "Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held.",
+  "recorded_at_utc": "2026-10-03T00:28:54Z",
+  "meaning": "Recorded checkpoint selecting repository Codex/SDK 0.160.0 with same-host native-account and gateway marker qualification. The shared launcher and daemon still run 0.159.3 until a coordinated switch. Earlier queue, Hindsight, foundation, paper and simulation evidence retains its original scope; no new-host or model-quality acceptance is claimed.",
   "lanes": [
     {
       "kind": "lane",
@@ -345,7 +345,7 @@
       "kind": "gate",
       "id": "codex-native-daemon-queue-20261001",
       "title": "Codex native daemon and cross-session queue",
-      "state": "0.159.3 native idle / busy / reconnect delivery passed in owned thread / no shared restart",
+      "state": "shared host still runs 0.159.3 / historical idle busy and reconnect delivery passed in owned thread / 0.160.0 selected separately / no shared restart",
       "evidence_ref": "evidence/receipts/codex-01593-native-queue-20261001.json"
     },
     {
@@ -357,10 +357,10 @@
     },
     {
       "kind": "gate",
-      "id": "sdk-pair-candidate-01593-20261001",
-      "title": "SDK and bundled CLI 0.159.3 pair qualification",
-      "state": "paired protocol and native marker passed / qualified inventory and model guards intact / 209-test run passed (32 skips) / gateway HTTP 429 held - cause unknown",
-      "evidence_ref": "evidence/artifacts/runtime-sdk-20261001/receipt.json"
+      "id": "sdk-pair-qualified-01600-20261003",
+      "title": "SDK and bundled CLI 0.160.0 pair qualification",
+      "state": "strict-hash sync and pip check passed / native SDK plus gateway SDK and CLI markers completed on this host / backend unobserved / no new-host or quality claim",
+      "evidence_ref": "evidence/artifacts/runtime-sdk-20261003/receipt.json"
     }
   ],
   "workers": [

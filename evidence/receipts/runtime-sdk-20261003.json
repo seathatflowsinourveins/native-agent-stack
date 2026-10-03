@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "runtime-sdk-20261003",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "Coordinator-run same-host qualification of the published Codex SDK/CLI 0.160.0 pair recorded strict-hash installation under CPython 3.13.15 and uv 0.12.17, matching bundled/npm-platform binaries, and completed native-account SDK, gateway SDK and gateway CLI marker canaries with the available usage and CLI exit status retained in the linked qualification artifact.",
+  "limitations": [
+    "Coordinator-recorded native-account and gateway qualification on the existing host only; not new-host or model-quality acceptance.",
+    "Gateway backend model and effort were not read from the call log; configured/requested routes and efforts do not prove backend selection.",
+    "The shared host launcher, daemon and production prefix still run 0.159.3 until a separate coordinated switch.",
+    "The 0.159.3 queue, Hindsight and October 1 SDK receipts retain their original scope; they do not qualify 0.160.0.",
+    "No stdout/stderr hashes, SDK caller exit codes, CLI token usage, gateway backend usage or monetary cost were supplied in the qualification facts; these remain unrecorded.",
+    "SDK last and total usage snapshots match for each canary and must be counted once; cached input and reasoning output are subsets, not additional tokens.",
+    "No unchanged upstream test suite, shared daemon restart, cleanup/recovery acceptance, package signature or provenance attestation verification is recorded here.",
+    "The move is inside the seven-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as the prior 0.159.2 and 0.159.3 moves were (docs/decisions/2026-09-27-model-currency.md).",
+    "This repository change records existing coordinator qualification; it performs no new model run or shared-host switch."
+  ],
+  "checked_at": "2026-10-03",
+  "qualification_ref": "evidence/artifacts/runtime-sdk-20261003/receipt.json",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "ref": "rust-v0.160.0",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "paths": [
+        "sdk/python",
+        ".github/workflows/python-sdk-build.yml",
+        "scripts/install/install.sh",
+        "codex-rs/app-server-daemon/README.md"
+      ]
+    },
+    {
+      "url": "https://pypi.org/pypi/openai-codex/0.160.0/json"
+    },
+    {
+      "url": "https://pypi.org/pypi/openai-codex-cli-bin/0.160.0/json"
+    },
+    {
+      "repository": "astral-sh/uv",
+      "ref": "0.12.17",
+      "url": "https://docs.astral.sh/uv/pip/compile/#adding-constraints"
+    },
+    {
+      "url": "https://registry.npmjs.org/@openai%2fcodex/0.160.0"
+    }
+  ]
+}
