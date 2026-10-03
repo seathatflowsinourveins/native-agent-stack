@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Publish the OmniRoute Codex SDK worker at 0.160.0 while repairing startup/deadline ownership and post-turn result retention. Separate limited pre-B2 live read-only evidence from final B2 synthetic/native integration checks and coordinator-supplied shell evidence. This unit serves reliable native workers for complex systems and north-star R&D.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc"
+    },
+    {
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/tree/f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "revision": "f2204bb956bab02907aaf3cb88eb9dead28eaa35"
+    },
+    {
+      "url": "https://github.com/mitmproxy/mitmproxy/tree/6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+      "revision": "6c09d56e4c29a92f5ad01b03199977584b8ea14f"
+    },
+    {
+      "url": "https://github.com/dagucloud/dagu/tree/58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053"
+    }
+  ],
+  "discovery_provenance": [
+    "Selected source remains openai/codex rust-v0.160.0, a956835d. Installed 0.160.0 SDK start/close source, gh api release changelog and exact tagged upstream source were checked before repair. Python 3.13 asyncio.shield supplies the task-retention cancellation pattern; official OpenAI documentation distinguishes Codex SDK, Agents API and Agents SDK.",
+    "September 30 records retain their original declarations with immutable source-path remaps and dated provenance notes. This sibling record alone holds the two moved October 3 observations; the live file/pin run is not duplicated in both historical records.",
+    "The completeness review is same-session builder self-review. The audit critic contributes only HP-2 gate alternatives (claude-audit-synth.json#/critic/gaps/9) and NA-2 count correction (claude-audit-synth.json#/critic/challenged_actions/9).",
+    "The separately supplied coordinator shell observation is copied byte-identically, with its JSON and native-result hashes. It is not a builder run and precedes B2 code repair. No new live model task was launched for B2."
+  ],
+  "license_and_compatibility": "Reuse the official Codex Apache-2.0 Python SDK/native app-server 0.160.0 through maintained uv PEP 723 locks. Preserve the native SDK/tool/model loops. Local authored fixtures remain integration checks, not unchanged upstream test acceptance or an SDK ranking.",
+  "baseline_and_candidate": {
+    "baseline": "September 30 SDK 0.159.2 history and pre-B2 0.160.0 candidate; the original convergence records and original receipts remain historical.",
+    "candidate": "SDK 0.160.0 candidate repaired for startup ownership/deadline cleanup and completed-result retention, with production plugins override tested and task-configured skill readiness."
+  },
+  "frozen_inputs": {
+    "base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+    "tasks": [
+      "sdk-refresh-fixtures-20261003",
+      "sdk-refresh-live-20261003",
+      "coordinator-shell-20261003",
+      "b2-fixtures-20261003",
+      "b2-regression-before-repair"
+    ],
+    "roles": [
+      "publication-integrator",
+      "coordinator-observer",
+      "builder"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.source.txt",
+        "sha256": "33057e8b5bcb042bed8f517d759b00936767d2a8df7055dd2179df5d93ace618"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.source.txt",
+        "sha256": "3497536133785b5fe3584265973941910a50826f410f62b0f95de67b206464ff"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.lock.source.txt",
+        "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.lock.source.txt",
+        "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime.config.template.toml.source.txt",
+        "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime-worker.yaml.source.txt",
+        "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime-judge.toml.source.txt",
+        "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-acceptance-plan.json.source.txt",
+        "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-worker.py.source.txt",
+        "sha256": "3aa19fa790e661f5142fa316b58473e508f68af6c4f155f0a2fa469177c8a623"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-test_worker.py.source.txt",
+        "sha256": "4dad11db9dc1faecc938d496815bb0504a6d93731dac28183542f97da4a38300"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation.json",
+        "sha256": "acabe8d2ee66340a99f1d7c3e39d2e99a31c6411c886738bd4c354bedc42c9c6"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/acceptance-plan.json.source.txt",
+        "sha256": "5b046e6e30802bbe66d837030ae3c215d6fd401d524d48f51302269450d65d94"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+        "sha256": "942e8a810334f14118ffb75fd6f16afb6637704a48efd6b30ba08c2e5ebb5052"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/checks.json.source.txt",
+        "sha256": "26dab6f4fa94512bbe8965f51fb29845ca07e8c4664765e484cd56bc80f9b610"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "The original publication contract requires twelve fixture invocations plus metadata, Claude SDK/observer and repository checks. B2 adds discriminating delayed native-start and post-turn read regressions, with twelve final nineteen-test invocations. The pre-B2 live answer and coordinator shell observation have separate scope and source snapshots; this is functional qualification, not a preregistered model/SDK comparison.",
+    "usage_rule": "Count the pre-B2 builder live run once and the distinct coordinator thread once. Native cumulative snapshots occur both in receipt and convergence metadata as representations of the same runs; do not add them. Cached input and reasoning are subsets. Synthetic fixture tokens, overall provider usage, retries and backend effort remain unknown; no savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux x86_64 glibc; worker Python 3.13.15, auxiliary Claude preflight Python 3.14.7.",
+    "tools": [
+      {
+        "name": "Codex Python SDK and bundled native CLI",
+        "version": "0.160.0"
+      },
+      {
+        "name": "uv",
+        "version": "0.12.17"
+      },
+      {
+        "name": "ruff",
+        "version": "0.15.8"
+      },
+      {
+        "name": "Claude Agent SDK",
+        "version": "0.2.162 / bundled CLI 2.1.285"
+      },
+      {
+        "name": "mitmproxy",
+        "version": "12.2.3"
+      },
+      {
+        "name": "Context Mode template/catalog",
+        "version": "1.0.169"
+      },
+      {
+        "name": "Dagu graph format (no B2 graph execution)",
+        "version": "2.16.6"
+      }
+    ],
+    "isolation": "Assigned checkout and owned private worker homes/fixture roots. Direct app-server PID observation and clone-directory absence only; no descendant/global-egress claim. Coordinator shell evidence was observed separately outside any nested Codex sandbox."
+  },
+  "commands": [
+    "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+    "rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <owned-worktree> --codex-home <new-private-home> --model cx/gpt-6.1-sol-max --sandbox read-only --timeout 180 --prompt 'List the files under examples/omniroute-codex-sdk and state the SDK pin in worker.py.' --native-result <new-private-result>",
+    "uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <candidate checkout> --codex-home <private home rendered from runtime.config.template.toml, session state removed> --sandbox read-only --timeout 600 --native-result <private> --prompt -",
+    "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+    "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py NativeTransportTests.test_initialization_deadline_waits_for_late_start_before_cleanup NativeTransportTests.test_initialization_cleanup_bound_reports_unresolved NativeTransportTests.test_post_turn_read_failure_preserves_completed_native_result"
+  ],
+  "observations": [
+    {
+      "id": "sdk-refresh-0160-20261003-fixtures",
+      "task": "sdk-refresh-fixtures-20261003",
+      "role": "publication-integrator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "2026-10-03 SDK 0.160.0 publication: twelve fifteen-test native loopback fixture invocations",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+          "sha256": "942e8a810334f14118ffb75fd6f16afb6637704a48efd6b30ba08c2e5ebb5052"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "sdk-refresh-0160-20261003-live",
+      "task": "sdk-refresh-live-20261003",
+      "role": "publication-integrator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "2026-10-03 SDK 0.160.0 publication: bounded read-only file/pin answer through OmniRoute; native shell startup remains unqualified",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+          "sha256": "942e8a810334f14118ffb75fd6f16afb6637704a48efd6b30ba08c2e5ebb5052"
+        }
+      ],
+      "usage": {
+        "uncached_input": 26283,
+        "cache_creation": 0,
+        "cache_read": 103808,
+        "output": 1442,
+        "reasoning_in_output": 639,
+        "total": 131533,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "coordinator-shell-0160-20261003",
+      "task": "coordinator-shell-20261003",
+      "role": "coordinator-observer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "SDK 0.160.0 pre-B2: coordinator read-only native shell outside a nested Codex sandbox",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation.json",
+          "sha256": "acabe8d2ee66340a99f1d7c3e39d2e99a31c6411c886738bd4c354bedc42c9c6"
+        }
+      ],
+      "usage": {
+        "uncached_input": 17111,
+        "cache_creation": 0,
+        "cache_read": 16768,
+        "output": 138,
+        "reasoning_in_output": null,
+        "total": 34017,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "sdk-repair-b2-20261003-fixtures",
+      "task": "b2-fixtures-20261003",
+      "role": "builder",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "SDK 0.160.0 B2: nineteen-test native lifecycle fixture suite",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+          "sha256": "942e8a810334f14118ffb75fd6f16afb6637704a48efd6b30ba08c2e5ebb5052"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "sdk-repair-b2-20261003-before-fix",
+      "task": "b2-regression-before-repair",
+      "role": "builder",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "B2 delayed-start and post-turn status regressions before repair",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+          "sha256": "942e8a810334f14118ffb75fd6f16afb6637704a48efd6b30ba08c2e5ebb5052"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "sdk-repair-b2-20261003-before-fix",
+      "reason": "Three regression tests returned five failures: worker/preflight cleanup closed before delayed startup settled; expired cleanup was falsely closed; post-turn read error changed completed to failed. The repaired same regression command and the final twelve nineteen-test runs pass; no provider usage is inferred."
+    }
+  ],
+  "limitations": [
+    "Authored loopback SSE fixtures, local Claude SDK tests and observer tests are integration/synthetic checks, not unchanged upstream suites or provider-model trials.",
+    "The pre-B2 builder live task returned the correct data while two native shell attempts failed in its enclosing Codex sandbox and a Context Mode call failed with Transport closed. A separate coordinator, outside a nested Codex sandbox, observed read-only shell success at that candidate. The repaired bytes have no new live-model run; error-free MCP transport and writing (workspace-write) dispatch remain unqualified at 0.160.0.",
+    "Plugin disabling is the selected native feature gate. Tests observe direct app-server PID termination and absence of clone directories; descendant cleanup and global non-loopback egress are not observed.",
+    "Metadata preflight submits no inference. No skill was installed in the new private home and no --require-skill was used; inherited/project catalog discovery does not qualify every skill or tool.",
+    "Requested model/Max effort and live catalog entry are observed; gateway-forwarded effort, backend model identity, complete provider usage, cost, remote cancellation and token savings remain unknown.",
+    "September 30 receipts and original observations remain historical. This refresh does not rerun the historical coding oracle, Claude callsite, Astra judge, Dagu graph or unchanged upstream SDK suite.",
+    "Exactly pinned private SDK preflight/PID attributes require review on every pin move. Stable Python SDK and experimental, unsupported-for-production app-server are separate support boundaries.",
+    "Expected ResourceWarning messages and argparse rejection output remain in private fixture logs. Long-lived SDK pools, alternative approval modes, alternate binary, credential-variable path, workspace-write live execution and scheduled Dagu acceptance remain unqualified.",
+    "Initial Ruff failure exits are retained from native task returns, but exact full output/timing was not saved. Repository validators prove declared consistency, not the truth of provider or historical claims.",
+    "Earlier checkout and alternate-index validation failures are retained as before-B2 attempts. The coordinator force-added the project skill to the real index; B2 acceptance uses that actual checkout index. Historical source archive acceptance does not replace current checkout acceptance.",
+    "If the cleanup bound expires during retained startup or close, cleanup_status is unresolved and the CLI exits nonzero. Continued deferred cleanup is observed only while the embedding event loop remains running; no post-bound standalone cleanup or remote termination guarantee is made.",
+    "The moved pre-B2 observations used the retained before-b2 worker/test sources, not the repaired B2 source snapshots. The exact pre-format regression test source for the failing reproduction was not retained; the returned failures and original worker bytes are retained."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "SDK 0.160.0 B2: nineteen-test native lifecycle fixture suite",
+    "qualification_run_ids": [
+      "sdk-repair-b2-20261003-fixtures"
+    ]
+  },
+  "rollback": "Discard this uncommitted review candidate to retain current main. Replay historical runs only from their retained source copies; preserve separately owned stack/adoption/SDK-pair pins, accounts and gateway configuration.",
+  "next_decision_changing_test": "Qualify writing/workspace-write dispatch and the retained MCP Transport closed failure on final repaired bytes outside nested Codex sandboxes. Backend effort/identity, optional approval modes, native judge execution, Dagu scheduling and long-lived SDK pools keep separate gates.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "sdk-refresh-0160-20261003-fixtures",
+      "sdk-refresh-0160-20261003-live",
+      "coordinator-shell-0160-20261003",
+      "sdk-repair-b2-20261003-fixtures",
+      "sdk-repair-b2-20261003-before-fix"
+    ],
+    "coverage_artifact": {
+      "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+      "sha256": "942e8a810334f14118ffb75fd6f16afb6637704a48efd6b30ba08c2e5ebb5052"
+    }
+  }
+}

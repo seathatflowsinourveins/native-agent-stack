@@ -1,0 +1,1926 @@
+{
+  "schema_version": 1,
+  "id": "omniroute-sdk-worker-0160-20261003",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "omniroute",
+    "context-mode"
+  ],
+  "checked_on": "2026-10-03",
+  "claim": "The SDK 0.160.0 B2 review candidate passed twelve of twelve nineteen-test native loopback fixture invocations, final metadata preflight and local Claude SDK/observer checks. The earlier builder live read-only task completed despite two nested-sandbox shell failures and one MCP Transport closed failure. A separately supplied coordinator observation at the pre-B2 candidate records one successful non-nested read-only shell command. Writing dispatch is not yet qualified, and backend effort remains unobserved.",
+  "limitations": [
+    "Authored loopback SSE fixtures, local Claude SDK tests and observer tests are integration/synthetic checks, not unchanged upstream suites or provider-model trials.",
+    "The pre-B2 builder live task returned the correct data while two native shell attempts failed in its enclosing Codex sandbox and a Context Mode call failed with Transport closed. A separate coordinator, outside a nested Codex sandbox, observed read-only shell success at that candidate. The repaired bytes have no new live-model run; error-free MCP transport and writing (workspace-write) dispatch remain unqualified at 0.160.0.",
+    "Plugin disabling is the selected native feature gate. Tests observe direct app-server PID termination and absence of clone directories; descendant cleanup and global non-loopback egress are not observed.",
+    "Metadata preflight submits no inference. No skill was installed in the new private home and no --require-skill was used; inherited/project catalog discovery does not qualify every skill or tool.",
+    "Requested model/Max effort and live catalog entry are observed; gateway-forwarded effort, backend model identity, complete provider usage, cost, remote cancellation and token savings remain unknown.",
+    "September 30 receipts and original observations remain historical. This refresh does not rerun the historical coding oracle, Claude callsite, Astra judge, Dagu graph or unchanged upstream SDK suite.",
+    "Exactly pinned private SDK preflight/PID attributes require review on every pin move. Stable Python SDK and experimental, unsupported-for-production app-server are separate support boundaries.",
+    "Expected ResourceWarning messages and argparse rejection output remain in private fixture logs. Long-lived SDK pools, alternative approval modes, alternate binary, credential-variable path, workspace-write live execution and scheduled Dagu acceptance remain unqualified.",
+    "Initial Ruff failure exits are retained from native task returns, but exact full output/timing was not saved. Repository validators prove declared consistency, not the truth of provider or historical claims.",
+    "Earlier checkout and alternate-index validation failures are retained as before-B2 attempts. The coordinator force-added the project skill to the real index; B2 acceptance uses that actual checkout index. Historical source archive acceptance does not replace current checkout acceptance.",
+    "If the cleanup bound expires during retained startup or close, cleanup_status is unresolved and the CLI exits nonzero. Continued deferred cleanup is observed only while the embedding event loop remains running; no post-bound standalone cleanup or remote termination guarantee is made."
+  ],
+  "north_star_action": "Reproducible, recoverable native workers for complex systems and north-star R&D.",
+  "workspace": {
+    "base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+    "branch": "foundation/omniroute-sdk-worker-20261003",
+    "working_directory": "<owned-worktree>",
+    "committed": false,
+    "pushed": false
+  },
+  "import_source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "branch": "codex/runtime-omniroute-quality-20260930",
+    "revision": "0e86cb7e7798b497a43672dc67328a12d2793964",
+    "added_files_in_contract_families": 40,
+    "contract_count_correction": "Unfiltered Git source diff contains forty added files, versus the contract text's thirty-nine.",
+    "manifest_taken_from_source": false
+  },
+  "sources": [
+    {
+      "repository": "https://github.com/openai/codex",
+      "ref": "rust-v0.160.0",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "paths": [
+        "sdk/python/src/openai_codex/api.py",
+        "sdk/python/src/openai_codex/client.py",
+        "sdk/python/src/openai_codex/async_client.py",
+        "codex-rs/core-plugins/src/manager.rs:743-763",
+        "codex-rs/core-plugins/src/marketplace_policy.rs:52-103,157-199",
+        "codex-rs/core-plugins/src/startup_sync.rs:103-159",
+        "codex-rs/core/src/config/mod.rs:1715-1725",
+        "codex-rs/core/config.schema.json:7038",
+        "codex-rs/core/src/responses_retry.rs:66-171",
+        "codex-rs/prompts/src/model_messages.rs:57,229-236",
+        "codex-rs/uds/src/daemon_directory.rs:1-38",
+        "codex-rs/linux-sandbox/src/bwrap.rs:425-430"
+      ]
+    },
+    {
+      "url": "https://pypi.org/pypi/openai-codex/0.160.0/json",
+      "wheel_sha256": "61d2d855ca2ebedfd51280fbeb60ff31fc47ccbd55ebce186505e3f3da096921"
+    },
+    {
+      "url": "https://docs.astral.sh/uv/guides/scripts/#locking-dependencies",
+      "installed_version": "0.12.17"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/codex-sdk.md",
+      "claim_scope": "Python SDK stable"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/mcp-server.md",
+      "claim_scope": "Underlying app-server experimental and unsupported for production workloads"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "ref": "v0.2.162",
+      "revision": "f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "claim_scope": "Imported local integration suite"
+    },
+    {
+      "repository": "https://github.com/mitmproxy/mitmproxy",
+      "ref": "v12.2.3",
+      "revision": "6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+      "claim_scope": "Imported local observer test suite"
+    },
+    {
+      "url": "https://git-scm.com/docs/git-write-tree",
+      "installed_version": "2.43.0",
+      "claim_scope": "Native private proposed-tree export; installed write-tree -h also verified"
+    },
+    {
+      "url": "https://git-scm.com/docs/git-archive/2.43.0",
+      "installed_version": "2.43.0",
+      "claim_scope": "Native source archive of the proposed tree; installed archive -h also verified"
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/asyncio-task.html#shielding-from-cancellation",
+      "claim_scope": "Retain and shield asyncio task ownership across cancellation"
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/agents-api/overview",
+      "claim_scope": "Managed Codex harness role split"
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/agents/sdk",
+      "claim_scope": "In-application agent-loop role split"
+    }
+  ],
+  "versions": {
+    "sdk": "0.160.0",
+    "bundled_native_cli": "0.160.0",
+    "standalone_codex_unchanged": "0.159.3",
+    "python": "3.13.15",
+    "uv": "0.12.17",
+    "ruff": "0.15.8",
+    "host_scope": "Linux x86_64 glibc",
+    "standalone_codex_observation_scope": "Before-B2 observation only; standalone installation belongs to the separate pin-move owner and was not changed by this unit."
+  },
+  "source_closure": [
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py",
+      "sha256": "33057e8b5bcb042bed8f517d759b00936767d2a8df7055dd2179df5d93ace618"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py",
+      "sha256": "3497536133785b5fe3584265973941910a50826f410f62b0f95de67b206464ff"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
+      "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
+      "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
+      "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc"
+    }
+  ],
+  "acceptance_environment": {
+    "UV_CACHE_DIR": "<B-homes>/uv-cache",
+    "TMPDIR": "<B-homes>/fixtures",
+    "UV_PROJECT_ENVIRONMENT_for_auxiliary_uv_run_with": "<B-homes>/aux-venv",
+    "UV_TOOL_DIR_for_ruff": "<B-homes>/uv-tools",
+    "UV_TOOL_BIN_DIR_for_ruff": "<B-homes>/uv-bin",
+    "worker_home_modes": {
+      "live-worker": "0o700",
+      "live-state": "0o700",
+      "fixtures": "0o700"
+    },
+    "shared_home_used": false
+  },
+  "attempts": [
+    {
+      "id": "initial-ruff-tool-directory-lint",
+      "command": "rtk uvx --from ruff==0.15.8 ruff check --select E,F,I,B,C4 --ignore E501 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 2,
+      "evidence_scope": "Earlier native command return retained in task history; no separate raw log was saved.",
+      "actual_returned_excerpt": null,
+      "unknowns": "Exact full returned output and timing are not recoverable from retained private logs.",
+      "correction": "Set UV_TOOL_DIR and UV_TOOL_BIN_DIR to owned private directories.",
+      "observed_summary": "Native uvx could not create its tool environment in the shared read-only UV tool directory.",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "initial-ruff-tool-directory-format",
+      "command": "rtk uvx --from ruff==0.15.8 ruff format --check --line-length 100 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 2,
+      "evidence_scope": "Earlier native command return retained in task history; no separate raw log was saved.",
+      "actual_returned_excerpt": null,
+      "unknowns": "Exact full returned output and timing are not recoverable from retained private logs.",
+      "correction": "Set UV_TOOL_DIR and UV_TOOL_BIN_DIR to owned private directories.",
+      "observed_summary": "Native uvx could not create its tool environment in the shared read-only UV tool directory.",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "ruff-import-order-before-fix",
+      "command": "rtk uvx --from ruff==0.15.8 ruff check --select E,F,I,B,C4 --ignore E501 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 1,
+      "evidence_scope": "Earlier native command return retained in task history; no separate raw log was saved.",
+      "actual_returned_excerpt": null,
+      "unknowns": "Exact full returned output and timing are not recoverable from retained private logs.",
+      "correction": "Supported ruff check --select I --fix corrected I001; format completed before all twelve final runs.",
+      "observed_summary": "Ruff reported I001, an unsorted import block.",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "worker-lock",
+      "command": "rtk uv lock --script examples/omniroute-codex-sdk/worker.py",
+      "exit_code": 0,
+      "actual_returned_output": "Resolved 8 packages in 278ms\nUpdated openai-codex v0.159.2 -> v0.160.0\nUpdated openai-codex-cli-bin v0.159.2 -> v0.160.0",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "test-lock",
+      "command": "rtk uv lock --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "actual_returned_output": "Resolved 8 packages in 7ms\nUpdated openai-codex v0.159.2 -> v0.160.0\nUpdated openai-codex-cli-bin v0.159.2 -> v0.160.0",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "initial-0160-fixtures",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "pin-plugin-fix-before-additional-audit-coverage",
+      "private_log": {
+        "locator": "<B-homes>/logs/initial-0160-fixtures.log",
+        "sha256": "7da2f64164a46ec68c97c7afedbb7d7a99f4da4907a0f27f159aa4219a4c1fdb"
+      },
+      "actual_returned_excerpt": "Ran 13 tests in 12.517s\n\nOK",
+      "test_count": 13,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "content-filter-coverage",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py NativeTransportTests.test_content_filter_terminal_failure_and_guidance_survive_resume",
+      "exit_code": 0,
+      "private_log": {
+        "locator": "<B-homes>/logs/content-filter-coverage.log",
+        "sha256": "f05634f5dd70fc71be282ef7bbf65991fbfadd28f5ee4535fc1f4b00a9025f5e"
+      },
+      "actual_returned_excerpt": "Ran 1 test in 8.296s\n\nOK",
+      "test_count": 1,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-lint",
+      "command": "rtk uvx --from ruff==0.15.8 ruff check --select E,F,I,B,C4 --ignore E501 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "actual_returned_output": "All checks passed!",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-format",
+      "command": "rtk uvx --from ruff==0.15.8 ruff format --check --line-length 100 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "actual_returned_output": "2 files already formatted",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "preflight",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <owned-worktree> --codex-home <new-private-home> --preflight --require-mcp context-mode --timeout 60",
+      "exit_code": 0,
+      "private_log": {
+        "locator": "<B-homes>/logs/preflight.log",
+        "sha256": "722698cb3679d82c9105e721dacea6d2698ca9815ded28bfdfaaee9ab37a528a"
+      },
+      "returned_fields_recorded_below": true,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "worker-help",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py --help",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:20:21.165Z",
+      "ended_at": "2026-10-03T01:20:22.094Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/worker-help.log",
+        "sha256": "eeb21813d7029d706ca849c64d3660452c4cd6f9cd36425215986ad2c3f3dbd5"
+      },
+      "actual_returned_excerpt": "from openai/codex rust-v0.160.0, commit\n                        explicit native 0.160.0 binary; defaults to the pinned",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "observer-tests",
+      "command": "rtk uv run --with mitmproxy==12.2.3 python -m unittest discover -s tools/runtime-worker-evidence -p 'test_*.py'",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:20:21.165Z",
+      "ended_at": "2026-10-03T01:20:22.333Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/observer-tests.log",
+        "sha256": "1122a7add165ffc10ad75d32a41a11e2a359b8d5c34114de80feb9ec1adc4fbb"
+      },
+      "actual_returned_excerpt": "Ran 5 tests in 0.246s\n\nOK",
+      "test_count": 5,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "claude-tests",
+      "command": "rtk uv run --with claude-agent-sdk==0.2.162 python -m unittest discover -s examples/claude-runtime-sdk/tests -v",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:20:21.165Z",
+      "ended_at": "2026-10-03T01:20:24.911Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/claude-tests.log",
+        "sha256": "26505765a6a8ff0b19b8cb089c94338a077ad322f867cca44ed57bb1d69d210b"
+      },
+      "actual_returned_excerpt": "Ran 24 tests in 0.170s\n\nOK",
+      "test_count": 24,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-01",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:20:21.153Z",
+      "ended_at": "2026-10-03T01:20:44.215Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-01.log",
+        "sha256": "bdfc445d1682534939750d6095ac6950364e6d62f336aadb921149f0448e2224"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.202s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-02",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:20:44.215Z",
+      "ended_at": "2026-10-03T01:21:07.858Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-02.log",
+        "sha256": "5dbcf7099e3d071daa37144d4db01351a00ec12befe463622c2634dc424610b3"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.816s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-03",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:21:07.858Z",
+      "ended_at": "2026-10-03T01:21:30.905Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-03.log",
+        "sha256": "522794b5b7cc1f4496ccccd28659d9c1c766dda9eca2ec1f14b4687d6b93efb2"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.230s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-04",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:21:30.905Z",
+      "ended_at": "2026-10-03T01:21:53.821Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-04.log",
+        "sha256": "807daedfde12f55c7599cbfb965d44b5ad25c60d97eb82438e84588cb105de95"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.080s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-05",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:21:53.821Z",
+      "ended_at": "2026-10-03T01:22:16.809Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-05.log",
+        "sha256": "034edaaf46895a5058177567c208dd0e8844275e021364ce74487b7faa558a63"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.164s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-06",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:22:16.809Z",
+      "ended_at": "2026-10-03T01:22:41.118Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-06.log",
+        "sha256": "7b0e93075db1e885e98b199ea5f831a9e6e56ff06462d392d944ece673a98d91"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 23.490s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-07",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:22:41.118Z",
+      "ended_at": "2026-10-03T01:23:04.950Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-07.log",
+        "sha256": "9d2a97b1a02ab041118967b7d3d0ff5b5115f4d6d510a5eb9a488575fa8e0ee3"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.981s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-08",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:23:04.951Z",
+      "ended_at": "2026-10-03T01:23:28.552Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-08.log",
+        "sha256": "5df24b072ed31cf970ca2623f484f340e22517be2d437664001c2adea3aacd66"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.762s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-09",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:23:28.552Z",
+      "ended_at": "2026-10-03T01:23:51.741Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-09.log",
+        "sha256": "1e2de1098c4dc98a09720bc09c660ede475282677585686ded5cc2474caf4bf2"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.368s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-10",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:23:51.741Z",
+      "ended_at": "2026-10-03T01:24:14.738Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-10.log",
+        "sha256": "b9aa9e6b748946fb3528295a84109da889d47f135441c630314f949e11ee257c"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.172s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-11",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:24:14.738Z",
+      "ended_at": "2026-10-03T01:24:38.456Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-11.log",
+        "sha256": "033c0769917c90949eabe0ea1d14bd4e3d6d2dccbc527fd68240aa77325b2461"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.880s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-suite-12",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:24:38.456Z",
+      "ended_at": "2026-10-03T01:25:01.755Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-suite-12.log",
+        "sha256": "9de6aa5019061a53171c7152b48b2aaf487506e22de4a94823ae68ba8838d049"
+      },
+      "actual_returned_excerpt": "Ran 15 tests in 22.486s\n\nOK",
+      "test_count": 15,
+      "expected_stderr": {
+        "resource_warning_lines": 4,
+        "argparse_rejection_blocks": 4
+      },
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "live-task",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <owned-worktree> --codex-home <new-private-home> --model cx/gpt-6.1-sol-max --sandbox read-only --timeout 180 --prompt 'List the files under examples/omniroute-codex-sdk and state the SDK pin in worker.py.' --native-result <new-private-result>",
+      "exit_code": 0,
+      "private_log": {
+        "locator": "<B-homes>/logs/live-task.log",
+        "sha256": "1f4184fc0e229827728fb62ae9417bb4381af5a197c4e33d853461b04d1b1d22"
+      },
+      "returned_fields_recorded_below": true,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "validate-before-registration",
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 1,
+      "phase": "expected-unregistered-files-before-final-registration",
+      "private_log": {
+        "locator": "<B-homes>/logs/validate-before-registration.log",
+        "sha256": "312bd8ec281c3bbd9d183b09859530dd49123129c37ce5d4ecf24fc3f0cacea7"
+      },
+      "actual_returned_excerpt": "Publication validation failed:\n.github/osv-scanner-lockfiles.json: SHA-256 mismatch\n.github/osv-scanner-lockfiles.json: byte count mismatch\ntests/test_osv_lockfile_coverage.py: SHA-256 mismatch\ntests/test_osv_lockfile_coverage.py: byte count mismatch\nevidence/artifacts/omniroute-runtime-enhancements-20260930/deadline300-judge-oracle-output.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime-worker.yaml.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime.config.template.toml.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-enhancements-20260930/post-env-import-runtime-worker.yaml.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-enhancements-20260930/pre-dispatch-default-skill.md: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/acceptance-plan.json.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-enhancements-experiment.json.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/rerun-plan.json.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime-judge.toml.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime-worker.yaml.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime.config.template.toml.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/test_worker.py.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.lock.source.txt: evidence file is not hash-listed\nevidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.source.txt: evidence file is not hash-listed\nevidence/receipts/omniroute-claude-callsite-20260930.json: evidence file is not hash-listed\nevidence/receipts/omniroute-runtime-enhancements-20260930.json: evidence file is not hash-listed\nevidence/receipts/omniroute-runtime-workers-20260930.json: evidence file is not hash-listed",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "osv-tests",
+      "command": "rtk python3 -B -m unittest tests.test_osv_lockfile_coverage",
+      "exit_code": 0,
+      "private_log": {
+        "locator": "<B-homes>/logs/osv-tests.log",
+        "sha256": "b3e2c1fcfee0d3d5c4288818fd7b9bf416c5d7a1887f841b98d2a7be57f0a146"
+      },
+      "actual_returned_excerpt": "Ran 38 tests in 0.268s\n\nOK",
+      "test_count": 38,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "historical-convergence-before-refresh-observation",
+      "command": "rtk python3 scripts/validate_convergence.py blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json blueprints/convergence-practice/omniroute-runtime-workers/experiment.json --root . --json",
+      "exit_code": 0,
+      "observation_summary": "Both historical records valid; 16 and17 unchanged historical observations.",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "pre-push-registry",
+      "command": "rtk python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "observation": "Private review index includes new files; shared Git metadata is read-only.",
+      "private_log": {
+        "locator": "<B-homes>/logs/pre-push-registry.log",
+        "sha256": "84dbcfbd93c2e150575c8a7e87755c99b2eddb13977f74381ea8dd07d51844d5"
+      },
+      "actual_returned_excerpt": "Ran 3 tests in 0.212s\n\nOK",
+      "test_count": 3,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "historical-convergence-native",
+      "command": "rtk python3 scripts/validate_convergence.py blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json blueprints/convergence-practice/omniroute-runtime-workers/experiment.json --root . --json",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:41:39.008Z",
+      "ended_at": "2026-10-03T01:41:39.239Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/historical-convergence-native.log",
+        "sha256": "96ca74e3df7c9252d258cf236acc05df3cd2e46ccb8b690d69553291255a638c"
+      },
+      "actual_returned_excerpt": "{\"records\": [{\"errors\": [], \"observations\": 16, \"path\": \"blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 17, \"path\": \"blueprints/convergence-practice/omniroute-runtime-workers/experiment.json\", \"valid\": true}], \"valid\": true}",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "receipt-assembly-file-set-oracle-correction",
+      "command": "rtk python3 <B-homes>/build-publication-evidence.py",
+      "exit_code": 1,
+      "actual_returned_excerpt": "AssertionError",
+      "observation_summary": "Receipt assembly initially counted ignored interpreter cache files via rglob. Native rtk proxy rg --files --hidden examples/omniroute-codex-sdk observes the same twelve paths as the live tool; that supported command now supplies the same-session builder oracle. No worker source or acceptance outcome changed.",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-validate",
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 1,
+      "started_at": "2026-10-03T01:52:30.462Z",
+      "ended_at": "2026-10-03T01:52:51.044Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-validate.log",
+        "sha256": "d6b78199dbcb16bf6597bb014071548dba28bb2b699ce9ed1d343a607378962f"
+      },
+      "actual_returned_excerpt": "Publication validation failed:\n.claude/skills/omniroute-runtime-worker/SKILL.md: hash-listed but ignored by Git and not tracked, so a commit would leave it out; rename it, add a narrow .gitignore exception, or force-add it",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-all-recorded",
+      "command": "rtk python3 scripts/validate_convergence.py --all-recorded",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:52:30.463Z",
+      "ended_at": "2026-10-03T01:52:32.046Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-all-recorded.log",
+        "sha256": "a0030d3502025091cb356a85455048a8de39f73fc75ff50fb400382b3b7c774b"
+      },
+      "actual_returned_excerpt": "record[0]: valid\nrecord[1]: valid\nrecord[2]: valid\nrecord[3]: valid\nrecord[4]: valid\nrecord[5]: valid\nrecord[6]: valid\nrecord[7]: valid\nrecord[8]: valid\nrecord[9]: valid\nrecord[10]: valid\nrecord[11]: valid\nrecord[12]: valid\nrecord[13]: valid\nrecord[14]: valid\nrecord[15]: valid\nrecord[16]: valid\nrecord[17]: valid\nrecord[18]: valid\nrecord[19]: valid\nrecord[20]: valid\nrecord[21]: valid\nrecord[22]: valid\nrecord[23]: valid\nrecord[24]: valid\nrecord[25]: valid\nrecord[26]: valid\nrecord[27]: valid",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-osv-tests",
+      "command": "rtk env GIT_INDEX_FILE=<B-homes>/review.index GIT_OBJECT_DIRECTORY=<B-homes>/review-objects GIT_ALTERNATE_OBJECT_DIRECTORIES=<repository-object-store> python3 -B -m unittest tests.test_osv_lockfile_coverage",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:52:30.463Z",
+      "ended_at": "2026-10-03T01:52:30.897Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-osv-tests.log",
+        "sha256": "d29f8ba3e36def1632aa77404e4cd4bb1d0a4e5e12aba0962edf77bc4a7603af"
+      },
+      "actual_returned_excerpt": "Ran 38 tests in 0.257s\n\nOK",
+      "test_count": 38,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-pre-push-registry",
+      "command": "rtk env GIT_INDEX_FILE=<B-homes>/review.index GIT_OBJECT_DIRECTORY=<B-homes>/review-objects GIT_ALTERNATE_OBJECT_DIRECTORIES=<repository-object-store> python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:52:30.463Z",
+      "ended_at": "2026-10-03T01:52:30.865Z",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-pre-push-registry.log",
+        "sha256": "8ce8c3903330d15bfe40814b3443a4cdec6e7dea58cc22bc34fc38116ab1de9b"
+      },
+      "actual_returned_excerpt": "Ran 3 tests in 0.202s\n\nOK",
+      "test_count": 3,
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-validate-proposal-index",
+      "command": "rtk env GIT_INDEX_FILE=<B-homes>/review.index GIT_OBJECT_DIRECTORY=<B-homes>/review-objects GIT_ALTERNATE_OBJECT_DIRECTORIES=<repository-object-store> python3 scripts/validate.py",
+      "exit_code": 1,
+      "started_at": "2026-10-03T01:53:40.546Z",
+      "ended_at": "2026-10-03T01:54:16.156Z",
+      "observation": "Private index force-includes the dispatcher hidden by host Git excludes; shared Git metadata is unchanged.",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-validate-proposal-index.log",
+        "sha256": "d6b78199dbcb16bf6597bb014071548dba28bb2b699ce9ed1d343a607378962f"
+      },
+      "actual_returned_excerpt": "Publication validation failed:\n.claude/skills/omniroute-runtime-worker/SKILL.md: hash-listed but ignored by Git and not tracked, so a commit would leave it out; rename it, add a narrow .gitignore exception, or force-add it",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "final-validate-native-archive",
+      "command": "rtk python3 scripts/validate.py",
+      "working_directory": "<B-homes>/validation-source",
+      "exit_code": 0,
+      "started_at": "2026-10-03T01:59:56.890Z",
+      "ended_at": "2026-10-03T02:02:32.621Z",
+      "observation": "Native proposed-tree archive validation passed; exact-root Git enumeration remains failed.",
+      "private_log": {
+        "locator": "<B-homes>/logs/final-validate-native-archive.log",
+        "sha256": "70146fc3d4ff5c4f3200408b98f7a6bd2f33c49c88d820dc817e6316fade76d2"
+      },
+      "actual_returned_excerpt": "{\"components\": 69, \"hashed_files\": 9369, \"profiles\": 4, \"receipts\": 190, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "candidate_phase": "before-B2-repair"
+    },
+    {
+      "id": "b2-regression-before-fix",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py NativeTransportTests.test_initialization_deadline_waits_for_late_start_before_cleanup NativeTransportTests.test_initialization_cleanup_bound_reports_unresolved NativeTransportTests.test_post_turn_read_failure_preserves_completed_native_result",
+      "exit_code": 1,
+      "phase": "B2-regression-before-repair",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/regression-before-fix.log",
+        "sha256": "c9b1e648305264bba5edb5bd25e5f8b3088474999f5d103664d2341a96b5c953"
+      },
+      "actual_returned_excerpt": "cleanup returned before startup settled; closed != unresolved; failed != completed\nRan 3 tests in 3.220s\nFAILED (failures=5)",
+      "test_count": 3,
+      "failed_subtests": 5,
+      "source_limit": "The original pre-B2 worker is retained byte-for-byte; the added regression test source was subsequently formatted and its pre-format bytes were not retained."
+    },
+    {
+      "id": "b2-regression-after-fix",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py NativeTransportTests.test_initialization_deadline_waits_for_late_start_before_cleanup NativeTransportTests.test_initialization_cleanup_bound_reports_unresolved NativeTransportTests.test_post_turn_read_failure_preserves_completed_native_result",
+      "exit_code": 0,
+      "phase": "B2-targeted-repair-before-final-format",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/regression-after-fix.log",
+        "sha256": "47ac3f3b6965de202c2c0c1d35b342f4c1a3c33e1068739f4b270b632dd9bcdc"
+      },
+      "actual_returned_excerpt": "Ran 3 tests in 3.591s\nOK",
+      "test_count": 3
+    },
+    {
+      "id": "b2-ruff-check",
+      "command": "rtk proxy uvx --from ruff==0.15.8 ruff check --select E,F,I,B,C4 --ignore E501 examples/omniroute-codex-sdk",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/ruff-check.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "actual_returned_excerpt": "All checks passed!"
+    },
+    {
+      "id": "b2-ruff-format-check",
+      "command": "rtk proxy uvx --from ruff==0.15.8 ruff format --check --line-length 100 examples/omniroute-codex-sdk",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/ruff-format-check.log",
+        "sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938"
+      },
+      "actual_returned_excerpt": "2 files already formatted"
+    },
+    {
+      "id": "b2-preflight-final",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <owned-checkout> --codex-home <new-B2-private-home> --preflight --require-mcp context-mode --timeout 60",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/preflight-final.log",
+        "sha256": "cbb93d3fb7f7965d7602a47a2277aeaf8071ee07f690fcc685d508fdbbd244d3"
+      },
+      "actual_returned_excerpt": "{\"status\":\"ready\",\"cleanup_status\":\"closed\",\"model_inference_submitted\":false,\"requirements\":{\"mcp\":[\"context-mode\"],\"skills\":[],\"unavailable_mcp\":[],\"unavailable_skills\":[]}}"
+    },
+    {
+      "id": "b2-worker-help-final",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py --help",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/worker-help-final.log",
+        "sha256": "eeb21813d7029d706ca849c64d3660452c4cd6f9cd36425215986ad2c3f3dbd5"
+      },
+      "actual_returned_excerpt": "usage: worker.py ...; One native Codex SDK turn, or metadata preflight, through OmniRoute; rust-v0.160.0 a956835d020762cb2b570053af06f643a11c0ecc"
+    },
+    {
+      "id": "b2-claude-tests",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python -m unittest discover -s examples/claude-runtime-sdk/tests -v",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/claude-tests.log",
+        "sha256": "60e1c38e4ac9b5e12df6f59346c5a469875fa75871822fe0f81fa0af232b65ae"
+      },
+      "actual_returned_excerpt": "Ran 24 tests in 0.142s\nOK",
+      "test_count": 24
+    },
+    {
+      "id": "b2-observer-tests",
+      "command": "rtk proxy uv run --no-project --with mitmproxy==12.2.3 python -m unittest discover -s tools/runtime-worker-evidence -p 'test_*.py'",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/observer-tests.log",
+        "sha256": "4fc6396c7f0d1fd67aa3c295328ffbe715c3f326198fe90a200ba2b472e736f8"
+      },
+      "actual_returned_excerpt": "Ran 5 tests in 0.129s\nOK",
+      "test_count": 5
+    },
+    {
+      "id": "b2-claude-control-disarmed",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python examples/claude-runtime-sdk/tests/check_controls.py --disarm-route",
+      "exit_code": 1,
+      "phase": "B2-discriminating-negative-control",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/claude-control-disarmed.log",
+        "sha256": "523ac9bc334cbd789f420cacb8d7593d60ad59405cb5bf0b76b5be30fa23a5e7"
+      },
+      "actual_returned_excerpt": "Ran 1 test in 0.005s\nFAILED (failures=5)",
+      "expected_exit_code": 1,
+      "test_count": 1
+    },
+    {
+      "id": "b2-claude-control-armed",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python examples/claude-runtime-sdk/tests/check_controls.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/claude-control-armed.log",
+        "sha256": "b725c6d3046883da7212a9e0132a0037a4f32a3ea1890efa5bf13df3dcaa4a45"
+      },
+      "actual_returned_excerpt": "Ran 1 test in 0.003s\nOK",
+      "test_count": 1
+    },
+    {
+      "id": "b2-claude-preflight",
+      "command": "rtk proxy uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/claude-preflight.log",
+        "sha256": "c141653615a430c76f4b0afecf45f65089e4d9a497e69c8f913d61cfb780c883"
+      },
+      "actual_returned_excerpt": "configuration_only; sdk_version 0.2.162; no provider request"
+    },
+    {
+      "id": "b2-osv-tests",
+      "command": "rtk python3 -B -m unittest tests.test_osv_lockfile_coverage",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/osv-tests.log",
+        "sha256": "c5e60b8142059752896a2ffbc6468bf899e7bf9479a7d9014c45fa5913f5a9bc"
+      },
+      "actual_returned_excerpt": "Ran 38 tests in 0.309s\nOK",
+      "test_count": 38
+    },
+    {
+      "id": "b2-pre-push-registry",
+      "command": "rtk python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/pre-push-registry.log",
+        "sha256": "e2f0e1352ca739f75623a0f32612971c13d5b2cc821350766c3ecf2a6cce65a3"
+      },
+      "actual_returned_excerpt": "Ran 3 tests in 0.453s\nOK",
+      "test_count": 3,
+      "index_scope": "checkout real index; project skill is an existing force-added intent-to-add entry"
+    },
+    {
+      "id": "b2-final-suite-01",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-01.log",
+        "sha256": "36013ea3ecd47f8d26452c4e6dd63498610866795cc18069d45b451182e4249e"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 31.838s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-02",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-02.log",
+        "sha256": "16609f8b74032fe10ce1321bc6858b54f2c391e5cb0bf00d2aff287403099763"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 42.112s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-03",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-03.log",
+        "sha256": "6910c3ac3ded26d3a8e1026273d072d0504ce0b2aba721e7eb50bf4240da5836"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 27.352s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-04",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-04.log",
+        "sha256": "fb77293c6d872f01b691057db788ea8dc7e5b1c4c762f91c3b3dd6bcae77e110"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 28.431s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-05",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-05.log",
+        "sha256": "eee8730c30b6816c0b71fb263b7de5c3d83315adaace1fccb2fd82ecee1d200b"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 28.775s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-06",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-06.log",
+        "sha256": "8d9263c02aafe7d2a4c8b814074475dfc732c8bec764add5da0d68314ad0232c"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 27.089s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-07",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-07.log",
+        "sha256": "68397d518e2655e4f030bdc7e549a77697d540feba52011bd6aca11517bc570d"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 29.059s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-08",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-08.log",
+        "sha256": "7b55cd05fede5a1ee9edb45ecfc6cbb9888fdb76c8c8b4ed9656ac676df55759"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 26.779s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-09",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-09.log",
+        "sha256": "ed6840ae28afffed2d03196ef0b821264b8d5e69ed6c5daa98060c69da6af410"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 27.410s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-10",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-10.log",
+        "sha256": "2ce1247ce055a44ded9069c69659f40ae62ae19c763ef1400df051ebeaf682ca"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 29.218s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-11",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-11.log",
+        "sha256": "987bb374577ba079e02ed05482e178df7d40f396d86102dcb1fff5275f521b2f"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 27.202s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-final-suite-12",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "phase": "B2-final-repair-bytes",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/final-suite-12.log",
+        "sha256": "c84f1c3e915bb81146a7692c65b60b9ef45f189f53538200c6dcee757fd525bd"
+      },
+      "actual_returned_excerpt": "Ran 19 tests in 29.181s\nOK",
+      "test_count": 19
+    },
+    {
+      "id": "b2-validate-final",
+      "command": "rtk proxy python3 scripts/validate.py",
+      "exit_code": 0,
+      "phase": "B2-final-source-before-returned-result-seal",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/validate-final.log",
+        "sha256": "cbf3f5fb2fc507a8741812164218e9c9fcef113afc5a99716c6bed38f13e2481"
+      },
+      "actual_returned_output": "{\"components\": 69, \"hashed_files\": 9383, \"profiles\": 4, \"receipts\": 190, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "index_scope": "checkout real index; force-added project skill present"
+    },
+    {
+      "id": "b2-all-recorded-final",
+      "command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded",
+      "exit_code": 0,
+      "phase": "B2-final-source-before-returned-result-seal",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/all-recorded-final.log",
+        "sha256": "2e2cb59d7e86bd664480e5a763a93b1b8ec6faa809e75511fff22873cb951b42"
+      },
+      "actual_returned_output": "record[0]: valid\nrecord[1]: valid\nrecord[2]: valid\nrecord[3]: valid\nrecord[4]: valid\nrecord[5]: valid\nrecord[6]: valid\nrecord[7]: valid\nrecord[8]: valid\nrecord[9]: valid\nrecord[10]: valid\nrecord[11]: valid\nrecord[12]: valid\nrecord[13]: valid\nrecord[14]: valid\nrecord[15]: valid\nrecord[16]: valid\nrecord[17]: valid\nrecord[18]: valid\nrecord[19]: valid\nrecord[20]: valid\nrecord[21]: valid\nrecord[22]: valid\nrecord[23]: valid\nrecord[24]: valid\nrecord[25]: valid\nrecord[26]: valid\nrecord[27]: valid\nrecord[28]: valid",
+      "index_scope": "checkout real index; force-added project skill present"
+    },
+    {
+      "id": "b2-component-matrix-check",
+      "command": "rtk proxy python3 scripts/component_matrix.py --check",
+      "exit_code": 0,
+      "phase": "B2-final-source-before-returned-result-seal",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/component-matrix-check.log",
+        "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd"
+      },
+      "actual_returned_output": "{\"rows\": 32, \"status\": \"checked\"}",
+      "index_scope": "checkout real index; force-added project skill present"
+    },
+    {
+      "id": "b2-new-host-grand-list-check",
+      "command": "rtk proxy python3 scripts/new_host_grand_list.py --check",
+      "exit_code": 0,
+      "phase": "B2-final-source-before-returned-result-seal",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/new-host-grand-list-check.log",
+        "sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226"
+      },
+      "actual_returned_output": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}",
+      "index_scope": "checkout real index; force-added project skill present"
+    },
+    {
+      "id": "b2-osv-tests-final",
+      "command": "rtk python3 -B -m unittest tests.test_osv_lockfile_coverage",
+      "exit_code": 0,
+      "phase": "B2-final-source-before-returned-result-seal",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/osv-tests-final.log",
+        "sha256": "1dde1f9b1b59af4018c61c0fba8001e02bb319eb17999845f0c95caa6fa4e711"
+      },
+      "actual_returned_output": "......................................\n----------------------------------------------------------------------\nRan 38 tests in 0.256s\n\nOK",
+      "index_scope": "checkout real index; force-added project skill present"
+    },
+    {
+      "id": "b2-pre-push-registry-final",
+      "command": "rtk python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "phase": "B2-final-source-before-returned-result-seal",
+      "private_log": {
+        "locator": "<B-homes>/B2-repair/logs/pre-push-registry-final.log",
+        "sha256": "109b2b2c0b0df77a30f3e9097dc79e93e5c97a83357180f36648fbdca112831b"
+      },
+      "actual_returned_output": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.206s\n\nOK",
+      "index_scope": "checkout real index; force-added project skill present"
+    },
+    {
+      "id": "b2-worker-help-before-private-cache",
+      "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py --help",
+      "exit_code": 2,
+      "candidate_phase": "before-B2-code-repair",
+      "actual_returned_excerpt": "error: Could not acquire lock\ncause: Could not create temporary file\ncause: Read-only file system (os error 30) at path \"<shared-uv-cache>/.tmpct0SKZ\"",
+      "evidence_scope": "Actual native tool return in this B2 session; no separate raw log was retained. Only the personal shared UV cache path was sanitized.",
+      "correction": "Use the owned private UV cache for B2 acceptance. b2-worker-help-final then returned exit 0 on final source bytes.",
+      "model_inference_submitted": false
+    }
+  ],
+  "fixture_acceptance": {
+    "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+    "invocations": 12,
+    "passed_invocations": 12,
+    "failed_invocations": 0,
+    "tests_per_invocation": 19,
+    "source_formatted_before_final_invocations": true,
+    "evidence_class": "local_integration_synthetic_provider",
+    "provider_usage": null,
+    "content_filter_guidance_counts": {
+      "native_retries_disabled": 1,
+      "native_default_five_retries": 6
+    },
+    "content_filter_continuation": "Explicit permitted continuation resumes with persisted guidance; no automatic blocked-task replay.",
+    "phase": "B2-final-repair-bytes"
+  },
+  "plugin_sync_decision": {
+    "fixture_config": "features.plugins=false in standard fixture homes; one dedicated fixture has no [features] table and relies only on the production override",
+    "runtime_override": "features.plugins=false",
+    "template_config": "features.plugins=false",
+    "selected_because": "Worker uses native skills and MCP and has no plugin dependency. The single feature switch directly gates sync without introducing remote-catalog authentication or a requirements policy.",
+    "gate": "a956835d core-plugins/src/manager.rs:743-763 requires plugins enabled, remote catalog inactive and marketplace-policy admission.",
+    "alternatives_reviewed": [
+      "Backend-authenticated remote catalog (not used)",
+      "Requirements restrict_to_allowed_sources and Git/ref policy (supported, deferred until plugins needed)",
+      "Configured marketplace pin alone is not the requirements gate",
+      "Proxy/network options are not predicates in this gate"
+    ],
+    "observed_cleanup_scope": "Direct app-server PID exit and absence of .tmp/plugins-clone-*; no global egress or descendant-process claim.",
+    "production_override_asserted": true
+  },
+  "preflight": {
+    "command_id": "b2-preflight-final",
+    "returned_fields": {
+      "event": "result",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "provider": "omniroute_runtime",
+      "model_inference_submitted": false,
+      "usage_status": "unknown",
+      "usage_scope": null,
+      "usage": null,
+      "preflight": true,
+      "evidence_scope": "native_catalog_discovery",
+      "native_runtime": {
+        "name": "omniroute_codex_runtime_worker",
+        "version": "0.160.0",
+        "metadata_source": "userAgent"
+      },
+      "effective_config": {
+        "model": "cx/gpt-6.1-sol-max",
+        "model_provider": "omniroute_runtime",
+        "model_reasoning_effort": "max"
+      },
+      "agent_defaults": {
+        "enabled": true,
+        "max_concurrent_threads_per_session": 3,
+        "default_subagent_model": null,
+        "default_subagent_reasoning_effort": null
+      },
+      "configured_roles": [
+        {
+          "name": "runtime-judge"
+        }
+      ],
+      "mcp_servers": [
+        {
+          "name": "context-mode",
+          "configured": true,
+          "enabled": true,
+          "runtime_status": null,
+          "auth_status": "unsupported",
+          "tools_error": false,
+          "tool_count": 9,
+          "catalog_ready": true
+        },
+        {
+          "name": "serena",
+          "configured": true,
+          "enabled": true,
+          "runtime_status": null,
+          "auth_status": "unsupported",
+          "tools_error": false,
+          "tool_count": 5,
+          "catalog_ready": true
+        }
+      ],
+      "skills": {
+        "total_count": 33,
+        "enabled_count": 33,
+        "required": {}
+      },
+      "skill_error_count": 0,
+      "requirements": {
+        "mcp": [
+          "context-mode"
+        ],
+        "skills": [],
+        "unavailable_mcp": [],
+        "unavailable_skills": []
+      },
+      "status": "ready",
+      "cleanup_status": "closed"
+    },
+    "home_render_source": "tools/adoption/render_config.py::render_one",
+    "template": {
+      "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048"
+    },
+    "rendered_private_files": [
+      {
+        "locator": "<B-homes>/B2-repair/preflight-home/config.toml",
+        "sha256": "bf41d4eb1de3fcad5f7efcf28f45d1f18884cd2c440188ad671ceeca3ac6b59c",
+        "mode": "0600"
+      },
+      {
+        "locator": "<B-homes>/B2-repair/preflight-home/agents/runtime-judge.toml",
+        "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f",
+        "mode": "0600"
+      }
+    ],
+    "skill_installed_in_private_home": false,
+    "require_skill_passed": false,
+    "inherited_project_skills_separate": true
+  },
+  "live_task": {
+    "command_id": "live-task",
+    "prompt": "List the files under examples/omniroute-codex-sdk and state the SDK pin in worker.py.",
+    "returned_fields": {
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "provider": "omniroute_runtime",
+      "model_inference_submitted": true,
+      "usage_status": "reported",
+      "usage_scope": "native_thread_cumulative",
+      "usage": {
+        "last": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 24960,
+          "inputTokens": 25369,
+          "outputTokens": 415,
+          "reasoningOutputTokens": 272,
+          "totalTokens": 25784
+        },
+        "modelContextWindow": 258400,
+        "total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 103808,
+          "inputTokens": 130091,
+          "outputTokens": 1442,
+          "reasoningOutputTokens": 639,
+          "totalTokens": 131533
+        }
+      },
+      "native_runtime": {
+        "name": "omniroute_codex_runtime_worker",
+        "version": "0.160.0",
+        "metadata_source": "serverInfo"
+      },
+      "thread_mode": "started",
+      "status": "completed",
+      "final_response": "Files under `examples/omniroute-codex-sdk`, including subdirectories:\n\n```text\nREADME.md\nacceptance-plan.json\nagents/runtime-judge.toml\nchecks.json\nenhancements.md\nrerun-plan.json\nruntime-worker.yaml\nruntime.config.template.toml\ntest_worker.py\ntest_worker.py.lock\nworker.py\nworker.py.lock\n```\n\nThe SDK pin is **`0.160.0`**, declared as `SDK_VERSION = \"0.160.0\"` in [worker.py](examples/omniroute-codex-sdk/worker.py:39).",
+      "duration_ms": 64676,
+      "item_counts": {
+        "userMessage": 1,
+        "commandExecution": 2,
+        "reasoning": 5,
+        "mcpToolCall": 2,
+        "agentMessage": 1
+      },
+      "thread_status": {
+        "type": "idle"
+      },
+      "cleanup_status": "closed"
+    },
+    "private_original": {
+      "locator": "<B-homes>/live-worker/native-result.json",
+      "sha256": "aee5115fed08f48114ea7afcb982b6e0832dfc577763d044e04280c4350a6b01"
+    },
+    "sanitization": "Private request/thread/turn IDs and raw tool payloads omitted; final-answer absolute repository path replaced with relative path.",
+    "tool_results": [
+      {
+        "type": "commandExecution",
+        "command": "/bin/bash -lc 'rtk proxy rg --files --hidden examples/omniroute-codex-sdk'",
+        "status": "failed",
+        "exit_code": 1,
+        "actual_returned_excerpt": "error building bubblewrap command: app-server socket directory must be a user-owned directory with mode 0700\n"
+      },
+      {
+        "type": "commandExecution",
+        "command": "/bin/bash -lc \"rtk proxy rg -n -i -C 2 'sdk|pin|revision|version|commit' examples/omniroute-codex-sdk/worker.py\"",
+        "status": "failed",
+        "exit_code": 1,
+        "actual_returned_excerpt": "error building bubblewrap command: app-server socket directory must be a user-owned directory with mode 0700\n"
+      },
+      {
+        "type": "mcpToolCall",
+        "server": "context-mode",
+        "tool": "ctx_execute",
+        "status": "completed",
+        "error": null,
+        "result_scope": "Correct twelve-file listing and worker pin"
+      },
+      {
+        "type": "mcpToolCall",
+        "server": "context-mode",
+        "tool": "ctx_execute",
+        "status": "failed",
+        "error": {
+          "message": "tool call error: tool call failed for `context-mode/ctx_execute`\n\nCaused by:\n    Transport closed"
+        },
+        "result_scope": null
+      }
+    ],
+    "catalog": {
+      "endpoint": "http://127.0.0.1:20128/v1/models",
+      "exact_requested_route_listed": true,
+      "private_return_sha256": "b53d88e3addf404eaa41f1b660ea72583177471edb787eb2ebbdc6f831723e4b",
+      "gateway_precondition": "Default route requires the gateway carry of PR #15167; catalog presence is not backend/forwarded-effort attestation."
+    },
+    "forwarded_effort": null,
+    "backend_model_identity_verified": false,
+    "usage_accounting": "Count returned usage.total once. Cached input is within input; reasoning is within output. Do not add usage.last. Failed tool attempts within this thread remain in the same cumulative snapshot; all-provider/coordinator usage and billing are unknown.",
+    "builder_same_session_observation": {
+      "expected_files_from_disk": [
+        "README.md",
+        "acceptance-plan.json",
+        "agents/runtime-judge.toml",
+        "checks.json",
+        "enhancements.md",
+        "rerun-plan.json",
+        "runtime-worker.yaml",
+        "runtime.config.template.toml",
+        "test_worker.py",
+        "test_worker.py.lock",
+        "worker.py",
+        "worker.py.lock"
+      ],
+      "returned_file_set_equals_disk": true,
+      "sdk_pin_equals_worker_source": true
+    },
+    "candidate_phase": "before-B2-repair",
+    "source_artifact": {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-worker.py.source.txt",
+      "sha256": "3aa19fa790e661f5142fa316b58473e508f68af6c4f155f0a2fa469177c8a623"
+    }
+  },
+  "negative_controls": [
+    "Missing response.completed fails with unknown usage and closed native child.",
+    "Unsupported wire_api=chat fails during initialization before provider submission.",
+    "Existing native-result output refuses overwrite.",
+    "An explicit nonmatching serverInfo.version is rejected while its userAgent correctly derives from current worker.SDK_VERSION; the matching fallback cannot mask the wrong authoritative version.",
+    "Missing/disabled/empty/error MCP or skill catalog is rejected before inference.",
+    "Content filter fails terminally for retry budgets zero and five; permitted continuation retains one/six guidance items."
+  ],
+  "historical_preservation": {
+    "receipts": [
+      {
+        "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+        "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e",
+        "byte_identical_to_import_source": true
+      },
+      {
+        "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+        "sha256": "913b02edf8b557a86a0f16f672a3bcaf8e28609ef608e05a192d1e3cb5c7fb06",
+        "byte_identical_to_import_source": true
+      },
+      {
+        "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+        "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3",
+        "byte_identical_to_import_source": true
+      }
+    ],
+    "copied_originals_directory": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical",
+    "source_copy_count": 11,
+    "historical_observations_and_qualification_ids_unchanged": true,
+    "refresh_observations_have_separate_dated_ids_and_scope": true,
+    "new_convergence_record": "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
+    "historical_records_restored": "#551 declarations restored; only immutable frozen-path remaps and one dated provenance note per record differ"
+  },
+  "audit_disposition": {
+    "HP-1": {
+      "status": "addressed_within_contract",
+      "detail": "Owned scripts, locks, SDK_VERSION, negative-control pin, help, docs, config, role, plans and skill refreshed. Two landscape paths named by the wider audit are absent from current main and not part of this contract."
+    },
+    "HP-2": {
+      "status": "addressed",
+      "detail": "Fixture and worker/template disable unused plugins; all twelve final runs pass. Narrow switch alternatives checked at pinned source. Historical temporary-directory cleanup remains coordinator-owned; global egress and descendant assertions are outside observed scope."
+    },
+    "HP-3": {
+      "status": "addressed_required_checks_optional_surfaces_deferred",
+      "detail": "Current hashes/results, locked shebangs, README test coverage and expected stderr updated. Required template rendering, runtime-judge catalog and live read-only task exercised. Alternate credentials/binary, approval reviewer, workspace-write live behavior, native judge spawn, long-lived pools and Dagu scheduling not executed."
+    },
+    "HP-4": {
+      "status": "partially_addressed",
+      "detail": "Gateway carry precondition documented; exact default catalog route checked. Requested effort separated from unknown forwarded effort/backend identity. No model fallback because the contract route was present."
+    },
+    "HP-5": {
+      "status": "addressed_fixture_gateway_behavior_unknown",
+      "detail": "Zero/five-retry guidance fixture added and passed; explicit permitted continuation policy selected. Whether the live gateway emits content_filter remains unknown; model guidance/catalog overrides are not added."
+    },
+    "HP-6": {
+      "status": "addressed",
+      "detail": "Preflight and PID APIs labeled exactly pinned SDK internals, source chain reverified and support boundary documented. The decision now distinguishes local Codex SDK, managed Agents API and in-application Agents SDK, with official documentation citations."
+    },
+    "AD-1": {
+      "status": "deferred_other_owner",
+      "detail": "Shared-home concurrent state-DB and logs-reclamation acceptance belongs to the separate Codex pin-move owner; this contract requires private worker homes."
+    },
+    "AD-2": {
+      "status": "deferred_gateway_precondition",
+      "detail": "Session-tag header awaits gateway owner confirmation that its documented memory side effect is inactive and by-run reconciliation. Existing request ID preserved."
+    },
+    "PL-2": {
+      "status": "addressed_harness_only",
+      "detail": "Runtime config guard keeps model_catalog_url absent. tests/test_codex_worker_lane.py and adoption profile guard belong to the other owner."
+    },
+    "NA-1": {
+      "status": "no_redesign_required",
+      "detail": "Published SDK/CLI installed at 0.160.0; native skill discovery assertions pass. No installation from development-placeholder Git pyproject."
+    },
+    "NA-2": {
+      "status": "no_redesign_required",
+      "detail": "Relevant native config/resume/MCP/sandbox transport fixtures exercised; no blanket hooks/auth/multi-agent acceptance claimed. Critic correction: four new config keys are six property paths.",
+      "critic_locator": "claude-audit-synth.json#/critic/challenged_actions/9"
+    },
+    "NA-3": {
+      "status": "no_redesign_required",
+      "detail": "Namespaced default and explicit Astra fixture pass. Live acceptance records requested default and catalog entry, not backend attestation."
+    },
+    "NA-4": {
+      "status": "no_redesign_required",
+      "detail": "Responses wire and request ID retained; no gateway session-memory or idempotency redesign."
+    }
+  },
+  "completeness_critic": {
+    "review_scope": "Same-session builder self-review; no new independent review claim",
+    "findings_applied": [
+      "Retain startup ownership through worker and preflight deadlines; expired cleanup is unresolved",
+      "Save completed native result before post-turn status read",
+      "Assert production plugins override and test a home with no features table",
+      "Preserve and attribute separate coordinator non-nested shell evidence",
+      "State writing/MCP limits in README and project skill",
+      "Move refresh observations to one sibling record with current base and frozen source snapshots",
+      "Use task-configured graph skill requirements and document the project-skill lifecycle exception"
+    ],
+    "audit_critic_contributions": [
+      {
+        "topic": "HP-2 startup gate alternatives",
+        "locator": "claude-audit-synth.json#/critic/gaps/9",
+        "scope": "Remote backend-authenticated catalog and requirements marketplace-policy alternatives to the feature switch"
+      },
+      {
+        "topic": "NA-2 schema count",
+        "locator": "claude-audit-synth.json#/critic/challenged_actions/9",
+        "scope": "Four new keys correspond to six property paths"
+      }
+    ],
+    "source_verification": [
+      "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc sdk/python/src/openai_codex/async_client.py:73-103 and api.py:329-344",
+      "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc codex-rs/core-plugins/src/manager.rs:743-763 and codex-rs/uds/src/daemon_directory.rs:1-4",
+      "Python 3.13 asyncio.shield documentation; installed openai-codex 0.160.0 start/close source"
+    ],
+    "next_lifecycle_sweep": [
+      "Writing/workspace-write dispatch on repaired bytes, and MCP Transport closed failure",
+      "Gateway forwarded-effort/backend evidence and session-memory side effect",
+      "Optional approval/long-lived/scheduled/skill modalities",
+      "A task requiring plugins would reopen the feature switch comparison"
+    ],
+    "final_same_session_checks": [
+      "Three September 30 receipts verified byte-identical to #551.",
+      "Both September 30 records differ only in frozen artifact paths and one dated provenance note; neither retains an October 3 run.",
+      "The sibling record holds the builder live run once and attributes the separate coordinator shell observation.",
+      "Coordinator JSON verified byte-identical; native-result hash is supplied evidence, not a builder inspection of that private result.",
+      "Final worker/test/lock bytes match acceptance snapshots; no private worker directory is named in the public decision.",
+      "All B2 repairs and acceptance commands are accounted for; no new live model, stack/adoption/SDK-pair pin, commit or push action occurred."
+    ]
+  },
+  "publication_validation": {
+    "owned_root": {
+      "status": "passed",
+      "command_ids": [
+        "b2-validate-final",
+        "b2-pre-push-registry-final"
+      ],
+      "previous_status": "failed_before-B2",
+      "before_b2_reason": "Host-excluded untracked dispatcher; validator intentionally ignores inherited Git routing/index variables.",
+      "returned_summary": {
+        "components": 69,
+        "hashed_files": 9383,
+        "profiles": 4,
+        "receipts": 190,
+        "status": "passed"
+      }
+    },
+    "native_archive": {
+      "status": "passed",
+      "command_id": "final-validate-native-archive",
+      "source_snapshot_before_receipt_seal": {
+        "tree": "c3af447fc3f7dcd0b3ede8c5fa4b28467f3f71a6",
+        "base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+        "archive_sha256": "7eef67a568a48d5e730a89b9ee181ebe11fe687673f98660b1450d70337ef4a9",
+        "tree_inventory_sha256": "3d63d32c731c7a24b31d18ab2990d2feb7c839991b7415388d96afe01db1691f",
+        "tree_file_count": 10067,
+        "owned_file_count": 55,
+        "owned_file_bytes_match_worktree": true,
+        "dispatcher_present": true,
+        "committed": false,
+        "pushed": false,
+        "validation_scope": "Native proposed-tree source archive; shared-checkout Git enumeration remains failed until force-staging."
+      },
+      "private_archive_locator": "<B-homes>/native-proposal-c3af447fc3f7dcd0b3ede8c5fa4b28467f3f71a6.tar",
+      "private_tree_inventory_locator": "<B-homes>/native-proposal-c3af447fc3f7dcd0b3ede8c5fa4b28467f3f71a6-tree-inventory.bin",
+      "snapshot_scope": "This passed snapshot precedes addition of its own returned validation result to the receipt. A final sealed-tree export is revalidated by the same-session builder; neither snapshot is checkout Git enumeration acceptance."
+    },
+    "coordinator_completion": "The skill is present in the checkout real index; B2 runs checkout validation and real-index registry tests. No commit or push performed.",
+    "returned_result_seal_scope": "The recorded commands checked the final source and candidate metadata before adding their own returned output to this receipt. Sealed receipt/checks/experiment hashes are re-registered and checked again by the same-session builder; final check logs remain in owned private state. No independent review or provider run is inferred."
+  },
+  "before_b2_fixture_acceptance": {
+    "command": "rtk uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+    "invocations": 12,
+    "passed_invocations": 12,
+    "failed_invocations": 0,
+    "tests_per_invocation": 15,
+    "source_formatted_before_final_invocations": true,
+    "evidence_class": "local_integration_synthetic_provider",
+    "provider_usage": null,
+    "content_filter_guidance_counts": {
+      "native_retries_disabled": 1,
+      "native_default_five_retries": 6
+    },
+    "content_filter_continuation": "Explicit permitted continuation resumes with persisted guidance; no automatic blocked-task replay."
+  },
+  "before_b2_source_closure": [
+    {
+      "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
+      "sha256": "c3b54fa2586c2c10cb255842023a133d6c2bb9ea7dcafb787fe2c6119559e0a8"
+    },
+    {
+      "path": ".github/osv-scanner-lockfiles.json",
+      "sha256": "ee664120d449a20f7df72e4fe15942f70f9b55f4f10c2b5f1a15bb42ffa1acfd"
+    },
+    {
+      "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
+      "sha256": "22c52104ccec6af101427f16fa9ac85aa3b1b812d0b7e7d2a122cda43c3dd0e7"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
+      "sha256": "827acfed0972723588959a993165f1b352d66b9806d6800f227a3333f75f2caf"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/deadline300-judge-oracle-output.txt",
+      "sha256": "b9032a013f9d5b050a0940a2c8142d75ff75d6e560e88e77c58383d4c94fc679"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime-worker.yaml.txt",
+      "sha256": "82dd567b9e0fd8cc300b516fed535584472a499f63431ddeb030a36065c91426"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime.config.template.toml.txt",
+      "sha256": "5c023dcf0c9c80a3aaf303dda47a268250c61b054551e3f8ccf213033609c72e"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/post-env-import-runtime-worker.yaml.txt",
+      "sha256": "46cab557d04fcb6bc5ad1be96c5b46d4dd82a8bfc25fe719fb095deb64a7e756"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/pre-dispatch-default-skill.md",
+      "sha256": "14593cbbbe7a89507c0559dd975dff4a2273a46f0e828a7689f79d650767d28f"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt",
+      "sha256": "7b49b6e997017b1cde21f9aa33af3d5510926ad182f3211d0dd40cd71762a44a"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "sha256": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
+      "sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt",
+      "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
+      "sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/acceptance-plan.json.source.txt",
+      "sha256": "5b046e6e30802bbe66d837030ae3c215d6fd401d524d48f51302269450d65d94"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-enhancements-experiment.json.source.txt",
+      "sha256": "819124da985301f216fd0e3178d7b1aa4986e0c3812d18a75505723d85dbdfcc"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt",
+      "sha256": "6d4812ea4906789e2f55cf206d03863af6116c7137d667d542d2395ac985ce31"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/rerun-plan.json.source.txt",
+      "sha256": "3f4e9c441ca1b34c9a425cc3e8344e979b99757370506970fd7f760ac55d8730"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime-judge.toml.source.txt",
+      "sha256": "0a0b549d3007c75ccb35be3a1d765de31d0504abdd35dfad1e3d68ad4daead55"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime-worker.yaml.source.txt",
+      "sha256": "b3093a32ad708f09b81893f9d65975f9f01f99078976929e82830e6ec1b6a7b4"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime.config.template.toml.source.txt",
+      "sha256": "3602da96a99c2cc4a6f211695dcf0b8f46cd408cd10290b8b54537e38f0258d6"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/test_worker.py.source.txt",
+      "sha256": "b31d70450151925ac506e9cd018740e9d3d4ca4529a70f3a9d4f8b845d7e8da8"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.lock.source.txt",
+      "sha256": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.source.txt",
+      "sha256": "d93e4bb0e54f436d15b6c06375126eba51289f8b1513e5ef52dfacaa8a65a074"
+    },
+    {
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+      "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3"
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "sha256": "913b02edf8b557a86a0f16f672a3bcaf8e28609ef608e05a192d1e3cb5c7fb06"
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+    },
+    {
+      "path": "examples/claude-runtime-sdk/README.md",
+      "sha256": "eb8e0d9f5f794c5fe66d3c7d402dc850ee666a2317c3fc66763f5ebd275fb87c"
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/check_controls.py",
+      "sha256": "21a79c84a780a900fb365c0478bf79af5ed1d55a9c20f59b5859368b71fe9dcf"
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/test_worker.py",
+      "sha256": "2e748b56185fc8aa8eb519a371d4524327fe5fe9f4bfdfda4f60bb6510f96dea"
+    },
+    {
+      "path": "examples/claude-runtime-sdk/verification.md",
+      "sha256": "980b4f2ffbf49ee9ca2ab0127a4bc90c1d56c401c2cbb74d78b9a9dbe1f05ae1"
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py",
+      "sha256": "92b6077da5f659a9798d61433b73920903dd2637dd4b4ee914e42995d111abf9"
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py.lock",
+      "sha256": "79f1e72c87e1a934cf532a6ee929e22b1defcb2476317e24d68c1124913235c8"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/README.md",
+      "sha256": "5f9ee5c9138e26655ca9068cf25bd610e8fe0061779ef404ad951ecdb0f971cc"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
+      "sha256": "1e80fe8861bbb3669cb6bdff0d03f3d3b81dd2e7fce707d46b766f2f1c742a8d"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
+      "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/enhancements.md",
+      "sha256": "898c04701a0e8be428b94e61983c74fd2e27b1d8a6acad01e47ec1cc80d87d7b"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/rerun-plan.json",
+      "sha256": "c144ce553283ed283e1d790c51dc061eeb57982e35d440e1a052c749cbc7b929"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
+      "sha256": "b3093a32ad708f09b81893f9d65975f9f01f99078976929e82830e6ec1b6a7b4"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py",
+      "sha256": "4dad11db9dc1faecc938d496815bb0504a6d93731dac28183542f97da4a38300"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py",
+      "sha256": "3aa19fa790e661f5142fa316b58473e508f68af6c4f155f0a2fa469177c8a623"
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+    },
+    {
+      "path": "tests/test_osv_lockfile_coverage.py",
+      "sha256": "d9378993f71a10cb3e8c8ac32e6bb9f6dfb3e8e5d704ea535b9ae7af39d92de1"
+    },
+    {
+      "path": "tools/runtime-worker-evidence/README.md",
+      "sha256": "b614d175056395e2f88818b57f27c76f435b97512afa4ef7444b43316a041c8d"
+    },
+    {
+      "path": "tools/runtime-worker-evidence/checks.json",
+      "sha256": "094cd7785fabc277508bc4ed90bac60a4e98dacdca7b51f50f5731608cc5e80c"
+    },
+    {
+      "path": "tools/runtime-worker-evidence/gateway_observer.py",
+      "sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97"
+    },
+    {
+      "path": "tools/runtime-worker-evidence/osv-check.json",
+      "sha256": "0d31c8900e8f5475c2fbe04f26d09493e2e507354c8c99e5b35a50c079e318b7"
+    },
+    {
+      "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
+      "sha256": "b5cba9a4a0ffacba92a1194644ee6cde96e267246bc24f302876d4ad5bf5e8db"
+    }
+  ],
+  "before_b2_preflight": {
+    "command_id": "preflight",
+    "returned_fields": {
+      "event": "result",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "model_inference_submitted": false,
+      "usage_status": "unknown",
+      "usage_scope": null,
+      "usage": null,
+      "preflight": true,
+      "evidence_scope": "native_catalog_discovery",
+      "native_runtime": {
+        "name": "omniroute_codex_runtime_worker",
+        "version": "0.160.0",
+        "metadata_source": "userAgent"
+      },
+      "effective_config": {
+        "model": "cx/gpt-6.1-sol-max",
+        "model_provider": "omniroute_runtime",
+        "model_reasoning_effort": "max"
+      },
+      "agent_defaults": {
+        "enabled": true,
+        "max_concurrent_threads_per_session": 3,
+        "default_subagent_model": null,
+        "default_subagent_reasoning_effort": null
+      },
+      "configured_roles": [
+        {
+          "name": "runtime-judge"
+        }
+      ],
+      "mcp_servers": [
+        {
+          "name": "context-mode",
+          "configured": true,
+          "enabled": true,
+          "runtime_status": null,
+          "auth_status": "unsupported",
+          "tools_error": false,
+          "tool_count": 9,
+          "catalog_ready": true
+        },
+        {
+          "name": "serena",
+          "configured": true,
+          "enabled": true,
+          "runtime_status": null,
+          "auth_status": "unsupported",
+          "tools_error": false,
+          "tool_count": 5,
+          "catalog_ready": true
+        }
+      ],
+      "skills": {
+        "total_count": 33,
+        "enabled_count": 33,
+        "required": {}
+      },
+      "skill_error_count": 0,
+      "requirements": {
+        "mcp": [
+          "context-mode"
+        ],
+        "skills": [],
+        "unavailable_mcp": [],
+        "unavailable_skills": []
+      },
+      "status": "ready",
+      "cleanup_status": "closed"
+    },
+    "home_render_source": "tools/adoption/render_config.py::render_one",
+    "template": {
+      "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048"
+    },
+    "rendered_private_files": [
+      {
+        "locator": "<B-homes>/live-worker/config.toml",
+        "sha256": "7d493723ce1e16249b8518ce72f41473bd58d9467061fe76da7e798b7dff43f8",
+        "mode": "0600"
+      },
+      {
+        "locator": "<B-homes>/live-worker/agents/runtime-judge.toml",
+        "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f",
+        "mode": "0600"
+      }
+    ],
+    "skill_installed_in_private_home": false,
+    "require_skill_passed": false,
+    "inherited_project_skills_separate": true
+  },
+  "b2_source_snapshots": [
+    {
+      "source_path": "examples/omniroute-codex-sdk/worker.py",
+      "artifact": {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.source.txt",
+        "sha256": "33057e8b5bcb042bed8f517d759b00936767d2a8df7055dd2179df5d93ace618"
+      }
+    },
+    {
+      "source_path": "examples/omniroute-codex-sdk/test_worker.py",
+      "artifact": {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.source.txt",
+        "sha256": "3497536133785b5fe3584265973941910a50826f410f62b0f95de67b206464ff"
+      }
+    },
+    {
+      "source_path": "examples/omniroute-codex-sdk/worker.py.lock",
+      "artifact": {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.lock.source.txt",
+        "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+      }
+    },
+    {
+      "source_path": "examples/omniroute-codex-sdk/test_worker.py.lock",
+      "artifact": {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.lock.source.txt",
+        "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+      }
+    },
+    {
+      "source_path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "artifact": {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime.config.template.toml.source.txt",
+        "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048"
+      }
+    },
+    {
+      "source_path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
+      "artifact": {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime-worker.yaml.source.txt",
+        "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c"
+      }
+    },
+    {
+      "source_path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
+      "artifact": {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime-judge.toml.source.txt",
+        "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f"
+      }
+    },
+    {
+      "source_path": "examples/omniroute-codex-sdk/acceptance-plan.json",
+      "artifact": {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-acceptance-plan.json.source.txt",
+        "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc"
+      }
+    }
+  ],
+  "coordinator_shell_observation": {
+    "attribution": "Separate coordinator Bash observation supplied by repair contract B2; not a builder run",
+    "candidate_phase": "before-B2-repair",
+    "observation_artifact": {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation.json",
+      "sha256": "acabe8d2ee66340a99f1d7c3e39d2e99a31c6411c886738bd4c354bedc42c9c6"
+    },
+    "returned_observation": {
+      "observed_at": "2026-10-03 (coordinator Bash, not nested in any Codex sandbox)",
+      "worker": "examples/omniroute-codex-sdk/worker.py at the harness candidate (SDK 0.160.0)",
+      "command": "uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <candidate checkout> --codex-home <private home rendered from runtime.config.template.toml, session state removed> --sandbox read-only --timeout 600 --native-result <private> --prompt -",
+      "task": "run `ls examples/omniroute-codex-sdk | wc -l` with the shell tool and reply with the number",
+      "worker_exit": 0,
+      "status": "completed",
+      "final_response": "13",
+      "items": {
+        "userMessage": 1,
+        "commandExecution": 1,
+        "reasoning": 1,
+        "agentMessage": 1
+      },
+      "command_execution": {
+        "exitCode": 0,
+        "status": "completed",
+        "aggregatedOutput": "13\\n"
+      },
+      "native_runtime": "0.160.0 (serverInfo)",
+      "route": "cx/gpt-6.1-sol-max, effort max requested",
+      "usage_total": {
+        "inputTokens": 33879,
+        "cachedInputTokens": 16768,
+        "outputTokens": 138,
+        "totalTokens": 34017
+      },
+      "thread_status": "idle",
+      "cleanup_status": "closed",
+      "native_result_sha256": "244f6e30f795cbbcb51ba50a96adb2b25adb8f27bde7b7fb931bcebba6725698",
+      "meaning": "the builder's two shell startup failures (socket directory must be user-owned 0700) occurred inside its own Codex sandbox; outside it, native shell execution through the worker completes. Backend effort is still unobserved."
+    },
+    "native_result_sha256": "244f6e30f795cbbcb51ba50a96adb2b25adb8f27bde7b7fb931bcebba6725698",
+    "native_result_review_scope": "Hash and sanitized JSON supplied by coordinator; builder did not read the private native result",
+    "backend_effort": "unobserved",
+    "source_artifact": {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-worker.py.source.txt",
+      "sha256": "3aa19fa790e661f5142fa316b58473e508f68af6c4f155f0a2fa469177c8a623"
+    }
+  },
+  "b2_repair": {
+    "checked_on": "2026-10-03",
+    "native_model_tasks_started": 0,
+    "fixture_added_tests": [
+      "test_runtime_override_gates_plugins_without_home_features_table",
+      "test_initialization_deadline_waits_for_late_start_before_cleanup",
+      "test_initialization_cleanup_bound_reports_unresolved",
+      "test_post_turn_read_failure_preserves_completed_native_result"
+    ],
+    "project_skill_description_chars": 129,
+    "force_added_skill_index_scope": "real checkout index, existing intent-to-add entry",
+    "new_credential_or_auth_store_reads": false,
+    "source_scope": "Owned SDK example, project skill/lifecycle exception, decision/convergence records and evidence; no stack/adoption/SDK-pair pin changes",
+    "generated_report_writes_performed": false,
+    "generated_report_checks": {
+      "component_matrix": {
+        "exit_code": 0,
+        "rows": 32,
+        "status": "checked"
+      },
+      "new_host_grand_list": {
+        "exit_code": 0,
+        "layers": 32,
+        "winners": 66,
+        "status": "passed"
+      }
+    }
+  }
+}
