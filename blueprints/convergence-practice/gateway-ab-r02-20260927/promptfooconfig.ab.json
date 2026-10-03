@@ -1,0 +1,246 @@
+{
+  "description": "R02 gateway A/B (FW effort), arm order A-B per filing",
+  "prompts": [
+    "file://prompt_r02.py:build_prompt"
+  ],
+  "providers": [
+    {
+      "id": "http",
+      "label": "r02-A",
+      "config": {
+        "url": "http://127.0.0.1:20128/v1/chat/completions",
+        "method": "POST",
+        "maxRetries": 0,
+        "headers": {
+          "Content-Type": "application/json",
+          "x-omniroute-session": "r02-a-{{accession}}-r{{__repeatIndex}}-{{__evalId}}",
+          "Idempotency-Key": "r02-a-{{__evalId}}-{{__evalStepId}}",
+          "X-Correlation-Id": "r02-a-{{__evalId}}-{{__evalStepId}}",
+          "X-OmniRoute-No-Cache": "true"
+        },
+        "body": {
+          "model": "cx/gpt-6-astra",
+          "messages": [
+            {
+              "role": "user",
+              "content": "{{prompt}}"
+            }
+          ],
+          "stream": true,
+          "stream_options": {
+            "include_usage": true
+          },
+          "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+              "name": "li26_filing_items",
+              "strict": true,
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "items"
+                ],
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "1.01",
+                        "1.02",
+                        "1.03",
+                        "1.04",
+                        "1.05",
+                        "2.01",
+                        "2.02",
+                        "2.03",
+                        "2.04",
+                        "2.05",
+                        "2.06",
+                        "3.01",
+                        "3.02",
+                        "3.03",
+                        "4.01",
+                        "4.02",
+                        "5.01",
+                        "5.02",
+                        "5.03",
+                        "5.04",
+                        "5.05",
+                        "5.06",
+                        "5.07",
+                        "5.08",
+                        "6.01",
+                        "6.02",
+                        "6.03",
+                        "6.04",
+                        "6.05",
+                        "6.06",
+                        "6.10",
+                        "7.01",
+                        "8.01",
+                        "9.01"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "transformResponse": "file://transform_r02.js"
+      }
+    },
+    {
+      "id": "http",
+      "label": "r02-B",
+      "config": {
+        "url": "http://127.0.0.1:20128/v1/chat/completions",
+        "method": "POST",
+        "maxRetries": 0,
+        "headers": {
+          "Content-Type": "application/json",
+          "x-omniroute-session": "r02-b-{{accession}}-r{{__repeatIndex}}-{{__evalId}}",
+          "Idempotency-Key": "r02-b-{{__evalId}}-{{__evalStepId}}",
+          "X-Correlation-Id": "r02-b-{{__evalId}}-{{__evalStepId}}",
+          "X-OmniRoute-No-Cache": "true"
+        },
+        "body": {
+          "model": "cx/gpt-6-astra-max",
+          "messages": [
+            {
+              "role": "user",
+              "content": "{{prompt}}"
+            }
+          ],
+          "stream": true,
+          "stream_options": {
+            "include_usage": true
+          },
+          "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+              "name": "li26_filing_items",
+              "strict": true,
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "items"
+                ],
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "1.01",
+                        "1.02",
+                        "1.03",
+                        "1.04",
+                        "1.05",
+                        "2.01",
+                        "2.02",
+                        "2.03",
+                        "2.04",
+                        "2.05",
+                        "2.06",
+                        "3.01",
+                        "3.02",
+                        "3.03",
+                        "4.01",
+                        "4.02",
+                        "5.01",
+                        "5.02",
+                        "5.03",
+                        "5.04",
+                        "5.05",
+                        "5.06",
+                        "5.07",
+                        "5.08",
+                        "6.01",
+                        "6.02",
+                        "6.03",
+                        "6.04",
+                        "6.05",
+                        "6.06",
+                        "6.10",
+                        "7.01",
+                        "8.01",
+                        "9.01"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "transformResponse": "file://transform_r02.js"
+      }
+    }
+  ],
+  "defaultTest": {
+    "assert": [
+      {
+        "type": "python",
+        "value": "file://assert_r02.py:get_assert"
+      },
+      {
+        "type": "is-json",
+        "value": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "1.01",
+                  "1.02",
+                  "1.03",
+                  "1.04",
+                  "1.05",
+                  "2.01",
+                  "2.02",
+                  "2.03",
+                  "2.04",
+                  "2.05",
+                  "2.06",
+                  "3.01",
+                  "3.02",
+                  "3.03",
+                  "4.01",
+                  "4.02",
+                  "5.01",
+                  "5.02",
+                  "5.03",
+                  "5.04",
+                  "5.05",
+                  "5.06",
+                  "5.07",
+                  "5.08",
+                  "6.01",
+                  "6.02",
+                  "6.03",
+                  "6.04",
+                  "6.05",
+                  "6.06",
+                  "6.10",
+                  "7.01",
+                  "8.01",
+                  "9.01"
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -5198,6 +5198,56 @@
       "bytes": 3223
     },
     {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/README.md",
+      "sha256": "1a9c0c8c8d75bc37509aacbe4778cf5a860e352dc462b8929941515783523f27",
+      "bytes": 68781
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/analyze_r02.py",
+      "sha256": "b7a113e71c6f7a1d0fd8693b75f9bae2ffb26632e62e503fa0de03e008f4cf8d",
+      "bytes": 60802
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/assert_r02.py",
+      "sha256": "acab8fd0ac691b073b10c7d205f8aad6042b0dbe84cf20637a00f0d3b4fbc832",
+      "bytes": 2145
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/build_r02.py",
+      "sha256": "e4114084e958c6318990edc4f4fd4907b8ebcdcb229b41da045a35dcab3421f7",
+      "bytes": 21435
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/call_logs_by_correlation.py",
+      "sha256": "1c8345d443378798737c49ff6e05eba5685f9098f3ce7cc18b58eb4ac3eb66dd",
+      "bytes": 9163
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json",
+      "sha256": "37a1ded4ab20535ca81632c9f9db42996fb0fb1fe767c1592102529d5967f614",
+      "bytes": 66364
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/prompt_r02.py",
+      "sha256": "c4fb538527f0ca010dbc96cb8f1c5710d8c2ee9250c17c7808ca8a7a37f458d2",
+      "bytes": 1445
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ab.json",
+      "sha256": "85df87522f8289633cd2fd33055e5fb5412b06bfea22e3ccd43e6fe812b1e8c0",
+      "bytes": 6928
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ba.json",
+      "sha256": "506cdd45829569222ed477f4fa6e5d9e36e2be64f336d7d294b8a7c883f34442",
+      "bytes": 6928
+    },
+    {
+      "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/transform_r02.js",
+      "sha256": "c0ae04eb90b70e0b28ec620095fbfe5349e1c22e29f37ae3b6ba6dc9caa06f2c",
+      "bytes": 8822
+    },
+    {
       "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/README.md",
       "sha256": "e46bbf1918e63dbb1dd816d58cee63f02a10eb236e01ab27a38c780775676e0a",
       "bytes": 22730
@@ -50586,6 +50636,11 @@
       "path": "tests/test_gap_wave_ledger.py",
       "sha256": "7857d26cddfa114483dff44b8813afbd937de044fa2a28c3c71cda8b1cac0db3",
       "bytes": 9965
+    },
+    {
+      "path": "tests/test_gateway_ab_r02_20260927.py",
+      "sha256": "ca9733e57a26d1c4482e0fc8010042b741b36569e8aa24f6c3eb27130ae7288c",
+      "bytes": 111349
     },
     {
       "path": "tests/test_gitleaks_config.py",
