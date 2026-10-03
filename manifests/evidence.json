@@ -4018,13 +4018,13 @@
     },
     {
       "id": "mcporter-0142-qualification-20261003",
-      "kind": "native_cli_e2e",
+      "kind": "compatibility_attempt",
       "component_ids": [
         "mcporter"
       ],
-      "claim": "The recorded version command printed \"0.14.2\" (exit 0). The new ad-hoc stdio order/get_session_stats canary returned \"visible_tools\": 6, \"catalog_tools\": 94 and \"session_tokens_saved\": 0 (exit 0).",
+      "claim": "mcporter 0.14.2 remains an unaccepted compatibility attempt: version and an ad-hoc stdio canary passed, but npm ls --all returned ELSPROBLEMS (bundled core 2.2.0 beside resolved server 2.3.0). The persistent daemon and serve roles used by foundation-cpu and token-efficiency were not qualified. The selected Linux pin remains 0.14.1; the independently held macOS pin remains 0.13.13.",
       "limitations": [
-        "The original documented host-config smoke is \"NOT RUN\"; the accepted canary is a fresh ad-hoc stdio call, with no daemon.",
+        "The original documented host-config smoke is \"NOT RUN\"; the ad-hoc stdio canary is evidence for the hold only and does not establish daemon or serve acceptance.",
         "No daemon restart/recovery, mixed-version daemon, OAuth, Windows retry, serve operation or upstream test suite was exercised.",
         "The judge records npm ls --all ELSPROBLEMS from bundled core 2.2.0 beside resolved server 2.3.0; the canary covers client stdio calls, not serve.",
         "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
@@ -4329,8 +4329,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "1718c5b0acd021df75308ca42aa35cea8039702d2f638842a47cf62c87938f68",
-      "bytes": 63692
+      "sha256": "932806ffa1d2b9b1b6053068a907c1574cc8701365201f055438272261d49486",
+      "bytes": 65378
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4429,8 +4429,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a",
-      "bytes": 20102
+      "sha256": "4aedebfa4528918a008d99c2ef6044b307a6fcf7646afe8857ee8db936241714",
+      "bytes": 20038
     },
     {
       "path": "adoption/new-wsl-profile.json",
@@ -4474,12 +4474,12 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "5afb235eaafc76c1348809329800a6414cff1bc797e119e5ff5e0297ce04c402",
-      "bytes": 32270
+      "sha256": "f39042b4c9999ae2f1fe7a32b85dc5f555bc845a91d96209925daafe1a2a8eda",
+      "bytes": 31575
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "58cce2b4581117c729fa60126b1cef24d2c8cf2fa19950bbef669b8881f2311c",
+      "sha256": "1d693b66002e8931af2370fc9da919f667bfbf3a1a22ddd54bdd2c1d81cf19e4",
       "bytes": 43700
     },
     {
@@ -4489,8 +4489,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "f3298bc8b8a105a0179be003fd916282e2db2009cee22a9536ed097e706023db",
-      "bytes": 26276
+      "sha256": "15c8fe95c8484d85fd369f10d7d8723b467f8ed33200576abdc45d4715715889",
+      "bytes": 26335
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -9865,8 +9865,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "57d619d6904e3f80148e81245cf7b4180c581c4680acc26e4f970be6c9f94e95",
-      "bytes": 491131
+      "sha256": "7c4937a35a7ee54d2a4f5b74cbb3ba69b1379e48a1fad4a32084200571365986",
+      "bytes": 490254
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15205,8 +15205,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "883e38a6e70bd5ac44f327bc7ac8beb56c2bb252c41ebd361de85031a93c63ab",
-      "bytes": 287705
+      "sha256": "2d939cb03f303a0ccf87356a72df9ffe18c8e9649fc8c3bec01100db6c4408be",
+      "bytes": 287577
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -15215,8 +15215,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "58fce711495355032ff360a018099a5bcc9f4fac5d89ae0a90e17f07c2e16370",
-      "bytes": 286129
+      "sha256": "26c021f065f577637368db1b42c7f34cd9ec30ae89ae4179f18337677004b85e",
+      "bytes": 290085
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15955,8 +15955,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-currency-wave-w1.md",
-      "sha256": "8478ca3a2b6db1471a91ddaf1225e30c80bff433b0295b84a9b83ac95e14cc93",
-      "bytes": 20359
+      "sha256": "45a4cc616e230dbcc65e0b308922f22a61179139845049d6fa73376618076913",
+      "bytes": 28687
     },
     {
       "path": "docs/direct-results.md",
@@ -16210,7 +16210,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "48ced30b2922fe638af083fd873724c39f062b2903f79aaf1cdc8f51acfd759e",
+      "sha256": "02c9ae5e193d3b759d4036b3b10a77019ee6a0d14bcddd28b23c750825fab68f",
       "bytes": 18484
     },
     {
@@ -16320,7 +16320,7 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "d27e356ba812e5983a83021f833a9f60c3fe860e307871b0a571054243c1a420",
+      "sha256": "ee51bbd55ab98e55b72fa91647a6adcee036a8ea6da695144f0a896b32e82736",
       "bytes": 587562
     },
     {
@@ -17935,8 +17935,13 @@
     },
     {
       "path": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json",
-      "sha256": "6cadeabcb90fa7440a72538f216cbf031106a57cb9b6d7c1155674ec3e3fc963",
-      "bytes": 25075
+      "sha256": "a0194f7ce41dc4efc6320e10662f53e2b21afe7e15d477752947cb7ec160cb60",
+      "bytes": 74214
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/review-bot-repair-checks.json",
+      "sha256": "c9d4db925ee8a28bdbcbddd088a1e410569ba840d3e4209bc2d8848d98fea8c4",
+      "bytes": 121015
     },
     {
       "path": "evidence/artifacts/currency-wave-w1-20261003/review-repair-checks.json",
@@ -48200,8 +48205,8 @@
     },
     {
       "path": "evidence/receipts/mcp-inspector-290-qualification-20261003.json",
-      "sha256": "c7ace6e12522585e47cfea8a31d702e5656446e7574507218b605235d82aa5b5",
-      "bytes": 9779
+      "sha256": "ea5909301508d3ef61ef5c79a920da793e4904a5d219e20a9c32c2fd83f45ba3",
+      "bytes": 10165
     },
     {
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
@@ -48210,8 +48215,8 @@
     },
     {
       "path": "evidence/receipts/mcporter-0142-qualification-20261003.json",
-      "sha256": "1a2f88df967ffc3b460bad86c0026f433aee7ddaf333a7e5da5520b1cd2cb37a",
-      "bytes": 8409
+      "sha256": "b1beab03a1aca6fae782b9e8d5d3264bb597ad5c38b111451e715f98ba1256bb",
+      "bytes": 10463
     },
     {
       "path": "evidence/receipts/memory-landscape-20260921.json",
@@ -49015,13 +49020,13 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "824878f6c49975e564590ef3a0d760b4ec14ea43708cec6947b745ab64f914c6",
-      "bytes": 103602
+      "sha256": "51c40b98bd8502bcf664585a271246126d9f750ef369aa57f1b9fc73ddc5a0c1",
+      "bytes": 103387
     },
     {
       "path": "observability/README.md",
-      "sha256": "0c9395106ed32420ea5b26cbd2d7c2f30218c6850c7290680643dedb9292d288",
-      "bytes": 15457
+      "sha256": "721b99df7babd5288f62a260910e0d7d704e103e2fa57a7d8797426971b2a508",
+      "bytes": 15861
     },
     {
       "path": "observability/backends/README.md",
@@ -49300,8 +49305,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "9b2da5a65fd73850c4774a3f075f00070885351edd38b44779ae3e9bdc0a7eda",
-      "bytes": 126428
+      "sha256": "816386cde96d3ee55c62942822fab79c3bd0d23e4eaa8fd9bb6989d311b95d1e",
+      "bytes": 128375
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -49420,7 +49425,7 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "11277c5a212ceaabfffc811fda1f6d41ab781949585ab4b0da7168bd9778d44c",
+      "sha256": "03307274bb4891465267cc617aa81e0863ed7fb7ba0c5632c7bbcb3d0513bf44",
       "bytes": 114715
     },
     {
@@ -49750,7 +49755,7 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "5fe82766d90ffeab29262eb776ed7b43f599b59a88d755e630cb91c116a77a8a",
+      "sha256": "8dd9d881d0ae3472eddf91c9be6da13a5ee891983fe70367dce22d798ae3cfb7",
       "bytes": 228097
     },
     {
@@ -51140,7 +51145,7 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "c389f35a9dde4b18f6e52a6505b527546cdf97d40ab022d2294848a7531f9d1a",
+      "sha256": "56ffe669a67dae185d7de23e270e53c420f9b346198913e1073fa9341e43a8be",
       "bytes": 25833
     },
     {
