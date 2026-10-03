@@ -391,7 +391,7 @@ npm install --prefix "$HOME/.local/share/codex-ecosystem/tools/tree-sitter-bash-
 node --input-type=module -e "import { loadShellParser } from './examples/claude-native/workflows/child-usage.mjs'; console.log(JSON.stringify(await loadShellParser()))"
 ```
 
-The check prints `{"ok":true,"versions":{...},"wasm_sha256":{...}}` when the lockfile and every pinned file match the pin, and `{"ok":false,"reason":"not_installed"}` (or `hash_mismatch`, `load_error`) otherwise; it writes nothing into the install. The validate job installs the same pin into `$RUNNER_TEMP`, and `tests/test_shell_parser_ci.py` fails any GitHub Actions job that runs it (`GITHUB_ACTIONS=true`) when the loader does not report the pinned install there. Two whole-suite jobs do not install it yet, the macOS `validate-macos` job of `adoption-bootstrap.yml` and the weekly `freshness` job of `catalog-freshness.yml`; that file records them and the check skips in them and says so.
+The check prints `{"ok":true,"versions":{...},"wasm_sha256":{...}}` when the lockfile and every pinned file match the pin, and `{"ok":false,"reason":"not_installed"}` (or `hash_mismatch`, `load_error`) otherwise; it writes nothing into the install. The validate job installs the same pin into `$RUNNER_TEMP`, and `tests/test_shell_parser_ci.py` fails any GitHub Actions job that runs it (`GITHUB_ACTIONS=true`) when the loader does not report the pinned install there. Two whole-suite jobs do not install it yet, the macOS `validate-macos` job of `adoption-bootstrap.yml` and the daily `freshness` job of `catalog-freshness.yml`; that file records them and the check skips in them and says so.
 
 ## Resolve project configuration and environment
 
