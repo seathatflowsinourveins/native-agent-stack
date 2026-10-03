@@ -279,8 +279,10 @@ which modality, source or candidate class the unit missed. Its seeds below feed 
 ### Sources missed before the trial
 
 The preregistration records these reads before the trial: unittest-parallel's PyPI JSON, its repository record and
-its `main.py` and README at the release commit, CPython's `pickle.py` and `unittest` sources, GitHub's documentation
-(for background steps, the workflow-syntax reference) and upstream issue reports for one other tool,
+its `main.py` and README at the release commit, coverage's PyPI JSON, CPython's `pickle.py` and `unittest` sources,
+pytest's documentation and `src/_pytest/unittest.py` at 9.1.1 (the preregistration's decision record, "Alternatives" and
+"Evidence class"), GitHub's documentation (for background steps, the workflow-syntax reference) and upstream issue
+reports for one other tool,
 `actions/upload-artifact` (`preregistration-experiment.json.txt:27-35`, its `discovery_provenance`, and `:104`, a
 limitation; the preregistration's decision record, "Alternatives"). A lifecycle review of parallel test execution
 inside one CI job also reads the four sources below, none of which the preregistration or its decision record records
@@ -314,7 +316,8 @@ issue search), this suite's modules locally with `git grep` at the trial head, a
 ### Candidate classes this trial did not evaluate
 
 The list comes from a read-only single-family research lane (Codex, `gpt-6.1-sol` at max effort, live search,
-2026-10-03): a lead, not authority, apart from matrix sharding, which plan W1 itself compared. Every claim relayed
+2026-10-03): a lead, not authority. Plan W1 itself compared matrix sharding, pytest-xdist and background steps, and the
+preregistration rejected pytest-xdist before the trial (its decision record, "Alternatives"). Every claim relayed
 here was re-read on 2026-10-03, by source class: repository files with GET requests to the GitHub contents API at the
 release tag or commit, each tag resolved through the GitHub commits API to the commit pinned below; repository
 records (last push, archived state) with GET requests to the GitHub REST API, as they stood that day; PyPI upload
@@ -322,7 +325,8 @@ dates, files and dependencies with GET requests to each release's PyPI JSON, whi
 changelog and the GNU findutils announcement with GET requests to the pages, also unpinned; the GNU xargs exit
 statuses from the locally installed GNU xargs 4.10.0 manual page, because the gnu.org manual did not answer; and the
 matrix-sharding blockers and the count of test modules that import `unittest.mock` locally, at this record's base
-`4ced2923`, and in this run's job records. **VERIFIED** means the cited text or record says it. **LEAD-ONLY** means
+`4ced2923`, and, for the macOS queue figures, in this run's job records and those of the concurrent Adoption bootstrap
+smoke runs (the receipt's `data.cancellation.macos_queue_observation`). **VERIFIED** means the cited text or record says it. **LEAD-ONLY** means
 it was not found or not checked there, so it is not asserted. None of these classes ran on this suite, so whether
 any of them keeps the suite's ids and outcomes is unknown.
 
@@ -420,8 +424,9 @@ any of them keeps the suite's ids and outcomes is unknown.
   outside the lifecycle task of this list and of the seeds, parallel execution inside one CI job, because it spreads
   the suite over several jobs; it is listed here, and seeded separately below, so that the next sweep sees its
   blockers. Source: this record's base (`.github/main-ruleset.json:35` and `:41`, `docs/github-automation.md:26-28`,
-  `tests/test_workflow_hardening.py:1249-1257`), this run's job records (the receipt's `data.jobs` and
-  `data.cancellation`) and github/docs at `2bd66de8` (`content/actions/reference/limits.md:64-69`).
+  `tests/test_workflow_hardening.py:1249-1257`), this run's job records and those of the concurrent Adoption bootstrap
+  smoke runs (the receipt's `data.jobs`, `data.cancellation` and `data.cancellation.macos_queue_observation`) and
+  github/docs at `2bd66de8` (`content/actions/reference/limits.md:64-69`).
   - Blocks: (1) the ruleset requires the checks `validate` and `validate-macos` by job id, and renaming a required job
     or giving it a job-level `name:` orphans its check; a matrix leg without a `name:` is named after its job and its
     matrix values, as this trial's own matrix jobs were (`arms-linux (1, S)` and so on), so sharding changes the

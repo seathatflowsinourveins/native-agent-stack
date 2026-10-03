@@ -45,16 +45,18 @@ change its hash.
 
 Each name is the original path with the trial directory `blueprints/convergence-practice/macos-suite-parallelism-20261003/`
 (`<trial>` below) shortened to `trial`, the leading dot of `.github` dropped and every `/` replaced by `-`, plus
-`.txt`. The suffix keeps test discovery, workflow and lockfile scanners and
-`scripts/validate_convergence.py --all-recorded` from reading a copy as a live file, and no lock copy's name starts
-with `requirements`, which `tests/test_osv_lockfile_coverage.py` would otherwise require in the OSV lockfile
-inventory.
+`.txt`, except the two lock copies. The `.txt` suffix keeps test discovery, workflow scanning and
+`scripts/validate_convergence.py --all-recorded` from reading a copy as a live file. A `.txt` name containing
+`requirements` is what Python dependency scanners and `tests/test_osv_lockfile_coverage.py` match, so the two lock
+copies are named `trial-ci-suite-<os>-pins.frozen`: neither `requirements` nor `.txt` appears in the name (bytes and
+sha256 unchanged). That this keeps them out of GitHub's dependency graph is expected from the name patterns and is not
+verified; check the dependency graph and Dependabot alerts on the pushed head.
 
 | Copy | Original at `1e4bb5ab` | Role in `frozen_inputs` | What it is | Bytes |
 | --- | --- | --- | --- | --- |
 | `tests-test_native_maintenance.py.txt` | `tests/test_native_maintenance.py` | sources | The B1 fix: the wrapper that loads the convergence-practice blueprint tests and registers each loaded module under a child name of itself, so that a spawned worker finds their classes by name | 2,389 |
-| `github-requirements-ci-suite-macos.txt.txt` | `.github/requirements-ci-suite-macos.txt` | sources | The macOS hash lock (unittest-parallel 1.8.6 and coverage 7.16.2) | 1,136 |
-| `github-requirements-ci-suite-linux.txt.txt` | `.github/requirements-ci-suite-linux.txt` | sources | The Linux hash lock (the same two packages) | 1,316 |
+| `trial-ci-suite-macos-pins.frozen` | `.github/requirements-ci-suite-macos.txt` | sources | The macOS hash lock (unittest-parallel 1.8.6 and coverage 7.16.2) | 1,136 |
+| `trial-ci-suite-linux-pins.frozen` | `.github/requirements-ci-suite-linux.txt` | sources | The Linux hash lock (the same two packages) | 1,316 |
 | `trial-controls-test_zz_trial_controls.py.txt` | `<trial>/controls/test_zz_trial_controls.py` | inputs | The controls file: a pass, a skip, a failure, an error, a failing subtest, an expected failure, an unexpected success, a multi-line description and a failing `setUpClass` | 1,975 |
 | `trial-controls-crash_control-test_crash.py.txt` | `<trial>/controls/crash_control/test_crash.py` | inputs | The crash control: one test that ends its process with `os._exit(3)` | 476 |
 | `trial-controls-control_expectations.json.txt` | `<trial>/controls/control_expectations.json` | inputs | The expected results of the controls file run alone and of the crash control | 3,131 |
