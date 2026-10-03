@@ -26,6 +26,9 @@ sees an instruction file, hook, skill or MCP server (`clean-room.json`, with its
 | `compare.py` | The comparison with the definitive manifest at #602's merge commit (pinned by sha256); writes `audit-of-manifest.json` |
 | `preregistration.json` | The sha256 of every frozen file, recorded before the first dossier |
 | `preregistration-amendment-1.json`, `preregistration-amendment-2.json` | The runner's prompt fix (before the decide stage), and the retargeting to an audit of #602 with the comparison rule, the row mapping, the audit labels and the run notes (before any packet or decision) |
+| `selection.json`, `run-record.json`, `dossiers/` | The assembled outcome per slot under the decision rule, every attempt with its usage and the sha256 of each private original, and the 177 verified dossiers (sanitized) |
+| `audit-of-manifest.json`, `audit-of-manifest.before-amendment-4.json`, `preregistration-amendment-4.json` | The comparison with #602, and the defect fix of amendment 4 (made with the results known) with the output before it |
+| `run-notes.json` | The coordinator's run facts: timeline, the ordering that kept a family's decisions away from the other family's deciders, the unequal live web evidence, usage, the usage-limit stops |
 | `reverify.py`, `preregistration-amendment-3.json` | The frozen verification loop re-run on the 13 dossiers whose verifier attempts a usage-limit stop ended, with no dossier repaired twice (before any packet or decision) |
 
 Private originals (clones, raw returns, event streams) stay outside the repository; the assembled record lists their

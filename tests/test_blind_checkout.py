@@ -134,6 +134,10 @@ class BlindCheckoutFixture(unittest.TestCase):
         self.write("docs/ecosystem/index.html", "<html></html>")
         self.write("docs/ecosystem/manifest.json", {"files": []})
         self.write("docs/keep-me.md", "# Keep this one\n")
+        self.write("evidence/artifacts/new-wsl-definitive-round-20261002/selection.json", {"units": []})
+        self.write("evidence/artifacts/new-wsl-definitive-round-20261002/audit-of-manifest.json", {"rows": []})
+        self.write("evidence/artifacts/new-wsl-definitive-round-20261002/dossiers/owner__repo.json", {"dossier": {}})
+        self.write("docs/decisions/2026-10-03-definitive-round-audit.md", "# Round\n")
 
         git(["add", "-A"], self.source)
         git(["commit", "-q", "-m", "fixture"], self.source)
@@ -170,6 +174,17 @@ class RemovedFilesTests(BlindCheckoutFixture):
         self.assertFalse((self.dest / "docs/ecosystem/manifest.json").exists())
         # An unrelated docs file is untouched.
         self.assertTrue((self.dest / "docs/keep-me.md").is_file())
+
+    def test_the_definitive_round_records_are_removed_and_its_dossiers_kept(self):
+        manifest = self.run_checkout()
+        self.addCleanup(self.remove_worktree)
+        folder = "evidence/artifacts/new-wsl-definitive-round-20261002"
+        for removed in (f"{folder}/selection.json", f"{folder}/audit-of-manifest.json",
+                        "docs/decisions/2026-10-03-definitive-round-audit.md"):
+            self.assertIn(removed, manifest["removed_files"])
+            self.assertFalse((self.dest / removed).exists())
+        # A dossier names no pick and stays.
+        self.assertTrue((self.dest / f"{folder}/dossiers/owner__repo.json").is_file())
 
 
 class LedgerV2ResetTests(BlindCheckoutFixture):
