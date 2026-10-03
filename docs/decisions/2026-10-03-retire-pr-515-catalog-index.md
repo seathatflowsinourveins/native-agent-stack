@@ -74,9 +74,12 @@ above a recorded winner ([old record:139-140][old-role-first]). The record in #5
 merging #515 and says it does not depend on it ([docs/decisions/2026-10-01-final-catalog.md:303-306 at
 #595 head `7f6a1781a5d8803a04baddb36f936c237e5ce8ba`][p595-independent]).
 
-**A merit-neutral re-key leaves no active key until a layer records a measured comparison that
-qualifies under U11.** Removing the bookkeeping keys supplies no measurement: the retained JSON has
-an empty `measurements` array, no measurement-ordered placements and zero K4 on every placement
+**A merit-neutral re-key leaves no active key until a layer records a head-to-head comparison that
+decides merit under program decision 5:** upstream evidence and the same frozen tasks, each arm
+installed fresh by its upstream command ([program decision 5:97-104][program-5-merit]). Because U11 is
+not accepted policy, its bar adds to that gate only if U11 is accepted first. Removing the bookkeeping
+keys supplies no measurement: the retained JSON has an empty `measurements` array, no
+measurement-ordered placements and zero K4 on every placement
 ([catalogs/landscape/catalog-index.json:34-57][index-counts], [JSON:42085][index-measurements]).
 Keeping an inert index or merely renaming its keys would not answer the user's evidence-strength
 request. The alternatives are to retain this history and reopen on qualifying evidence, or to restore
@@ -227,7 +230,8 @@ These are the proposal's reference patterns; retirement adds no catalog implemen
 The PR body reports one independent Claude review with seven findings, one repair round, then a delta
 verification confirming 8/8. The old record describes the repair/rebase ([old record:3-9][old-repair])
 and explicitly says no GPT cross-family review ran ([old record:221-222][old-review]). Those are
-retained historical review claims, not a new review of this retirement. The original author session
+retained historical review claims about #515, not a review of this retirement; this retirement's own
+reviews are recorded on [#660](https://github.com/seathatflowsinourveins/native-agent-stack/pull/660). The original author session
 is unidentified. The [trading-lane ACK at this head](https://github.com/seathatflowsinourveins/native-agent-stack/pull/515#issuecomment-5896926888)
 was for #515's proposed integration and becomes moot on retirement.
 
@@ -255,10 +259,11 @@ status explicit. The repository precedent retains historical receipts while reco
 
 ## Reopening triggers
 
-1. A layer records a measured comparison that qualifies under U11: a preregistered decision rule and
-   a registered receipt bound to its inputs and outcome ([U11:111-117][u11-receipt]). A merit-only
-   index may then return with K1-K3 removed, K4 bound to that receipt, the macOS fixture fix and
-   main's current freshness wording.
+1. A layer records a head-to-head comparison that decides merit under program decision 5
+   ([program decision 5:97-104][program-5-merit]). If U11 is accepted first, the comparison must also
+   meet its bar: a preregistered decision rule and a registered receipt bound to its inputs and outcome
+   ([U11:111-117][u11-receipt]). A merit-only index may then return with K1-K3 removed, K4 bound to
+   that comparison's recorded result, the macOS fixture fix and main's current freshness wording.
 2. The user restores the provisional install of the recorded selection as the default, program decision 5's
    overturn ([program decision 5:105-106][program-5-overturn]).
 3. The user restores precedence for the selection of record by an explicit decision. This is a separate
@@ -281,6 +286,7 @@ PR needs no trading-lane ACK ([docs/lanes.md:145-150][lane-labels]).
 [k3]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L220-L234
 [k4]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L244-L250
 [program-5]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L96-L106
+[program-5-merit]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L97-L104
 [program-5-overturn]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L105-L106
 [u11-status]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L1-L9
 [u11-context]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L14-L17
