@@ -1,0 +1,32 @@
+{
+  "observed_at": "2026-10-03 (coordinator Bash, not nested in any Codex sandbox)",
+  "worker": "examples/omniroute-codex-sdk/worker.py at the harness candidate (SDK 0.160.0)",
+  "command": "uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <candidate checkout> --codex-home <private home rendered from runtime.config.template.toml, session state removed> --sandbox read-only --timeout 600 --native-result <private> --prompt -",
+  "task": "run `ls examples/omniroute-codex-sdk | wc -l` with the shell tool and reply with the number",
+  "worker_exit": 0,
+  "status": "completed",
+  "final_response": "13",
+  "items": {
+    "userMessage": 1,
+    "commandExecution": 1,
+    "reasoning": 1,
+    "agentMessage": 1
+  },
+  "command_execution": {
+    "exitCode": 0,
+    "status": "completed",
+    "aggregatedOutput": "13\\n"
+  },
+  "native_runtime": "0.160.0 (serverInfo)",
+  "route": "cx/gpt-6.1-sol-max, effort max requested",
+  "usage_total": {
+    "inputTokens": 33879,
+    "cachedInputTokens": 16768,
+    "outputTokens": 138,
+    "totalTokens": 34017
+  },
+  "thread_status": "idle",
+  "cleanup_status": "closed",
+  "native_result_sha256": "244f6e30f795cbbcb51ba50a96adb2b25adb8f27bde7b7fb931bcebba6725698",
+  "meaning": "the builder's two shell startup failures (socket directory must be user-owned 0700) occurred inside its own Codex sandbox; outside it, native shell execution through the worker completes. Backend effort is still unobserved."
+}

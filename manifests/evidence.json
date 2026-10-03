@@ -3900,6 +3900,93 @@
         "The earlier final-native-scan-record.json remains historical output for its bound earlier workflow/config. completion-native-record.json records the strengthened partition, shortened 2026-10-17 expiry, fresh active/expired controls and 161-test run; neither is an unchanged upstream test suite. The first completion validation failed on a stale hash row for an already-empty output and is retained, with the corrected diagnosis in publication-correction.md."
       ],
       "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
+    },
+    {
+      "id": "omniroute-runtime-workers-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "omniroute"
+      ],
+      "claim": "The retained official Codex SDK Sol-Max worker passed one upstream coding fixture, native resume and fresh recovery through the selected OmniRoute Responses lane. Interrupted usage and Claude bridge qualification remain unknown/failed.",
+      "limitations": [
+        "One arithmetic fixture and lifecycle acceptance; no universal SDK or model quality ranking.",
+        "Actual provider trials invoked the SDK from root, rather than through a Claude coordinator. Native project dispatch skill is supplied and structurally checked; its coordinator invocation remains unmeasured.",
+        "Native Codex SDK remains the incumbent. The separate frozen three-arm SDK gate remains unresolved.",
+        "Native gateway requested/returned model labels are not backend attestation.",
+        "All 136 skills are available in the owned project, with two bodies exercised; full role coverage and optional service acceptance remain incomplete.",
+        "Native Codex repeated in-process fixtures emit stdout/stderr ResourceWarnings; standalone per-invocation child exit is qualified separately.",
+        "Complete provider usage, spending, remote cancellation and token savings remain unknown.",
+        "Public record is sanitized selected actual return fields and independent observations; original private returned artifacts remain outside the checkout."
+      ],
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json"
+    },
+    {
+      "id": "omniroute-runtime-enhancements-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "omniroute",
+        "context-mode",
+        "serena",
+        "dagu"
+      ],
+      "claim": "A scoped native Codex SDK Sol-Max worker completed skill use, selected Context Mode/Serena MCP calls, one Astra-Max native judge and an unchanged oracle through OmniRoute in a successful bounded Dagu graph.",
+      "limitations": [
+        "One unchanged arithmetic fixture and bounded integration; no universal highest-quality model, framework or SDK ranking.",
+        "169 enabled skills were visible through native discovery. This run read using-superpowers and exercised three selected MCP calls; it does not qualify every installed skill, tool, language server, plugin or hook.",
+        "Native hook support and live web search are configured, but their execution is unmeasured here. No scheduler, schedule, hook or global account configuration was installed by this kit.",
+        "Native parent and child cumulative usage are separate scopes. Cached input and reasoning are subsets; observer response counters corroborate the same usage and must not be added. Failed/interrupted and complete provider usage, billing and token savings remain unknown.",
+        "Each observed completed stream also has an unclassified flow_error record. Native results completed; transport is not described as error-free, and requested model/provider labels are not backend identity attestation.",
+        "The separate Claude SDK Devin bridge retains its failed/unqualified status. Earlier native Claude-to-SDK acceptance is a historical separate callsite, not a rerun against this source.",
+        "The follow-up native Claude cooperation session was stopped after no confirmed SendMessage/final packet; no peer approval or new owner-contact count is claimed.",
+        "The isolated kit is a scoped private worker configuration. Live owners retain shared worker policy, host-wide catalogs/defaults and dashboard checkpoint ownership."
+      ],
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+    },
+    {
+      "id": "omniroute-claude-callsite-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "omniroute"
+      ],
+      "claim": "A native Claude Opus5.5/Max coordinator discovered and read the project dispatcher, invoked the official Sol-Max Codex SDK worker through native Bash, and the retained original shows one unchanged fixture test with exit0.",
+      "limitations": [
+        "One bounded read-only callsite and existing arithmetic oracle; no universal quality or SDK winner claim.",
+        "Coordinator tool scope was Bash/Read/Skill for this acceptance; other coordinator tools and optional MCP services are not qualified.",
+        "Native Claude and external Codex SDK usage remain separate scopes; parent list-price cost is not complete provider billing.",
+        "The separate Claude SDK Devin bridge remains failed/unqualified; this native Claude-account coordinator run does not promote it.",
+        "Provider backend identity, overall task usage, failed/interrupted calls, remote cancellation and token savings remain unverified."
+      ],
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json"
+    },
+    {
+      "id": "omniroute-sdk-worker-0160-20261003",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "omniroute",
+        "context-mode"
+      ],
+      "claim": "The SDK 0.160.0 B3 review candidate addresses all five PR #628 bot findings and passed twelve of twelve twenty-five-test native loopback fixture invocations, 26 local Claude SDK tests, six observer tests and final Ruff checks. Each reported bug has a retained failing-before-repair command and a passing counterpart. B2 metadata preflight and the earlier builder/coordinator live observations remain historical; no B3 live model task ran. Writing dispatch, live keyed-shell/search qualification and backend effort remain unobserved.",
+      "limitations": [
+        "Authored loopback SSE fixtures, local Claude SDK tests and observer tests are integration/synthetic checks, not unchanged upstream suites or provider-model trials.",
+        "The pre-B2 builder live task returned the correct data while two native shell attempts failed in its enclosing Codex sandbox and a Context Mode call failed with Transport closed. A separate coordinator, outside a nested Codex sandbox, observed read-only shell success at that candidate. The repaired bytes have no new live-model run; error-free MCP transport and writing (workspace-write) dispatch remain unqualified at 0.160.0.",
+        "Plugin disabling is the selected native feature gate. Tests observe direct app-server PID termination and absence of clone directories; descendant cleanup and global non-loopback egress are not observed.",
+        "Metadata preflight submits no inference. No skill was installed in the new private home and no --require-skill was used; inherited/project catalog discovery does not qualify every skill or tool.",
+        "Requested model/Max effort and live catalog entry are observed; gateway-forwarded effort, backend model identity, complete provider usage, cost, remote cancellation and token savings remain unknown.",
+        "September 30 receipts and original observations remain historical. This refresh does not rerun the historical coding oracle, Claude callsite, Astra judge, Dagu graph or unchanged upstream SDK suite.",
+        "Exactly pinned private SDK preflight/PID attributes require review on every pin move. Stable Python SDK and experimental, unsupported-for-production app-server are separate support boundaries.",
+        "Expected ResourceWarning messages and argparse rejection output remain in private fixture logs. Long-lived SDK pools, alternative approval modes, alternate binary, credential-variable path, workspace-write live execution and scheduled Dagu acceptance remain unqualified.",
+        "Initial Ruff failure exits are retained from native task returns, but exact full output/timing was not saved. Repository validators prove declared consistency, not the truth of provider or historical claims.",
+        "Earlier checkout and alternate-index validation failures are retained as before-B2 attempts. The coordinator force-added the project skill to the real index; B2 acceptance uses that actual checkout index. Historical source archive acceptance does not replace current checkout acceptance.",
+        "If the cleanup bound expires during retained startup or close, cleanup_status is unresolved and the CLI exits nonzero. Continued deferred cleanup is observed only while the embedding event loop remains running; no post-bound standalone cleanup or remote termination guarantee is made.",
+        "B3 repairs have local regression/configuration acceptance only: no live model tasks, keyed gateway shell trial, standalone search endpoint trial or native Claude connect fault injection. The native SDK retains its own shielded cleanup/transport bounds; wrapper grace does not override them."
+      ],
+      "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
     }
   ],
   "files": [
@@ -3907,6 +3994,11 @@
       "path": ".claude/settings.json",
       "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
       "bytes": 2884
+    },
+    {
+      "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
+      "sha256": "feacd5b6324649e3fff16d4f7f469f994e2984dccbb462f84e6fa8bf8e93da48",
+      "bytes": 3840
     },
     {
       "path": ".gitattributes",
@@ -3950,8 +4042,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "51dae9e9907bda6c3a5de21c1c3dfdea79c5e0a379494ba4c6e42906abc6e114",
-      "bytes": 10704
+      "sha256": "2ebf209587e336a146348151a16f9c2e99e98d67597047baa2f93cd12c536dfe",
+      "bytes": 11008
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4382,6 +4474,11 @@
       "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
       "sha256": "9e215b2c85823b33b881ae1ff38a2c666ebd46d75d34568f5e8747d350f8ef74",
       "bytes": 77578
+    },
+    {
+      "path": "adoption/skills/lifecycle.md",
+      "sha256": "ccec73d92d533262600887baadce9323b6585f79c3465092822bf6bcb5f2e165",
+      "bytes": 17927
     },
     {
       "path": "adoption/skills/manifest.json",
@@ -5813,6 +5910,21 @@
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
       "sha256": "de31f07cf4ac3f1d32fc64ef94796a98a9aec39fb2a10945dfd1d13e37cdb246",
       "bytes": 56660
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+      "sha256": "96e4ed6bb0ff719a1a60be7cacebe544acf910aab601eb7cd9afa47cf720eed3",
+      "bytes": 30470
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
+      "sha256": "2ac13a28d723f15e205f0c0a37c3936f1e4c8f80ffa2499a494f2be67928a019",
+      "bytes": 29442
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
+      "sha256": "3f497fb2bbcab2c2e7de2fce659ecb06276120fa8331eeb1f78ddbecef67cbf6",
+      "bytes": 30325
     },
     {
       "path": "blueprints/convergence-practice/protocol.json",
@@ -15760,6 +15872,11 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
+      "sha256": "22c52104ccec6af101427f16fa9ac85aa3b1b812d0b7e7d2a122cda43c3dd0e7",
+      "bytes": 11606
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
       "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
       "bytes": 8312
@@ -15808,6 +15925,11 @@
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
       "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
       "bytes": 19619
+    },
+    {
+      "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
+      "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
+      "bytes": 25043
     },
     {
       "path": "docs/direct-results.md",
@@ -38580,6 +38702,216 @@
       "bytes": 23100
     },
     {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/deadline300-judge-oracle-output.txt",
+      "sha256": "b9032a013f9d5b050a0940a2c8142d75ff75d6e560e88e77c58383d4c94fc679",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime-worker.yaml.txt",
+      "sha256": "82dd567b9e0fd8cc300b516fed535584472a499f63431ddeb030a36065c91426",
+      "bytes": 1047
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime.config.template.toml.txt",
+      "sha256": "5c023dcf0c9c80a3aaf303dda47a268250c61b054551e3f8ccf213033609c72e",
+      "bytes": 2183
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/post-env-import-runtime-worker.yaml.txt",
+      "sha256": "46cab557d04fcb6bc5ad1be96c5b46d4dd82a8bfc25fe719fb095deb64a7e756",
+      "bytes": 1282
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/pre-dispatch-default-skill.md",
+      "sha256": "14593cbbbe7a89507c0559dd975dff4a2273a46f0e828a7689f79d650767d28f",
+      "bytes": 2565
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt",
+      "sha256": "7b49b6e997017b1cde21f9aa33af3d5510926ad182f3211d0dd40cd71762a44a",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "sha256": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439",
+      "bytes": 186305
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
+      "sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5",
+      "bytes": 2248
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt",
+      "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a",
+      "bytes": 12585
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
+      "sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651",
+      "bytes": 11517
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-acceptance-plan.json.source.txt",
+      "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc",
+      "bytes": 2615
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime-judge.toml.source.txt",
+      "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f",
+      "bytes": 1053
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime-worker.yaml.source.txt",
+      "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c",
+      "bytes": 1411
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime.config.template.toml.source.txt",
+      "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048",
+      "bytes": 3221
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.lock.source.txt",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
+      "bytes": 12840
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.source.txt",
+      "sha256": "3497536133785b5fe3584265973941910a50826f410f62b0f95de67b206464ff",
+      "bytes": 34794
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.lock.source.txt",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
+      "bytes": 12840
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.source.txt",
+      "sha256": "33057e8b5bcb042bed8f517d759b00936767d2a8df7055dd2179df5d93ace618",
+      "bytes": 24103
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-claude-test_worker.py.source.txt",
+      "sha256": "282de47c359375d6fcfbb756ff30c4a52dcf6756236b4e532124f64043685990",
+      "bytes": 18987
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-claude-worker.py.source.txt",
+      "sha256": "4cf3dcadabf497e05f10656e24cc796e8619c9601141a6d069bef6eba45fe155",
+      "bytes": 19889
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-codex-test_worker.py.source.txt",
+      "sha256": "14018bd65c39f18683ce83833abe23c9238419c7c1fde99f5521ae752dbd1c43",
+      "bytes": 38441
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-codex-worker.py.source.txt",
+      "sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
+      "bytes": 25542
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-gateway_observer.py.source.txt",
+      "sha256": "2412d0b58adbad028993cbd6e4835c2b0cf40f406384de7d99867a3de74bbcef",
+      "bytes": 6143
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-runtime.config.template.toml.source.txt",
+      "sha256": "49b2958498238c032cee9eb0b3ca8603bc17b633aaf72d348398a671873affb2",
+      "bytes": 3630
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-test_gateway_observer.py.source.txt",
+      "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d",
+      "bytes": 5277
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-test_worker.py.source.txt",
+      "sha256": "4dad11db9dc1faecc938d496815bb0504a6d93731dac28183542f97da4a38300",
+      "bytes": 28968
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-worker.py.source.txt",
+      "sha256": "3aa19fa790e661f5142fa316b58473e508f68af6c4f155f0a2fa469177c8a623",
+      "bytes": 22284
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b3-claude-worker.py.source.txt",
+      "sha256": "92b6077da5f659a9798d61433b73920903dd2637dd4b4ee914e42995d111abf9",
+      "bytes": 19866
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b3-gateway_observer.py.source.txt",
+      "sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97",
+      "bytes": 5702
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation-final-bytes.json",
+      "sha256": "147ba86f3aa68354193872213065e81a6162896a01e684cc1038b2a53d002f08",
+      "bytes": 2096
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation.json",
+      "sha256": "acabe8d2ee66340a99f1d7c3e39d2e99a31c6411c886738bd4c354bedc42c9c6",
+      "bytes": 1472
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/acceptance-plan.json.source.txt",
+      "sha256": "5b046e6e30802bbe66d837030ae3c215d6fd401d524d48f51302269450d65d94",
+      "bytes": 1889
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/checks.json.source.txt",
+      "sha256": "26dab6f4fa94512bbe8965f51fb29845ca07e8c4664765e484cd56bc80f9b610",
+      "bytes": 4632
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-enhancements-experiment.json.source.txt",
+      "sha256": "819124da985301f216fd0e3178d7b1aa4986e0c3812d18a75505723d85dbdfcc",
+      "bytes": 29678
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt",
+      "sha256": "6d4812ea4906789e2f55cf206d03863af6116c7137d667d542d2395ac985ce31",
+      "bytes": 29902
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/rerun-plan.json.source.txt",
+      "sha256": "3f4e9c441ca1b34c9a425cc3e8344e979b99757370506970fd7f760ac55d8730",
+      "bytes": 1813
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime-judge.toml.source.txt",
+      "sha256": "0a0b549d3007c75ccb35be3a1d765de31d0504abdd35dfad1e3d68ad4daead55",
+      "bytes": 1053
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime-worker.yaml.source.txt",
+      "sha256": "b3093a32ad708f09b81893f9d65975f9f01f99078976929e82830e6ec1b6a7b4",
+      "bytes": 1294
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime.config.template.toml.source.txt",
+      "sha256": "3602da96a99c2cc4a6f211695dcf0b8f46cd408cd10290b8b54537e38f0258d6",
+      "bytes": 3027
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/test_worker.py.source.txt",
+      "sha256": "b31d70450151925ac506e9cd018740e9d3d4ca4529a70f3a9d4f8b845d7e8da8",
+      "bytes": 26008
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.lock.source.txt",
+      "sha256": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44",
+      "bytes": 12842
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.source.txt",
+      "sha256": "d93e4bb0e54f436d15b6c06375126eba51289f8b1513e5ef52dfacaa8a65a074",
+      "bytes": 22008
+    },
+    {
       "path": "evidence/artifacts/omniroute-sol-max-20260930/README.md",
       "sha256": "ecd66ad007aca5ec24223805e98035b5da99284671a65a62dbf799f4aaba2084",
       "bytes": 2800
@@ -48340,6 +48672,26 @@
       "bytes": 16128
     },
     {
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+      "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3",
+      "bytes": 6238
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "sha256": "913b02edf8b557a86a0f16f672a3bcaf8e28609ef608e05a192d1e3cb5c7fb06",
+      "bytes": 27429
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e",
+      "bytes": 17754
+    },
+    {
+      "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+      "sha256": "9ad1db0b9e841cd780d04e544f6e75dde57fd88ebc6fc4f5b0bafd84287f20da",
+      "bytes": 149558
+    },
+    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
@@ -48695,6 +49047,36 @@
       "bytes": 8495
     },
     {
+      "path": "examples/claude-runtime-sdk/README.md",
+      "sha256": "abb5622dd2fa9dd6a3c4c0c36aab6170bc9df694a7e006ec434a2f58212ff885",
+      "bytes": 10259
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/check_controls.py",
+      "sha256": "21a79c84a780a900fb365c0478bf79af5ed1d55a9c20f59b5859368b71fe9dcf",
+      "bytes": 1010
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/test_worker.py",
+      "sha256": "282de47c359375d6fcfbb756ff30c4a52dcf6756236b4e532124f64043685990",
+      "bytes": 18987
+    },
+    {
+      "path": "examples/claude-runtime-sdk/verification.md",
+      "sha256": "980b4f2ffbf49ee9ca2ab0127a4bc90c1d56c401c2cbb74d78b9a9dbe1f05ae1",
+      "bytes": 8558
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py",
+      "sha256": "4cf3dcadabf497e05f10656e24cc796e8619c9601141a6d069bef6eba45fe155",
+      "bytes": 19889
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py.lock",
+      "sha256": "79f1e72c87e1a934cf532a6ee929e22b1defcb2476317e24d68c1124913235c8",
+      "bytes": 96322
+    },
+    {
       "path": "examples/codex-mcp.toml.example",
       "sha256": "6203fdcb819d183fae1ac01ae2eda447252f2f8d07de53d82cf947845a07e6c0",
       "bytes": 1474
@@ -48748,6 +49130,66 @@
       "path": "examples/native-stack-qdrant.service.example",
       "sha256": "4b5e20c8785fc6d9d81a6cbaf752648e79afc5a32888300b525a2f4b64f09e63",
       "bytes": 378
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/README.md",
+      "sha256": "082bb1714e51f99114b5dbb3858833d25f43b62229be62c90fba331e8aceeb75",
+      "bytes": 16427
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
+      "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc",
+      "bytes": 2615
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
+      "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f",
+      "bytes": 1053
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/checks.json",
+      "sha256": "9b3548c9a81d81cf07cff275b1eec82000b7bc646da520ef381f04e2d0408096",
+      "bytes": 103875
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/enhancements.md",
+      "sha256": "034a8e301e0f14014e744b5bb46226db79b199079ba23ffc9ae1bdfd98fcd64b",
+      "bytes": 10255
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/rerun-plan.json",
+      "sha256": "c144ce553283ed283e1d790c51dc061eeb57982e35d440e1a052c749cbc7b929",
+      "bytes": 1924
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
+      "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c",
+      "bytes": 1411
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "sha256": "49b2958498238c032cee9eb0b3ca8603bc17b633aaf72d348398a671873affb2",
+      "bytes": 3630
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py",
+      "sha256": "14018bd65c39f18683ce83833abe23c9238419c7c1fde99f5521ae752dbd1c43",
+      "bytes": 38441
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
+      "bytes": 12840
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py",
+      "sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
+      "bytes": 25542
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
+      "bytes": 12840
     },
     {
       "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
@@ -50181,8 +50623,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "a5cb994e66138fdad5da76abaaf6e4645266b575eaf722cfb239cc78fe6d6da9",
-      "bytes": 65234
+      "sha256": "c5869af9dc29f5b5abe469f3588559734051c8f87d75c23183d90d299aa4d21a",
+      "bytes": 65718
     },
     {
       "path": "tests/test_path_safety.py",
@@ -50630,6 +51072,31 @@
       "bytes": 4963
     },
     {
+      "path": "tools/runtime-worker-evidence/README.md",
+      "sha256": "83511b44626cc710cfcc093ea6bbe86889c69cb533d6155081a81099a751f213",
+      "bytes": 2663
+    },
+    {
+      "path": "tools/runtime-worker-evidence/checks.json",
+      "sha256": "094cd7785fabc277508bc4ed90bac60a4e98dacdca7b51f50f5731608cc5e80c",
+      "bytes": 3851
+    },
+    {
+      "path": "tools/runtime-worker-evidence/gateway_observer.py",
+      "sha256": "2412d0b58adbad028993cbd6e4835c2b0cf40f406384de7d99867a3de74bbcef",
+      "bytes": 6143
+    },
+    {
+      "path": "tools/runtime-worker-evidence/osv-check.json",
+      "sha256": "0d31c8900e8f5475c2fbe04f26d09493e2e507354c8c99e5b35a50c079e318b7",
+      "bytes": 2778
+    },
+    {
+      "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
+      "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d",
+      "bytes": 5277
+    },
+    {
       "path": "tools/skill-usage/README.md",
       "sha256": "34cda0de60388ff139f55bec45f875ca6f104471913120d540c072f9b3f05c01",
       "bytes": 54151
@@ -51051,6 +51518,9 @@
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
     "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
-    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
+    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
+    "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+    "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
+    "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json"
   ]
 }
