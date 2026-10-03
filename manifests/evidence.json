@@ -15774,8 +15774,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "e2f1a186cdd2be91138bef340cea766c67c0b040d4ae0595ceec4c8733025e8d",
-      "bytes": 148153
+      "sha256": "0267c93b58e204089a3db684c552fcfb62c21020d152d32525742439eec080e2",
+      "bytes": 148156
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -16009,8 +16009,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-osv-split-hardening-port.md",
-      "sha256": "32f57955e30f015c550769b57f6d97417bd70e3c5b0e7eba5b57c4ca3774725f",
-      "bytes": 4454
+      "sha256": "3a5a7491e8a1034b3fb6ecbe6d482d03eb261920c957a99992751604246a8e0f",
+      "bytes": 4475
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
@@ -40133,6 +40133,16 @@
       "bytes": 611
     },
     {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.py.txt",
+      "sha256": "06eab390d148c50eb7a8833474d5ef1e9da0da89477b7823fbdcbd16c3547f4f",
+      "bytes": 4087
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.stdout.txt",
+      "sha256": "7e42d7dd71f3a3351a3b56db793aa7696cadae9c6d8a8b9b57c6772dfc630055",
+      "bytes": 4226
+    },
+    {
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stderr.txt",
       "sha256": "0b782c5d0b46f72714633a087253c1d5d997982751e08246e5797901fafdc34c",
       "bytes": 28944
@@ -49389,8 +49399,8 @@
     },
     {
       "path": "evidence/receipts/osv-split-hardening-port-20261003.json",
-      "sha256": "741df70d325c2eecb517371585c21309cdd367e61088c33c7ad218be1742bb76",
-      "bytes": 97987
+      "sha256": "725545ea32efeec4ff37df16fd0c6c596728ec8f3dea15e5d123b9ffea28bdda",
+      "bytes": 104714
     },
     {
       "path": "evidence/receipts/osv-urllib3-next-20260930.json",
@@ -51314,8 +51324,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "c8c9b92cc0604fb308e8c5ca9b62fda93cf4f6acde7636ab196f727e70a86a25",
-      "bytes": 73738
+      "sha256": "33fcb5e4580443d97e3dd0ac282651d10eec26d9b8e72cf10651c4426eb8f2d3",
+      "bytes": 75469
     },
     {
       "path": "tests/test_path_safety.py",
