@@ -108,7 +108,7 @@ runs can be compared with the workstation's li26 results.
 ### Upstream throughput and serving ([`capacity.json`](capacity.json))
 
 **Corrected 2026-10-03 (port of #410).** The table uses the class names from the
-[acceptance evidence policy](../../../docs/acceptance-evidence-policy.md#identify-what-each-check-proves).
+[acceptance evidence policy](../../../docs/acceptance-evidence-policy.md#identify-what-each-check-proves); #410 labelled the four host-reading rows "measured".
 `capacity.json` remains byte-identical, including its embedded `evidence_class`
 values `native_proven` and `local_integration`. Those are the recording session's
 labels, not accepted policy classes or a qualification claim.
@@ -117,10 +117,10 @@ labels, not accepted policy classes or a qualification claim.
 | --- | --- | --- |
 | `llama-bench -p 512,4096 -n 128 -ngl 99 -fa on -r 3` (b11057, Metal) | pp512 371.5 ± 1.1, pp4096 341.7 ± 15.3, tg128 15.9 ± 0.6 tokens/s | Upstream example or native operation, on this host on 2026-09-27 |
 | llama-server, 32,768-token unified context (4 default slots), 9 requests, `cache_prompt: false` | median time to first token 4.67 s at a median 1,603 prompt tokens; 15.1 s at 5,189 tokens; median decode 15.8 tokens/s | Local integration check (the prompts are this repository's own docs) |
-| Server peak RSS | 22,941 MiB | measured, 72 one-second samples |
-| System free memory (`memory_pressure -Q`) | 89% before, 61% loaded, 89% after | measured |
-| Swap | 16.81 MB used before, during and after (no change) | measured |
-| Jetsam | 0 memorystatus kills | measured: 66 log lines matched, 63 were runningboardd "Ignoring jetsam update", 2 runningboard diagnostics, 1 the `log show` query itself |
+| Server peak RSS | 22,941 MiB | Local integration check (serving-probe reading, 72 one-second samples) |
+| System free memory (`memory_pressure -Q`) | 89% before, 61% loaded, 89% after | Local integration check (capacity-probe readings `baseline`, `server_loaded`, `after_stop`) |
+| Swap | 16.81 MB used before, during and after (no change) | Local integration check (all five capacity-probe readings) |
+| Jetsam | 0 memorystatus kills | Local integration check: 66 log lines matched, 63 were runningboardd "Ignoring jetsam update", 2 runningboard diagnostics, 1 the `log show` query itself |
 
 The memory stack's own Ollama models were idle-unloaded during this probe. The worst case with them loaded
 is measured below.

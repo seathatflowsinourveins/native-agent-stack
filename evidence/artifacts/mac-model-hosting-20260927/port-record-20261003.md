@@ -1,8 +1,8 @@
 # Port record: the Mac session's 2026-09-27 model-hosting observations
 
 Port date: 2026-10-03. Source: [PR #410](https://github.com/seathatflowsinourveins/native-agent-stack/pull/410)
-at `14b5c52145d9cc42d4c9da36df53ac994009856a`. Port base:
-`cac8700ba914950266272347468bff7ad630a4bf`. Lane: `lane:foundation`.
+at `14b5c52145d9cc42d4c9da36df53ac994009856a`. Prepared on main at
+`cac8700ba914950266272347468bff7ad630a4bf`; [PR #670](https://github.com/seathatflowsinourveins/native-agent-stack/pull/670) records the merge base. Lane: `lane:foundation`.
 
 These artifacts preserve the Mac coordinator session's descriptive observations.
 They establish no host acceptance or qualification, change no host role or pin,
