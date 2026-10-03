@@ -9354,8 +9354,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "cf933c21a562e4495fcb8cda0cf222b8cf805b7dafa146d0213cc7d9156762c4",
-      "bytes": 39144
+      "sha256": "58e13cf6a946e0ddf21d308c02fe103df5b385ecb8017af53e820c4c209886ee",
+      "bytes": 40753
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -15914,8 +15914,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "70df91591819d0c14b200c9053a8706c0b36ca8afddfa79eb4c88c6ab1af0ea2",
-      "bytes": 25538
+      "sha256": "14fb2b73896106699fc643045373e89a2a8dc9cc043a1796326e686e93b2d073",
+      "bytes": 27620
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
@@ -51019,8 +51019,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "c2f17619d993cf840a62188ae9c9d14835165ea11cf2e8b04c99559bf3be48e7",
-      "bytes": 254451
+      "sha256": "9b7c25a125d503b02de5c195378f8e0ad3510b3a67515a79f60293aedf8ff023",
+      "bytes": 254598
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
