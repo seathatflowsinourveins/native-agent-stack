@@ -106,6 +106,52 @@ groups:
         annotations:
           summary: 'Token counters of {{ $labels.job }} have no per-process writer identity'
           description: 'These series are labelled instance="unscoped": a Claude process without session.id (a session that started before OTEL_METRICS_INCLUDE_SESSION_ID=true, or one that disables it) or a Codex process started without the identity launcher. Concurrent unscoped writers share one series, so the dashboards exclude them; restart the session or reinstall the launcher (observability/collector/README.md). The rule keeps 15 minutes of samples, longer than its 5-minute delay: a short Codex run''s series leaves the Collector''s exporter five minutes after its last export (metric_expiration), so it fires for such a run too and resolves 15 minutes after the last unscoped sample.'
+  - name: ecosystem-lanes
+    rules:
+      - alert: CodexLaneGoalBlocked
+        expr: 'sum by (ecosystem_lane) (increase(ecosystem_codex_goal_blocked_total[15m])) > 0'
+        for: 0m
+        keep_firing_for: 30m
+        labels:
+          severity: warning
+          scope: codex-lanes
+        annotations:
+          summary: 'A Codex goal is blocked (ecosystem_lane="{{ $labels.ecosystem_lane }}")'
+          description: 'A Codex goal reported codex.goal.blocked in the last 15 minutes. Event counters reach Prometheus as delta points that delta_to_cumulative converts, and their series leave the Collector''s exporter five minutes after the last export, so the rule fires at once (for: 0m) and keeps firing for 30 minutes after the event leaves the window (keep_firing_for). Check the lane''s goal state and the requests waiting on it on the lane board. ecosystem_lane comes from the launch-time OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<lane>; an empty value is a Codex process started without it.'
+      - alert: CodexLaneToolErrorBurst
+        expr: |
+          (sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total{success="false"}[1h]))
+            / sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total[1h])) > 0.10)
+          and sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total[1h])) >= 30
+        for: 15m
+        labels:
+          severity: warning
+          scope: codex-lanes
+        annotations:
+          summary: 'Codex tool calls are failing (ecosystem_lane="{{ $labels.ecosystem_lane }}")'
+          description: 'More than 10% of at least 30 Codex tool calls (codex.tool.call, success="false") failed in the last hour, for 15 minutes. 10% is twice the root lane''s 2026-10-03 daily failure rate of 4.9%, a starting value to re-tune after 7 days of data. The value is the failed share.'
+      - alert: CodexLaneMcpErrorRatio
+        expr: |
+          (sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_error_total[1h]))
+            / sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_total[1h])) > 0.10)
+          and sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_total[1h])) >= 20
+        for: 15m
+        labels:
+          severity: warning
+          scope: codex-lanes
+        annotations:
+          summary: 'Codex MCP calls are failing (ecosystem_lane="{{ $labels.ecosystem_lane }}")'
+          description: 'More than 10% of at least 20 Codex MCP calls returned an error in the last hour (codex.mcp.call.error over codex.mcp.call), for 15 minutes. The tool label on these series names the failing MCP tool. A starting value to re-tune after 7 days of data. The value is the error share.'
+      - alert: CodexLaneUsageLimited
+        expr: 'sum by (ecosystem_lane) (increase(ecosystem_codex_goal_usage_limited_total[15m])) > 0'
+        for: 0m
+        keep_firing_for: 30m
+        labels:
+          severity: critical
+          scope: codex-lanes
+        annotations:
+          summary: 'A Codex goal hit a usage limit (ecosystem_lane="{{ $labels.ecosystem_lane }}")'
+          description: 'A Codex goal reported codex.goal.usage_limited in the last 15 minutes; any such event is critical. Resume the lane after the limit resets. It has the same delta-event mechanics as CodexLaneGoalBlocked (for: 0m, keep_firing_for: 30m). The 80% and 95% rate-limit readings come from the rollouts and are shown on the lane board, not here.'
   - name: equities-broker-path
     rules:
       - alert: EquitiesOrderStateDivergence

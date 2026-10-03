@@ -109,11 +109,11 @@ class RulesTemplateTests(unittest.TestCase):
         self.assertIn('job!~"acceptance-fixture|adaptive-paper"', match.group(1))
 
     @unittest.skipUnless(HAVE_YAML, "optional PyYAML structural check")
-    def test_rendered_yaml_is_well_formed_and_has_seventeen_rules(self):
+    def test_rendered_yaml_is_well_formed_and_has_twenty_one_rules(self):
         placeholder = self.text.replace("@CONFIG_ROOT@", "/tmp/x").replace("@DATA_ROOT@", "/tmp/y")
         doc = yaml.safe_load(placeholder)
         rule_count = sum(len(group["rules"]) for group in doc["groups"])
-        self.assertEqual(rule_count, 17)
+        self.assertEqual(rule_count, 21)
         names = {rule["alert"] for group in doc["groups"] for rule in group["rules"] if "alert" in rule}
         self.assertTrue(EXPECTED_ALERTS.issubset(names))
 
@@ -237,7 +237,7 @@ class RenderedNativeValidationTests(unittest.TestCase):
             capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("17 rules found", result.stdout)
+        self.assertIn("21 rules found", result.stdout)
 
     def test_promtool_check_config(self):
         result = subprocess.run(
@@ -314,6 +314,128 @@ class PaperMetricsMissingRuleTests(unittest.TestCase):
         result = subprocess.run([str(PROMTOOL), "test", "rules", str(unit_tests)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("SUCCESS", result.stdout + result.stderr)
+
+
+def render_backends(root: Path) -> Path:
+    subprocess.run(
+        ["python3", str(CONFIGURE),
+         "--tools-root", str(root / "tools"), "--config-root", str(root / "config"),
+         "--data-root", str(root / "data"), "--unit-root", str(root / "unit")],
+        check=True, capture_output=True, text=True,
+    )
+    return root / "config"
+
+
+@unittest.skipUnless(PROMTOOL.exists(), "promtool not installed at the documented ecosystem tool path")
+class CodexLaneRuleTests(unittest.TestCase):
+    """``promtool test rules`` over configure.py's rendered ecosystem-lanes group, with synthetic series.
+
+    A goal event counter reaches Prometheus as a delta point that the Collector's delta_to_cumulative converts: the
+    new series starts at 0 (Prometheus created-timestamp-zero-ingestion), reads 1 while Codex exports it and goes
+    stale five minutes after the last export. native_proven when it runs: the installed promtool evaluates the real
+    rendered rules. Skipped (not failed) when promtool is absent on the host."""
+
+    LANE = 'job="codex_exec",instance="proc-a",ecosystem_lane="root"'
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.rules = render_backends(self.root) / "ecosystem-prometheus-rules.yml"
+        group = self.rules.read_text().split("  - name: ecosystem-lanes\n", 1)[1].split("\n  - name: ", 1)[0]
+        # promtool compares annotations exactly, so take labels and annotations from the rendered rules themselves.
+        self.by_name = {}
+        for name, block in re.findall(r"- alert: (\w+)\n(.*?)(?=\n      - alert: |\Z)", group, re.S):
+            self.by_name[name] = {
+                "labels": dict(re.findall(r"^          (severity|scope): (\S+)$", block, re.M)),
+                "annotations": {key: re.search(rf"^ +{key}: '((?:[^']|'')*)'$", block, re.M).group(1).replace("''", "'")
+                                for key in ("summary", "description")}}
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def firing(self, alert, lane="root"):
+        rule = self.by_name[alert]
+        annotations = {k: v.replace("{{ $labels.ecosystem_lane }}", lane) for k, v in rule["annotations"].items()}
+        return [{"exp_labels": {**rule["labels"], "ecosystem_lane": lane}, "exp_annotations": annotations}]
+
+    def check(self, alert, cases):
+        document = {"rule_files": [str(self.rules)], "evaluation_interval": "1m", "tests": [
+            {"interval": "1m", "input_series": [{"series": s, "values": v} for s, v in inputs],
+             "alert_rule_test": [{"eval_time": at, "alertname": alert, "exp_alerts": exp} for at, exp in expected]}
+            for inputs, expected in cases]}
+        path = self.root / f"{alert}.test.yml"
+        path.write_text(json.dumps(document))  # JSON is valid YAML
+        result = subprocess.run([str(PROMTOOL), "test", "rules", str(path)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_every_lane_rule_is_scoped_and_usage_limits_are_critical(self):
+        self.assertEqual(set(self.by_name), {"CodexLaneGoalBlocked", "CodexLaneToolErrorBurst",
+                                             "CodexLaneMcpErrorRatio", "CodexLaneUsageLimited"})
+        self.assertEqual({rule["labels"]["scope"] for rule in self.by_name.values()}, {"codex-lanes"})
+        self.assertEqual({name: rule["labels"]["severity"] for name, rule in self.by_name.items()},
+                         {"CodexLaneGoalBlocked": "warning", "CodexLaneToolErrorBurst": "warning",
+                          "CodexLaneMcpErrorRatio": "warning", "CodexLaneUsageLimited": "critical"})
+
+    def test_goal_events_fire_at_once_and_keep_firing_after_their_series_expires(self):
+        for alert, metric in (("CodexLaneGoalBlocked", "ecosystem_codex_goal_blocked_total"),
+                              ("CodexLaneUsageLimited", "ecosystem_codex_goal_usage_limited_total")):
+            series = f"{metric}{{{self.LANE}}}"
+            fire = self.firing(alert)
+            self.check(alert, [
+                # One event, exported for five minutes and then dropped. The 15-minute window holds it until 14m;
+                # keep_firing_for holds the alert for 30 minutes after that.
+                ([(series, "0 1 1 1 1 1 stale")], [("1m", fire), ("14m", fire), ("40m", fire), ("50m", [])]),
+                ([(series, "0x30")], [("10m", [])]),
+            ])
+
+    def test_tool_errors_fire_above_ten_percent_of_at_least_thirty_calls_after_fifteen_minutes(self):
+        tool = "ecosystem_codex_tool_call_total{" + self.LANE + ',success="%s"}'
+        fire = self.firing("CodexLaneToolErrorBurst")
+        self.check("CodexLaneToolErrorBurst", [
+            # 72 calls an hour, 12 failed (16.7%): 30 calls by 25m, firing 15 minutes later
+            ([(tool % "true", "0+1x90"), (tool % "false", "0+0.2x90")], [("30m", []), ("45m", fire), ("70m", fire)]),
+            # the same share of 18 calls an hour
+            ([(tool % "true", "0+0.25x90"), (tool % "false", "0+0.05x90")], [("70m", [])]),
+            # 61 calls an hour, 1 failed
+            ([(tool % "true", "0+1x90"), (tool % "false", "0+0.0167x90")], [("70m", [])]),
+        ])
+
+    def test_mcp_errors_fire_above_ten_percent_of_at_least_twenty_calls_after_fifteen_minutes(self):
+        calls = "ecosystem_codex_mcp_call_total{" + self.LANE + ',tool="ctx_search",status="%s"}'
+        errors = "ecosystem_codex_mcp_call_error_total{" + self.LANE + ',tool="ctx_search",status="error"}'
+        fire = self.firing("CodexLaneMcpErrorRatio")
+        self.check("CodexLaneMcpErrorRatio", [
+            # 60 calls an hour, 12 errors (20%): 20 calls by 20m, firing 15 minutes later
+            ([(calls % "ok", "0+0.8x90"), (calls % "error", "0+0.2x90"), (errors, "0+0.2x90")],
+             [("30m", []), ("45m", fire)]),
+            # the same share of 15 calls an hour
+            ([(calls % "ok", "0+0.2x90"), (calls % "error", "0+0.05x90"), (errors, "0+0.05x90")], [("70m", [])]),
+        ])
+
+
+@unittest.skipUnless(AMTOOL.exists(), "amtool not installed at the documented ecosystem tool path")
+class CodexLaneRouteTests(unittest.TestCase):
+    """``amtool config routes test`` over configure.py's rendered Alertmanager config: lane warnings go to the quiet
+    topic, critical lane alerts to the alert topic, and the other routes are unchanged. native_proven when it runs."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.config = render_backends(Path(self.tmp.name)) / "ecosystem-alertmanager.yml"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def assertRoute(self, receiver, *labels):
+        result = subprocess.run([str(AMTOOL), "config", "routes", "test", f"--config.file={self.config}",
+                                 f"--verify.receivers={receiver}", *labels], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_lane_warnings_are_quiet_and_critical_lane_alerts_reach_the_alert_topic(self):
+        self.assertRoute("local-ntfy-lanes", "alertname=CodexLaneGoalBlocked", "scope=codex-lanes", "severity=warning")
+        self.assertRoute("local-ntfy", "alertname=CodexLaneUsageLimited", "scope=codex-lanes", "severity=critical")
+        self.assertRoute("local-ntfy", "scope=equities-broker", "severity=warning")
+        self.assertRoute("local-ntfy", "scope=local-ecosystem", "severity=warning")
+        self.assertIn("/ecosystem-lanes?template=alertmanager&priority=low", self.config.read_text())
 
 
 if __name__ == "__main__":

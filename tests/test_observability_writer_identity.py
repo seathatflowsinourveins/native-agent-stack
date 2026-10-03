@@ -417,6 +417,25 @@ class NativeCollectorTests(unittest.TestCase):
         self.assertTrue(any(line.startswith("otelcol_processor_incoming_items{") and 'processor="groupbyattrs/session"'
                             in line for line in telemetry.splitlines()), telemetry)
 
+    def test_lane_name_becomes_a_label_and_a_malformed_one_is_dropped(self):
+        # A lane's launch exports OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<lane> (codex-identity-launcher.sh.example).
+        start = time.time_ns() - 5_000_000_000
+        now = time.time_ns()
+        for instance, lane in (("codex-proc-1", "trading"), ("codex-proc-2", "Trading Lane"), ("codex-proc-3", None)):
+            resource = {"service.name": "codex_exec", "service.version": "0.160.0", "service.instance.id": instance}
+            if lane is not None:
+                resource["ecosystem.lane"] = lane
+            self.post(resource, "codex_otel", [{"name": "codex.turn.token_usage", "histogram": {
+                "aggregationTemporality": 1,
+                "dataPoints": [codex_histogram({"token_type": "input"}, 1000.0, start, now)]}}])
+        time.sleep(2)
+        exported = {labels["instance"]: labels for labels, _ in samples(
+            self.scrape(self.exporter), "ecosystem_codex_turn_token_usage_sum")}
+        self.assertEqual({instance: labels.get("ecosystem_lane") for instance, labels in exported.items()},
+                         {"codex-proc-1": "trading", "codex-proc-2": None, "codex-proc-3": None})
+        # Only the lane becomes a label; the other kept resource attributes stay off the series.
+        self.assertNotIn("service_version", exported["codex-proc-1"])
+
     @unittest.skipUnless(PROMETHEUS.exists(), "the pinned Prometheus is not installed at the documented path")
     def test_prometheus_scrape_drops_codex_buckets_and_counts_a_new_series_from_zero(self):
         start = time.time_ns() - 5_000_000_000

@@ -11,8 +11,22 @@ route:
         scope: equities-broker
       receiver: local-ntfy
       continue: false
+    # Codex lane alerts: critical ones reach the alert topic, the rest go to a quiet topic (ntfy priority low).
+    - match:
+        scope: codex-lanes
+        severity: critical
+      receiver: local-ntfy
+      continue: false
+    - match:
+        scope: codex-lanes
+      receiver: local-ntfy-lanes
+      continue: false
 receivers:
   - name: local-ntfy
     webhook_configs:
       - url: 'http://127.0.0.1:18080/ecosystem-alerts?template=alertmanager'
+        send_resolved: true
+  - name: local-ntfy-lanes
+    webhook_configs:
+      - url: 'http://127.0.0.1:18080/ecosystem-lanes?template=alertmanager&priority=low'
         send_resolved: true

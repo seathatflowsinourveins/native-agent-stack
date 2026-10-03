@@ -11,6 +11,12 @@
 # <inherited>/<fresh>, so concurrent children of one parent stay separate writers. The entry is parsed the way the
 # SDK does (sdk/src/resource/env.rs at v0.31.0: split on commas, then on the first '=', key and value trimmed; the
 # last duplicate wins). The script is POSIX sh apart from its shebang, so macOS bash 3.2 runs it.
+#
+# Every other entry is kept, unchanged, after the new id. A Codex lane names itself this way: its launch exports
+# OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<root|runtime|token|trading> and starts codex through this launcher, so
+# the process exports service.instance.id=<fresh>,ecosystem.lane=<lane>. A child started through the launcher with
+# that environment keeps the lane next to its <inherited>/<fresh> id. The Collector keeps a short lowercase lane
+# name only and makes it the ecosystem_lane metric label (collector.yaml, transform/privacy and exporters.prometheus).
 # @CODEX_BIN@ is the absolute path of the real codex executable; see observability/collector/README.md for
 # installing a rendered copy in place of the codex link on PATH.
 set -eu
