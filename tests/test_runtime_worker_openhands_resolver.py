@@ -1579,14 +1579,16 @@ class OutgoingGuardTests(unittest.TestCase):
                                      session_key=self.g.SessionKey(self.key_value), host_paths=[str(link)],
                                      user_name="fixtureuser")
         # A real link needs a real temporary root, so this case probes its prerequisite, as git's
-        # test_lazy_prereq does. If the root is PRIVATE_CONTENT (a personal home path), the guard refuses
-        # both texts as private_content first. It comes last: under failfast a skipped subtest ends the test.
+        # test_lazy_prereq does. If the root matches any scripts/validate.py PRIVATE_CONTENT pattern (such
+        # as a personal home path), the guard refuses both texts as private_content first. It comes last:
+        # under failfast a skipped subtest ends the test.
         temp_root_is_private = any(pattern.search(f"{self.tmp}/") for _, pattern in self.g.PRIVATE_CONTENT)
         for text in (f"{link}/x", f"{os.path.realpath(real)}/x"):
             with self.subTest(text=text):
                 if temp_root_is_private:
-                    self.skipTest("prerequisite missing: TMPDIR is under a personal home path, which the guard "
-                                  "refuses as private_content before host paths")
+                    self.skipTest("prerequisite missing: TMPDIR matches a scripts/validate.py PRIVATE_CONTENT "
+                                  "pattern (such as a personal home path), which the guard refuses as "
+                                  "private_content before host paths")
                 with self.assertRaises(self.g.GuardRefused) as caught:
                     guard.check(text)
                 self.assertEqual(caught.exception.reason, "host_path")

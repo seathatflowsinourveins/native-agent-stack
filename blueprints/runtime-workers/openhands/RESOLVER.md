@@ -418,8 +418,13 @@ Resolver mode meets neither as written: CI runs the patch with network, and the 
 body publishes the final message. The record's
 [resolver-mode amendment](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md#resolver-mode-amendment-proposed-2026-09-28-pending-the-owners-decision)
 is proposed and waits for the owner's decision between two options: accept CI
-execution within the bounds above, or push agent branches to an owner fork. Until
-the owner accepts one, the first live run waits (the live runbook's precondition).
+execution within the bounds above, which needs no code change, or push agent
+branches to an owner fork. The fork first needs a separately reviewed change to this
+driver's GitHub harness, which pushes to and opens PRs only in this repository (see
+Residuals). Neither option blocks CI egress, and under either the PR body publishes
+the final message unless `build_pr_body` drops it. Until the owner accepts one, and
+for the fork until that harness change has passed its own review, the first live
+run waits (the live runbook's precondition).
 
 ### 4. The review loop, after `host.run` returns
 
@@ -512,13 +517,27 @@ free branch name.
   The plan's installer dry run checks the binary and the source trees, not the add.
   A failure between the attempt's start and the probe spends that day's run id.
 - Gate G4 has not run. Until the coordinator records its qualified argv hash, `run`
-  refuses every reviewer command (`stage_gate_g4_not_recorded`). Which arm qualifies
-  (`--safe-mode`, `--restricted` or another) is G4's result.
+  refuses every reviewer command. Today it refuses earlier, at the gates stage, with
+  `stage_gates_not_recorded`, because no `stage-gates.json` exists
+  (`host.read_stage_gates`). It refuses with `stage_gate_g4_not_recorded` once the
+  recorded stage gates and G5 pass but G4 is missing, the order in which `plan_run`
+  checks them. Which arm qualifies (`--safe-mode`, `--restricted` or another) is G4's
+  result.
 - `run` holds the gh login's full scopes for the whole attempt. That is plan section
   3's residual.
-- The owner's decision on the record's resolver-mode amendment is open. The CI-side
-  mitigations the review proposed are workflow changes outside this PR: an egress
-  block in the PR jobs that run repository code, or pushing to an owner fork.
+- The owner's decision on the record's resolver-mode amendment is open. The review
+  proposed two mitigations of different kinds:
+  - An egress block in the PR jobs that run repository code. That is a workflow
+    change outside this PR, and either option can add it.
+  - Pushing agent branches to an owner fork (option 2). That changes this PR's own
+    harness, which targets only this repository: `resolver/gh_harness.py` fixes
+    `REPO` (`:44`), pushes only to `origin` (`op_push`, `:241-254`) after checking
+    its push URL (`push`, `:704-709`), opens the PR with `--head <branch>`
+    (`:257-259`, allowlist entry `:448`), and checks this repository's identity and
+    branch rules (`:627-628`, `:684-689`). Before any run, option 2 needs a fork
+    remote and push-URL check, `--head <owner>:<branch>`, the rules lookup and a
+    `non_fast_forward` ruleset on the fork, and its own review. A fork does not stop
+    the PR body publishing the final message; only a change to `build_pr_body` does.
 - A7's environment listing reads `Config.Env`, the environment Docker starts the server
   with. A variable that the model's terminal exports later is not in it. The listing
   has not run against the live image. The proxy log is split from the probe's traffic
@@ -534,7 +553,9 @@ name, never a credential.
 
 ```sh
 # Precondition: the owner has accepted one option of the decision record's resolver-mode amendment
-# (docs/decisions/2026-09-28-openhands-resolver-isolation.md). Until then, stop here.
+# (docs/decisions/2026-09-28-openhands-resolver-isolation.md). Until then, stop here. Option 2 (an owner
+# fork) also needs its separately reviewed harness change first, because this driver pushes and opens
+# PRs only in this repository (Residuals). Until that change lands, stop here too.
 export PATH="$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin:$HOME/.local/share/codex-ecosystem/tools/skills-1.7.0/bin:$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:$HOME/.local/share/codex-ecosystem/bin:$PATH"
 RECIPE="$PWD/blueprints/runtime-workers/openhands"
 PREFIX="$HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6"

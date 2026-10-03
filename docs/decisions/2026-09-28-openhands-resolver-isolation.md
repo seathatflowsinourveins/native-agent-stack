@@ -226,14 +226,39 @@ results on `openhands/*` are model-controlled and are not evidence.
 
 The owner decides between two options:
 1. **Accept CI execution** for resolver mode within those bounds, re-checked whenever a workflow
-   changes, and accept the final message as a second, guarded output.
+   changes, and accept the final message as a second, guarded output. The resolver as built
+   needs no code change for this option.
 2. **Push agent branches to an owner fork**, so that PR runs get no secret and a read-only token
-   whatever a workflow declares. This is the review's proposal; GitHub's fork-PR limits were not
-   re-read for this amendment.
+   whatever a workflow declares. This is the review's proposal. GitHub's fork-PR token and secret
+   limits, and its rules on which account may hold the fork, were not re-read for this amendment,
+   so that guarantee is unverified here.
+   - **Owner.** The fork's owner is this repository's owner, the User account
+     `seathatflowsinourveins`. The repository is public and has no fork
+     (`gh api repos/seathatflowsinourveins/native-agent-stack`, read 2026-10-03). That account is
+     also the admin login the resolver acts through (ruleset section above), so the fork needs
+     its own rules.
+   - **A harness change.** The resolver as built pushes to and opens PRs only in this repository.
+     `resolver/gh_harness.py:44` fixes `REPO`. `op_push` (`:241-254`) pushes only to `origin`,
+     and `push` (`:704-709`) refuses unless the origin push URL equals `ORIGIN_URL`. `op_pr_create`
+     (`:257-259`) and its allowlist entry (`:448`) pass `--head <branch>` in this repository.
+     `check_repository` (`:627-628`) requires `full_name` to equal `REPO`, and `branch_rules`
+     (`:684-689`) reads this repository's rules. The ruleset section above binds only this
+     repository's `openhands/*` refs.
+   - **Before a first run**, option 2 therefore needs a separately reviewed change: a fork remote
+     and push-URL check, `gh pr create --head <owner>:<branch>`, the branch-rules lookup and a
+     `non_fast_forward` ruleset on the fork, and its own independent review.
+   - **Condition 3.** A fork does not change what the PR body publishes. `build_pr_body`
+     (`blueprints/runtime-workers/openhands/resolver.py:547-550`, `:590-592`) includes the final
+     message wherever the branch lives. Under option 2 the owner either accepts the final message
+     as a second, guarded output, as in option 1, or has it dropped from the PR body, which is a
+     further change to `build_pr_body`.
 
-Either option can add an egress block to the PR jobs that run repository code; that is a
-workflow change outside the resolver PR. Until the owner accepts one option, this narrowing does
-not cover resolver mode's CI execution, and the resolver's first live run waits.
+Neither option blocks CI egress. With a fork, main's `pull_request` workflows still run the pushed
+code on the same GitHub-hosted runners, whose egress is audited, not blocked. Either option can
+add an egress block to the PR jobs that run repository code; that is a workflow change outside the
+resolver PR. Until the owner accepts one option, and for option 2 until its harness change has
+passed its own review, this narrowing does not cover resolver mode's CI execution, and the
+resolver's first live run waits.
 
 ## GitHub harness (follow-up PR)
 
