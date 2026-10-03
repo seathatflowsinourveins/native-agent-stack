@@ -15830,6 +15830,11 @@
       "bytes": 5432
     },
     {
+      "path": "docs/decisions/2026-10-03-token-role-admission-and-r2-stop.md",
+      "sha256": "007b4667e20e9cf79816340c7f6ad4c1900dab43ab19c6a1bc1d2bfa6d82154b",
+      "bytes": 6485
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -45566,8 +45571,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "1cf15c5f2126fbbcdacb0193d06b3e384e67c330be58ecf9b9ec35c74ab06f57",
-      "bytes": 121442
+      "sha256": "a7f71c0a80eab1928d91b313654450de460f9deae14ff08c24161693ac03613b",
+      "bytes": 134218
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -45643,6 +45648,46 @@
       "path": "evidence/artifacts/token-context-20261003/unit12-qmd-codex-stop.json",
       "sha256": "6d46bbce9215eded18a006fa5e3736e127d733dbcf0e497600deff02d470903b",
       "bytes": 7141
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit13-claude-b-native-call-result-admission.json",
+      "sha256": "a989e9dedd54d1e7773a526eed8bfd58051bf7ab08652678316fc3e3784935a5",
+      "bytes": 10615
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit13-codex-b-native-call-result-admission.json",
+      "sha256": "a21c657897a9953b7cf08fd8e199f8daf357aa7042fbdf76df382bbb2a36b5b9",
+      "bytes": 9362
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit13-r2-first-aa-stop.json",
+      "sha256": "a07247e6c58b33c397b1a8cddac4ce389b16bbac88708949d0ed88cfc1bb2ce1",
+      "bytes": 10629
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit13-r2-preregistration.json",
+      "sha256": "a284a8235f76028aba888750479c1ac87ad9023b3b3f2d65dbf6a9129c6e5e59",
+      "bytes": 7545
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit14-codex-tui-hook-metadata-source.json",
+      "sha256": "75920a01e5a1af1dd31bbd9c4759d509e1f590ff0f5e2fb1de44b3fdff3dd4ea",
+      "bytes": 5137
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit15-native-stdio-hook-metadata-source.json",
+      "sha256": "987b1f2a55954a6fa4222c33c61e038a7b2175c2a3646a153b27f18e01f5fe8d",
+      "bytes": 7494
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit16-codex-synthetic-mount-enospc-source.json",
+      "sha256": "0f9fe615d1f2a30954b3cf720d55dbc4cd64579129daf2029e0a082d22344343",
+      "bytes": 3977
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit17-native-stdio-carrier-astra-judgment.json",
+      "sha256": "5184cd75cacf94e290d613306416e5663e29783ab32c8a5b9af567b765ca3d40",
+      "bytes": 4820
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",

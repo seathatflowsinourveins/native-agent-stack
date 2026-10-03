@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Measure faithful context supply for substantial systems and US-equities R&D while preserving native context practices.",
+  "evidence_class": "preregistration; frozen prospective native comparison, with original registration preserved after terminal STOP",
+  "status": "PREREGISTERED_FROZEN_R2_HISTORY",
+  "registration": {
+    "frozen_bindings": 234,
+    "freeze_utc": "2026-10-03T16:10:22.754691Z",
+    "last_native_launch_deadline_utc": "2026-10-04T07:06:22.754691Z",
+    "total_window_seconds": 53760,
+    "pauses_count": true,
+    "public_native_preregistration": {
+      "pull_request": 608,
+      "comment_id": 5970930065,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5970930065",
+      "native_post_exit": 0,
+      "before_first_native_launch": true,
+      "order_basis": "Retained coordinator native post and stage order; GitHub createdAt was not returned in this record."
+    }
+  },
+  "unchanged_design": {
+    "planned_cases": 56,
+    "clients": 2,
+    "cases_per_client": 28,
+    "AA_cases": 8,
+    "comparison_cases": 48,
+    "matched_blocks_per_client": 12,
+    "matched_order": "Odd blocks AB, even blocks BA; clients serial, one native case at a time.",
+    "role_contract": "Fresh native main q1/q2 and exactly one actual max child q3/q4.",
+    "quality": "Original 27 gold records, 28 critical statements, eight exact answer/citation strings and generic schema; all56 critical-quality conjunction. Separate unchanged native blind judge and canonical duplicate-key/inventory checks; no authored oracle.",
+    "stats": {
+      "ratio_threshold": 0.9,
+      "upper_95pct_ratio_bound_must_be_below": 1,
+      "method": "paired BCa",
+      "resamples": 9999,
+      "seed": 20261003,
+      "pooled_clients_or_failed_case_exclusions_or_fallback": false
+    },
+    "question_gold_schema_role_block_statistics_changed": false,
+    "first_case": "codex-01, A/A position1, arm A, nonconfirmatory"
+  },
+  "native_contract": {
+    "harness": "unchanged Promptfoo0.123.1 native CLI, one fixed case per invocation",
+    "declared_clients": {
+      "Codex": {
+        "native_CLI": "0.160.0",
+        "SDK": "0.160.0",
+        "model": "gpt-6.1-sol",
+        "effort": "max"
+      },
+      "Claude": {
+        "explicit_native_CLI": "2.1.288",
+        "SDK": "0.3.263",
+        "model": "claude-opus-5-5",
+        "effort": "max",
+        "embedded_CLI_is_not_the_explicit_native_ELF": true
+      }
+    },
+    "native_accounts_caching_tool_discovery_and_compaction": "PRESERVED",
+    "parent_adaptive_scheduler": "DISABLED",
+    "repeat": 1,
+    "max_concurrency": 1,
+    "no_share": true,
+    "no_cache": true,
+    "case_outer_seconds": 950,
+    "kill_grace_seconds": 10,
+    "absolute_config_argument_required": true,
+    "A": "Native focused reads through registered native providers.",
+    "B": "Source-qualified CM Docker MCP launcher with TINI_KILL_PROCESS_GROUP=1; Claude adds released case-local Docker-command hooks. Full plugin/bootstrap and other stack layers are excluded.",
+    "CM_use_in_comparison": "OPTIONAL; no directed calibration schedule imported."
+  },
+  "accepted_observable_endpoint": {
+    "required": "Actual native role/spawn custody, complete serialized invocation and linked returned result, original-source identity/output, observable effective configuration, model-facing evidence where claimed and finalized disjoint native usage.",
+    "Codex": "Each required role first full request and complete previous_response_id chain; journal/native response-prefix cross-check.",
+    "Claude": "Native initialization/Agent linkage, own role journals and final inclusive modelUsage with known helper aggregates counted once.",
+    "outside_UNKNOWN": [
+      "physical stream separation and OS actor",
+      "encrypted assignment plaintext/hidden-input equivalence",
+      "invisible helper identity census",
+      "independent backend/wire/invoice",
+      "universal confinement"
+    ]
+  },
+  "terminal_rule": "First required mechanical, quality, role, source, counter or lifecycle failure after launch causes terminal STOP, preserves known failed usage and marks remaining slots UNRUN_FINAL; no retry, repair, replacement or regrade.",
+  "source_snapshots": [
+    {
+      "file": "docs/token-session-handbook.md",
+      "bytes": 90785,
+      "sha256": "caf81fa3aa0fa3e662e1807869331dc024ca787233a4844a0eca3e92e4ea46d6"
+    },
+    {
+      "file": "docs/token-efficiency-stack.json",
+      "bytes": 587560,
+      "sha256": "b43af443e3ec7dd81efe16f7adc6ead8fe99a4748bc59a541f8ca8696799b80e"
+    }
+  ],
+  "sources": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "version": "0.123.1",
+      "files": [
+        "src/providers/openai/codex-sdk.ts:2421-2447",
+        "src/providers/claude-agent-sdk.ts"
+      ]
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "version": "0.160.0",
+      "files": [
+        "codex-rs/rollout-trace/README.md:157-170,208-210",
+        "codex-rs/protocol/src/protocol.rs:2241-2346,2467-2474"
+      ]
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "revision": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "version": "1.0.169",
+      "scope": "Released MCP and explicit Claude Docker-command hooks only; full plugin/bootstrap is excluded."
+    },
+    {
+      "repository": "krallin/tini",
+      "revision": "de40ad007797e0dcd8b7126f27bb87401d224240",
+      "file": "src/tini.c",
+      "scope": "Qualified process-group signal environment for the B MCP launcher."
+    },
+    {
+      "repository": "scipy/scipy",
+      "revision": "54ef5423f2e4376230ec3bfda6912a07a50958e3",
+      "version": "1.18.0",
+      "scope": "Frozen paired BCa method; no analysis executed.",
+      "symbol": "scipy.stats.bootstrap"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+      "files": [
+        "docs/token-session-handbook.md",
+        "docs/token-efficiency-stack.json"
+      ],
+      "scope": "Frozen task-source snapshots; catalog claims are dated source material, not current host acceptance."
+    }
+  ],
+  "custody": {
+    "root_live_freeze": {
+      "bytes": 67728,
+      "sha256": "ab39de3dac26d655c66e87bb8574ea8a588ab4b38f7b58de9c7a6e0f626fe7bf"
+    },
+    "root_native_public_preregistration": {
+      "bytes": 336,
+      "sha256": "6851d66090d896b29d5a03b620e3e77d12a5dbcab19431a1ccf9ec0c1e6d0128"
+    },
+    "producer_source_bindings": {
+      "bytes": 12370,
+      "sha256": "9d2020ad36c34c0f790638aa55196fb5c134a5ec455cb41ed30f0cd780a84b79"
+    },
+    "accepted_endpoint_addendum": {
+      "bytes": 7133,
+      "sha256": "b5c06e5d6f1025e60b3f39d839ed99e9956b8e4b867da8c76bd0ef246f5ac84e"
+    },
+    "acceptance_template": {
+      "bytes": 27998,
+      "sha256": "431274caf40a2a4e76b34fd17b7dfc3d7f09eeac1d67a745fc9d4d4e95b695e5"
+    },
+    "later_terminal_stop": {
+      "bytes": 8835,
+      "sha256": "277f8721b080a52dd17e2582fb9e11e75fbffc63c3327c7555aacc0ec09e4d2d"
+    }
+  },
+  "limits": "Registration does not pass a native case, establish savings or protection, accept a baseline, change defaults or qualify P2. Earlier strict carrier and P1 failures remain unchanged.",
+  "privacy": "Sanitized source locators, counts and hashes only; private paths, raw configurations/transcripts and native UUIDs are omitted."
+}

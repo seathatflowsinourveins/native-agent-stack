@@ -96,7 +96,15 @@
       "unit12-qmd-codex-stop",
       "unit12-opus-prefreeze-failed-read",
       "unit12-opus-source-repair-timeout",
-      "unit12-native-hook-metadata-hold"
+      "unit12-native-hook-metadata-hold",
+      "unit13-codex-b-native-call-result-admission",
+      "unit13-claude-b-native-call-result-admission",
+      "unit13-r2-preregistration",
+      "unit13-r2-first-aa-stop",
+      "unit14-codex-tui-hook-metadata-source",
+      "unit15-native-stdio-hook-metadata-source",
+      "unit16-codex-synthetic-mount-enospc-source",
+      "unit17-native-stdio-carrier-astra-judgment"
     ],
     "roles": [
       "command-worker",
@@ -242,7 +250,15 @@
     "Supported native Promptfoo one-case QMD Codex functional admission; own native role journals/trace and existing o200k facade",
     "Native Claude2.1.288 restricted Opus/max read-only source review",
     "Native Claude2.1.288 restricted Opus/max exact owned source-copy correction; one600s cap",
-    "Supported Codex0.160.0 pure native app-server generate-json-schema --experimental; unchanged pinned source/custody reads"
+    "Supported Codex0.160.0 pure native app-server generate-json-schema --experimental; unchanged pinned source/custody reads",
+    "Supported native Promptfoo fixed Codex B admission; complete native role/request/call/result prefix reconciliation and owned Docker lifecycle observations; synthetic integration only.",
+    "Supported native Promptfoo fixed Claude B admission; main/linked-child native journals plus finalized helper-inclusive result and owned Docker lifecycle observations; synthetic integration only.",
+    "Retained native public preregistration response and prelaunch 234-binding freeze custody; offline publication of an existing registration, no new execution.",
+    "Unchanged registered native Promptfoo first Codex AA case; retained root native reduction and nine finalized parent groups; required child helper failure and terminal STOP, no retry.",
+    "Read-only retained Codex released TUI hooks handler/detail sources; selected full-key/hash display HOLD, no TUI or model launch.",
+    "Read-only retained installed protocol/SDK and released native stdio hooks/list sources; matching profile and startup HOLD, no RPC/client/provider launch.",
+    "Read-only retained native error and pinned linux_run_main.rs source trace; registry write identified, resource cause/remedy unknown; no runtime repair.",
+    "Existing native Codex Astra/max keyless-pool read-only source judgment on unchanged private SDK formatter and supported stdio metadata recipe; five response prefixes independently reconciled, no metadata server launch."
   ],
   "observations": [
     {
@@ -2724,6 +2740,254 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "unit13-codex-b-native-call-result-admission",
+      "task": "unit13-codex-b-native-call-result-admission",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 72,
+      "evidence_class": "model_task_execution",
+      "scope": "Synthetic directed Codex B native main/max-child call/result admission:12attempts/4MCPcalls, known disjoint572563tokens. Natural rates, performance, strict/full-plugin/protection and invoice UNQUALIFIED or UNKNOWN.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit13-codex-b-native-call-result-admission.json",
+          "sha256": "a21c657897a9953b7cf08fd8e199f8daf357aa7042fbdf76df382bbb2a36b5b9"
+        }
+      ],
+      "usage": {
+        "uncached_input": 77118,
+        "cache_creation": 0,
+        "cache_read": 489600,
+        "output": 5845,
+        "reasoning_in_output": 2501,
+        "total": 572563,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit13-claude-b-native-call-result-admission",
+      "task": "unit13-claude-b-native-call-result-admission",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 73,
+      "evidence_class": "model_task_execution",
+      "scope": "Synthetic directed Claude B native main/max-child call/result admission:12attempts/4MCPcalls, known inclusive460066tokens. Actual signal2/exit130 retained. Natural rates, performance, strict/full-plugin/protection and invoice UNQUALIFIED or UNKNOWN.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit13-claude-b-native-call-result-admission.json",
+          "sha256": "a989e9dedd54d1e7773a526eed8bfd58051bf7ab08652678316fc3e3784935a5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2519,
+        "cache_creation": 59682,
+        "cache_read": 364459,
+        "output": 33406,
+        "reasoning_in_output": 25955,
+        "total": 460066,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit13-r2-preregistration",
+      "task": "unit13-r2-preregistration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 74,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Historical prospective R2 registration/freeze234bindings and actual public prelaunch comment, not a model/performance run. Subsequent first A STOP;55/judge UNRUN_FINAL.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit13-r2-preregistration.json",
+          "sha256": "a284a8235f76028aba888750479c1ac87ad9023b3b3f2d65dbf6a9129c6e5e59"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit13-r2-first-aa-stop",
+      "task": "unit13-r2-first-aa-stop",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 75,
+      "evidence_class": "model_task_execution",
+      "scope": "Native R2 first A required child spawn failed ENOSPC; CLI/schema0 only. Known parent252333 receipt-only; failed-child/two-role estimand UNKNOWN;55/judge UNRUN_FINAL. No retry/repair/statistics/default claim.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit13-r2-first-aa-stop.json",
+          "sha256": "a07247e6c58b33c397b1a8cddac4ce389b16bbac88708949d0ed88cfc1bb2ce1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit14-codex-tui-hook-metadata-source",
+      "task": "unit14-codex-tui-hook-metadata-source",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 76,
+      "evidence_class": "pinned_source_review",
+      "scope": "Source-only selected TUI full-key/hash display HOLD; actual TUI/model UNRUN. Null exit/counters denote no launched-client claim, not executed-client failure.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit14-codex-tui-hook-metadata-source.json",
+          "sha256": "75920a01e5a1af1dd31bbd9c4759d509e1f590ff0f5e2fb1de44b3fdff3dd4ea"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit15-native-stdio-hook-metadata-source",
+      "task": "unit15-native-stdio-hook-metadata-source",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 77,
+      "evidence_class": "pinned_source_review",
+      "scope": "Source-only supported stdio protocol; matching TOML/startup/actual six-definition discovery HOLD as of unit15 closure. Null exit/counters; no client/RPC/model launch in this source unit.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit15-native-stdio-hook-metadata-source.json",
+          "sha256": "987b1f2a55954a6fa4222c33c61e038a7b2175c2a3646a153b27f18e01f5fe8d"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit16-codex-synthetic-mount-enospc-source",
+      "task": "unit16-codex-synthetic-mount-enospc-source",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 78,
+      "evidence_class": "pinned_source_review",
+      "scope": "Source-only pinned registry-marker write identified; actual allocation cause/backing namespace/capacity/remedy UNKNOWN. No repair/client/system/new native run. Failed denotes unclosed remedy gate; null exit/counters.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit16-codex-synthetic-mount-enospc-source.json",
+          "sha256": "0f9fe615d1f2a30954b3cf720d55dbc4cd64579129daf2029e0a082d22344343"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit17-native-stdio-carrier-astra-judgment",
+      "task": "unit17-native-stdio-carrier-astra-judgment",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 79,
+      "evidence_class": "model_task_execution",
+      "scope": "One native Astra/max consequential source judgment on exact private formatter/stdin/lane boundaries with source/counter custody. READY permits prospective recipe; native parsing/metadata, P2/default/full-plugin/protection and user approval unqualified.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit17-native-stdio-carrier-astra-judgment.json",
+          "sha256": "5184cd75cacf94e290d613306416e5663e29783ab32c8a5b9af567b765ca3d40"
+        }
+      ],
+      "usage": {
+        "uncached_input": 10691,
+        "cache_creation": 0,
+        "cache_read": 86784,
+        "output": 2944,
+        "reasoning_in_output": 1794,
+        "total": 100419,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -2902,6 +3166,22 @@
     {
       "run_id": "unit12-native-hook-metadata-hold",
       "reason": "Pure schema export0/sourcecontract observed; actual native per-case keys/current hashes missing. GateHOLD; no native model or live server/admission/protection."
+    },
+    {
+      "run_id": "unit13-r2-first-aa-stop",
+      "reason": "Native R2 first A required child spawn failed ENOSPC; CLI/schema0 only. Known parent252333 receipt-only; failed-child/two-role estimand UNKNOWN;55/judge UNRUN_FINAL. No retry/repair/statistics/default claim."
+    },
+    {
+      "run_id": "unit14-codex-tui-hook-metadata-source",
+      "reason": "Source-only selected TUI full-key/hash display HOLD; actual TUI/model UNRUN. Null exit/counters denote no launched-client claim, not executed-client failure."
+    },
+    {
+      "run_id": "unit15-native-stdio-hook-metadata-source",
+      "reason": "Source-only supported stdio protocol; matching TOML/startup/actual six-definition discovery HOLD as of unit15 closure. Null exit/counters; no client/RPC/model launch in this source unit."
+    },
+    {
+      "run_id": "unit16-codex-synthetic-mount-enospc-source",
+      "reason": "Source-only pinned registry-marker write identified; actual allocation cause/backing namespace/capacity/remedy UNKNOWN. No repair/client/system/new native run. Failed denotes unclosed remedy gate; null exit/counters."
     }
   ],
   "limitations": [
@@ -2943,7 +3223,9 @@
     "Unit10 five sandbox controls pass only a distinct model-free harmless-fixture integration. Three expected native negative exits1 remain in original outputs and receipt; observer aggregate success is not native producer exit or unchanged upstream tests. Actual exec/skill/child/MCP/Claude/R2/P2 admission remains unqualified. Astra285466 is separate review overhead, native wire/helpers/invoice unknown.",
     "Unit10 owner record arrived after the location request:13,020bytes/fullSHA15bd8a386e640e9c98827ed6d4c4a18d9ace796889e5a59be7b7ebfab3fbc2cd verified from complete local copy. Earlier inaccessible wording is historical; current runtime/corpus/client admission remains open. Source status wrapper may repair legacy columns; owner current-schema snapshot is a lead, not lifetime no-write proof.",
     "Unit11 strict carrier remains unqualified; prospective native-call/result boundary accepted only as method. Independent nested role/call/result inventory and each family treatment lifecycle required;56producers prepared UNRUN/UNFROZEN. Selected QMD readonly predicates are dated, not nativeMCP/corpus/lifetime no-write acceptance.",
-    "Unit12 QMD D1 child model-visible truncation terminalSTOP despite complete runtime bytes; all retrieval comparisons and Claude admissionlaterUNRUN. Two Opus review failures retained:8sourceReads repair observed but final critique/wholeusage missing. Native Codex hook map corrected privately but returnedkeys/hashes missing; no contextprotection. No candidate/default/install/context-supply amendment."
+    "Unit12 QMD D1 child model-visible truncation terminalSTOP despite complete runtime bytes; all retrieval comparisons and Claude admissionlaterUNRUN. Two Opus review failures retained:8sourceReads repair observed but final critique/wholeusage missing. Native Codex hook map corrected privately but returnedkeys/hashes missing; no contextprotection. No candidate/default/install/context-supply amendment.",
+    "Units13-17: B fixtures are synthetic/directed admissions only. R2 child failure is terminal,55/judge UNRUN_FINAL; known parent252333 is receipt-only, two-role aggregate UNKNOWN. Source-only TUI/stdio/ENOSPC gates keep null native usage/exits. Astra100419 is source judgment, not approval/live metadata/default/protection. No host/other-layer change.",
+    "Publication corrections: derived STOP pending-unit16 prose updated to completed source diagnosis only. Proposed generic unit17 stopped-case label corrected to actual frozen formatter/stdin/lane judgment. First two metadata integrations expected absent proposal scope/usage fields and stopped before writes; root binds declared actual scopes/counters. All original native/freeze/private drafts and old aggregate observations remain unchanged."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -3028,7 +3310,11 @@
       "unit9-native-profile-repair",
       "unit9-sources-and-scoped-defaults",
       "unit10-runtime-profile-astra",
-      "unit10-native-stage1-controls"
+      "unit10-native-stage1-controls",
+      "unit13-codex-b-native-call-result-admission",
+      "unit13-claude-b-native-call-result-admission",
+      "unit13-r2-first-aa-stop",
+      "unit17-native-stdio-carrier-astra-judgment"
     ],
     "coverage_artifact": null
   }

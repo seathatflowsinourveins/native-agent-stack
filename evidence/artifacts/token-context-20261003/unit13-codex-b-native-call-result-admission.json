@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Keep native retrieval/compression preparation reviewable for complex project work before any original comparison launch",
+  "evidence_class": "local_integration; one synthetic native admission per family, not unchanged upstream acceptance",
+  "status": "SCOPED_READY_B_NATIVE_CALL_RESULT",
+  "registration": {
+    "endpoint": "Prospectively declared native call/result/source/settings/counter endpoint",
+    "fixture": "Harmless fixed four-fact synthetic fixture, shared original bytes",
+    "fixture_bytes": 244,
+    "fixture_sha256": "2b572f4dc2ce3558abe5ed4bf234132dad0f9280f2944c25b44420f4f8709c83",
+    "closed_bindings_unchanged": 40,
+    "directed_main_child_operations_each": 6,
+    "eligible_directed_fixture_probe_operations": 12,
+    "attempted_directed_operations": 12,
+    "successful_allowed_operations": 8,
+    "expected_denial_results": 4,
+    "natural_denial_or_recovery_rate": "NOT_ESTIMATED",
+    "subsequent_trial": "Separate R2 freeze234bindings SHAab39de3dac26d655c66e87bb8574ea8a588ab4b38f7b58de9c7a6e0f626fe7bf, publicly preregistered before firstcase; fixture outcomes are not real producer outcomes."
+  },
+  "preserved_status": {
+    "strict_physical_carrier": "UNQUALIFIED",
+    "original_56_comparisons": "UNRUN/UNFROZEN",
+    "original_q3_q4_producers": "UNRUN",
+    "full_context_mode_plugin_bootstrap": "HOLD",
+    "adoption_default_protection_savings": "NOT_CLAIMED",
+    "temporal_scope": "At native admission closure, before the separately registered subsequent R2 comparison freeze."
+  },
+  "privacy": "Counts, source URLs/pins and private-artifact hashes only; no host paths, native IDs, raw conversations, active client configuration, authentication or credentials.",
+  "native_invocation": {
+    "family": "Codex",
+    "native_cli": "0.160.0",
+    "Promptfoo": "0.123.1",
+    "model_main_child": "gpt-6.1-sol",
+    "effort_main_child": "max",
+    "native_scheduler_attempts": 1,
+    "start_utc": "2026-10-03T15:18:20.004094Z",
+    "end_utc": "2026-10-03T15:23:27.038596Z",
+    "native_exit": 0,
+    "required_roles_completed": 2,
+    "native_provider_key_and_display": "openai / OpenAI",
+    "physical_route_backend": "UNKNOWN"
+  },
+  "actual_results": {
+    "both_roles_original_four_facts_source_scratch_fidelity": true,
+    "complete_call_result_links_and_effective_observable_settings": true,
+    "input_write_destinations_absent": true,
+    "outside_canary_content_not_returned": true,
+    "all_native_calls": 19,
+    "directed_calls": 12,
+    "additional_guidance_calls": 3,
+    "additional_collaboration_calls": 4,
+    "all_call_inventory": {
+      "exec_command": 11,
+      "ctx_index": 2,
+      "ctx_search": 2,
+      "spawn_agent": 1,
+      "wait_agent": 2,
+      "list_agents": 1
+    },
+    "first_full_request_per_role_and_previous_response_chains_verified": true,
+    "full_request_tool_schema_sha256": [
+      "0d3ffb2d9927a7a4e536703a7d55e0b2daebf7c8be52bdb530b1ba4a85f17d53",
+      "cbac0aeea375ba291e44ce8bb9d077f0891888741eafb086f54166885f307009"
+    ],
+    "native_fork_turns": "all; parent context retained, hidden nonforwarding UNKNOWN"
+  },
+  "native_usage": {
+    "finalized_response_groups_main": 14,
+    "finalized_response_groups_child": 7,
+    "disjoint_finalized_response_groups": 21,
+    "main_total": 405180,
+    "child_total": 167383,
+    "inclusive_identifiable_total": 572563,
+    "input_includes_cache": 566718,
+    "cached_input_subset": 489600,
+    "cache_write_input_subset": 0,
+    "output_includes_reasoning": 5845,
+    "reasoning_output_subset": 2501,
+    "all_21_prefixes_and_finals_reconciled": true,
+    "provider_returned_parent_only_total": 405180,
+    "count_once": "Raw responses and cumulative/native journal/trace/provider views reconcile; overlapping totals and cache/reasoning subsets are never added.",
+    "unseen_helpers_and_billing": "UNKNOWN"
+  },
+  "observed_lifecycle": {
+    "snapshots": 137,
+    "positive_owned_process_ids_count": 18,
+    "positive_owned_containers": 2,
+    "positive_live_top_and_native_MCP_operation_readiness": true,
+    "native_container_signal_exit_pairs": [
+      [
+        15,
+        143
+      ],
+      [
+        15,
+        143
+      ]
+    ],
+    "native_containers_destroyed_before_manual_cleanup": true,
+    "post_known_process_and_case_container_checks_empty": true,
+    "observer_exit": 143,
+    "only_owned_observer_stopped_after_native_completion": true,
+    "signal_actor_and_physical_EOF": "UNKNOWN"
+  },
+  "corrections_and_failures": [
+    {
+      "condition": "Original freeze raced final receipt/manifest writes; custody guard failed before launch. No model/observer attempt consumed. Original failure retained; separately closed40 freeze used.",
+      "artifact_sha256": "d992ecafcc9c5c42ef3c870307c01e7c5c86e4376b52daa66da06b978d88ca01"
+    },
+    {
+      "condition": "Seven intermediate directory privacy modes and evaluator state/log isolation required correction before launch. Separate root amendment retained; original closed commands/config bytes unchanged.",
+      "preparation_receipt_sha256": "1bec56d87ade0ec8b5fde806fac0db4f2ff27e563debccacd12610c1ff7e9329",
+      "root_amendment_sha256": "5005ee88ab752d65ba9114f511c9cfbcc2eb90c2e7ac49e6c4a1a0adeaf34e45"
+    },
+    {
+      "condition": "Worker locator, oversized projection and final-phase selection mistakes preserved; corrected using actual metadata/final phase, without native retry.",
+      "artifact_sha256": "f42d7cd9683e8417ab6934937c47bdd65049fd3a0d97226d730b83066ff7d2bd"
+    }
+  ],
+  "sources": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/codex-sdk.ts",
+      "lines": "1860\u20131872,2421\u20132447",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts",
+      "retained_source_sha256": "98ea2f086fbd073a3648d56320afd54adbc42f4dd5c399e6acd3b669176b06c7"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/protocol/src/protocol.rs",
+      "lines": "1933\u20131937,2241\u20132274",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/protocol.rs",
+      "retained_source_sha256": "d3d3d384da91b2824c10091de4331a2bc26ec5474887ed0aef1e3f3c4ae110f4"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/rollout-trace/README.md",
+      "lines": "157\u2013170,208\u2013210",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/rollout-trace/README.md",
+      "retained_source_sha256": "5d8c177a38dec8e8b44530f0c0add531160a93c98e522e00d0240c97a4423adc"
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "revision": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "file": "src/server.ts",
+      "lines": "source-bound native tools implementation",
+      "url": "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts",
+      "retained_source_sha256": "4a34c4a17b64fa188d2a2c894765f492bf62b624a60c64e666fbaeef760f4a59"
+    },
+    {
+      "repository": "krallin/tini",
+      "revision": "de40ad007797e0dcd8b7126f27bb87401d224240",
+      "file": "src/tini.c",
+      "lines": "526,572\u2013577",
+      "url": "https://github.com/krallin/tini/blob/de40ad007797e0dcd8b7126f27bb87401d224240/src/tini.c",
+      "retained_source_sha256": "48b982967a950c35533df82b2f29eb4a863a6de836306ae76e4f57fbb1abf11f"
+    }
+  ],
+  "custody": {
+    "closed40_freeze_sha256": "8b639bd5fd3e92ce46c257931fe0e797766cc46a2147e0b5cebe3740148657cb",
+    "worker_receipt_sha256": "f76e2fcb321fc26ee4c72dd56c1d6538df87755b0bdfaeb1772a2d7d28977595",
+    "worker_manifest_sha256": "be7143dc9ec8d9c8cc9ed380d482157c49ba2e08114f36ef3b3076036e0e0a8e",
+    "worker_role_request_sha256": "096d5abb6386f4a9663684f58f785d5eee6bc0c61d69119ca79a492e787b2c2a",
+    "worker_call_result_source_effect_sha256": "f8c1117aab99793221d3c8247d4f69706fcc1ef042fd1106cb44d511f095b971",
+    "worker_lifecycle_sha256": "e22efe0e82801183bf0c9f8d7c4551d8a1f167683a4c1b67b13f92c8c36676e8",
+    "worker_source_bindings_sha256": "d492db13f4262812ba39e2be1981d65824564e541a3adf25f37bd5e4712a1b1b",
+    "root_independent_counter_prefix_sha256": "c043ed4d9ce0f3eacbd15acde496df467299100449c7b3ff46ee490ea4b54b18",
+    "native_role_journal_sha256": [
+      "46aaa82482f9643940befeaed9b4ff91bd43bc246f676fc2cfb0bb48b0ed50c3",
+      "64cb72780c3cffa4aa9569ddf8b735fe0b652f98271699f3fae1b2972f5d0706"
+    ]
+  },
+  "completeness_critic": "READY is limited to this synthetic native call/result admission. It supplies no original task/rate/protection/full-plugin acceptance. Preserve parent context, counted guidance/collaboration and unknown physical/helper/wire scopes.",
+  "unknowns_outside_estimand": [
+    "Physical EOF/stream separation and OS execution attribution",
+    "Individual signaling actor/recipients and invisible helper/partial-attempt census",
+    "Hidden input/plaintext/nonforwarding/equivalence and independent wire/backend/invoice",
+    "Original task/resume/full-plugin/protection/savings qualification"
+  ]
+}
