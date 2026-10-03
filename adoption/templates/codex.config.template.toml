@@ -43,11 +43,15 @@ default_subagent_reasoning_effort = "max"
 # skill-installer by its path, so skills reach a host only through that installer (wave-2 skills ruling, 2026-10-03;
 # a path rule names one skill, a name rule every skill of the name: codex-rs/config/src/skills_config.rs at
 # rust-v0.160.0). Rules for an account's remote plugin skills are per account and are not in this template.
+# The path is relative on purpose: Codex installs its bundled skills in <Codex home>/skills/.system
+# (codex-rs/skills/src/lib.rs L62-69) and resolves a relative path in config.toml against the folder that file is in,
+# which for this file is the Codex home, CODEX_HOME or else ~/.codex (config/src/loader/mod.rs L557, L573-582 and
+# L1424-1445; utils/absolute-path/src/lib.rs L392-405; the same functions at rust-v0.159.3 and rust-v0.155.1).
 [skills]
 max_context_tokens = 6000
 
 [[skills.config]]
-path = "${HOME}/.codex/skills/.system/skill-installer/SKILL.md"
+path = "skills/.system/skill-installer/SKILL.md"
 enabled = false
 
 # User scope, so every worktree Codex is launched from inherits these servers without a project-local

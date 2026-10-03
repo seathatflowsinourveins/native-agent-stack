@@ -3059,7 +3059,8 @@ class RemotePluginRuleTests(unittest.TestCase):
         self.assertNotIn("turned off", out)
         text = self.config.read_text()
         config = tomllib.loads(text)
-        installer = {"path": str(self.home / ".codex/skills/.system/skill-installer/SKILL.md"), "enabled": False}
+        # Relative, so Codex resolves it against the Codex home that holds this config.toml (the template's comment).
+        installer = {"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}
         self.assertEqual(config["skills"]["config"], [installer, {"name": "superpowers:brainstorming", "enabled": False}])
         self.assertEqual(text.count("[[skills.config]]"), 2)                # an array of tables, so it can grow as text
         self.assertEqual(config["plugins"]["openai-developers@openai-curated-remote"],
@@ -3146,8 +3147,7 @@ class RemotePluginRuleTests(unittest.TestCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         self.assertEqual(tomllib.loads(self.config.read_text())["skills"]["config"],
-                         [{"path": str(self.home / ".codex/skills/.system/skill-installer/SKILL.md"), "enabled": False},
-                          remote])
+                         [{"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}, remote])
         # A non-empty array of tables, as a file: extended after its own rule, every line it had kept.
         tables = '[[skills.config]]\nname = "my-skill"\nenabled = false\n\n[tui]\nscreen_reader_detection_done = true\n'
         self.config.write_text(tables, encoding="utf-8")
@@ -3155,8 +3155,7 @@ class RemotePluginRuleTests(unittest.TestCase):
         self.assertEqual(code, 0, out[-800:])
         self.assertIn("rules added to skills.config: 2, after the file's own", out)
         self.assertEqual(tomllib.loads(self.config.read_text())["skills"]["config"],
-                         [own, {"path": str(self.home / ".codex/skills/.system/skill-installer/SKILL.md"), "enabled": False},
-                          remote])
+                         [own, {"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}, remote])
         self.assertTrue(keeps_lines(tables, self.config.read_text()))
 
     def test_the_toml_writer_writes_a_list_of_tables_as_an_array_of_tables(self):
