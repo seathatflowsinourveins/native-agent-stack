@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
-      "sha256": "db91f3dce42da2bc0c84b3b3cca7282089b092896a9fa0b90cc469d91c717b18",
-      "bytes": 60670
+      "sha256": "f40a38b59e156e652568e34152743e1a8c047235a9d42322602bb72c9461bddf",
+      "bytes": 64699
     },
     {
       "path": "docs/direct-results.md",
@@ -45546,8 +45546,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "9d2e680cdd9076fa2bcd7eb77da5fb07c1c51103a07ebf4bf08859f5fa1fc1f0",
-      "bytes": 89736
+      "sha256": "eee44438381ecd170d0f25d2d1e5d36d0862971f841958233cb86c941ef14999",
+      "bytes": 94502
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -45588,6 +45588,16 @@
       "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",
       "sha256": "f7559e3aebd1460da9ab17a8fa65634fbd61fd60072a28789e19c1baaa2a431c",
       "bytes": 3286
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit8-completeness-critic.md",
+      "sha256": "c8b78023cd6216bfb49ee4e2acadb62b3a49eaf4d767211eede13fa77f475ed7",
+      "bytes": 4027
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
+      "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6",
+      "bytes": 19909
     },
     {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",

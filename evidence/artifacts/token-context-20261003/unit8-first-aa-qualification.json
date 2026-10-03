@@ -1,0 +1,504 @@
+{
+  "study": "token-context-20261003",
+  "unit": "unit8-first-aa-and-prerequisites",
+  "evidence_class": "native_cli_execution",
+  "publication_status": "Observed stopped P1 case and review/prerequisite scopes; exact-head publication review pending",
+  "north_star_action": "Reliable economical original-source context for complex R&D with native main and max-effort child roles.",
+  "P1": {
+    "frozen_at_utc": "2026-10-03T10:53:08.444184+00:00",
+    "freeze_sha256": "da7ec099ec55f98b306fb28eccdbc73a68040df91effcc14c550b99d899d293f",
+    "deadline_utc": "2026-10-04T01:49:08.444184+00:00",
+    "fixed_total_window_seconds": 53760,
+    "immutable_inputs": 212,
+    "registered_cases": 56,
+    "AA_cases": 8,
+    "comparison_cases": 48,
+    "final_status": "STOPPED: first A/A mechanics UNKNOWN/NOT PASS; original stopping rule enforced",
+    "first_case": {
+      "case": "codex-01",
+      "task": "AA1",
+      "native_promptfoo_invocations": 1,
+      "started_utc": "2026-10-03T10:58:46.015988242Z",
+      "completed_utc": "2026-10-03T11:03:08.506820773Z",
+      "native_cli_exit": 0,
+      "output_schema": "PASS",
+      "mechanics": "UNKNOWN/NOT PASS",
+      "semantic_judge": "UNRUN; root source checks are separate and do not replace the frozen judge",
+      "required_proof_missing": [
+        "The native child task body contains encrypted_content; question-only assignment versus facts forwarded cannot be established.",
+        "Actual advertised/deferred tool schemas and charged instruction exposure were not captured."
+      ],
+      "interpretation": "Missing proof does not establish a fact-forwarding, hidden-gold-read, or account-access violation."
+    },
+    "later_cases_UNRUN_FINAL": 55,
+    "replacement_cases": 0,
+    "common_blind_judge": "UNRUN",
+    "accepted_cases_for_confirmatory_ratios": 0,
+    "paired_comparison": "UNRUN; ratio and confidence interval undefined",
+    "post_execution_immutable_inputs": {
+      "checked": 212,
+      "all_match": true
+    },
+    "source_role_evidence": {
+      "native_main_child_linkage_model_max": "PASS in identified persisted native records",
+      "actual_role_assignment_and_schema_exposure": "UNKNOWN",
+      "no_evaluator_gold_literal_read_observed": "Selected visible native records only; opaque instruction and OS-level blindness remain unknown"
+    },
+    "native_roles": [
+      {
+        "role": "main",
+        "native_model": "gpt-6.1-sol",
+        "native_effort": "max",
+        "distinct_completed_response_records": 10,
+        "native_count_once": {
+          "input_tokens": 280041,
+          "cached_input_tokens": 244992,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 4408,
+          "reasoning_output_tokens": 2646,
+          "total_tokens": 284449
+        },
+        "all_prefix_snapshots_match": true
+      },
+      {
+        "role": "child",
+        "native_model": "gpt-6.1-sol",
+        "native_effort": "max",
+        "distinct_completed_response_records": 6,
+        "native_count_once": {
+          "input_tokens": 186993,
+          "cached_input_tokens": 161792,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 3033,
+          "reasoning_output_tokens": 1532,
+          "total_tokens": 190026
+        },
+        "all_prefix_snapshots_match": true
+      }
+    ],
+    "known_disjoint_native_usage_once": {
+      "input_tokens": 467034,
+      "cached_input_tokens": 406784,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 7441,
+      "reasoning_output_tokens": 4178,
+      "total_tokens": 474475
+    },
+    "count_once": "10 parent plus 6 child completed response records. Parent provider view is 284449 and excludes the separately identified child 190026. Cumulative prefix/final views are alternatives. Cached input and cache-write are input subsets; reasoning is an output subset.",
+    "billing_and_unreported_helpers": "UNKNOWN; no zero inferred from Promptfoo cost placeholder or lack of a native USD field",
+    "retained_observations": {
+      "parent_commands": 10,
+      "child_commands": 9,
+      "child_git_provenance_exit": 128,
+      "child_large_search_returned_bytes": 128190,
+      "large_search_carrier_truncation": "Observed; focused original-source recovery followed, with all observed usage retained",
+      "child_extra_skill_read": "Observed outside factual corpus; not silently counted as an original-source fact read"
+    },
+    "failure_policy": "First failed or unproven A/A mechanics gate stops later launches. All 56 quality predicates, source contracts and failed/unknown slots remain unchanged.",
+    "sanitized_actual_returned_response_usage": [
+      {
+        "role": "main",
+        "ordinal_within_role": 1,
+        "native_journal_line": 14,
+        "returned_native_usage": {
+          "input_tokens": 18173,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 131,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 18304
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 2,
+        "native_journal_line": 22,
+        "returned_native_usage": {
+          "input_tokens": 18469,
+          "cached_input_tokens": 18048,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 335,
+          "reasoning_output_tokens": 197,
+          "total_tokens": 18804
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 3,
+        "native_journal_line": 30,
+        "returned_native_usage": {
+          "input_tokens": 26352,
+          "cached_input_tokens": 18304,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 223,
+          "reasoning_output_tokens": 71,
+          "total_tokens": 26575
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 4,
+        "native_journal_line": 40,
+        "returned_native_usage": {
+          "input_tokens": 29244,
+          "cached_input_tokens": 26112,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 552,
+          "reasoning_output_tokens": 203,
+          "total_tokens": 29796
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 5,
+        "native_journal_line": 49,
+        "returned_native_usage": {
+          "input_tokens": 29819,
+          "cached_input_tokens": 29056,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 666,
+          "reasoning_output_tokens": 643,
+          "total_tokens": 30485
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 6,
+        "native_journal_line": 60,
+        "returned_native_usage": {
+          "input_tokens": 30510,
+          "cached_input_tokens": 29696,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 244,
+          "reasoning_output_tokens": 180,
+          "total_tokens": 30754
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 7,
+        "native_journal_line": 70,
+        "returned_native_usage": {
+          "input_tokens": 30936,
+          "cached_input_tokens": 30336,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 275,
+          "reasoning_output_tokens": 195,
+          "total_tokens": 31211
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 8,
+        "native_journal_line": 76,
+        "returned_native_usage": {
+          "input_tokens": 31223,
+          "cached_input_tokens": 30720,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 90,
+          "reasoning_output_tokens": 67,
+          "total_tokens": 31313
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 9,
+        "native_journal_line": 86,
+        "returned_native_usage": {
+          "input_tokens": 31776,
+          "cached_input_tokens": 31104,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 323,
+          "reasoning_output_tokens": 56,
+          "total_tokens": 32099
+        }
+      },
+      {
+        "role": "main",
+        "ordinal_within_role": 10,
+        "native_journal_line": 98,
+        "returned_native_usage": {
+          "input_tokens": 33539,
+          "cached_input_tokens": 31616,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1569,
+          "reasoning_output_tokens": 1034,
+          "total_tokens": 35108
+        }
+      },
+      {
+        "role": "child",
+        "ordinal_within_role": 1,
+        "native_journal_line": 14,
+        "returned_native_usage": {
+          "input_tokens": 20543,
+          "cached_input_tokens": 12032,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 403,
+          "reasoning_output_tokens": 245,
+          "total_tokens": 20946
+        }
+      },
+      {
+        "role": "child",
+        "ordinal_within_role": 2,
+        "native_journal_line": 24,
+        "returned_native_usage": {
+          "input_tokens": 28090,
+          "cached_input_tokens": 20352,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 701,
+          "reasoning_output_tokens": 280,
+          "total_tokens": 28791
+        }
+      },
+      {
+        "role": "child",
+        "ordinal_within_role": 3,
+        "native_journal_line": 33,
+        "returned_native_usage": {
+          "input_tokens": 31689,
+          "cached_input_tokens": 27904,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 743,
+          "reasoning_output_tokens": 421,
+          "total_tokens": 32432
+        }
+      },
+      {
+        "role": "child",
+        "ordinal_within_role": 4,
+        "native_journal_line": 42,
+        "returned_native_usage": {
+          "input_tokens": 34779,
+          "cached_input_tokens": 31488,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 59,
+          "reasoning_output_tokens": 11,
+          "total_tokens": 34838
+        }
+      },
+      {
+        "role": "child",
+        "ordinal_within_role": 5,
+        "native_journal_line": 50,
+        "returned_native_usage": {
+          "input_tokens": 35609,
+          "cached_input_tokens": 34560,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 662,
+          "reasoning_output_tokens": 516,
+          "total_tokens": 36271
+        }
+      },
+      {
+        "role": "child",
+        "ordinal_within_role": 6,
+        "native_journal_line": 57,
+        "returned_native_usage": {
+          "input_tokens": 36283,
+          "cached_input_tokens": 35456,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 465,
+          "reasoning_output_tokens": 59,
+          "total_tokens": 36748
+        }
+      }
+    ]
+  },
+  "review_overhead_separate_from_trial": {
+    "Opus": {
+      "native_cli_exit": 0,
+      "input_hashes_checked": 42,
+      "input_hashes_match": true,
+      "answer_words": 797,
+      "word_cap": 650,
+      "word_gate": "FAIL retained",
+      "persisted_assistant_blocks": 110,
+      "effort_max_blocks": 110,
+      "unique_request_message_pairs": 36,
+      "native_disjoint_categories": {
+        "input_tokens": 72,
+        "cache_creation_input_tokens": 206792,
+        "cache_read_input_tokens": 4107196,
+        "output_tokens": 76284
+      },
+      "native_total_tokens": 4390344,
+      "thinking_output_subset": 62960,
+      "native_list_cost_usd": 4.0017432,
+      "invoice_and_unreported_helpers": "UNKNOWN",
+      "scope": "Read-only source/readiness overhead; not an arm result or approval"
+    },
+    "Astra": {
+      "native_cli_exit": 0,
+      "input_hashes_checked": 129,
+      "input_hashes_match": true,
+      "answer_words": 391,
+      "word_gate": "PASS",
+      "distinct_completed_response_records": 13,
+      "completed_native_commands": 39,
+      "command_exits": "All 0 in selected original events",
+      "native_usage_once": {
+        "input_tokens": 763333,
+        "cached_input_tokens": 628096,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 11376,
+        "reasoning_output_tokens": 5713,
+        "total_tokens": 774709
+      },
+      "readiness_result": "Conditional source readiness only; not user approval, runtime acceptance, savings or default",
+      "wire_identity_and_billing": "UNKNOWN",
+      "startup_warning": "One recorded development-feature warning; not a failed native command",
+      "scope": "Review overhead only; cumulative snapshots and subsets not added"
+    }
+  },
+  "earlier_prerequisites_retained": {
+    "Circuit_reference": {
+      "raw_cases_passed": 566,
+      "native_pytest_exit": 0,
+      "returned_filtered_cases": 539,
+      "space_containing_ids_omitted_by_selected_source": 27,
+      "strict_registered_count_coherence": "FAIL; no rerun or regrade; no independent candidate oracle accepted"
+    },
+    "Circuit_direct_controls": {
+      "independent_direct_controls": 2,
+      "comparison_counts": [
+        16,
+        2
+      ],
+      "scope": "Source/reference controls only, not candidate or trajectory quality"
+    },
+    "Circuit_promptfoo_carrier": {
+      "positive_interface": "PASS only",
+      "negative_single_attempt": "FAIL retained",
+      "negative_provider_callbacks": 4,
+      "native_cli_exit": 100,
+      "returned_error_response": null,
+      "rejected_child_numeric_exit_and_stdout": "UNKNOWN within this carrier",
+      "cause_scope": "Shared timeout error matcher can match the executable pathname; scheduler repeat=1 is distinct from internal retries"
+    },
+    "QMD_existing_connection_D1": {
+      "native_calls": 1,
+      "retry": false,
+      "returned_original_bytes": 62594,
+      "whole_text_sha256": "19431b3f3bb47ae7f85a2dd5e91b231713e41d518705d55f532e2a494bbee92f",
+      "whole_text_equal": true,
+      "missing_resource_name": "Original aggregate gate FAIL retained",
+      "scope": "One resource, not collection completeness, provider savings or adoption"
+    },
+    "command_output": {
+      "RTK_0_51_0": "Candidate excluded before client comparison: final unchanged upstream tests 3922 PASS, 2 FAIL, 8 ignored; exit101 and later suites unexecuted. Repair budget closed.",
+      "native_C3": "Original separate-process-stdout/stderr prerequisite UNPROVEN; overall original unit NOT PASS",
+      "native_schema_N5": "Native Codex output-schema exposure remains UNPROVEN; later schema grades do not repair old gates",
+      "retention_scope": "Native retained: candidate excluded; no measured model-token superiority"
+    },
+    "structured_data": {
+      "native_JSON": "Functioning semantic unit PASS for five S1 answers plus three exact U+FEFF string controls in all four native actors",
+      "released_TOON_4_1_1": "Unrestricted JSON fidelity excluded after three root-string BOM failures; unchanged upstream tests 767 PASS",
+      "eligible_uniform_artifacts": "Canonical uniform-record round-trip PASS; artifact reductions are separate and overlapping boundaries are not summed",
+      "eligible_uniform_live_model_arm": "UNRUN; no provider savings, comparative win or uniform-record default"
+    }
+  },
+  "future_qualification": {
+    "hook": "Separate functional admission qualification; root reports completed runtime while whole native counters and role hook attribution are being reconciled. No result from that separate unit is accepted here. P1 remains stopped and P2/protection remain HOLD.",
+    "request_trace": "Pinned Codex rollout-trace source and root primary-byte verification provide a prospective lead only. Root reports native help exit0; this unit does not independently project its contents. No trace enabled or runtime request/schema capture is claimed. Tracing is best-effort and sensitive local output; installation, capture completeness, child coverage and privacy/lifecycle require separate qualification.",
+    "scope": "No future hook or trace observation retroactively supplies missing evidence for the stopped P1 case."
+  },
+  "corrections": [
+    {
+      "original": "Postcheck said five AA1 source records",
+      "verified": "Four original AA1 records contain six critical statements; original postcheck retained; exact passage checks remain valid."
+    },
+    {
+      "original": "Structured fixture was called four-fact",
+      "verified": "Five S1 answers plus three U+FEFF controls across four actors; four conditions are not four facts."
+    },
+    {
+      "original": "Native token_usage_record selected under payload.type",
+      "verified": "Record type is top-level; payload carries usage and response identity. All 13 review and 16 case records were recomputed."
+    },
+    {
+      "original": "Neutral b001 was treated as codex-01",
+      "verified": "Blind mapping is shuffled; actual first case is task AA1 and was audited against AA1 gold."
+    },
+    {
+      "original": "Claude hook tool prefix cited at line23",
+      "verified": "Pinned released tool-naming.mjs line20 is Claude; line23 is antigravity-cli."
+    },
+    {
+      "original": "Codex provider source path used a hyphenated filename",
+      "verified": "Pinned canonical file is src/providers/openai/codex-sdk.ts."
+    },
+    {
+      "original": "Historical runtime/source-preparation records and older drafts describe P1 as unfrozen or running",
+      "verified": "Those observations remain historical. Original actual freeze plus final stopped ledger govern this draft."
+    },
+    {
+      "original": "Private publication draft placed Claude SDK provider under anthropic/",
+      "verified": "Pinned upstream directory API lists src/providers/claude-agent-sdk.ts; Codex is src/providers/openai/codex-sdk.ts. Root reread both exact source directories; original draft retained."
+    }
+  ],
+  "claims": {
+    "provider_savings": "NONE",
+    "default_change": "NONE",
+    "context_protection": "UNMEASURED",
+    "whole_job_completion": false,
+    "reviewer_approval": "NOT INFERRED",
+    "coverage": "PARTIAL"
+  },
+  "primary_sources": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "version": "0.123.1",
+      "files": [
+        "src/providers/openai/codex-sdk.ts",
+        "src/providers/claude-agent-sdk.ts",
+        "site/docs/configuration/rate-limits.md:117"
+      ]
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "version": "0.160.0",
+      "files": [
+        "codex-rs/protocol/src/protocol.rs:883",
+        "sdk/typescript/src/events.ts:118",
+        "codex-rs/rollout-trace/README.md:94",
+        "codex-rs/hooks/src/engine/command_runner.rs:214"
+      ]
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "pin": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "version": "1.0.169",
+      "file": "hooks/core/tool-naming.mjs:20"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "version": "0.51.0",
+      "file": "tests/guard_integration_test.rs"
+    },
+    {
+      "repository": "toon-format/toon",
+      "pin": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+      "version": "4.1.1",
+      "file": "benchmarks/data/github-repos.json"
+    }
+  ],
+  "preparation": "Only four sanitized draft data/prose artifacts and their manifest; no public edits, model calls, tests, installations, configuration changes or source changes.",
+  "coordination": {
+    "status_comment": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5968779417",
+    "accepted_main_preserved": "4ced2923063db6a6dcafa9f25af5ee05a4153c75"
+  },
+  "root_independent_observation": {
+    "draft_and_selected_packet_hash_checks": 28,
+    "all_match": true,
+    "prior_root_actual_native_reconciliation": "Sixteen distinct responses/prefixes independently recomputed; all native thread/turn/final alternatives matched",
+    "native_journal_sha256": {
+      "main": "ec9998742e3b9ce3e7755c40a0fc1675e656938371ed9a88e60c54d3f7173f70",
+      "child": "4fe8ddb34783d910666eebb5e390d779d3fcd54dceb50d43147b078220ab81f5"
+    }
+  }
+}

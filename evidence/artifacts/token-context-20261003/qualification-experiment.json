@@ -3,7 +3,7 @@
   "kind": "convergence_experiment",
   "status": "observed",
   "lane": "native-agent-engineering",
-  "task_and_failure": "Qualify five token/context candidate jobs for source-faithful long research/engineering without touching peer layers. This source/runtime unit preserves pre-freeze failures; it does not freeze the pending comparative protocol.",
+  "task_and_failure": "Qualify five client token/context jobs without touching peer layers. Prerequisite failures are retained; original P1 freeze stopped after one unproven A/A mechanics case,55laterUNRUN_FINAL. No comparative/default winner is selected.",
   "primary_sources_and_pins": [
     {
       "url": "https://github.com/promptfoo/promptfoo",
@@ -74,7 +74,10 @@
       "forge-claude-settings-relocation",
       "forge-claude-stopped-program-grade",
       "p2-trajectory-astra-source-judgment",
-      "usage-cost-metering"
+      "usage-cost-metering",
+      "p1-first-aa",
+      "p1-prefreeze-opus-read",
+      "p1-prefreeze-astra-read"
     ],
     "roles": [
       "command-worker",
@@ -115,7 +118,7 @@
     ]
   },
   "predeclared_metrics": {
-    "quality_rule": "Qualification contracts: unchanged native upstream commands, exact roundtrip/exit/critical facts, release/executable identity, no peer/auth changes. Preserve failed gates; narrative source vote never activates a default. Final comparative task/quality/statistical contract stays NOT FROZEN.",
+    "quality_rule": "Historical prerequisite contracts remain unchanged. Original P1 actual212input freeze/all56quality predicates retained; first A/A mechanics UNKNOWN/NOTPASS stops55latercases and commonjudge. P2 and a future distinct measurable comparison remain open.",
     "usage_rule": "Exact unique response/request counters counted once; cached/reasoning subsets not added. Research reads are overhead, not treatment savings. CLI/tests/artifacts do not substitute for provider counters. Unknown fields remain null; whole study coverage is partial."
   },
   "runtime_and_platform": {
@@ -200,7 +203,10 @@
     "Native Promptfoo0.123.1 distinct registered Claude Forge settings relocation, absolute -c, no-cache/repeat1/concurrency1/no-share, original900000ms deadline; nativeCLI2.1.288/Opus5.5/max main and one child observed",
     "One unchanged pinned slop-code eval-snapshot stopped-copy -o owned-output -p forge -c checkpoint_1 -e pinned local-py.yaml --json; cap300s+5s",
     "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max -s read-only source judgment; no benchmark or nested model",
-    "Nine preregistered native ccusage20.0.26 daily/codex-daily JSON commands on fixed usage-only copies in owned network-none read-only containers; no models"
+    "Nine preregistered native ccusage20.0.26 daily/codex-daily JSON commands on fixed usage-only copies in owned network-none read-only containers; no models",
+    "One supported Promptfoo0.123.1 native eval for frozen codex-01 AA1, no-cache/repeat1/max-concurrency1/no-share and process-local adaptive scheduler disabled; original absolute invocation retained privately.",
+    "One native read-only claude -p Opus/max prefreeze source read, exact frozen42inputs; final797words exceeds650word gate",
+    "One native read-only codex exec gpt-6-astra/max prefreeze source read, exact frozen129inputs; final391words within550word gate"
   ],
   "observations": [
     {
@@ -2062,6 +2068,99 @@
         "total": 0,
         "native_retries": 0
       }
+    },
+    {
+      "id": "p1-first-aa-codex-01",
+      "task": "p1-first-aa",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 52,
+      "evidence_class": "native_cli_execution",
+      "scope": "First frozen native A/A case only: CLI0 and schemaPASS; actual child assignment and advertised/deferred schema exposure UNKNOWN, frozen mechanics NOTPASS,55laterUNRUN_FINAL,commonjudgeUNRUN. Sixteen disjoint identified completed response records; billing and unreported helper coverage unknown.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
+          "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6"
+        }
+      ],
+      "usage": {
+        "uncached_input": 60250,
+        "cache_creation": 0,
+        "cache_read": 406784,
+        "output": 7441,
+        "reasoning_in_output": 4178,
+        "total": 474475,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit8-prefreeze-opus-read",
+      "task": "p1-prefreeze-opus-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 53,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate source/readiness review overhead; exact native disjoint response categories. Conditional opinion is not user approval or trial/default acceptance. Word gateFAIL preserved;110maxeffortblocks and36request/messagepairs reconcile native coststate; billing/helpers unknown.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
+          "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6"
+        }
+      ],
+      "usage": {
+        "uncached_input": 72,
+        "cache_creation": 206792,
+        "cache_read": 4107196,
+        "output": 76284,
+        "reasoning_in_output": 62960,
+        "total": 4390344,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit8-prefreeze-astra-read",
+      "task": "p1-prefreeze-astra-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 54,
+      "evidence_class": "native_cli_execution",
+      "scope": "Separate source/readiness review overhead; exact native disjoint response categories. Conditional opinion is not user approval or trial/default acceptance. 13distinct responses/all prefixes and39native command exits0; modelwire/invoice unknown. Metadata/source-read contract only.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit8-first-aa-qualification.json",
+          "sha256": "9fcd62d88259ada9b0d2961150a9e0bab3e2383c6a8714a3406ef647564d67b6"
+        }
+      ],
+      "usage": {
+        "uncached_input": 135237,
+        "cache_creation": 0,
+        "cache_read": 628096,
+        "output": 11376,
+        "reasoning_in_output": 5713,
+        "total": 774709,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -2192,6 +2291,14 @@
     {
       "run_id": "meter-expanded-role-accounting",
       "reason": "Nine parser-only integration cases; selected Codex/Opus/deltas match, inclusive Claude helpers omitted; prior M2 compaction failure retained; native baseline retained for tested scopes; retained detailed gates {\"native_command_execution\":true,\"inclusive_native_usage_reconciles\":false,\"selected_raw_records_reconcile\":true}"
+    },
+    {
+      "run_id": "p1-first-aa-codex-01",
+      "reason": "CLI0/schemaPASS but actual child assignment and tool/instruction exposure UNKNOWN; originalmechanicsNOTPASS,55laterUNRUN_FINAL/commonjudgeUNRUN."
+    },
+    {
+      "run_id": "unit8-prefreeze-opus-read",
+      "reason": "797words exceeds650word cap; original answer/counters retained; conditional readiness is source opinion only."
     }
   ],
   "limitations": [
@@ -2226,15 +2333,16 @@
     "Two registered native Forge pilot attempts fail before code: Codex400strictschema/type error with native usage unemitted; Claude SDK resolution fails because root used relativeconfig and pinned loader falls back to cwd. Separate source-supported recovery registration retains both failures. No shape-validation/import/typed-copy metadata substitutes runtime/P2 acceptance.",
     "Original-failed packet hash projection first used worktree cwd for relative manifest paths. Corrected read anchors each path at the actual private packet directory; no original files, runtime observations or model calls changed.",
     "Unit6 sanitization changed the public meter-artifact receipt bytes while leaving its experiment anchor stale; consistency check correctly failed. Public anchor now matches sanitized bytes, private original hashes/measurements remain unchanged; failed validator outputs retained.",
-    "Unit7 native role/functionality and artifact/program/source checks remain pre-freeze. Lifecycle missed views and reader-cleanup error preserved; writable engineering feasibility does not substitute for read-only P2 until independently bound."
+    "Unit7 native role/functionality and artifact/program/source checks remain pre-freeze. Lifecycle missed views and reader-cleanup error preserved; writable engineering feasibility does not substitute for read-only P2 until independently bound.",
+    "First fixed schedule yields0accepted confirmatorycases; no ratio/CI, saving, protection, native-baselinewin or default inferred. Native trace/hook qualifications do not retrofit it."
   ],
   "decision_and_scope": {
     "decision": "trial",
-    "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+    "scope": "Selected source/runtime prerequisites, separate source reviews and original stopped frozen P1 first A/A; no comparative/default activation",
     "qualification_run_ids": []
   },
   "rollback": "Keep existing native client/profile/defaults. Disposable study state can be removed through owned native cleanup after evidence custody; no peer state is changed.",
-  "next_decision_changing_test": "Fully bind/calibrate/freeze the fixed two-client job comparisons after an Opus/max read; observe natural compaction/resume and all native accounting scopes, then qualify any winner in fresh native main/child sessions. RTK prerequisite stays excluded without a separately justified future protocol.",
+  "next_decision_changing_test": "Qualify supported native request exposure and released hook/main-child admission under separate prospective contracts, preserving original P1 failure. Then a distinct fixed comparison with prefreeze Opus/max read and complete native counters; natural compaction/resume and unchanged quality remain separate gates. No RTK rescue or failed-gate waiver.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",
@@ -2298,7 +2406,10 @@
       "forge-claude-settings-timeout",
       "forge-claude-stopped-program-grade",
       "p2-trajectory-astra-source-judgment",
-      "meter-expanded-role-accounting"
+      "meter-expanded-role-accounting",
+      "p1-first-aa-codex-01",
+      "unit8-prefreeze-opus-read",
+      "unit8-prefreeze-astra-read"
     ],
     "coverage_artifact": null
   }
