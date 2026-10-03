@@ -2403,7 +2403,7 @@
       "attempt": 1,
       "command_index": 62,
       "evidence_class": "offline_artifact_check",
-      "scope": "No new producer run: existing210080command/185514structured/nativeparser views reused, neveradded. Limited prerequisite/fidelity/inclusive accounting defaults, not powered provider superiority. Currentrelease metadata unchanged; source-only constraints/retrieval owner pending.",
+      "scope": "No new producer run: existing210080command/185514structured/nativeparser views reused, neveradded. Limited prerequisite/fidelity/inclusive accounting defaults, not powered provider superiority. Currentrelease metadata unchanged; source-only constraints/retrieval runtime/corpus/client qualification pending; owner handoff received.",
       "status": "passed",
       "exit_code": 0,
       "quality": {
@@ -2413,7 +2413,7 @@
       "artifacts": [
         {
           "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
-          "sha256": "e4f30efea33131ce278a19b935907eafccd25bd592b19606d6cf03030dbb3787"
+          "sha256": "a725beca2182398975d6a9860b0fe0dee0171bb34b96dea4ad7d01512054774a"
         }
       ],
       "usage": {
@@ -2619,7 +2619,8 @@
     "Unit6 sanitization changed the public meter-artifact receipt bytes while leaving its experiment anchor stale; consistency check correctly failed. Public anchor now matches sanitized bytes, private original hashes/measurements remain unchanged; failed validator outputs retained.",
     "Unit7 native role/functionality and artifact/program/source checks remain pre-freeze. Lifecycle missed views and reader-cleanup error preserved; writable engineering feasibility does not substitute for read-only P2 until independently bound.",
     "First fixed schedule yields0accepted confirmatorycases; no ratio/CI, saving, protection, native-baselinewin or default inferred. Native trace/hook qualifications do not retrofit it.",
-    "Unit9 original markerFAIL/native trace processvisibilityUNKNOWN and OpuswordFAIL remain; distinct groupcleanupPASS is integrationonly. Namedprofile original and repairallowedcontrolsFAIL/deniedUNRUN; R2producerbundle unprepared. Hiddeninputs/billing/nativeP2/retrievalowner remain open."
+    "Unit9 original markerFAIL/native trace processvisibilityUNKNOWN and OpuswordFAIL remain; distinct groupcleanupPASS is integrationonly. Namedprofile original and repairallowedcontrolsFAIL/deniedUNRUN; R2producerbundle unprepared. Hiddeninputs/billing/nativeP2/retrievalowner remain open.",
+    "Unit10 correction: PR608 comment5969106337 supplied the retrieval-owner handoff at12:21:24Z. The Unit9 pending statement was stale, corrected after exact-head review; the complete named owner record is not yet accessible. Owner snapshot remains a lead, pinned-source/runtime/corpus/client qualification pending; no new retrieval operation."
   ],
   "decision_and_scope": {
     "decision": "trial",

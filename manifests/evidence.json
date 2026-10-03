@@ -15811,8 +15811,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-native-scoped-defaults.md",
-      "sha256": "0e5f50aedbd949892e740ab727363cbf68555e4c49cd24da83f850cf5425f530",
-      "bytes": 4647
+      "sha256": "1847bf63f8753631d417d19eb5c80635ae89f45eb83f2059b2e2efc4e3d18298",
+      "bytes": 4883
     },
     {
       "path": "docs/direct-results.md",
@@ -45551,8 +45551,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "f3c2f33779b615ddf8683bc01c327bdf98d1b8e5f96631793d21cb25d0a2409a",
-      "bytes": 106627
+      "sha256": "2a53befc599efffa5337576d9bc9105d83cd037d7aa7e9bf0896ee763ccb7b5e",
+      "bytes": 107028
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -45621,8 +45621,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit9-completeness-critic.md",
-      "sha256": "3e0317821baddffb5e62db89f497dba659de72a2566ff81aef86b1afc04911fc",
-      "bytes": 5357
+      "sha256": "5516af458f98478d7cd393245084b4826ce9daa5b6c661e89609d1e26dc5413e",
+      "bytes": 5902
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit9-native-profile-failures.json",
@@ -45646,13 +45646,13 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit9-retrieval-source-closure.md",
-      "sha256": "8513cc18ce22c807272caba741b95da37449805827774a79bd47e0963dfb85cc",
-      "bytes": 1906
+      "sha256": "7ffd670b25ee083333fb250618b52e95076878d5b69611e44f73ffc7da1ae7cf",
+      "bytes": 2240
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit9-scoped-native-defaults.json",
-      "sha256": "e4f30efea33131ce278a19b935907eafccd25bd592b19606d6cf03030dbb3787",
-      "bytes": 6771
+      "sha256": "a725beca2182398975d6a9860b0fe0dee0171bb34b96dea4ad7d01512054774a",
+      "bytes": 6821
     },
     {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
