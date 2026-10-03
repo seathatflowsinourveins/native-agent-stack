@@ -9114,8 +9114,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/README.md",
-      "sha256": "feae5ff60a18d4c088f1edafa496629aa6f0e6b14f271b86f510a3edf3d1ea3e",
-      "bytes": 11664
+      "sha256": "3a817b42e91ce84a6b683486a9fe763a111c0f6c14075efa0754b30069b4b7a6",
+      "bytes": 11740
     },
     {
       "path": "blueprints/native-skill-practice/p1/l_nli_provider.py",
@@ -9124,8 +9124,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/p1_casepack.py",
-      "sha256": "e105a9042a86bf8514576b20618176af7a83267c129f6cb21599324234dba5ab",
-      "bytes": 34109
+      "sha256": "d04270216da791ff25469acdd300a39f2a028d2ac58ef921054f2e654610597e",
+      "bytes": 34807
     },
     {
       "path": "blueprints/native-skill-practice/p1/p1_frame.py",
@@ -32054,17 +32054,17 @@
     },
     {
       "path": "evidence/artifacts/jev-p1-20261003/README.md",
-      "sha256": "91c7a551519a9106842ce872d7540e61e9584da819d2afac9ad58dfbb1c52b13",
-      "bytes": 1556
+      "sha256": "8387fb3bd98bdaf70e2a968d5843bd0dfe9a4c8106354b351e250f685688d325",
+      "bytes": 1577
     },
     {
       "path": "evidence/artifacts/jev-p1-20261003/draw-record.draft.json",
-      "sha256": "103766e47ffee046164fca8207805efb49e6eca00710d9117685216ae6405af6",
-      "bytes": 23081
+      "sha256": "2e7462c09474a38af673a3f6d9ce5b8a4841c1e515fb4a787a967a0fa4a029ce",
+      "bytes": 23038
     },
     {
       "path": "evidence/artifacts/jev-p1-20261003/freeze-manifest.draft.json",
-      "sha256": "a0d7e43afe32d8cad35faf46abf84d2c214b50e2a4750ece66d42c83a9692b77",
+      "sha256": "a7531504ddcdbc59f538fcb4337a81c06742e6b695d2ee49dbb8ff68377c7a8d",
       "bytes": 4800
     },
     {
@@ -50739,8 +50739,8 @@
     },
     {
       "path": "tests/test_jev_p1_casepack.py",
-      "sha256": "7d60c1cbc2a9f2a9c78239308cb9ad42b82497706d4817f906b78c0c5b0a33e0",
-      "bytes": 21989
+      "sha256": "1d75998d012e48c67a88d8d46a7ec4cf0268b884ebf442c23fe7b0d5b6c7c4d3",
+      "bytes": 22701
     },
     {
       "path": "tests/test_jev_p1_scoring.py",
