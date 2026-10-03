@@ -15839,8 +15839,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
-      "sha256": "12076b4c53141f4f093ed66ddd2e73d90273a53cf870f5b21b4bbf7621e15e41",
-      "bytes": 41895
+      "sha256": "c6ea6e295f60a0f390b1e63cacf62bc37d72636bcc3019deeaca62ee3a2690b4",
+      "bytes": 42094
     },
     {
       "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
@@ -15869,8 +15869,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "9b3115f672526723e242d0d99bdcdd4fc9e536dc2529ecb54dfa64b61365204a",
-      "bytes": 33379
+      "sha256": "0c262a772632c090bee7a257d2227c224b2cdf8b55fe52fca4e8a203000eeb90",
+      "bytes": 34588
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -15996,6 +15996,11 @@
       "path": "docs/decisions/2026-10-03-retire-pr508-token-stack-winner.md",
       "sha256": "59f58e14e624f1783b5182ae0ea0bd3caa92298b4b5b6ebab556eae26d76c70d",
       "bytes": 21398
+    },
+    {
+      "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
+      "sha256": "0b643c9cb062e534a0aa7cd6d8205d98cb9b87f95565f0b6ba1857fc2672edcf",
+      "bytes": 34261
     },
     {
       "path": "docs/direct-results.md",
