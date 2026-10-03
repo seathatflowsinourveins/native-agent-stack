@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "layer_id": "semantic-rag",
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "No held-out conceptual-code comparison proves grounded answer quality, cross-project isolation and full serving/index maintenance cost.",
+      "Qdrant restore does not establish SocratiCode watcher/client/whole-stack recovery.",
+      "Bootstrap's unbounded transitive dependency resolution does not reproduce the qualified SocratiCode tree."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin_of_record": "1.15.0 @ f6191f076a42405f0d5508139f3a8b505cfef93a",
+      "pin_source": "manifests/stack.json:962; adoption/pins-linux-x86_64.json:312",
+      "source_pinned_url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md",
+      "upstream_currency": "Latest v1.16.0 adds Git refresh/restart/deletion fixes: https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0. Unqualified here.",
+      "native_install": {
+        "command": "npm install --global --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0",
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md; qualified dependency cutoff: adoption/pins-linux-x86_64.json:319",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "npm run test:unit; npm run test:integration; npm run test:e2e",
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/package.json",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin_of_record": "1.19.1 @ 6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "pin_source": "manifests/stack.json:727; no qdrant ID in frozen Linux tools pins",
+      "source_pinned_url": "https://github.com/qdrant/qdrant/blob/v1.19.1/README.md",
+      "upstream_currency": "Latest v1.19.1: https://github.com/qdrant/qdrant/releases/tag/v1.19.1",
+      "native_install": {
+        "command": "docker run -p 127.0.0.1:6333:6333 qdrant/qdrant:v1.19.1",
+        "source": "https://github.com/qdrant/qdrant/blob/v1.19.1/README.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "uv --project tests run pytest -n auto --dist=loadfile -v tests/consensus_tests --durations=10",
+        "source": "https://github.com/qdrant/qdrant/blob/v1.19.1/.github/workflows/integration-tests.yml",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "vllm",
+      "repository": "https://github.com/vllm-project/vllm",
+      "pin_of_record": "0.30.0 @ ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+      "pin_source": "manifests/stack.json:1029; no vllm ID in frozen Linux tools pins",
+      "source_pinned_url": "https://github.com/vllm-project/vllm/blob/v0.30.0/README.md",
+      "upstream_currency": "Latest v0.30.0: https://github.com/vllm-project/vllm/releases/tag/v0.30.0",
+      "native_install": {
+        "command": "uv pip install vllm==0.30.0 --torch-backend=auto",
+        "source": "https://github.com/vllm-project/vllm/blob/v0.30.0/docs/getting_started/installation/gpu.cuda.inc.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "pytest tests/models/language/pooling/test_embedding.py",
+        "source": "https://github.com/vllm-project/vllm/blob/v0.30.0/tests/models/language/pooling/test_embedding.py",
+        "evidence_class": "source_review"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Hugging Face Hub native CLI",
+      "repository": "https://github.com/huggingface/huggingface_hub",
+      "verdict": "Retain the supporting model-artifact verification role; file checks and four upstream examples are compatibility evidence, not held-out answer quality.",
+      "sources": [
+        "https://github.com/huggingface/huggingface_hub/blob/v1.32.0/README.md"
+      ]
+    },
+    {
+      "name": "code-memory",
+      "repository": "https://github.com/kapillamba4/code-memory",
+      "verdict": "Conditional portability challenger; its bundled Jina loader is unpinned in scripts/download_model.py:8. Stale-index concerns and quality superiority remain unexecuted hypotheses.",
+      "sources": [
+        "https://github.com/kapillamba4/code-memory/blob/v1.0.33/README.md"
+      ]
+    },
+    {
+      "name": "Haystack",
+      "repository": "https://github.com/deepset-ai/haystack",
+      "verdict": "General composable retrieval/evaluation pipelines fit broader document workflows; no task-specific index/watch/restore comparison supports replacing the accepted code lane.",
+      "sources": [
+        "https://github.com/deepset-ai/haystack/blob/v3.2.0/README.md"
+      ]
+    },
+    {
+      "name": "pgvector",
+      "repository": "https://github.com/pgvector/pgvector",
+      "verdict": "Current tagged SQL-vector candidate; use only for an established Postgres integration need and matched retrieval/recovery acceptance.",
+      "sources": [
+        "https://github.com/pgvector/pgvector/blob/v0.8.6/README.md"
+      ]
+    },
+    {
+      "name": "LanceDB",
+      "repository": "https://github.com/lancedb/lancedb",
+      "verdict": "Current vector/full-text candidate; no matching conceptual-code watcher, state-recovery and answer-quality comparison qualifies replacement.",
+      "sources": [
+        "https://github.com/lancedb/lancedb/blob/v0.39.0/README.md"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "adoption/platforms/linux-wsl2.md:74 says the working WSL pin remains 0.25.0.",
+      "correction": "The same guide :61-69 and current stack :1029 record 0.30.0 accepted since 2026-09-25. Preserve the 0.29.0 failure and 0.25.0 rollback; new-host status remains unknown.",
+      "deciding_source": "evidence/receipts/vllm-030-switch-20260925.json; https://github.com/vllm-project/vllm/releases/tag/v0.30.0"
+    },
+    {
+      "claim": "A socraticode --help invocation is a read-only CLI capability listing.",
+      "correction": "The bounded probe returned empty stdout/exit 0; the tagged entry point starts MCP instead. Use registry/package metadata, not another CLI invocation.",
+      "deciding_source": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/index.ts#L466; adoption/pins-linux-x86_64.json:322"
+    }
+  ],
+  "evidence_assessment": [
+    "Landscape winner pins 1.14.0/0.25.0 are sealed history, not current installation pins. Reuse newer qualification receipts without silently rewriting that history.",
+    "SocratiCode 1.15.0 receipt preserves 2475 upstream unit tests and 12 selected integration tests, outside upstream CI's exact Node/Qdrant matrix, plus a repaired native-client approval attempt. Health/graph counts do not measure grounded answer quality.",
+    "vLLM switch receipts 20260925/20260926 record actual historical embedding execution. Laptop strict order mismatches and production controls remain failures/controls; this review did not replay them as a new model run.",
+    "adoption/bootstrap-linux.sh:397-410 passes --ignore-scripts but no --before; adoption/pins-linux-x86_64.json:319 and socraticode-1150-qualification receipt :16 identify unfrozen dependency ranges. The archive hash alone does not qualify that new-host dependency tree.",
+    "All installation/test commands are prospective. vLLM's generic upstream embedding suite does not itself qualify Nemotron's pinned model and /v1/embeddings route."
+  ],
+  "failed_access": [
+    {
+      "source": "vllm --help",
+      "result": "Bounded 12-second timeout; no feature-absence inference or serving acceptance."
+    },
+    {
+      "source": "GitHub releases/latest for pgvector/pgvector",
+      "result": "HTTP 404, exit 1; tags API identifies v0.8.6. Release absence is not capability absence."
+    }
+  ],
+  "omissions": [
+    "No model downloads, GPU execution, requested MCP tool queries, index mutation, snapshot restore or service rebinding performed; the unparsed help probe's startup effects were not inspected.",
+    "SocratiCode's empty help probe is not a new-host/native-client handshake."
+  ],
+  "next_wave": [
+    "First reconcile the bootstrap's supported npm dependency cutoff with the qualified install recipe; then qualify its fresh dependency tree with unchanged upstream tests.",
+    "Inspect v1.16.0 Git-refresh restart/deletion tests before any bounded isolated trial; use a held-out source-grounded conceptual corpus and retain complete failures/usage."
+  ],
+  "reopen_on": [
+    "A reproducible new-host dependency/service failure, index freshness violation or held-out superiority result reopens this composed lane."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

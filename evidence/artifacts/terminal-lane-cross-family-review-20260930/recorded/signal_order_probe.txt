@@ -1,4 +1,4 @@
-sent SIGTERM then SIGHUP: the handlers ran in the order ['SIGHUP', 'SIGTERM']
-sent SIGHUP then SIGTERM: the handlers ran in the order ['SIGHUP', 'SIGTERM']
-sent SIGTERM then SIGINT: the handlers ran in the order ['SIGINT', 'SIGTERM']
-the handlers ran in ascending signal number in every case: True
+sent SIGTERM then SIGHUP: the handlers ran in the order ['SIGHUP', 'SIGTERM']; equals the expected ascending pair: True
+sent SIGHUP then SIGTERM: the handlers ran in the order ['SIGHUP', 'SIGTERM']; equals the expected ascending pair: True
+sent SIGTERM then SIGINT: the handlers ran in the order ['SIGINT', 'SIGTERM']; equals the expected ascending pair: True
+the handlers ran in ascending signal number, both of them, in every case: True

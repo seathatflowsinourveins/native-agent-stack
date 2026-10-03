@@ -1,0 +1,13 @@
+{
+  "serverMode": "self-hosted",
+  "apiUrl": "http://127.0.0.1:18888",
+  "bankId": "native-qualification-canary",
+  "optInOnly": true,
+  "optInPaths": [],
+  "disabled": true,
+  "retainSessions": true,
+  "autoSeed": false,
+  "codebaseSurvey": false,
+  "gitIngest": "none",
+  "autoUpdate": false
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "kind": "owned_source_review_handoff_freeze",
+  "date_utc": "2026-10-01T22:25:08.174263+00:00",
+  "source_head": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "evidence_class": "structural_validation",
+  "owned_file_sha256": {
+    "adoption/README.md": "d3102407adb302ab847c52afe31b538721eee69b4cf31be0ec68d2cac5d44361",
+    "adoption/manifest.json": "7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a",
+    "adoption/new-wsl-profile.json": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa",
+    "adoption/new-wsl-profile.md": "c9ee10df153a4b8cb5636ea0f69296591795e6be1861d957d4cc4eadac18ae4a",
+    "scripts/adoption_status.py": "5017a00d36990b5e576fa17a5761e2ea2c6d879ea72252bb068baf7542b0447d",
+    "scripts/new_wsl_profile.py": "dc7f39df2d5d297b2e87c82ebfdbd15bf876d33cc1723da6f5d148c49954df23",
+    "tests/test_new_wsl_profile.py": "c678f764383a0bca9fa3e0ccefee3c9da48378305d3ec4b2e938562fb49fda16",
+    "evidence/artifacts/new-wsl-profile-20261001/astramax-takeover-baseline.json": "9328a16072d7b54a0c5be6546bca2cf8a05b28de8cb8db95b25c85896673e47b",
+    "evidence/artifacts/new-wsl-profile-20261001/source-review.json": "3f040fe35e39c52358b213ef4fc0f5b62a1bd43680f21529b7ceed2af685541b",
+    "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json": "cb3a796d1032739fccf1dedb96f92465bb7dd87f126feb2f5873bd02f8551d0f"
+  },
+  "final_tracked_diff_check": {
+    "command": "rtk git diff --check",
+    "exit_code": 0,
+    "returned_output": ""
+  },
+  "review_record": "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+  "snapshot_semantics": "Hashes freeze the named owned source files after source review and scoped tests. This file excludes its own hash. No provider, install, sign-in, source-test execution or new-host acceptance is established.",
+  "ownership_handoff": "Frozen for coordinator integration. The coordinator owns staging, shared registries, central validation and import into W-BOOK.",
+  "untracked_file_observations": [
+    {
+      "command": "rtk git diff --no-index --check -- /dev/null adoption/new-wsl-profile.json",
+      "exit_code": 1,
+      "returned_output": ""
+    },
+    {
+      "command": "rtk git diff --no-index --check -- /dev/null adoption/new-wsl-profile.md",
+      "exit_code": 1,
+      "returned_output": ""
+    },
+    {
+      "command": "rtk git diff --no-index --check -- /dev/null scripts/new_wsl_profile.py",
+      "exit_code": 1,
+      "returned_output": ""
+    },
+    {
+      "command": "rtk git diff --no-index --check -- /dev/null tests/test_new_wsl_profile.py",
+      "exit_code": 1,
+      "returned_output": ""
+    },
+    {
+      "command": "rtk git diff --no-index --check -- /dev/null evidence/artifacts/new-wsl-profile-20261001/astramax-takeover-baseline.json",
+      "exit_code": 1,
+      "returned_output": ""
+    },
+    {
+      "command": "rtk git diff --no-index --check -- /dev/null evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+      "exit_code": 1,
+      "returned_output": ""
+    },
+    {
+      "command": "rtk git diff --no-index --check -- /dev/null evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+      "exit_code": 1,
+      "returned_output": ""
+    }
+  ],
+  "untracked_file_observation_scope": "These /dev/null comparisons returned native exit 1 and no diagnostics. They are retained as observations, not zero-exit qualification. Coordinator staging enables the final combined tracked diff check."
+}

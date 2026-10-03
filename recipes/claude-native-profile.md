@@ -40,7 +40,7 @@ On another PC, native `claude` is sufficient; retain any accepted local launcher
 
 For Windows Terminal, add a named profile with the distro, WSL user and project resolved on that PC. The
 [fragment example](../examples/claude-native/windows-terminal.fragment.example.json) carries the Shell, Codex and
-Claude set; its install steps, the login-shell check and the Claude Code notification overlay are in
+Claude set and one resume profile for each client; its install steps, the login-shell check and the Claude Code notification overlay are in
 [the Linux/WSL2 page](../adoption/platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell). The
 Claude entry, with its settings explained below:
 

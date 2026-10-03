@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "layer_id": "ci-supply-chain",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Weekly Dependabot timing, nonempty groups and hosted PR cancellation remain unmeasured.",
+      "No new-host native execution or hosted workflow execution was performed; accepted receipts retain their original revision/scope."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "actionlint",
+      "repository": "https://github.com/kjanat/actionlint",
+      "pin_of_record": "1.17.0 @ 08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "pin_source": "catalogs/foundation/automation.json:83",
+      "source_pinned_url": "https://github.com/kjanat/actionlint/blob/08bb2c4f0d039744455b87aef1c647fb8b66d37b/docs/install.md",
+      "upstream_currency": "v1.17.0; releases/latest matches record",
+      "native_install": {
+        "command": "gh release download --repo kjanat/actionlint --pattern '*_linux_amd64.tar.gz' v1.17.0; tar xf actionlint_1.17.0_linux_amd64.tar.gz",
+        "source": "https://github.com/kjanat/actionlint/blob/08bb2c4f0d039744455b87aef1c647fb8b66d37b/docs/install.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "actionlint -color",
+        "source": "Pinned installation and docs/usage.md; no functional run",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "pin_of_record": "1.30.1",
+      "pin_source": "manifests/stack.json:1563",
+      "source_pinned_url": "https://github.com/zizmorcore/zizmor/blob/v1.30.1/README.md",
+      "upstream_currency": "v1.30.1; matches record",
+      "native_install": {
+        "command": "uv tool install zizmor==1.30.1",
+        "source": "https://github.com/zizmorcore/zizmor/blob/v1.30.1/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "zizmor --offline --no-progress .github/workflows",
+        "source": "https://docs.zizmor.sh/installation/; installed --version only",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "pin_of_record": "8.30.1",
+      "pin_source": "manifests/stack.json:489",
+      "source_pinned_url": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md",
+      "upstream_currency": "v8.30.1; matches record",
+      "native_install": {
+        "command": "make build",
+        "source": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "gitleaks dir --redact=100 --no-banner --no-color \"$PROJECT_ROOT\"",
+        "source": "Installed 8.30.1 dir --help exited 0; pinned README",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "syft",
+      "repository": "https://github.com/anchore/syft",
+      "pin_of_record": "1.52.0",
+      "pin_source": "manifests/stack.json:1394",
+      "source_pinned_url": "https://github.com/anchore/syft/blob/v1.52.0/install.sh",
+      "upstream_currency": "v1.52.0; matches record",
+      "native_install": {
+        "command": "sh install.sh -b \"$BIN_DIR\" v1.52.0",
+        "source": "https://github.com/anchore/syft/blob/v1.52.0/install.sh",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "syft scan \"dir:$PROJECT_ROOT\" --parallelism 2 -o syft-json",
+        "source": "Installed 1.52.0 scan --help exited 0; pinned README",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "attest",
+      "repository": "https://github.com/actions/attest",
+      "pin_of_record": "4.2.2 @ 1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "pin_source": "catalogs/foundation/automation.json:147",
+      "source_pinned_url": "https://github.com/actions/attest/blob/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md",
+      "upstream_currency": "v4.2.2; matches record",
+      "native_install": {
+        "command": "uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "source": "https://github.com/actions/attest/blob/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "gh attestation verify \"$ARTIFACT\" --repo \"$REPOSITORY\"",
+        "source": "Pinned README permissions/subject contract; installed gh verify --help exited 0",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "grype",
+      "repository": "https://github.com/anchore/grype",
+      "pin_of_record": "0.119.0",
+      "pin_source": "catalogs/foundation/automation.json:173",
+      "source_pinned_url": "https://github.com/anchore/grype/blob/v0.119.0/README.md",
+      "upstream_currency": "v0.119.0; matches record",
+      "native_install": {
+        "command": "sh install.sh -b \"$BIN_DIR\" v0.119.0",
+        "source": "https://github.com/anchore/grype/blob/v0.119.0/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "grype \"sbom:$SBOM\" --config .grype.yaml --fail-on high -o json",
+        "source": "Pinned README/install.sh; .github/workflows/supply-chain.yml:89",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "osv-scanner",
+      "repository": "https://github.com/google/osv-scanner",
+      "pin_of_record": "2.6.0",
+      "pin_source": "catalogs/foundation/automation.json:182",
+      "source_pinned_url": "https://github.com/google/osv-scanner/blob/v2.6.0/docs/installation.md",
+      "upstream_currency": "v2.6.0 releases/latest matches record",
+      "native_install": {
+        "command": "go install github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.6.0",
+        "source": "https://github.com/google/osv-scanner/blob/v2.6.0/docs/installation.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=\"$PARSER:$LOCKFILE\"",
+        "source": ".github/workflows/security-scan.yml:50; pinned installation/README",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "codeql-sarif",
+      "repository": "https://github.com/github/codeql-action",
+      "pin_of_record": "4.38.1 @ 1c5b675653bb5c22dbe9b12b556ec555138e09fd",
+      "pin_source": "catalogs/foundation/automation.json:191",
+      "source_pinned_url": "https://github.com/github/codeql-action/blob/1c5b675653bb5c22dbe9b12b556ec555138e09fd/README.md",
+      "upstream_currency": "releases/latest is codeql-bundle-v2.27.1, not an uploader action pin",
+      "native_install": {
+        "command": "uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd",
+        "source": "https://github.com/github/codeql-action/blob/1c5b675653bb5c22dbe9b12b556ec555138e09fd/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "Observe upload result and default-setup analysis in the native GitHub interface",
+        "source": "Pinned README; automation.json:191/199; no hosted execution",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "dependabot",
+      "repository": "https://github.com/dependabot/dependabot-core",
+      "pin_of_record": "GitHub-managed service; repository-native configuration",
+      "pin_source": ".github/dependabot.yml:1",
+      "source_pinned_url": "https://github.com/dependabot/dependabot-core/blob/v0.398.0/README.md",
+      "upstream_currency": "Core v0.398.0 is not a hosted-service pin",
+      "native_install": {
+        "command": "Configure .github/dependabot.yml through GitHub's native interface",
+        "source": "https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "Observe scheduled grouped update PRs and check results",
+        "source": "catalogs/foundation/automation.json; native options reference",
+        "evidence_class": "source_only"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "rhysd/actionlint",
+      "repository": "https://github.com/rhysd/actionlint",
+      "verdict": "Historical predecessor; current fork pin in automation.json governs",
+      "sources": [
+        "https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md"
+      ]
+    },
+    {
+      "name": "Trivy",
+      "repository": "https://github.com/aquasecurity/trivy",
+      "verdict": "Candidate overlap with selected inventory/scanners; compare one concrete unsupported artifact",
+      "sources": [
+        "https://github.com/aquasecurity/trivy/blob/v0.74.0/README.md"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "CI landscape names rhysd/actionlint as current candidate",
+      "correction": "Record selects maintained kjanat/actionlint 1.17.0; older native receipts stay historical",
+      "deciding_source": "https://github.com/kjanat/actionlint/blob/08bb2c4f0d039744455b87aef1c647fb8b66d37b/docs/install.md"
+    },
+    {
+      "claim": "Landscape Grype packet's adopted=false governs foundation CI",
+      "correction": "Foundation automation and frozen supply-chain workflow already gate the Syft SBOM with Grype --fail-on high; OSV is an active PR check; CodeQL action uploads SARIF while default setup analyzes",
+      "deciding_source": "catalogs/foundation/automation.json:173; .github/workflows/supply-chain.yml:89; .github/workflows/security-scan.yml:50"
+    }
+  ],
+  "evidence_assessment": [
+    "Source review and safe installed version/help only; no fresh upstream tests, hosted checks, model runs or vulnerability assurance.",
+    "Read all selected action setup/download README files at automation.json pins: setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97, setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e, setup-node@820762786026740c76f36085b0efc47a31fe5020, download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c. Hosted fixture acceptance is separate from unchanged upstream verifier runs.",
+    "Installed actionlint --version returned 127; this is one reviewer-host command observation, not a new-distro or global absence claim.",
+    "Dependabot and Grype appear in the named alternatives and selected interfaces; their current selected scopes are recorded above.",
+    "Current releases/latest matches setup-python7.0.0, setup-go7.0.0, setup-node7.0.0, download-artifact8.0.1 and OSV2.6.0; CodeQL monorepo latest identifies the hosted CLI bundle, not the uploader version."
+  ],
+  "failed_access": [
+    "One local source-extraction regex failed before fetching; corrected extraction and re-read original Grype/OSV/Grafana URLs successfully."
+  ],
+  "omissions": [
+    "No live GitHub ruleset or scheduled-run inspection; this task froze repository source.",
+    "No new scanner database scan or broad security audit."
+  ],
+  "next_wave": [
+    "Observe one actual weekly grouped update and PR cancellation at the selected revision; preserve failed conditions."
+  ],
+  "reopen_on": [
+    "Selected action/scanner pin or required checks change",
+    "Concrete unsupported artifact/lock parser or an observed grouped-update/cancellation failure"
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

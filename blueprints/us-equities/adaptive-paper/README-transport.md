@@ -50,7 +50,8 @@ documents the body but not the HTTP status. 422 was inferred from the code prefi
 the POST /v2/orders 422 entry. It was first observed on the paper endpoint in the
 2026-09-24 14:39Z native-fault run (`native-faults/receipt-20260924t143905.json`,
 C04), and again in the 18:58Z run that day (`native-faults/receipt-20260924t185811.json`)
-and the 2026-09-25 18:25Z run (`native-faults/receipt.json`). The message, not the
+and the 2026-09-25 18:25Z run (`native-faults/receipt-20260925t182513.json`; the current
+`native-faults/receipt.json` is the 2026-10-01 14:38Z run on engine dca821cc). The message, not the
 code, is the discriminator. The transport
 raises `RejectedSubmission(422, "sub_penny_minimum_price_variance")` and compares
 the body with those constants only, never retaining or raising it. The engine's

@@ -166,7 +166,7 @@
       "client_temp_entries_in_private_dir": {
         "messaging_socket_dirs": 1,
         "sandbox_multiplexer_sockets": 1,
-        "file_watch_probe_dirs": 0,
+        "file_watch_probe_dirs": 1,
         "client_state_dirs": 1,
         "other": 2
       }
@@ -184,7 +184,7 @@
       "sandbox_multiplexer_sockets": 0,
       "file_watch_probe_dirs": 0,
       "client_state_dirs": 0,
-      "other": 1
+      "other": 0
     },
     "in_tmp_claude_uid": {
       "messaging_socket_dirs": 0,

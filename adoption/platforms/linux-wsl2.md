@@ -71,11 +71,13 @@ Version **0.29.0 failed real startup with "UVA is not available"** on this
 WSL GPU path (unified virtual addressing unsupported by the WSL GPU driver
 surface at that release).
 [`adoption/lifecycle.md`](../lifecycle.md) records this exactly: "The working
-WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
-unavailable UVA support. Preserve the accepted environment and model/vector
-data; repeating installation until the version number is newer would not
-resolve that compatibility failure." Do not bump this pin on a new WSL host
-without first re-testing 0.29.0 (or any newer release) startup on that host's
+WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0 on the same
+host before the switch; 0.25.0 stays installed for rollback. Version 0.29.0
+failed real startup with unavailable UVA support. Preserve the accepted
+environment and model/vector data; repeating installation until the version
+number is newer would not resolve such a compatibility failure, so a new
+version is qualified on an owned instance first." Do not bump this pin on a new
+WSL host without first re-testing any newer release's startup on that host's
 actual GPU/driver combination; a newer upstream version number is not by
 itself evidence the WSL UVA gap closed.
 
@@ -165,6 +167,16 @@ upstream behavior behind each.
   either. Pipe the script to `bash -s` instead:
   `wsl.exe -d <distro> -- bash -s < script.sh`.
 
+## A new distro from the official Ubuntu WSL image
+
+Added after `v2026.09.26.2`. [A new distro from the official Ubuntu WSL image](linux-wsl2-new-distro.md) creates a
+second WSL 2 distribution on this Windows host from Canonical's `ubuntu-24.04.5-wsl-amd64.wsl`, after checking the file
+against both published sha256 values. cloud-init gives it a passwordless default user before its first launch, and the page
+proves systemd, linger and the user bus before the bootstrap runs there. It changes nothing for the other distributions:
+no `.wslconfig` edit, no `wsl --update`, never `wsl --shutdown`, and the default distribution stays as it is. The
+decisions, their alternatives, the command table and the open questions are in
+[the 2026-10-01 record](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md).
+
 ## Windows Terminal profiles and the login shell
 
 Added after `v2026.09.26.2`: `adoption/templates/claude.settings.linux-wsl2.overlay.json`, the profile example
@@ -205,6 +217,10 @@ with bubblewrap, Claude Code creates such an empty `~/.bash_profile` and leaves 
    client sends; gives them an explicit `bellStyle` array (never `"all"`) and a quiet `bellSound`; and sets `COLORTERM` through the profile's `environment` key. **Precedence** (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`, source read, not run here): a profile's own value, then `profiles.defaults`, then the fragment's profile. A profile that only a fragment defines therefore loses to `profiles.defaults` for every key `defaults` sets: if your `defaults` set `suppressApplicationTitle`, `bellStyle`, `bellSound` or `environment`, the example's values for those keys do not apply, and so the titles, the quiet bell or `COLORTERM` are not what the example advertises. Remove those keys from `defaults`, or put the values in the `settings.json` entry for the profile's own (derived) GUID, which does beat `defaults`. A profile's own `environment` also completely replaces `profiles.defaults.environment` instead of merging with it ([profile-advanced](https://github.com/MicrosoftDocs/terminal/blob/main/TerminalDocs/customize-settings/profile-advanced.md), "Environment variables"), so in such an entry copy the variables the defaults set. The practice repository's host check refuses a `defaults` that suppresses titles or rings `all`; it does not compare `defaults.environment`.
 
 Measured on one workstation (Windows Terminal 1.24, Claude Code 2.1.284, Codex 0.157.1, before the Linux pin moved to 0.159.2). A new host collects its own evidence.
+
+The example also carries two resume profiles, `WSL - Codex - resume` and `WSL - Claude - resume`, each right after the profile of its client. They run `exec codex resume` and `exec claude --resume`, which open the client's own session picker, and nothing resumes until you choose a row. Each picker starts with the sessions of the profile's `--cd` directory (Codex: the launch directory; Claude Code: the current worktree) and can be widened from inside it ([Codex `resume_picker.rs` at `rust-v0.159.3`](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/tui/src/resume_picker.rs#L674-L687); [Claude Code sessions](https://code.claude.com/docs/en/sessions)), and the default profiles are unchanged and still start a new session.
+
+Windows Terminal re-saves `settings.json` in its own layout, written from its settings model with four-space indentation, and writes a single `bellSound` string back as a one-element array (`microsoft/terminal` `v1.24.11911.0`: `CascadiaSettingsSerialization.cpp` L1602 writes the file, and `JsonUtils.h` L359-L389 reads a lone string as a list of one while L549-L551 always writes an array), so a check that reads that file must accept both forms.
 
 ## Listeners and ports
 

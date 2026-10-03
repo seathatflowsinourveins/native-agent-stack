@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "kind": "new-wsl-handbook-slot-state-and-core-recipes",
+  "date_utc": "2026-10-02",
+  "evidence_class": "local_integration",
+  "accepted_main": "8b51946ee16e542e544936e19bb793114fea948e",
+  "source_manifest": {
+    "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+    "source_head": "f565764972a65554bd8968f6205957989c6ab3a7",
+    "sha256": "16eaf725e0bb616fcf2e4dc838f2482ebb272e2b3fcb585b3b4e01437edef42f",
+    "publication_status": "published-source",
+    "layers": 37,
+    "slots": 74,
+    "display_states": {"definitive": 3, "split": 2, "measurement": 1, "pending": 68},
+    "pending_derivation": {"empty_source_state": 65, "omitted_source_state": 3},
+    "meaning": "Owner install decisions are preserved verbatim; definitive is distinct from merit or destination acceptance."
+  },
+  "generator_sha256": "bd1423260c589c226760dfdbdec751c13ae99b788cdf30bd5e9ce70e968a70d7",
+  "slot_state_patch_sha256": "6edc6f7dd204b3563bfd25f5e0c6f314a264a2c1d3f79d4f7bd50620c809d328",
+  "profile": {
+    "path": "adoption/new-wsl-profile.json",
+    "sha256": "b55e826e7828752b17d69ba16a42a66bd935e1686d2b1246f7627abbbea68c92",
+    "source_recipe_receipt": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+    "changed_entries": 8,
+    "remaining_null_install_commands": 35,
+    "remaining_null_acceptance_commands": 40,
+    "install_commands_executed": 0,
+    "upstream_source_tests_executed": 0,
+    "new_host_acceptance_claimed": false
+  },
+  "canonical_generation": {
+    "write_command": "python3 scripts/build_new_wsl_handbook.py --write",
+    "write_exit_code": 0,
+    "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+    "check_exit_code": 0,
+    "outputs": {
+      "docs/new-wsl-handbook.json": "6721c9cc60e2f7f7cf2479801bfab215b0046cea06812b03a2c33090ea4838d3",
+      "docs/new-wsl-handbook.md": "efaa74ace284b9b9e8c49cb54ded268912e7cc321303e71e031b5e3b17703fb7"
+    },
+    "tools": 73,
+    "final_layers": 0,
+    "new_host_acceptance_claimed": false
+  },
+  "independent_slot_state_controls": {
+    "command": "python3 -m unittest discover -s tests -p test_new_wsl_handbook.py -k defaults_manifest",
+    "tests": 6,
+    "duration_seconds": 3.682,
+    "exit_code": 0,
+    "skips": 0,
+    "evidence_class": "synthetic",
+    "actual_source_preview_write_exit_code": 0,
+    "actual_source_preview_check_exit_code": 0,
+    "preview_status": "supplied-preview",
+    "negative_controls": [
+      {"mutation": "invalid-state", "public_write_exit_code": 1, "published_bytes_preserved": true},
+      {"mutation": "wrong-layer", "public_write_exit_code": 1, "published_bytes_preserved": true},
+      {"mutation": "duplicate-slot", "public_write_exit_code": 1, "published_bytes_preserved": true},
+      {"mutation": "ignored-metadata-private-path", "public_write_exit_code": 1, "published_bytes_preserved": true}
+    ],
+    "independent_assertion_exit_code": 0,
+    "returned_assertion": "SLOT_STATE_PUBLIC_CLI_VERIFICATION_PASSED",
+    "prior_test_bodies_unchanged": 45,
+    "prior_package_privacy_and_verdict_guards_unchanged": true
+  },
+  "retained_evidence": {
+    "historical_handbook_receipt": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+    "historical_profile_receipts_unchanged": true,
+    "original_package_identity_failure_and_correction_retained": true,
+    "original_generated_index_ci_failure_and_correction_retained": true,
+    "earlier_45_tests_reused_only_for_unchanged_bodies": true,
+    "complete_51_test_suite_rerun_claimed": false
+  },
+  "review_route": {
+    "requested": "Astra/Max",
+    "trigger": "Consequential publication of owner slot states after package identity failures",
+    "actual_backend": null,
+    "acceptance": "Scoped independent source and public CLI controls passed; no native destination execution."
+  },
+  "not_claimed": ["All layers finalized", "All source recipes completed", "Upstream native tests passed", "New WSL boot", "Provider acceptance", "GPU qualification", "Memory or retrieval quality winner", "Full unattended cross-client bridge"],
+  "sources": [
+    "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json at accepted_main",
+    "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json (tagged upstream file citations)",
+    "docs/decisions/2026-10-01-new-wsl-handbook-generator.md"
+  ]
+}

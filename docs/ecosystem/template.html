@@ -19,6 +19,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 #token-topic th:nth-child(1){width:15%}#token-topic th:nth-child(2){width:25%}#token-topic th:nth-child(3){width:32%}#token-topic th:nth-child(4){width:28%}
 #token-topic .topic-detail td{padding-top:0;padding-bottom:20px}#token-topic .topic-detail pre{max-width:100%}
 #token-topic-section{scroll-margin-top:160px}
+#architecture .token-table{table-layout:fixed;min-width:1100px}#architecture td{overflow-wrap:anywhere}#architecture th:nth-child(1){width:14%}#architecture th:nth-child(2){width:17%}#architecture th:nth-child(3){width:10%}#architecture th:nth-child(4){width:11%}#architecture th:nth-child(5){width:28%}#architecture th:nth-child(6){width:20%}#architecture .topic-detail td{padding-top:0;padding-bottom:20px}#architecture .topic-detail pre{max-width:100%}#architecture h4{font-size:13px;margin:16px 0 6px}#architecture ol{font-size:12px;padding-left:20px}#architecture ol li{margin:6px 0}.architecture-verdict{font-weight:650}.architecture-verdict.closed{color:var(--green)}.architecture-verdict.open{color:var(--copper)}
 .navigation{flex-wrap:wrap;column-gap:22px;row-gap:0}.navigation button:last-child{margin-left:0}
 .catalog-entries,.catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 36px}.catalog-entry,.catalog-layer,.catalog-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);overflow-wrap:anywhere}.catalog-entry:first-child{background:#e8eddf}.catalog-entry h2{margin:12px 0;font-size:35px}.catalog-entry p,.catalog-layer p,.catalog-card p{font-size:13px;margin:12px 0;color:var(--muted)}.catalog-entry .button{margin-top:15px}.catalog-entry .catalog-count{color:var(--green);font-weight:600}.catalog-layer h3,.catalog-card h3{font-size:20px}.catalog-layer .eyebrow{color:var(--copper);margin-bottom:8px}.catalog-layer .accepted-scope{color:var(--green)}.catalog-gap{border-left:3px solid var(--copper);padding-left:12px;margin:16px 0;font-size:12px}.catalog-gap strong{display:block}.catalog-gap p{margin:5px 0}.catalog-detail{border-top:1px solid var(--line);padding:15px 0 0;margin-top:16px;min-width:0}.catalog-detail p,.catalog-detail li{font-size:12px}.catalog-detail summary,.catalog-detail a{overflow-wrap:anywhere}.catalog-capability{border-top:1px solid var(--line);padding:18px 0 4px}.catalog-capability h4{font-size:15px;margin:0 0 9px}.catalog-capability .badge{font-size:10px}.catalog-sources{display:flex;flex-direction:column;gap:8px;margin:14px 0;font-size:12px}.catalog-facts{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2fr);gap:9px 16px;font-size:12px;margin:15px 0}.catalog-facts dt{color:var(--muted)}.catalog-facts dd{margin:0;overflow-wrap:anywhere}.catalog-layer .catalog-detail .catalog-detail{padding-left:12px}.catalog-summary{margin:0 0 22px}.catalog-summary p{font-size:13px;margin-top:10px}.catalog-controls{margin-bottom:20px}.catalog-scope{font-size:12px;color:var(--muted);margin:15px 0 25px}.catalog-empty{padding:30px;border:1px dashed var(--line);border-radius:12px;margin-bottom:30px}.catalog-grid>*{min-width:0}.catalog-card pre{max-width:100%}@media(max-width:800px){.catalog-entries,.catalog-grid{grid-template-columns:1fr}}@media(max-width:670px){.navigation{overflow:visible;column-gap:16px}.catalog-entry,.catalog-layer,.catalog-card{padding:20px}.catalog-facts{grid-template-columns:1fr}.catalog-facts dd{margin-bottom:7px}.catalog-entry h2{font-size:31px}}
 .foundation-repos{padding-left:18px;font-size:12px}.foundation-repos li{margin:9px 0}.foundation-repos code{display:block;font-size:10px;overflow-wrap:anywhere;color:var(--muted)}.foundation-surfaces{margin:20px 0}.foundation-surfaces h4{font-size:14px;margin:0 0 10px}.foundation-surface{border-left:2px solid var(--line);padding-left:12px;margin:16px 0}.foundation-surface h5{font-size:13px;margin:0 0 6px}.foundation-surface p{font-size:12px;margin:8px 0}.foundation-surface .catalog-sources{margin:9px 0}.foundation-surface .native-code{max-width:100%}
@@ -45,7 +46,8 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <button role="tab" id="tab-explorer" aria-controls="explorer" aria-selected="false" tabindex="-1" data-tab="explorer"><span class="tab-number">02</span>Repository explorer</button>
 <button role="tab" id="tab-setup" aria-controls="setup" aria-selected="false" tabindex="-1" data-tab="setup"><span class="tab-number">03</span>Selected stack & setup</button>
 <button role="tab" id="tab-efficiency" aria-controls="efficiency" aria-selected="false" tabindex="-1" data-tab="efficiency"><span class="tab-number">04</span>Token efficiency</button>
-<button role="tab" id="tab-evidence" aria-controls="evidence" aria-selected="false" tabindex="-1" data-tab="evidence"><span class="tab-number">05</span>Evidence & sources</button>
+<button role="tab" id="tab-architecture" aria-controls="architecture" aria-selected="false" tabindex="-1" data-tab="architecture" hidden><span class="tab-number">05</span>Final architecture</button>
+<button role="tab" id="tab-evidence" aria-controls="evidence" aria-selected="false" tabindex="-1" data-tab="evidence"><span class="tab-number">06</span>Evidence & sources</button>
 </nav></div></header>
 <main id="main" class="shell" tabindex="-1">
 <section id="overview" role="tabpanel" aria-labelledby="tab-overview">
@@ -118,6 +120,12 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div class="runtimes"><article class="runtime"><h3>Codex</h3><p>Use native task context, compaction, cache, skills and collaboration. Select independent subagents and isolated writing worktrees; return source paths and concise verification.</p></article><article class="runtime"><h3>Claude Code</h3><p>Use native skills, subagents, scoped project instructions and isolated worktrees. Preserve native caching and compaction; keep account setup and active tool discovery specific to the host.</p></article><article class="runtime"><h3>Research workers</h3><p>Give each worker a bounded input packet, purpose and output contract. Preserve usage and failure evidence. Keep numerical state and permitted execution in deterministic code.</p></article></div>
 <p class="subnote">Codex input includes its cached-input subset. Claude ordinary input, cache creation and cache reads use different categories. Do not add those conventions blindly or double-count the same telemetry receipt.</p>
 </section>
+<section id="architecture" role="tabpanel" aria-labelledby="tab-architecture" hidden>
+<div class="page-heading"><div><div class="eyebrow">New WSL distro / one dated edition</div><h2>The final architecture, layer by layer.</h2><p>Each row names the source host's selection of record at its recorded pin (not a merit result: a comparison row's winner is undetermined until its arms run on the new distro), the verdict under the edition's rules, the evidence class, the reasons with their sources and what a session runs on the new distro. Expand a row for the five closure items, alternatives, upstream currency, ordered new-host steps and gates. A new distro collects its own evidence; nothing here is acceptance on it.</p></div></div>
+<div id="architecture-edition" class="scope-note landscape-summary"></div>
+<div id="architecture-actions" class="landscape-actions"></div>
+<div id="architecture-topic"></div>
+</section>
 <section id="evidence" role="tabpanel" aria-labelledby="tab-evidence" hidden>
 <div class="page-heading"><div><div class="eyebrow">Claims should travel with their limits</div><h2>Know what the record proves.</h2><p>This static page reads no local account, process, index or service. Its current-host state is unknown; observations belong to their recorded time, host and task.</p></div></div>
 <div class="status-list"><div class="status-item"><strong>Discovery</strong><p>A public star or list entry identifies a lead. Popularity is not evidence of suitability or execution.</p></div><div class="status-item"><strong>Source reviewed</strong><p>Selected primary material was inspected at the recorded depth. Version pins and source commits may differ.</p></div><div class="status-item"><strong>Recorded execution</strong><p>A linked native receipt describes useful historical behavior. Read its precise input, outcome and limitations.</p></div><div class="status-item"><strong>Live on this host</strong><p>Unknown from an offline page. A new machine must establish its own native sign-in, discovery and acceptance.</p></div></div>
@@ -157,7 +165,8 @@ const layerNames = new Map(data.layers.map(layer => [layer.id, layer.name]));
 document.querySelectorAll("[data-catalog-tab]").forEach(tab => { tab.hidden = !data.grand_catalogs; });
 $("tab-landscape").hidden = !data.landscape;
 $("tab-convergence").hidden = !data.convergence;
-const tabs = [...document.querySelectorAll("[data-tab]")].filter(tab => !tab.hidden);
+$("tab-architecture").hidden = !data.architecture;
+const tabs =[...document.querySelectorAll("[data-tab]")].filter(tab => !tab.hidden);
 function showTab(id, focus = false) {
   if(!tabs.some(tab => tab.dataset.tab === id)) id = "overview";
   tabs.forEach(tab => { const active = tab.dataset.tab === id; tab.setAttribute("aria-selected", String(active)); tab.tabIndex = active ? 0 : -1; $(tab.dataset.tab).hidden = !active; if(active && focus) tab.focus(); });
@@ -776,6 +785,101 @@ if(topic.edition) {
   });
   add(table, body); add($("token-topic"), make("h3", "", title), add(make("div", "table-wrap"), table));
 });
+// The dated new-WSL architecture edition: every verdict, closure state, count, date and label below is read
+// from the data, and every link goes through link() and safeHref.
+const architectureSourceLabel = source => source.kind === "pending" ? source.path + " · pull request #" + source.pull_request + (source.commit ? " at " + source.commit : "") + ", not on main at this edition's base" : source.kind === "landed" ? source.path + " · landed after this edition's base (pull request #" + source.pull_request + ")" : (source.path || source.url);
+const architectureDrift = winner => "Pin drift: the stack now records " + winner.pin_drift + "; this edition recorded " + winner.pin + ".";
+function architectureSource(parent, source, label) {
+  if(source) add(parent, add(make("p", "small"), link(label + architectureSourceLabel(source) + " ↗", source.url)));
+}
+function architectureDetail(row, edition) {
+  const detail = add(make("details", "record-detail"), make("summary", "", "Closure items, winners, alternatives, new-host steps and gates"));
+  const closure = make("dl", "catalog-facts");
+  edition.closure_items.forEach(item => add(closure, make("dt", "", item.id + " · " + readable(row.closure[item.id])), make("dd", "", item.text)));
+  add(detail, make("h4", "", "Closure items"), closure, make("p", "", row.closure.missing ? "Missing: " + row.closure.missing : "Nothing missing: all five closure items hold."));
+  if(row.winners.length) add(detail, make("h4", "", "Source host's selection of record: pin, install, acceptance and upstream currency"));
+  row.winners.forEach(winner => {
+    const block = add(make("div", "catalog-detail"), make("strong", "", [winner.label, winner.role, winner.pin].filter(Boolean).join(" · ")), add(make("p", "small"), link("Pin of record: " + winner.pin_source.locator + " ↗", winner.pin_source.url)));
+    if(winner.pin_drift !== null) add(block, make("p", "small", architectureDrift(winner)));
+    add(block, make("p", "small", "Install (" + readable(winner.install.kind) + ")"), codeBlock(winner.install.command || "No install command recorded"));
+    architectureSource(block, winner.install.source, "Install source: ");
+    add(block, make("p", "small", "Acceptance (" + edition.evidence_classes[winner.acceptance.evidence_class] + ")"), codeBlock(winner.acceptance.command || "No acceptance command recorded"));
+    architectureSource(block, winner.acceptance.source, "Acceptance source: ");
+    const currency = winner.upstream_currency;
+    const line = make("p", "small", "Upstream: " + currency.latest_release + " · pin is latest: " + currency.pin_is_latest + " · checked " + currency.checked_at + " ");
+    add(block, currency.url ? add(line, link("↗", currency.url)) : line);
+    add(detail, block);
+  });
+  add(detail, make("h4", "", "Alternatives"));
+  if(!row.alternatives.length) add(detail, make("p", "muted", "No alternative is recorded for this row."));
+  row.alternatives.forEach(item => architectureSource(detail, item.source, item.name + " · " + item.verdict + " · "));
+  add(detail, make("h4", "", "New-host steps, in order"));
+  const steps = make("ol");
+  row.new_host_steps.forEach(step => add(steps, make("li", "", step)));
+  add(detail, steps, make("h4", "", "Gates"));
+  if(!row.gates.length) add(detail, make("p", "muted", "No gate is recorded for this row."));
+  row.gates.forEach(gate => { add(detail, make("p", "", readable(gate.kind) + " gate: " + gate.text)); architectureSource(detail, gate.source, "Gate source: "); });
+  add(detail, make("p", "small", "Owner lane: " + row.owner_lane));
+  if(row.notes) add(detail, make("p", "small muted", "Notes: " + row.notes));
+  return detail;
+}
+function renderArchitecture() {
+  const architecture = data.architecture;
+  if(!architecture) return;
+  const edition = architecture.edition, rows = architecture.rows;
+  const closed = rows.filter(row => row.verdict === "closed").length;
+  const counts = {};
+  rows.forEach(row => { counts[row.verdict] = (counts[row.verdict] || 0) + 1; });
+  const head = $("architecture-edition");
+  add(head, make("strong", "", "Edition " + edition.date_utc + " · base commit " + edition.base_commit), make("p", "", edition.scope));
+  add(head, make("p", "", "Closed: " + closed + " of " + rows.length + " rows." + (closed ? "" : " No layer is closed in this edition: none meets all five closure items, and every row names what is missing.")));
+  add(head, make("p", "", "Verdicts: " + Object.keys(edition.verdict_values).filter(key => counts[key]).map(key => readable(key) + " " + counts[key]).join(" · ")));
+  add(head, make("p", "", architecture.missing_layers.length ? "Catalog layers without a row in this edition: " + architecture.missing_layers.join(", ") : "Every catalog layer has a row in this edition."));
+  add(head, make("h4", "", "Verdict rules")); listLimits(head, edition.verdict_rules);
+  const definitions = add(make("details", "record-detail"), make("summary", "", "Verdict values, closure items and evidence classes"));
+  [["Verdict values", edition.verdict_values], ["Evidence classes", edition.evidence_classes]].forEach(([title, values]) => {
+    const list = make("dl", "catalog-facts");
+    Object.entries(values).forEach(([key, text]) => add(list, make("dt", "", readable(key)), make("dd", "", text)));
+    add(definitions, make("h4", "", title), list);
+  });
+  const items = make("dl", "catalog-facts");
+  edition.closure_items.forEach(item => add(items, make("dt", "", item.id), make("dd", "", item.text)));
+  add(definitions, make("h4", "", "Closure items (close_only_when)"), items);
+  const sources = add(make("details", "record-detail"), make("summary", "", "Edition sources"));
+  edition.sources.forEach(source => architectureSource(sources, source, ""));
+  add(head, definitions, sources);
+  add($("architecture-actions"), link("Edition source file ↗", architecture.url));
+  [["foundation", "Foundation layers"], ["us-equities", "US-equities layers"], ["cross", "Cross-cutting rows"]].forEach(([catalog, title]) => {
+    const subset = rows.filter(row => row.catalog === catalog);
+    if(!subset.length) return;
+    const table = make("table", "token-table"), body = make("tbody");
+    add(table, add(make("thead"), add(make("tr"), ...["Layer", "Source host's selection (pin)", "Verdict", "Evidence class", "Reasons", "Install on the new distro"].map(label => make("th", "", label)))));
+    subset.forEach(row => {
+      const layer = add(make("td"), make("strong", "", row.title), make("p", "small mono", row.catalog + "/" + row.layer_id));
+      if(row.research_status) add(layer, make("p", "small muted", "Research state: " + readable(row.research_status)));
+      const winners = make("td");
+      if(!row.winners.length) add(winners, make("p", "muted", "No selection of record"));
+      row.winners.forEach(winner => {
+        const name = add(make("p"), link(winner.label + " ↗", winner.repository));
+        if(winner.role) add(name, make("span", "small muted", " · " + winner.role));
+        add(winners, name, make("p", "small mono", winner.pin));
+        if(winner.pin_drift !== null) add(winners, make("p", "small muted", architectureDrift(winner)));
+      });
+      const verdict = add(make("td"), make("p", "architecture-verdict " + (row.verdict === "closed" ? "closed" : "open"), readable(row.verdict)), make("p", "small muted", edition.verdict_values[row.verdict]));
+      const reasons = make("td");
+      row.reasons.forEach(reason => add(reasons, add(make("p"), make("span", "", reason.text + " "), link("(" + architectureSourceLabel(reason.source) + ") ↗", reason.source.url))));
+      const install = make("td");
+      if(!row.winners.length) add(install, make("p", "muted", "Nothing to install for this row in this edition."));
+      row.winners.forEach(winner => add(install, make("p", "small", winner.label + " · " + readable(winner.install.kind)), codeBlock(winner.install.command || "No install command recorded")));
+      const record = add(make("tr"), layer, winners, verdict, make("td", "", edition.evidence_classes[row.evidence_class]), reasons, install);
+      record.dataset.layer = row.layer_id;
+      const detailCell = add(make("td"), architectureDetail(row, edition)); detailCell.colSpan = 6;
+      add(body, record, add(make("tr", "topic-detail"), detailCell));
+    });
+    add(table, body); add($("architecture-topic"), make("h3", "", title), add(make("div", "table-wrap"), table));
+  });
+}
+renderArchitecture();
 data.efficiency.selection_policy.forEach(row => {
   const measured = [row.baseline_tokens, row.candidate_tokens, row.chosen_tokens].every(value => typeof value === "number");
   const numbers = measured ? "Baseline " + row.baseline_tokens + " → candidate " + row.candidate_tokens + "; chosen " + row.chosen_tokens + " " + row.unit : "Numeric comparison: not measured here. " + row.unit;

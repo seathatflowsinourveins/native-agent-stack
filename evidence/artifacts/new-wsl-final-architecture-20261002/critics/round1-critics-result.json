@@ -1,0 +1,447 @@
+{
+ "code-navigation": [
+  {
+   "labels": "single-as-A",
+   "result": {
+    "layer": "code-navigation",
+    "items": [
+     {
+      "item": "ast-grep (structural-search CLI installed beside Serena)",
+      "job": "Search source by AST pattern (syntax-shaped questions, independent of text layout) through a shell CLI that both agents call.",
+      "verdict": "install",
+      "winner_if_competing": "",
+      "reasons": "Two jobs, not one. ast-grep matches tree-sitter AST patterns and, by its own docs, works only at the syntactic level; Serena resolves symbols and references through language servers and offers only regex pattern search, typically disabled inside agent harnesses. Rule 1: nothing else in the final set owns AST-pattern search. Named overlaps: `ast-grep outline` (alpha) duplicates Serena's symbol overview, which stays Serena's; plain-text patterns stay with native search. Rule 2: no fetched upstream source measures a gain, but the job would otherwise have no owner, so documented capability decides. Gates: release 0.45.3 on 2026-08-31, default-branch commit 2026-09-28, Linux x86_64 binary, documented installs, a CLI both agents call from their shell; no daemon or index.",
+      "evidence": [
+       {
+        "url": "https://ast-grep.github.io/advanced/tool-comparison.html",
+        "quote": "It does not have deep semantic information or comparison equivalence. It only operates on the syntactic level of the code, which may miss some matches or may be too cumbersome to match certain code."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/oraios/serena/v1.7.0/README.md",
+        "quote": "- **`search_for_pattern`** \u2013 flexible regex search across the codebase"
+       },
+       {
+        "url": "https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/README.md",
+        "quote": "pip install ast-grep-cli"
+       },
+       {
+        "url": "https://api.github.com/repos/ast-grep/ast-grep/releases/tags/0.45.3",
+        "quote": "app-x86_64-unknown-linux-gnu.zip"
+       }
+      ],
+      "measurement": "Run Claude Code and Codex on frozen repositories in the target languages against sealed syntax-shaped questions with sealed exact match sets (for example every call passing a given keyword argument, every bare except, every await inside a loop): arm A native text search plus Serena, arm B the same plus ast-grep with its use asserted. Metric: match precision and recall, and full-session tokens per correct answer. Overturn to do_not_install if arm B gains on neither.",
+      "confidence": "high"
+     },
+     {
+      "item": "claude-plugins-official code-intelligence LSP plugins (pyright-lsp, typescript-lsp and siblings) beside Serena",
+      "job": "Semantic symbol and reference navigation through language servers (definitions, references, implementations, call hierarchies), which these plugins offer to Claude Code only, plus post-edit diagnostics.",
+      "verdict": "do_not_install",
+      "winner_if_competing": "Serena",
+      "reasons": "Same job as Serena: the plugin activates Claude Code's LSP tool, which looks up definitions, references and symbols through a language server, navigation Serena already owns (rule 1). Rule 2: each plugin adds an install plus a language-server binary, and no fetched upstream source measures a gain on exact source or reference retrieval. Rule 3 gate: the plugins connect Claude Code only; Serena documents setup for both agents, and every Ubuntu job of its 2026-09-30 test run passed (the run failed on a Windows batch). The plugins' one unowned capability, automatic post-edit diagnostics, is not a navigation job. Residual risk: Serena upstream reports drastically reduced tool adherence in Claude Code.",
+      "evidence": [
+       {
+        "url": "https://code.claude.com/docs/en/plugins/code-intelligence.md",
+        "quote": "Each plugin connects Claude Code to a language server for one language through the Language Server Protocol (LSP). You install the plugin from Anthropic's official marketplace and the language server binary on your machine."
+       },
+       {
+        "url": "https://code.claude.com/docs/en/plugins/code-intelligence.md",
+        "quote": "**Code navigation**: Claude gets an `LSP` tool that looks up symbols through the server instead of searching text for them. The tool is read-only."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/oraios/serena/v1.7.0/docs/02-usage/030_clients.md",
+        "quote": "You can simply run `serena setup codex`."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/oraios/serena/v1.7.0/docs/02-usage/030_clients.md",
+        "quote": "and introduce a very strong bias towards internal tools, making it almost impossible to convince Opus 4.7 to use Serena."
+       }
+      ],
+      "measurement": "In Claude Code on the target host, on frozen Python and TypeScript repositories with sealed symbol and reference answers (definitions, cross-file references, aliases, shadowing): arm A Serena only under upstream's documented Claude Code launch (setup, reminder hooks, system-prompt override), arm B pyright-lsp and typescript-lsp only. Metric: share of sessions with at least one semantic-tool call, reference precision and recall, full-session tokens, language-server memory. Overturn to install (plugins own the Claude side, Serena serves Codex only) if arm A's call rate is near zero or its recall is lower.",
+      "confidence": "high"
+     }
+    ],
+    "extra_differences": [
+     "ast-grep install command differs inside Record B: pass 1 `npm install --global @ast-grep/cli`, pass 2 `cargo install ast-grep --locked`. The README at 0.45.3 documents npm, pip, brew, cargo and cargo binstall. Observed this session: PyPI 0.45.3 ships a prebuilt manylinux_2_28_x86_64 wheel; npm 0.45.3 has seven platform optionalDependencies and a postinstall script. `cargo install` builds from source (cargo's standard behaviour, not checked here). Rule-3 tiebreak on fewer moving parts (not measured, not executed here): `pip install ast-grep-cli`. Not verified: whether the host's system pip accepts a global install, or the uv tool / pipx equivalent for the same wheel.",
+     "Serena install command differs inside Record B: pass 1 ends with `serena setup claude-code` and `serena setup codex`; pass 2 stops at `serena init`, which registers Serena with neither agent. The v1.7.0 clients doc (the version PyPI serves, uploaded 2026-08-09) documents both setup commands, so pass 1's sequence is the complete one. Neither pass includes the Claude Code system-prompt override that upstream highly recommends or the reminder hooks it strongly recommends and labels alpha.",
+     "Record A carries no roles, install commands, languages or sources, and names its second slot as the whole marketplace repository; upstream ships one LSP plugin per language (pyright-lsp, typescript-lsp, gopls-lsp, rust-analyzer-lsp and others), each needing a separately installed language-server binary. Record B carries sources for every selection.",
+     "Record B's passes give different reasons for not selecting claude-plugins-official: pass 2 says no particular navigation plugin is identified, which upstream contradicts; pass 1's reason (real Claude Code navigation, Codex integration not established) is the one that holds.",
+     "Record B's passes describe Serena test run 36761901285 differently and both descriptions are true. Observed through gh: conclusion failure; every ubuntu-latest job success; other-langs (windows-latest) failure; native (macos-latest) cancelled.",
+     "Record B's deciding comparisons differ: pass 1 includes Claude's official LSP plugins and jCodeMunch plus SCIP as arms, pass 2 omits both. The item-2 measurement here needs the LSP-plugin arm.",
+     "Pass 2 records that its page fetches were blocked and that it read upstream through the GitHub API; the Serena and ast-grep facts that carry these verdicts were re-fetched here."
+    ],
+    "notes": "Two jobs, decided first: AST-pattern search (ast-grep) and semantic navigation (Serena). After this verdict no tool in the layer gives automatic post-edit diagnostics; raise that with the layer owning edit verification. Serena's published evaluations ran on its paid JetBrains backend, not the language-server backend installed here. Upstream's Claude Code recipe (system-prompt override, alpha hooks) is itself a moving part; the item-2 invoke-rate measurement is what would flip it. Token tools: context-mode fetch and search."
+   }
+  },
+  {
+   "labels": "pair-as-A",
+   "result": {
+    "layer": "code-navigation",
+    "items": [
+     {
+      "item": "ast-grep (structural-search CLI beside Serena)",
+      "job": "Match and rewrite code by syntax-tree shape (AST patterns) across files, on demand through either agent's shell; no index, no symbol identity.",
+      "verdict": "install",
+      "winner_if_competing": "",
+      "reasons": "Two jobs. Rule 1: ast-grep matches and rewrites syntax-tree shape (node kind, nesting, multi-line composition); upstream says it works only at the syntactic level, without scope or type analysis, so it cannot own Serena's symbol/reference job. Overlaps: name, literal and line-local lookups with native grep/rg; Serena's only pattern tool is regex, normally off under both agents. Rule 2: nothing else in the final set parses syntax, so shape queries are otherwise ownerless and documented capability decides; the requirement admits a structural lane on demand, and ast-grep adds no index, daemon or MCP schema. One public head-to-head agrees: rg wins 9 of 12 cells and stays the default, but returns 0% on JSX/TSX structural queries, where ast-grep hits 66.7%.",
+      "evidence": [
+       {
+        "url": "https://raw.githubusercontent.com/ast-grep/ast-grep/25334496c105c9c728f0a6024f3d164aed40cacc/README.md",
+        "quote": "ast-grep(sg) is a CLI tool for code structural search, lint, and rewriting."
+       },
+       {
+        "url": "https://ast-grep.github.io/advanced/tool-comparison.html",
+        "quote": "It does not have deep semantic information or comparison equivalence. It only operates on the syntactic level of the code, which may miss some matches or may be too cumbersome to match certain code."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/oraios/serena/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/README.md",
+        "quote": "- **`search_for_pattern`** \u2013 flexible regex search across the codebase"
+       },
+       {
+        "url": "https://onk3sh.github.io/post/rg-vs-ast-grep/",
+        "quote": "rg wins 9/12, ties 2, loses 1. The single ast-grep win is React/TSX structural patterns, the one query class where rg returns 0% and ast-grep returns 66.7%."
+       }
+      ],
+      "measurement": "Seal 30 or more structural questions with complete expected match sets (file:line) on frozen repositories in the host's target languages, including one TSX repository. Run Claude Code and Codex under WSL2 in two arms: grep/rg plus Serena only, versus the same plus ast-grep 0.45.3 on PATH with one routing line. Metric: exact-match recall and precision of returned locations, full-session tokens, ast-grep invocations per session. Overturn to do_not_install if the ast-grep arm shows no recall or precision gain in any target language, or ast-grep is invoked in no session.",
+      "confidence": "medium"
+     },
+     {
+      "item": "claude-plugins-official code-intelligence LSP plugins (beside Serena)",
+      "job": "Language-server navigation (definition, references, symbols) and automatic post-edit diagnostics inside Claude Code terminal sessions only; one plugin plus one separately installed server binary per language.",
+      "verdict": "do_not_install",
+      "winner_if_competing": "Serena",
+      "reasons": "Rule 1: the plugins' job is language-server navigation plus post-edit diagnostics inside Claude Code only; definition, references, symbol listing, implementations and diagnostics all overlap Serena's tools. Rule 2: I found no public measurement of a gain from adding them beside Serena. Rule 3 gates: both are maintained and run on Linux; the plugins fail 'works with both agents' (each plugin connects Claude Code to one language server; the Codex documentation export never mentions LSP), while Serena documents setup for both. Fewer parts: each language needs a plugin plus a separately installed server binary, and a second server indexing the same project. Automatic diagnostics after edits is another job, outside this layer's requirement.",
+      "evidence": [
+       {
+        "url": "https://code.claude.com/docs/en/plugins/code-intelligence.md",
+        "quote": "Each plugin connects Claude Code to a language server for one language through the Language Server Protocol (LSP). You install the plugin from Anthropic's official marketplace and the language server binary on your machine."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/anthropics/claude-plugins-official/ab024cdcfa7ca80be204acd4907656ba5a968589/plugins/typescript-lsp/README.md",
+        "quote": "TypeScript/JavaScript language server for Claude Code, providing code intelligence features like go-to-definition, find references, and error checking."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/oraios/serena/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/docs/02-usage/030_clients.md",
+        "quote": "You can simply run `serena setup codex`."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/oraios/serena/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/README.md",
+        "quote": "| find referencing symbols         | yes              | yes              |"
+       }
+      ],
+      "measurement": "In Claude Code under WSL2, on frozen Python and TypeScript repositories with sealed reference and definition questions (complete expected reference sets): arm A Serena with its documented system-prompt override and hooks; arm B pyright-lsp and typescript-lsp without Serena; arm C both. Metric: reference precision and recall, tool-invocation rate per session, full-session tokens, peak language-server memory. Overturn (plugins own the job in Claude Code, Serena serves Codex only) if arm B beats arm A on recall and precision at equal or lower tokens.",
+      "confidence": "high"
+     }
+    ],
+    "extra_differences": [
+     "ast-grep install line differs inside Record A: pass 1 `npm install --global @ast-grep/cli`, pass 2 `cargo install ast-grep --locked`; Record B does not mention ast-grep at all. Both commands are in the upstream README. Use the npm line: it pulls the prebuilt @ast-grep/cli-linux-x64-gnu 0.45.3 binary (npm registry, observed now), while cargo compiles from source and needs a Rust toolchain; `pip install ast-grep-cli` (manylinux_2_28 x86_64 wheel) is the documented alternative. Gates observed: release 0.45.3 on 2026-08-31, default-branch commit 2026-09-28, release asset app-x86_64-unknown-linux-gnu.zip.",
+     "Serena install line differs inside Record A: pass 1 adds `serena setup claude-code` and `serena setup codex`; pass 2 stops at `serena init`. Upstream documents all four commands (README Quick Start; docs/02-usage/030_clients.md), and wiring both agents needs the two setup commands. Record B gives Serena no install command, version, source or client setup. PyPI serena-agent is 1.7.0 (uploaded 2026-08-09).",
+     "Record A pass 2 never evaluated the LSP plugins: it treated claude-plugins-official as a plugin directory with no identified navigation plugin. Only pass 1 rejected them, on the missing Codex path. Record B names no languages; upstream lists 13 code-intelligence plugins (12 Anthropic, 1 Shopify), each needing its own separately installed language-server binary.",
+     "The two passes report Serena CI run 36761901285 differently (pass 1: Ubuntu batches passed; pass 2: overall suite failed). Both hold (gh, observed now): run conclusion failure from other-langs (windows-latest), native (macos-latest) cancelled, all five ubuntu-latest jobs success; the default-branch head status is FAILURE for that reason, not a Linux failure.",
+     "Layer shape differs: Record A has two jobs with one owner each (semantic navigation, structural search); Record B has two language-server providers for one job inside Claude Code and no structural-search owner.",
+     "Neither record carries Serena's Claude Code workarounds from docs/02-usage/030_clients.md: start Claude Code with `claude --system-prompt=\"$(serena prompts print-cc-system-prompt-override)\"` and add the reminder hooks (upstream: strongly recommended, alpha feature). Codex hooks are documented there too.",
+     "Neither record notes that ast-grep installs an `sg` binary beside `ast-grep` (npm bin map, observed now), and the upstream quick start warns that Linux already has `sg` for setgroups; agents must call `ast-grep`.",
+     "Evidence basis differs: pass 1 says Serena's upstream evaluation does not establish measured superiority; pass 2 and Record B cite no performance evidence. Found here: Serena's published evaluations are agent self-reports run on the paid JetBrains backend, not the language-server backend; arXiv 2608.13568 (preliminary, custom harness) finds language-server gains conditional (precision on reference tasks, extra tokens on localization); the rg-vs-ast-grep benchmark is a single-author post on four private codebases whose hit rate counts any non-empty first result, not exact answers."
+    ],
+    "notes": "Semantic navigation and structural search are two jobs: final layer is Serena plus ast-grep; LSP plugins out. Serena upstream says Claude Code makes it 'almost impossible to convince Opus 4.7 to use Serena' without its system-prompt override and hooks: assert real Serena calls per session. Neither agent's docs mention ast-grep; add one routing line (shape queries only; call `ast-grep`, not `sg`). The plugins' automatic post-edit diagnostics is unowned here; route it to the quality layer. gh calls: 3."
+   }
+  }
+ ],
+ "ci-supply-chain": [
+  {
+   "labels": "single-as-A",
+   "result": {
+    "layer": "ci-supply-chain",
+    "items": [
+     {
+      "item": "Dependabot",
+      "job": "Open pull requests that move pinned dependency versions (SHA-pinned actions, lockfiles) in the GitHub-hosted repositories; advisory alerts are a hosted by-product.",
+      "verdict": "install",
+      "winner_if_competing": "",
+      "reasons": "Rule 1: jobs of the four: zizmor audits workflow security, actionlint checks workflow correctness, Syft inventories, attest signs provenance; none moves a pin. zizmor's docs hand hash-pin updates to Dependabot or Renovate, and zizmor audits dependabot.yml. Only overlap: zizmor known-vulnerable-actions with Dependabot alerts, Actions only. Rule 2: the job would otherwise have no owner, so documented capability decides; the hosted service is enabled by a checked-in .github/dependabot.yml and installs nothing on the host. Record B rejected only the self-hosted library path. A 2023 study with mixed findings (reduced technical lag) is supporting only. Maintained: HEAD 2026-10-01, v0.398.0 2026-09-28 (gh). Reading taken: 'pinned dependencies' includes keeping pins current; alerts and security updates are not the basis.",
+      "evidence": [
+       {
+        "url": "https://raw.githubusercontent.com/zizmorcore/zizmor/v1.30.1/docs/audits.md",
+        "quote": "Once your workflows and actions are hash-pinned, consider using [Dependabot] or [Renovate] to keep them up-to-date automatically."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/dependabot/dependabot-core/v0.398.0/README.md",
+        "quote": "Most people are familiar with the Dependabot service that runs on GitHub.com and GitHub Enterprise. Enabling that is as simple as [checking a `dependabot.yml` configuration file in to your repository's `.github` directory]"
+       },
+       {
+        "url": "https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot",
+        "quote": "When you enable Dependabot version updates for GitHub Actions, Dependabot will help ensure that references to actions in a repository's workflow.yml file and reusable workflows used inside workflows are kept up to date."
+       },
+       {
+        "url": "https://arxiv.org/abs/2206.07230",
+        "quote": "We obtain mixed findings. On the positive side, projects do reduce technical lag after Dependabot adoption and developers are highly receptive to its pull requests."
+       }
+      ],
+      "measurement": "Enable .github/dependabot.yml (github-actions plus the repository's package ecosystems, 7-day cooldown) on one of this host's repositories for four weekly cycles, and Renovate (named by zizmor's docs, not a packet candidate) with equivalent rules on a fork. Metric: stale SHA pins and lockfile entries at start and end, update PRs merged with required checks green, PRs closed as wrong or noise. Overturn to do_not_install if no useful update merges; change owner if Renovate clears more stale pins with no more failed PRs.",
+      "confidence": "medium"
+     },
+     {
+      "item": "CodeQL SARIF upload (github/codeql-action)",
+      "job": "Transport scanner SARIF into GitHub code scanning (upload-sarif); CodeQL semantic analysis, the repository's other function, is a separate job.",
+      "verdict": "do_not_install",
+      "winner_if_competing": "",
+      "reasons": "Rule 1: upload-sarif is transport, not a scanner. None of the four performs it, but its only consumer in the final set is zizmor, whose upstream integration already carries the step: zizmor-action pins and runs it (advanced-security default true) and the manual recipe prescribes it. It is a pinned dependency of zizmor's slot, not a separately owned job; actionlint annotates by default, Syft and attest emit no findings. The job belongs on public repositories; where code scanning is unavailable zizmor documents --format=github as the fallback and calls it more limited. CodeQL analysis itself is vulnerability tooling without the defined gap the layer packet requires. Maintained (4.38.2, 24 Sept 2026).",
+      "evidence": [
+       {
+        "url": "https://raw.githubusercontent.com/github/codeql-action/v4.38.2/README.md",
+        "quote": "`upload-sarif`: Uploads a SARIF file to Code Scanning. If you are using the `analyze` action, there is no reason to use this action as well."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/zizmorcore/zizmor-action/v0.6.4/action.yml",
+        "quote": "uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9"
+       },
+       {
+        "url": "https://raw.githubusercontent.com/zizmorcore/zizmor/v1.30.1/docs/integrations.md",
+        "quote": "The workflow below performs a [SARIF] upload, which is available for public repositories and for GitHub Enterprise Cloud organizations that have [Advanced Security]. If neither of these apply to you, then you can use `--format=github`"
+       },
+       {
+        "url": "https://raw.githubusercontent.com/zizmorcore/zizmor/v1.30.1/docs/integrations.md",
+        "quote": "A simpler (but more limited) way to use `zizmor` in GitHub Actions is with annotations, which `zizmor` can produce via `--format=github`."
+       }
+      ],
+      "measurement": "Run zizmor-action v0.6.4 with its defaults on the public repository over workflows with seeded findings, then read gh api repos/OWNER/REPO/code-scanning/alerts filtered to tool zizmor. The verdict stands if the findings appear as alerts with commit and line attribution and no upload step exists outside zizmor's integration. Overturn to a separate slot that owns code-scanning publication if a second SARIF producer is routed there (kjanat/actionlint format: sarif, or osv-scanner or Scorecard if retained), since upload-sarif would then serve several slots.",
+      "confidence": "high"
+     }
+    ],
+    "extra_differences": [
+     "Pins: Record A carries no install command, version or source for any slot. Record B pins zizmor 1.30.1, kjanat/actionlint v1.17.0, Syft v1.54.0 and actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 (v4.2.2). Checked now: each is the repository's latest release (gh GraphQL, 2026-10-02) and the attest tag resolves to that commit (git ls-remote).",
+     "actionlint install: pass 1 uses the download script pinned to commit 662318dd with version 1.17.0 (prebuilt binary); pass 2 uses `go install actionlint.kjanat.dev/cmd/actionlint@v1.17.0`. Both appear in the v1.17.0 release notes (https://github.com/kjanat/actionlint/releases/tag/v1.17.0); the README says 'With a Go toolchain, install it from source', so the script path has fewer moving parts unless another layer already owns Go.",
+     "Syft install: pass 1 runs install.sh from commit cc326e45 into $HOME/.local/bin without sudo (it calls this its own pinned adaptation); pass 2 runs the README's command `curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin` with v1.54.0 appended (mutable URL, sudo). The README documents the second form (https://raw.githubusercontent.com/anchore/syft/main/README.md).",
+     "attest fragment: pass 1 sets `create-storage-record: false`, pass 2 omits it. The README says the storage record 'Requires that push-to-registry is set to true' and that push-to-registry defaults to false, so both fragments behave the same for a subject-path artifact (https://raw.githubusercontent.com/actions/attest/main/README.md).",
+     "Record A sets installs_nothing_extra: false on attest, Dependabot and codeql-sarif, although each is a GitHub-hosted feature configured in the repository and installs nothing on the WSL host; its Dependabot slot also names dependabot/dependabot-core, the library, not the hosted service.",
+     "Grype and osv-scanner: pass 1 lists them under excluded (outside_requirement), pass 2 under not_selected; the outcome is the same.",
+     "CI status of kjanat/actionlint HEAD f45fbd2f: pass 1 reports successful jobs, pass 2 found the check suites queued and unverified. gh GraphQL now returns statusCheckRollup SUCCESS for that commit (2026-10-02).",
+     "Confidence labels: pass 1 rates actionlint high and zizmor medium; pass 2 rates zizmor high and actionlint medium."
+    ],
+    "notes": "Item 2 means no separate slot, not removal: upload-sarif stays SHA-pinned in workflows as zizmor's integration step on public repositories. origin/main also routes osv-scanner and Scorecard SARIF through it; both are outside the final set, and keeping them meets the overturn condition. Adopt Dependabot as .github/dependabot.yml only, never dependabot-core or its CLI. Common-tool overlap: actionlint's opt-in require-commit-hash duplicates zizmor unpinned-uses. Quotes join wrapped lines. Lanes: ctx_fetch_and_index, ctx_execute, ctx_search; gh: 2 GraphQL calls."
+   }
+  },
+  {
+   "labels": "pair-as-A",
+   "result": {
+    "layer": "ci-supply-chain",
+    "items": [
+     {
+      "item": "Dependabot (GitHub-hosted service configured by .github/dependabot.yml; the records cite dependabot/dependabot-core)",
+      "job": "Open scheduled update pull requests that keep hash-pinned actions and manifest dependencies current, and raise advisory alerts and security-update pull requests for manifest dependencies.",
+      "verdict": "install",
+      "winner_if_competing": "",
+      "reasons": "Rule 1: none of the four opens update pull requests; zizmor and actionlint only detect unpinned or mismatched references, and zizmor's docs point hash-pinned users to Dependabot. The job belongs here: the requirement names pinned dependencies, and unmaintained pins go stale. Overlap: zizmor's known-vulnerable-actions checks actions against GitHub advisories, while Dependabot alerts skip SHA-pinned actions and cover manifests; zizmor's dependabot-cooldown and dependabot-execution audits lint dependabot.yml, not replace it. Rule 2: the job has no other owner, so documented capability decides; the owner is the hosted service enabled by a checked-in dependabot.yml, which installs nothing on the WSL2 host. Record A's objection applies to the dependabot-core library and CLI, which stay uninstalled. Gates pass: main commit 2026-10-01, release v0.398.0 2026-09-28.",
+      "evidence": [
+       {
+        "url": "https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/about-dependabot-version-updates",
+        "quote": "You enable Dependabot version updates by checking a `dependabot.yml` configuration file into your repository."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/dependabot/dependabot-core/v0.398.0/README.md",
+        "quote": "Dependabot-Core is a library, so you'll need an entrypoint script of some kind."
+       },
+       {
+        "url": "https://docs.github.com/en/code-security/dependabot/ecosystems-supported-by-dependabot/supported-ecosystems-and-repositories",
+        "quote": "Dependabot updates the version documentation of GitHub Actions when the comment is on the same line, such as `actions/checkout@<commit> #<tag or link>` or `actions/checkout@<tag> #<tag or link>`."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/zizmorcore/zizmor/v1.30.1/docs/audits.md",
+        "quote": "Once your workflows and actions are hash-pinned, consider using [Dependabot] or [Renovate] to keep them up-to-date automatically."
+       }
+      ],
+      "measurement": "Commit .github/dependabot.yml (github-actions plus each manifest ecosystem, weekly, grouped, seven-day cooldown) on the public host repository and observe four weekly cycles. Metric: number of pinned references behind their latest upstream release at each cycle end, and the share of Dependabot pull requests that pass zizmor and actionlint unchanged with the 40-hex pin and version comment intact. Overturn if the stale-pin count does not fall against a no-updater baseline, if those pull requests fail the checks, or if Renovate on the same repository and weeks leaves fewer stale pins.",
+      "confidence": "high"
+     },
+     {
+      "item": "CodeQL SARIF upload (github/codeql-action upload-sarif) as its own slot",
+      "job": "Upload scanner SARIF output to GitHub code scanning so findings appear as alerts in the repository's security tab.",
+      "verdict": "do_not_install",
+      "winner_if_competing": "zizmor (zizmor-action embeds the upload-sarif step)",
+      "reasons": "Rule 1: the job is SARIF upload to code scanning. zizmor's action already embeds a pinned github/codeql-action/upload-sarif step behind advanced-security (default true), so a separate slot gives the job a second owner; actionlint's action defaults to format github. CodeQL analysis (init, analyze) is a different job the requirement does not name. Rule 2: the requirement asks for scoped permissions and attributable hosted checks; a failing zizmor or actionlint step delivers that with nothing extra, while upstream states the upload mode needs security-events: write, does not fail on findings, and blocks only through a ruleset. I found no public measured gain. Gates pass (main commit 2026-09-29; code scanning is available on public repositories); that is eligibility, not a reason.",
+      "evidence": [
+       {
+        "url": "https://raw.githubusercontent.com/zizmorcore/zizmor-action/v0.6.4/action.yml",
+        "quote": "uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9"
+       },
+       {
+        "url": "https://raw.githubusercontent.com/zizmorcore/zizmor-action/v0.6.4/README.md",
+        "quote": "In this mode, the action will **not** fail when `zizmor` produces findings."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/zizmorcore/zizmor-action/v0.6.4/README.md",
+        "quote": "you can still use `zizmor-action` without any issues or feature limitations!"
+       },
+       {
+        "url": "https://raw.githubusercontent.com/github/codeql-action/61817fadad823920a8924645dd5f67985d6a1d94/README.md",
+        "quote": "`upload-sarif`: Uploads a SARIF file to Code Scanning. If you are using the `analyze` action, there is no reason to use this action as well."
+       }
+      ],
+      "measurement": "On the public host repository, open the same seeded-finding pull requests (zizmor unsafe-workflow fixture: template-injection, unpinned-uses) under two arms: (A) zizmor with advanced-security: false, the step's exit code as the required check; (B) zizmor-action default upload plus a code-scanning merge-protection ruleset. Metric: share of seeded findings that block merge through a check tied to the head SHA, and time-to-fix by Claude Code and by Codex. Overturn only if B beats A and a SARIF producer without an embedded upload (actionlint format sarif, or the zizmor CLI's manual integration) has to publish; then upload-sarif earns its own slot.",
+      "confidence": "high"
+     }
+    ],
+    "extra_differences": [
+     "Record B sets installs_nothing_extra=false on all six slots. For Dependabot and attest (and codeql-sarif) that conflicts with the host-install reading of rule 2: each is a GitHub-hosted feature enabled by repository YAML (a checked-in dependabot.yml; a workflow uses: step) and puts nothing on the WSL2 host.",
+     "Artifact identity: both records cite dependabot/dependabot-core. Record A rejected the library's standalone path (README v0.398.0: 'Dependabot-Core is a library, so you'll need an entrypoint script of some kind'); the job's owner is the hosted service. The final slot should name the hosted service and its dependabot.yml, and no host install of dependabot-core or dependabot/cli.",
+     "Install commands and pins: Record B carries none. Record A's two passes disagree on actionlint: pass 1's commit-pinned download script is verbatim in docs/install.md at v1.17.0 and needs no toolchain; pass 2's go install is documented there as build-from-source and needs a Go toolchain (https://raw.githubusercontent.com/kjanat/actionlint/v1.17.0/docs/install.md).",
+     "Syft install: pass 2's command is the README v1.54.0 form (curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin) plus the TAG argument that install.sh documents. Pass 1's is an adaptation, not the README form: commit-pinned raw install.sh, the script's internal DOWNLOAD_TAG_INSTALL_SCRIPT variable, $HOME/.local/bin without sudo. install.sh's -b DIR does allow a user directory (https://raw.githubusercontent.com/anchore/syft/v1.54.0/README.md).",
+     "attest fragment: pass 1 sets create-storage-record: false, pass 2 omits it. README v4.2.2 says the record 'Requires that push-to-registry is set to true', defaults to true, and 'can only be created for artifacts built from organization-owned repositories'; neither fragment pushes to a registry, so by that text neither creates one (inference, not run). Both omit the README's artifact-metadata: write permission.",
+     "Scope condition on attest: Record A conditions it on supported or public repositories (README v4.2.2: private or internal repositories need GitHub Enterprise Cloud); Record B states no condition. The host repository native-agent-stack is PUBLIC (gh GraphQL, 2026-10-02).",
+     "Status: Record A marks the set provisional (close_call true; zizmor against poutine and Syft against Trivy still to be measured; three of four at medium confidence in each pass). Record B lists the same tools as plain defaults with empty state. This review does not settle those two close calls.",
+     "actionlint role: Record A pass 1 includes 'configurable commit-hash requirements' (kjanat policy require-commit-hash, opt-in per README v1.17.0), which duplicates zizmor's unpinned-uses; pass 2 and Record B give actionlint workflow correctness only. One owner for pin enforcement: zizmor; leave the actionlint policy at its opt-in default.",
+     "actionlint CI state: pass 1 reports HEAD unit tests SUCCESS, pass 2 reports all HEAD check suites queued and unverified. gh GraphQL on 2026-10-02 returns statusCheckRollup SUCCESS for kjanat/actionlint master f45fbd2f.",
+     "Bookkeeping: pass 1 files Grype and osv-scanner as excluded (outside_requirement), pass 2 as not_selected; the outcome is the same. Record B lists no rejected candidates, reasons or sources."
+    ],
+    "notes": "Final slots: zizmor, actionlint (kjanat), Syft, attest, Dependabot. Dependabot 'install' means committing .github/dependabot.yml (include a cooldown; zizmor's dependabot-cooldown audit detects a missing one) and enabling alerts; nothing goes on the host. zizmor-action defaults to upload mode (advanced-security: true; needs security-events: write; does not fail on findings); set advanced-security: false, or run the zizmor CLI, for a failing check. Renovate was outside the packet, not evaluated. Line-wrapped quotes are whitespace-normalised. Tools: ctx fetch/search/execute; one gh GraphQL call."
+   }
+  }
+ ],
+ "cross:wsl-distro": [
+  {
+   "labels": "single-as-A",
+   "result": {
+    "layer": "cross:wsl-distro",
+    "items": [
+     {
+      "item": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+      "job": "Base Linux distribution of the WSL2 host: the one userland under systemd, rootless Docker, CUDA on WSL, uv, Node, Claude Code and Codex. Overlap: Ubuntu 24.04.5 LTS claims the same job in full.",
+      "verdict": "install",
+      "winner_if_competing": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+      "reasons": "Rule 1: one base image owns this job; 24.04.5 competes for it. Rule 2: no option is install-free; plain `wsl --install` resolves to this image. Rule 3: both pass every gate (images dated 2026-08-27 and 2026-09-08, amd64 registry entries, documented `wsl --install`, Claude Code needs Ubuntu 20.04+, Codex ships a musl Linux binary). No public measurement separates them. Seamlessness decides: it is the registry default, standard support runs to May 2031 against May 2029, and Docker Engine and NVIDIA Container Toolkit both list 26.04. Its cgroup v1 removal costs nothing here: rootless Docker limits need cgroup v2 anyway. uv installs its own Python, so the 3.14 default is neutral. Moving parts are equal: one image.",
+      "evidence": [
+       {
+        "url": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+        "quote": "\"Name\": \"Ubuntu\", \"FriendlyName\": \"Ubuntu\", \"Default\": true, \"Amd64Url\": { \"Url\": \"https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl\","
+       },
+       {
+        "url": "https://ubuntu.com/about/release-cycle",
+        "quote": "Ubuntu 26.04 LTS Released: Apr 2026 | May 2031 | May 2036 | May 2036 | May 2041"
+       },
+       {
+        "url": "https://docs.docker.com/engine/install/ubuntu/",
+        "quote": "To install Docker Engine, you need the 64-bit version of one of these Ubuntu versions: Ubuntu Resolute 26.04 (LTS) Ubuntu Noble 24.04 (LTS) Ubuntu Jammy 22.04 (LTS)"
+       },
+       {
+        "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/supported-platforms.html",
+        "quote": "Ubuntu 24.04 | X | | X | Ubuntu 26.04 | X | | X"
+       }
+      ],
+      "measurement": "Target Windows 11 host on WSL 3.0.1 (per-distro cgroups isolated). Install both checksum-pinned images (26.04.1 48d56724..., 24.04.5 bb415d82...), run the identical bootstrap, record pass/fail per step: first boot to shell; `systemctl --user is-system-running`; `dockerd-rootless-setuptool.sh install`, `docker info` reporting cgroup v2 with the systemd driver, `docker run --memory 1g hello-world`; `nvidia-smi`; `docker run --rm --gpus all` on a CUDA image; `uv python install` and `uv run`; Node LTS install; `claude --version` and `codex --version` plus one headless prompt each. Overturned only if 26.04.1 fails a step that 24.04.5 passes and the documented in-release remedies (gnu-prefixed coreutils, `update-alternatives --set sudo /usr/bin/sudo.ws`) do not clear it.",
+      "confidence": "high"
+     },
+     {
+      "item": "Ubuntu 24.04.5 LTS (Canonical WSL image) as co-finalist or named fallback",
+      "job": "The same job as item 1 (base distribution of the host); as a co-finalist or standby it would be a second owner of that job. Overlap: complete, with Ubuntu 26.04.1 LTS.",
+      "verdict": "do_not_install",
+      "winner_if_competing": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+      "reasons": "Rule 1: the job has one owner; a co-finalist or standby image is a second owner of the same job, justified only by a documented 26.04 blocker on this host, and no fetched source shows one. Rule 3: it passes the same gates and no measurement favours it; it loses on seamlessness because standard support ends May 2029, two years earlier. Its cgroup v1 tolerance buys nothing here, since rootless Docker limits need cgroup v2. The 26.04 changes (uutils coreutils, sudo-rs) keep GNU coreutils and sudo.ws available in-release. The WSL 2.7.x shared-cgroup stop is a WSL property and no trigger for a fallback. It stays only as the comparison arm of the measurement.",
+      "evidence": [
+       {
+        "url": "https://ubuntu.com/about/release-cycle",
+        "quote": "Ubuntu 24.04 LTS Released: Apr 2024 | May 2029 | May 2034 | May 2034 | May 2039"
+       },
+       {
+        "url": "https://docs.docker.com/engine/security/rootless/troubleshoot/",
+        "quote": "cgroup is supported only when running with cgroup v2 and systemd."
+       },
+       {
+        "url": "https://documentation.ubuntu.com/server/reference/other-tools/sudo-rs/",
+        "quote": "In newer releases where the Rust-based implementations are the default, GNU Coreutils and sudo.ws remain available as providers, while the Rust-based implementations are the primary ones going forward."
+       },
+       {
+        "url": "https://github.com/microsoft/WSL/pull/40519",
+        "quote": "All distro's systemd instances shared the same sets of cgroup. This will cause conflicts. For example, when booting multiple wsl distros at the same time. Only one can create the systemd user session successfully."
+       }
+      ],
+      "measurement": "The same run as item 1. 24.04.5 returns (as the single default, never as a parallel install) only if 26.04.1 fails a step there that 24.04.5 passes under the identical bootstrap and WSL version, and the failure survives the documented in-release remedies. Metric: pass/fail per step. A failure that hits both images, or the WSL 2.7.x shared-cgroup stop, does not count.",
+      "confidence": "medium"
+     }
+    ],
+    "extra_differences": [
+     "Source field: Record A and pass 2 name https://ubuntu.com/download/server, pass 1 names https://github.com/ubuntu/WSL (the legacy launcher). Neither is the image source. The registry entry in microsoft/WSL distributions/DistributionInfo.json points to https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl (SHA-256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, listed 2026-08-27 14:17, 399M); first-boot provisioning lives in ubuntu/wsl-setup (not archived, last push 2026-09-03).",
+     "Finality: Record A states a plain default (its name carries ', primary' but names no secondary); both Record B passes mark the selection provisional, close_call true, confidence medium, because their ctx_fetch_and_index calls were blocked. The same pages fetched in this session, so the documentation gap behind 'provisional' is closed. Target-host acceptance is still not run.",
+     "Install command: both Record B passes give `wsl --install --from-file ubuntu-26.04.1-wsl-amd64.wsl`; Record A gives none. Canonical's how-to also documents `wsl --install Ubuntu-26.04`, and the registry name `Ubuntu` (Default: true) resolves to the same image and SHA-256.",
+     "Deciding comparison: pass 1 measures three arms (26.04.1, 24.04.5, Debian 13); pass 2 measures the two Ubuntu images; Record A names no comparison.",
+     "Evidence weight: pass 1 cites Canonical's GPU how-to as a 26.04 deviceQuery PASS. The page says its commands target Ubuntu 26.04 AMD64, but its captured build log reads 'host compiler GNU 13.3.0' while the 26.04 release notes give GCC 15.2, so that log is not a 26.04 run. NVIDIA's CUDA 13.4 Linux guide lists Ubuntu 26.04.1 (kernel 7.0.0-31, GCC 15.2.0, glibc 2.43).",
+     "Record A sets installs_nothing_extra false for the slot; Record B has no such field. The passes also differ in what they verified for the rejected distributions (pass 1: Debian 13 release facts; pass 2: Arch GitLab pipeline), with the same outcome."
+    ],
+    "notes": "The 2.7.13 first-boot stop matches a WSL defect: PR 40519 (released in 2.9.8, namespaces added in 2.9.13, stable in 3.0.1 on 2026-09-29) isolates per-distro cgroups; the 2.7.14 notes do not mention cgroup. Not verified on this host. On 26.04: `apt-key` is gone (skip NVIDIA's `apt-key del` step), the sudo-rs prompt differs, and `coreutils-from-gnu` may conflict with build-essential. rust-coreutils CVE fix status in 26.04.1 was not verified. Tools: ctx_fetch_and_index, ctx_search, ctx_execute, gh (8 calls)."
+   }
+  },
+  {
+   "labels": "pair-as-A",
+   "result": {
+    "layer": "cross:wsl-distro",
+    "items": [
+     {
+      "item": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+      "job": "Base Linux distribution of the WSL2 developer host: systemd, userland and package base under rootless Docker, CUDA, uv, Node and both agents.",
+      "verdict": "install",
+      "winner_if_competing": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+      "reasons": "Rule 1: one job, base distribution; the only overlap is Ubuntu 24.04.5, so one owner. Rule 2: on a new host the job has no owner, so documented capability decides, and the WSL registry default `Ubuntu` already resolves to the 26.04.1 image. Rule 3: both releases pass every gate (amd64 WSL images dated 2026-08-27 and 2026-09-08, documented install, Claude Code needs Ubuntu 20.04+, Codex ships a musl Linux x86_64 binary). No public measurement found that separates them. Seamlessness decides: registry default, Canonical's current WSL release, support to April 2031 against May 2029, and Docker Engine, NVIDIA Container Toolkit and CUDA all list 26.04. Its cgroup-v2-only systemd matches rootless Docker's requirement; uv supplies Python, so the 3.14 default is neutral.",
+      "evidence": [
+       {
+        "url": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+        "quote": "\"Name\": \"Ubuntu\",\n                \"FriendlyName\": \"Ubuntu\",\n                \"Default\": true,\n                \"Amd64Url\": {\n                    \"Url\": \"https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl\""
+       },
+       {
+        "url": "https://documentation.ubuntu.com/release-notes/26.04/",
+        "quote": "Ubuntu 26.04 LTS will be supported until April 2031."
+       },
+       {
+        "url": "https://docs.docker.com/engine/install/ubuntu/",
+        "quote": "Ubuntu Resolute 26.04 (LTS)"
+       },
+       {
+        "url": "https://documentation.ubuntu.com/wsl/latest/howto/gpu-cuda/",
+        "quote": "The following commands will install the WSL-specific CUDA toolkit version 13.2 on Ubuntu 26.04 AMD64 architecture."
+       }
+      ],
+      "measurement": "Run the same bootstrap on the checksum-pinned ubuntu-26.04.1-wsl-amd64.wsl and ubuntu-24.04.5-wsl-amd64.wsl on the target host, one distribution running at a time. Metric: pass or fail per gate: first boot with no failed systemd units; a lingering `systemctl --user` unit active after `wsl --shutdown`; rootless `docker run --rm --gpus all` of a CUDA image running `nvidia-smi` and listing the RTX 4090; `uv python install 3.13`; Node 24; `claude --version`, `codex --version` and one sandboxed shell command per agent; the repository test suite. Overturned only if 26.04.1 fails a gate that 24.04.5 passes and the failure survives coreutils-from-gnu and sudo.ws.",
+      "confidence": "high"
+     },
+     {
+      "item": "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+      "job": "The same job, base Linux distribution of the WSL2 host; as a named fallback it owns no job until a rollback is triggered.",
+      "verdict": "do_not_install",
+      "winner_if_competing": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+      "reasons": "Rule 1: it competes for the same single job, so it cannot stay a co-finalist. Rule 2: a second image is an extra install and no public measurement shows a gain. Rule 3: it passes the same gates but loses on seamlessness: not the registry default, and standard support ends 31 May 2029. The 26.04 changes that can break scripts have documented in-place remedies (GNU coreutils via coreutils-from-gnu, classic sudo as sudo.ws), and Docker's and the NVIDIA Container Toolkit's install commands use keyring files, so the removed apt-key does not block them. Fallback: keep 24.04.5 only as a named rollback target, never installed or bootstrapped ahead of a trigger; its checksum-pinned image stays one registry command away.",
+      "evidence": [
+       {
+        "url": "https://documentation.ubuntu.com/release-notes/26.04/summary-for-lts-users/",
+        "quote": "Because `rust-coreutils` are not fully compatible yet, we continue to provide the classic GNU utilities as well. These are accessed by running `gnu` prefixed to the desired command."
+       },
+       {
+        "url": "https://documentation.ubuntu.com/server/how-to/security/user-management/",
+        "quote": "The original `sudo` utility (maintained by Todd C. Miller), `sudo.ws` remains supported in the 25.10 and the subsequent 26.04 LTS."
+       },
+       {
+        "url": "https://documentation.ubuntu.com/release-notes/24.04/",
+        "quote": "Ubuntu 24.04 LTS will be security maintained for 5 years until 31 May 2029."
+       },
+       {
+        "url": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+        "quote": "\"Name\": \"Ubuntu-24.04\",\n                \"FriendlyName\": \"Ubuntu 24.04 LTS\",\n                \"Default\": false,\n                \"Amd64Url\": {\n                    \"Url\": \"https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl\""
+       }
+      ],
+      "measurement": "The same comparison. 24.04.5 replaces 26.04.1 as the single default only if 26.04.1 fails a gate that is caused by the Ubuntu release rather than the WSL version, has no in-release remedy, and 24.04.5 passes every gate. No result leaves both images installed.",
+      "confidence": "high"
+     }
+    ],
+    "extra_differences": [
+     "Role of 26.04.1: pass 1 calls it 'provisional preferred', pass 2 'provisional co-finalist', Record B plain 'primary' with an empty state. Both passes set close_call true and confidence medium; Record B carries neither field.",
+     "Record B has no install command, image URL or checksum. Record A gives `wsl --install --from-file ubuntu-26.04.1-wsl-amd64.wsl` with SHA-256 48d56724...acd54104 (pass 2 also bb415d82...ac6039e for 24.04.5); both hashes match releases.ubuntu.com SHA256SUMS and the WSL registry as fetched in this session.",
+     "Repository field: pass 1 names https://github.com/ubuntu/WSL, pass 2 and Record B name https://ubuntu.com/download/server. Neither is the image source: the image is on releases.ubuntu.com and is registered in microsoft/WSL distributions/DistributionInfo.json.",
+     "install_source differs between the passes: pass 1 points at the image URL on releases.ubuntu.com, pass 2 at Canonical's install how-to at a pinned commit.",
+     "Deciding comparison: pass 1 names three arms (26.04.1, 24.04.5, Debian 13), pass 2 two arms (the two Ubuntu images), Record B none.",
+     "Alternatives: both passes list Debian 13, Arch Linux and Fedora as not selected, with different reasons (pass 2 alone read Arch's README and pipeline); Record B lists no alternatives. The outcome for these three is the same in every record.",
+     "Support horizon: pass 1 treats 26.04's later horizon as an inference and pass 2 says end dates were not verified. Fetched here: 26.04 'supported until April 2031', 24.04 'until 31 May 2029'.",
+     "Both passes of Record A state that the page-fetch tool was blocked and that their findings rest on GitHub API files and search results; Record B cites no sources.",
+     "Pass 2 alone raises Node's BUILDING.md note that WSL is not a supported platform. It applies equally to both releases and does not separate them (Node main asks for glibc >= 2.34 on x64; 24.04 has 2.39, 26.04 has 2.43).",
+     "Record B marks installs_nothing_extra false; Record A has no such field."
+    ],
+    "notes": "26.04 points to plan for: release notes list 20 rust-coreutils CVEs and an ACL `mkdir -p` bug (remedy: coreutils-from-gnu); sudo-rs (remedy: sudo.ws); apt-key is removed, so skip the `apt-key del` step in NVIDIA's WSL guide; /tmp is tmpfs. Install as `Ubuntu-26.04` or the checksum-verified file, because `Ubuntu` follows the newest LTS. 24.04.5: named rollback only, not installed. NVIDIA Container Toolkit lists both releases. Per-distribution cgroups belong to the WSL layer (2.9.8 #40519, 2.9.13 #41512). gh calls used: 4."
+   }
+  }
+ ]
+}

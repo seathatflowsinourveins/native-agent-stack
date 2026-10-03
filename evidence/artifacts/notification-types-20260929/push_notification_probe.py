@@ -23,7 +23,7 @@ usage:
   push_notification_probe.py push --no-user-settings --no-focus-report --sleep 15   arm E: no focus report and 15 s (the user counts as present: no event, nothing rings)
   push_notification_probe.py --selftest                                     check the BEL counter against split, doubled, interrupted and string-embedded cases
 """
-import argparse, codecs, concurrent.futures, fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
+import argparse, ast, codecs, concurrent.futures, fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
 from pathlib import Path
 
 
@@ -114,12 +114,26 @@ spec = importlib.util.spec_from_file_location("probe", path)
 probe = importlib.util.module_from_spec(spec)
 sys.modules["probe"] = probe
 spec.loader.exec_module(probe)
-WATCH = {"main", "with_private_dir", "measure"}   # the resource lifecycle: the private directory, the pty and the client
-seen, fired, alive_at_fire = [], [], []
+WATCH = {"main", "with_private_dir", "measure", "end_by_latched_signal", "emit_report"}   # the resource lifecycle (the private directory, the pty and the client), the handoff and the output after it
+seen, fired, alive_at_fire, created = [], [], [], []
+
+
+import subprocess
+_Popen = subprocess.Popen
+
+
+class CountingPopen(_Popen):
+    def __init__(self, args, *rest, **options):
+        if isinstance(args, (list, tuple)) and args and str(args[0]) == "claude":
+            created.append("claude")      # a client is being created: recorded before it exists
+        super().__init__(args, *rest, **options)
+
+
+subprocess.Popen = CountingPopen
 
 
 def dump():
-    open(record, "w").write(json.dumps({"lines": seen, "fired": fired, "alive_at_fire": alive_at_fire}))
+    open(record, "w").write(json.dumps({"lines": seen, "fired": fired, "alive_at_fire": alive_at_fire, "created": created}))
 
 
 def alive():
@@ -151,13 +165,85 @@ def tracer(frame, event, arg):
 
 
 sys.argv = [path, kind] + (["--no-user-settings"] if kind == "push" else [])
+_end = probe.end_by_latched_signal
+
+
+def end_and_dump():
+    dump()      # the record is complete before the process can end BY the signal inside the handoff
+    _end()
+
+
+probe.end_by_latched_signal = end_and_dump
 sys.settrace(tracer)
 try:
     status = probe.main()
 finally:
     sys.settrace(None)
     dump()
-sys.exit(status)
+sys.exit(status)      # what the probe's own __main__ block runs after main returns: `main` has handed off in its own `finally`
+"""
+
+
+HANDOFF_DRIVER = r"""
+import importlib.util, os, signal, sys
+path, kind, first_line, second_line = sys.argv[1:5]
+first_line, second_line = int(first_line), int(second_line)
+spec = importlib.util.spec_from_file_location("probe", path)
+probe = importlib.util.module_from_spec(spec)
+sys.modules["probe"] = probe
+spec.loader.exec_module(probe)
+WATCH = {"main", "measure"}
+sent = []
+
+
+def local(frame, event, arg):
+    if event == "line":
+        for number, name in ((first_line, signal.SIGINT), (second_line, signal.SIGTERM)):
+            if frame.f_lineno == number and number not in sent:
+                sent.append(number)
+                os.kill(os.getpid(), name)      # delivered at this line, before it runs
+    return local
+
+
+def tracer(frame, event, arg):
+    return local if frame.f_code.co_filename == path and frame.f_code.co_name in WATCH else None
+
+
+sys.argv = [path, kind] + (["--no-user-settings"] if kind == "push" else [])
+sys.settrace(tracer)
+try:
+    status = probe.main()
+finally:
+    sys.settrace(None)
+sys.exit(status)      # what the probe's own __main__ block runs after main returns: `main` has handed off in its own `finally`
+"""
+
+FLUSH_CHILD = r"""
+import importlib.util, os, signal, sys
+path, mode, kind = sys.argv[1:4]
+spec = importlib.util.spec_from_file_location("probe", path)
+probe = importlib.util.module_from_spec(spec)
+sys.modules["probe"] = probe
+spec.loader.exec_module(probe)
+if mode == "blocked-signal":
+    probe.STOP["signal"] = signal.SIGTERM      # a latched signal that a mask inherited from the parent blocks
+    signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGTERM})
+    probe.end_by_latched_signal()
+    sys.exit(0)      # reached only when the process was not ended by the signal
+
+
+def measure(args, private):
+    sys.stdout.write("a result line written earlier, still in the buffer of stdout\n")      # what a flush before the final kill would have to write
+    if mode in ("closed-stdout", "full-pipe"):
+        os.kill(os.getpid(), signal.SIGTERM)      # latched at the next bytecode: the latch is set when the measurement returns
+    return 0
+
+
+probe.measure = measure
+if mode in ("closed-stdout", "closed-stdout-exit"):
+    os.close(1)
+sys.argv = [path, kind] + (["--no-user-settings"] if kind == "push" else [])
+sys.exit(probe.main())      # what the probe's own __main__ block runs: `main` hands off in its own `finally`
 """
 
 
@@ -280,30 +366,34 @@ def status_case(kind, workers=3):
 
 
 def sweep_trial(path, kind, target, stand_in, serial):
-    """One run of the probe in a child process with a stand-in client; SIGTERM is delivered to it at the first execution of line `target` of its resource lifecycle (`main`, `with_private_dir`, `measure`; -1
+    """One run of the probe in a child process with a stand-in client; SIGTERM is delivered to it at the first execution of line `target` of its resource lifecycle (`main`, `with_private_dir`, `measure`, `end_by_latched_signal`, `emit_report`; -1
     delivers none: a dry run that records the lines). Returns what the run showed: its exit status, what the driver recorded, the payload directories and the stand-in left behind."""
     with tempfile.TemporaryDirectory(prefix="sweep-") as raw:
         root = Path(raw)
         env, tmp, pidfile, unique = arena(root, stand_in, serial)
         record = root / "record.json"
         try:
-            status = subprocess.run([sys.executable, "-B", "-c", SWEEP_DRIVER, path, kind, str(target), str(record), str(pidfile), unique], env=env, capture_output=True, timeout=180).returncode
-        except subprocess.TimeoutExpired:
-            status = "timeout"   # the stand-in is still killed below, through its pidfile
-        info = json.loads(record.read_text()) if record.exists() else {}
-        client = int(pidfile.read_text().strip()) if pidfile.exists() and pidfile.read_text().strip().isdigit() else None
-        alive = client is not None and stand_in_alive(client, unique)
-        if alive:
-            os.kill(client, signal.SIGKILL)   # never leave the stand-in behind, whatever the verdict
-        return {"target": target, "status": status, "info": info, "left": len(list(tmp.glob("alert-probe-*"))), "alive": alive, "started": client is not None}
+            try:
+                status = subprocess.run([sys.executable, "-B", "-c", SWEEP_DRIVER, path, kind, str(target), str(record), str(pidfile), unique], env=env, capture_output=True, timeout=180).returncode
+            except subprocess.TimeoutExpired:
+                status = "timeout"      # the stand-in is still killed below, through its pidfile
+            try:
+                info = json.loads(record.read_text()) if record.exists() else {}
+            except (OSError, ValueError):
+                info = {"unreadable_record": True}      # a driver killed while it wrote its record: a finding of this trial, not an exception that skips the cleanup
+        finally:
+            client = int(pidfile.read_text().strip()) if pidfile.exists() and pidfile.read_text().strip().isdigit() else None
+            alive = client is not None and stand_in_alive(client, unique)
+            if alive:
+                os.kill(client, signal.SIGKILL)      # never leave the stand-in behind, whatever happened above
+        return {"target": target, "status": status, "info": info, "left": len(list(tmp.glob("alert-probe-*"))), "alive": alive, "started": bool(info.get("created"))}
 
 
 def sweep_case(kind, stand_in="trust", workers=6):
-    """A SIGTERM at each line of `main`, `with_private_dir` and `measure` that a dry run reaches: the dry run uses a stand-in client that makes the probe give up at the trust dialog and take its normal exit path (about 7 s), so
+    """A SIGTERM at each line of `main`, `with_private_dir`, `measure`, `end_by_latched_signal` and `emit_report` that a dry run reaches: the dry run uses a stand-in client that makes the probe give up at the trust dialog and take its normal exit path (about 7 s), so
     it reaches every line that acquires or releases the private directory, the pty, the client and the handlers, but NOT the lines after the prompt is typed (typing, the observation loop, the report) nor the branches it does not
-    take (the detail says how many lines with code that leaves out). One run per reached line delivers the signal there. Every run must exit with 128 + SIGTERM (the latch, after the cleanup: the driver calls `main`, whose
-    return value that is) or -SIGTERM (a signal before the latch exists or after the previous handlers returned, when nothing is left to protect), leave no payload directory and no stand-in client, and, for a signal that lands
-    at or before the spawn guard, have started NO client at all. The client must have been RUNNING when the signal fired at ten lines or more, so a stand-in that is not there (a control that proves nothing) fails the case.
+    take (the detail says how many lines with code that leaves out). One run per reached line delivers the signal there. Every run must end BY SIGTERM (status -15: with the latch installed the probe ends by it at the handoff, before it the default action does, after it the default action does too), leave no payload directory and no stand-in client, and, for a signal that lands
+    at or before the spawn guard, have started NO client at all (observed by counting the `subprocess.Popen` calls of the client in the driver, not by the stand-in's pidfile). The client must have been RUNNING when the signal fired at ten lines or more, so a stand-in that is not there (a control that proves nothing) fails the case.
     Returns (ok, detail)."""
     if not (Path.home() / "code/native-agent-stack").is_dir():
         return None, "skipped (the probe's working directory does not exist on this machine)"
@@ -314,31 +404,203 @@ def sweep_case(kind, stand_in="trust", workers=6):
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
         trials = list(pool.map(lambda pair: sweep_trial(path, kind, pair[1], stand_in, pair[0] + 1), enumerate(lines)))
     source = Path(path).read_text(encoding="utf-8").splitlines()
-    guard = next((number for number, text in enumerate(source, 1) if text.strip().startswith("if not stopped():") and "no client is started" in text), None)
+    guard = next((number for number, text in enumerate(source, 1) if text.strip().startswith("if ") and "# SPAWN GUARD:" in text), None)
     before_spawn = lines[:lines.index(guard) + 1] if guard in lines else []
-    problems = [] if before_spawn else ["the dry run did not reach the spawn guard (`if not stopped():`), so the sweep cannot tell whether a client was started after a stop request"]
+    problems = [] if before_spawn else ["the dry run did not reach the spawn guard (the line marked `# SPAWN GUARD`), so the sweep cannot tell whether a client was started after a stop request"]
     for trial in trials:
         line = trial["target"]
         if trial["info"].get("fired") != [line]:
             problems.append(f"line {line}: the signal was not delivered")
-        elif trial["status"] not in (128 + signal.SIGTERM, -signal.SIGTERM):
+        elif trial["status"] != -signal.SIGTERM:
             problems.append(f"line {line}: exit status {trial['status']}")
         if trial["left"]:
             problems.append(f"line {line}: a payload directory was left")
         if trial["alive"]:
             problems.append(f"line {line}: the stand-in client was left running")
+        if trial["info"].get("unreadable_record"):
+            problems.append(f"line {line}: the driver's record was unreadable")
         if line in before_spawn and trial["started"]:
             problems.append(f"line {line}: a client was started although the signal landed at or before the spawn guard")
     live = sum(1 for trial in trials if trial["info"].get("alive_at_fire") == [True])
     if live < 10:
         problems.append(f"the client was running when the signal fired at only {live} lines (at least 10 expected): the sweep did not exercise the client's lifetime")
-    code_lines = len(frozenset(number for function in (main, with_private_dir, measure) for _start, _end, number in function.__code__.co_lines() if number and number > function.__code__.co_firstlineno))
-    return not problems, (f"{len(lines)} lines swept of the {code_lines} lines with code in main, with_private_dir and measure ({len(before_spawn)} of them up to the spawn guard), the client was running at {live} of them, "
+    code_lines = len(frozenset(number for function in (main, with_private_dir, measure, end_by_latched_signal, emit_report) for _start, _end, number in function.__code__.co_lines() if number and number > function.__code__.co_firstlineno))
+    return not problems, (f"{len(lines)} lines swept of the {code_lines} lines with code in main, with_private_dir, measure, end_by_latched_signal and emit_report ({len(before_spawn)} of them up to the spawn guard), the client was running at {live} of them, "
                           f"{len(problems)} problems" + ("" if not problems else " | " + "; ".join(problems[:4])))
 
 
+def wchan_exposed():
+    """Whether this kernel shows a wait channel in /proc/<pid>/wchan: a short sleeping child must show something other than 0."""
+    child = subprocess.Popen(["sleep", "5"])
+    try:
+        time.sleep(0.3)
+        return Path(f"/proc/{child.pid}/wchan").read_text().strip() not in ("", "0")
+    except OSError:
+        return False
+    finally:
+        child.kill()
+        child.wait()
+
+
+def wait_until_blocked_in_write(pid, limit=15.0):
+    """True once /proc/<pid>/wchan names a pipe wait, that is, once the child is blocked in its write to the full pipe; False when it never does within `limit` seconds (the caller sends the signal anyway and the detail says that it was not seen blocked);
+    None when this kernel exposes no wait channel (a fixed 2 s wait is used, as the first version of the case did)."""
+    if not wchan_exposed():
+        time.sleep(2)
+        return None
+    deadline = time.time() + limit
+    while time.time() < deadline:
+        try:
+            if "pipe" in Path(f"/proc/{pid}/wchan").read_text():
+                return True
+        except OSError:
+            return False      # the child is gone
+        time.sleep(0.05)
+    return False
+
+
+def flush_case(kind):
+    """The probe must end BY the latched signal, or exit with the measurement's own status, when stdout cannot take a write (finding U2 of the post-merge GPT read and finding B2 of the Codex review bot's read of this change). The real `main` runs with a measurement that leaves
+    a line in the buffer of stdout (the children run without PYTHONUNBUFFERED, which would send that line to the descriptor at once, under the latch) and, in two of the children, signals itself, so that the latch is set when the cleanup has run: the signal handoff must come before
+    any output, since a flush would raise on a closed descriptor and a write to a full pipe would block for good (a handler that only returns does not interrupt it: PEP 475). The children: stdout closed and a latched SIGTERM; stdout closed and no signal (the exit status must be the
+    measurement's, 0, not 120 from a failed final flush); a full pipe nobody reads and a latched SIGTERM; a full pipe and nothing latched, the SIGTERM being sent once the child is seen blocked in its write (the handoff has given the handled signals back to their default action, so the
+    signal is not latched and lost); and `end_by_latched_signal` called directly with SIGTERM latched and blocked in the mask inherited from the parent (the kill would leave a blocked signal pending). Each child runs with its own temporary directory, which must hold no payload
+    directory afterwards, and must end within 20 s with the status stated for it. Returns (ok, detail)."""
+    path = str(Path(__file__).resolve())
+    expected = {"closed-stdout-exit": 0}      # every other child must die by SIGTERM
+    results = []
+    for mode in ("closed-stdout", "closed-stdout-exit", "full-pipe", "late-signal", "blocked-signal"):
+        with tempfile.TemporaryDirectory(prefix="flush-") as raw:
+            tmp = Path(raw)
+            argv = [sys.executable, "-B", "-c", FLUSH_CHILD, path, mode, kind]
+            env = {key: value for key, value in os.environ.items() if key != "PYTHONUNBUFFERED"}
+            env["TMPDIR"] = str(tmp)
+            blocked = None
+            if mode in ("full-pipe", "late-signal"):
+                read_end, write_end = os.pipe()
+                fcntl.fcntl(write_end, fcntl.F_SETFL, fcntl.fcntl(write_end, fcntl.F_GETFL) | os.O_NONBLOCK)
+                try:
+                    while True:
+                        os.write(write_end, b"x" * 4096)
+                except BlockingIOError:
+                    pass      # the pipe is full and nobody reads it
+                fcntl.fcntl(write_end, fcntl.F_SETFL, fcntl.fcntl(write_end, fcntl.F_GETFL) & ~os.O_NONBLOCK)
+                child = subprocess.Popen(argv, env=env, stdout=write_end, stderr=subprocess.DEVNULL)
+                os.close(write_end)
+            else:
+                child = subprocess.Popen(argv, env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+            try:
+                if mode == "late-signal":
+                    blocked = wait_until_blocked_in_write(child.pid)
+                    child.send_signal(signal.SIGTERM)
+                code = child.wait(timeout=20)
+            except subprocess.TimeoutExpired:
+                child.kill()
+                child.wait()
+                code = None
+            if mode in ("full-pipe", "late-signal"):
+                os.close(read_end)
+            else:
+                child.stdout.close()
+            left = len(list(tmp.iterdir()))
+        results.append((mode, code, left, blocked))
+    ok = all(code == expected.get(mode, -signal.SIGTERM) and not left for mode, code, left, _blocked in results)
+    return ok, "; ".join(f"{mode}: " + (f"the child ended with {code} (expected {expected.get(mode, -signal.SIGTERM)}), payload directories left {left}" if code is not None else "the child was still running after 20 s and was killed")
+                         + ("" if mode != "late-signal" else f" (blocked in its write when the signal was sent: {'yes' if blocked else 'not observed, a fixed wait was used' if blocked is None else 'NO'})") for mode, code, left, blocked in results)
+
+
+def noout_case():
+    """The functions that run while the latch is installed must not write to stdout or stderr themselves: a write to a stuck descriptor cannot be interrupted by a handler that only returns (PEP 475), so `measure` collects its result lines with `say` for `emit_report`, which runs after
+    the handoff, and `type_prompt` writes only to the pty (finding B2 of the Codex review bot's read of this change). Reads the probe's own source: in `measure` and in `type_prompt` no call of `print`, of `sys.stdout.write`, `sys.stderr.write` (or `writelines`) or of `os.write` with the descriptor 1 or 2,
+    and at least five calls of `say` in `measure` (so that an emptied function cannot pass). It is a structural guard for the two functions that could write; the behaviour itself is the flush case. Returns (ok, detail)."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    functions = {each.name: each for each in ast.walk(tree) if isinstance(each, ast.FunctionDef) and each.name in ("measure", "type_prompt")}
+    writes, says = [], 0
+    for name, node in functions.items():
+        for call in (each for each in ast.walk(node) if isinstance(each, ast.Call)):
+            target = call.func
+            if isinstance(target, ast.Name) and target.id == "print":
+                writes.append(f"{name}:{call.lineno}")
+            elif isinstance(target, ast.Attribute) and target.attr in ("write", "writelines") and ast.unparse(target.value) in ("sys.stdout", "sys.__stdout__", "sys.stderr", "sys.__stderr__"):
+                writes.append(f"{name}:{call.lineno}")
+            elif ast.unparse(target) == "os.write" and call.args and isinstance(call.args[0], ast.Constant) and call.args[0].value in (1, 2):
+                writes.append(f"{name}:{call.lineno}")
+            elif isinstance(target, ast.Name) and target.id == "say" and name == "measure":
+                says += 1
+    return len(functions) == 2 and not writes and says >= 5, f"`measure` collects {says} result lines with `say`; `measure` and `type_prompt` write to stdout or stderr themselves at {len(writes)} places"
+
+
+def handoff_case(kind):
+    """A second signal that arrives AFTER the cleanups must not replace the first one (finding U3): SIGINT is delivered at the first line of `measure` (the spawn guard then starts no client) and SIGTERM at the line of `main`
+    that returns after `with_private_dir`, when the previous handlers would already be back if they were restored; the driver then runs what the probe's own `__main__` block runs. The probe must end BY SIGINT (return code
+    -2) and leave no payload directory. The stand-in client of the arena stands in for the real `claude`, which must never start here. Returns (ok, detail)."""
+    if not (Path.home() / "code/native-agent-stack").is_dir():
+        return None, "skipped (the probe's working directory does not exist on this machine)"
+    path = str(Path(__file__).resolve())
+    source = Path(path).read_text(encoding="utf-8").splitlines()
+    first = next(number for number, text in enumerate(source, 1) if text.strip() == 'log.write_text("")')
+    second = next(number for number, text in enumerate(source, 1) if text.strip().startswith("return signal_status() or status"))
+    with tempfile.TemporaryDirectory(prefix="handoff-") as raw:
+        env, tmp, pidfile, unique = arena(Path(raw), "sleep", 300)
+        try:
+            code = subprocess.run([sys.executable, "-B", "-c", HANDOFF_DRIVER, path, kind, str(first), str(second)], env=env, capture_output=True, timeout=120).returncode
+        except subprocess.TimeoutExpired:
+            code = "timeout"
+        client = int(pidfile.read_text().strip()) if pidfile.exists() and pidfile.read_text().strip().isdigit() else None
+        alive = client is not None and stand_in_alive(client, unique)
+        if alive:
+            os.kill(client, signal.SIGKILL)
+        left = len(list(tmp.glob("alert-probe-*")))
+    ok = code == -signal.SIGINT and not left and not alive
+    return ok, f"SIGINT at line {first}, SIGTERM at line {second}: the probe ended with {code} (expected {-signal.SIGINT}), payload directories left {left}, stand-in still alive {alive}"
+
+
+def partial_case():
+    """A sweep driver killed while it writes its record leaves a truncated record.json: `sweep_trial` must report it (info["unreadable_record"]) and still kill the stand-in client, instead of raising before the kill
+    (finding U5). subprocess.run is replaced for the call by a function that starts the stand-in `sleep <unique>`, publishes its PID and writes a truncated record. Returns (ok, detail)."""
+    path = str(Path(__file__).resolve())
+    started = []
+    real_run = subprocess.run
+
+    def fake_run(argv, **kwargs):
+        # argv: python, -B, -c, <driver code>, path, kind, target, record, pidfile, unique
+        record, pidfile, unique = Path(argv[7]), Path(argv[8]), argv[9]
+        client = subprocess.Popen(["sleep", unique], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        started.append(client)
+        pidfile.write_text(str(client.pid))
+        record.write_text('{"lines": [1, 2')
+        return subprocess.CompletedProcess(argv, 0, b"", b"")
+
+    subprocess.run = fake_run
+    try:
+        trial = sweep_trial(path, "ask", 5, "sleep", 7)
+        error = None
+    except Exception as failure:      # the repaired code does not raise
+        trial, error = None, f"{type(failure).__name__}"
+    finally:
+        subprocess.run = real_run
+        for client in started:
+            if client.poll() is None:
+                time.sleep(0.2)
+                if client.poll() is None:
+                    client.kill()
+                    client.wait()
+    killed = bool(started) and started[0].returncode == -signal.SIGKILL
+    ok = error is None and trial["info"].get("unreadable_record") is True and killed
+    return ok, f"a truncated record: sweep_trial raised {error}; record reported unreadable {None if trial is None else trial['info'].get('unreadable_record')}; the stand-in was killed {killed}"
+
+
 def typing_case():
-    """`type_prompt` with fake writers: a stop request latched after five keystrokes sends no further keystroke and no Enter; with no stop request every keystroke and the Enter are sent. Returns (ok, detail)."""
+    """`type_prompt` with fake writers and sleepers: (1) a stop latched after five keystrokes sends no further keystroke and no Enter; (2) a stop latched by the LAST keystroke sends no Enter and never reaches the 0.4 s
+    wait; (3) a stop latched during that wait sends no Enter; (4) a SIGTERM sent right after the final check, before the Enter is written, stays pending (the handled signals are blocked around the check and the write):
+    the latch is not set when the Enter is written and is set right after, so no Enter is ever written after the latch is set; (5) with no stop every keystroke and the Enter are sent. Returns (ok, detail)."""
+    global stopped
+    problems = []
+
+    def fresh():
+        STOP["signal"] = None
+
+    # (1) a stop after five keystrokes
     sent = []
 
     def stop_after_five(_fd, data):
@@ -346,14 +608,69 @@ def typing_case():
         if len(sent) == 5:
             STOP["signal"] = signal.SIGTERM
 
-    STOP["signal"] = None
-    interrupted = type_prompt(0, "x" * 20, write=stop_after_five, sleep=lambda _seconds: None)
-    STOP["signal"] = None
+    fresh()
+    first = type_prompt(0, "x" * 20, write=stop_after_five, sleep=lambda _seconds: None)
+    if first is not False or len(sent) != 5 or b"\r" in sent:
+        problems.append(f"(1) a stop after five keystrokes: Enter sent {first}, {len(sent)} keystrokes")
+    # (2) a stop latched by the last keystroke: no Enter and no 0.4 s wait
+    sent, sleeps = [], []
+
+    def stop_at_last(_fd, data):
+        sent.append(data)
+        if len(sent) == 3:
+            STOP["signal"] = signal.SIGTERM
+
+    fresh()
+    second = type_prompt(0, "abc", write=stop_at_last, sleep=sleeps.append)
+    if second is not False or b"\r" in sent or 0.4 in sleeps:
+        problems.append(f"(2) a stop at the last keystroke: Enter sent {second}, the 0.4 s wait reached {0.4 in sleeps}")
+    # (3) a stop latched during the 0.4 s wait
+    sent = []
+
+    def stop_in_wait(seconds):
+        if seconds == 0.4:
+            STOP["signal"] = signal.SIGTERM
+
+    fresh()
+    third = type_prompt(0, "abc", write=lambda _fd, data: sent.append(data), sleep=stop_in_wait)
+    if third is not False or b"\r" in sent:
+        problems.append(f"(3) a stop during the wait: Enter sent {third}")
+    # (4) a SIGTERM sent right after the final check
+    sent, at_enter = [], []
+    real_stopped, checks = stopped, []
+    old_handler = signal.signal(signal.SIGTERM, latch)
+
+    def check_then_signal():
+        value = real_stopped()
+        checks.append(value)
+        if len(checks) == 3 and not value:      # the third check of a one-character prompt is the final one, before the Enter
+            os.kill(os.getpid(), signal.SIGTERM)
+        return value
+
+    def write_and_note(_fd, data):
+        sent.append(data)
+        if data == b"\r":
+            at_enter.append(STOP["signal"])
+
+    fresh()
+    stopped = check_then_signal
+    try:
+        fourth = type_prompt(0, "a", write=write_and_note, sleep=lambda _seconds: None)
+        time.sleep(0.05)
+        latched_after = STOP["signal"]
+    finally:
+        stopped = real_stopped
+        signal.signal(signal.SIGTERM, old_handler)
+        fresh()
+    if fourth is not True or at_enter != [None] or latched_after != signal.SIGTERM:
+        problems.append(f"(4) a signal right after the final check: Enter sent {fourth}, the latch when Enter was written {at_enter}, after {latched_after}")
+    # (5) no stop
     plain = []
-    completed = type_prompt(0, "abc", write=lambda _fd, data: plain.append(data), sleep=lambda _seconds: None)
-    enter_after_stop = b"\r" in sent
-    ok = interrupted is False and len(sent) == 5 and not enter_after_stop and completed is True and plain == [b"a", b"b", b"c", b"\r"]
-    return ok, f"a stop after five keystrokes: Enter sent {interrupted}, {len(sent)} keystrokes sent, Enter among them {enter_after_stop}; no stop: Enter sent {completed}, {len(plain)} writes"
+    fresh()
+    fifth = type_prompt(0, "abc", write=lambda _fd, data: plain.append(data), sleep=lambda _seconds: None)
+    if fifth is not True or plain != [b"a", b"b", b"c", b"\r"]:
+        problems.append(f"(5) no stop: Enter sent {fifth}, writes {plain}")
+    return not problems, "five typing situations checked" if not problems else " | ".join(problems)
 
 
 def ignored_case():
@@ -375,10 +692,26 @@ def ignored_case():
     finally:
         signal.signal(signal.SIGHUP, before)
     ok = result == 7 and latched is None and inside == [signal.SIG_IGN] and after == signal.SIG_IGN
-    return ok, f"an ignored SIGHUP: work result {result}, latched {latched}, disposition inside the work {inside}, after {after}"
+    # the end of the process: with nothing latched, `end_by_latched_signal` gives the latch's signals back to the default action, and the one the parent ignored stays ignored
+    saved = {number: signal.getsignal(number) for number in HANDLED}
+    signal.signal(signal.SIGHUP, signal.SIG_IGN)
+    try:
+        with_private_dir(lambda _private: 0, restore=False)
+        end_by_latched_signal()
+        ending = {number: signal.getsignal(number) for number in HANDLED}
+    finally:
+        for number, handler in saved.items():
+            signal.signal(number, handler)
+    expected = {signal.SIGHUP: signal.SIG_IGN, signal.SIGTERM: signal.SIG_DFL, signal.SIGINT: signal.SIG_DFL}
+    ok = ok and ending == expected
+    return ok, f"an ignored SIGHUP: work result {result}, latched {latched}, disposition inside the work {inside}, after {after}; at the end of the process SIGHUP {ending[signal.SIGHUP]}, SIGTERM {ending[signal.SIGTERM]}, SIGINT {ending[signal.SIGINT]}"
 
 
 def selftest():
+    ignored = [signal.Signals(number).name for number in HANDLED if signal.getsignal(number) is signal.SIG_IGN]
+    if ignored:
+        print(f"REFUSED: {', '.join(ignored)} ignored in this process (nohup, or a background job of a non-interactive sh, which ignores SIGINT): the probe honors an inherited ignore, so the cases that send it would fail; start the selftest from a shell that does not ignore it")
+        return 2
     cases = [
         ("plain BEL", [b"\x07"], 1),
         ("two BELs in one read", [b"ab\x07\x07cd"], 2),
@@ -451,7 +784,7 @@ def selftest():
         bad += 0 if ok else 1
         print(("PASS " if ok else "FAIL ") + f"a {name} in the work is latched, the work carries on, the directory is removed and the previous handlers return"
               + ("" if ok else f" (result {result}, latched {latched}, directory left {seen[0].exists() if seen else None}, handlers restored {after == before})"))
-    for label, function in (("an inherited SIG_IGN stays: the latch is not installed for a signal the parent ignored", ignored_case), ("typing stops at a latched signal and sends no Enter", typing_case)):
+    for label, function in (("an inherited SIG_IGN stays: the latch is not installed for a signal the parent ignored", ignored_case), ("typing stops at a latched signal and sends no Enter, and never after the latch is set", typing_case), ("a truncated sweep record is reported and the stand-in killed", partial_case), ("no output is written while the latch is installed: `measure` and `type_prompt` write nothing to stdout or stderr", noout_case)):
         ok, detail = function()
         bad += 0 if ok else 1
         print(("PASS " if ok else "FAIL ") + label + f": {detail}")
@@ -468,6 +801,8 @@ def selftest():
             ("SIGTERM then SIGINT: the first signal is the one that ends the probe", lambda: signal_case("push", signums=(signal.SIGTERM, signal.SIGINT)), True),
             ("a SIGTERM at each line a dry run reaches", lambda: sweep_case("push"), True),
             ("the measurement's exit status: 2 when the dialog never opened, 1 for a control that saw a BEL, 0 for a quiet one", lambda: status_case("ask"), True),
+            ("a closed or stuck stdout or a blocked signal does not keep the probe from ending by the signal", lambda: flush_case("push"), True),
+            ("a second signal after the cleanups does not replace the first", lambda: handoff_case("push"), True),
             ("negative control: a client that never starts is rejected by a signal case", lambda: signal_case("push", stand_in="true"), False),
             ("negative control: a client that exits at once is rejected by the sweep", lambda: sweep_case("push", stand_in="trust-exit"), False)):
         ok, detail = function()
@@ -514,10 +849,11 @@ def main():
         return measure(args, private)
 
     try:
-        status = with_private_dir(work)
-        return signal_status() or status   # a latched signal is the exit status, produced after the cleanup
+        status = with_private_dir(work, restore=False)
+        return signal_status() or status   # the answer of a run that latched nothing: a latched signal ends the process in the `finally` below
     finally:
-        print("raw payload directory removed:", bool(used) and not used[0].exists())
+        end_by_latched_signal()   # the last safe point: a latched signal ends the process BY it now, before any output; with none latched every handled signal is back to its default action
+        emit_report(used)         # so a signal during the output, or a stuck stdout, cannot hold the process
 
 
 HANDLED = (signal.SIGTERM, signal.SIGHUP, signal.SIGINT)
@@ -542,22 +878,58 @@ def signal_status():
     return None if STOP["signal"] is None else 128 + STOP["signal"]
 
 
+REPORT = []   # the result lines of the measurement: printed by `emit_report` after the handoff, never while the latch is installed
+
+
+def say(*parts):
+    """Collect one result line (the arguments of `print`, joined by spaces). `measure` runs while the latch is installed, and a write to a stuck stdout cannot be interrupted by a handler that only returns (PEP 475 retries the write):
+    it collects its lines here and `emit_report` prints them after `end_by_latched_signal` (finding B2 of the Codex review bot's read of this change)."""
+    REPORT.append(" ".join(str(part) for part in parts))
+
+
+def emit_report(used):
+    """Print the collected result lines and the cleanup's one line, after `end_by_latched_signal`: no latch is installed any more, so a signal during the output takes its default action and ends the process, and a stuck stdout cannot hold it.
+    A closed or broken stdout is tolerated (what is left in its buffer goes to devnull, so that the final flush cannot change the exit status); a line that cannot be encoded is not."""
+    try:
+        for line in REPORT:
+            print(line)
+        print("raw payload directory removed:", bool(used) and not used[0].exists(), flush=True)
+    except UnicodeEncodeError:
+        raise      # a line that this stdout cannot encode is a defect to see, not a closed pipe to ignore
+    except (OSError, ValueError):
+        # a closed or broken stdout: the bytes still in its buffer would fail again in the interpreter's final flush and the exit status would be 120 instead of the measurement's,
+        # so the rest goes to devnull (the Python signal documentation, "Note on SIGPIPE")
+        try:
+            os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        except (OSError, ValueError):
+            sys.stdout = open(os.devnull, "w")
+
+
 def end_by_latched_signal():
-    """After the cleanups, end the process BY the latched signal: its default action, then the signal sent to itself. A parent shell tells "died of SIGINT" from "exited with 130": after a child that only exits 130 a shell loop
-    goes on (measured, `shell_loop_control.py` in the review artifact directory), and Cracauer ("Proper handling of SIGINT/SIGQUIT", cons.org/cracauer/sigint.html) says the only way to report it is to kill yourself with the
-    signal, since an exit status cannot fake it. Returns at once when no signal was latched."""
+    """The last safe point: the latch's life ends here. With the handled signals BLOCKED (no handler can run, so the latch cannot change between the snapshot and what follows) the latch is read. If a signal was latched, the process ends BY it
+    after the cleanups: its default action, the signal unblocked, then the signal sent to itself (a shell that waits cooperatively, bash among them, tells "died of SIGINT" from "exited with 130" when it has received the SIGINT too, as Ctrl-C
+    sends it to the whole foreground group: after a child that only exits 130 its loop goes on, after a child that ends by the signal it stops, measured by `shell_loop_control.py` in the review artifact directory, which also records that dash
+    behaves differently; Cracauer, "Proper handling of SIGINT/SIGQUIT", cons.org/cracauer/sigint.html: the only way to report it is to kill yourself with the signal, since an exit status cannot fake it). If none was latched, every handler that is
+    still the latch goes back to the default action (a signal the parent ignored was never taken over and stays ignored) and the old mask comes back: a signal that arrived during the block is pending and now takes its default action, which ends
+    the process BY it, and a later one does the same. The latch, a handler that only returns, must not outlive this point: a signal that landed after the snapshot would be latched and never acted on (the final handoff window, finding B1 of the Codex review bot's read of this change), and a blocking write after it could not be interrupted, since PEP 475 retries a system call after a handler that returns (finding B2). Nothing is flushed here (finding U2 of the post-merge GPT read): the output
+    follows from `emit_report`."""
+    blocked = signal.pthread_sigmask(signal.SIG_BLOCK, HANDLED)      # nothing below can be overtaken by a handler
     number = STOP["signal"]
     if number is None:
+        for each in HANDLED:
+            if signal.getsignal(each) is latch:
+                signal.signal(each, signal.SIG_DFL)
+        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)      # a signal that is pending now meets its default action
         return
-    sys.stdout.flush()
-    sys.stderr.flush()
     signal.signal(number, signal.SIG_DFL)
+    signal.pthread_sigmask(signal.SIG_UNBLOCK, {number})      # a mask inherited from the parent would leave the signal pending
     os.kill(os.getpid(), number)
 
 
 def type_prompt(master, prompt, write=os.write, sleep=time.sleep):
-    """Type the prompt into the client and press Enter, unless a stop request has been latched: a signal during the keystrokes ends the typing with no Enter, so no model turn is submitted after the stop. Returns True when
-    Enter was sent."""
+    """Type the prompt into the client and press Enter, unless a stop request has been latched. The Enter is the only keystroke that submits a model turn, so its check and its write are made with the handled signals BLOCKED: a handler
+    cannot run between them, the latch cannot flip, and a signal that arrives meanwhile stays pending and is latched right after the write. Exactly: no Enter is ever written after the latch is set (finding U4 of the post-merge GPT
+    read). The block surrounds one write to the pty master, never a spawn, so no child inherits it. Returns True when the Enter was sent."""
     for character in prompt:
         if stopped():
             return False
@@ -566,15 +938,20 @@ def type_prompt(master, prompt, write=os.write, sleep=time.sleep):
     if stopped():
         return False
     sleep(0.4)
-    if stopped():
-        return False
-    write(master, b"\r")
+    before = signal.pthread_sigmask(signal.SIG_BLOCK, HANDLED)
+    try:
+        if stopped():
+            return False
+        write(master, b"\r")
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, before)
     return True
 
 
-def with_private_dir(work):
-    """Install the latch handler first, create the private directory, run work(private_dir), and remove the directory and restore the previous handlers whatever happened (a normal return, an exception, a latched
-    signal). Returns what work returns; the caller turns a latched signal into the exit status after this cleanup."""
+def with_private_dir(work, restore=True):
+    """Install the latch handler first, create the private directory, run work(private_dir), and remove the directory and, when `restore` is true, restore the previous handlers whatever happened (a normal return, an exception, a latched
+    signal). Returns what work returns; the caller ends the process by a latched signal after this cleanup. `main` passes restore=False: the latch then stays installed until `end_by_latched_signal` (the end of its life: the process ends BY the first signal, or every handled signal goes back to its default action), so a SECOND signal that arrives after the
+    cleanups (when the previous handlers, SIGTERM's default among them, would be back) is latched too and cannot end the probe by another signal than the first one (finding U3 of the post-merge GPT read)."""
     STOP["signal"] = None
     previous = {}
     for number in HANDLED:
@@ -587,8 +964,9 @@ def with_private_dir(work):
     finally:
         if private is not None:
             shutil.rmtree(private, ignore_errors=True)
-        for number, handler in previous.items():
-            signal.signal(number, handler)
+        if restore:
+            for number, handler in previous.items():
+                signal.signal(number, handler)
 
 
 def measure(args, private):
@@ -628,7 +1006,7 @@ def measure(args, private):
     proc = None
     slave_open = True
     try:
-        if not stopped():   # a signal latched before this point: no client is started
+        if not stopped():   # SPAWN GUARD: a signal latched before this point starts no client
             proc = subprocess.Popen(["claude", "--model", "haiku" if args.kind == "push" else "sonnet", *mode_flags, "--setting-sources", sources,
                                      "--settings", json.dumps(overlay), "-n", f"alert-probe-{args.kind}"],
                                     stdin=slave, stdout=slave, stderr=slave, env=env, cwd=cwd, start_new_session=True, close_fds=True)
@@ -755,33 +1133,31 @@ def measure(args, private):
     except ProcessLookupError:
         group = "gone"
 
-    print(f"kind={args.kind} control={args.control} state={state} dialog_opened={t_open is not None} probe_process_group={group}")
+    say(f"kind={args.kind} control={args.control} state={state} dialog_opened={t_open is not None} probe_process_group={group}")
     if args.kind == "push":
-        print(f"focus reporting enabled by the client: {focus_reporting_enabled} | focus-out report sent: {sent_focus_out}"
+        say(f"focus reporting enabled by the client: {focus_reporting_enabled} | focus-out report sent: {sent_focus_out}"
               + (f" ({round(t_focus_out - t_enter, 1)} s after Enter)" if sent_focus_out and t_enter else "")
               + f" | prompt sleep: {args.sleep} s | seconds from Enter to the tool call: {round(t_open - t_enter, 1) if t_open and t_enter else None}")
-    print("events:", events)
+    say("events:", events)
     if args.control:
-        print("Notification events: not observable (every hook is disabled, so the observer hook is off); the BEL byte count below is the measurement")
+        say("Notification events: not observable (every hook is disabled, so the observer hook is off); the BEL byte count below is the measurement")
     else:
-        print(f"Notification events: {len(notifications)}")
+        say(f"Notification events: {len(notifications)}")
     for stamp, ntype, message in notifications[:4]:
-        print(f"  +{round(stamp - t_open, 1) if t_open else None}s after open | type={ntype} | message length={len(message)}")
+        say(f"  +{round(stamp - t_open, 1) if t_open else None}s after open | type={ntype} | message length={len(message)}")
     total = 0
     if t_open:
         after = [(round(t - t_open, 1), n) for t, n in bel_events if t >= t_open - 0.5]
         total = sum(n for _, n in after)
-        print(f"bare BEL bytes after the dialog opened: {total}  (seconds after open, bytes per read: {after})")
+        say(f"bare BEL bytes after the dialog opened: {total}  (seconds after open, bytes per read: {after})")
     if args.show_screen:
-        print("screen tail (ANSI stripped):", screen_tail[-260:])
+        say("screen tail (ANSI stripped):", screen_tail[-260:])
     if t_open is None:
-        print("measurement failed: the tool call was never observed, so nothing above is a result")
+        say("measurement failed: the tool call was never observed, so nothing above is a result")
     elif args.control and total:
-        print("a hooks-disabled control saw a BEL byte: the BEL is not attributable to the notification hook")
+        say("a hooks-disabled control saw a BEL byte: the BEL is not attributable to the notification hook")
     return exit_status(t_open, args.control, total)
 
 
 if __name__ == "__main__":
-    status = main()
-    end_by_latched_signal()   # after the cleanups: a latched signal ends the process BY the signal, not by an exit status
-    sys.exit(status)
+    sys.exit(main())      # `main` hands off in its own `finally`: a latched signal ends the process BY it there, before any output

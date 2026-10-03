@@ -1,0 +1,10 @@
+label=A3
+arm=llama
+profile=llamacpp-gate
+server_pid=3931480
+server_started_utc=2026-10-02T00:24:43Z
+server_ready_utc=2026-10-02T00:24:52Z
+codex_exit=0
+codex_finished_utc=2026-10-02T00:26:38Z
+server_stopped_utc=2026-10-02T00:26:40Z
+server_alive_after_stop=no

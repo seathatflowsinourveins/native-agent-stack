@@ -13,11 +13,189 @@ The harness then turns the run into the retained evidence that `scripts/saturati
 writes `catalogs/landscape/`, `catalogs/sota-convergence/` or `research-state.json`. Those files, and publishing
 the merged manifest, stay with the lane owners.
 
+## Version 2 source contracts (U11 A/B)
+
+The opt-in repository input contract implements source preparation for
+[U11 revision 4, A/B/E](https://github.com/seathatflowsinourveins/native-agent-stack/blob/89424e36e8f60c4413021bc449390f235c3f2cfd/docs/decisions/2026-10-01-u11-merit-neutral-selection.md)
+(design SHA256 `031e8cf64347914fe4684f9dba40fe4c1f20b40cce6b6ca04649b99e0dd0358b`).
+It extends the maintained
+[input builder at 798ac445](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/landscape-sweep/build_inputs.py),
+[manifest candidate join](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/lane_packets.py#L325)
+and [prose reducer](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/lane_packets.py#L981).
+Repository identities also reuse the existing [canonical slug helpers](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/landscape-sweep/sweep_common.py)
+and [Hugging Face model adapter](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/landscape-sweep/source_reviews.py#L205).
+The existing runner stays on version 1. `build_args.py` refuses V2-marked inputs and
+`--contract-version 2` before staging a launchable workflow. The future runner must wire the blind
+inputs, full-field screens, replicated judgments and expanded field hash before V2 can run.
+`sweep.js` and `make_prompt.py` still use the V1 shared input and proposal projection.
+
+Prepare source inputs with the existing frozen scope and manifest arguments, adding:
+
+```sh
+python3 tools/sota-convergence/landscape-sweep/build_inputs.py \
+  --work-dir "$SWEEP_WORK_DIR" --freshness-manifest "$FRESHNESS_MANIFEST" --contract-version 2
+```
+
+Version 1 remains the default, and the skills modality keeps version 1. The added
+`common_v2`, `discover_v2`, `facts_v2` and `fit_v2` keys coexist with unchanged V1 strings;
+`schemas/discover-v2.json` and `schemas/votes-v2.json` coexist with the unchanged V1 schemas.
+The filled V1 repository/skills prompt hashes remain pinned in the tests. The whole repository
+`templates.json` file has a new source hash because it includes additional keys; that hash never
+replaces a prior run's frozen source or prompt hash. The filled V2 fixture hash is a future
+source-contract change detector, not execution evidence. Active workflows, frozen private inputs,
+historical sweeps and their receipts are not rewritten.
+
+For each layer, `inputs/<layer>.json` records `contract_version: 2`, `eligible_field` and
+`field_sha256`. The field unions all landscape selections/candidates/alternatives, manifest
+components/entries/candidates/alternatives, layer-linked candidate/independent reviews, the second
+family's final selections and challengers, seeds, and all historical repository-sweep proposals.
+History includes stopped attempts, V1 fit-only refutations and raw discovery-family returns beyond
+the merge cap. Identity dedupe keeps each canonical repository once. The known-repository filter
+and six-proposal discovery budget govern novelty, and cannot remove an eligible member.
+
+Every member awaits the same V2 screen. The producer records `disposition: admit_pending`,
+`material: true`, a `pending_reason` (`awaiting_v2_screen` or `legacy_v1_refutation`), nullable
+`exclusion_reason`, stable `candidate_key` and `evidence_key`, and source `evidence_refs`.
+GitHub keys have the form `<catalog>/<layer_id>/<lowercase owner/repo>`; Hugging Face keys
+use `<catalog>/<layer_id>/https://huggingface.co/<lowercase namespace/model>` so registries
+cannot collide. Model source URLs retain upstream case. Historical maintenance or
+adoption labels are observations, not automatic exclusions. `baseline_manifest` and
+`freshness_manifest` reference the supplied documents; `seeded_candidates` references the supplied
+seed object. Catalog/review/history refs retain their repository-relative paths and JSON pointers.
+
+An unsupported discovery identity (including a GitLab/Codeberg repository or a documentation URL
+that the current adapter cannot resolve) is retained with an opaque `unsupported-identity-<sha256>`
+key and `pending_reason: unsupported_discovery_identity`. The raw proposal stays unchanged,
+its JSON pointer records a retained failure, and conversion continues through later proposals
+and layers. The failure reopens that layer. This does not establish that the candidate is ineligible.
+The next input field retains earlier V2 keys and evidence references, including opaque keys, without
+requiring discovery to repeat them. Raw-return pointers are qualified against their original retained
+returns file. Frozen keys are checked against the same deterministic identity derivation; a replaced
+candidate or evidence key is rejected. Unsupported identities remain pending even when later model
+returns label them credible. GitHub/Hugging Face identities keep their strict canonical contract.
+
+A missing repository, non-object proposal or non-list `proposed` value also retains its complete raw
+return as an opaque pending member with a `malformed_discovery_proposal` pointer failure. An explicit
+null, integer or string `evidence`, or a list containing non-strings, records
+`malformed_discovery_evidence`; none is treated as a valid evidence list. Its raw value stays in the
+retained return, and the member remains material pending in later fields. Later proposals and layers
+continue through conversion. These are the bounded repairs to blockers 1–2 in the
+[PR #590 source review](https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180),
+under [revision 5 item 6 at 49a42600](https://github.com/seathatflowsinourveins/native-agent-stack/blob/49a4260029244e3e20d8b2dd3ada00af7983a3c9/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#revision-5-2026-10-01).
+
+The field hash is SHA256 of UTF-8 JSON with sorted keys, no inter-key whitespace and
+`ensure_ascii=False`: `{contract_version, catalog, layer_id, requirement_sha256,
+platform_profiles_sha256, members}`. `members` contains only `{candidate_key, repository}` sorted
+by `candidate_key`; adoption, mutable screen states and receipt counts do not enter that hash.
+If discovery returns a new identity, a future consumer must freeze the expanded union, recompute
+`field_sha256` and preserve the earlier `source_field_sha256` separately. The original hash cannot
+cover additions. A deciding comparison must later bind its actual releases/tasks/preregistration
+and this complete field.
+
+`inputs/<layer>.fit-v2.json` is the blind input for both fit and facts; `layers.json` names it in
+`fit_input` and `facts_input`, with the same version and field hash. It carries every candidate's
+identity, uniformly sourced technical facts (unknowns are null), and equal primary source surfaces:
+repository/releases/commits for GitHub, model page/tree/API for Hugging Face. It omits selection
+labels, installed pins, receipt counts, historical verdicts and
+selection-bearing prose. The requirement uses the maintained prose reducer. Explicit user pins
+and fixture oracles appear in `pinned_requirements`: the destination/broker/adapter requirement
+and fixed oracle remain requirements, while their source-host installed versions do not become fit
+evidence. Unknown facts or a budget cutoff leave a material member pending.
+
+The default offline build sets all upstream facts to null and records a `not_requested` pending
+observation. It never copies facts from a member's adoption, catalog or sweep record. For a source
+review, add `--pull-upstream-facts`: the builder pulls each distinct identity once, in sorted order,
+through the maintained GitHub/Hub transports and freezes `upstream-facts-v2.json`. Every membership
+of the identity shares that observation and its source URLs, returned status and canonical complete
+parsed-response hashes. API failures stay pending and do not stop later members. These hashes are
+not raw HTTP-byte hashes. Stars, license and likes stay out of blind input. This preparation mode
+does not implement the later maintenance exclusion script or make V2 launchable.
+
+The full producer contains 1,135 memberships across the 32 committed layer fields: 688 foundation
+and 447 trading. The earlier 1,134 review union omitted the catalog alternative
+`promptfoo/promptfoo` at `catalogs/landscape/us-equities.json#/layers/8/alternatives/3`; the complete
+producer already retained it. This is a corrected counting scope, not a new model return or merit
+result. The original September 29 manifest and September 26 seed inputs give unchanged membership
+sets at the integrated main revision.
+
+Trading `acceptance_gates` summarises what every candidate must show from
+[the unchanged acceptance plan at 798ac445, sections 1–6](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/blueprints/us-equities/engine-nautilus/acceptance-plan.md).
+The current `runtime-target.next_acceptance` scopes describe executed history, so those scopes,
+statuses and executed evidence refs stay out of the screen. The three named gates use declarative
+replay, offline broker-state and independent paper-adapter requirements from that plan. An explicit
+future `gate.requirement` takes precedence; an unrecognized gate without one remains pending.
+The three summaries are pinned by exact section-byte SHA256 assertions in the producer tests:
+sections 1–3 `a79c33c07f9de52bb7270fb9e6e0e85a19c1064da9ad47f9d7cc92ff362f0a0f`, section 4
+`1f557403dc4169db578cd2a327f025ac3acee25c78b333dfc91906d83ff421c3`, and sections 5–6
+`e5921c5afa6d5db25408549873127b5a07cd8690e2ca674b6ed508f22bb32ec9`. A changed plan must prompt
+review of its summaries. This projection declares requirements and provides no new acceptance result.
+The receipt's earlier claim of a changed-section negative fixture was unsupported and is withdrawn;
+the retained test asserts the unchanged section hashes. The summaries and hashes remain unchanged.
+
+Discovery V2 returns `admit`, `admit_pending` or `not_admitted`, `requirement_fit` and `frozen_tasks`;
+it never requires a winner-relative gap. Even `not_admitted` enters the field pending because
+discovery sees the source-host health notes. Model votes use `status: credible | not_credible | pending`
+and preserve candidate/evidence keys and reasoning/refs. The only model exclusion criteria are
+`target_host_incompatible`, `outside_requirement` and `paid_service_required`, each with a fact and
+supporting evidence. Within the excluding role, both families need replicated agreeing majorities.
+The facts role may exclude only on `target_host_incompatible` or `paid_service_required`; that
+supported facts exclusion stands whatever fit returned. `outside_requirement` can exclude only
+when the fit role supports it (including when both roles returned it). A facts-only
+`outside_requirement` stays pending and cannot exclude. These are the design owner's PR #590
+review refinements; the V2 runner remains unlaunchable until the later frozen-scope/script work.
+In part 1, a `paid_service_required` vote stays pending with the explicit reason
+"the paid-service policy field arrives in part 2"; requirement-text matching cannot exclude it.
+Part 2 must add the layer owner's `paid_service_allowed` field, false by default, bind it into the
+frozen scope, and implement the deterministic screen before V2 launch. Under that future default,
+a paid-only candidate is excluded in each layer where its owner has not enabled the field;
+an enabled field carries a purchase gate. Missing credentials never establish a mandatory fee.
+Script owns API-supported maintenance and
+repository identity dedupe; unverifiable facts never exclude.
+
+Every V2 vote envelope requires `judgment`: `judgment_id`, integer `order_seed`, `family`
+(`claude` or `gpt6`), `model_route_requested`, nullable `model_route_actual`, the exact screened
+`source_field_sha256`, nullable `provider_sampling_seed_requested` and
+`provider_sampling_seed_actual`, and `provider_sampling_seed_status` (`unknown`, `not_exposed`
+or `recorded`). `order_seed` records deterministic candidate ordering. It does not establish a
+provider sampling seed. Native unexposed sampling seeds stay null/unknown; no run is claimed here.
+The future role slots accept lists of these envelopes (a single envelope is one judgment): each
+family needs two distinct judgment IDs and order seeds, bound to the same screened field, and
+the families' majorities must agree. Ties, missing/malformed provenance, insufficient replication,
+unsupported exclusions or unresolved exposure stay material pending; clean saturation cannot advance.
+
+Focused no-model integration tests cover neutral admission, full-field inclusion, blind input and
+pin/gate projection, provenance, the V1 staging guard, and unchanged V1 repository/skills contracts.
+They are synthetic/local integration checks, not unchanged upstream model acceptance or a merit result.
+
+### Part 2 review queue
+
+Notes 4–11 from the [PR #590 source review](https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180)
+remain open for part 2. This repair does not qualify the future V2 runner.
+
+4. Reconcile the historical receipt's source revisions, unretained 1,135-count script and earlier
+   390-test run with retained command/source evidence. The historical verifier's actual backend is
+   unknown and remains null; a requested role/model does not establish the backend that ran.
+5. Resolve fit-only `target_host_incompatible` outcome behavior, cover credible versus pending facts
+   controls, and retain the excluding fact with the outcome.
+6. Bind each judgment's family to its native role slot and actual model route; self-declared family
+   labels and a nullable route do not prove independent families. Exercise `facts_gpt6` explicitly.
+7. Add discriminating fit-role controls for the evidence/credential/maintenance guards and differing
+   family majorities; facts-only `outside_requirement` controls do not exercise those exclusions.
+8. Reconcile credible field membership with novelty and saturation counting so a credible selection
+   of record does not permanently prevent a clean layer.
+9. Align the V2 maintenance template with the unconditional script-owned archived/stale criterion and
+   replace the fact-word pattern with deterministic API evidence before launch.
+10. Treat an expected missing GitHub latest release as an observation instead of a whole-source
+    failure, using the maintained `github_freshness.py` missing-response policy.
+11. Reconcile the inferred `alpacahq/alpaca-py` pin with the user's separate Alpaca adapter-path
+    requirement; the user has not pinned that repository. Preserve the acknowledged trading
+    acceptance summaries and exact section hashes while resolving this input policy.
+
 ## Files
 
 | File | Runs | Role |
 | --- | --- | --- |
-| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep of the run's modality, a baseline manifest, a freshness manifest and optional seeds. |
+| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep of the run's modality, a baseline manifest, a freshness manifest, the gap-wave ledgers and optional seeds. |
 | `build_args.py` | checkout | Stages a run into the work directory: frozen dated templates, schemas, the GPT-6 runtime, first-round GPT-6 prompts, `staged.json`, `prompts_sha256.txt`, the compact `args.json` and `sweep.embedded.js`. |
 | `sweep.js` | Workflow | The lane itself (`const A = args`; its header documents the args object). |
 | `codex_call.sh`, `codex_job.py` | staged | The GPT-6 job runner the wrapper agents call (`start`, `wait`, `result`). |
@@ -757,6 +935,18 @@ The deliberate changes:
   - Known-repository slugs are no longer cut by `rstrip(".git")`, which had shortened, for example, `qdrant/qdrant`
     to `qdrant/qdran` in 30 of 32 layers.
   - The previous sweep is the last completed one of the run's modality (repository or skills).
+  - A repository-layer input dates its sealed fields (2026-10-01). `winners`, `alternatives` and `open_gaps` are
+    copied from the row's verdict, which only a new verdict wave re-records, so weeks later a pin or a gap in them
+    can be out of date: an audit of 32 frozen inputs on 2026-10-01 found 14 winner pins behind the stack and gap
+    texts that later receipts had already answered. Three fields say so, and none of the existing ones changes:
+    `verdict_checked_at` is the row's `checked_at`; `verdict_note` names the sealed fields and says that
+    `components_vs_upstream[].pin` is the pin the stack installs today; `open_gaps_followup` joins the gap-wave
+    owner ledgers (`catalogs/landscape/gap-wave*--*.json`, the ledgers `lane_packets.gap_receipts_index` reads) onto
+    the gaps shown. Each follow-up entry gives the gap's index, the ledger's status, its receipts that exist in the
+    checkout, and the waves and ledgers that recorded it; two ledgers with the same status and receipts share one
+    entry. A ledger entry joins only when its index and text equal the sealed open gap's. The summary line counts
+    the ledger entries joined, those that match no sealed gap and those for gaps beyond the five shown. What the
+    ledgers do not record, such as a comparison run after the last gap wave, still reaches a sweep through `--seeds`.
 - **Placeholder filling.** Placeholders are filled in one pass, with no `$&` expansion. Merged rows drop
   `by_family`.
 - **`convert.py` additions.**

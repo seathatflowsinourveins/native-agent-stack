@@ -1,0 +1,33 @@
+test_average_preserves_normal_result (test_utils.QuickstartContract.test_average_preserves_normal_result) ... ok
+test_empty_average_does_not_crash (test_utils.QuickstartContract.test_empty_average_does_not_crash) ... ERROR
+test_name_preserves_normal_result (test_utils.QuickstartContract.test_name_preserves_normal_result) ... ok
+test_null_user_does_not_crash (test_utils.QuickstartContract.test_null_user_does_not_crash) ... ERROR
+
+======================================================================
+ERROR: test_empty_average_does_not_crash (test_utils.QuickstartContract.test_empty_average_does_not_crash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/examples/native-sdk-acceptance/claude-quickstart/test_utils.py", line 26, in test_empty_average_does_not_crash
+    UTILS.calculate_average([])
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^
+  File "<checkout>/examples/native-sdk-acceptance/claude-quickstart/utils.py", line 5, in calculate_average
+    return total / len(numbers)
+           ~~~~~~^~~~~~~~~~~~~~
+ZeroDivisionError: division by zero
+
+======================================================================
+ERROR: test_null_user_does_not_crash (test_utils.QuickstartContract.test_null_user_does_not_crash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/examples/native-sdk-acceptance/claude-quickstart/test_utils.py", line 29, in test_null_user_does_not_crash
+    UTILS.get_user_name(None)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "<checkout>/examples/native-sdk-acceptance/claude-quickstart/utils.py", line 9, in get_user_name
+    return user["name"].upper()
+           ~~~~^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (errors=2)

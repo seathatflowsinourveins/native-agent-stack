@@ -1,0 +1,122 @@
+{
+ "read": {
+  "reader": "Claude Opus, effort max, one read-only agent (evidence-reviewer: Read, Glob and Grep, no shell), the independent read of the repairs of the Codex review bot's three findings, made before the second head was pushed",
+  "input": "a 1,333-line diff against the first head, the changed files, a brief with the design, the invariants and the accepted limits, and the results of the direct runs (no completed run of the new runner existed)",
+  "usage": {
+   "subagent_tokens": 316348,
+   "tool_uses": 23,
+   "minutes": 25
+  },
+  "findings": {
+   "total": 9,
+   "by_severity": {
+    "high": 4,
+    "medium": 1,
+    "low": 4
+   }
+  },
+  "no_finding_areas": [
+   "signal windows in the probe's real run path",
+   "output or blocking while latched beyond the accepted residuals",
+   "tmux removal scope and counting (beyond O6)"
+  ],
+  "also_reported": [
+   "the code labelled the stuck-stdout repair finding 3 and the tmux directories finding 2 while the record numbers them B2 and B3 (repaired)",
+   "an inherited blocked signal mask, unlike SIG_IGN, is not refused by the runner or the selftest (it would show as a signal-case failure on the stand-in's mask)",
+   "tmux_servers() can still count a server that is mid-exit right after kill-server (predates the patch)"
+  ],
+  "its_prediction_for_the_five_new_mutants": "two of the five expected sets were wrong as written (O1 and O3) and the expected set of an older mutant had changed (O2); the other three were predicted right"
+ },
+ "findings": [
+  {
+   "id": "O1",
+   "reader_id": "H1",
+   "severity": "high",
+   "file": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
+   "line": 82,
+   "claim": "The mutant \"the snapshot of the latch is read without a block\" is expected to fail the sweep, but no case fails for it: the sweep driver, like the probe's own `__main__`, called `end_by_latched_signal()` a second time after `main`, which kills by the latched signal, so every trial of the sweep ended -15 and the window the sweep was extended to see could not fail it.",
+   "verified_by": "execution on the code before the repair: the runner with --only on that mutant printed WRONG, failing 0 of 12 cases and missing the sweep",
+   "repair": "the handoff is called once, in the `finally` of `main`; `__main__`, the sweep driver, the handoff driver and the flush child no longer repeat it"
+  },
+  {
+   "id": "O2",
+   "reader_id": "H2",
+   "severity": "high",
+   "file": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
+   "line": 61,
+   "claim": "The unchanged expected set of the \"handler raises\" mutant is wrong now that `main`'s `finally` hands off: one SIGTERM and the handoff case pass for it because the raised exit becomes death BY the latched signal.",
+   "verified_by": "execution on the code before the repair: failing 5 of the 7 expected cases; one SIGTERM and the second-signal case passed, as the reader predicted",
+   "repair": "the expected set is the two-signal cases, the sweep and the typing case, with the reason beside it"
+  },
+  {
+   "id": "O3",
+   "reader_id": "H3",
+   "severity": "high",
+   "file": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
+   "line": 83,
+   "claim": "The expected set of the mutant \"the latch is not handed back to the default action when nothing was latched\" includes the sweep, which it could not fail (same cause as O1).",
+   "verified_by": "execution on the code before the repair: failing 2 of the 3 expected cases, the sweep missed",
+   "repair": "removing the second handoff call lets the sweep see it; the expected set stays and is confirmed by a run on the repaired code"
+  },
+  {
+   "id": "O4",
+   "reader_id": "H4",
+   "severity": "high",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 235,
+   "claim": "With PYTHONUNBUFFERED=1, which the runner's own text recommends, the flush case fails for the unmutated probe: the stub's \"line still in the buffer\" goes straight to the descriptor under the latch (a blocking write on a full pipe, an error on a closed descriptor).",
+   "verified_by": "execution: one call of the flush case with PYTHONUNBUFFERED=1 returned False with three children failing (it was also what failed the first valid validation run)",
+   "repair": "the children of the flush case run without PYTHONUNBUFFERED; the case passes with and without it"
+  },
+  {
+   "id": "O5",
+   "reader_id": "M1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 462,
+   "claim": "The late-signal child assumes without checking that a SIGTERM sent after a fixed 2 s lands while the child is blocked in the report's write; under load the hand-back mutant, which only that child can fail, could pass by accident.",
+   "verified_by": "reading (a design defect of the case)",
+   "repair": "the case waits until /proc/<pid>/wchan shows the child blocked in a pipe write (a fixed wait only where the kernel shows no wait channel) and its detail says whether it saw it"
+  },
+  {
+   "id": "O6",
+   "reader_id": "L1",
+   "severity": "low",
+   "file": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+   "line": 215,
+   "claim": "The control's cleanup removes the directory of every recorded socket whether or not `kill-server` succeeded, so a server that did not stop loses its socket and can no longer be stopped by it.",
+   "verified_by": "reading",
+   "repair": "a directory is removed only when its server is gone (`list-sessions` fails); one that still answers keeps it and the control reports it (both tmux probes)"
+  },
+  {
+   "id": "O7",
+   "reader_id": "L2",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 480,
+   "claim": "The static case only catches `print` and `sys.stdout.write` inside `measure`, while its label claims that no output is written while the latch is installed.",
+   "verified_by": "reading",
+   "repair": "it also covers `type_prompt`, `sys.stderr` and `os.write` to the descriptors 1 and 2, and the label says what it checks; the behaviour is the flush case"
+  },
+  {
+   "id": "O8",
+   "reader_id": "L3",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 851,
+   "claim": "`emit_report` tolerates a closed or broken stdout, but the failed flush leaves the bytes buffered and the interpreter's final flush fails again: a normal run then exits 120 instead of the measurement's status.",
+   "verified_by": "execution: the real `main` with a measurement that returns 0 and fd 1 closed exited 120",
+   "repair": "what a failed write leaves goes to devnull (Python's signal documentation, \"Note on SIGPIPE\"); a flush child checks the exit status and a mutant removes the redirect"
+  },
+  {
+   "id": "O9",
+   "reader_id": "L4",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-experience-20260928/README.md",
+   "line": 18,
+   "claim": "Stale text: the README row still described 18 mutants, eleven cases and six quick cases; the runner's docstring announced seven quick cases and listed six; `sweep_trial`'s docstring named three functions; the `__main__` comment described a call that can no longer end the process.",
+   "verified_by": "reading",
+   "repair": "the rows, docstrings and comments follow the code; the finding labels of the code follow this record (B1 the final window, B2 the stuck stdout, B3 the tmux directories)"
+  }
+ ]
+}

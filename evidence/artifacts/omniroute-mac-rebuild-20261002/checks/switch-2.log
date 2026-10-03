@@ -1,0 +1,6 @@
+{"step": "smoke", "at": "2026-10-02T03:43:42Z", "healthy": true}
+{"step": "plist", "at": "2026-10-02T03:43:42Z", "lint": "ok"}
+{"step": "switch", "at": "2026-10-02T03:43:45Z", "bootstrap_exit": 0}
+{"step": "health", "at": "2026-10-02T03:44:49Z", "healthy": true}
+{"step": "probe", "at": "2026-10-02T03:48:54Z", "attempt": 1, "passed": true, "catalog": {"status": 200, "cx/gpt-6.1-sol": true, "cx/gpt-6-astra": true, "models": 618}, "sol": 200, "astra": 200, "codex_exit": 0}
+{"step": "update_check_agent", "at": "2026-10-02T03:48:54Z", "bootstrap_exit": 0}

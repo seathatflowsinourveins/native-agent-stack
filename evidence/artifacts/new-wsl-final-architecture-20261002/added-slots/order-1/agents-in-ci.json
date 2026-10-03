@@ -1,0 +1,180 @@
+{
+  "layers": [
+    {
+      "layer_id": "agents-in-ci",
+      "selection": [
+        {
+          "name": "GitHub Agentic Workflows (C06)",
+          "repository": "https://github.com/github/gh-aw",
+          "role": "Provisional selection for running both agents with a consistent permission boundary. Use v0.89.21, with separate workflows selecting engine: claude and engine: codex, explicit PR/issue triggers, and explicitly scoped safe-outputs. This is a capability and architecture judgment; measured review quality and cost superiority are not established.",
+          "install_command": "gh extension install github/gh-aw --pin v0.89.21\ngh aw version",
+          "install_source": "https://github.com/github/gh-aw/blob/v0.89.21/README.md#quick-start",
+          "basis": [
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/engines.md",
+              "shows": "Both requested clients are built-in engines. Claude supports ANTHROPIC_API_KEY or workload identity federation; Codex supports CODEX_API_KEY or OPENAI_API_KEY. Engine selection, tool permissions and execution limits are documented."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/introduction/architecture.mdx",
+              "shows": "The documented architecture separates agent execution with read-only GitHub permissions from subsequent jobs with scoped write permissions. The default Linux runtime places the agent in a Docker container with proxy-controlled egress; MCP servers have separate containment. These documented controls are the principal reason for selecting it."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/safe-outputs.md",
+              "shows": "Writes are requested through structured outputs and performed by separate permission-controlled jobs. A material default requires attention: omitting safe-outputs automatically enables limited issue creation. Least-privilege deployment therefore requires explicit output configuration."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/Makefile",
+              "shows": "An upstream test suite and supported test commands are present, including make test-unit-all. This establishes test infrastructure, not a successful test result on the target host."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/.github/workflows/ci.yml",
+              "shows": "Public CI defines tagged Go integration tests, coverage collection and tests of unauthenticated public-workflow retrieval. The sampled check suites did not establish a completed passing result for this pin."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/releases/tag/v0.89.21",
+              "shows": "The latest stable release returned by the API was published on 2026-09-23, within 90 days. Its tag resolves to c35393777e5604a63721d09512263b1383301d4f. Published assets include linux-amd64 and darwin-arm64."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/setup/quick-start.mdx",
+              "shows": "Upstream documents the GitHub CLI extension install, compilation into GitHub Actions workflows, and Linux, macOS and Windows-with-WSL authoring support. The documented API-based engines imply that the RTX 4090 is unnecessary for this layer."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/commit/35eb607ae44d",
+              "shows": "The latest default-branch commit was dated 2026-10-02T01:47:17Z, still October 1 in the user's timezone and within the 90-day maintenance window."
+            },
+            {
+              "url": "https://api.github.com/repos/github/gh-aw",
+              "shows": "The repository is not archived. The API identifies the license as MIT; license was treated as information only."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/issues/64899",
+              "shows": "Recent issue creation and closure activity is visible. This sampled issue is automated activity and does not establish human responsiveness or review accuracy."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C10",
+          "name": "claude-code-action (StepSecurity)",
+          "reason": "Active: default-branch commit 2026-10-01 and release v1.0.183 on 2026-08-12; settings and wrapper tests passed. It covers Claude only and adds a subscription-service check for private repositories, without reviewed comparative evidence establishing a better two-agent solution. [Action source](https://github.com/step-security/claude-code-action/blob/f921413b67d5/action.yml), [passing tests](https://github.com/step-security/claude-code-action/actions/runs/36870692705/job/110397372573)."
+        },
+        {
+          "key": "C08",
+          "name": "codex-action (OpenAI)",
+          "reason": "A close alternative when paired with Anthropic's action: documented privilege reduction and sandbox controls, with a passing verify check. Its latest default-branch commit is 2026-08-20; the latest-stable-release endpoint returned 404. I provisionally prefer gh-aw's shared permission and network architecture for both agents. [README](https://github.com/openai/codex-action/blob/86365089eb2b/README.md), [verify CI](https://github.com/openai/codex-action/actions/runs/32429534752/job/96618203279)."
+        },
+        {
+          "key": "C02",
+          "name": "claude-codex-actions",
+          "reason": "A credible alternative covering both clients, with isolated CLI state and passing contract/scenario CI. Release v1.0.0 reports nine parser/contract tests and twelve synthetic CLI scenarios; these establish wrapper behavior, not live review quality. Permission configuration remains substantially with the caller. Commit and release are from 2026-09-10. [README](https://github.com/andrii-artemenko-gen/claude-codex-actions/blob/f28024429881/README.md), [release](https://github.com/andrii-artemenko-gen/claude-codex-actions/releases/tag/v1.0.0), [passing CI](https://github.com/andrii-artemenko-gen/claude-codex-actions/actions/runs/34486107507)."
+        },
+        {
+          "key": "C01",
+          "name": "No additional component",
+          "reason": "The packet supplies no comparison establishing that neither agent is needed, and this option provides no implementation to assess. Retain it as a control in the deciding trial; the incremental value of agent execution remains unmeasured."
+        },
+        {
+          "key": "C07",
+          "name": "codex-action (iCoreTech)",
+          "reason": "Active, with a 2026-10-01 default-branch commit and v0.9.48 release. It provides a Linux Docker-based Codex runner, but network_access=false is explicitly documented as a prompt-level policy, making that particular control weaker evidence for least privilege than an enforced network boundary; it also covers only Codex. [README](https://github.com/icoretech/codex-action/blob/ff40c1183874/README.md), [action inputs](https://github.com/icoretech/codex-action/blob/ff40c1183874/action.yml)."
+        },
+        {
+          "key": "C03",
+          "name": "claude-code-action (Anthropic)",
+          "reason": "A close alternative when paired with OpenAI's action, with direct PR/issue integration and documented setup. It covers Claude only; the selected orchestrator documents a common permission boundary across both engines. Maintenance is current through a 2026-10-01 default-branch commit, although the latest-release endpoint returned v1 published on 2025-08-26. [README](https://github.com/anthropics/claude-code-action/blob/97c53473391b/README.md), [latest release](https://github.com/anthropics/claude-code-action/releases/tag/v1)."
+        },
+        {
+          "key": "C09",
+          "name": "multi-llm-security-review",
+          "reason": "Active, with a 2026-10-01 commit and 1.0.4 release, plus passing check CI. Its documented workflow is on-demand security review that commits fixes and opens PRs, requiring contents, pull-requests and security-events write permissions; this is a narrower task with broader grants than the requested general PR/issue execution. [README](https://github.com/shaztechio/multi-llm-security-review/blob/e22b5fd0d480/README.md), [passing CI](https://github.com/shaztechio/multi-llm-security-review/actions/runs/36894031611/job/110476393292)."
+        },
+        {
+          "key": "C05",
+          "name": "CodeForge",
+          "reason": "Active, with a 2026-09-17 commit and v1.1.3 release, and passing test, integration and end-to-end CI. Its own security model documents agents executing with approvals disabled in the server container, without per-session filesystem or network isolation; that is a weaker fit for this layer's least-privilege requirement. [Security model](https://github.com/freema/codeforge/blob/ef50634085b7/README.md#security-model), [passing CI](https://github.com/freema/codeforge/actions/runs/35197207050)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C04",
+          "name": "claude-code-base-action",
+          "criterion": "duplicate",
+          "fact": "The repository explicitly identifies itself as an automated mirror of the base-action directory in anthropics/claude-code-action and directs contributions to that repository. Its current commit, dated 2026-10-01, records that synchronization. It adds no independent complementary component. [Mirror declaration](https://github.com/anthropics/claude-code-base-action/blob/4bd489c7d926/README.md)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "Run four arms on the same fixed PR and issue corpus: gh-aw v0.89.21 using both engines; the OpenAI and Anthropic action pair at the inspected commits; claude-codex-actions v1.0.0 using both clients; and no additional component. Hold agent versions, models, prompts and task budgets constant across agent-enabled arms. Use fresh Linux x86_64 GitHub Actions runners under WSL2 with the required Docker setup. Measure human-confirmed actionable findings, false positives, successful issue-task completion, effective GitHub permissions, filesystem/network access, provider and runner cost per task, and failures. Include controlled untrusted-input fixtures to test permission boundaries. Smoke-test authoring and compilation separately on macOS arm64. This trial would determine whether the integrated controls justify gh-aw's additional machinery and whether either agent adds enough value to justify its cost.",
+      "evidence_gaps": [
+        "No all-arm review-quality, permission or cost comparison was supplied in the packet or found in the fetched upstream READMEs and releases. The selection is provisional; no measured superiority is claimed.",
+        "For gh-aw, the first eight sampled check suites on both the release commit and current default-branch commit were QUEUED with no check runs. This sample establishes neither a passing nor a failing CI result. Several other candidates also had queued suites; Anthropic's observed successful mirror-sync job was not treated as a test-suite result.",
+        "WSL2 authoring support and Linux/macOS release assets are documented, but installation and agent execution were not tested on the target hosts. macOS arm64 support is established for the gh-aw CLI, not for the Linux Docker security runtime.",
+        "The selected engines require CI-specific provider authentication. Reuse of workstation logins or subscription credentials was not verified, and cost per run remains unmeasured. Repository visibility is unspecified, so StepSecurity's private-repository subscription check does not justify a general needs_paid_service exclusion.",
+        "All nine repositories were unarchived and had default-branch commits within 90 days. Issue activity was sampled, not evaluated for response latency. Old latest-release records for the Anthropic repositories were not treated as staleness because their default branches are current.",
+        "Research used 30 GitHub API calls, including one failed GraphQL request, one web-search query and two blocked page-fetch attempts. Both ctx_fetch_and_index calls returned 'MCP tool call requires approval, but approval policy is never.' Consequently, the required webpage-fetch method could not be completed. Original upstream files were instead retrieved through gh api, indexed with ctx_index and read with ctx_search; no local repository records other than the supplied packet were read."
+      ],
+      "sources_read": [
+        "packets/order-1/agents-in-ci.json",
+        "https://api.github.com/repos/step-security/claude-code-action",
+        "https://api.github.com/repos/step-security/claude-code-action/releases/latest",
+        "https://api.github.com/repos/step-security/claude-code-action/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex-action",
+        "https://api.github.com/repos/openai/codex-action/releases/latest",
+        "https://api.github.com/repos/openai/codex-action/commits?per_page=1",
+        "https://api.github.com/repos/andrii-artemenko-gen/claude-codex-actions",
+        "https://api.github.com/repos/andrii-artemenko-gen/claude-codex-actions/releases/latest",
+        "https://api.github.com/repos/andrii-artemenko-gen/claude-codex-actions/commits?per_page=1",
+        "https://api.github.com/repos/icoretech/codex-action",
+        "https://api.github.com/repos/icoretech/codex-action/releases/latest",
+        "https://api.github.com/repos/icoretech/codex-action/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/claude-code-action",
+        "https://api.github.com/repos/anthropics/claude-code-action/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-code-action/commits?per_page=1",
+        "https://api.github.com/repos/github/gh-aw",
+        "https://api.github.com/repos/github/gh-aw/releases/latest",
+        "https://api.github.com/repos/github/gh-aw/commits?per_page=1",
+        "https://api.github.com/repos/shaztechio/multi-llm-security-review",
+        "https://api.github.com/repos/shaztechio/multi-llm-security-review/releases/latest",
+        "https://api.github.com/repos/shaztechio/multi-llm-security-review/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/claude-code-base-action",
+        "https://api.github.com/repos/anthropics/claude-code-base-action/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-code-base-action/commits?per_page=1",
+        "https://api.github.com/repos/freema/codeforge",
+        "https://api.github.com/repos/freema/codeforge/releases/latest",
+        "https://api.github.com/repos/freema/codeforge/commits?per_page=1",
+        "https://github.com/step-security/claude-code-action/blob/f921413b67d5/README.md",
+        "https://github.com/step-security/claude-code-action/blob/f921413b67d5/action.yml",
+        "https://github.com/openai/codex-action/blob/86365089eb2b/README.md",
+        "https://github.com/andrii-artemenko-gen/claude-codex-actions/blob/f28024429881/README.md",
+        "https://github.com/andrii-artemenko-gen/claude-codex-actions/blob/f28024429881/claude/action.yml",
+        "https://github.com/andrii-artemenko-gen/claude-codex-actions/blob/f28024429881/codex/action.yml",
+        "https://github.com/andrii-artemenko-gen/claude-codex-actions/blob/f28024429881/.github/workflows/test.yml",
+        "https://github.com/icoretech/codex-action/blob/ff40c1183874/README.md",
+        "https://github.com/icoretech/codex-action/blob/ff40c1183874/action.yml",
+        "https://github.com/anthropics/claude-code-action/blob/97c53473391b/README.md",
+        "https://github.com/anthropics/claude-code-action/blob/97c53473391b/action.yml",
+        "https://github.com/github/gh-aw/blob/v0.89.21/README.md",
+        "https://github.com/github/gh-aw/blob/v0.89.21/install.md",
+        "https://github.com/github/gh-aw/blob/v0.89.21/CONTRIBUTING.md",
+        "https://github.com/github/gh-aw/blob/v0.89.21/Makefile",
+        "https://github.com/github/gh-aw/blob/v0.89.21/.github/workflows/ci.yml",
+        "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/introduction/architecture.mdx",
+        "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/engines.md",
+        "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/safe-outputs.md",
+        "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/setup/quick-start.mdx",
+        "https://github.com/github/gh-aw/commit/c35393777e56/checks",
+        "https://github.com/github/gh-aw/commit/35eb607ae44d/checks",
+        "https://github.com/github/gh-aw/issues/64899",
+        "https://github.com/shaztechio/multi-llm-security-review/blob/e22b5fd0d480/README.md",
+        "https://github.com/anthropics/claude-code-base-action/blob/4bd489c7d926/README.md",
+        "https://github.com/freema/codeforge/blob/ef50634085b7/README.md",
+        "https://github.com/step-security/claude-code-action/actions/runs/36870692705/job/110397372573",
+        "https://github.com/openai/codex-action/actions/runs/32429534752/job/96618203279",
+        "https://github.com/andrii-artemenko-gen/claude-codex-actions/actions/runs/34486107507",
+        "https://github.com/shaztechio/multi-llm-security-review/actions/runs/36894031611/job/110476393292",
+        "https://github.com/freema/codeforge/actions/runs/35197207050"
+      ]
+    }
+  ]
+}

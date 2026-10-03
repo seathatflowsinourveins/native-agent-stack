@@ -340,7 +340,7 @@ locally with `GH_TOKEN` set and no `--offline`, using
   together. The carried-forward oauthlib review holds: the four oauthlib source files it names are byte-identical in the new
   venv and oauthlib 3.3.1 is unchanged. The macOS lock is a frozen evidence artifact for which the tree records no owner (its
   only commit is #201, and neither its experiment record nor `docs/lanes.md` names one), so it is not patched: its advisory is
-  excepted until 2026-12-24 under the policy above. **The exception is scoped by the scanner, not by a reader of the lock.**
+  excepted until 2026-12-24 under the policy above. **The workflow scopes the exception to its reviewed input.**
   OSV-Scanner 2.6.0 applies an explicit `--config` to every input of one invocation (`docs/configuration.md`,
   `internal/config/manager.go`, `Manager.Get`), so an `[[IgnoredVulns]]` entry in the one config would hide the advisory in
   every lock of the inventory. The exception therefore lives in `.github/osv-scanner-frozen-macos.toml` (one entry, nothing
@@ -366,6 +366,43 @@ locally with `GH_TOKEN` set and no `--offline`, using
   for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes. **Not covered:** the image's server binary (PyInstaller
   build of upstream's unchanged uv.lock, urllib3 2.7.0 and PyJWT 2.13.0 or older) and the grader venv, as for the earlier PyJWT
   relock. Evidence: `evidence/receipts/osv-urllib3-next-20260930.json`.
+  **Retired historical WSL retrieval partition (2026-10-03).** The original
+  `blueprints/convergence-practice/wsl-retrieval/package-lock.json` remains at
+  SHA256 `5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`.
+  Its braces 3.0.3 advisory, GHSA-vfj7-8cjw-p6xm, is assigned only to
+  `.github/osv-scanner-frozen-wsl-retrieval.toml`, expiring at the bare TOML
+  date 2026-10-17. The dated reason names the supported-entry-point retirement,
+  its limitations, the exact lock and digest, the retirement assessment and
+  `evidence/receipts/wsl-retrieval-retirement-20261003.json`. Retirement preserves
+  vulnerable historical bytes; it does not qualify active QMD.
+
+  The workflow now scans three exhaustive, disjoint inventory groups under
+  ordinary, frozen macOS and retired WSL configs. Before invoking OSV, the
+  native unittest preflight rejects unlisted or duplicated inputs, unknown
+  configs, advisory or package-override leakage, digest changes, missing or
+  mismatched retirement evidence, a restored assessment status, unbound reasons
+  and expired grants. The shell also checks the two exact archive assignments.
+  Each group's primary and SARIF statuses are retained, and the largest observed
+  status becomes the step status. Off pull requests, all three reports are kept
+  and uploaded under separate categories by the existing tool-free write job.
+
+  **Sources and correction.** Reuse the reviewed macOS partition at repository
+  revision `56473e4b840f0e6940c031801d866e7e9bf29baf`, and OSV-Scanner v2.6.0
+  (`e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6`): installed version/help, the
+  [tagged release](https://github.com/google/osv-scanner/releases/tag/v2.6.0),
+  [configuration reference](https://github.com/google/osv-scanner/blob/v2.6.0/docs/configuration.md),
+  [Manager.Get](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/manager.go)
+  and [ShouldIgnore](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go).
+  The older prose attributed path scope to the scanner. `Manager.Get` returns
+  the explicit override for every target path; caller partitioning enforces
+  scope. Mutation tests exercise the actual policy guards, and recording doubles
+  execute the workflow shell to verify routing, error propagation and SARIF
+  retention. These are local integration and synthetic checks; native scanner
+  controls and final integrated CI remain separate acceptance evidence.
+  **Overturn:** supported replay/install entry points return, the lock changes,
+  the source/evidence binding fails, or the date reaches 2026-10-17. Reassess the
+  disposition and remove or replace the dedicated grant; do not extend it to
+  active inputs or relock historical evidence without its owner.
 
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
