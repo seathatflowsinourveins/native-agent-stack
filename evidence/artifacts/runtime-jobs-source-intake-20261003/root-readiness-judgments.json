@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "receipt_id": "runtime-jobs-root-readiness-judgments-20261003",
+  "date_utc": "2026-10-03",
+  "published_protocol_head": "65a0d370ed8c075d922ff60857287e33d3a14788",
+  "base_policy_head": "d2777ee76a6ca14e020856fcd76421ceebc1e4f0",
+  "outcome": "readiness_only_execution_and_quality_hold",
+  "claim_boundary": [
+    "Pinned-source reads and independent artifact observations only.",
+    "No evaluated-runtime provider request, frozen study, role qualification or new default was produced.",
+    "Source acceptance, unchanged upstream controls, authored boundary probes, repository checks and actual provider/GPU acceptance remain separate."
+  ],
+  "root_original_source_reads": [
+    {
+      "repo": "diegosouzapw/OmniRoute",
+      "pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "file": "src/sse/handlers/chat.ts",
+      "bytes": 114738,
+      "sha256": "94bb265049693bebd350692bc6c90063798e31cdb3bf76b87fe242beaf105116",
+      "lines": "1878-1890",
+      "finding": "Calls resolveBareModelToConnectionDefault; no caller in chatCore.ts did not establish global absence."
+    },
+    {
+      "repo": "diegosouzapw/OmniRoute",
+      "pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "file": "src/app/api/v1/responses/route.ts",
+      "bytes": 8369,
+      "sha256": "6dda9adf645263b6de189d85dc24f8ce4fa3d0c7c82aaf17203486de19155b81",
+      "lines": "61-85",
+      "finding": "HTTP Responses invokes native Codex-preferred resolution before downstream handling."
+    },
+    {
+      "repo": "diegosouzapw/OmniRoute",
+      "pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "file": "src/app/api/internal/codex-responses-ws/modelResolution.ts",
+      "bytes": 4816,
+      "sha256": "a52ac61f4aee865caa02878542020681ab3a887790c938ccf10124db382dac2c",
+      "lines": "79-118",
+      "finding": "Qualified IDs, auto and combo branches are preserved; successful Codex resolution qualifies a bare ID. Actual deployed branch and delivered settings remain unobserved."
+    },
+    {
+      "repo": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/models-manager/src/manager.rs",
+      "bytes": 33616,
+      "sha256": "d998bb2768561c761f83a77ce60d3be4b5d1a453e4a7afb10c5f86d314d76a80",
+      "lines": "892-912",
+      "finding": "Longest-prefix metadata matching preserves the requested model slug; unchanged native catalog can supply base metadata to an Ultra alias. Actual routing remains unqualified."
+    },
+    {
+      "repo": "dagucloud/dagu",
+      "pin": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "file": "internal/test/helper.go",
+      "bytes": 36121,
+      "sha256": "e10620b50da754e4efaf9d809226876c918746a48afad3b0f55cffdeb0865d9a",
+      "lines": "219-224",
+      "finding": "Config loading precedes the named duplicate-ID assertion and failed despite a temporary application-home override."
+    },
+    {
+      "repo": "dagucloud/dagu",
+      "pin": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "file": "internal/cmn/config/loader.go",
+      "bytes": 80811,
+      "sha256": "0c6e3a06d59bdfd51a695a35cdfb149fc5308c941918217073ad1febd5464e60",
+      "lines": "179-190,1969-1977,2439-2445",
+      "finding": "Inherited HOME lookup precedes application-home override."
+    },
+    {
+      "repo": "golang/go",
+      "pin": "go1.27.0",
+      "file": "src/os/file.go",
+      "bytes": 30343,
+      "sha256": "d77653afbcbec5256b56aee25dce3df3ed001f964c9b245b848a5d378884bcb3",
+      "lines": "605-614",
+      "finding": "Linux UserHomeDir returns nonempty inherited HOME; NSS identity does not substitute for an absent variable."
+    },
+    {
+      "repo": "containers/bubblewrap",
+      "pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "file": "bubblewrap.c",
+      "bytes": 113001,
+      "sha256": "3f17ee26057cae9d660801ca8d9ba84722f1bafdcd072d5151ee1c64eeeb15f4",
+      "lines": "2488-2496",
+      "finding": "Native --unsetenv permits a strict variable-name whitelist without replacing HOME."
+    }
+  ],
+  "sdk_original_artifact_observation": {
+    "public_worker_receipt_sha256": "f0d622731a87e31c6076350b6ceaed9e13c31b45ed8bf1bc9cf2e2dc39852f5f",
+    "public_stdout_sha256": "b4ef819cae1a771acdc59df8da0f345ed5b0d28e1b20a3510f27b2f2c9e840c3",
+    "worker_file_hashes_independently_match": true,
+    "all_three_original_stdout_regions_match_public": true,
+    "exec_and_companion_original_stderr_regions_match_public": true,
+    "local_proxy_original_stderr_bytes": 17089,
+    "local_proxy_original_stderr_sha256": "8731c3e01451afaffde8d753e50e332aa30ea3a155db7a2702a68a6e7bd4ce1e",
+    "local_proxy_stderr_selected_original_lines": 32,
+    "local_proxy_selected_original_lines_match_public": true,
+    "native_json": [
+      {
+        "artifact": "exec-controls-native.json",
+        "bytes": 5509,
+        "sha256": "fcc20e35c8a9033c9a38bf58f3e642fbdfd634d478a0fd511aa467626e42507b",
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "success": true,
+        "native_exit_from_worker": 0
+      },
+      {
+        "artifact": "local-proxy-controls-native.json",
+        "bytes": 63103,
+        "sha256": "64d5b3e472bb681d05ecbb54fdd992ad6b126258a5cef92f6ce8d3289782cbf5",
+        "passed": 6,
+        "failed": 26,
+        "pending": 0,
+        "success": false,
+        "native_exit_from_worker": 1
+      },
+      {
+        "artifact": "companion-staging-positive-native.json",
+        "bytes": 9442,
+        "sha256": "909f3855746f3aa75b6a947fb0d87f9bd1a06ea470991cf164cac72dd6f77075",
+        "passed": 0,
+        "failed": 1,
+        "pending": 22,
+        "success": false,
+        "native_exit_from_worker": 1
+      }
+    ],
+    "disposition": "No cause established. Further repairs held pending value-free native child/listener/connectivity diagnostics.",
+    "repair_trigger": "Failure unresolved after one bounded Sol companion-staging repair; consequential Astra/max read requested.",
+    "quality_qualified": false
+  },
+  "scheduler_original_artifact_observation": [
+    {
+      "artifact": "dagu-duplicate-run-id.json",
+      "bytes": 1067,
+      "sha256": "3ace26aabb3400404494c3e19a1284bdea7e780aab8043452d17a5d269a74f7b",
+      "native_exit": 1,
+      "timeout": false,
+      "duration_seconds": 236.95349955558777,
+      "stdout_bytes": 3552,
+      "stdout_sha256": "583efbc962f2139abcc4fa75040c2f0d1604ecb0338e46f772c21bf9410d8ba1",
+      "disposition": "Setup failure before duplicate-ID assertions; retain failed attempt."
+    },
+    {
+      "artifact": "dagu-selected-step-retry.json",
+      "bytes": 1078,
+      "sha256": "c03a2989ebfdf3b8b3dc943b7ec58837e867d8e421b7d16cf1f77b1fd9caee81",
+      "native_exit": 0,
+      "timeout": false,
+      "duration_seconds": 1.818467378616333,
+      "stdout_bytes": 2264,
+      "stdout_sha256": "c61f8af8a4a64da5d9fe549882a92d1ccae0a8fef542d3ec76024c482e0cd038",
+      "disposition": "One unchanged native conformance case passed; upstream runner owns its temporary fixture HOME. This is separate from failed duplicate-ID setup."
+    },
+    {
+      "artifact": "deerflow-scheduler-controls-repaired.json",
+      "bytes": 1555,
+      "sha256": "f251bfd056c2d14ae36e8ae499f63856142c358a9f8dc6b0a0447feedca972a2",
+      "native_exit": 0,
+      "timeout": false,
+      "duration_seconds": 8.183974742889404,
+      "stdout_bytes": 99,
+      "stdout_sha256": "bd806c9da28ad3948dab00c772111f02692a754a8a2ac11fc33efc7959e53454",
+      "passed": 12,
+      "disposition": "Selected unchanged scheduler controls; not useful GPT tasks or scheduler default acceptance."
+    }
+  ],
+  "scheduler_public_receipt_observation": {
+    "bytes": 57486,
+    "sha256": "5a787bb41f8291645cb56aaf50b38f3ed3548e7a4fe32846922d757db34e23e2",
+    "worker_hash_independently_matches": true,
+    "original_native_json_and_stdout_hashes_independently_observed": true,
+    "claim": "Original native outputs remain separate from the compact public representation and derived summaries."
+  },
+  "scheduler_repair_observation": {
+    "native_upstream_case": "TestCmdStart_DuplicateRunIDDoesNotOverwriteExistingAttempt",
+    "artifact_bytes": 1198,
+    "artifact_sha256": "9b25fcfbb66bd9325be1e4961bdbbb9d6eb50470c235335b8985edfd43d35e6a",
+    "native_exit": 0,
+    "timeout": false,
+    "duration_seconds": 7.532895088195801,
+    "native_case_elapsed_seconds": 0.03,
+    "stdout_bytes": 4228,
+    "stdout_sha256": "303266ad4892e64080d3744cafaa95b0b2f6a5fe6c56f8f73c87ebe0c2469ad0",
+    "parent_process_reaped": true,
+    "process_present_after": false,
+    "repair": "Native bubblewrap --unsetenv whitelist preserves ordinary inherited HOME unchanged, with no external HOME assignment or host-home bind.",
+    "authored_boundary_probe": {
+      "first_native_exit": 1,
+      "first_stdout_sha256": "af6a8f7c2dce36124d990caf0094449d6f02de0b1fe05b1019f3e193de114183",
+      "failure": "Expected-name assertion omitted bubblewrap's native PWD; no upstream test failure or namespace relaxation.",
+      "source": "containers/bubblewrap@2a76602a8c71f36c1527cf9fc3417d9149822e0c:bubblewrap.c:3427",
+      "corrected_native_exit": 0,
+      "corrected_stdout_sha256": "b903771921b42c9d2a87613543749ae0fa65825bc8fcd04b64384d1c8f3e3cc6",
+      "parent_home_present": true,
+      "inherited_home_present": true,
+      "home_bytes_equal": true,
+      "codex_home_present": false,
+      "inherited_home_directory_visible": false,
+      "claim": "Authored boundary observation remains separate from unchanged upstream test acceptance."
+    },
+    "disposition": "Only the named duplicate-ID case passed after the accepted repair; retain original native1. Scheduler useful-task/GPT/default gates remain open."
+  },
+  "consequential_reads": [
+    {
+      "trigger": "Conflicting primary Harbor phase-network and model-routing evidence.",
+      "requested_role": "Astra/max",
+      "verdict": "Accept native derived task and read-only configuration carriers for readiness only; hold freeze/execution/quality.",
+      "conditions": [
+        "Distinct original and derived task identities; only task.toml changes and same derivation across every arm.",
+        "Harbor native phase allowlist; no main host-network override that bypasses protection.",
+        "Actual gateway allow/public-source deny plus lifecycle and reference-isolation observations.",
+        "Unchanged native Codex catalog and Pi nested-model carrier need activation/wire canaries."
+      ]
+    },
+    {
+      "trigger": "Dagu setup failure after one bounded Sol compiler-namespace repair.",
+      "requested_role": "Astra/max",
+      "verdict": "Accept one bounded environment repair, not test acceptance.",
+      "conditions": [
+        "Preserve ordinary inherited HOME byte-for-byte through native --unsetenv whitelist; no HOME assignment.",
+        "No host-home/auth access; same namespace/identity/upstream test bytes.",
+        "Report presence/equality booleans and public allowed names only.",
+        "If ordinary inherited HOME is absent, hold; retain original failed setup and subsequent named-test result separately."
+      ]
+    }
+  ],
+  "owner_gateway_metadata_observations": {
+    "health_native_exit": 0,
+    "health_http_status": 200,
+    "model_call": false,
+    "model_list_snapshots": [
+      {
+        "bytes": 253821,
+        "sha256": "177c7648058fbe72ae1b1696f19e57ddf6144c78ab39333f54be94bd71245810",
+        "advertised_model_count": 598
+      },
+      {
+        "bytes": 253171,
+        "sha256": "4c75db650d379a10ad72359104f1bbadf8d7ffdd4a5d398c334ccb3392b78d21",
+        "advertised_model_count": null
+      }
+    ],
+    "claim": "Readonly liveness/model metadata only; generic gateway metadata is not native Codex ModelsResponse qualification. Bare-model listing absence does not establish routing absence.",
+    "usage": null,
+    "delivered_model": null,
+    "delivered_effort": null,
+    "actual_codex_lite": null,
+    "actual_astra_transport": null
+  },
+  "release_read_correction": {
+    "repository": "diegosouzapw/OmniRoute",
+    "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+    "release_tag": "v3.8.52",
+    "release_api_native_exit": 1,
+    "release_api_http_status": 404,
+    "changelog_file": "CHANGELOG.md",
+    "changelog_bytes": 3124074,
+    "changelog_sha256": "fecca7ebbef9565310f7d1f02dca40b2e17ab22929b4a3636c6bd22634a8032f",
+    "finding": "Pinned changelog labels 3.8.52 TBD; the installed composite is not established as a published v3.8.52 release.",
+    "retained_failed_read": "Contents API returned empty inline content; decoding zero bytes was not a source read. Native raw-media API corrected the read."
+  },
+  "cross_family_and_execution": {
+    "source_admission_note": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/633#issuecomment-5967674197",
+    "source_note_head": "65a0d370ed8c075d922ff60857287e33d3a14788",
+    "source_note_scope": "Bounded consequential admission continuation; not a whole seven-protocol/eight-decision review.",
+    "complete_claude_delta_verdict": null,
+    "coding_block_bound_minutes_before_overhead": 195,
+    "reserved_minutes": 180,
+    "freeze": false,
+    "execution_admitted": false,
+    "new_measured_defaults": 0
+  },
+  "ci_observation": {
+    "cancelled_run": 37110192152,
+    "cancelled_head": "65a0d370ed8c075d922ff60857287e33d3a14788",
+    "cancelled_run_conclusion": "cancelled",
+    "later_validate_run": 37110320055,
+    "later_validate_job": 111167201369,
+    "later_validate_conclusion": "SUCCESS",
+    "macos_checks_at_observation": "QUEUED",
+    "claim": "Cancellation and later validation success are separate native returned states; cancellation cause and complete required-CI acceptance are not inferred."
+  },
+  "root_processing_failures_retained": [
+    {
+      "operation": "projected evidence-registration patch",
+      "result": "Native apply_patch rejected numeric unified-diff hunk headers; no registry edit occurred. Convert headers to native apply_patch syntax, then derive hashes again after retaining this failure.",
+      "classification": "patch-format failure; not upstream test failure"
+    },
+    {
+      "operation": "ctx execution timeout argument",
+      "result": "60 interpreted as milliseconds; timed out before returned native results. Corrected to 60000; repeated readonly calls returned native0.",
+      "native_exit": null
+    },
+    {
+      "operation": "PR metadata output",
+      "result": "Combined derived output exceeded the bound and triggered context-mode auto-indexing. No search/index cleanup was used; subsequent output was explicitly bounded."
+    },
+    {
+      "operation": "source-window extraction",
+      "result": "Guessed end beyond the 118-line resolver raised IndexError; corrected bounds returned the original source and hash.",
+      "native_exit": 1
+    },
+    {
+      "operation": "native-artifact shape and filename lookup",
+      "result": "A command-manifest argv string was initially treated as a result object and raised AttributeError; a .stdout lookup returned no files because originals use .stdout.txt. Corrected typed inspection and exact filenames independently matched the originals. No absence or upstream test failure is inferred.",
+      "native_exit": 1
+    },
+    {
+      "operation": "derived-output bound guards",
+      "result": "SDK/scheduler and tracker/source processing assertions stopped oversized output before printing; bounded extraction succeeded.",
+      "classification": "analysis-helper failures; not upstream test failures"
+    }
+  ],
+  "remaining_gates": [
+    "Complete Claude exact-head delta read and required CI.",
+    "Owner-agreed sufficient provider window, actual reachable gateway and complete counter/delivered-setting receipts.",
+    "Supported SDK child/listener diagnostic result and role qualification for issue617.",
+    "Actual coding task/image/network/extension/reference/lifecycle qualification.",
+    "Native useful-task evaluator bindings for every job and trading-owner protocol/data gate.",
+    "Both-family freeze, full measured comparisons, canonical harness/catalog/freshness integration and manifest consensus."
+  ]
+}

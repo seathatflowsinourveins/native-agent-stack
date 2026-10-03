@@ -42010,6 +42010,16 @@
       "bytes": 2582
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json",
+      "sha256": "f0d622731a87e31c6076350b6ceaed9e13c31b45ed8bf1bc9cf2e2dc39852f5f",
+      "bytes": 31925
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.stdout.txt",
+      "sha256": "b4ef819cae1a771acdc59df8da0f345ed5b0d28e1b20a3510f27b2f2c9e840c3",
+      "bytes": 6330
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-source-and-native-readiness.json",
       "sha256": "8eb44ebfbb0e07485373d33843b0519fbb4795c266b461189bee38c97ea8258f",
       "bytes": 25271
@@ -42195,9 +42205,19 @@
       "bytes": 1953
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-judgments.json",
+      "sha256": "6e8f7150896bda43e03ea464eb85262312ca480f0ed2deb7f0fbff6173d5fbe6",
+      "bytes": 16084
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-source-read-followup.json",
       "sha256": "f02d8e250fda9f42427eff044d333c10dbdf02b597d4f547ac30daa0c789d76d",
       "bytes": 11172
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/scheduler-native-controls.json",
+      "sha256": "5a787bb41f8291645cb56aaf50b38f3ed3548e7a4fe32846922d757db34e23e2",
+      "bytes": 57486
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-read.json",
