@@ -2,12 +2,16 @@
 
 Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001, and the
 layer-consensus record that its assembler reads last). They do not judge any pick; they hold the manifest to its own rule.
+One class runs a committed program: the install plan's acceptance of the consensus row skill-authoring, against stand-ins.
 """
 import hashlib
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import types
 import unittest
 from pathlib import Path
@@ -19,6 +23,7 @@ RECORD = ROOT / "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md"
 SELECTION = ROOT / "evidence/artifacts/new-wsl-clean-install-selection-20261001"
 CONSENSUS_ART = ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002"
 CONSENSUS_RECORD = ROOT / "docs/decisions/2026-10-02-new-wsl-layer-consensus.md"
+PLAN = ROOT / "evidence/artifacts/new-wsl-install-plan-20261002"
 ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added", "consensus"}
 # What the rounds decided on a row: an amendment by direct consensus is recorded beside these and carries none of them.
 PROTECTED = {"default", "state", "definitive", "repository", "installs_nothing_extra", "row_kind"}
@@ -73,13 +78,17 @@ def converged_key(slot):
     return picks[0] if picks[0] == picks[1] else None
 
 
-def load_assembler():
-    """The assembler's functions, compiled from source so that no bytecode is written into the artifact folder."""
-    path = ART / "assemble_manifest.py"
-    module = types.ModuleType("assemble_manifest")
+def load_source(path, name):
+    """A module compiled from source, so that no bytecode is written into an artifact folder."""
+    module = types.ModuleType(name)
     module.__file__ = str(path)
     exec(compile(path.read_text(encoding="utf-8"), str(path), "exec"), module.__dict__)
     return module
+
+
+def load_assembler():
+    """The assembler's functions."""
+    return load_source(ART / "assemble_manifest.py", "assemble_manifest")
 
 
 class Manifest(unittest.TestCase):
@@ -778,6 +787,12 @@ class Manifest(unittest.TestCase):
         records = self.consensus["records"]
         copies = load(CONSENSUS_ART / "copy-notes.json")["copies"]
         named = {name: ref for name, ref in records.items() if name != "acknowledgements"}
+        # The Claude lane's review of the Codex lane's scoped dispositions is hashed like the copies but is not one: it was
+        # written in the folder from the review as returned, so copy-notes.json, which accounts for the copies, omits it.
+        review = named.pop("claude_review_held_topics")
+        self.assertEqual(review["path"], (CONSENSUS_ART / "claude-review-held-topics.md").relative_to(ROOT).as_posix())
+        self.assertNotIn(Path(review["path"]).name, copies)
+        self.assertEqual(sha(ROOT / review["path"]), review["sha256"])
         self.assertEqual(sorted(Path(ref["path"]).name for ref in named.values()), sorted(copies))
         for name, ref in named.items():
             path = ROOT / ref["path"]
@@ -789,6 +804,43 @@ class Manifest(unittest.TestCase):
         self.assertEqual({ack["family"] for ack in records["acknowledgements"]}, {"claude", "gpt"})
         for ack in records["acknowledgements"]:
             self.assertTrue(ack["url"].startswith("https://github.com/"), ack["url"])
+        # The Claude lane's acknowledgement of the scoped dispositions came from the note, before its review; the record
+        # says what it covers and names the review.
+        covering = [ack for ack in records["acknowledgements"] if "covers" in ack]
+        self.assertEqual([(ack["family"], ack["url"].rsplit("-", 1)[1]) for ack in covering], [("claude", "5959684384")])
+        self.assertIn("claude_review_held_topics", covering[0]["covers"])
+
+    def test_consensus_labels_follow_the_rule(self):
+        """The rule's label clause, in the labels' own words: every consensus row names the direct consensus of both
+        families; a row whose install waits says that its gate or its measurement decides and that nothing is installed
+        until it returns, and every other row says that it is not a blind round and not a measurement. Acceptance gates
+        that an installed or resolved row still has to pass are its open acceptance gates and do not hold its install."""
+        self.assertIn("listed as its open acceptance gates and do not hold its install", self.consensus["rule"])
+        rows = [row for row in self.rows if row["row_kind"] == "consensus"]
+        self.assertEqual(len(rows), len(self.consensus_rows))
+        for row in rows:
+            label, resolution = row["label"], row["resolution"]
+            with self.subTest(slot=row["slot_id"]):
+                self.assertTrue(label.startswith("both families by direct consensus"), label)
+                self.assertNotIn("open_gates", resolution)
+                if row["state"] == "measurement":
+                    self.assertRegex(label, r"; (?:an activation gate|the named measurement) decides\b")
+                    self.assertTrue(label.endswith(", nothing installed until it returns"), label)
+                    self.assertNotIn("not a blind round", label)
+                    self.assertTrue(resolution["deciding_measurement"])
+                    self.assertNotIn("open_acceptance_gates", resolution)
+                else:
+                    self.assertTrue(label.endswith("; not a blind round, not a measurement"), label)
+                    self.assertNotIn("decides", label)
+                    self.assertNotIn("deciding_measurement", resolution)
+        gated = {row["slot_id"]: row for row in rows if "open_acceptance_gates" in row["resolution"]}
+        self.assertEqual(sorted(gated), ["cross-family-review", "skill-authoring", "skill-discovery"])
+        for sid, row in gated.items():
+            with self.subTest(gated=sid):
+                # Installed or resolved, not waiting: the gates are acceptance on the destination, not a hold on the install.
+                self.assertNotIn(row["state"], ("measurement", "split"))
+                self.assertIsNone(row["measurement"])
+                self.assertTrue(row["resolution"]["open_acceptance_gates"])
 
     def test_tables_show_consensus_rows_by_their_label_and_list_the_amendments(self):
         lines = RECORD.read_text(encoding="utf-8").splitlines()
@@ -826,6 +878,118 @@ class Manifest(unittest.TestCase):
                 text = path.read_text(encoding="utf-8")
                 self.assertIsNone(re.search(PRIVATE_SHAPES[0], text), str(path.relative_to(ROOT)))
                 self.assertIsNone(re.search(PRIVATE_SHAPES[1], text, re.I), str(path.relative_to(ROOT)))
+
+
+class SkillAuthoringAcceptance(unittest.TestCase):
+    """The install plan's acceptance of the consensus row skill-authoring, run against stand-ins.
+
+    The record's reason for the row is that no same-name copy of skill-creator is placed beside the one Codex embeds.
+    The program that accept.sh runs for the row is run here as accept.sh runs it (bash -euo pipefail -c), with a stub
+    npx that prints a canned listing and records its arguments, a canned lock file and a scratch HOME. The expected state
+    passes, and each condition of the program, planted on its own, fails it. The fixtures are our own: the stub does not
+    exercise the installer's listing logic, and nothing is installed.
+    """
+
+    WANT = "3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6"
+    LISTING_ARGS = "--yes skills@1.7.0 list -g --json"
+    SKILL = "---\nname: skill-creator\n---\n"
+
+    @classmethod
+    def setUpClass(cls):
+        if not (shutil.which("bash") and shutil.which("jq")):
+            raise unittest.SkipTest("bash and jq are needed to run the acceptance program")
+        row = next(r for r in load(PLAN / "install-plan.json")["owners"] if r["slot"] == "skill-authoring")
+        cls.program = row["acceptance"]["post_install"]["command"]
+
+    def run_case(self, agents=("Claude Code",), folder_hash=None, plant=(), codex_home=False, errexit=True):
+        """The program's exit status for one state, the arguments the stub npx received, and the program's stderr.
+
+        HOME is <scratch>/home and, with codex_home, CODEX_HOME is <scratch>/codex-home; `plant` holds (kind, path under
+        the scratch folder) pairs, where kind is "folder" (a skill folder) or "dangling" (a link to nothing). Without
+        errexit the program runs without -e."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            home, stub = scratch / "home", scratch / "bin"
+            (home / ".agents/skills/find-skills").mkdir(parents=True)  # another skill in the shared directory
+            embedded = home / ".codex/skills/.system/skill-creator"  # where Codex keeps its embedded skills
+            embedded.mkdir(parents=True)
+            (embedded / "SKILL.md").write_text(self.SKILL, encoding="utf-8")
+            listing = [{"name": "find-skills", "scope": "global", "agents": ["Claude Code", "Codex"]}]
+            if agents is not None:
+                listing.append({"name": "skill-creator", "scope": "global", "agents": list(agents)})
+            (scratch / "listing.json").write_text(json.dumps(listing), encoding="utf-8")
+            lock = {"version": 3, "skills": {"skill-creator": {"skillFolderHash": folder_hash or self.WANT}}}
+            (home / ".agents/.skill-lock.json").write_text(json.dumps(lock), encoding="utf-8")
+            for kind, relative in plant:
+                path = scratch / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                if kind == "folder":
+                    path.mkdir()
+                    (path / "SKILL.md").write_text(self.SKILL, encoding="utf-8")
+                else:
+                    path.symlink_to(scratch / "nowhere")
+            stub.mkdir()
+            (stub / "npx").write_text('#!/bin/sh\nprintf \'%s\\n\' "$*" >"$STUB_DIR/args"\ncat "$STUB_DIR/listing.json"\n',
+                                      encoding="utf-8")
+            (stub / "npx").chmod(0o755)
+            env = {key: value for key, value in os.environ.items()
+                   if key not in ("XDG_STATE_HOME", "CODEX_HOME", "CLAUDE_CONFIG_DIR", "BASH_ENV", "ENV")}
+            env.update(HOME=str(home), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}", STUB_DIR=str(scratch))
+            if codex_home:
+                env["CODEX_HOME"] = str(scratch / "codex-home")
+            result = subprocess.run(["bash", "-euo" if errexit else "-uo", "pipefail", "-c", self.program], env=env,
+                                    capture_output=True, text=True, timeout=60)
+            args = scratch / "args"
+            return result.returncode, args.read_text(encoding="utf-8").strip() if args.exists() else None, result.stderr
+
+    def test_the_program_is_the_one_accept_sh_runs(self):
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        functions = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
+        self.assertEqual(checker.checks_of(functions["skill-authoring"]),
+                         [("post_install", "skill-authoring", "smoke", self.program)])
+
+    def test_the_expected_state_passes_and_the_listing_has_no_agent_filter(self):
+        # Listed for Claude Code alone, the recorded tree hash, another skill in the shared directory and Codex's
+        # embedded copy under skills/.system.
+        status, args, stderr = self.run_case()
+        self.assertEqual(status, 0, stderr)
+        self.assertEqual(args, self.LISTING_ARGS)
+
+    def test_each_planted_condition_fails_the_program(self):
+        cases = {
+            "the listing names Codex as well": dict(agents=("Claude Code", "Codex")),
+            "the listing names Codex alone": dict(agents=("Codex",)),
+            "the listing has no skill-creator": dict(agents=None),
+            "the lock records another tree hash": dict(folder_hash="0" * 40),
+            "a copy in the installer's shared directory": dict(plant=[("folder", "home/.agents/skills/skill-creator")]),
+            "a dangling link in the installer's shared directory": dict(plant=[("dangling", "home/.agents/skills/skill-creator")]),
+            "a copy in Codex's skills directory": dict(plant=[("folder", "home/.codex/skills/skill-creator")]),
+            "a dangling link in Codex's skills directory": dict(plant=[("dangling", "home/.codex/skills/skill-creator")]),
+            "a copy in the skills directory under CODEX_HOME": dict(codex_home=True,
+                                                                    plant=[("folder", "codex-home/skills/skill-creator")]),
+        }
+        for name, case in cases.items():
+            with self.subTest(case=name):
+                status, args, stderr = self.run_case(**case)
+                self.assertEqual(status, 1, stderr)
+                self.assertEqual(args, self.LISTING_ARGS)
+
+    def test_the_directory_conditions_do_not_rest_on_errexit(self):
+        # Before bash 4.1 (macOS /bin/bash is 3.2) a failing [[ ]] does not stop a set -e script (bash NEWS, bash-4.1,
+        # item j). The directory test is therefore the program's last command, and without -e its status is still the
+        # program's: each planted copy or link fails the program on any bash.
+        cases = {
+            "a copy in the installer's shared directory": dict(plant=[("folder", "home/.agents/skills/skill-creator")]),
+            "a dangling link in the installer's shared directory": dict(plant=[("dangling", "home/.agents/skills/skill-creator")]),
+            "a copy in Codex's skills directory": dict(plant=[("folder", "home/.codex/skills/skill-creator")]),
+            "a dangling link in Codex's skills directory": dict(plant=[("dangling", "home/.codex/skills/skill-creator")]),
+            "a copy in the skills directory under CODEX_HOME": dict(codex_home=True,
+                                                                    plant=[("folder", "codex-home/skills/skill-creator")]),
+        }
+        for name, case in cases.items():
+            with self.subTest(case=name):
+                status, _, stderr = self.run_case(errexit=False, **case)
+                self.assertEqual(status, 1, stderr)
 
 
 if __name__ == "__main__":

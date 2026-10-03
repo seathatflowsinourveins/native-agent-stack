@@ -1063,14 +1063,22 @@ class NewWslHandbookTests(unittest.TestCase):
         def round_outcome(manifest):
             next(row for row in manifest["slots"] if row["slot_id"] == "skill-discovery")["resolution"]["outcome"] = "final"
 
+        def definitive(manifest):
+            # The flag and the state agree, as the producer's flag check requires, and the outcome is the record's own:
+            # only the rule that a consensus row is never definitive refuses it.
+            next(row for row in manifest["slots"] if row["slot_id"] == "skill-discovery").update(definitive=True,
+                                                                                                state="definitive")
+            recount(manifest)
+
         def bare_amendment(manifest):
             del next(row for row in manifest["slots"] if row["slot_id"] == "codex")["amendments"][0]["decision"]
 
         for mutate, message in ((relabel, "consensus row differs from the layer-consensus record: codex"),
                                 (unlabel, "consensus row differs from the layer-consensus record: skill-discovery"),
                                 (round_outcome, "is never definitive and carries no outcome of the rounds: skill-discovery"),
+                                (definitive, "is never definitive and carries no outcome of the rounds: skill-discovery"),
                                 (bare_amendment, "amendment needs its date, its author and its decision: codex")):
-            with self.subTest(message=message):
+            with self.subTest(mutation=mutate.__name__, message=message):
                 manifest = deepcopy(original)
                 mutate(manifest)
                 self.write(DEFAULTS_SOURCE, manifest)

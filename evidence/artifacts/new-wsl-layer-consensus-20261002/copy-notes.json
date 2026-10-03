@@ -1,5 +1,5 @@
 {
- "meaning": "the three notes of this folder are published copies of notes that the two lanes exchanged in a private coordination folder; this file records each copy's hash, the original's hash and every difference between them",
+ "meaning": "the three notes of this folder are published copies of notes that the two lanes exchanged in a private coordination folder; this file records each copy's hash, the original's hash and every difference between them. The Claude lane's review in the same folder (claude-review-held-topics.md) is not a copy and is not listed here; it lists its own replacements at its end",
  "copied_utc": "2026-10-02",
  "copies": {
   "claude-proposals.md": {

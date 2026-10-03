@@ -6,7 +6,7 @@ The sections are kept in the order they were written. The first two describe the
 
 ### Evidence class
 
-The result below is one run on one host: a throwaway Ubuntu 26.04.1 distribution on WSL 3.0.1, on 2026-10-02, executing this plan as it stood before this revision (branch `foundation/new-wsl-install-plan-20261002`, commit `bf5a08e2`). The coordinator recorded it in a findings note kept outside the repository. It is a historical host execution of the previous revision. It says nothing about the commands this revision changed or added. When this section was written they had not run on a distribution; their one run since then is the section "Clean run of this revision" below. The round 1 container run below is a separate, earlier class of evidence.
+The result below is one run on one host: a throwaway Ubuntu 26.04.1 distribution on WSL 3.0.1, on 2026-10-02, executing this plan as it stood before this revision (branch `foundation/new-wsl-install-plan-20261002`, commit `bf5a08e2`). The coordinator recorded it in a findings note kept outside the repository. It is a historical host execution of the previous revision. It says nothing about the commands this revision changed or added. When this section was written they had not run on a distribution; their run in a throwaway distribution since then is the section "Clean run of this revision" below, and their one run on the destination distribution is named in that section, after its list of results. The round 1 container run below is a separate, earlier class of evidence.
 
 ### Result of that run
 
@@ -71,15 +71,18 @@ no provider call, no model run. The distribution was removed afterwards.
   listener was left after the distribution was removed.
 
 Not established by this run: a signed-in client, a pulled or running model, the GPU, the gateway and the research
-harnesses as services, the three measurement-only owners, and a distribution that stays. On the destination
-distribution nothing has run: installation and acceptance there are UNRUN.
+harnesses as services, the three measurement-only owners, and a distribution that stays. Later on 2026-10-02 the plan
+at this revision, as merged to main (`6652b78e`), ran once on the destination distribution, the one meant to stay. The
+record of that run is private, its public receipt comes with that distribution's acceptance, and this file records no
+result of it.
 
 The record binds each phase to the commit that ran and to the SHA-256 of each plan file at that commit
 (`executed_files`). After both commits had run, the header comments of `install.sh` (lines 2 and 3) and of
 `accept.sh` (line 2) and the `status` text of `install-plan.json` were corrected, because they still said that this
-revision was unrun. No command, row or check changed and the corrected files were not run again, so the published
-files differ from the executed ones in those lines only. The raw outputs behind the record are private files; the
-record carries their hashes, and no reviewer has inspected them.
+revision was unrun. No command, row or check changed and the corrected files were not run again in a throwaway
+distribution, so the files merged to main (`6652b78e`) differ from the executed ones in those lines only; those merged
+files are the revision that ran once on the destination distribution. The raw outputs behind the record are private
+files; the record carries their hashes, and no reviewer has inspected them.
 
 ## Rows added from the layer consensus (2026-10-02): static checks only
 
@@ -122,6 +125,23 @@ measurement-only and 28 not installed.
   another tree hash and an absent skill each exit 1 for `skill-discovery`. Another tree hash, a listing without Claude
   Code and a `skill-creator` folder under `$HOME/.agents/skills` each exit 1 for `skill-authoring`; another skill in
   that shared directory does not fail it.
+- Then the `skill-authoring` acceptance was tightened, and its stand-ins became a committed test. The program also fails
+  on `skill-creator` in Codex's own global skills directory, `${CODEX_HOME:-$HOME/.codex}/skills` (the installer's
+  README, line 298), counts a dangling symbolic link as a copy in either directory, and requires the installer's
+  listing, now run without an agent filter, to name Claude Code as the only agent of `skill-creator`; Codex's embedded
+  skills under `skills/.system` are left alone. Both directories are tested in one `[[ ]]` as the program's last
+  command, so that its status is the program's on bash before 4.1 too (macOS `/bin/bash` is 3.2), where a failing
+  `[[ ]]` does not stop a `set -e` script (bash NEWS, bash-4.1, item j). The class `SkillAuthoringAcceptance` in
+  `tests/test_new_wsl_definitive_defaults.py` checks that its program is the one `accept.sh` runs and runs it as
+  `accept.sh` does, with a stub `npx` that records its arguments and prints a canned listing, a canned lock file and a
+  scratch `HOME` (our own fixtures, with jq 1.7 on the workstation). The expected state exits 0, with another skill in
+  the shared directory and Codex's embedded copy present, and the stub receives the unfiltered `list -g --json`. Each
+  condition planted on its own exits 1: a listing that also names Codex, names Codex alone or lacks the skill, another
+  tree hash, a folder or a dangling link in either directory, and a folder under a set `CODEX_HOME`. Each planted
+  folder or link also exits 1 with `-e` taken away; the earlier form, one `[[ ]]` per directory, exited 0 there for
+  both shared-directory cases (bash 5.2; no bash before 4.1 was run). Removing any one condition from the program,
+  in a scratch run of the test, made its planted case pass. The stub does not exercise the installer's own listing
+  logic.
 - `python3 -B scripts/validate.py`: exit 1; for this folder it reports only that the seven changed files differ from
   the hashes and byte counts registered in `manifests/evidence.json`, to be re-registered by the coordinator.
 
@@ -132,11 +152,14 @@ measurement-only and 28 not installed.
 - That the installer records the folder's git tree hash in its lock file for an install pinned to a commit, and that
   its listing shows the agents as the acceptance expects. The clean run showed both for `engineering-process-skills`,
   which is pinned to a tag and installed for two agents.
-- That `--copy` with one agent leaves `$HOME/.agents/skills` without a `skill-creator` folder. It is read from the
-  installer's bundled code.
+- That `--copy` with one agent leaves `$HOME/.agents/skills` without a `skill-creator` folder, and that the installer's
+  unfiltered listing then names Claude Code alone for it. Both are read from the installer's bundled code
+  (`installSkillForAgent`, `listInstalledSkills`).
 - That the embedded Codex `skill-creator` is available on the destination, and that any client loads or usefully
   invokes either skill. Those are open gates of the consensus record.
-- Anything on the destination distribution: installation and acceptance there remain UNRUN for every row.
+- Anything on the destination distribution for these rows. The plan's one run there was the 64-row revision (main
+  `6652b78e`), whose record is private and whose public receipt comes with that distribution's acceptance; it did not
+  include these rows, and none of the five has run there or anywhere else.
 
 ## Round 1 install-plan repair (historical)
 
@@ -193,4 +216,4 @@ The container cannot establish these conditions; check them on the real distribu
 
 Unresolved evidence limits: the suppressed original mise/chezmoi/Codex diagnostic rows cannot be recovered from these logs. Five workflow/adoption rows have no source-backed host executable check, so their explicit unavailable entries are skipped. Neither a skip, source review, configuration validation nor a version proves provider/GPU/service acceptance. All revised target-distribution commands remain unrun; no upstream failure was waived.
 
-Historical: executed checks for the round 1 revision (the first plan, 53 rows; the current plan has 64 rows and its checks are in the two sections above): the requested Python JSON load, `bash -n` on both scripts and `bash install.sh --list` all returned 0. The list retained all 53 rows. TOML parsing, stage/schema/source agreement, all 156 slot/stage combinations, default/all-owner stages, unavailable/excluded skips, nonzero failure propagation and invalid arguments passed local fixtures. Additional Bash fixtures caught the original caller-directory and doctor-only false-pass patterns and verified the repairs. All 16 passing acceptance objects, original model/research examples, original HTTP endpoints and all seven exclusions were compared with the original plan and retained. The entire plan folder passed a personal-path/user-name scan; `git diff --check` passed. The fixtures ran no native owner programs, stack services or models. Independent Astra/Max source review confirmed the two review fixes and reported no remaining follow-up findings.
+Historical: executed checks for the round 1 revision (the first plan, 53 rows; the current plan has 69 rows: the checks of its 64-row revision are in the first two sections above, and those of the five rows added from the layer consensus, which have not run anywhere, are in the third): the requested Python JSON load, `bash -n` on both scripts and `bash install.sh --list` all returned 0. The list retained all 53 rows. TOML parsing, stage/schema/source agreement, all 156 slot/stage combinations, default/all-owner stages, unavailable/excluded skips, nonzero failure propagation and invalid arguments passed local fixtures. Additional Bash fixtures caught the original caller-directory and doctor-only false-pass patterns and verified the repairs. All 16 passing acceptance objects, original model/research examples, original HTTP endpoints and all seven exclusions were compared with the original plan and retained. The entire plan folder passed a personal-path/user-name scan; `git diff --check` passed. The fixtures ran no native owner programs, stack services or models. Independent Astra/Max source review confirmed the two review fixes and reported no remaining follow-up findings.

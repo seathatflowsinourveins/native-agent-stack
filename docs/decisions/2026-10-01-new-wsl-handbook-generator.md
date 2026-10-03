@@ -708,3 +708,9 @@ ones. The receipt's generator and output hashes follow the regenerated files;
 the profile and its hash did not change. These are local integration checks of
 projections of source documents; none is host acceptance, and no install,
 service or `wsl.exe` command was run.
+
+A repair of 2026-10-02 adds a fifth change to that test: a consensus row that
+calls itself definitive, with its state set to match so that the flag check
+passes, which only the rule that a consensus row is never definitive refuses.
+With that clause removed from a scratch copy of the generator, the test failed
+on that change alone.

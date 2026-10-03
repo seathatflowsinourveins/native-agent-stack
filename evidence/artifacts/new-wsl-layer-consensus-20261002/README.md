@@ -8,10 +8,11 @@ direct consensus of the two model families. The decision, its rule and its limit
 
 | File | What it is |
 | --- | --- |
-| `consensus.json` | The record that the manifest's assembler reads: the owner's sentence that allows the method, the rule, five rows to add, six amendments, four topics held without a row change, a note to the trading lane, the two corrections the review made to the proposals, and what is not established. Its `records` name the three notes below by path and SHA-256 and the acknowledgements by link |
+| `consensus.json` | The record that the manifest's assembler reads: the owner's sentence that allows the method, the rule, five rows to add, six amendments, four topics held without a row change, a note to the trading lane, the two corrections the review made to the proposals, and what is not established. Its `records` name the three notes and the review below by path and SHA-256, and the acknowledgements by link |
 | `claude-proposals.md` | Published copy of the Claude lane's proposals for seven layers |
 | `claude-request.md` | Published copy of the Claude lane's request to the Codex lane; it relays the owner's sentence |
 | `codex-decisions.md` | Published copy of the Codex lane's independent decisions |
+| `claude-review-held-topics.md` | The Claude lane's independent primary-source review of the claims behind the Codex lane's scoped dispositions: the `credential-guard` amendment and the three topics held without a row change. Not a copy of an exchanged note: it is written here from the review as that lane returned it, with host paths replaced as it lists at its end |
 | `copy-notes.json` | Each copy's hash, its original's hash and every difference between the copy and the original |
 
 ## Method
@@ -21,6 +22,20 @@ leads, not facts. The Claude lane re-read every fact it used from GitHub by scri
 layers and for the skills rows. The Codex lane decided each one independently from its own reading of the primary
 sources and corrected two statements of the proposals. Both acknowledgements are public comments on pull request 608.
 `consensus.json` is the coordinator's record of what the two lanes agreed; the three notes are the exchange itself.
+
+## The `credential-guard` amendment and the held topics
+
+These four came from the Codex lane's note, section "Scoped novelty source dispositions". The Claude lane first
+acknowledged them from the note; its own reading of their sources came afterwards and is the review in this folder. Of
+the 36 claims it checks, 27 are confirmed, 9 are qualified and none is refuted; where `consensus.json` states a
+qualified claim, its text carries the qualification, and no decision changed.
+
+| Item | Proposal | Independent review | Acknowledgements |
+| --- | --- | --- | --- |
+| Amendment to `credential-guard`: keep the guard; hold HOL Guard 3.17.1 for a scoped enforcement comparison | The Codex lane, `codex-decisions.md` | The Claude lane, `claude-review-held-topics.md`, topic 1 | Both families: the Codex lane's comments that `consensus.json` lists, and the Claude lane's comment 5959684384 of 2026-10-02T19:16:53Z, given from the note before the review |
+| Held: evaluation harness (keep Inspect AI and Harbor; AgentCompass only for an identified unmet requirement) | The Codex lane, `codex-decisions.md` | The Claude lane, `claude-review-held-topics.md`, topic 2 | Both families, as for the amendment |
+| Held: Docker Compose 5.6.0 (qualify the update; 5.5.1 stays meanwhile) | The Codex lane, `codex-decisions.md` | The Claude lane, `claude-review-held-topics.md`, topic 4 | Both families, as for the amendment |
+| Held: catalog freshness (keep the existing automation; no Updatecli) | The Codex lane, `codex-decisions.md` | The Claude lane, `claude-review-held-topics.md`, topic 3 | Both families, as for the amendment |
 
 ## What this folder is not
 
@@ -34,11 +49,13 @@ sources and corrected two statements of the proposals. Both acknowledgements are
 
 ## What the build verifies
 
-`assemble_manifest.py` reads `consensus.json` in its last step. It checks that each of the three notes exists with
-the SHA-256 that `consensus.json` records, and stops with a message when one is missing or differs. Those hashes are
-the ones `copy-notes.json` gives for the copies. The acknowledgements are links: the build checks that one of each
-family is listed and does not fetch them. The originals of the notes are private; their hashes in `copy-notes.json`
-cannot be checked from this repository.
+`assemble_manifest.py` reads `consensus.json` in its last step. It checks that each file named under `records` (the
+three notes and the review) exists with the SHA-256 that `consensus.json` records, that at least one is named, and
+stops with a message when one is missing or differs. For the three notes those hashes are the ones `copy-notes.json`
+gives for the copies; the review is no copy and has no entry there. The acknowledgements are links: the build checks
+that one of each family is listed and does not fetch them. The originals of the notes are private; their hashes in
+`copy-notes.json` cannot be checked from this repository. The review as it was returned is private too, and no hash of
+it is recorded.
 
 The same step refuses a record that would replace what the rounds decided: a slot that already exists, an added row
 that is not of kind `consensus` or is definitive, an unknown state, catalog or layer, and an amendment that names an

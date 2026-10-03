@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision.
-# This revision ran once, on 2026-10-02, in a throwaway distribution (real-distribution-validation.json); on the destination distribution it is unrun.
-# Five rows were added after that run, from the layer consensus of 2026-10-02 (69 foundation rows). The commands of skill-discovery and
-# skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing.
+# This revision ran once, on 2026-10-02, in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to
+# main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that
+# distribution's acceptance.
+# Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The commands of skill-discovery
+# and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing.
 # Baseline results and limitations: VALIDATION.md.
 # Upstream command quotations and parameterizations: install-plan.json and SOURCES.md. Consistency check: check_plan.py.
 set -euo pipefail

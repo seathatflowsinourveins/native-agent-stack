@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Revised staged acceptance for the merged definitive manifest (64 foundation rows). This revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json); on the destination distribution it is unrun.
-# Five rows were added after that run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing and have nothing to check.
+# Revised staged acceptance for the merged definitive manifest (64 foundation rows). This revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that distribution's acceptance.
+# Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing and have nothing to check.
 # Checks are quoted upstream commands/parameterizations from install-plan.json and SOURCES.md.
 set -euo pipefail
 if (( EUID == 0 )); then printf 'Refusing to run as root.\n' >&2; exit 1; fi
@@ -192,14 +192,21 @@ skill-authoring() {
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164
-      # The last line: no same-name copy sits in the shared directory that the installer uses for Codex.
+      # The listing has no agent filter, so it reports every agent the installer detects, and it must name Claude Code as
+      # the only agent of skill-creator. No same-name copy, and no dangling link, may sit in the installer's shared
+      # directory, which it uses for Codex's global skills, or in Codex's own global skills directory (README.md#L298);
+      # Codex keeps its embedded skills under skills/.system, which these lines leave alone. Both directories are tested
+      # in one [[ ]] as the last command, so its status is the program's on any bash: before 4.1 (macOS /bin/bash is 3.2)
+      # a failing [[ ]] does not stop a set -e script (bash NEWS, bash-4.1, item j).
       check skill-authoring smoke 'want=3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6
 lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
 lock="${lock:-$HOME/.agents/.skill-lock.json}"
-listing="$(npx --yes skills@1.7.0 list -g -a claude-code --json)"
-jq -e '"'"'any(.[]; .name == "skill-creator" and (.agents | index("Claude Code") != null))'"'"' <<<"$listing" >/dev/null
+listing="$(npx --yes skills@1.7.0 list -g --json)"
+jq -e '"'"'[.[] | select(.name == "skill-creator") | .agents] == [["Claude Code"]]'"'"' <<<"$listing" >/dev/null
 jq -e --arg hash "$want" '"'"'.skills["skill-creator"].skillFolderHash == $hash'"'"' "$lock" >/dev/null
-[[ ! -e "$HOME/.agents/skills/skill-creator" ]]'
+shared_copy="$HOME/.agents/skills/skill-creator"
+codex_copy="${CODEX_HOME:-$HOME/.codex}/skills/skill-creator"
+[[ ! -e "$shared_copy" && ! -L "$shared_copy" && ! -e "$codex_copy" && ! -L "$codex_copy" ]]'
       ;;
     *) skipped skill-authoring ;;
   esac

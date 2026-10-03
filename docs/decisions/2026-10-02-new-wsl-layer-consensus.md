@@ -35,10 +35,14 @@ needs a sign-in, a grant or capacity. It grants no permission, sign-in or capaci
 
 The rule, verbatim from the record. The assembler appends it to the manifest's `decision_rule`:
 
-> A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus, is never definitive, and says in its label that it rests on a direct consensus of both families: a row without a gate or a comparison also says that it is neither a blind result nor a measurement, and a row with one says that the gate or the measurement decides and that nothing is installed until it returns. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides.
+> A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides.
 
-What the assembler holds the record to: each exchanged note that the record names exists with the recorded SHA-256, and
-an acknowledgement of each family is on record; a slot to add does not exist yet; an added row has the kind
+The labels say it in their own words: "not a blind round, not a measurement" for a row that is resolved, and "decides ...,
+nothing installed until it returns" for the two rows whose install waits; three rows carry `open_acceptance_gates`.
+
+What the assembler holds the record to: each file that the record names under `records` (the three exchanged notes and
+the Claude lane's review of the scoped dispositions) exists with the recorded SHA-256, at least one such file is named,
+and an acknowledgement of each family is on record; a slot to add does not exist yet; an added row has the kind
 `consensus`, is not definitive, uses a state, a catalog and a layer the manifest knows, carries the manifest's row
 fields and no outcome of the rounds, installs nothing while it waits for a measurement and takes no job that an
 installed row owns; an amendment names an existing slot, has a date, an author and a decision, and carries none of the
@@ -56,7 +60,9 @@ comments on pull request 608.
 The exchanged notes are published as copies in the evidence folder (`claude-proposals.md`, `claude-request.md`,
 `codex-decisions.md`). `copy-notes.json` gives each copy's hash, the original's hash and every difference between
 them: two paths in a private state folder and one distribution name were replaced, and one operational paragraph
-without a decision was left out.
+without a decision was left out. A fourth record, `claude-review-held-topics.md`, is not a copy of an exchanged note:
+it is the Claude lane's independent primary-source review of the claims behind the Codex lane's scoped dispositions,
+written in the folder from the review as that lane returned it, with host paths replaced as the file lists at its end.
 
 ## The five added rows
 
@@ -73,8 +79,8 @@ the install plan, and the client configuration wires it only after that.
   discovery skill, and only that named folder is installed, never the bundle; popularity counts serve discovery only.
   Alternatives: one row for all three capabilities, which the Codex lane's review rejected, and the whole bundle, which
   is not installed. The record names no competing discovery skill and no comparison. What would overturn the row is
-  one of its gates, which are open: listing, hash and read-back of the installed folder on the destination, and a
-  useful invocation in each client.
+  one of its open acceptance gates, which do not hold its install: listing, hash and read-back of the installed folder
+  on the destination, and a useful invocation in each client.
 - **`skill-authoring`** (layer `instructions-skills`, state `resolved`, installs). Default: `skill-creator`, embedded in
   Codex and taken from `anthropics/skills` for Claude Code, at commit `8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4`, with
   `skills/skill-creator/SKILL.md` at blob `65b3a402dbd09b8e83f9d637c6b553875189085c`. Job: writing and evaluating a new
@@ -82,8 +88,8 @@ the install plan, and the client configuration wires it only after that.
   `codex-rs/skills/src/lib.rs` of `openai/codex` at `a956835d020762cb2b570053af06f643a11c0ecc`), so nothing is installed
   for Codex and no same-name copy is placed beside it; Claude Code takes the maintained authoring folder, which carries
   its own evaluation workflow. Alternative: the same folder for both clients, which would place a same-name copy beside
-  Codex's own skill. What would overturn the row is one of its gates, which are open: that the embedded Codex skill is
-  available on the destination (source availability is not target availability), listing, hash and read-back of the
+  Codex's own skill. What would overturn the row is one of its open acceptance gates, which do not hold its install:
+  that the embedded Codex skill is available on the destination (source availability is not target availability), listing, hash and read-back of the
   installed Claude Code folder on the destination, and a useful invocation in each client.
 - **`research-skill`** (layer `instructions-skills`, state `measurement`, installs nothing). Default: not installed
   until its activation gate returns. Job: starting a research run on the research runtime from inside a session, in both
@@ -104,8 +110,8 @@ the install plan, and the client configuration wires it only after that.
   families, the model and effort, an immutable base and head, source-located findings, independent dispositions and a
   later verification; a local review neither implies local inference nor authorizes publication by itself. Alternative:
   PR-Agent 0.47.0, a comparison only for an identified gap; its own README describes a community-maintained legacy
-  project. What would overturn the row: its open gate, the qualification of the Codex 0.160 review command on the
-  destination, which the Codex lane owns; or an identified gap that the native commands leave, which calls for the
+  project. What would overturn the row: its open acceptance gate, the qualification of the Codex 0.160 review command
+  on the destination, which the Codex lane owns; or an identified gap that the native commands leave, which calls for the
   comparison with PR-Agent.
 - **`credential-custody`** (layer `secrets-credentials`, state `measurement`, installs nothing). Default: not installed
   until the deciding measurement returns; the repository's practice stays (one 0600 file per provider, pointer
@@ -163,24 +169,53 @@ alternatives it admits and the comparison that would overturn the row.
   no field of its row.
 - **`credential-guard`: keep the guard; hold one enforcement comparison.** HOL Guard 3.17.1
   (`hashgraph-online/hol-guard` at `85090ce61ed5bb5457104b5a73cb2bbc9443fda0`, Apache-2.0) declares native interception
-  and managed launches beyond the guard's text check of Claude Code shell commands. Its support matrix is a source
-  claim: native client compatibility, failure behaviour and the preservation of existing hooks are not qualified. The
-  comparison is about enforcement and stays separate from the custody comparison; the two are not merged into one
-  winner. That scoped enforcement comparison would overturn the row.
+  and managed launches beyond the guard's text check of Claude Code shell commands; the managed launch is declared for
+  Codex only, and for Claude Code it declares hooks alone, in the project's local settings file. Its support matrix is
+  a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not
+  qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged
+  into one winner. That scoped enforcement comparison would overturn the row. Proposal: the Codex lane's, in its note
+  (`codex-decisions.md`, "Scoped novelty source dispositions"). Independent review: the Claude lane's, in
+  `claude-review-held-topics.md`, topic 1: eight claims confirmed and two qualified, the managed launches (for Codex
+  only, now in the text above) and, for the review's brief, whether 3.17.1 is the current release (3.17.2 followed on
+  the same day). Acknowledgements of both families: the Codex lane's comments that the record lists, and the Claude
+  lane's comment 5959684384 (2026-10-02T19:16:53Z), which acknowledged this amendment and the held topics below from
+  the note, before that review.
 
 ## Held without a row change
 
+Each of the first three topics, like the `credential-guard` amendment above, is the Codex lane's proposal in its note
+(`codex-decisions.md`, "Scoped novelty source dispositions"), has the Claude lane's independent review in
+`claude-review-held-topics.md`, and has the acknowledgements of both families named for that amendment.
+
 - **Evaluation harness.** Keep Inspect AI 0.3.273 and Harbor 0.23; AgentCompass 1.0.0 only for an identified unmet
   evaluation requirement. AgentCompass supplies composable harness, environment, trajectory and resume machinery; a
-  comparative advantage is unmeasured. Its Codex and Claude adapters turn permission bypass on by default and its
-  Claude adapter supplies provider API configuration, so equivalence with the native account route is not established.
-  No adapter or permission change is adopted.
+  comparative advantage is unmeasured. Its Codex and Claude adapters turn permission bypass on by default, and both
+  supply provider API configuration (each needs an API key and a base URL and writes its own client configuration, so
+  neither runs on a native sign-in as shipped), so equivalence with the native account route is not established. No
+  adapter or permission change is adopted. Proposal: the Codex lane's note. Independent review: the Claude lane's,
+  topic 2: ten claims confirmed and one qualified, that only the Claude adapter supplies provider configuration (the
+  Codex adapter does too, as the text above now says). Acknowledgements: as for `credential-guard`.
 - **Docker Compose 5.6.0.** Qualify the update; the selected 5.5.1 stays until the owner of that review accepts it. It
-  is the same incumbent at a newer release. The Codex lane holds the isolated version and help binding review; no
-  daemon, container, global or destination installation is part of it. This record moves no pin.
+  is the same incumbent at a newer release: dry-run, config-hash, watch, monitor and log fixes, and more than those,
+  among them manually triggered jobs, provider-service relay networks, warnings for unsupported Compose-file
+  attributes, --parallel across all bulk engine calls, and docker/cli 29.8.2 with newer moby, containerd and buildkit
+  libraries. The Codex lane holds the isolated version and help binding review; no daemon, container, global or
+  destination installation is part of it. This record moves no pin. Proposal: the Codex lane's note. Independent
+  review: the Claude lane's, topic 4: four claims confirmed and two qualified, the list of changes (incomplete in the
+  note; the text above names the main further ones, and the review lists more) and, for the review's brief, that
+  nothing in the release changes what the install plan or the rootless engine relies on (no rootless change and
+  preserved configuration hashes upstream, not checked on a host). Acknowledgements: as for `credential-guard`.
 - **Catalog freshness and the session-start notice.** Keep the existing automation; the Codex lane owns a daily
-  report-only cadence and the notice documentation. Updatecli 0.122.0 overlaps the existing weekly mechanism and shows
-  no extra closure, so no new dependency is adopted.
+  report-only cadence and the notice documentation. The existing freshness workflow, weekly at the revision the note
+  cites and daily since pull request 613 (merged 2026-10-02), already supplies metadata and drift reports with guarded
+  evidence-only proposal pull requests (on a manual dispatch, or on its schedule only where the repository opts in).
+  Updatecli 0.122.0 overlaps that mechanism in detection, through its sources and conditions; its targets, which edit
+  pinned files and open pull requests with the edits, are the stage the workflow withholds, because the separate
+  convergence review owns the pins. It shows no extra closure, so no new dependency is adopted. Proposal: the Codex
+  lane's note. Independent review: the Claude lane's, topic 3: five claims confirmed and four qualified, the cadence
+  and the overlap (both now in the text above), that the cadence change sits on a separate branch (it has merged as
+  pull request 613), and that a historical 48-hour statement needs a dated correction (the correction has landed).
+  Acknowledgements: as for `credential-guard`.
 - **Local generation and embedding models.** Not part of this record. The first trial's result and the arms chosen
   again from the newest releases follow in their own record.
 
@@ -225,6 +260,13 @@ Beyond that list:
   validation file, and no earlier run of the plan covers them.
 - The acknowledgements are comments on a pull request. The manifest's build checks that the record lists them; it does
   not fetch or hash them.
+- The Claude lane acknowledged the Codex lane's scoped dispositions and the `credential-guard` amendment (comment
+  5959684384) from the note, before it read their sources. Its review, `claude-review-held-topics.md`, came afterwards:
+  of 36 claims it confirms 27, qualifies 9 and refutes none. Where this record states a qualified claim, its text now
+  carries the qualification; no decision changed. Two of the review's facts are reported here but not carried into the
+  text of `consensus.json`, which states no claim they bear on: HOL Guard 3.17.2 followed 3.17.1 on 2026-10-02, and the
+  record's link for AgentCompass's metadata points to line 5 of its `pyproject.toml`, while the values are on lines 7,
+  10 and 11. The review's other findings that this record does not carry are in the review only.
 - The request note says 99 reports; the folder held 103 report folders when it was counted later the same day. The
   count is discovery metadata and no decision rests on it (`copy-notes.json`).
 
@@ -252,17 +294,23 @@ Source selection, on main, in four files:
 - the handbook, `docs/new-wsl-handbook.md`.
 
 Host qualification, which is open. A useful task per client, the roles and the lifecycle are unqualified on the
-destination distribution. An install and acceptance run exists only in the coordinating lane's private record; it is
-not a public receipt, and the checkpoint does not count it. A source selection is not an acceptance of the Codex
+destination distribution, the one meant to stay. The install plan's scripts, at the revision with 64 rows as merged to
+main (`6652b78e`), ran once on that distribution on 2026-10-02. The record of that run is private; its public receipt
+comes with the destination's acceptance, and the checkpoint names the run without counting it as qualification. The
+five rows of this change have not run there or anywhere else. A source selection is not an acceptance of the Codex
 0.160 client, of its configuration or of an SDK on that host.
 
 ## Sources
 
 - The record: `evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json`, with `claude-proposals.md`,
-  `claude-request.md`, `codex-decisions.md` and `copy-notes.json` in the same folder.
+  `claude-request.md`, `codex-decisions.md`, `claude-review-held-topics.md` and `copy-notes.json` in the same folder.
 - The acknowledgements: [Claude, 18:29:20Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5958766754),
-  [GPT, 18:45:13Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959059286) and
-  [GPT, 18:51:56Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959205007).
+  [GPT, 18:45:13Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959059286),
+  [GPT, 18:51:56Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959205007) and
+  [Claude, 19:16:53Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959684384),
+  the last for the scoped dispositions and the `credential-guard` amendment.
+- The Claude lane's review of the scoped dispositions: `claude-review-held-topics.md`, which gives each claim's sources,
+  each at a pinned commit where one is cited.
 - `skill-discovery`: [find-skills at the pinned commit](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md).
 - `skill-authoring`: [Codex's embedded skills](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/skills/src/lib.rs#L55),
   [skill-creator at the pinned commit](https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md).
@@ -297,7 +345,8 @@ not a public receipt, and the checkpoint does not count it. A source selection i
   [the Lumibot release](https://github.com/Lumiwealth/lumibot/releases/tag/v4.6.3).
 
 These are the record's sources. This change opened none of them again except the two pinned skill folders, whose tree
-and blob hashes the install plan's `SOURCES.md` reports.
+and blob hashes the install plan's `SOURCES.md` reports; the sources of the scoped dispositions were read again by the
+Claude lane's review, which names each one.
 
 ## Overturn
 

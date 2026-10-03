@@ -3,7 +3,7 @@
  "kind": "new-wsl-definitive-manifest",
  "date_utc": "2026-10-01",
  "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance",
- "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus, is never definitive, and says in its label that it rests on a direct consensus of both families: a row without a gate or a comparison also says that it is neither a blind result nor a measurement, and a row with one says that the gate or the measurement decides and that nothing is installed until it returns. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides.",
+ "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides.",
  "decision_rule_before_amendment_2": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
  "no_install_rule": "an option that installs nothing extra is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero",
  "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate",
@@ -35,7 +35,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "8c81cd4ef434dc987ec6323eb8b9249a3b55a2eb05dd038c88a80848f50eb578"
+   "sha256": "70f6d3f619fb6fe2fa4231cca1427aaaaab0b65ae32d4b92454e998e646768c5"
   }
  },
  "counts": {
@@ -699,7 +699,7 @@
      "path": "skills/find-skills/SKILL.md",
      "blob": "a41bdd074bb587afd861332cf2f473f3154de4d7"
     },
-    "open_gates": [
+    "open_acceptance_gates": [
      "listing, hash and read-back of the installed folder on the destination",
      "a useful invocation in each client"
     ],
@@ -741,7 +741,7 @@
      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
      "path": "codex-rs/skills/src/lib.rs"
     },
-    "open_gates": [
+    "open_acceptance_gates": [
      "that the embedded Codex skill is available on the destination (source availability is not target availability)",
      "listing, hash and read-back of the installed Claude Code folder on the destination",
      "a useful invocation in each client"
@@ -2460,7 +2460,7 @@
      "repository": "https://github.com/The-PR-Agent/pr-agent",
      "support": "a comparison only for an identified gap; its own README describes a community-maintained legacy project"
     },
-    "open_gates": [
+    "open_acceptance_gates": [
      "qualification of the Codex 0.160 review command on the destination, owned by the Codex lane"
     ],
     "sources": [
@@ -2737,7 +2737,7 @@
      "date_utc": "2026-10-02",
      "by": "direct consensus of both model families",
      "decision": "keep the guard; hold one enforcement comparison",
-     "text": "HOL Guard 3.17.1 declares native interception and managed launches beyond the guard's text check of Claude Code shell commands. Its support matrix is a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged into one winner.",
+     "text": "HOL Guard 3.17.1 declares native interception and managed launches beyond the guard's text check of Claude Code shell commands; the managed launch is declared for Codex only, and for Claude Code it declares hooks alone, in the project's local settings file. Its support matrix is a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged into one winner.",
      "arms": [
       {
        "name": "the repository's command and secret-path guard",

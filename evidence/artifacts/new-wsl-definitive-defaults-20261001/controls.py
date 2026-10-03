@@ -7,7 +7,8 @@ Each case restores the inputs, manifest and record byte for byte, including when
 A case named "generated output: ..." plants its defect in the assembler's result instead of an input: it shows that the
 test sees the defect, not that the assembler refuses it. The older cases that add a line after apply_convergence work the same way.
 A case named "consensus: ..." mutates the layer-consensus record: the assembler's consensus step must refuse it with the
-named message, so the manifest stays as it was and the currency test fails.
+named message, so the manifest stays as it was and the currency test fails. A case named "consensus label: ..." mutates
+the record in a way the assembler accepts, and the label test must fail on the regenerated manifest.
 """
 import json
 import subprocess
@@ -94,8 +95,25 @@ CONSENSUS_CASES = [
      lambda doc: doc.pop("rule")),
     ("consensus: a records file named without its hash", "consensus records.claude_proposals: evidence path and sha256 required",
      lambda doc: doc["records"]["claude_proposals"].pop("sha256")),
+    # One for each branch that the cases above leave unexercised: the second disjunct of the definitive refusal (a
+    # state of definitive while the flag stays false), the empty list of hashed records, and a job that is blank.
+    ("consensus: an added row whose state is definitive", "consensus skill-discovery: a consensus row is never definitive",
+     lambda doc: added(doc, "skill-discovery").update(state="definitive")),
+    ("consensus: a record whose records name no hashed note",
+     "consensus records: the exchanged notes and an acknowledgement of each family are required",
+     lambda doc: doc.update(records={"acknowledgements": doc["records"]["acknowledgements"]})),
+    ("consensus: an added row with a blank job", "consensus skill-discovery: an added row needs a job and an outcome that no round uses",
+     lambda doc: added(doc, "skill-discovery").update(job=" ")),
 ]
 CASES += [(case, "test_manifest_is_current", refusal) for case, refusal, _ in CONSENSUS_CASES]
+# Records that the assembler accepts but whose labels break the rule's label clause: the label test must fail.
+LABEL_CASES = [
+    ("consensus label: a row that waits for its gate, labelled as neither a blind result nor a measurement",
+     lambda doc: added(doc, "research-skill").update(label=added(doc, "skill-discovery")["label"])),
+    ("consensus label: a resolved row labelled as waiting for its measurement",
+     lambda doc: added(doc, "skill-discovery").update(label=added(doc, "credential-custody")["label"])),
+]
+CASES += [(case, "test_consensus_labels_follow_the_rule", None) for case, _ in LABEL_CASES]
 
 
 def run(root, *args):
@@ -104,6 +122,7 @@ def run(root, *args):
 
 def mutate(root, case):
     consensus = {entry[0]: entry[2] for entry in CONSENSUS_CASES}
+    consensus.update(LABEL_CASES)
     if case in consensus:
         path = root / CONSENSUS
         doc = json.loads(path.read_text(encoding="utf-8"))

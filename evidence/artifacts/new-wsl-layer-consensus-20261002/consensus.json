@@ -10,15 +10,17 @@
   "said": "2026-10-02, shortly before 17:59:40Z (the time stamp of the request note that relays it)",
   "reading": "the two lanes settle research results between themselves and bring the owner only what needs a sign-in, a grant or capacity; it grants no permission, sign-in or capacity to either lane"
  },
- "rule": "A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus, is never definitive, and says in its label that it rests on a direct consensus of both families: a row without a gate or a comparison also says that it is neither a blind result nor a measurement, and a row with one says that the gate or the measurement decides and that nothing is installed until it returns. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides.",
+ "rule": "A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides.",
  "records": {
   "claude_proposals": {"path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-proposals.md", "sha256": "cd7b99553cc8d9c608262e47e709add19819aef84c06bbf35b84787f5969e832"},
   "claude_request": {"path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-request.md", "sha256": "d939a5b4ee1433a0f68250c334fbe5bce1759279c19e2a9a21ca2c21d00af005"},
   "codex_decisions": {"path": "evidence/artifacts/new-wsl-layer-consensus-20261002/codex-decisions.md", "sha256": "464608b928709f5fd987b44ce2a019b29bb85f886b38c1bc095dc326c02cbac6"},
+  "claude_review_held_topics": {"path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-review-held-topics.md", "sha256": "2f181c0b48c4f5a4ca1e45de56521501ba5744ba8305398e099019c273c54c91"},
   "acknowledgements": [
    {"family": "claude", "at": "2026-10-02T18:29:20Z", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5958766754"},
    {"family": "gpt", "at": "2026-10-02T18:45:13Z", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959059286"},
-   {"family": "gpt", "at": "2026-10-02T18:51:56Z", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959205007"}
+   {"family": "gpt", "at": "2026-10-02T18:51:56Z", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959205007"},
+   {"family": "claude", "at": "2026-10-02T19:16:53Z", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959684384", "covers": "the Codex lane's scoped source dispositions (the topics held without a row change: the evaluation harness, Docker Compose 5.6.0 and catalog freshness) and the amendment to credential-guard; given from the Codex lane's note, before the Claude lane's own primary-source review of their claims (claude_review_held_topics)"}
   ]
  },
  "corrections_of_the_proposals": [
@@ -59,7 +61,7 @@
      "path": "skills/find-skills/SKILL.md",
      "blob": "a41bdd074bb587afd861332cf2f473f3154de4d7"
     },
-    "open_gates": [
+    "open_acceptance_gates": [
      "listing, hash and read-back of the installed folder on the destination",
      "a useful invocation in each client"
     ],
@@ -99,7 +101,7 @@
      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
      "path": "codex-rs/skills/src/lib.rs"
     },
-    "open_gates": [
+    "open_acceptance_gates": [
      "that the embedded Codex skill is available on the destination (source availability is not target availability)",
      "listing, hash and read-back of the installed Claude Code folder on the destination",
      "a useful invocation in each client"
@@ -184,7 +186,7 @@
      "repository": "https://github.com/The-PR-Agent/pr-agent",
      "support": "a comparison only for an identified gap; its own README describes a community-maintained legacy project"
     },
-    "open_gates": [
+    "open_acceptance_gates": [
      "qualification of the Codex 0.160 review command on the destination, owned by the Codex lane"
     ],
     "sources": [
@@ -326,7 +328,7 @@
     "date_utc": "2026-10-02",
     "by": "direct consensus of both model families",
     "decision": "keep the guard; hold one enforcement comparison",
-    "text": "HOL Guard 3.17.1 declares native interception and managed launches beyond the guard's text check of Claude Code shell commands. Its support matrix is a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged into one winner.",
+    "text": "HOL Guard 3.17.1 declares native interception and managed launches beyond the guard's text check of Claude Code shell commands; the managed launch is declared for Codex only, and for Claude Code it declares hooks alone, in the project's local settings file. Its support matrix is a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged into one winner.",
     "arms": [
      {"name": "the repository's command and secret-path guard", "repository": "", "role": "the practice in use"},
      {"name": "HOL Guard 3.17.1", "repository": "https://github.com/hashgraph-online/hol-guard", "commit": "85090ce61ed5bb5457104b5a73cb2bbc9443fda0", "licence": "Apache-2.0", "role": "held for a scoped enforcement comparison"}
@@ -341,19 +343,19 @@
   {
    "topic": "evaluation harness",
    "decision": "keep Inspect AI 0.3.273 and Harbor 0.23; AgentCompass 1.0.0 only for an identified unmet evaluation requirement",
-   "text": "AgentCompass supplies composable harness, environment, trajectory and resume machinery; a comparative advantage is unmeasured. Its Codex and Claude adapters turn permission bypass on by default and its Claude adapter supplies provider API configuration, so equivalence with the native account route is not established. No adapter or permission change is adopted.",
+   "text": "AgentCompass supplies composable harness, environment, trajectory and resume machinery; a comparative advantage is unmeasured. Its Codex and Claude adapters turn permission bypass on by default, and both supply provider API configuration (each needs an API key and a base URL and writes its own client configuration, so neither runs on a native sign-in as shipped), so equivalence with the native account route is not established. No adapter or permission change is adopted.",
    "sources": ["https://github.com/open-compass/AgentCompass/blob/2b2a272ed2a00231d4dff3c2e33e21fa8a28593e/pyproject.toml#L5"]
   },
   {
    "topic": "Docker Compose 5.6.0",
    "decision": "qualify the update; the selected 5.5.1 stays until the owner of that review accepts it",
-   "text": "The same incumbent at a newer release (dry-run, config-hash, watch, monitor and log fixes). The Codex lane holds the isolated version and help binding review; no daemon, container, global or destination installation is part of it.",
+   "text": "The same incumbent at a newer release: dry-run, config-hash, watch, monitor and log fixes, and more than those, among them manually triggered jobs, provider-service relay networks, warnings for unsupported Compose-file attributes, --parallel across all bulk engine calls, and docker/cli 29.8.2 with newer moby, containerd and buildkit libraries. The Codex lane holds the isolated version and help binding review; no daemon, container, global or destination installation is part of it.",
    "sources": ["https://github.com/docker/compose/releases/tag/v5.6.0"]
   },
   {
    "topic": "catalog freshness and the session-start notice",
    "decision": "keep the existing automation; the Codex lane owns a daily report-only cadence and the notice documentation",
-   "text": "The existing weekly freshness workflow already supplies metadata and drift reports with guarded evidence-only pull requests. Updatecli 0.122.0 overlaps that mechanism and shows no extra closure, so no new dependency is adopted.",
+   "text": "The existing freshness workflow, weekly at the revision the note cites and daily since pull request 613 (merged 2026-10-02), already supplies metadata and drift reports with guarded evidence-only proposal pull requests (on a manual dispatch, or on its schedule only where the repository opts in). Updatecli 0.122.0 overlaps that mechanism in detection, through its sources and conditions; its targets, which edit pinned files and open pull requests with the edits, are the stage the workflow withholds, because the separate convergence review owns the pins. It shows no extra closure, so no new dependency is adopted.",
    "sources": ["https://github.com/updatecli/updatecli/blob/20e57d1b35190c25e41f3e2a8339621027484c0c/README.md"]
   },
   {
