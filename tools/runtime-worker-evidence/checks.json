@@ -1,0 +1,87 @@
+{
+  "kind": "authored_local_integration_checks",
+  "sources": [
+    "https://github.com/mitmproxy/mitmproxy/tree/6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5cfa2400e3ebb4aefb8419135345c1fa92b05409/scripts/validate.py"
+  ],
+  "scope": "Metadata/stream integration checks and publication integrity only; no new provider trial.",
+  "attempts": [
+    {
+      "command": "Native pre-push registry gate",
+      "exit_code": 1,
+      "returned_error": "Three new uv script lockfiles missing from .github/osv-scanner-lockfiles.json.",
+      "correction": "Registered all three with the source-verified native uv.lock override, preserved adversarial suppression checks, and ran native scanner acceptance; see osv-check.json."
+    },
+    {
+      "command": "Native pre-commit gitleaks git --pre-commit --staged --redact",
+      "exit_code": 1,
+      "returned_rule": "generic-api-key",
+      "finding": "Public receipt cache-identifier SHA-256 metadata name matched API-key syntax.",
+      "correction": "Renamed the metadata field to cache identity; retained the same independently observed digest. No allowlist or hook bypass."
+    },
+    {
+      "command": "rtk python3 -m unittest discover -s tools/runtime-worker-evidence -p 'test_*.py'",
+      "exit_code": 1,
+      "returned_error": "ModuleNotFoundError: No module named 'mitmproxy'",
+      "passed": 0,
+      "errors": 5,
+      "correction": "Use the selected native isolated dependency environment."
+    },
+    {
+      "command": "rtk uv run --with mitmproxy==12.2.3 python -m unittest discover -s tools/runtime-worker-evidence -p 'test_*.py'",
+      "exit_code": 0,
+      "returned_output": "Ran 5 tests in 0.101s\nOK",
+      "passed": 5
+    },
+    {
+      "command": "rtk python3 <skill-creator>/scripts/quick_validate.py .claude/skills/omniroute-runtime-worker",
+      "exit_code": 1,
+      "returned_error": "ModuleNotFoundError: No module named 'yaml'",
+      "correction": "Use supported isolated uv with pinned PyYAML; no global installation."
+    },
+    {
+      "command": "rtk uv run --with pyyaml==6.0.3 python <skill-creator>/scripts/quick_validate.py .claude/skills/omniroute-runtime-worker",
+      "exit_code": 0,
+      "returned_output": "Skill is valid!",
+      "limit": "Structural check; actual native Claude dispatch remains unmeasured."
+    },
+    {
+      "command": "rtk python3 scripts/validate_convergence.py blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
+      "exit_code": 1,
+      "returned_error": "Seven administrative observation task/role IDs were undeclared.",
+      "correction": "Declared the existing tasks and installer role; no model call or result changed."
+    },
+    {
+      "command": "Same scoped convergence validator after metadata correction",
+      "exit_code": 0,
+      "returned_output": "record[0]: valid"
+    },
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_error": "Hash-listed project skill was ignored by Git and not tracked.",
+      "correction": "Force-added only the owned project skill file; no broad ignore rule change."
+    },
+    {
+      "command": "Publication validation after force-adding owned project skill",
+      "exit_code": 0,
+      "returned_output": {
+        "components": 69,
+        "hashed_files": 8102,
+        "profiles": 4,
+        "receipts": 172,
+        "status": "passed"
+      },
+      "limit": "Integrity and scope only; final registration adds this check record."
+    },
+    {
+      "command": "Both pinned SDK runner --help commands",
+      "exit_code": 0,
+      "correction": "Corrected drafted Claude command option names against installed help; no capability absence inferred."
+    },
+    {
+      "command": "rtk git diff --check",
+      "exit_code": 0
+    }
+  ]
+}

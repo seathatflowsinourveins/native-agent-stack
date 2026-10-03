@@ -1,0 +1,51 @@
+# Native Codex configuration for a NEW private SDK worker home, not a named profile.
+# Source: openai/codex ff6aec96948b70d94983af2641a6b67c94faeff5
+# codex-rs/config/src/config_toml.rs (agents, MCP and hooks);
+# codex-rs/cli/src/main.rs:1263 (app-server does not apply --profile).
+# Render with tools/adoption/render_config.py as described in enhancements.md.
+# The worker supplies its process-scoped provider/model/Max overrides.
+model_reasoning_effort = "max"
+web_search = "live"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+default_subagent_model = "cx/gpt-6.1-sol-max"
+default_subagent_reasoning_effort = "max"
+
+[agents.runtime-judge]
+description = "Inspect a consequential runtime claim from original source and returned evidence; report a verdict without editing."
+config_file = "agents/runtime-judge.toml"
+
+# Maintained context-mode 1.0.169 native stdio entry, adapted from
+# adoption/templates/codex.config.template.toml. MCP readiness is required.
+[mcp_servers.context-mode]
+command = "${ECO_ROOT}/bin/node"
+args = ["${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"]
+startup_timeout_sec = 60
+tool_timeout_sec = 120
+required = true
+default_tools_approval_mode = "approve"
+disabled_tools = ["ctx_upgrade", "ctx_purge"]
+
+[mcp_servers.context-mode.env]
+RTK_TELEMETRY_DISABLED = "1"
+CONTEXT_MODE_PLATFORM = "codex"
+
+# Native, task-selected code navigation. Require serena explicitly in readiness
+# when the task needs it; discovery alone does not qualify a code-navigation run.
+# Source: the maintained Codex/Serena native entry in the adoption template.
+[mcp_servers.serena]
+command = "${ECO_ROOT}/bin/serena"
+args = ["start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "false", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
+startup_timeout_sec = 60
+tool_timeout_sec = 120
+enabled_tools = ["initial_instructions", "find_symbol", "find_referencing_symbols", "get_symbols_overview", "search_for_pattern"]
+
+[mcp_servers.serena.env]
+SERENA_HOME = "${WORKER_STATE}/serena"
+
+[features]
+hooks = true
+daemon_auto_start = false
+shell_snapshot = false

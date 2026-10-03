@@ -56,17 +56,17 @@
       },
       "by_state": {
         "definitive": 31,
-        "measurement": 4,
+        "measurement": 6,
         "open": 25,
         "resolved": 22,
-        "split": 7
+        "split": 5
       },
       "definitive": 31,
-      "installed": 56,
+      "installed": 58,
       "layers": 37,
-      "measurements_pending": 10,
-      "measurements_returned": 1,
-      "not_installed": 33,
+      "measurements_pending": 8,
+      "measurements_returned": 3,
+      "not_installed": 31,
       "slots": 89
     },
     "metadata": {
@@ -82,13 +82,13 @@
         },
         "by_state": {
           "definitive": 31,
-          "measurement": 4,
+          "measurement": 6,
           "open": 25,
           "resolved": 22,
-          "split": 7
+          "split": 5
         },
         "definitive": 31,
-        "installed": 56,
+        "installed": 58,
         "layers": 37,
         "slots": 89
       },
@@ -168,7 +168,7 @@
         },
         "settlements": {
           "file": "settlements.json",
-          "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24"
+          "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3"
         },
         "us-equities": {
           "file": "trading/trading-definitive.compact.json",
@@ -1368,24 +1368,33 @@
           "state": "split"
         },
         {
-          "installed": false,
-          "not_installed_reason": "one blind GPT order selected nothing and the other three models that each add a second server; the critic's choice was not among the judged candidates",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
             "claude": "not judged in the first round",
             "coincides_with_lane_record": null,
-            "default": "Not installed until the deciding measurement returns",
+            "default": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
             "definitive": false,
             "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
-            "installs_nothing_extra": true,
+            "installs_nothing_extra": false,
             "job": "local embedding model",
-            "label": "split: decided by the named measurement, nothing installed until it returns",
+            "label": "settled by the preregistered measurement: nDCG@10 0.49827 on CQADupstackUnixRetrieval against 0.41394 for EmbeddingGemma (difference 0.084331, 95% interval 0.067738 to 0.100656), with the generation model resident; Nemotron-3-Embed-1B tied (difference 0.003124, interval -0.012194 to 0.018141) and needs a second model server, and WeMM-Embedding-2B ran out of GPU memory; measured on one workstation; not a merit acceptance",
             "layer_id": "semantic-rag",
             "measurement": {
-              "receipts": [],
-              "returned": false
+              "receipts": [
+                {
+                  "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+                  "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+                },
+                {
+                  "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
+                  "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541"
+                }
+              ],
+              "returned": true
             },
-            "repository": "",
+            "repository": "https://github.com/QwenLM/Qwen3-Embedding",
             "resolution": {
               "arms": [
                 {
@@ -1420,9 +1429,9 @@
             },
             "row_kind": "added",
             "slot_id": "embedding-model",
-            "state": "split"
+            "state": "measurement"
           },
-          "state": "split"
+          "state": "measurement"
         },
         {
           "installed": false,
@@ -3325,24 +3334,33 @@
           "state": "resolved"
         },
         {
-          "installed": false,
-          "not_installed_reason": "the two blind GPT orders and the Claude critic chose different models, and the fit of the critic's choice is inferred, not measured",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
             "claude": "not judged in the first round",
             "coincides_with_lane_record": null,
-            "default": "Not installed until the deciding measurement returns",
+            "default": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
             "definitive": false,
             "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
-            "installs_nothing_extra": true,
+            "installs_nothing_extra": false,
             "job": "local generation model",
-            "label": "split: decided by the named measurement, nothing installed until it returns",
+            "label": "settled by the preregistered measurement: first-pass valid tool calls 200 of 200 against 175 of 200 for gpt-oss:20b (difference 0.125, 95% interval 0.065 to 0.19) on 100 BFCL cases through the server's chat and responses surfaces, both arms entirely on the GPU at 64,000 tokens with the embedder resident; Bonsai and Swift on PrismML's llama.cpp failed the function gate and qwen3.8:27b did not fit on the GPU; measured on one workstation; not a merit acceptance",
             "layer_id": "observation-inference",
             "measurement": {
-              "receipts": [],
-              "returned": false
+              "receipts": [
+                {
+                  "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+                  "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+                },
+                {
+                  "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+                  "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577"
+                }
+              ],
+              "returned": true
             },
-            "repository": "",
+            "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
             "resolution": {
               "arms": [
                 {
@@ -3372,9 +3390,9 @@
             },
             "row_kind": "added",
             "slot_id": "local-generation-model",
-            "state": "split"
+            "state": "measurement"
           },
-          "state": "split"
+          "state": "measurement"
         },
         {
           "installed": false,
@@ -6710,7 +6728,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "cfd08b85efca343f428fadd8253a06ce9c08afb944a4f66a2aaae15d3c08fa96"
+      "sha256": "857dddb408b17f5e54efe08dff4571d262736fb2af3702f9fb3c567d29463686"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -6718,7 +6736,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json",
-      "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24"
+      "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json",
