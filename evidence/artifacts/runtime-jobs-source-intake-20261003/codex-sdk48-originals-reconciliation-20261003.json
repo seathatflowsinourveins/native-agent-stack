@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T21:52:43Z",
+  "classification": "independent reconciliation of retained unchanged upstream SDK trial; no root rerun",
+  "status": "HISTORICAL_SCOPED_PASS",
+  "freeze_eligible": false,
+  "source_trial": {
+    "repository": "openai/codex",
+    "tag": "rust-v0.160.0",
+    "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "source_package_version": "0.0.0-dev",
+    "tool_versions": {
+      "Node": "22.23.3",
+      "pnpm": "10.34.5",
+      "released_CLI": "0.160.0"
+    },
+    "executable_bindings": {
+      "CLI_sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+      "code_mode_host_sha256": "37cab1584302611e9936902219640ab5e7a79fcfccd2504c6e85ea8cb97d0e10"
+    },
+    "commands": [
+      {
+        "phase": "install",
+        "argv": [
+          "pnpm",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "native_exit": 0
+      },
+      {
+        "phase": "build",
+        "argv": [
+          "pnpm",
+          "-r",
+          "--filter",
+          "./sdk/typescript",
+          "run",
+          "build"
+        ],
+        "native_exit": 0
+      },
+      {
+        "phase": "lint",
+        "argv": [
+          "pnpm",
+          "-r",
+          "--filter",
+          "./sdk/typescript",
+          "run",
+          "lint"
+        ],
+        "native_exit": 0
+      },
+      {
+        "phase": "exec-unit",
+        "argv": [
+          "pnpm",
+          "-r",
+          "--filter",
+          "./sdk/typescript",
+          "run",
+          "test",
+          "--runInBand",
+          "exec.test.ts"
+        ],
+        "native_exit": 0,
+        "test_suites": 1,
+        "tests": 14,
+        "scope": "mocked child spawning; no native CLI evidence"
+      },
+      {
+        "phase": "full-sdk",
+        "argv": [
+          "pnpm",
+          "-r",
+          "--filter",
+          "./sdk/typescript",
+          "run",
+          "test",
+          "--runInBand"
+        ],
+        "CODEX_EXEC_PATH": "tools/codex-0.160.0/bin/codex",
+        "native_exit": 0,
+        "test_suites": 5,
+        "tests": 48,
+        "passed_suites": [
+          "run.test.ts",
+          "runStreamed.test.ts",
+          "abort.test.ts",
+          "mcpConformance.test.ts",
+          "exec.test.ts"
+        ],
+        "reported_jest_seconds": 175.997,
+        "scope": "unchanged default suite; MCP baseline comparisons are not zero-defect full protocol conformance"
+      }
+    ],
+    "originals": [
+      {
+        "phase": "install",
+        "stream": "stdout",
+        "bytes": 6926,
+        "sha256": "9abe37de67cce6c5b0fb6c6a971b98503dda4368982c73e3b5db598d10a6f01a",
+        "artifact_id": "install-r1.stdout"
+      },
+      {
+        "phase": "install",
+        "stream": "stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifact_id": "install-r1.stderr"
+      },
+      {
+        "phase": "build",
+        "stream": "stdout",
+        "bytes": 705,
+        "sha256": "7b4461efec93faf0fd43311fc0c621467e75400e318be3517857f49bacff8cdf",
+        "artifact_id": "build-r1.stdout"
+      },
+      {
+        "phase": "build",
+        "stream": "stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifact_id": "build-r1.stderr"
+      },
+      {
+        "phase": "lint",
+        "stream": "stdout",
+        "bytes": 232,
+        "sha256": "c42bc503cde2d2765f43e8a6cc88f1b39c4ffe757d4fffdcab183a988a8b7956",
+        "artifact_id": "lint-r1.stdout"
+      },
+      {
+        "phase": "lint",
+        "stream": "stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifact_id": "lint-r1.stderr"
+      },
+      {
+        "phase": "exec-unit",
+        "stream": "stdout",
+        "bytes": 220,
+        "sha256": "7ba70acb2c9941576cc191e4a1dc3e818558fed0db509b2c5266e6f1e5289293",
+        "artifact_id": "exec-unit-r1.stdout"
+      },
+      {
+        "phase": "exec-unit",
+        "stream": "stderr",
+        "bytes": 1318,
+        "sha256": "a8dfdc585ded009456bbfe7ee8641d8dcac91e9dae2596f23f000ad14f74a1cb",
+        "artifact_id": "exec-unit-r1.stderr"
+      },
+      {
+        "phase": "full-sdk",
+        "stream": "stdout",
+        "bytes": 207,
+        "sha256": "bfa2dbc55244814a7238495335050f08189de8ce422e4a3ecc34ce16dbd8ef4f",
+        "artifact_id": "full-sdk-r1.stdout"
+      },
+      {
+        "phase": "full-sdk",
+        "stream": "stderr",
+        "bytes": 290,
+        "sha256": "d75d4767fff415c64b9e91a2a5a50eeaac7b017b1dbe98e78d087e32c6474a6c",
+        "artifact_id": "full-sdk-r1.stderr"
+      }
+    ],
+    "independent_original_reconciliation": "PASS scoped isolated upstream trial",
+    "results": {
+      "exec_subset": {
+        "suites": 1,
+        "tests": 14
+      },
+      "full_sdk": {
+        "suites": 5,
+        "tests": 48,
+        "reported_seconds": 175.997
+      },
+      "counting": "14 subset included in48; never sum to62"
+    },
+    "MCP": {
+      "dependency_lock_and_baseline_pin": "49103de6ed70804e940637bf3e9e29e4a3f54e64",
+      "counts_scope": "committed baseline identities, not reconstructed candidate-run failure counts",
+      "test_semantics": "regression comparisons permit known failures; not zero-failure full protocol conformance"
+    },
+    "limits": [
+      "Isolated host trial with released-musl CLI override; different from same-checkout GNU/Bazel CI",
+      "Default unchanged suite includes mock transports and protocol regression-baseline comparisons",
+      "No real provider, fresh NativeStack2604, GPU, complete source CI or production acceptance"
+    ]
+  },
+  "original_full_suite_stderr_utf8": "PASS tests/run.test.ts (28.675 s)\nPASS tests/runStreamed.test.ts\nPASS tests/abort.test.ts\nPASS tests/mcpConformance.test.ts (141.671 s)\nPASS tests/exec.test.ts\n\nTest Suites: 5 passed, 5 total\nTests:       48 passed, 48 total\nSnapshots:   0 total\nTime:        175.997 s\nRan all test suites.\n",
+  "terminal_records_binding": {
+    "bytes": 1216,
+    "sha256": "33b4bdf5ccd9664c4427717362800bc17584f98d148632c1fd33526e0d0ea176",
+    "full_sdk_terminal_chunk": "c41c72",
+    "full_sdk_native_exit": 0,
+    "scope": "Native terminal fields, not OS execve or per-stream EOF."
+  },
+  "source_receipt_binding": {
+    "bytes": 5909,
+    "sha256": "bc391d448c727b4f6276a8fc74336965b1b08ecf9e8717ea70fe5812541f0e48"
+  },
+  "sanitized_parent_binding": {
+    "bytes": 14930,
+    "sha256": "84abfb04facff5fa76858816c2e25ae1a4ab54ac8d9736f9c1803c16e283c16f"
+  },
+  "independent_root_observation": {
+    "original_streams": 10,
+    "original_bytes": 9898,
+    "all_complete_byte_hash_bindings_match": true,
+    "source_HEAD_exit": 0,
+    "tag_resolution_exit": 0,
+    "tracked_source_diff_exit": 0,
+    "source_HEAD_and_tag": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "CLI_and_code_mode_host_hashes_match": true,
+    "four_pinned_workflow_package_Jest_MCP_sources_native_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "correction": {
+    "earlier_statement": "48-test originals not found in specifically checked617/633 sources",
+    "new_locator": "PR608 comment5973765879 at head099ead33b68fe6df4ccb1f661bdb10bf418a840b supplied the separate source-lane publication packet",
+    "disposition": "locator gap closed for this scoped historical trial; earlier observation retained, no global absence claim"
+  },
+  "preserved_failure": {
+    "defined_tests": 23,
+    "passed": 0,
+    "failed": 1,
+    "pending": 22,
+    "original_timeout_ms": 5000,
+    "selected_fixture_reported_duration_ms": 5008,
+    "raw_Jest_bytes": 9442,
+    "raw_Jest_sha256": "d26ec17d367888d5ed775e106c010d5709996156ae12bb6d03a7ab292736d05e",
+    "scope": "Separate Node24.21.0 offline namespace diagnostic; it stays FAIL and unexplained."
+  },
+  "diagnostic_15s": {
+    "status": "DORMANT_PROSPECTIVE_ONLY",
+    "executed": false,
+    "needed_for_historical_source_suite": false,
+    "is_role_gate": false
+  },
+  "counting": "14 mocked-spawn tests are included in48; never sum to62. The separate root14 selection remains redundant scoped evidence.",
+  "limits": [
+    "Historical isolated Node22.23.3 released-musl trial; not fresh target-host acceptance",
+    "MCP regression baseline matches permit known failures, not zero-defect protocol conformance",
+    "Actual model/provider/OmniRoute Ultra delivery and useful roles remain unqualified",
+    "Complete wrapper custody, independent per-stream EOF and19-case lifecycle/network acceptance remain open",
+    "No comparative quality measurement or job default follows; measured defaults0/8"
+  ],
+  "source_urls": [
+    "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/.github/workflows/sdk.yml#L126",
+    "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/package.json#L36",
+    "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/jest.config.cjs",
+    "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/tests/mcpConformance.test.ts#L50"
+  ],
+  "measured_defaults": 0,
+  "root_new_model_runs": 0
+}

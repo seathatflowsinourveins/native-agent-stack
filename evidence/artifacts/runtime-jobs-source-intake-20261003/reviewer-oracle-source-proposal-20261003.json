@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T21:52:43Z",
+  "classification": "prospective pinned-source reviewer oracle proposal",
+  "status": "SOURCE_ONLY_HOLD",
+  "current_choice": "native clients remain the provisional reviewer baseline",
+  "measured_defaults": 0,
+  "freeze_eligible": false,
+  "current_mixed_reviewer_contract_changed": false,
+  "SWRBench": {
+    "repository": "ZZR0/SWRench",
+    "pin": "67ae1d4395ac05f800d62b0e13678eadeb9fa5c7",
+    "disposition": "blocked unchanged",
+    "basis": "evaluation_struct.py imports utils; utils.py12 requires OPENAI_API_BASE and13 subscripts os.getenv as a function. Source analysis only; no import or environment-value read."
+  },
+  "proposed_oracle": {
+    "repository": "withmartian/code-review-benchmark",
+    "pin": "e616e849755441da38f18bf3adba2c9583b03803",
+    "scope": "bug-containing PRs only",
+    "native_commands_cwd": "offline",
+    "native_commands": [
+      [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "code_review_benchmark.step2_extract_comments",
+        "--tool",
+        "<frozen arm>",
+        "--force"
+      ],
+      [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "code_review_benchmark.step3_judge_comments",
+        "--tool",
+        "<frozen arm>",
+        "--structured",
+        "--no-dedup",
+        "--force",
+        "--evaluations-file",
+        "<fresh owned output.json>"
+      ]
+    ],
+    "quality_outputs": [
+      "TP",
+      "FP",
+      "FN",
+      "precision",
+      "recall",
+      "errors"
+    ],
+    "empty_review": "step3:255-273 records all golden issues as false negatives",
+    "clean_review_gap": "step3:249-253 skips PRs with no golden comments; full reviewer-job correctness remains unqualified",
+    "timeouts": "step3 has separate30s individual call and1800s full review scopes; timed-out evaluations are counted then continued before mark_done. Missing/error outputs retain the existing frozen failure disposition.",
+    "task_bindings": "Five offline/golden_comments/*.json and offline/results/benchmark_data.json have metadata-only discovery; no task bodies acquired or frozen.",
+    "new_preregistration_required": true,
+    "route_identity": "Native source accepts MARTIAN_BASE_URL/model and a nonempty key-shaped input; actual OmniRoute/public-marker compatibility and judge model/effort remain unqualified."
+  },
+  "alternative_rejected": {
+    "repository": "droid-code-review-evals/review-droid-benchmark",
+    "pin": "2dfbbd6edcd5eea19495e725d611cb104c9e8f4d",
+    "basis": "scripts/eval_common.py33-52 excludes codex-grafana PR3; this is not a common-all-arms frozen denominator."
+  },
+  "independent_root_read": {
+    "sources": 13,
+    "native_source_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "complete_original_byte_hash_and_git_blob_matches": true,
+    "first_fetch_processing_attempt": "30s tool timeout; individual results unavailable; retained, no absence/pass claim",
+    "bounded_recovery": "GNU5sTERM/+1s per native fetch; all13 source fetches exit0"
+  },
+  "source_inventory": [
+    {
+      "source_id": "S-eval",
+      "repository": "ZZR0/SWRench",
+      "pin": "67ae1d4395ac05f800d62b0e13678eadeb9fa5c7",
+      "file": "swrbench/evaluation_struct.py",
+      "complete_original_bytes": 56263,
+      "sha256": "917505d1265fb3783e765c965960f24205a1d8778e7004f51226321553a5711f",
+      "git_blob": "6553e3e3f2bf178b5cb76ef880906eb14c47bf36"
+    },
+    {
+      "source_id": "S-utils",
+      "repository": "ZZR0/SWRench",
+      "pin": "67ae1d4395ac05f800d62b0e13678eadeb9fa5c7",
+      "file": "swrbench/utils.py",
+      "complete_original_bytes": 3450,
+      "sha256": "f25710dbf5ac3ae738c2d40bee02061d824a64b9e5e15a68e3bec4a97f9d888a",
+      "git_blob": "fde694b252b4cd68a42844847bb5632845bacdda"
+    },
+    {
+      "source_id": "S-readme",
+      "repository": "ZZR0/SWRench",
+      "pin": "67ae1d4395ac05f800d62b0e13678eadeb9fa5c7",
+      "file": "README.md",
+      "complete_original_bytes": 8973,
+      "sha256": "1fa309393c193f99060844493d303e33af8858097933b92a734d4d92c5c9272e",
+      "git_blob": "de6f781d4f14d4ad3dbecc3a4b19c6dc71c46072"
+    },
+    {
+      "source_id": "M-readme",
+      "repository": "withmartian/code-review-benchmark",
+      "pin": "e616e849755441da38f18bf3adba2c9583b03803",
+      "file": "README.md",
+      "complete_original_bytes": 11549,
+      "sha256": "4eca16de461cf4dad0cf09f51595b19c48ad81be60bb63b9d4874b8bc5e99bf9",
+      "git_blob": "333ab571e122da0c431519db220efff2901db47f"
+    },
+    {
+      "source_id": "M-judge",
+      "repository": "withmartian/code-review-benchmark",
+      "pin": "e616e849755441da38f18bf3adba2c9583b03803",
+      "file": "offline/code_review_benchmark/step3_judge_comments.py",
+      "complete_original_bytes": 21161,
+      "sha256": "7370dfb21bed01655aada1d4d75f32e07c92e4c4c86dfc6cf6d47058a65ce16d",
+      "git_blob": "d3fe172f2f0d940de948f84ce5a759130dc2626f"
+    },
+    {
+      "source_id": "M-extract",
+      "repository": "withmartian/code-review-benchmark",
+      "pin": "e616e849755441da38f18bf3adba2c9583b03803",
+      "file": "offline/code_review_benchmark/step2_extract_comments.py",
+      "complete_original_bytes": 10197,
+      "sha256": "d0b328d3953a3f68819ed530b1aafb594e7ad7cf09ef64e3b7e82d7bb221c800",
+      "git_blob": "3d3ec9bc839ee4e45684e7107effc573aa020484"
+    },
+    {
+      "source_id": "M-score",
+      "repository": "withmartian/code-review-benchmark",
+      "pin": "e616e849755441da38f18bf3adba2c9583b03803",
+      "file": "offline/analysis/score_profiles.py",
+      "complete_original_bytes": 7638,
+      "sha256": "b5d474a373f008f0899dbcbe8deca5f596d8081bc9579b75391971f6f2959f52",
+      "git_blob": "fa3f38ce2332dcc2683598ca00bc58be88cf0ed9"
+    },
+    {
+      "source_id": "F-readme",
+      "repository": "droid-code-review-evals/review-droid-benchmark",
+      "pin": "2dfbbd6edcd5eea19495e725d611cb104c9e8f4d",
+      "file": "README.md",
+      "complete_original_bytes": 4216,
+      "sha256": "bcc7feb139415519a6c5c9be23525a5ddf7a410ab768123bb16835cc2f4c5f6b",
+      "git_blob": "54a6f996f552d03a6b93c44244fadff1fe2484b4"
+    },
+    {
+      "source_id": "F-eval",
+      "repository": "droid-code-review-evals/review-droid-benchmark",
+      "pin": "2dfbbd6edcd5eea19495e725d611cb104c9e8f4d",
+      "file": "scripts/eval_common.py",
+      "complete_original_bytes": 16796,
+      "sha256": "69717eb0d416bb923da6a1767f7522c5e9670733d1cc10263951b571c3b48903",
+      "git_blob": "1a37d55b075cc20716d72786ba564f2c126b58af"
+    },
+    {
+      "source_id": "F-codex",
+      "repository": "droid-code-review-evals/review-droid-benchmark",
+      "pin": "2dfbbd6edcd5eea19495e725d611cb104c9e8f4d",
+      "file": "scripts/evaluate_codex.py",
+      "complete_original_bytes": 1114,
+      "sha256": "33ce61b9bf95c63e3aab7a11e8b6fc9281051da417e999114128658d1240f781",
+      "git_blob": "cde9aaad6cfea07e8dee76de28494380cae31cf9"
+    },
+    {
+      "source_id": "M-download",
+      "repository": "withmartian/code-review-benchmark",
+      "pin": "e616e849755441da38f18bf3adba2c9583b03803",
+      "file": "offline/code_review_benchmark/step1_download_prs.py",
+      "complete_original_bytes": 12036,
+      "sha256": "58069f36349d010bce7c9971904121719d77d731ad2cac041309287434411796",
+      "git_blob": "cedf88207418c87d00fa117f66670b4bf1066218"
+    },
+    {
+      "source_id": "M-tests",
+      "repository": "withmartian/code-review-benchmark",
+      "pin": "e616e849755441da38f18bf3adba2c9583b03803",
+      "file": "offline/tests/test_step3.py",
+      "complete_original_bytes": 5324,
+      "sha256": "47ac90cdc37cb1726a5b8351000e535fd3e64c49c022a0bf758590d30143783c",
+      "git_blob": "b16205f79c537ecba599d7de6276ee77b631500a"
+    },
+    {
+      "source_id": "M-project",
+      "repository": "withmartian/code-review-benchmark",
+      "pin": "e616e849755441da38f18bf3adba2c9583b03803",
+      "file": "offline/pyproject.toml",
+      "complete_original_bytes": 1961,
+      "sha256": "f5f91bfe5074babc830d699e4aa1445c5e8b6c7e13701cedc25d4153efd866cb",
+      "git_blob": "429a426b725ba8e026e2cd807e22cc8172aa5faa"
+    }
+  ],
+  "seal_binding": {
+    "sha256": "d1d8da0625cf188bced7e091785eb22fff4568f6a7a2be694002b1fe336ef907"
+  },
+  "not_run": [
+    "dataset acquisition",
+    "upstream scorer",
+    "evaluation framework integration",
+    "provider/model/judge trials",
+    "new credentials or configuration"
+  ],
+  "selection_policy": "Source-supported bug-containing oracle does not select the reviewer default or close the clean-review gap."
+}

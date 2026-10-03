@@ -1,0 +1,491 @@
+{
+  "native_switch_source_leads": [
+    {
+      "feature": "Prompt compression plan",
+      "files": [
+        "open-sse/services/compression/planResolution.ts:24-58",
+        "open-sse/services/compression/resolveCompressionPlan.ts:8-20",
+        "open-sse/handlers/chatCore/compressionSettings.ts:29-43"
+      ],
+      "switches": [
+        "x-omniroute-compression:off",
+        "x-omniroute-compression:default",
+        "x-omniroute-compression:engine:<enabled-id>",
+        "x-omniroute-compression:<named-combo>"
+      ],
+      "facts": "Header resolver accepts off/default/enabled engine/named combo and returns null for unrecognized values. ResolveCompressionPlan returns off when config.enabled is false, then considers route-combo override, active combo and derived engine default. Compression settings derive enabled and contextEditing.enabled===true; lookup failure returns disabled.",
+      "limits": "Pure supported resolution paths; actual master, per-key, combo, engine, route, request applicability and intervention are unobserved."
+    },
+    {
+      "feature": "Request lossy policy",
+      "files": [
+        "open-sse/services/compression/lossyRequestPolicy.ts:9-75"
+      ],
+      "switches": [
+        "x-omniroute-compression:allow-lossy",
+        "request-header plan from engine:<id> or named combo"
+      ],
+      "facts": "No opt-in downgrades listed lossy modes or removes unsafe stacked steps; fallback pipeline is session-dedup plus lite. allow-lossy preserves the operator plan, while engine/named-combo request-header plans themselves constitute opt-in.",
+      "limits": "Safe-default classification is the upstream source contract, not proof of useful-task quality or byte identity."
+    },
+    {
+      "feature": "Semantic cache vector layer",
+      "files": [
+        "tests/unit/semantic-cache-vector-layer-opt-in.test.ts:22-63"
+      ],
+      "switches": [
+        "cache.semanticCacheEnabled",
+        "cache.semanticCacheVectorEnabled",
+        "OMNIROUTE_SEMANTIC_CACHE_ENABLED (deleted in fixture)"
+      ],
+      "facts": "Unrun upstream fixture asserts vector manager off by default and enables DB-bridge vector manager only when master and vector opt-in are true; legacy exact-match default is separate.",
+      "limits": "Fixture settings are not active settings. Vector/embedding delivery, namespace, freshness and native Responses replay are unqualified. Existing explicit request no-cache controls are reused rather than rerun."
+    }
+  ],
+  "responses_and_effort": {
+    "prompt_compression_test": "tests/unit/codex-prompt-compression-passthrough.test.ts:19-61",
+    "supported_source_scope": "Regression checks proactive prompt-compression exclusion does not contain nativeCodexPassthrough and matches operator exclusions. Separate assertions retain !nativeCodexPassthrough reactive compaction guards.",
+    "semantic_cache_test_scope": "New truncation tests use Chat-style messages/choices, stub cache backend and cacheability/size gates, and assert truncated responses are not written. They do not establish Responses output/history/identity replay.",
+    "effort_test": "tests/unit/openai-responses-reasoning-effort.test.ts",
+    "effort_gap": "Inspected translator tests include low/medium/high/max, including Kiro GPT-5.6 Max; no Ultra fixture. Existing source-qualified raw Ultra-to-Max HTTP normalization and native app-server limitations remain as recorded in prior Ultra receipt. No new route delivery claim.",
+    "executed": false
+  },
+  "counter_source_leads": [
+    {
+      "files": [
+        "open-sse/services/compression/stats.ts:223-278"
+      ],
+      "fact": "Stats call estimateCompressionTokens before/after. Strings use char-count estimates; Codex-shaped objects can use countTextTokens under the size bound, with image accounting and char-count/error fallback.",
+      "scope": "Preprocessing estimates and estimator provenance, not authoritative provider G/R/O or realized savings."
+    },
+    {
+      "files": [
+        "open-sse/handlers/chatCore/compressionUsageReceipt.ts:12-27",
+        "tests/unit/chatcore-compression-usage-receipt.test.ts:32-78"
+      ],
+      "fact": "Attachment waits for pending analytics write and is best-effort. Source accepts provider/estimated/stream labels. Fixture supplies prompt/completion/total counters and verifies aggregation.",
+      "scope": "Receipt label and aggregation do not independently prove original provider field presence, types, terminal source or nonoverlapping attempt identity."
+    },
+    {
+      "files": [
+        "tests/unit/nonstream-usage-cache-tokens.test.ts:1-17,31-85"
+      ],
+      "fact": "Claude-to-OpenAI nonstream fixture folds cache-read into prompt_tokens and keeps cache-creation outside that sum; no cache input leaves details absent.",
+      "scope": "Translated Claude/OpenAI usage, not Codex Responses original-terminal usage."
+    },
+    {
+      "files": [
+        "tests/unit/call-log-in-memory-usage.test.ts:26-96,130-170",
+        "tests/unit/stream-responses-upstream-call-log-content.test.ts:51-88"
+      ],
+      "fact": "In-memory call-log fixtures preserve supplied counters across closed persistence, independent requests and later enrichment. Responses collector fixture separates answer and reasoning using supplied SSE.",
+      "scope": "Synthetic reconstruction bookkeeping. No original pre-sanitation terminal operand witness or new consumption measurement."
+    }
+  ],
+  "firstparty_mechanical_oracles": [
+    {
+      "path": "tests/golden-set/compression-quality.test.ts",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "task_binding": "tests/golden-set/data/prompts.jsonl referenced at lines15-18; data contents were not read/acquired.",
+      "actual_grader": "cavemanCompress user-message fixture; key-phrase preservation >=0.95 at lines83-85; code-block/nonempty/grammar checks.",
+      "limits": "Caveman mechanical fixture, no useful-task grading, native Ultra or arbitrary engine/combo guarantee."
+    },
+    {
+      "path": "tests/golden-set/compression-savings.test.ts",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "task_binding": "Same prompts.jsonl reference at line12; data contents were not read/acquired.",
+      "actual_grader": "String estimateCompressionTokens, executable mean savings >=3% and median>=2% at lines68-71.",
+      "source_discrepancy": "Test title at line37 says average>=20%; executable assertion is 3%. Keep actual assertion; never infer benchmark thresholds from title.",
+      "limits": "Estimated string shrinkage, not provider token efficiency. No adoption of these thresholds into the existing 5% complete-counter comparison."
+    },
+    {
+      "path": "tests/golden-set/compression-upstream-parity.test.ts",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "task_binding": "Requires _references/_outros/caveman/mcp-servers/caveman-shrink/compress.js and _references/_outros/caveman/tests/caveman-compress fixture tree, lines13-17,101-114.",
+      "limits": "External reference availability was not qualified. Offline parity, not full study oracle; no acquisition, execution or substitution."
+    }
+  ],
+  "native_command_leads": {
+    "executed": false,
+    "source": "Pinned package.json test:unit Node runner and named unchanged upstream node:test files.",
+    "scoped_unit_selector": "rtk proxy env DISABLE_SQLITE_AUTO_BACKUP=true node --max-old-space-size=8192 --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit --test-concurrency=1 tests/unit/codex-prompt-compression-passthrough.test.ts tests/unit/chatcore-compression-settings.test.ts tests/unit/chatcore-compression-usage-receipt.test.ts tests/unit/nonstream-usage-cache-tokens.test.ts tests/unit/call-log-in-memory-usage.test.ts tests/unit/semantic-cache-vector-layer-opt-in.test.ts tests/unit/semantic-cache-no-truncated-writes.test.ts tests/unit/openai-responses-reasoning-effort.test.ts",
+    "selected_mechanical_selector": "rtk proxy env DISABLE_SQLITE_AUTO_BACKUP=true node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit tests/golden-set/compression-quality.test.ts tests/golden-set/compression-savings.test.ts",
+    "execution_context": "Lead only for future authorized unchanged upstream fixture checks at the named pin with installed qualified dependencies and fresh cleared owned state. No installation, test/model invocation or independent network trace performed by this task.",
+    "no_new_oracle": "The proposal must still inherit unchanged frozen job tasks/oracles and delivered route; these native fixtures are readiness or mechanical controls, not a winning common study oracle.",
+    "source_prefix_correction": "The sealed source lead omitted package.json test:unit literal DISABLE_SQLITE_AUTO_BACKUP=true. Future selected invocations preserve it through supported env plus stock imports/runner, fresh owned isolated data state and declared native supervisor. Original sealed lead is retained; none was executed."
+  },
+  "remaining_existing_gaps": [
+    "Actual selected composed destination/build",
+    "Per-runtime Responses/request-shape applicability and exact engine/combo intervention",
+    "Delivered native Codex Ultra mode, model/effort/helper identity",
+    "Supported original-terminal provider G/R/O metadata witness with absent fields preserved",
+    "Complete ordered attempts, failures, partial-scope and cache namespace/freshness/order",
+    "Inherited job tasks/oracles and complete paired efficiency inputs",
+    "Owner window, snapshot/restoration and existing lifecycle/network gates"
+  ],
+  "preservation": {
+    "repository_edits": false,
+    "active_gateway_client_settings_read": false,
+    "credential_or_auth_store_read": false,
+    "environment_values_read": false,
+    "activation": false,
+    "pool_window_reservation": false,
+    "provider_model_workload_build": false,
+    "study_freeze": false,
+    "selected_default": false,
+    "unknown_usage": null
+  },
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T22:03:25Z",
+  "classification": "pinned upstream compression/cache/accounting helper and fixture source qualification; no feature benefit measurement",
+  "status": "SOURCE_ONLY_HOLD",
+  "measured_defaults": 0,
+  "freeze_eligible": false,
+  "source_repository": "diegosouzapw/OmniRoute",
+  "release_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+  "default_head": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+  "independent_root_read": {
+    "complete_source_bodies": 33,
+    "native_source_exits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "byte_and_hash_matches": true,
+    "shared_helpers_tests_release_head_identical": 13
+  },
+  "reused_native_evidence": "Six existing cache replay controls; not rerun. They prove no job default or realized provider savings.",
+  "private_seal_binding": {
+    "sha256": "0c7b458b8034c4f0bf9861d68dddeb34861df3a75a8c9d7d5be6bf0027147879"
+  },
+  "selection_policy": "Keep actual useful-task quality and complete paired efficiency rule. Mechanical thresholds and estimates do not select or activate a token feature.",
+  "source_inventory": [
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "package.json",
+      "native_exit": 0,
+      "bytes": 35615,
+      "sha256": "b002c54561bd762f41c7f4cafe6809ac5d5e58bbe175ce0399eb7c1df5b0baf6",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/package.json"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/codex-prompt-compression-passthrough.test.ts",
+      "native_exit": 0,
+      "bytes": 2233,
+      "sha256": "d4781bf4e67b86a2360ab99db6851fe22789e3be4805474b91e20d947ea52a34",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/codex-prompt-compression-passthrough.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/chatcore-compression-settings.test.ts",
+      "native_exit": 0,
+      "bytes": 2134,
+      "sha256": "38f7b70d7be60858684611b669381b7720f5126b991654b39ddbb44ff2b67ab9",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/chatcore-compression-settings.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/chatcore-compression-usage-receipt.test.ts",
+      "native_exit": 0,
+      "bytes": 2737,
+      "sha256": "c6f804b60ef6d4ffd580fe240c0b78bf88bdc43068ffeb994d301e0a37773e41",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/chatcore-compression-usage-receipt.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/nonstream-usage-cache-tokens.test.ts",
+      "native_exit": 0,
+      "bytes": 2849,
+      "sha256": "612eef8d9f695ae73bd3d9b7b6ffee20a9aa964b10865fe6923736b6931611dc",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/nonstream-usage-cache-tokens.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/call-log-in-memory-usage.test.ts",
+      "native_exit": 0,
+      "bytes": 6167,
+      "sha256": "c1adbf455f62f4da071f111d6f4550171d3b59b6cd355c6b6a8916e89280103d",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/call-log-in-memory-usage.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/stream-responses-upstream-call-log-content.test.ts",
+      "native_exit": 0,
+      "bytes": 4647,
+      "sha256": "08fd82ece75e175665de796ca347a7511ada65303bf4f956ecc568a6ffdc26b9",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/stream-responses-upstream-call-log-content.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/semantic-cache-vector-layer-opt-in.test.ts",
+      "native_exit": 0,
+      "bytes": 4368,
+      "sha256": "9412cd800775383a35e61d3b3f9313abb84fb8ff959b66e1e0a205334f722bd9",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/semantic-cache-vector-layer-opt-in.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/semantic-cache-no-truncated-writes.test.ts",
+      "native_exit": 0,
+      "bytes": 4925,
+      "sha256": "d7881e7b0b346ec9f5b71d0475261d703044f4dd7d211c62deadabd7008f35a3",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/semantic-cache-no-truncated-writes.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/services/compression/planResolution.ts",
+      "native_exit": 0,
+      "bytes": 6663,
+      "sha256": "b44772204d5a57144528665a0dd94b706d253463d8374ae57197cf315be8ffc0",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/services/compression/planResolution.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/services/compression/lossyRequestPolicy.ts",
+      "native_exit": 0,
+      "bytes": 2169,
+      "sha256": "8831e43712b6b2a994a418022e548f31b8eebc46b9f6fa8c3a32e60f2eac25c5",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/services/compression/lossyRequestPolicy.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/services/compression/stats.ts",
+      "native_exit": 0,
+      "bytes": 11479,
+      "sha256": "48f5fcd1e573d854d09d21a3ceaf337443dca4aa1d2a69fe01555db5b933737c",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/services/compression/stats.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/services/compression/resolveCompressionPlan.ts",
+      "native_exit": 0,
+      "bytes": 1041,
+      "sha256": "bd90aa4e3ed0898114a1ff782a094490cf0928e685236d51da27d0e8804fbff8",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/services/compression/resolveCompressionPlan.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/handlers/chatCore/compressionSettings.ts",
+      "native_exit": 0,
+      "bytes": 1601,
+      "sha256": "6338a49b58f2ddb45c1c8501e18b36511b232e2eb40269b093938641511a2dbc",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore/compressionSettings.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/handlers/chatCore/compressionUsageReceipt.ts",
+      "native_exit": 0,
+      "bytes": 1173,
+      "sha256": "24eb4fc96a14fd52cff396134d5cb05a48f9d2448dbbbd0ab0378caba293134a",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore/compressionUsageReceipt.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/compression/resolve-compression-plan.test.ts",
+      "native_exit": 0,
+      "bytes": 1208,
+      "sha256": "a8f47624f901e6994ab2267bbd54ab5f94ecdf0c73ad176a9d5cb9634502a88b",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/compression/resolve-compression-plan.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/unit/openai-responses-reasoning-effort.test.ts",
+      "native_exit": 0,
+      "bytes": 4211,
+      "sha256": "8e60058185c7505fa0547861d67492efecd3788b2d04737fdbb93dc0f71b1239",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/openai-responses-reasoning-effort.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "tests/unit/codex-prompt-compression-passthrough.test.ts",
+      "native_exit": 0,
+      "bytes": 2233,
+      "sha256": "d4781bf4e67b86a2360ab99db6851fe22789e3be4805474b91e20d947ea52a34",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/tests/unit/codex-prompt-compression-passthrough.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "tests/unit/chatcore-compression-usage-receipt.test.ts",
+      "native_exit": 0,
+      "bytes": 2737,
+      "sha256": "c6f804b60ef6d4ffd580fe240c0b78bf88bdc43068ffeb994d301e0a37773e41",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/tests/unit/chatcore-compression-usage-receipt.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "tests/unit/nonstream-usage-cache-tokens.test.ts",
+      "native_exit": 0,
+      "bytes": 2849,
+      "sha256": "612eef8d9f695ae73bd3d9b7b6ffee20a9aa964b10865fe6923736b6931611dc",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/tests/unit/nonstream-usage-cache-tokens.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "tests/unit/call-log-in-memory-usage.test.ts",
+      "native_exit": 0,
+      "bytes": 6167,
+      "sha256": "c1adbf455f62f4da071f111d6f4550171d3b59b6cd355c6b6a8916e89280103d",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/tests/unit/call-log-in-memory-usage.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "tests/unit/semantic-cache-vector-layer-opt-in.test.ts",
+      "native_exit": 0,
+      "bytes": 4368,
+      "sha256": "9412cd800775383a35e61d3b3f9313abb84fb8ff959b66e1e0a205334f722bd9",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/tests/unit/semantic-cache-vector-layer-opt-in.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "tests/unit/semantic-cache-no-truncated-writes.test.ts",
+      "native_exit": 0,
+      "bytes": 4925,
+      "sha256": "d7881e7b0b346ec9f5b71d0475261d703044f4dd7d211c62deadabd7008f35a3",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/tests/unit/semantic-cache-no-truncated-writes.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/services/compression/planResolution.ts",
+      "native_exit": 0,
+      "bytes": 6663,
+      "sha256": "b44772204d5a57144528665a0dd94b706d253463d8374ae57197cf315be8ffc0",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/services/compression/planResolution.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/services/compression/lossyRequestPolicy.ts",
+      "native_exit": 0,
+      "bytes": 2169,
+      "sha256": "8831e43712b6b2a994a418022e548f31b8eebc46b9f6fa8c3a32e60f2eac25c5",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/services/compression/lossyRequestPolicy.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/services/compression/stats.ts",
+      "native_exit": 0,
+      "bytes": 11479,
+      "sha256": "48f5fcd1e573d854d09d21a3ceaf337443dca4aa1d2a69fe01555db5b933737c",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/services/compression/stats.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/services/compression/resolveCompressionPlan.ts",
+      "native_exit": 0,
+      "bytes": 1041,
+      "sha256": "bd90aa4e3ed0898114a1ff782a094490cf0928e685236d51da27d0e8804fbff8",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/services/compression/resolveCompressionPlan.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/handlers/chatCore/compressionSettings.ts",
+      "native_exit": 0,
+      "bytes": 1601,
+      "sha256": "6338a49b58f2ddb45c1c8501e18b36511b232e2eb40269b093938641511a2dbc",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/handlers/chatCore/compressionSettings.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/handlers/chatCore/compressionUsageReceipt.ts",
+      "native_exit": 0,
+      "bytes": 1173,
+      "sha256": "24eb4fc96a14fd52cff396134d5cb05a48f9d2448dbbbd0ab0378caba293134a",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/handlers/chatCore/compressionUsageReceipt.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "tests/unit/openai-responses-reasoning-effort.test.ts",
+      "native_exit": 0,
+      "bytes": 4211,
+      "sha256": "8e60058185c7505fa0547861d67492efecd3788b2d04737fdbb93dc0f71b1239",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/tests/unit/openai-responses-reasoning-effort.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/golden-set/compression-quality.test.ts",
+      "native_exit": 0,
+      "bytes": 4765,
+      "sha256": "66c4607852d862324978c2da6fb0c5b0fa3a117d6063264a9060b94e8fe1bebd",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/golden-set/compression-quality.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/golden-set/compression-savings.test.ts",
+      "native_exit": 0,
+      "bytes": 4006,
+      "sha256": "13570e81db612f36fd2056fd0dd303a2799199a3a2027b0c6b368b0e56600cec",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/golden-set/compression-savings.test.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "tests/golden-set/compression-upstream-parity.test.ts",
+      "native_exit": 0,
+      "bytes": 5733,
+      "sha256": "a8f81c2787c39fad93e092eb2b391f730212458d0400818b1e697ce95ac3086c",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/golden-set/compression-upstream-parity.test.ts"
+    }
+  ]
+}

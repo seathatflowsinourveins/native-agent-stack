@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T22:03:25Z",
+  "classification": "prospective native catalog and gateway alias input proposal; no live route acceptance",
+  "status": "SOURCE_ONLY_HOLD",
+  "measured_defaults": 0,
+  "freeze_eligible": false,
+  "source_trigger": "Consequential semantic ambiguity across native catalog matching and gateway suffix/forced-effort precedence; independent Astra/max source read, then root complete original reads.",
+  "native_codex": {
+    "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "default_catalog": "Longest-prefix match, then one simple namespace-strip retry. cx/gpt-6.1-sol-ultra can inherit the bundled gpt-6.1-sol metadata; requested slug is retained on outgoing inference.",
+    "explicit_provider_catalog": "Exact slug match; bundled fallback is suppressed. Custom provider alone does not force generic metadata fallback.",
+    "static_catalog": "Supported model_catalog_json loads a full ModelsResponse and selects prefix-aware StaticModelsManager; unchanged pinned models.json is a prospective source-backed input, never an applied host configuration.",
+    "native_effort": "The suffix does not set native Ultra. Explicit native modelReasoningEffort=ultra activates native orchestration where configured. Bundled matching row has multi_agent_reasoning_effort=xhigh; actual effective catalog must still be observed."
+  },
+  "gateway": {
+    "base_head": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+    "release_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "declared_owner_carry": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+    "provider_alias": "cx",
+    "precedence": "forced rule, then recognized model suffix, then body effort",
+    "risk": "The owner carry recognizes the gpt-6.1-sol-ultra suffix. It can overwrite native-resolved xhigh, then HTTP conversion emits Max. Source-supported input shapes alone do not establish the installed carry or actual delivery."
+  },
+  "recommended_sdk_input": {
+    "model": "cx/gpt-6.1-sol",
+    "modelReasoningEffort": "ultra"
+  },
+  "recommended_action_input": {
+    "model": "cx/gpt-6.1-sol",
+    "effort": "ultra"
+  },
+  "selection_policy": "Use suffixless model plus separate native effort prospectively; preserve force-rule/transport/carry/catalog/mode/identity observation under the existing canonical gate. No model, runtime or transport is adopted by this record.",
+  "unchanged_catalog_binding": {
+    "upstream_file": "codex-rs/models-manager/models.json",
+    "bytes": 472512,
+    "sha256": "fd219bd9f061278275f528939f82f54d2eb97df4b25c23b022adbe48813d920b"
+  },
+  "source_inventory": [
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/models-manager/src/manager.rs",
+      "native_exit": 0,
+      "bytes": 33616,
+      "sha256": "d998bb2768561c761f83a77ce60d3be4b5d1a453e4a7afb10c5f86d314d76a80",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/src/manager.rs"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/model-provider/src/provider.rs",
+      "native_exit": 0,
+      "bytes": 55121,
+      "sha256": "adabad97f59dbc593431a9c47911e74d1fd9d48648b874026a23db86b32ec5a1",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/model-provider/src/provider.rs"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/thread_manager.rs",
+      "native_exit": 0,
+      "bytes": 107109,
+      "sha256": "1c356242684633729042aaac6350295b759a8fe1fc05eff28b78895f6ff2fa9d",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/thread_manager.rs"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/config/mod.rs",
+      "native_exit": 0,
+      "bytes": 200720,
+      "sha256": "854f5a6b184714740500b8d3eae2bb04cb88172efccf11d38a74f2f6189c0341",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "sdk/typescript/src/exec.ts",
+      "native_exit": 0,
+      "bytes": 14203,
+      "sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/src/exec.ts"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/client.rs",
+      "native_exit": 0,
+      "bytes": 118699,
+      "sha256": "605ced35cd853fcc4e23f6edd724c96f96f74c736a45e6ea95bf5300f3ab814c",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/client.rs"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "open-sse/config/providers/registry/codex/index.ts",
+      "native_exit": 0,
+      "bytes": 8413,
+      "sha256": "79d856f4aaf4c3c62e40118813244976985edce9b33303ef396a74475e8d21af",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/open-sse/config/providers/registry/codex/index.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "path": "open-sse/executors/codex/reasoningSuffix.ts",
+      "native_exit": 0,
+      "bytes": 1756,
+      "sha256": "e6709380c42b76fe115861df83afc9a00be64bba3e5fdf615ec910094d5901c9",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "path": "open-sse/executors/codex.ts",
+      "native_exit": 0,
+      "bytes": 63338,
+      "sha256": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex.ts"
+    }
+  ],
+  "independent_root_source_exits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "not_run": [
+    "native client or SDK execution",
+    "provider/model call",
+    "catalog/configuration override",
+    "gateway rule or transport change",
+    "job comparison"
+  ]
+}
