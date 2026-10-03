@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
-      "sha256": "c192bb4e396f5b598d78777f9c09c67e69fd0a50703ad5ec7e653d71d52ff437",
-      "bytes": 27542
+      "sha256": "d8b119ccf00931c0d3ab837a2dcbc9c583a0dfa987a79056cd0176eaacf34356",
+      "bytes": 27952
     },
     {
       "path": "docs/direct-results.md",
