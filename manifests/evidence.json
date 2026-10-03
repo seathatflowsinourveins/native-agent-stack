@@ -15681,8 +15681,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
-      "sha256": "12076b4c53141f4f093ed66ddd2e73d90273a53cf870f5b21b4bbf7621e15e41",
-      "bytes": 41895
+      "sha256": "c6ea6e295f60a0f390b1e63cacf62bc37d72636bcc3019deeaca62ee3a2690b4",
+      "bytes": 42094
     },
     {
       "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
@@ -15711,8 +15711,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "9b3115f672526723e242d0d99bdcdd4fc9e536dc2529ecb54dfa64b61365204a",
-      "bytes": 33379
+      "sha256": "955c3b2e8c20c874043b35c3f9b0e488777aa6e2acc84bf2ac293016580db3dc",
+      "bytes": 34009
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -15803,6 +15803,11 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "64d49f2de46d3309d7802678039caac1609027b8f00b561987e464e94432847f",
       "bytes": 21453
+    },
+    {
+      "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
+      "sha256": "30746c52d50959bb1920ad1c3e8d3617422891c3563601bf515578682e038723",
+      "bytes": 32111
     },
     {
       "path": "docs/direct-results.md",
