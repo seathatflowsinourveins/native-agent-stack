@@ -7,10 +7,11 @@ the seeds, the scoring code and config, and each native arm's launch context; pu
 in a pushed commit reachable from main before the first call. File mtimes do not count.
 
 draft (default) records what exists and lists every missing role. --final refuses a missing role,
-a pending adversarial insertion, an unlabelled case, a re-label list that differs from the drawn
-one, a re-label written less than 24 hours after its first label, rendered inputs that differ from
-the case pack, and a render check that does not reproduce them. External (private) files are
-recorded by a caller-chosen name, sha256 and size only, never by host path.
+a pending adversarial insertion, a pack whose current bytes are not the output of its last A2 pass,
+a label packet that does not show exactly the pack's cases, an unlabelled case, a re-label list that
+differs from the drawn one, a re-label written less than 24 hours after its first label, rendered
+inputs that differ from the case pack, and a render check that does not reproduce them. External
+(private) files are recorded by a caller-chosen name, sha256 and size only, never by host path.
 """
 
 from __future__ import annotations
@@ -32,19 +33,22 @@ REQUIRED_ROLES = {
     "labels": "the user's blind labels (label and claim type per case)",
     "relabels": "the seeded 15% re-labels, written at least 24 hours later and before any model call",
     "promptfoo_tests": "the generated test rows (case_id, repeat_index, source, claim, arm_group)",
-    "rendered_inputs": "sha256 of the exact prompt bytes per case and prompt, after the A2 rule",
-    "render_check": "promptfoo echo output reproducing every rendered input (no model call)",
+    "rendered_inputs": "sha256 of the exact bytes per case and arm input, after the A2 pass: the native "
+                       "prompt (O, S, G), the jev-state prompt (L) and each J provider's HTTP request body",
+    "render_check": "promptfoo output reproducing every rendered input with no model call: the echo provider "
+                    "for the prompts, loopback copies of the J providers for the request bodies",
     "harness": "promptfoo config, prompts (question text and option orders), provider adapters",
     "draw_and_scoring_code": "frame extractor, case pack, scoring code and its hash-locked requirements",
     "native_launch_contexts": "hash of each native arm's init event (O, S, G) from the smoke checks",
     "arm_l_checkpoint": "arm L checkpoint name, full revision and file hashes",
-    "a2_custody": "gitleaks 8.30.1 and host-path/identity rule output over the exact bytes; home-directory canary",
+    "a2_custody": "each A2 result the case pack records (gitleaks 8.30.1, the host-path and identity rule "
+                  "and the home-directory and user-name canary over the exact bytes)",
     "canary": "the A1 canary: 10 frozen cases and their stored answers",
 }
 REPOSITORY_DEFAULTS = {
     "harness": [f"{P1}/promptfooconfig.yaml", f"{P1}/render-check.yaml", f"{P1}/prompts/jev-state.txt",
-                f"{P1}/prompts/native-question.txt", f"{P1}/l_nli_provider.py", f"{BASE}/response.cjs",
-                f"{BASE}/gate.cjs"],
+                f"{P1}/prompts/native-question.txt", f"{P1}/l_nli_provider.py", f"{P1}/response-model.cjs",
+                f"{P1}/render_echo_server.py", f"{BASE}/response.cjs", f"{BASE}/gate.cjs"],
     "draw_and_scoring_code": [f"{P1}/p1_frame.py", f"{P1}/p1_casepack.py", f"{P1}/p1_scoring.py",
                               f"{P1}/p1_freeze.py", f"{P1}/requirements-scoring.in",
                               f"{P1}/requirements-scoring.lock"],
@@ -68,36 +72,52 @@ def entry(item, root: Path) -> dict:
     return {"external": item["external"], **digest(Path(item["file"]))}
 
 
-def compare_render(rendered: dict, echo_output: dict) -> dict:
-    """Match promptfoo echo results (prompt label, case_id) to the rendered-input hashes.
+J_BODY_PROVIDERS = ("J-o0", "J-o1", "J-o2")
 
-    The echo provider's output is the prompt a provider receives. promptfoo 0.123.1 records
-    prompt.raw in a re-serialized form (the 2026-10-03 draft check saw '{"source":"' where the
-    provider received '{"source": "'), so prompt.raw is never the comparison. A file prompt's
-    recorded label is "<label>: <path>: <template>"; the configured label is its first field."""
-    expected = {(record["case_id"], record["prompt"]): record["sha256"] for record in rendered["inputs"]}
+
+def compare_render(rendered: dict, echo_output: dict) -> dict:
+    """Match render-check results to the rendered-input hashes, by (case_id, input).
+
+    The echo provider's output is the prompt a provider receives, keyed by the prompt label. That is
+    what O, S and G receive, not what arm J receives: promptfoo 0.123.1's HTTP provider parses the
+    JSON-valued state back into an object and sends JSON.stringify of the whole body (providers-*.js
+    processJsonBody and the fetch body). render-check.yaml therefore also sends every case through
+    loopback copies of the three J providers, whose echo server returns the request body unchanged;
+    those rows are keyed by the provider label (J-o0, J-o1, J-o2). promptfoo records prompt.raw in a
+    re-serialized form, so prompt.raw is never the comparison. A file prompt's recorded label is
+    "<label>: <path>: <template>"; the configured label is its first field."""
+    expected = {(record["case_id"], record["input"]): record["sha256"] for record in rendered["inputs"]}
     results = echo_output.get("results", {})
     rows = results.get("results", []) if isinstance(results, dict) else results
     seen, mismatched = set(), []
     for row in rows:
         case = (row.get("vars") or (row.get("testCase") or {}).get("vars") or {}).get("case_id")
+        provider = (row.get("provider") or {}).get("label")
         prompt = str((row.get("prompt") or {}).get("label") or "").split(": ", 1)[0]
+        name = provider if provider in J_BODY_PROVIDERS else prompt
         output = (row.get("response") or {}).get("output")
-        if (case, prompt) not in expected or not isinstance(output, str):
+        if (case, name) not in expected or not isinstance(output, str):
             continue
-        seen.add((case, prompt))
-        if hashlib.sha256(output.encode("utf-8")).hexdigest() != expected[(case, prompt)]:
-            mismatched.append(f"{case}/{prompt}")
-    missing = sorted(f"{case}/{prompt}" for case, prompt in set(expected) - seen)
+        seen.add((case, name))
+        if hashlib.sha256(output.encode("utf-8")).hexdigest() != expected[(case, name)]:
+            mismatched.append(f"{case}/{name}")
+    missing = sorted(f"{case}/{name}" for case, name in set(expected) - seen)
     return {"expected": len(expected), "matched": len(seen) - len(mismatched), "mismatched": sorted(mismatched),
             "missing": missing, "passed": not mismatched and not missing}
 
 
 def final_checks(pack: dict, labels: dict, relabels: dict, rendered: dict | None, render: dict | None,
-                 rendered_now: list[dict]) -> list[str]:
+                 rendered_now: list[dict], packet: dict | None = None, case_bytes_now: str | None = None) -> list[str]:
     problems = []
-    if pack.get("status") != "ready_for_labels" or any(case["pending_insertion"] for case in pack["cases"]):
+    if any(case["pending_insertion"] for case in pack["cases"]):
         problems.append("the case pack still has a pending adversarial insertion")
+    passes = pack.get("a2_passes") or []
+    if pack.get("status") != "ready_for_labels" or not passes or passes[-1].get("output_sha256") != case_bytes_now:
+        problems.append("the case pack's bytes are not the output of a recorded A2 pass")
+    shown = sorted((entry.get("case_id"), entry.get("claim"), entry.get("excerpt")) for entry in (packet or {}).get("cases", []))
+    if (packet or {}).get("status") != "ready" or shown != sorted(
+            (case["case_id"], case["claim"], case["excerpt"]) for case in pack["cases"]):
+        problems.append("the label packet is not the ready packet of exactly the pack's post-A2 cases")
     case_ids = {case["case_id"] for case in pack["cases"]}
     if set(labels) != case_ids:
         problems.append("labels do not cover exactly the drawn cases")
@@ -148,8 +168,10 @@ def build_manifest(spec: dict, root: Path, final: bool) -> dict:
         pack = _load_role(spec, "case_pack", root)
         rendered = _load_role(spec, "rendered_inputs", root)
         render = compare_render(rendered, _load_role(spec, "render_check", root))
+        casepack = _casepack_module()
         problems = final_checks(pack, _load_role(spec, "labels", root), _load_role(spec, "relabels", root),
-                                rendered, render, _casepack_module().rendered_inputs(pack))
+                                rendered, render, casepack.rendered_inputs(pack), _load_role(spec, "label_packet", root),
+                                casepack.case_bytes_sha256(pack))
         manifest["checks"] = {"render": render, "problems": problems}
         if problems:
             raise SystemExit("cannot freeze: " + "; ".join(problems))
@@ -171,7 +193,10 @@ def main(argv=None) -> int:
         summary = compare_render(_load_role(spec, "rendered_inputs", REPO_ROOT),
                                  json.loads(args.render_echo.read_text(encoding="utf-8")))
         manifest["draft_checks"] = {"render_check": {key: summary[key] for key in ("expected", "matched", "passed")},
-                                    "render_check_method": "render-check.yaml (echo provider, no model call)"}
+                                    "render_check_method": "render-check.yaml: the echo provider for the prompts and "
+                                                           "loopback copies of the J providers for the request "
+                                                           "bodies, in a network namespace with only loopback; "
+                                                           "no model call"}
     args.out.write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
     print(json.dumps({"status": manifest["status"], "missing_roles": manifest["missing_roles"],
                       **({"draft_checks": manifest["draft_checks"]} if "draft_checks" in manifest else {})}))

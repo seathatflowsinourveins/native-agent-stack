@@ -4,7 +4,8 @@ The scoring code needs numpy, scipy and scikit-learn from
 blueprints/native-skill-practice/p1/requirements-scoring.lock. Without them this module skips; with
 JEV_P1_REQUIRE_SCORING_DEPS=1 a missing dependency fails the import instead, so a run that claims
 these tests passed cannot have skipped them (docs/acceptance-evidence-policy.md: a skipped check is
-untested, not passed). Every test pairs its passing case with a negative control.
+untested, not passed). Every rule, statistic and adapter checked here is paired with a negative control
+that must fail or differ, in the same test; FrozenConstantsTests.test_frozen_values only pins constants.
 """
 
 from __future__ import annotations
@@ -108,11 +109,25 @@ class RuleTests(unittest.TestCase):
         self.assertAlmostEqual(scoring.wilson_interval(1, 80)[1], 0.0675, places=4)
         self.assertFalse(self.outcome(false_closes=1, nonsupported=80)["rules"]["a"])
 
-    def test_prescreen_l_leaves_unmeasured_rule_d_open(self):
-        open_d = scoring.prescreen_qualifies(0, 80, 0.3, -0.01, None, 0.0)
+    def test_rule_d_uses_the_high_bound_and_reject_the_low_bound(self):
+        # 2 known flips and 4 incomplete cases of 120: low 0.017, high 0.050.
+        self.assertTrue(self.outcome(order_flip=(2 / 120, 6 / 120))["rules"]["d"])
+        self.assertFalse(self.outcome(order_flip=(2 / 120, 7 / 120))["rules"]["d"])
+        self.assertFalse(self.outcome(repeat_disagreement=(0.0, 0.031))["rules"]["d"])
+        self.assertEqual(self.outcome(order_flip=(0.11, 0.20))["verdict"], "reject")
+        # Negative control: incomplete cases alone never reject (low 0.05, high 0.20).
+        self.assertEqual(self.outcome(order_flip=(0.05, 0.20))["verdict"], "inconclusive")
+
+    def test_prescreen_l_rule_d_without_an_order(self):
+        na = scoring.NOT_APPLICABLE
+        self.assertTrue(scoring.prescreen_qualifies(0, 80, 0.3, -0.01, na, 0.0)["qualifies"])
+        self.assertTrue(scoring.prescreen_qualifies(0, 80, 0.3, -0.01, na, (0.0, 0.03))["qualifies"])
+        # Negative controls: repeats that disagree fail (d); unmeasured repeats leave (d) open, never a pass.
+        self.assertFalse(scoring.prescreen_qualifies(0, 80, 0.3, -0.01, na, (0.0, 0.04))["qualifies"])
+        open_d = scoring.prescreen_qualifies(0, 80, 0.3, -0.01, na, None)
         self.assertEqual((open_d["qualifies"], open_d["rules"]["d"]), (None, None))
-        self.assertTrue(scoring.prescreen_qualifies(0, 80, 0.3, -0.01, 0.0, 0.0)["qualifies"])
-        self.assertFalse(scoring.prescreen_qualifies(1, 80, 0.3, -0.01, None, 0.0)["qualifies"])
+        self.assertEqual(scoring.prescreen_qualifies(0, 80, 0.3, -0.01, None, 0.0)["qualifies"], None)
+        self.assertFalse(scoring.prescreen_qualifies(1, 80, 0.3, -0.01, na, 0.0)["qualifies"])
 
 
 @unittest.skipIf(MISSING, f"scoring dependencies missing ({MISSING}); install requirements-scoring.lock")
@@ -178,6 +193,10 @@ class StatisticsTests(unittest.TestCase):
         for row, (acc, conf) in zip(table, zip(accuracy, confidence)):
             self.assertAlmostEqual(row["accuracy"], acc, places=12)
             self.assertAlmostEqual(row["mean_confidence"], conf, places=12)
+        # Negative control: ten bins put the same data in other bins, which the comparison detects.
+        accuracy_10, confidence_10 = calibration_curve(correct, confidences, n_bins=10, strategy="uniform")
+        self.assertFalse(len(table) == len(accuracy_10) and all(
+            abs(row["mean_confidence"] - conf) < 1e-12 for row, conf in zip(table, confidence_10)))
 
 
 def jev_calls(case: str, answers: dict[tuple[int, int], str], latency: float = 0.2) -> list[dict]:
@@ -202,20 +221,28 @@ class DefinitionTests(unittest.TestCase):
         calls += jev_calls("c3", grid(o2r2="insufficient"))
         views = scoring.jev_views(calls, ["c1", "c2", "c3"])
         flips = scoring.order_flip_rate(views)
-        self.assertEqual((flips["flips"], flips["cases"]), (1, 3))
+        self.assertEqual((flips["flips"], flips["cases"], flips["rate"]), (1, 3, 1 / 3))
         repeats = scoring.repeat_disagreement_rate(calls, ["c1", "c2", "c3"])
-        self.assertEqual((repeats["disagreements"], repeats["pairs"]), (2, 9))
+        self.assertEqual((repeats["disagreements"], repeats["pairs"], repeats["rate"]), (2, 9, 2 / 9))
         mutated = jev_calls("c1", grid(o0r1="insufficient")) + calls[9:]
         self.assertEqual(scoring.repeat_disagreement_rate(mutated, ["c1", "c2", "c3"])["disagreements"], 3)
 
-    def test_incomplete_calls_leave_the_denominators(self):
+    def test_incomplete_calls_stay_in_the_frozen_denominators(self):
         cells = grid()
         del cells[(1, 2)]
-        views = scoring.jev_views(jev_calls("c1", cells), ["c1"])
+        calls = jev_calls("c1", cells) + jev_calls("c2", grid())
+        views = scoring.jev_views(calls, ["c1", "c2"])
         self.assertIsNotNone(views["c1"]["J3"])
         self.assertIsNone(views["c1"]["J9"])
-        self.assertEqual(scoring.order_flip_rate(views)["incomplete"], 1)
-        self.assertEqual(scoring.repeat_disagreement_rate(jev_calls("c1", cells), ["c1"])["incomplete"], 1)
+        flips = scoring.order_flip_rate(views)
+        self.assertEqual((flips["cases"], flips["incomplete"], flips["rate"]), (2, 1, None))
+        self.assertEqual((flips["rate_low"], flips["rate_high"]), (0.0, 0.5))
+        repeats = scoring.repeat_disagreement_rate(calls, ["c1", "c2"])
+        self.assertEqual((repeats["pairs"], repeats["incomplete"], repeats["rate_low"], repeats["rate_high"]),
+                         (6, 1, 0.0, 1 / 6))
+        # Negative control: with every call present the bounds meet at the frozen rate.
+        complete = scoring.repeat_disagreement_rate(jev_calls("c1", grid()) + jev_calls("c2", grid()), ["c1", "c2"])
+        self.assertEqual((complete["rate"], complete["rate_low"], complete["rate_high"]), (0.0, 0.0, 0.0))
 
     def test_plurality_tie_breaks(self):
         rows = [probabilities("supported", 0.5), probabilities("contradicted", 0.6), probabilities("insufficient", 0.4)]
@@ -229,6 +256,7 @@ class DefinitionTests(unittest.TestCase):
     def test_j3_latency_is_the_slowest_of_three(self):
         views = scoring.jev_views(jev_calls("c1", grid(), latency=0.3), ["c1"])
         self.assertAlmostEqual(views["c1"]["j3_latency_s"], 0.32, places=12)
+        self.assertNotAlmostEqual(views["c1"]["j3_latency_s"], 0.31, places=6)     # control: not the mean
 
     def test_cascade_routes(self):
         claims = {"c1": "Codex 0.160 ships", "c2": "The gate closes", "c3": "The gate closes", "c4": "The gate opens"}
@@ -255,11 +283,29 @@ class DefinitionTests(unittest.TestCase):
         cached = calls[:95] + [{"arm": "J", "answer": "supported", "model": "jev-1.13.0", "inference": "cache"}]
         self.assertEqual(scoring.stop_checks(cached, 0)["reasons"], ["jev_result_not_live"])
 
+    def test_a_failed_call_without_a_model_is_not_a_move(self):
+        live = {"model": "jev-1.13.0", "inference": "live"}
+        calls = [{"arm": "J", "answer": "supported", **live} for _ in range(99)]
+        calls.append({"arm": "J", "answer": None, "error": "HTTP call failed with status 503", "model": None})
+        result = scoring.stop_checks(calls, 0)
+        self.assertEqual((result["stop"], result["unexpected_jev_models"], result["jev_failed_model_unknown"]),
+                         (False, [], 1))
+        # Negative controls: a refused response that names another model is a move, and an answered
+        # call whose model was never recorded is unverified.
+        refused = calls[:99] + [{"arm": "J", "answer": None, "error": "contract", "model": "jev-latest"}]
+        self.assertEqual(scoring.stop_checks(refused, 0)["reasons"], ["jev_model_moved"])
+        silent = calls[:99] + [{"arm": "J", "answer": "supported", "inference": "live"}]
+        self.assertEqual(scoring.stop_checks(silent, 0)["reasons"], ["jev_model_unverified"])
+
     def test_operations_summary(self):
         calls = jev_calls("c1", grid()) + [{"arm": "O", "case_id": "c1", "answer": None, "error": "x", "attempts": 2}]
+        calls.append({"arm": "O", "case_id": "c2", "answer": "supported", "attempts": 1})
         summary = scoring.operations(calls)
         self.assertEqual((summary["J"]["calls"], summary["J"]["request_ids"], summary["J"]["usage"]["prompt"]), (9, 9, 900))
-        self.assertEqual((summary["O"]["errors"], summary["O"]["resent"], summary["O"]["attempts"]), (1, 1, 2))
+        self.assertEqual((summary["O"]["errors"], summary["O"]["resent"], summary["O"]["attempts"]), (1, 1, 3))
+        # Negative control: calls that record no attempt count are unknown, never counted as one attempt.
+        self.assertEqual((summary["J"]["attempts"], summary["J"]["attempts_unknown"], summary["O"]["attempts_unknown"]),
+                         (0, 9, 0))
 
     def test_promptfoo_adapter_reads_triples_not_row_order(self):
         def row(label, case, repeat, output, metadata=None, latency=200):
@@ -277,6 +323,25 @@ class DefinitionTests(unittest.TestCase):
         self.assertEqual(sorted((call["arm"], call["order"], call["repeat"], call["answer"]) for call in calls),
                          [("J", 0, 0, "supported"), ("J", 2, 1, "supported"), ("O", 0, 0, "insufficient")])
         self.assertIsNone(scoring._verdict('{"verdict":"maybe"}'))
+        self.assertEqual({call["attempts"] for call in calls}, {None})          # no metadata, no guess
+
+    def test_promptfoo_adapter_reads_the_model_a_refused_response_named(self):
+        def failed(error, metadata=None):
+            return {"provider": {"label": "J-o0"}, "vars": {"case_id": "c1", "repeat_index": 0},
+                    "error": error, "response": {"metadata": metadata or {}}}
+
+        moved = ('Error: Unexpected TypeSafe model or answer contract [response model: "jev-latest"]\n\n'
+                 "Error: Unexpected TypeSafe model or answer contract [response model: \"jev-latest\"]\n    at x")
+        rows = [failed(moved), failed('Error: Invalid TypeSafe probability distribution [response model: null]'),
+                failed("Error: HTTP call failed with status 503 Service Unavailable"),
+                {**failed(None, {"model": "jev-1.13.0", "attempts": 2}), "error": None,
+                 "response": {"output": "supported", "metadata": {"model": "jev-1.13.0", "attempts": 2}}}]
+        calls = scoring.calls_from_promptfoo({"results": {"results": rows}}, {"J-o0": ("J", 0)})
+        self.assertEqual([call["model"] for call in calls], ["jev-latest", None, None, "jev-1.13.0"])
+        self.assertEqual([call["attempts"] for call in calls], [None, None, None, 2])
+        self.assertEqual(scoring.stop_checks(calls, 0)["unexpected_jev_models"], ["jev-latest"])
+        # Negative control: without the moved row, neither the null model nor the transport error is a move.
+        self.assertNotIn("jev_model_moved", scoring.stop_checks(calls[1:], 0)["reasons"])
 
 
 @unittest.skipIf(MISSING, f"scoring dependencies missing ({MISSING}); install requirements-scoring.lock")
@@ -312,6 +377,53 @@ class EndToEndTests(unittest.TestCase):
         del unlabelled["c001"]
         with self.assertRaises(ValueError):
             scoring.score({"cases": cases}, unlabelled, calls)
+
+    @staticmethod
+    def l_fixture(repeats: int, disagreeing: int = 0):
+        """90 digit-free cases (30 supported, 60 non-supported); L and O answer every case correctly."""
+        labels, cases, calls = {}, [], []
+        for index in range(90):
+            case = f"c{index + 1:03d}"
+            label = "supported" if index < 30 else ("contradicted", "insufficient")[index % 2]
+            labels[case] = {"label": label, "claim_type": "literal"}
+            cases.append({"case_id": case, "subset": "natural", "claim": "The gate closes",
+                          "strata": {"universal": False, "numeric_or_date": False,
+                                     "adversarial_form": None, "adversarial_author": None}})
+            calls += jev_calls(case, grid(label))
+            calls.append({"arm": "O", "case_id": case, "order": 0, "repeat": 0, "answer": label})
+            for repeat in range(repeats):
+                answer = "insufficient" if repeat == 2 and index < disagreeing else label
+                calls.append({"arm": "L", "case_id": case, "order": 0, "repeat": repeat, "answer": answer,
+                              "probabilities": probabilities(answer), "confidence": 0.9})
+        return {"cases": cases}, labels, calls
+
+    def test_arm_l_qualifies_once_l_is_repeated(self):
+        with mock.patch.object(scoring, "N_RESAMPLES", 200):
+            repeated = scoring.score(*self.l_fixture(repeats=3))
+            single = scoring.score(*self.l_fixture(repeats=1))
+            noisy = scoring.score(*self.l_fixture(repeats=3, disagreeing=3))
+        self.assertEqual(repeated["prescreen_L"]["primary"]["false_closes"], 0)
+        self.assertEqual((repeated["prescreen_L"]["rules"]["d"], repeated["prescreen_L"]["qualifies"]), (True, True))
+        self.assertEqual(repeated["prescreen_L"]["repeat_disagreement"]["pairs"], 90)
+        # Negative controls: unrepeated L leaves (d) open; 3 of 90 disagreeing cases (3.3%) fail it.
+        self.assertEqual((single["prescreen_L"]["rules"]["d"], single["prescreen_L"]["qualifies"]), (None, None))
+        self.assertEqual((noisy["prescreen_L"]["rules"]["d"], noisy["prescreen_L"]["qualifies"]), (False, False))
+
+    def test_a_stopped_run_decides_nothing(self):
+        pack, labels, calls = self.l_fixture(repeats=3)
+        calls = [dict(call, model="jev-latest") if call["arm"] == "J" and call["case_id"] == "c001" else call
+                 for call in calls]
+        with mock.patch.object(scoring, "N_RESAMPLES", 200):
+            stopped = scoring.score(pack, labels, calls)
+            running = scoring.score(*self.l_fixture(repeats=3))
+        self.assertEqual((stopped["decision_C"]["verdict"], stopped["decision_C"]["reason"]), ("inconclusive", "stopped"))
+        self.assertIn("jev_model_moved", stopped["decision_C"]["stop_reasons"])
+        self.assertIn("rules", stopped["decision_C"]["partial"])                  # partial results stay reported
+        self.assertIsNone(stopped["prescreen_L"]["qualifies"])
+        # Negative control: the same data without the moved model is not stopped.
+        self.assertFalse(running["stop"]["stop"])
+        self.assertNotEqual(running["decision_C"].get("reason"), "stopped")
+        self.assertTrue(running["prescreen_L"]["qualifies"])
 
 
 if __name__ == "__main__":

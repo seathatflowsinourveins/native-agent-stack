@@ -638,14 +638,19 @@
    "numeric_or_date": 10
   }
  },
+ "a2_passes": [],
  "private_files": {
   "case_pack": {
-   "sha256": "10c27d8161461704efe8668a7897ad1abd5b919aa74e508d2f8997a2814cc961",
-   "bytes": 359694
+   "sha256": "55bf5d005803df58dc51b701ea528122baf117968d65c3ced1590fbb20485855",
+   "bytes": 359906
+  },
+  "frame": {
+   "sha256": "a6f20bd46ab57fdec2587ba080e530f330163328633b637ce32e9024703eb66a",
+   "bytes": 1066622
   },
   "label_packet": {
-   "sha256": "14911c165d2ba8f25f2eed81ebc42ba3d8c7c6e0904f8efe7a2a819484ff3fce",
-   "bytes": 119864
+   "sha256": "de0731c93c332b8b8b2ee3d01ef3c4e01663d7a2dca17f345d68f219ae70cbdb",
+   "bytes": 119542
   }
  },
  "note": "No case id is recorded here: the completed packet reorders every case and redraws the re-label positions, both keyed on the insertions."

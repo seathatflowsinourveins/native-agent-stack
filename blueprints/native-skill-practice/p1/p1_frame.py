@@ -303,7 +303,8 @@ class GitSnapshot:
 
 
 class UpstreamFetcher:
-    """GET a pinned upstream file once; cache by URL. Offline mode reads only the cache."""
+    """GET a pinned upstream file once; cache by URL. Offline mode reads only the cache. Only an HTTP 404
+    is cached as missing; a timeout, a network error or any other status stops the frame build."""
 
     def __init__(self, cache_dir: Path | None, offline: bool):
         self.cache_dir = cache_dir
@@ -328,12 +329,19 @@ class UpstreamFetcher:
         try:
             with urllib.request.urlopen(url, timeout=30) as response:
                 raw = response.read()
-        except (urllib.error.URLError, TimeoutError, OSError):
+        except urllib.error.HTTPError as error:
+            # Only a definitive 404 (a private repository or a path absent at the pin) is recorded and
+            # cached as missing. Any other status would drop candidates from every later build that
+            # reuses the cache, so it stops the frame build instead.
+            if error.code != 404:
+                raise RuntimeError(f"upstream fetch failed with HTTP {error.code}: {url}") from error
             if cache_file is not None:
                 cache_file.parent.mkdir(parents=True, exist_ok=True)
                 cache_file.with_suffix(".missing").write_text(url + "\n", encoding="utf-8")
             self._record(url, None, "unavailable")
             return None
+        except (urllib.error.URLError, TimeoutError, OSError) as error:
+            raise RuntimeError(f"upstream fetch failed ({type(error).__name__}): {url}") from error
         if cache_file is not None:
             cache_file.parent.mkdir(parents=True, exist_ok=True)
             cache_file.write_bytes(raw)

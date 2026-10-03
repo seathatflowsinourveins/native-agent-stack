@@ -48,6 +48,11 @@ ECE_BINS = 15
 JEV_MODEL = "jev-1.13.0"
 J_ORDERS = (0, 1, 2)
 J_REPEATS = (0, 1, 2)
+# Arm L scores one premise-hypothesis pair and has no option order, so rule (d)'s order-flip part does
+# not apply to it (README "Open decisions"); its repeat disagreement is measured over repeated L calls.
+NOT_APPLICABLE = "not_applicable"
+# The suffix p1/response-model.cjs adds when ../response.cjs refuses a response.
+MODEL_IN_ERROR = re.compile(r'\[response model: (null|"(?:[^"\\]|\\.)*")\]')
 
 # Section 5.1 rules (a)-(e) and the reject rule, as written. Rule (a)'s Wilson bound is compared
 # at WILSON_DECIMALS decimals: unrounded, 0 of 60 gives 0.0602 > 0.060 (0 of 61 gives 0.0592),
@@ -214,29 +219,43 @@ def jev_views(calls: list[dict], case_ids: list[str]) -> dict:
     return views
 
 
+def bounded_rate(events: int, incomplete: int, denominator: int) -> dict:
+    """A rate over the frozen denominator. An incomplete unit (a failed call removed an answer it needs)
+    is counted both ways: rate_low as no event, rate_high as an event. Rule (d) must hold at rate_high
+    and the reject rule fires at rate_low, so a missing call never helps either verdict (README "Open
+    decisions"). With nothing incomplete both bounds equal the frozen definition, and so does rate."""
+    if not denominator:
+        return {"rate": math.nan, "rate_low": math.nan, "rate_high": math.nan}
+    return {"rate": events / denominator if not incomplete else None,
+            "rate_low": events / denominator, "rate_high": (events + incomplete) / denominator}
+
+
 def order_flip_rate(views: dict) -> dict:
     """Order flip: a case whose three order-level answers (each the plurality of that order's three
-    repeats) are not all equal; the rate is over cases with all three order-level answers."""
+    repeats) are not all equal; the rate is over all cases (section 5.1: "rate over 120 cases")."""
     complete = [view["order_answers"] for view in views.values() if len(view["order_answers"]) == len(J_ORDERS)]
     flips = sum(1 for answers in complete if len(set(answers.values())) > 1)
-    return {"flips": flips, "cases": len(complete), "incomplete": len(views) - len(complete),
-            "rate": flips / len(complete) if complete else math.nan}
+    incomplete = len(views) - len(complete)
+    return {"flips": flips, "cases": len(views), "complete": len(complete), "incomplete": incomplete,
+            **bounded_rate(flips, incomplete, len(views))}
 
 
 def repeat_disagreement_rate(calls: list[dict], case_ids: list[str]) -> dict:
-    """Repeat disagreement: a (case, order) pair whose three repeats are not all equal."""
+    """Repeat disagreement: a (case, order) pair whose three repeats are not all equal; the rate is over
+    all pairs, every case times every order (section 5.1: "rate over 360 pairs")."""
     table = index_calls(calls, "J")
-    pairs = disagreements = incomplete = 0
+    complete = disagreements = incomplete = 0
     for case in case_ids:
         for order in J_ORDERS:
             repeats = [table.get((case, order, repeat)) for repeat in J_REPEATS]
             if not all(answered(call) for call in repeats):
                 incomplete += 1
                 continue
-            pairs += 1
+            complete += 1
             disagreements += len({call["answer"] for call in repeats}) > 1
-    return {"disagreements": disagreements, "pairs": pairs, "incomplete": incomplete,
-            "rate": disagreements / pairs if pairs else math.nan}
+    pairs = len(case_ids) * len(J_ORDERS)
+    return {"disagreements": disagreements, "pairs": pairs, "complete": complete, "incomplete": incomplete,
+            **bounded_rate(disagreements, incomplete, pairs)}
 
 
 def single_arm_view(calls: list[dict], arm: str, case_ids: list[str]) -> dict:
@@ -283,11 +302,20 @@ def wilson_bound_passes(upper: float) -> bool:
     return not math.isnan(upper) and round(upper, WILSON_DECIMALS) <= RULES["a"]["wilson_upper_max"]
 
 
+def rate_bounds(value) -> tuple:
+    """A rate, or (rate_low, rate_high) bounds when some units are incomplete (bounded_rate)."""
+    return tuple(value) if isinstance(value, (tuple, list)) else (value, value)
+
+
 def decide(false_closes: int, nonsupported: int, closure_rate: float, ba_difference_lower: float,
-           order_flip: float, repeat_disagreement: float, median_latency_s: float | None) -> dict:
+           order_flip, repeat_disagreement, median_latency_s: float | None) -> dict:
     """Section 5.1: adopt C for S2 only if (a)-(e) all hold; reject J for S2 on two or more false
-    closes or order flips above 10%; otherwise inconclusive (including fewer than 60 non-supported)."""
+    closes or order flips above 10%; otherwise inconclusive (including fewer than 60 non-supported).
+    order_flip and repeat_disagreement are rates or (low, high) bounds: (d) uses the high bounds, the
+    reject rule the low bound."""
     upper = wilson_interval(false_closes, nonsupported)[1] if nonsupported else math.nan
+    flip_low, flip_high = rate_bounds(order_flip)
+    repeat_high = rate_bounds(repeat_disagreement)[1]
 
     def ok(value):
         return value is not None and not (isinstance(value, float) and math.isnan(value))
@@ -297,13 +325,13 @@ def decide(false_closes: int, nonsupported: int, closure_rate: float, ba_differe
         and wilson_bound_passes(upper),
         "b": ok(closure_rate) and closure_rate >= RULES["b"]["closure_rate_min"],
         "c": ok(ba_difference_lower) and ba_difference_lower >= RULES["c"]["ba_difference_lower_min"],
-        "d": ok(order_flip) and ok(repeat_disagreement) and order_flip <= RULES["d"]["order_flip_rate_max"]
-        and repeat_disagreement <= RULES["d"]["repeat_disagreement_rate_max"],
+        "d": ok(flip_high) and ok(repeat_high) and flip_high <= RULES["d"]["order_flip_rate_max"]
+        and repeat_high <= RULES["d"]["repeat_disagreement_rate_max"],
         "e": ok(median_latency_s) and median_latency_s <= RULES["e"]["median_j3_decision_latency_s_max"],
     }
     if all(rules.values()):
         verdict = "adopt"
-    elif false_closes >= RULES["reject"]["false_closes_min"] or (ok(order_flip) and order_flip > RULES["reject"]["order_flip_rate_above"]):
+    elif false_closes >= RULES["reject"]["false_closes_min"] or (ok(flip_low) and flip_low > RULES["reject"]["order_flip_rate_above"]):
         verdict = "reject"
     else:
         verdict = "inconclusive"
@@ -315,11 +343,12 @@ def decide(false_closes: int, nonsupported: int, closure_rate: float, ba_differe
 
 
 def prescreen_qualifies(false_closes: int, nonsupported: int, closure_rate: float, ba_difference_lower: float,
-                        order_flip: float | None, repeat_disagreement: float | None) -> dict:
-    """Arm L as the private-text closing pre-screen: rules (a)-(d) with L in place of J. A rule that
-    was not measured is None, and then L neither qualifies nor fails on it: qualifies is None."""
+                        order_flip, repeat_disagreement) -> dict:
+    """Arm L as the private-text closing pre-screen: rules (a)-(d) with L in place of J. order_flip is
+    NOT_APPLICABLE for an arm without option orders, which leaves (d) to repeat disagreement alone. A
+    rule that was not measured (None) leaves L neither qualified nor failed on it: qualifies is None."""
     outcome = decide(false_closes, nonsupported, closure_rate, ba_difference_lower,
-                     math.nan if order_flip is None else order_flip,
+                     0.0 if order_flip == NOT_APPLICABLE else (math.nan if order_flip is None else order_flip),
                      math.nan if repeat_disagreement is None else repeat_disagreement, 0.0)
     rules = {key: outcome["rules"][key] for key in "abc"}
     rules["d"] = None if order_flip is None or repeat_disagreement is None else outcome["rules"]["d"]
@@ -334,44 +363,69 @@ def prescreen_qualifies(false_closes: int, nonsupported: int, closure_rate: floa
     return {"qualifies": qualifies, "rules": rules, "values": values}
 
 
-def single_arm_repeat_disagreement(calls: list[dict], arm: str, case_ids: list[str]) -> float | None:
-    """For an arm without option orders (L): cases whose repeats (two or more) are not all equal."""
+def single_arm_repeat_disagreement(calls: list[dict], arm: str, case_ids: list[str]) -> dict | None:
+    """For an arm without option orders (L), each case is one pair: it disagrees when its repeats are
+    not all equal. The rate is over all cases. A case with fewer answered repeats than the run's repeat
+    count is incomplete (bounded_rate). None when the run did not repeat the arm: (d) stays open."""
     table = index_calls(calls, arm)
-    pairs = disagreements = 0
-    for case in case_ids:
-        repeats = [call for (call_case, _, _), call in table.items() if call_case == case]
-        if len(repeats) < 2 or not all(answered(call) for call in repeats):
+    per_case = {case: [] for case in case_ids}
+    for (call_case, _, _), call in table.items():
+        if call_case in per_case:
+            per_case[call_case].append(call)
+    repeats = max((len(found) for found in per_case.values()), default=0)
+    if repeats < 2:
+        return None
+    disagreements = incomplete = 0
+    for found in per_case.values():
+        answers = [call["answer"] for call in found if answered(call)]
+        if len(answers) < repeats:
+            incomplete += 1
             continue
-        pairs += 1
-        disagreements += len({call["answer"] for call in repeats}) > 1
-    return disagreements / pairs if pairs else None
+        disagreements += len(set(answers)) > 1
+    return {"disagreements": disagreements, "pairs": len(case_ids), "repeats": repeats, "incomplete": incomplete,
+            **bounded_rate(disagreements, incomplete, len(case_ids))}
+
+
+def attempts_of(call: dict) -> int | None:
+    """A call's attempt count when its record carries one; None (unknown) otherwise, never a guess of 1."""
+    value = call.get("attempts")
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 1 else None
 
 
 def stop_checks(calls: list[dict], canary_flips: int | None) -> dict:
     """Section 5.0 stop rules: service errors above 5% of calls (a resend counts), a moved Jev
-    model, or more than 2 of 10 canary flips; and every Jev result must be live, not cached."""
+    model, or more than 2 of 10 canary flips; and every Jev result must be live, not cached.
+    A failed call whose response never reached the contract check has no model (unknown), which is
+    not a move; an answered Jev call must carry the pinned model, or its model went unverified."""
     total = len(calls)
     failed = sum(1 for call in calls if call.get("error") or call.get("answer") not in LABELS
-                 or int(call.get("attempts", 1)) > 1)
-    moved = sorted({str(call.get("model")) for call in calls if call["arm"] == "J" and call.get("model") != JEV_MODEL})
-    not_live = sum(1 for call in calls if call["arm"] == "J" and not call.get("error") and call.get("inference") != "live")
+                 or (attempts_of(call) or 1) > 1)
+    jev = [call for call in calls if call["arm"] == "J"]
+    moved = sorted({str(call["model"]) for call in jev if call.get("model") is not None and call["model"] != JEV_MODEL})
+    unverified = sum(1 for call in jev if answered(call) and call.get("model") is None)
+    not_live = sum(1 for call in jev if not call.get("error") and call.get("inference") != "live")
     share = failed / total if total else math.nan
     reasons = []
     if total and share > RULES["stop"]["service_error_share_above"]:
         reasons.append("service_errors")
     if moved:
         reasons.append("jev_model_moved")
+    if unverified:
+        reasons.append("jev_model_unverified")
     if not_live:
         reasons.append("jev_result_not_live")
     if canary_flips is not None and canary_flips > RULES["stop"]["canary_flips_above"]:
         reasons.append("canary_flips")
     return {"stop": bool(reasons), "reasons": reasons, "calls": total, "failed_or_resent": failed,
-            "share": share, "unexpected_jev_models": moved, "jev_results_not_live": not_live,
-            "canary_flips": canary_flips}
+            "attempts_unknown": sum(1 for call in calls if attempts_of(call) is None),
+            "share": share, "unexpected_jev_models": moved, "jev_models_unverified": unverified,
+            "jev_failed_model_unknown": sum(1 for call in jev if not answered(call) and call.get("model") is None),
+            "jev_results_not_live": not_live, "canary_flips": canary_flips}
 
 
 def operations(calls: list[dict]) -> dict:
-    """Section 5.0 "report regardless of outcome": usage, latency, errors, attempts and request IDs per arm."""
+    """Section 5.0 "report regardless of outcome": usage, latency, errors, attempts and request IDs per
+    arm. Attempts are summed over the calls that record them; the rest are counted as unknown."""
     report = {}
     for arm in sorted({call["arm"] for call in calls}):
         own = [call for call in calls if call["arm"] == arm]
@@ -381,9 +435,10 @@ def operations(calls: list[dict]) -> dict:
             for key, value in (call.get("usage") or {}).items():
                 if isinstance(value, (int, float)) and not isinstance(value, bool):
                     usage[key] = usage.get(key, 0) + value
+        known = [attempts_of(call) for call in own if attempts_of(call) is not None]
         report[arm] = {"calls": len(own), "errors": sum(1 for call in own if call.get("error") or call.get("answer") not in LABELS),
-                       "resent": sum(1 for call in own if int(call.get("attempts", 1)) > 1),
-                       "attempts": sum(int(call.get("attempts", 1)) for call in own),
+                       "resent": sum(1 for attempts in known if attempts > 1),
+                       "attempts": sum(known), "attempts_unknown": len(own) - len(known),
                        "median_latency_s": statistics.median(latencies) if latencies else None,
                        "request_ids": sum(1 for call in own if call.get("request_id")), "usage": usage}
     return report
@@ -436,11 +491,12 @@ def score(pack: dict, labels: dict[str, dict], calls: list[dict], relabels: dict
                 "wilson_false_close_rate": wilson_interval(false, nonsupported) if nonsupported else None,
                 "escalation_rate": 1 - len(closed) / len(case_ids)}
 
+    stop = stop_checks(calls, canary_flips)
     report = {"schema": "jev-p1-score/1", "frozen": {"seed": SEED, "n_resamples": N_RESAMPLES,
               "confidence_level": CONFIDENCE_LEVEL, "bootstrap_method": BOOTSTRAP_METHOD,
               "close_threshold": CLOSE_THRESHOLD, "ece_bins": ECE_BINS, "rules": RULES},
               "cases": len(case_ids), "nonsupported": nonsupported,
-              "label_counts": dict(Counter(truth_labels)), "stop": stop_checks(calls, canary_flips),
+              "label_counts": dict(Counter(truth_labels)), "stop": stop,
               "operations": operations(calls)}
     primary_c = primary(routes["C"])
     report["primary_C"] = primary_c
@@ -448,22 +504,32 @@ def score(pack: dict, labels: dict[str, dict], calls: list[dict], relabels: dict
         c_vs_o = paired_bootstrap(ba_difference, [truth, predicted["C"], predicted["O"]])
         report["rule_c_bootstrap"] = c_vs_o
         report["decision_C"] = decide(primary_c["false_closes"], nonsupported, primary_c["closure_rate"],
-                                      c_vs_o["low"], flips["rate"], repeats["rate"], median_latency)
+                                      c_vs_o["low"], (flips["rate_low"], flips["rate_high"]),
+                                      (repeats["rate_low"], repeats["rate_high"]), median_latency)
     else:
         report["decision_C"] = {"verdict": "inconclusive", "reason": "arm O missing"}
+    if stop["stop"]:
+        # Section 5.0: a stopped run reports its partial results and decides nothing.
+        report["decision_C"] = {"verdict": "inconclusive", "reason": "stopped", "stop_reasons": stop["reasons"],
+                                "partial": report["decision_C"]}
     report["order_flips"] = flips
     report["repeat_disagreement"] = repeats
     report["j3_latency"] = {"median_s": median_latency, "cases": len(latencies)}
     if "C_L" in routes and "O" in predicted:
         primary_l = primary(routes["C_L"])
         l_vs_o = paired_bootstrap(ba_difference, [truth, predicted["C_L"], predicted["O"]])
-        # L scores each label alone, so an option order does not exist; repeat disagreement is
-        # measured only when the run repeats L. Unmeasured parts of (d) stay None, never a pass.
-        report["prescreen_L"] = {"primary": primary_l, "bootstrap": l_vs_o,
-                                 "order_flips_note": "L has no option order; not measured",
-                                 **prescreen_qualifies(primary_l["false_closes"], nonsupported,
-                                                       primary_l["closure_rate"], l_vs_o["low"], None,
-                                                       single_arm_repeat_disagreement(calls, "L", case_ids))}
+        # L scores one premise-hypothesis pair, so the order-flip part of (d) does not apply; repeat
+        # disagreement is measured over repeated L calls (README "Open decisions"). Without repeats it
+        # stays None, and so does qualifies: an unmeasured rule is never a pass.
+        l_repeats = single_arm_repeat_disagreement(calls, "L", case_ids)
+        prescreen = {"primary": primary_l, "bootstrap": l_vs_o, "order_flips": NOT_APPLICABLE,
+                     "repeat_disagreement": l_repeats,
+                     **prescreen_qualifies(primary_l["false_closes"], nonsupported, primary_l["closure_rate"],
+                                           l_vs_o["low"], NOT_APPLICABLE,
+                                           None if l_repeats is None else (l_repeats["rate_low"], l_repeats["rate_high"]))}
+        if stop["stop"]:
+            prescreen.update({"qualifies": None, "reason": "stopped", "stop_reasons": stop["reasons"]})
+        report["prescreen_L"] = prescreen
     descriptive = {"balanced_accuracy": {name: balanced_accuracy(truth, values) for name, values in predicted.items()}}
     if {"O", "S"} <= set(predicted):
         descriptive["J3_minus_best_native"] = paired_bootstrap(
@@ -549,9 +615,18 @@ def intra_rater(labels: dict[str, dict], relabels: dict[str, dict]) -> dict:
 # --------------------------------------------------------------------------- promptfoo adapter
 
 
+def model_from_error(error) -> str | None:
+    """The response model p1/response-model.cjs names when ../response.cjs refused a response; None when
+    the error carries none (a transport error, or a refused response without a model field)."""
+    match = MODEL_IN_ERROR.search(str(error or ""))
+    return json.loads(match.group(1)) if match else None
+
+
 def calls_from_promptfoo(document: dict, arm_of_label: dict[str, tuple[str, int]]) -> list[dict]:
     """Normalize a promptfoo 0.123.1 --output JSON. arm_of_label maps a provider label to (arm, order).
-    case_id and repeat_index come from the test vars; row order is never used."""
+    case_id and repeat_index come from the test vars; row order is never used. A call's model is its
+    response metadata's, or on a refused response the one its error names; attempts come from the
+    response metadata when a provider records them, and are unknown (None) otherwise."""
     results = document.get("results", {})
     rows = results.get("results", []) if isinstance(results, dict) else results
     calls = []
@@ -565,14 +640,17 @@ def calls_from_promptfoo(document: dict, arm_of_label: dict[str, tuple[str, int]
         metadata = response.get("metadata") or {}
         answer = _verdict(response.get("output"))
         error = row.get("error") or response.get("error")
+        model = metadata.get("model")
+        if model is None and error:
+            model = model_from_error(error)
         calls.append({
             "arm": arm, "case_id": variables["case_id"], "order": order, "repeat": int(variables.get("repeat_index", 0)),
             "answer": answer if not error else None, "error": error or None,
             "confidence": metadata.get("confidence"), "probabilities": metadata.get("probabilities"),
-            "model": metadata.get("model"), "inference": metadata.get("inference"),
+            "model": model, "inference": metadata.get("inference"),
             "request_id": metadata.get("request_id"),
             "latency_s": (row.get("latencyMs") / 1000.0) if isinstance(row.get("latencyMs"), (int, float)) else None,
-            "usage": response.get("tokenUsage"), "attempts": 1,
+            "usage": response.get("tokenUsage"), "attempts": attempts_of(metadata),
         })
     return calls
 

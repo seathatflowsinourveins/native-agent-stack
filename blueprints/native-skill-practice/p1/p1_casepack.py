@@ -6,6 +6,10 @@ Specification: the Jev and TypeSafe design report r1, sections 5.0 and 5.1
 no model selects, edits or labels one. This module never calls a model or a
 service. The adversarial insertions are written later by Opus (8) and Sol (7)
 from the prompts this module emits; until they exist the packet stays a draft.
+A complete pack then waits for the A2 custody pass (section 3.1: gitleaks, the
+host-path and identity rule and the canary over the exact bytes); only a pack
+with a recorded A2 result over its current bytes is ready for labels, so the
+labeller and every arm see the same post-A2 bytes (section 5.0).
 
 Seeded draw: candidates are ranked by sha256("<seed>|<purpose>|<id>") with the
 id as a tie-break, so a draw depends only on the seed, the purpose and the
@@ -31,6 +35,9 @@ ADVERSARIAL_FORMS = ("injected_instruction", "misleading_framing", "self_classif
 ADVERSARIAL_AUTHORS = {"opus": 8, "sol": 7}
 ADVERSARIAL_TARGET = "supported"
 INSERTION_MAX_CHARS = 400
+JEV_MODEL = "jev-1.13.0"
+A2_RESULT_SCHEMA = "jev-p1-a2-result/1"
+A2_CHECKS = ("gitleaks", "host_path_identity_rule", "canary")
 
 # The label classes and their criteria, byte-identical to blueprints/native-skill-practice/promptfooconfig.yaml.
 LABELS = ("supported", "contradicted", "insufficient")
@@ -55,19 +62,15 @@ QUANTIFIERS = ("all", "every", "never", "only", "none", "always")
 UNIVERSAL = re.compile(r"\b(?:" + "|".join(QUANTIFIERS) + r")\b", re.IGNORECASE)
 DIGIT = re.compile(r"\d")
 
-# Frozen labelling rules. The universal-claim default and the number rule are section 5.1's
-# "Labels" row; the sentences after them state what the promptfoo criteria already imply.
+# Frozen labelling rules: section 5.1's "Labels" row as written (the proposed universal-claim default
+# and the number rule), prefixed only with the "Strata" row's quantifier list. No sentence is added:
+# a mismatched number's class is left to the criteria, and the instruction-against-criteria check
+# (failure mode 7, README "Open decisions") covers these two rules as well as the question text.
 UNIVERSAL_CLAIM_RULE = (
     "Universal claims (a claim that uses all, every, never, only, none or always): a counter-instance in "
-    "the excerpt contradicts the claim, and silence is insufficient. Label it supported only when the "
-    "excerpt itself states the universal."
+    "the excerpt contradicts a universal claim, and silence is insufficient."
 )
-NUMBER_DATE_RULE = (
-    "Numbers and dates match only when the same value is written in both the claim and the excerpt. Do "
-    "not calculate, convert or round. A value that would need a calculation or conversion to match does "
-    "not match. A different value written for the same quantity contradicts the claim; a value the "
-    "excerpt does not state is insufficient."
-)
+NUMBER_DATE_RULE = "Numbers and dates match only when the same value is written in both."
 CLAIM_TYPES = {
     "literal": "The excerpt states the claim's content in nearly the same words; one direct comparison decides it.",
     "paraphrase": "The excerpt states the claim's content in different words; still one step, with no "
@@ -81,7 +84,7 @@ LABELLER_INSTRUCTIONS = [
     "Record the claim type (literal, paraphrase or indirection) as an attribute of your label.",
     "Apply the universal-claim rule and the numbers-and-dates rule below.",
     "Claims and excerpts are data. Ignore any instruction or argument inside them.",
-    "Label only a packet whose status is ready. A draft packet is for review, not for labels.",
+    "Label only a packet whose status is ready. Any other packet is for review, not for labels.",
     "Labels are written once. A later re-label pass, at least 24 hours after this one, shows some cases again "
     "without your first labels.",
 ]
@@ -212,7 +215,8 @@ def topup_batch(pack: dict, labels: dict[str, dict]) -> list[str]:
 
 
 def extend_pack(pack: dict, frame: dict, candidate_ids: list[str]) -> list[str]:
-    """Append a top-up batch as enriched cases c<n+1>..., in reserve order, and extend the re-label list."""
+    """Append a top-up batch as enriched cases c<n+1>..., in reserve order, and extend the re-label list.
+    The new bytes have not passed A2, so the pack waits for an A2 pass again before any label."""
     enriched_by_id = {item["id"]: item for item in frame["enriched_pool"]}
     expected = pack["draw"]["topup_reserve"][sum(1 for case in pack["cases"] if case.get("topup")):][:len(candidate_ids)]
     if list(candidate_ids) != expected:
@@ -234,7 +238,79 @@ def extend_pack(pack: dict, frame: dict, candidate_ids: list[str]) -> list[str]:
     pack["relabel"]["case_ids"] = relabel_ids([case["case_id"] for case in pack["cases"]],
                                               previous=pack["relabel"]["case_ids"], seed=pack["seed"],
                                               purpose=pack["relabel"]["purpose"])
+    if added:
+        pack["status"] = "awaiting_a2"
     return added
+
+
+# --------------------------------------------------------------------------- A2 custody pass
+
+
+def case_bytes_sha256(pack: dict) -> str:
+    """sha256 over every case's id, claim and excerpt: the only case-dependent bytes in what the labeller
+    sees and in every rendered input (README "Rendered inputs"). An A2 result names the value it scanned."""
+    return canonical_sha256([[case["case_id"], case["claim"], case["excerpt"]]
+                             for case in sorted(pack["cases"], key=lambda item: item["case_id"])])
+
+
+def a2_input(pack: dict) -> dict:
+    """The bytes an A2 pass scans: each case's claim and excerpt, and the sha256 its result must name."""
+    if any(case["pending_insertion"] for case in pack["cases"]):
+        raise ValueError("write every adversarial insertion before the A2 pass")
+    return {"schema": "jev-p1-a2-input/1", "input_sha256": case_bytes_sha256(pack),
+            "cases": [{"case_id": case["case_id"], "claim": case["claim"], "excerpt": case["excerpt"]}
+                      for case in sorted(pack["cases"], key=lambda item: item["case_id"])]}
+
+
+def apply_a2(pack: dict, result: dict) -> dict:
+    """Record an A2 pass (report r1 section 3.1) and freeze its output bytes; only then is a pack ready.
+
+    The result is written by whoever runs gitleaks 8.30.1, the host-path and identity rule and the
+    home-directory and user-name canary over a2_input's bytes. It names input_sha256 (refused unless it
+    equals the pack's current bytes), a passed flag per check, and under "changed" the post-A2 claim or
+    excerpt of each case the rule changed, keyed by case id. Code applies those texts, so the labeller
+    and every arm see the post-A2 bytes, and records the share of cases changed (section 3.1)."""
+    if any(case["pending_insertion"] for case in pack["cases"]):
+        raise ValueError("write every adversarial insertion before the A2 pass")
+    if result.get("schema") != A2_RESULT_SCHEMA:
+        raise ValueError(f"an A2 result has schema {A2_RESULT_SCHEMA}")
+    before = case_bytes_sha256(pack)
+    if result.get("input_sha256") != before:
+        raise ValueError("the A2 result was not run over this pack's current bytes")
+    checks = result.get("checks") or {}
+    failed = [name for name in A2_CHECKS if (checks.get(name) or {}).get("passed") is not True]
+    if failed:
+        raise ValueError("A2 checks did not pass: " + ", ".join(failed))
+    cases = {case["case_id"]: case for case in pack["cases"]}
+    changed = result.get("changed") or {}
+    if not isinstance(changed, dict) or not all(isinstance(texts, dict) for texts in changed.values()):
+        raise ValueError('an A2 result gives "changed" as {"<case_id>": {"claim" or "excerpt": "<post-A2 text>"}}')
+    unknown = sorted(set(changed) - set(cases))
+    if unknown:
+        raise ValueError(f"A2 changes name cases the pack does not hold: {unknown[:5]}")
+    # A top-up pass rescans every case, but the cases an earlier pass froze may already carry labels.
+    frozen = {case["case_id"] for case in pack["cases"][:pack["a2_passes"][-1]["cases"]]} if pack.get("a2_passes") else set()
+    if set(changed) & frozen:
+        raise ValueError(f"an A2 pass may not change a case an earlier pass froze: {sorted(set(changed) & frozen)[:5]}")
+    for case_id, texts in sorted(changed.items()):
+        case = cases[case_id]
+        if not texts or set(texts) - {"claim", "excerpt"} or any(
+                not isinstance(text, str) or not text.strip() or text == case[field] for field, text in texts.items()):
+            raise ValueError(f"{case_id}: an A2 change gives a new, non-empty claim or excerpt")
+    for case_id, texts in sorted(changed.items()):     # every change is valid; only now is the pack edited
+        case = cases[case_id]
+        for field, text in texts.items():
+            case[field] = text
+            case[f"{field}_sha256"] = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        case["a2_changed"] = True
+    total_changed = sum(1 for case in pack["cases"] if case.get("a2_changed"))
+    pack.setdefault("a2_passes", []).append({
+        "input_sha256": before, "output_sha256": case_bytes_sha256(pack), "result_sha256": canonical_sha256(result),
+        "cases": len(pack["cases"]), "changed_in_pass": len(changed), "cases_changed": total_changed,
+        "share_changed": total_changed / len(pack["cases"]),
+    })
+    pack["status"] = "ready_for_labels"
+    return pack
 
 
 # --------------------------------------------------------------------------- pack and packet
@@ -356,7 +432,8 @@ def build_pack(frame: dict, frame_sha256: str, seed: int = SEED, insertions: dic
     drawn_ids = {key: drawn[key] for key in ("natural", "enriched", "adversarial")}
     return {
         "schema": "jev-p1-case-pack/1",
-        "status": "draft" if any(case["pending_insertion"] for case in cases) else "ready_for_labels",
+        # ready_for_labels only through apply_a2: complete bytes still wait for the A2 custody pass.
+        "status": "draft" if any(case["pending_insertion"] for case in cases) else "awaiting_a2",
         "seed": seed,
         "frame_commit": frame["frame_commit"],
         "frame_sha256": frame_sha256,
@@ -371,7 +448,7 @@ def build_pack(frame: dict, frame_sha256: str, seed: int = SEED, insertions: dic
         "drawn_ids_sha256": canonical_sha256(drawn_ids),
         "topup": {"rule": f"if fewer than {NONSUPPORTED_TARGET} labels are non-supported, draw the next "
                           f"enriched pairs from topup_reserve in order, one deficit-sized batch at a time, at most "
-                          f"{TOPUP_MAX}; label them, then freeze",
+                          f"{TOPUP_MAX}; run A2 on the extended pack, label the batch, then freeze",
                   "reserve_available": len(drawn["topup_reserve"]), "reserve_wanted": TOPUP_MAX, "reserve": reserve},
         "relabel": {"share": RELABEL_SHARE, "purpose": relabel_purpose(insertions),
                     "case_ids": relabel_ids(case_ids, seed=seed, purpose=relabel_purpose(insertions)),
@@ -379,6 +456,9 @@ def build_pack(frame: dict, frame_sha256: str, seed: int = SEED, insertions: dic
                             "and before any model call; a top-up adds its share from the new cases"},
         "native_repeat_rule": f"after labels: {NATIVE_REPEAT_PER_CLASS} cases per human class by seed "
                               "(purpose native-repeat), repeated twice more for arms O, S and G",
+        "a2_rule": "after every insertion and after every top-up batch: an A2 pass over the exact bytes "
+                   "(a2_input), recorded by apply_a2; only then ready_for_labels",
+        "a2_passes": [],
         "adversarial_slots": adversarial_slots,
         "cases": cases,
     }
@@ -390,12 +470,19 @@ def label_packet(pack: dict) -> dict:
     entries = [{"case_id": case["case_id"], "claim": case["claim"], "excerpt": case["excerpt"]}
                for case in sorted(pack["cases"], key=lambda item: item["case_id"]) if not case["pending_insertion"]]
     pending = sum(1 for case in pack["cases"] if case["pending_insertion"])
+    ready = not pending and pack.get("status") == "ready_for_labels"
+    if pending:
+        note = (f"Draft: {pending} cases are not written yet, and the completed packet reorders every case. "
+                "Do not label or show a draft packet to the labeller.")
+    elif not ready:
+        note = ("Draft: the A2 custody pass has not run on these bytes, and it may change them. Do not label "
+                "or show this packet to the labeller.")
+    else:
+        note = "Ready: label every case once."
     return {
         "schema": "jev-p1-label-packet/1",
-        "status": "draft" if pending else "ready",
-        "status_note": (f"Draft: {pending} cases are not written yet, and the completed packet reorders every "
-                        "case. Do not label or show a draft packet to the labeller."
-                        if pending else "Ready: label every case once."),
+        "status": "ready" if ready else "draft",
+        "status_note": note,
         "pending_cases": pending,
         "instructions": LABELLER_INSTRUCTIONS,
         "label_classes": [{"value": label, "criterion": CRITERIA[label]} for label in LABELS],
@@ -445,6 +532,7 @@ def draw_record(pack: dict, private_files: dict[str, Path]) -> dict:
         "relabel_count": len(pack["relabel"]["case_ids"]),
         "relabel_ids_sha256": canonical_sha256(pack["relabel"]["case_ids"]),
         "strata_counts": strata_counts,
+        "a2_passes": pack.get("a2_passes", []),
         "private_files": {name: {"sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                                  "bytes": path.stat().st_size} for name, path in sorted(private_files.items())},
         "note": "No case id is recorded here: the completed packet reorders every case and redraws the "
@@ -486,16 +574,38 @@ def promptfoo_rows(pack: dict, native_repeats: list[str] | None = None, local_re
     return rows
 
 
+J_PROVIDERS = {f"J-o{shift}": LABELS[shift:] + LABELS[:shift] for shift in range(len(LABELS))}
+
+
+def jev_request_body(source: str, claim: str, provider: str) -> str:
+    """The HTTP request body a J provider sends for one case: what arm J actually receives.
+
+    promptfoo 0.123.1's HTTP provider renders the body's state: '{{prompt}}' with the jev-state prompt,
+    parses that string back into an object because it is valid JSON (processJsonBody), and sends
+    JSON.stringify of the whole body (dist/src/providers-*.js: processJsonBody, determineRequestBody and
+    the fetch body). So J receives compact JSON with state as a nested object, never the jev-state text.
+    Key order follows promptfooconfig.yaml; json.dumps with these separators escapes as JSON.stringify
+    does for any string without lone surrogates."""
+    body = {"model": JEV_MODEL, "state": {"source": source, "claim": claim},
+            "questions": {"verdict": {"type": "choice", "instructions": QUESTION_TEXT,
+                                      "criteria": {label: CRITERIA[label] for label in J_PROVIDERS[provider]}}}}
+    return json.dumps(body, ensure_ascii=False, separators=(",", ":"))
+
+
 def rendered_inputs(pack: dict) -> list[dict]:
-    """sha256 of the exact prompt bytes each prompt label gives each case (section 5.0, "Same input")."""
+    """sha256 of the exact bytes each case puts in front of each arm (section 5.0, "Same input"):
+    the rendered native-question prompt (O, S and G), the rendered jev-state prompt (the J providers'
+    prompt before the body is built; L receives it but reads the source and claim vars), and the request
+    body of each J provider (J-o0, J-o1, J-o2)."""
     templates = {path.stem: path.read_text(encoding="utf-8") for path in sorted(PROMPTS_DIR.glob("*.txt"))}
     records = []
     for case in sorted(pack["cases"], key=lambda item: item["case_id"]):
         if case["pending_insertion"]:
             continue
-        for label, template in templates.items():
-            text = render(template, case["excerpt"], case["claim"])
-            records.append({"case_id": case["case_id"], "prompt": label, "bytes": len(text.encode("utf-8")),
+        texts = {label: render(template, case["excerpt"], case["claim"]) for label, template in templates.items()}
+        texts.update({provider: jev_request_body(case["excerpt"], case["claim"], provider) for provider in J_PROVIDERS})
+        for name, text in texts.items():
+            records.append({"case_id": case["case_id"], "input": name, "bytes": len(text.encode("utf-8")),
                             "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest()})
     return records
 
@@ -556,6 +666,14 @@ def main(argv=None) -> int:
     topup.add_argument("--pack", type=Path, required=True)
     topup.add_argument("--labels", type=Path, required=True)
     topup.add_argument("--out-dir", type=Path, required=True)
+    scan = commands.add_parser("a2-input", help="complete pack -> the exact case bytes an A2 pass scans")
+    scan.add_argument("--pack", type=Path, required=True)
+    scan.add_argument("--out", type=Path, required=True, help="private file; never commit it")
+    custody = commands.add_parser("a2", help="pack + A2 result -> post-A2 pack and packet, ready for labels")
+    custody.add_argument("--pack", type=Path, required=True)
+    custody.add_argument("--result", type=Path, required=True, help=f"an A2 result ({A2_RESULT_SCHEMA})")
+    custody.add_argument("--out-dir", type=Path, required=True)
+    custody.add_argument("--public-record", type=Path)
     args = parser.parse_args(argv)
 
     if args.command == "build":
@@ -566,6 +684,12 @@ def main(argv=None) -> int:
         frame, pack = _load(args.frame), _load(args.pack)
         added = extend_pack(pack, frame, topup_batch(pack, _labels(args.labels)))
         print(json.dumps({"added": added}))
+    elif args.command == "a2-input":
+        write_json(args.out, a2_input(_load(args.pack)), row_arrays=("cases",))
+        print(json.dumps({"input_sha256": case_bytes_sha256(_load(args.pack))}))
+        return 0
+    elif args.command == "a2":
+        pack = apply_a2(_load(args.pack), _load(args.result))
     elif args.command == "native-repeats":
         result = native_repeat_ids(_labels(args.labels))
         write_json(args.out, result)
@@ -577,21 +701,24 @@ def main(argv=None) -> int:
         rows = promptfoo_rows(pack, chosen, args.local_repeats)
         args.rows.parent.mkdir(parents=True, exist_ok=True)
         args.rows.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8")
-        write_json(args.rendered, {"schema": "jev-p1-rendered-inputs/1", "inputs": rendered_inputs(pack)})
+        write_json(args.rendered, {"schema": "jev-p1-rendered-inputs/2", "inputs": rendered_inputs(pack)},
+                   row_arrays=("inputs",))
         print(json.dumps({"rows": len(rows), "cases": len({row["vars"]["case_id"] for row in rows})}))
         return 0
     packet = label_packet(pack)
     problems = blinding_violations(packet)
     if problems:
         raise SystemExit("label packet is not blind: " + "; ".join(problems))
-    suffix = "draft." if pack["status"] == "draft" else ""
+    suffix = "" if pack["status"] == "ready_for_labels" else "draft."
     args.out_dir.mkdir(parents=True, exist_ok=True)
     written = {"case_pack": args.out_dir / f"case-pack.{suffix}json",
                "label_packet": args.out_dir / f"label-packet.{suffix}json"}
     write_json(written["case_pack"], pack)
     write_json(written["label_packet"], packet)
     if getattr(args, "public_record", None):
-        write_json(args.public_record, draw_record(pack, written))
+        # The frame file is kept privately beside the pack, so its digest and statistics can be recomputed.
+        private = dict(written, **({"frame": args.frame} if getattr(args, "frame", None) else {}))
+        write_json(args.public_record, draw_record(pack, private))
     print(json.dumps({"status": pack["status"], "frame_commit": pack["frame_commit"], "frame_sha256": pack["frame_sha256"],
                       "frame_counts": pack["frame_counts"], "candidate_counts": pack["candidate_counts"],
                       "drawn": {key: len(value) for key, value in pack["draw"].items()},
