@@ -42743,6 +42743,16 @@
       "bytes": 3027
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-bounds-source-inventory-20261003.json",
+      "sha256": "b3ebf1faaeb313e589a4143f3ddef1b6f0b29b6544ff078788a8779f8d2bad9b",
+      "bytes": 13545
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-bounds-source-proposal-20261003.json",
+      "sha256": "0b95b00d0ae13ae16b9ae519d6f3fbd2221a24756f761134fdb2949e8a27404d",
+      "bytes": 6628
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-carriers-source-read.json",
       "sha256": "4fcef4a9f16c4eeb9c6c2d6c1f796b24993d64e61e1ba1a54ee891a3d068fe46",
       "bytes": 42119
@@ -42913,6 +42923,11 @@
       "bytes": 21190
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/network-policy-native-controlled-fixture-20261003.json",
+      "sha256": "8cbf76e1eab50fd279fab2e4f3a16f4f2e4be105583d27e42bed6b7dcf2165e5",
+      "bytes": 4171
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/network-policy-native-dependency-install-20261003.json",
       "sha256": "708a80cccc617e76746c5cdf7a2f1769e4923680dfd5a59af256f100aa1fa89b",
       "bytes": 9969
@@ -42926,6 +42941,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/network-policy-native-metadata-20261003.json",
       "sha256": "39a04a9385daa8155adcdec6e727021c6237fb0091fdac3054d8d4287d6942d3",
       "bytes": 10564
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/network-policy-native-volume-first-precheck-20261003.json",
+      "sha256": "c431ca0797af085ff3f73bad8f169094cb40ac9ab478e204aeed9c3e48d0d847",
+      "bytes": 1285
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/onyx-auth-source-gap.json",
@@ -43026,6 +43046,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/scheduler-native-controls.json",
       "sha256": "5762a989640f451d1393b2e4953b957ea9ec1f8f06602b9d49975599f2136b30",
       "bytes": 57662
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/sdk-role-source-carry-20261003.json",
+      "sha256": "72cb02bdadeacf9f7424d6aa16f4f7a08d05d0100f180ad5535ff21fdf911818",
+      "bytes": 2038
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-controls-scan-false-positive-correction.json",

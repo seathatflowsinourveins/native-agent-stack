@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native read-only prerequisite failure",
+  "recorded_date": "2026-10-03",
+  "outcome": "stopped_before_up",
+  "freeze": {
+    "bytes": 160581,
+    "sha256": "7a48b347aae18432709d2d730e31668db0e6efaa56960082306272dc0f2684f1"
+  },
+  "actual_native_returns": 2,
+  "native_exits": [
+    0,
+    1
+  ],
+  "failure": {
+    "stage": "prerequisite-image-declared-volumes-0",
+    "stdout_exact": "\n",
+    "stderr_exact": "template parsing error: template: :1:52: executing \"\" at <.Config.Volumes>: map has no entry for key \"Volumes\"\n",
+    "cause": "Dotted optional omitempty field is absent in decoded image JSON; native template raises an error.",
+    "retained": true
+  },
+  "originals": {
+    "bytes": 7541,
+    "sha256": "560e63cde8e6ba85bf113d9ba9ea5a39478436481efb1e01b87e3094c9f1b9c3",
+    "scope": "private complete actual argv/tool returns/capture hashes"
+  },
+  "source": {
+    "repository": "docker/cli",
+    "pin": "7fc2dff9bceb96b266a3b2c3117c0955a0d9e616"
+  },
+  "policy_stages": 0,
+  "up_issued": false,
+  "cleanup_required": false,
+  "original_task_started": false,
+  "comparative_model_or_provider_calls": 0,
+  "selected_defaults": 0,
+  "repair": "Separate immutable v2 source qualification; original failure is unchanged."
+}

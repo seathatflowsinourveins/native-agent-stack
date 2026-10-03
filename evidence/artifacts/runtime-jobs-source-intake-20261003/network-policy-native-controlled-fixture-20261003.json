@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "evidence_class": "controlled native integration fixture",
+  "recorded_date": "2026-10-03",
+  "completed_at": "2026-10-03 20:45:14 UTC",
+  "outcome": "passed",
+  "sources": [
+    {
+      "repository": "laude-institute/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "file": "src/harbor/environments/docker/harbor-docker-egress-control-sidecar/bin/network-policy"
+    },
+    {
+      "repository": "docker/cli",
+      "pin": "7fc2dff9bceb96b266a3b2c3117c0955a0d9e616",
+      "file": "cli/command/inspect/inspector.go"
+    },
+    {
+      "repository": "docker/cli",
+      "pin": "7fc2dff9bceb96b266a3b2c3117c0955a0d9e616",
+      "file": "vendor/github.com/opencontainers/image-spec/specs-go/v1/config.go"
+    },
+    {
+      "repository": "golang/go",
+      "pin": "go1.26.3",
+      "file": "src/text/template/funcs.go"
+    }
+  ],
+  "freeze": {
+    "bytes": 170022,
+    "sha256": "3d5b904fcb792eaa223fc977a6b8014ebc5a82a87803eb6d8228ef43fa654399",
+    "source_inventory_bytes": 12747,
+    "source_inventory_sha256": "cc0b91aafb87bc77a1144496c253fe57f398ce7490e27cc023adcdf205e602d7",
+    "yaml_bytes": 1937,
+    "yaml_sha256": "6d2475713882736b84ac9a63a333ec030ccdbac4a495fd5aca7163827420087c"
+  },
+  "source_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "verdict": "conditional ACCEPT before one up",
+    "trigger": "One bounded Sol optional-field projection repair after retained native failure"
+  },
+  "native_result": {
+    "commands": 51,
+    "exits": {
+      "0": 35,
+      "1": 15,
+      "52": 1
+    },
+    "prerequisites": 11,
+    "core_policy_stages": 22,
+    "cleanup_ownership_observations": 6,
+    "native_down": 1,
+    "independent_final_names_and_selector": 6,
+    "independent_final_actual_ids": 5,
+    "all_gates_pass": true,
+    "adaptive_retries": 0
+  },
+  "http_results": [
+    {
+      "stage": "control-allow1",
+      "native_exit": 0,
+      "status": "200\n"
+    },
+    {
+      "stage": "main-allow1",
+      "native_exit": 0,
+      "status": "200\n"
+    },
+    {
+      "stage": "control-deny-before",
+      "native_exit": 0,
+      "status": "200\n"
+    },
+    {
+      "stage": "main-deny",
+      "native_exit": 52,
+      "status": "000\n"
+    },
+    {
+      "stage": "control-deny-after",
+      "native_exit": 0,
+      "status": "200\n"
+    },
+    {
+      "stage": "main-allow2",
+      "native_exit": 0,
+      "status": "200\n"
+    },
+    {
+      "stage": "control-allow2",
+      "native_exit": 0,
+      "status": "200\n"
+    }
+  ],
+  "network_result": "Exact four running source-bound identities; main shares sidecar namespace, control shares independent gateway namespace; two source-owned live endpoints. Stock nft modes/rules observed. Denial qualified by independent controls before and after.",
+  "image_declared_volumes": [
+    null,
+    null,
+    null,
+    null
+  ],
+  "cleanup": "Fresh selector and exact name/image/labels/network/owner bindings before one native down0. Independent empty selector, four name absences, network-name absence, four actual-ID absences and actual network-ID absence all pass.",
+  "private_originals": {
+    "bytes": 163004,
+    "sha256": "724fa0ca19c7a4b58674c6e78d4595f7bb3bd9eb81ccb856db48fd85f46d5065",
+    "complete_native_returns_and_streams": true,
+    "raw_capture_files": 153,
+    "independent_original_hash_integrity_check_exit": 0
+  },
+  "retained_failure": "evidence/artifacts/runtime-jobs-source-intake-20261003/network-policy-native-volume-first-precheck-20261003.json",
+  "scope": {
+    "image_pull_or_build": false,
+    "original_SWE_task_started": false,
+    "model_or_provider_calls": 0,
+    "SDK_or_upstream_suite_acceptance": false,
+    "default_or_quality_comparison": false,
+    "credential_authfile_or_clientconfig_reads": 0
+  },
+  "limits": [
+    "Observed controlled peer routing and Docker-engine namespace/cleanup bindings only; no general kernel isolation or unseen volume claim.",
+    "Actual SWE task image, SDK role delivery, OmniRoute route, retry/deadline enforcement and benchmark/default qualification remain separate gates."
+  ],
+  "usage": {
+    "tokens": null,
+    "cost": null
+  },
+  "measured_defaults": 0
+}

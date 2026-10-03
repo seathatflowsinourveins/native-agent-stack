@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "evidence_class": "prospective pinned-source method proposal",
+  "recorded_date": "2026-10-03",
+  "scope": "One native coding M9 checkpoint only",
+  "status": "proposal_only",
+  "default_mode": "full_usage",
+  "selected_mode": null,
+  "freeze_eligible": false,
+  "admitted": false,
+  "method": "A newly accepted coding quality_only checkpoint may use native phase time limits with explicitly uncapped observed tools. No active comparison preregistration is amended.",
+  "native_time_configuration": {
+    "status": "PROPOSED_ONLY_NOT_WRITTEN_OR_DELIVERED",
+    "carrier": "Pinned Harbor YAML/JSON JobConfig; native CLI --config accepts YAML/JSON, no custom wrapper or enforcer.",
+    "job_fields": {
+      "timeout_multiplier": 1,
+      "agent_timeout_multiplier": 1,
+      "verifier_timeout_multiplier": 1,
+      "agent_setup_timeout_multiplier": 1,
+      "environment_build_timeout_multiplier": 1,
+      "n_concurrent_trials": 1,
+      "retry": {
+        "max_retries": 0
+      },
+      "verifier": {
+        "override_timeout_sec": 3000,
+        "max_timeout_sec": 3000
+      }
+    },
+    "per_candidate_agent_fields": {
+      "override_timeout_sec": 900,
+      "max_timeout_sec": 900,
+      "override_setup_timeout_sec": 360
+    },
+    "original_task_environment_fields": {
+      "build_timeout_sec": 1800,
+      "preserved_original_task_bytes": true
+    },
+    "expected_source_calculation": {
+      "agent_seconds": 900,
+      "verifier_seconds": 3000,
+      "agent_setup_seconds": 360,
+      "environment_build_seconds": 1800
+    },
+    "source_caveats": [
+      "Harbor computes min(base_sec,max_sec-or-infinity) times the effective multiplier; bind all four phase multipliers and the fallback multiplier to 1.0.",
+      "A max_timeout_sec alone does not create a finite agent timeout when the base is None. Use the positive 900s native override and retain original task TOMLs.",
+      "Task build_timeout_sec remains 1800 in all 24 original TOMLs; do not invent a JobConfig build override field. The setup override is the native AgentConfig field.",
+      "Finite setup360/build1800 source calculations remain HOLD for actual delivery/enforcement. All phases, overhead, verifier completion, cancellation and cleanup need independent observation.",
+      "n_concurrent_trials=1 and retry.max_retries=0 retain the intended independent arm policy. Harbor queue max_retries+1 counts complete trial executions, not SDK/provider/helper retries."
+    ],
+    "source_refs": [
+      "H-cli:415-417,563-565",
+      "H-job:291-300,396-427",
+      "H-trial-config:99-101,148-149,320-322",
+      "H-trial:94-96,485-494,548-560,889-891,1436-1474,1572-1577",
+      "H-queue:194-215"
+    ]
+  },
+  "tool_count_contract": {
+    "common_all_role_ceiling": null,
+    "policy": "uncapped_observed",
+    "actual_tool_counts": null,
+    "native_runtime_iteration_limits": "Keep declared native runtime defaults/selected settings separately; they do not establish a shared all-role tool ceiling."
+  },
+  "native_retry_declarations": [
+    {
+      "candidate": "openhands-sdk",
+      "repository": "OpenHands/software-agent-sdk",
+      "pin": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "sdk_attempts_total_per_sequence": 5,
+      "provider_transport_extra_retries": 0,
+      "scope": "Decorator/request sequence; later kwargs, fallback and helper delivery remain independently qualified."
+    },
+    {
+      "candidate": "codex",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "provider_fields": {
+        "request_max_retries": 4,
+        "stream_max_retries": 5
+      },
+      "feature_fields": {
+        "unbounded_connection_retries": false
+      },
+      "default_unbounded_connection_retries": true,
+      "http_count_semantics": "Four extra attempts beyond the first.",
+      "stream_scope": "Native fallback can reset stream counter; no aggregate or helper count guarantee."
+    },
+    {
+      "candidate": "pi",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "selected_provider_api": "openai-responses",
+      "agent_extra_retries": 3,
+      "provider_extra_retries": 0,
+      "scope": "Separate operation/request sequences; no shared helper/compaction counter."
+    }
+  ],
+  "source_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "verdict": "conditional source-method ACCEPT",
+    "actual_execution": false,
+    "source_original_reads": 29,
+    "citation_correction": {
+      "original": "H-factory:217,237-256",
+      "corrected": "H-factory:216,237-256",
+      "reason": "resolve_env_vars(config.env) is original line216;217 is blank.",
+      "root_original_native_read_exit": 0
+    }
+  },
+  "private_original_proposal": {
+    "bytes": 22693,
+    "sha256": "595a31579e019c2ef4a4c833d63a5719a36ca586792d834122557aa4789af28a",
+    "unchanged": true
+  },
+  "private_original_inventory": {
+    "bytes": 161615,
+    "sha256": "93b4a75d552efe34078512f0ff0ed21afbce2ffd90afccb10759562b125522a0"
+  },
+  "native_integrity_receipt": {
+    "bytes": 9033,
+    "sha256": "17f7761631b08894c07b93c9b939cfea9069e6bfb5c19847f76c6cd86423d604",
+    "exit": 0,
+    "scope": "Source bytes/excerpts and24 retained TOMLs only; not native enforcement or upstream tests."
+  },
+  "source_inventory": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-native-bounds-source-inventory-20261003.json",
+  "remaining_gates": {
+    "root_conditional_scope": "source-only ACCEPT; active contracts unchanged",
+    "astra_consequential_original_source_read": "source-method ACCEPT with verified citation correction",
+    "codex_family_full_original_packet_and_future_preregistration_read": "HOLD",
+    "claude_family_full_original_packet_and_future_preregistration_read": "HOLD",
+    "fresh_pre_output_preregistration": "HOLD",
+    "configured_values_bound_to_new_accepted_exact_packet": "HOLD",
+    "actual_delivered_runtime_route_model_effort_helper_retry_identity": "HOLD",
+    "native_time_retry_setup_build_enforcement_and_breach_disposition": "HOLD",
+    "outer_deadline_lifecycle_cleanup_network_image_oracle_window_gates": "HOLD",
+    "task_owned_effective_config_and_codex_native_feature_delivery": "HOLD",
+    "native_auth_bypass_delivery_no_host_auth_state_reads": "HOLD"
+  },
+  "source_protection": {
+    "research_contract_unchanged": true,
+    "full_usage_unchanged": true,
+    "historical_attempts_and_outcomes_unchanged": true,
+    "actual_configuration_delivery_auth_enforcement_lifecycle_and_window": "HOLD",
+    "tokens": null,
+    "cost": null
+  },
+  "measured_defaults": 0
+}
