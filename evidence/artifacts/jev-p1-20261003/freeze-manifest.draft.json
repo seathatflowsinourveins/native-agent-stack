@@ -97,8 +97,8 @@
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_casepack.py",
-    "sha256": "61b31950dd9bb06dfc4c85d98708af24f4c1a77b78b967bd803044043dc287fa",
-    "bytes": 43146
+    "sha256": "f0a22b74078487bc80f13221aa74752c526ab488396cf1cc889c163d74f4dc31",
+    "bytes": 43493
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_scoring.py",

@@ -673,8 +673,11 @@ def main(argv=None) -> int:
     custody.add_argument("--pack", type=Path, required=True)
     custody.add_argument("--result", type=Path, required=True, help=f"an A2 result ({A2_RESULT_SCHEMA})")
     custody.add_argument("--out-dir", type=Path, required=True)
-    custody.add_argument("--public-record", type=Path)
+    custody.add_argument("--public-record", type=Path, help="needs --frame, so the record keeps its sha256")
+    custody.add_argument("--frame", type=Path, help="the private frame file the pack was drawn from")
     args = parser.parse_args(argv)
+    if getattr(args, "public_record", None) and not getattr(args, "frame", None):
+        parser.error("--public-record needs --frame: the draw record names the private frame file's sha256")
 
     if args.command == "build":
         frame = _load(args.frame)

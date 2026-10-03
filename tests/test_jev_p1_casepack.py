@@ -384,6 +384,26 @@ class PacketTests(unittest.TestCase):
                 casepack.apply_a2(json.loads(json.dumps(pack)), self.a2_result(pack, changed=changed))
         self.assertEqual(pack["status"], "awaiting_a2")
 
+    def test_a2_command_keeps_the_frame_hash_in_the_public_record(self):
+        pack = self.complete_pack()
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            (root / "pack.json").write_text(json.dumps(pack))
+            (root / "result.json").write_text(json.dumps(self.a2_result(pack)))
+            (root / "frame.json").write_text(json.dumps(self.data))
+            common = ["a2", "--pack", str(root / "pack.json"), "--result", str(root / "result.json"),
+                      "--out-dir", str(root / "out"), "--public-record", str(root / "record.json")]
+            with mock.patch("sys.stdout", io.StringIO()):
+                casepack.main(common + ["--frame", str(root / "frame.json")])
+            record = json.loads((root / "record.json").read_text())
+            self.assertEqual(record["private_files"]["frame"]["sha256"],
+                             hashlib.sha256((root / "frame.json").read_bytes()).hexdigest())
+            self.assertEqual((record["status"], len(record["a2_passes"])), ("ready_for_labels", 1))
+            self.assertTrue((root / "out" / "label-packet.json").is_file())
+            # Negative control: without --frame the command refuses rather than drop the frame's hash.
+            with mock.patch("sys.stderr", io.StringIO()), self.assertRaises(SystemExit):
+                casepack.main(common)
+
     def test_topup_waits_for_a2_and_keeps_labelled_cases(self):
         pack = self.complete_pack()
         casepack.apply_a2(pack, self.a2_result(pack))
