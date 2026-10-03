@@ -6,6 +6,23 @@ and [two-host architecture](2026-10-02-two-host-north-star-architecture.md)
 retain the selected repositories, native clients and all twenty layers.
 This record reports observed execution and the remaining admission gates.
 
+## Workstation source handoff, 2026-10-03
+
+The [workstation continuation](2026-10-03-north-star-workstation-handoff.md)
+transfers remaining host, native simulation and separate paper acceptance.
+The new six-case successor is **UNEXECUTED**. Its source and synthetic controls
+do not qualify native timer ordering, initial/maintenance margin, liquidation,
+rounding or adaptive economics. The frozen inputs, original oracle and tolerances
+remain unchanged. Original private LEAN audit bytes require a verified transfer
+from their retaining owner before comparison; local availability is unproved.
+
+The historical corrected-source results below remain tied to their original
+revisions. The three subsequently changed files (`run.py`, `compare.py`,
+`cost_models.py`) are byte-exact under `historical-source-review-fixes-e73af98`;
+publication tests verify those original bytes plus the unchanged source files.
+No receipt is rebound to the new harness. A fresh destination Claude economic
+review, platform artifact lock and prospective command freeze precede native runs.
+
 ## Corrected-harness qualification, 2026-10-03
 
 Four valid PR review findings required fresh source acceptance: an unbound
@@ -188,10 +205,10 @@ must rebind actual measured source; synthetic tests do not replace that step.
 | Frozen `one_zero` | Historical receipt verified by the current production CLI:136/136 against eight archived sources; no new engine replay | Preserve its exact scope. Changed-source engine qualification remains separate. |
 | Frozen `one_stress` | Corrected source ae6778e:two fresh processes each142/142; correct case ID and four matching normalized exports | Carry the dated20261003 receipt; earlier source/IDs remain historical. |
 | Frozen `over_limit` | Corrected source e73af98:selected successor; two fresh processes each98/98; four exact cached/callback denial streams | Carry this exact economic refusal scope; native execution labels provide no general MOO or maintenance/liquidation equivalence. |
-| Frozen `two_zero`, `two_stress`, `adaptive_stress` | Blocked by pinned native maintenance-margin and liquidation mapping gaps | Reproduce frozen mark-to-market maintenance and partial-liquidation economics with an upstream-supported, reviewed mapping. No invented fills/cash or tolerance widening. |
+| Frozen `two_zero`, `two_stress`, `adaptive_stress` | Successor source implements pinned LEAN policy through native execution; actual six-case native acceptance remains UNRUN | Qualify frozen mark-to-market maintenance and partial-liquidation economics on the acknowledged destination after prospective review. No invented fills/cash or tolerance widening. |
 | Surviving NativeStack WSL2 | Destination/transport not enrolled in this task | Follow the [activation packet](2026-10-02-north-star-host-paper-activation.md); qualify the actual workstation and its platform artifact lock. Mac Linux simulation is insufficient. |
-| Alpaca paper | Required Keychain entries absent; no account call | Store credentials in the native Keychain, perform supported read-only preflight, then separately admit the paper/fault run. |
-| IBKR paper | Local native session absent; exact rc5 recovery harness gap persists | Qualify the single-account rc5 order/restart/fill-replay sequence. Historical 1.231 lifecycle is insufficient; open upstream 5007/5057/5060 remain visible. |
+| Alpaca paper | Mac credential checks absent; destination credentials/account remain unobserved; no account call | Provision credentials in the destination's supported native store, perform read-only preflight, then separately admit the paper/fault run. |
+| IBKR paper | Local native paper session/endpoint unobserved; exact rc5 recovery harness gap persists | Qualify the single-account rc5 order/restart/fill-replay sequence. Historical 1.231 lifecycle is insufficient; open upstream 5007/5057/5060 remain visible. |
 | Historical data fitness | Frozen fixture source/provenance checked; production PIT/data entitlement acceptance unproved | Validate the intended provider's point-in-time records, adjustments, sessions and entitlement before research claims. |
 | Native memory/retrieval/provider lifecycle | Existing scoped receipts retained; broader gates remain partial/blocked | Respect the closed memory decision and current owners. No candidate trial or shared inference is queued by this offline execution. |
 

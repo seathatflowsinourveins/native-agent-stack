@@ -1,6 +1,6 @@
 """Publication contracts for actual corrected-source SPY qualifications.
 
-These tests read public evidence and hash source bytes. They run no engine,
+These tests read historical public evidence and hash its original source bytes. They run no engine,
 broker, model or service. Missing new refusal publication is an incomplete
 qualification, never a skip. Existing test_spy_parity.V2PublishedResultTests
 and test_spy_over_limit retain the historical and runtime-source contracts.
@@ -17,6 +17,8 @@ HARNESS = Path("blueprints/us-equities/engine-nautilus/spy-parity")
 STRESS = "receipt-stress-review-fixes-20261003.json"
 REFUSAL = "receipt-over-limit-review-fixes-20261003.json"
 SUCCESSOR = "mapping-manifest-over-limit-review-fixes-20261003.json"
+ARCHIVE = "historical-source-review-fixes-e73af98"
+ARCHIVED_FILES = {"compare.py", "cost_models.py", "run.py"}
 STRESS_COMMIT = "ae6778e850d5fd05e510d9cef65c0988ec849ef2"
 REFUSAL_COMMIT = "e73af98d5eea2325113a64fc62d7981303757287"
 STRESS_FILES = {
@@ -37,7 +39,10 @@ class CorrectedSpyPublicationTests(unittest.TestCase):
 
     def sha256(self, name):
         self.assertEqual(Path(name).name, name)
-        path = ROOT / HARNESS / name
+        # Only three mutable files changed for the unexecuted six-case successor.
+        # Historical qualification remains bound to the exact reviewed originals;
+        # it supplies no acceptance for the current successor source.
+        path = ROOT / HARNESS / (ARCHIVE if name in ARCHIVED_FILES else "") / name
         self.assertTrue(path.is_file(), "missing bound source: " + name)
         self.assertFalse(path.is_symlink(), "bound source must be an actual file: " + name)
         return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -159,7 +164,7 @@ class CorrectedSpyPublicationTests(unittest.TestCase):
         # Existing historical-source and published receipt tests independently
         # retain all eight hashes and old manifests; do not rebind them here.
 
-    def test_refusal_current_thirteen_sources_selected_manifest_and_prospective_processes(self):
+    def test_refusal_historical_thirteen_sources_selected_manifest_and_prospective_processes(self):
         receipt = self.load(REFUSAL)
         old = self.load("receipt-over-limit-20261002.json")
         self.assertEqual(receipt["id"], "nautilus-spy-initial-margin-refusal-review-fixes-two-processes-20261003")

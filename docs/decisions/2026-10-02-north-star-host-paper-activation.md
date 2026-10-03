@@ -7,20 +7,26 @@ inputs to the [two-host architecture](2026-10-02-two-host-north-star-architectur
 and the standing [paper authorization](../paper-lane-policy.md). Its commands
 are prepared steps, not newly executed host or broker acceptance.
 
+The 2026-10-03 [workstation handoff](2026-10-03-north-star-workstation-handoff.md)
+transfers remaining execution to a newly claimed destination request. Read its
+exact published source revision and receiver acknowledgement before continuing.
+The new six-case source is unexecuted; this packet's historical Mac receipts and
+credential observations do not establish workstation readiness.
+
 ## Current boundary
 
 | Scope | Observed status / required input |
 | --- | --- |
 | Mac native clients | Coordinator reports Codex and Claude logged in; selected Codex model/effort is Sol Ultra. Preserve those sign-ins. |
 | Mac Alpaca | `credential_status` reports `alpaca-paper` env store `MISSING`; both named Keychain checks exited 44/missing. Operator must provision the paper pair locally. |
-| Mac IBKR | Native application `not_local`; owner must identify the signed-in paper TWS/Gateway destination. |
+| Mac IBKR | The credential inventory marks IBKR as native interactive login; `credential_status` reports `not_local` without assessing installation or authentication. Actual TWS/Gateway installation, paper sign-in and endpoint remain unobserved; owner must identify the destination. |
 | Workstation | No surviving WSL identifier, approved transport, SSH configuration or remote connector supplied. Enrollment precedes native-client or GPU acceptance. |
 | Current implementation | 523 unique offline tests passed, zero skips, all 14 bounded runs exited 0. No actual paper execution or WSL acceptance ran for this source. |
 
 Offline evidence: coordinator artifact `recovery/acceptance-record.json`, SHA-256
 `78c2d1050eb7d11baa5cf2e8069ddbbc99355cc7fee0fab2046ad3de3276645e`.
 Sanitized registration at
-`blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json` is pending
+`blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json` is retained
 in the integration branch. Exact commands, test IDs, raw logs, the earlier 133
 dependency skips and two incomplete timeouts remain retained. Coverage:
 [recovery](../../tests/test_adaptive_paper_recovery.py),

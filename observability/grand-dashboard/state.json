@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-02T21:37:59Z",
-  "meaning": "Source checkpoint adds the 2026-10-02 frozen stress, native initial-margin refusal and pinned-SDK recovery receipts while preserving earlier records and failed attempts. Twenty foundation layers and 21 carried gates remain represented; full-stack/two-host readiness is false. No new destination, account, shared inference, timer emission or provider settlement is claimed.",
+  "recorded_at_utc": "2026-10-03T07:06:14Z",
+  "meaning": "Source checkpoint prepares workstation continuation and an unexecuted six-case successor; historical receipts and failures retain their original revisions. Twenty foundation layers and 21 carried gate dispositions remain represented; full-stack/two-host readiness is false. Receiver acknowledgement, destination enrollment and native/paper acceptance remain unobserved. No new host, account, shared inference, timer emission or settlement is claimed.",
   "lanes": [
     {
       "kind": "lane",
@@ -26,6 +26,13 @@
     }
   ],
   "gates": [
+    {
+      "kind": "gate",
+      "id": "north-star-workstation-continuation-20261003",
+      "title": "Workstation six-case and separate paper continuation",
+      "state": "source controls only / native UNRUN / six LEAN audits missing / destination profile Claude review owner claim and paper gates pending",
+      "evidence_ref": "docs/decisions/2026-10-03-north-star-workstation-handoff.md"
+    },
     {
       "kind": "gate",
       "id": "north-star-frozen-stress-20261002",
@@ -389,7 +396,7 @@
       "kind": "worker",
       "id": "north-star-runtime-review-20261002",
       "title": "North Star bounded implementation and independent review",
-      "state": "Sol source review / stress 142/142 and refusal 86/86 in two fresh processes each / recovery 523 SDK tests / remaining gates explicit",
+      "state": "historical stress 142/142 refusal 98/98 / SDK 523 / successor controls 248 pass 5 skip / workstation native Claude review and paper pending",
       "evidence_ref": "docs/decisions/2026-10-02-north-star-runtime-qualification.md"
     },
     {
