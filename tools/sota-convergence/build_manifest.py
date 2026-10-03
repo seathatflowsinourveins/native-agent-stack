@@ -479,12 +479,17 @@ RUNTIME_WATCH_ONLY = "watch_only"
 RUNTIME_LEAK_GATE_ERROR = "leak_gate_tripped"
 # upstream.latest_source on a runtime row whose entry declares tags (extract_layers.py's
 # RUNTIME_TAG_KEYS): the latest is the highest matching tag, the declared pattern matched
-# no fetched tag, or the record has no tag list for the declared prefix (github_freshness.py
-# never fetched one, or its matching-refs call failed). A row without the declaration has
-# no latest_source.
+# no fetched tag, the record has no tag list for the declared prefix (github_freshness.py
+# never fetched one, or its matching-refs call failed), or the record's tag list was cut at
+# github_freshness.py's MATCHING_TAGS_CAP ("matching_tags_truncated"), so a higher version
+# may be missing from it. A row without the declaration has no latest_source.
 RUNTIME_LATEST_MATCHING_TAG = "matching_tag"
 RUNTIME_TAG_PATTERN_UNMATCHED = "tag_pattern_unmatched"
 RUNTIME_TAG_PATTERN_UNFETCHED = "tag_pattern_unfetched"
+RUNTIME_TAG_PATTERN_TRUNCATED = "tag_pattern_truncated"
+# pin_comparison_reason on a pinned runtime row whose latest_source is
+# RUNTIME_TAG_PATTERN_TRUNCATED: a latest read from a cut list is not compared.
+RUNTIME_TAG_LIST_TRUNCATED = "tag_list_truncated"
 # A tag pattern's capture group is ranked only when it is a dotted numeric version in ASCII
 # digits. re.ASCII here and on the declared pattern: \d otherwise matches any Unicode decimal
 # digit and int() reads one, so a tag in fullwidth digits could outrank the real version.
@@ -544,17 +549,28 @@ def apply_tag_declaration(upstream: dict, tags: dict, record) -> dict:
     RUNTIME_TAG_PATTERN_UNMATCHED when the pattern selects no name (a pattern that is
     missing or does not compile included), or RUNTIME_TAG_PATTERN_UNFETCHED without a
     list (never fetched, or github_freshness.py's ``matching_tags_errors`` holds the
-    failed call)."""
+    failed call).
+
+    When the record carries ``matching_tags_truncated``, the list may lack a higher
+    version, so ``latest_source`` is RUNTIME_TAG_PATTERN_TRUNCATED in place of
+    RUNTIME_LATEST_MATCHING_TAG or RUNTIME_TAG_PATTERN_UNMATCHED; ``latest`` is still
+    the tag selected from the names kept (with ``matching_tag_count``), or
+    compute_upstream's when none matched, and build_runtime_freshness does not compare
+    the pin. github_freshness.py marks the record, not the prefix, so a cut list of any
+    prefix of the repository marks every row that declares one of them."""
     held = record.get("matching_tags") if isinstance(record, dict) else None
     names = held.get(tags.get("prefix")) if isinstance(held, dict) else None
     if not isinstance(names, list):
         return {**upstream, "latest_source": RUNTIME_TAG_PATTERN_UNFETCHED}
+    truncated = bool(record.get("matching_tags_truncated"))
     tag, count = select_matching_tag(names, tags.get("pattern"))
     if tag is None:
-        return {**upstream, "latest_source": RUNTIME_TAG_PATTERN_UNMATCHED}
+        return {**upstream,
+                "latest_source": RUNTIME_TAG_PATTERN_TRUNCATED if truncated else RUNTIME_TAG_PATTERN_UNMATCHED}
     kept = {key: value for key, value in upstream.items() if key != "latest_flag"}
     return {**kept, "latest": tag, "released_at": None, "prerelease": None,
-            "latest_source": RUNTIME_LATEST_MATCHING_TAG, "matching_tag_count": count}
+            "latest_source": RUNTIME_TAG_PATTERN_TRUNCATED if truncated else RUNTIME_LATEST_MATCHING_TAG,
+            "matching_tag_count": count}
 
 
 def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, checked_at: str,
@@ -579,8 +595,10 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
     listed for the declared prefix (``apply_tag_declaration``), before the pin is
     compared, so a tag-only or monorepo upstream is compared by its own version
     tags. A missing or failed tag list only sets ``latest_source``
-    RUNTIME_TAG_PATTERN_UNFETCHED. Every other row's upstream is compute_upstream's,
-    unchanged."""
+    RUNTIME_TAG_PATTERN_UNFETCHED. A cut tag list sets RUNTIME_TAG_PATTERN_TRUNCATED,
+    and a pinned row with it is ``not_compared`` with the reason
+    RUNTIME_TAG_LIST_TRUNCATED (an unresolved or watch-only row keeps its own reason).
+    Every other row's upstream is compute_upstream's, unchanged."""
     entries = []
     for pin in sorted((runtime_pins or {}).get("entries", []), key=lambda item: str(item.get("id"))):
         repository = pin.get("repository")
@@ -594,6 +612,11 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
         elif pin.get("kind") == RUNTIME_WATCH_ONLY:
             pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
                           "pin_comparison_reason": RUNTIME_WATCH_ONLY}
+        elif upstream.get("latest_source") == RUNTIME_TAG_PATTERN_TRUNCATED:
+            # A latest read from a cut tag list is not definitive: a higher version can be
+            # among the names github_freshness.py did not keep.
+            pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
+                          "pin_comparison_reason": RUNTIME_TAG_LIST_TRUNCATED}
         else:
             pin_fields = pin_comparison_fields(classify_pin(
                 pin.get("pin"), repository, upstream.get("latest"),

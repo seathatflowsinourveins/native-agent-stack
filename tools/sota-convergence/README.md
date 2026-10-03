@@ -34,7 +34,10 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    constraints in `adoption/sdk/accepted-constraints.txt`.
    `RUNTIME_WATCH_SOURCES` adds watch-only upstreams that a file on main names
    but no install or runtime record on main pins, such as pi (a catalog card
-   may record an evaluated version). A malformed declaration raises. A
+   may record an evaluated version). A malformed declaration raises, a
+   `pin_pointer`, `repository_pointer` or row `array` that is not an
+   [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901) JSON pointer included
+   (`tag` for `/tag`, or a `~` other than `~0` and `~1`). A
    record that moved or changed shape does not, so the daily report keeps its
    other tables: that entry is written with `"pin": null` and an `"error"`
    naming only the declared path, its pointer, slot or requirement and a short
@@ -70,7 +73,9 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    `"matching_tags": {prefix: [names]}`, without `refs/tags/` and in the API's
    name order. At most 5,000 names are kept per prefix, the first in that
    order (a cut list may miss the highest version), and a record with a cut
-   list carries `"matching_tags_truncated": true`. A repository without a
+   list carries `"matching_tags_truncated": true`, once per record, not per
+   prefix, so `build_manifest.py` compares none of the rows that declare a
+   prefix of that repository (step 4). A repository without a
    declared prefix makes no such call, whichever working file names it. A
    prefix that matches no tag returns an empty list, so any failure of that
    call leaves the prefix without a list and is kept under the record's
@@ -91,7 +96,24 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    releases" (a timeout, 429, or 5xx) keeps that failure in
    `"partial_errors"`, is counted in the document's top-level
    `partial_errors`, and is also retried on the next run -- it is not
-   silently treated as done just because the primary call succeeded. One
+   silently treated as done just because the primary call succeeded.
+   The top-level `errors` and `partial_errors` count only the repositories
+   that a working file other than `runtime-pins.json` names (and any record
+   retained from an earlier run that no working file names now), the
+   inventory and the counts from before that file existed: they hold
+   `catalog-freshness.yml`'s `propose` job through
+   `scripts/freshness_propose.py`'s `upstream-errors.txt` and
+   `upstream-partial-errors.txt`, and `scripts/saturation_ledger.py` reads
+   them as the freshness input's completeness. A repository that only
+   `runtime-pins.json` names (by normalized slug, so another file's alias or
+   other letter case makes it shared; five on 2026-10-03:
+   `harbor-framework/harbor`, `openai/codex-action`,
+   `openai/openai-agents-js`, `openai/openai-python` and
+   `openhands/software-agent-sdk`) is fetched, resumed and recorded the same
+   way, but its failures count in `runtime_only_errors` and
+   `runtime_only_partial_errors`, which nothing in the drift or propose path
+   reads, and `runtime_only_repositories` lists those slugs, so the runtime
+   table of `drift.md` can name the rows whose fetch failed. One
    `gh` call raising (a timeout, missing binary, etc.) never aborts the batch
    -- `gh_api` catches it and records `{"error": "..."}` for that repository
    only -- and progress is checkpointed to `--out` every 25 fetched
@@ -170,9 +192,19 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    activity. With no match (a pattern that is missing or does not compile
    counts as none), or no list (never fetched, or the call failed), the row
    keeps every `compute_upstream` field with `latest_source`
-   `tag_pattern_unmatched` or `tag_pattern_unfetched`.
-   `drift.md` marks a matching-tag latest `(tag)` and lists those two kinds of
-   row in one line after the runtime table. A watch-only row carries its upstream
+   `tag_pattern_unmatched` or `tag_pattern_unfetched`. When the record carries
+   `matching_tags_truncated`, a higher version may be among the names cut, so
+   `latest_source` is `tag_pattern_truncated` in place of `matching_tag` or
+   `tag_pattern_unmatched`: the latest is still the tag selected from the
+   names kept (or `compute_upstream`'s when none matched), and a pinned row is
+   `not_compared` with reason `tag_list_truncated`; a watch-only or unresolved
+   row keeps its own reason.
+   `drift.md` marks a matching-tag latest `(tag)` (never a latest from a cut
+   list) and lists those three kinds of row in one line after the runtime
+   table, each with its `latest_source`. One more line names the rows on a
+   runtime-only repository whose fetch failed (step 2); like every row with no
+   reliable upstream data they are blanked and listed as unfetched, but their
+   failures do not hold the `propose` job. A watch-only row carries its upstream
    and dormancy; an unresolved row does only when it has a repository, and one
    without has an empty `upstream` and the `not_fetched` dormancy. The same
    upstreams' `manifests/stack.json` pins and selected (`default`/`conditional`)

@@ -79,16 +79,34 @@ RUNTIME_WITHHELD_LINE = (
 )
 # build_manifest.py's upstream.latest_source values for a runtime row that declares a
 # tag pattern (kept independent here, like RUNTIME_LEAK_GATE_ERROR): the latest is the
-# highest matching tag, or the pattern selected no tag this run.
+# highest matching tag; or the pattern selected no tag this run; or the tag list was cut
+# at github_freshness.py's cap, so the row is not compared (reason tag_list_truncated).
 RUNTIME_LATEST_MATCHING_TAG = "matching_tag"
-RUNTIME_TAG_PATTERN_MISSES = ("tag_pattern_unmatched", "tag_pattern_unfetched")
+RUNTIME_TAG_PATTERN_MISSES = ("tag_pattern_unmatched", "tag_pattern_unfetched", "tag_pattern_truncated")
 # Appended to the upstream-latest cell of a row whose latest is the highest matching tag.
 RUNTIME_TAG_MARKER = " (tag)"
-# The line after the runtime table that lists the rows whose declared pattern selected no tag.
+# The line after the runtime table that lists the rows whose declared pattern gave no
+# definitive latest: it selected no tag, or it selected one from a cut list.
 RUNTIME_TAG_MISS_SENTENCE = (
-    "runtime row(s) whose declared tag pattern selected no tag this run, each with its reason "
+    "runtime row(s) whose declared tag pattern gave no definitive upstream latest this run, each with its reason "
     "(`tag_pattern_unmatched`: no listed tag matched; `tag_pattern_unfetched`: the tag list could not be read "
-    "this run; in both cases the upstream latest stays the release or tag listing)"
+    "this run; in both cases the upstream latest stays the release or tag listing; `tag_pattern_truncated`: "
+    "the tag list was cut at its cap, so the upstream latest is the highest matching version among the "
+    "names kept, or the release or tag listing when none of them matched, and the pin is not compared "
+    "(`tag_list_truncated`))"
+)
+# github_freshness.py's top-level list of the runtime-only repositories (normalized slugs):
+# those that only runtime-pins.json names. Their fetch failures count in its
+# runtime_only_errors and runtime_only_partial_errors, never in the errors and
+# partial_errors that upstream_error_count and upstream_partial_error_count read, so they
+# never hold the propose job. The runtime table reads this list, never those two counts.
+RUNTIME_ONLY_REPOSITORIES_FIELD = "runtime_only_repositories"
+# The line after the runtime table that names the rows on a runtime-only repository whose
+# fetch failed this run (each is also a row with no reliable upstream data).
+RUNTIME_ONLY_FAILURE_SENTENCE = (
+    "runtime row(s) whose upstream only this table tracks could not be fetched this run (counted in "
+    "`github-freshness.json`'s `runtime_only_errors` or `runtime_only_partial_errors`, never in the `errors` "
+    "or `partial_errors` that hold the propose job)"
 )
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
@@ -432,7 +450,17 @@ def runtime_freshness_rows(document: dict, raw_repositories: dict | None = None)
     return rows, flagged
 
 
-def render_runtime_markdown(document: dict, raw_repositories: dict | None = None):
+def runtime_only_repository_slugs(freshness_document) -> set:
+    """github-freshness.json's RUNTIME_ONLY_REPOSITORIES_FIELD as lower-cased
+    slugs. Report-only data, so it does not fail closed: a document without the
+    list (written before it existed) or with another value gives an empty set."""
+    value = freshness_document.get(RUNTIME_ONLY_REPOSITORIES_FIELD) if isinstance(freshness_document, dict) else None
+    if not isinstance(value, list):
+        return set()
+    return {item.lower() for item in value if isinstance(item, str)}
+
+
+def render_runtime_markdown(document: dict, raw_repositories: dict | None = None, runtime_only_slugs=()):
     """The drift.md section listing the GPT runtime workers, SDKs and agents
     against upstream. Returns ``(markdown, summary)``, the summary keyed by
     ``RUNTIME_SUMMARY_KEYS``. Like the trading section it is informational: it has
@@ -441,8 +469,15 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
 
     A row whose upstream latest is the highest tag matching its declared tag pattern
     shows RUNTIME_TAG_MARKER after it, and one line after the table
-    (RUNTIME_TAG_MISS_SENTENCE) lists the rows whose pattern selected no tag
-    (RUNTIME_TAG_PATTERN_MISSES), each with its reason; neither changes the summary.
+    (RUNTIME_TAG_MISS_SENTENCE) lists the rows whose pattern gave no definitive
+    latest (RUNTIME_TAG_PATTERN_MISSES), each with its reason; neither changes the summary.
+
+    ``runtime_only_slugs`` (runtime_only_repository_slugs) are the repositories that
+    only runtime-pins.json names. One more line (RUNTIME_ONLY_FAILURE_SENTENCE) names
+    the rows on such a repository whose freshness record shows a fetch problem
+    (``_freshness_record_has_error``); the summary does not change. Such a row is
+    blanked and listed as unfetched like any other, but its failure is not in the
+    counts that hold the propose job.
 
     When build_manifest.py withheld the rows because a runtime upstream tripped its
     leak gate (the document has ``gate_error``), the section is the heading and
@@ -458,6 +493,10 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
     tag_misses = [f"{entry.get('id')} ({(entry.get('upstream') or {}).get('latest_source')})"
                   for entry in document.get("entries", [])
                   if (entry.get("upstream") or {}).get("latest_source") in RUNTIME_TAG_PATTERN_MISSES]
+    runtime_only = set(runtime_only_slugs or ())
+    runtime_only_failures = [entry.get("id") for entry in document.get("entries", [])
+                             if _github_repo_slug(entry.get("repository")) in runtime_only
+                             and _freshness_record_has_error(entry.get("repository"), raw_repositories)]
     lines = [
         RUNTIME_TABLE_HEADING, "",
         "Report-only. This table lists the GPT runtime workers, SDKs and agents that "
@@ -488,6 +527,7 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
         (flagged["runtime_dormant"], f"dormant upstream(s) (no release or default-branch commit in {threshold}+ days)"),
         (flagged["runtime_archived"], "archived upstream repository(ies)"),
         (flagged["runtime_unfetched"], "runtime row(s) with no reliable upstream data this run"),
+        (runtime_only_failures, RUNTIME_ONLY_FAILURE_SENTENCE),
         (tag_misses, RUNTIME_TAG_MISS_SENTENCE),
     ):
         if items:
@@ -532,7 +572,10 @@ def upstream_partial_error_count(document: dict) -> int:
     around with a fallback (N2) -- ``propose``'s job condition treats this
     the same as a full fetch error: it must be 0 before a PR is opened. A
     failed matching-tags list is not counted here; the document counts it
-    separately as ``matching_tags_errors``, which this gate does not read."""
+    separately as ``matching_tags_errors``, which this gate does not read. Nor
+    is a failure on a repository that only runtime-pins.json names: the document
+    counts those as ``runtime_only_errors`` and ``runtime_only_partial_errors``,
+    which neither this gate nor ``upstream_error_count`` reads."""
     return _int_field(document, "partial_errors", "github-freshness.json")
 
 
@@ -589,7 +632,10 @@ def build_drift_report(work_dir: Path) -> dict:
     runtime_summary = {key: [] for key in RUNTIME_SUMMARY_KEYS}
     runtime_document = load_runtime_freshness(work_dir)
     if runtime_document is not None:
-        runtime_markdown, runtime_summary = render_runtime_markdown(runtime_document, raw_repositories)
+        # The runtime-only slug list names rows in the report; the upstream-errors.txt and
+        # upstream-partial-errors.txt below read only "errors" and "partial_errors".
+        runtime_markdown, runtime_summary = render_runtime_markdown(
+            runtime_document, raw_repositories, runtime_only_repository_slugs(freshness_document))
         markdown += "\n" + runtime_markdown
     (work_dir / "drift.md").write_text(markdown, encoding="utf-8")
     (work_dir / "drift-status.txt").write_text("true\n" if drifted else "false\n", encoding="utf-8")

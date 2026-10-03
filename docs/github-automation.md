@@ -397,7 +397,10 @@ workers, SDKs and agents with the same columns: the pins in `extract_layers.py`'
 pin record and the native SDK constraints) and the watch-only upstreams in
 `RUNTIME_WATCH_SOURCES`, such as pi. It lists the pinned rows behind upstream and
 any source that did not resolve, and like the trading table it never sets
-`drift-status.txt`.
+`drift-status.txt`. A fetch failure on a repository that only this table tracks
+counts in `github-freshness.json`'s `runtime_only_errors` or
+`runtime_only_partial_errors`, not in the `upstream_errors` and `partial_errors`
+that hold the `propose` job below, and the table names that row in one line.
 
 `catalog-freshness.yml`'s `python3 -m unittest` step runs on this job's
 `setup-python 3.13` interpreter, which has no `requests` package installed

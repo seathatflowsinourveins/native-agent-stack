@@ -38,16 +38,21 @@ Extend the existing job's inputs; add no tool, service, schedule or job. The cha
   trading pins do), a row of a JSON array selected by key (the install plan's `owners[]` by `slot`, so an inserted
   or reordered row does not retarget it; a composite row is split on `;` and its part chosen by repository), or a
   `name==version` line of a pip constraints file (PEP 503 names). A declaration error raises, because only a code
-  edit can cause one. A record that moved does not: the entry is written with `"pin": null` and an `error`, so the
-  daily job keeps its foundation and trading report.
-- `github_freshness.py` fetches the repositories of `runtime-pins.json` with the other working files.
+  edit can cause one; a pointer that is not an RFC 6901 JSON pointer (`tag` for `/tag`) is one. A record that moved
+  does not: the entry is written with `"pin": null` and an `error`, so the daily job keeps its foundation and
+  trading report.
+- `github_freshness.py` fetches the repositories of `runtime-pins.json` with the other working files. Its top-level
+  `errors` and `partial_errors`, which hold the propose job and set the saturation ledger's freshness input, still
+  count only the repositories that another working file names. A failure on a repository that only
+  `runtime-pins.json` names counts in `runtime_only_errors` or `runtime_only_partial_errors`, which nothing in the
+  drift or propose path reads, and the runtime section of `drift.md` names its row in one line.
 - `build_manifest.py --runtime-freshness-out` writes the report-only `runtime-freshness.json` (schema
   `runtime-freshness/1`) with the manifest's own `compute_upstream`, `classify_pin` and `compute_dormancy`. Watch-only
   and unresolved rows are `not_compared`. The manifest and the trading sidecar are byte-identical with or without
   the flag. If a runtime upstream's own data trips the leak gate, only this sidecar is withheld (no entries and a
   fixed `gate_error`); the manifest's and the trading sidecar's leak checks stay fatal.
 - `scripts/freshness_propose.py` appends a "GPT runtime workers, SDKs and agents" table to `drift.md`. The table
-  never changes `drift-status.txt`, the drift table, a receipt or the propose job.
+  never changes `drift-status.txt`, the drift table, a receipt's component ids or whether the propose job runs.
 - The workflow passes the flag, prints the runtime counts and uploads the sidecar with the other artifact files.
 
 | id | group | pin source at `56473e4b` | pin |
@@ -187,15 +192,17 @@ sidecar; rebuilt without the new flag, the manifest and the trading sidecar were
 All commands ran on this distribution (Claude Code 2.1.288, Python 3.13). Builds came from written contracts; an
 independent verifier re-ran each claim, and evidence and security reviewers read the diff against source.
 
-- `python3 -m unittest tests.test_catalog_freshness_runtime -v`: 86 tests OK, none skipped (53 before the tag
-  patterns, 80 at `0dadeab7`). The `watch:openai-agents-js` `named_in` check, skipped until this record existed, now
-  runs against it and passes.
+- `python3 -m unittest tests.test_catalog_freshness_runtime -v`: 99 tests OK, none skipped (53 before the tag
+  patterns, 80 at `0dadeab7`, 86 at `2d28e04e`). The `watch:openai-agents-js` `named_in` check, skipped until this
+  record existed, now runs against it and passes.
 - `python3 -m unittest tests.test_catalog_freshness_trading tests.test_catalog_freshness_propose
   tests.test_catalog_freshness_pins tests.test_sota_convergence tests.test_practice_references`: 308 tests. Before
   each evidence registration its only failure is the publication validator's hash check of the edited registered
   files: six before `80b55377` registered them, then the four that round 3 edited at `0dadeab7` (`README.md`,
   `build_manifest.py`, `extract_layers.py` and `github_freshness.py` in `tools/sota-convergence/`). Round 4 edits no
-  other registered file.
+  other registered file. Round 5 adds `tests.test_saturation_ledger`, which reads the top-level counts: 407 tests, one
+  skipped (`jsonschema` is not installed), and the hash check names the registered files round 5 edited, the four
+  above and `docs/github-automation.md`.
 - The three builder registry tests: OK, none skipped (zizmor 1.30.1 on `PATH`). `actionlint` 1.17.0 and `zizmor`
   on the workflow: no findings, the same 3 suppressed as at the base.
 - Full suite at `6bc1199b`: 9,846 tests, 26 failures. Rerun at the base `56473e4b`, the same failures recur
@@ -215,6 +222,20 @@ independent verifier re-ran each claim, and evidence and security reviewers read
     another size, from the end, not at all or without recording it; let the report treat a failed list as a fetch
     problem; keep another release's date, prerelease flag or `latest_flag` on a matching tag; remove `re.ASCII` from
     either pattern; and leave each kind of compile error uncaught.
+  - Round 5 (the fixes for the cross-family review below): 32 mutants against the 13 new tests; all 57 mutant/test
+    pairings were killed and each test failed under at least one mutant. The mutants count runtime-only failures in
+    the gate again; drop the runtime-only counts or mis-scope them (every runtime slug, URLs instead of slugs,
+    case-sensitive slugs, the set not passed from `main`, the slug list not written); let either gate, or the
+    saturation ledger, read a runtime-only count; drop the report line, widen it to every failed row or read the list
+    carelessly; ignore the cut flag; still compare a cut list, give it another reason, drop its selected tag or call
+    it unmatched; let the cut override the watch and unresolved reasons; drop it from the miss line, mark it `(tag)` or
+    drop its meaning; and loosen each pointer check (no leading `/`, any `~`, each of the three fields unchecked, a
+    non-string pointer) or tighten it (`~1` or the empty pointer rejected).
+- Round 5 replay of the major finding, synthetic fixture: with the reviewed head's `github_freshness.py` and
+  `scripts/freshness_propose.py`, a 503 on a runtime-only repository's `repos/{slug}` call wrote 1 to
+  `upstream-errors.txt`, and a 503 on its `releases/latest` call wrote 1 to `upstream-partial-errors.txt`, either of
+  which holds the propose job. With round 5 both files say 0 and `runtime_only_errors` or
+  `runtime_only_partial_errors` is 1.
 - Round 4 replay, offline: `build_runtime_freshness` at the round-4 code on the round-3 run's records gives the same
   counts and the same latest and comparison on all 19 rows; only Inspect AI loses `latest_flag`, and Deep Agents'
   `released_at` and `prerelease` become null. In that run they were 2026-09-30 and false from Deep Agents' own release
@@ -227,12 +248,28 @@ independent verifier re-ran each claim, and evidence and security reviewers read
   reviews also found no blocking or major defect; round 4 fixes their minor findings (a failed tag list made the
   repository's other rows unreliable and held the propose job; a matching tag could be paired with another package's
   release date) and their nits.
+- Round 5: a cross-family review of `2d28e04e` (`gpt-6-astra` at max effort through native `codex exec`, Codex CLI
+  0.160.0, read-only sandbox) returned BLOCK. Its major finding: a fetch failure on a repository that only
+  `runtime-pins.json` names entered the counts that hold the propose job, so a 503 on `openai/openai-python` could
+  suppress a valid foundation or trading proposal. Its minor findings: a cut tag list still gave a definitive
+  comparison, and a malformed pointer declaration such as `tag` passed validation and read as a moved record. Its
+  nit: this record said the propose pull request never sees the runtime rows. Round 5 fixes all four (see "Limits
+  and open findings"); the reviewer ran no tests, and these fixes have not been re-reviewed by it.
 
 ## Limits and open findings
 
-- Report-only. The runtime rows are not in the manifest, so the saturation ledger, the landscape sweep, the
-  receipts and the propose pull request never see them. They live in `drift.md`, the run's step summary and the
-  30-day artifact.
+- Report-only. The runtime rows are not in the manifest, so the saturation ledger and the landscape sweep never see
+  them. They never trigger a proposal, set `drift-status.txt` or name a receipt's component ids, but they appear in
+  the committed `drift.md`: the propose job copies the whole report, runtime section included, into the evidence
+  branch. They also live in the run's step summary and the 30-day artifact.
+- Runtime-only fetch failures. Five repositories are named only by `runtime-pins.json` on 2026-10-03
+  (`harbor-framework/harbor`, `openai/codex-action`, `openai/openai-agents-js`, `openai/openai-python` and
+  `OpenHands/software-agent-sdk`). A failure on one of them (its `repos/{slug}` call, or a releases, tags or commit
+  call that is not an ordinary "not found") counts in `runtime_only_errors` or `runtime_only_partial_errors`, never
+  in the `errors` and `partial_errors` that hold the propose job and set the saturation ledger's freshness input, so
+  it cannot suppress a valid foundation or trading proposal. Its runtime row is blanked and listed as unfetched as
+  before, and one more line names it as a runtime-only fetch failure. A failure on a repository that another working
+  file also names still holds the gate, as before this table.
 - Tag-only upstreams. When a repository has no release, `github_freshness.py` takes the first tag in the API's name
   order, and a monorepo's latest release can be another package's. That withheld Inspect AI and left
   `watch:codex-action` and `watch:deepagents` on name order or on whichever package released last. These three rows
@@ -247,7 +284,11 @@ independent verifier re-ran each claim, and evidence and security reviewers read
   has a null `released_at` and `prerelease`, because the repository's latest release can be another package's. Every
   other row keeps the release-or-first-tag rule until it declares a pattern. The tag list is read with
   `gh api --paginate` within the 60-second per-call timeout, and at most 5,000 names per prefix are kept
-  (`matching_tags_truncated` marks a cut). A failed `matching-refs` call goes to the record's `matching_tags_errors`,
+  (`matching_tags_truncated` marks a cut). A cut list gives no definitive comparison: the row's `latest_source` is
+  `tag_pattern_truncated`, it shows the tag selected from the names kept (without the `(tag)` marker), a pinned row is
+  `not_compared` with reason `tag_list_truncated`, and the report's tag-miss line names it. The flag is per record,
+  not per prefix, so a cut on one prefix withholds every row that declares a prefix of that repository; each of the
+  three repositories declares one today. A failed `matching-refs` call goes to the record's `matching_tags_errors`,
   never `partial_errors`: the runtime row says `tag_pattern_unfetched` and nothing else changes, not the
   repository's drift or trading rows, the partial-error count or the propose job.
 - Registry versions and advisories are outside this table. A registry identity per row (the PyPI simple JSON API,
@@ -257,6 +298,10 @@ independent verifier re-ran each claim, and evidence and security reviewers read
   OpenHands SDK.
 - One runtime-only upstream whose data trips the leak gate withholds the whole runtime table for that run; the
   drift table and `drift-status.txt` are unaffected.
+- Declaration checks are syntactic. Since round 5 a `pin_pointer`, `repository_pointer` or row `array` must be an
+  [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901) JSON pointer when the declaration is checked, so `tag` for
+  `/tag` raises. Whether a valid pointer resolves is known only when its record is read; one that no longer resolves
+  still gives an entry error, as a moved record does.
 - Watch-only rows report upstream activity and are never compared. Promote an entry to `RUNTIME_PIN_SOURCES` when an
   install or runtime record on `main` pins it (#524 for pi, #428 for crawl4ai, #566 for Deep Agents, #550 for
   codex-action, or #633's runtime-job catalog). The `alternative` trading card `openai-agents-sdk` records an

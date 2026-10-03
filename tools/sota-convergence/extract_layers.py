@@ -303,6 +303,11 @@ RUNTIME_PIN_KIND = "pin_source"
 RUNTIME_WATCH_KIND = "watch_only"
 # Exactly one of these names where a pin source's pin comes from (see RUNTIME_PIN_SOURCES).
 RUNTIME_SOURCE_FORMS = ("pin_pointer", "row", "requirement")
+# A declared pin_pointer, repository_pointer or row "array" is an RFC 6901 JSON Pointer
+# (https://www.rfc-editor.org/rfc/rfc6901#section-3): empty, or reference tokens that
+# each start with "/", in which "~" appears only as "~0" or "~1". Checked when the
+# declaration is, so a malformed pointer raises instead of reading as a moved record.
+JSON_POINTER_RE = re.compile(r"(?:/(?:[^/~]|~[01])*)*")
 # A "row" source reads these two fields of the row it selects. A composite row
 # (several upstreams in one slot) joins its parts with RUNTIME_PART_SEPARATOR in
 # both fields, in the same order.
@@ -544,6 +549,13 @@ def _check_repository_literal(entry_id, value, field="repository") -> None:
                          "https://github.com/<owner>/<repo>")
 
 
+def _check_json_pointer(entry_id, field, pointer) -> None:
+    """Raise ValueError unless ``pointer`` is a string that JSON_POINTER_RE fully matches."""
+    if not isinstance(pointer, str) or not JSON_POINTER_RE.fullmatch(pointer):
+        raise ValueError(f"runtime source {entry_id!r}: {field} {pointer!r} is not an RFC 6901 JSON pointer "
+                         "(empty, or tokens that each start with '/', with '~' only as '~0' or '~1')")
+
+
 def _ends_with_end_anchor(pattern: str) -> bool:
     """True when ``pattern`` ends with a "$" that no backslash escapes."""
     if not pattern.endswith("$"):
@@ -606,7 +618,10 @@ def _check_runtime_declaration(repo_root: Path, source: dict, kind: str, seen: s
     if forms == ["pin_pointer"]:
         if not isinstance(source["pin_pointer"], str):
             raise ValueError(f"runtime source {entry_id!r}: pin_pointer is not a string")
-        if not isinstance(source.get("repository_pointer"), str) and not source.get("repository"):
+        _check_json_pointer(entry_id, "pin_pointer", source["pin_pointer"])
+        if source.get("repository_pointer") is not None:
+            _check_json_pointer(entry_id, "repository_pointer", source["repository_pointer"])
+        elif not source.get("repository"):
             raise ValueError(f"runtime source {entry_id!r}: a pin_pointer source needs repository_pointer "
                              "or repository")
     elif forms == ["requirement"]:
@@ -619,6 +634,7 @@ def _check_runtime_declaration(repo_root: Path, source: dict, kind: str, seen: s
         if not isinstance(row, dict) or any(not isinstance(row.get(field), str) or not row[field]
                                             for field in ("array", "key", "value")):
             raise ValueError(f"runtime source {entry_id!r}: row needs string array, key and value")
+        _check_json_pointer(entry_id, "row array", row["array"])
         if row.get("part_repository") is not None:
             _check_repository_literal(entry_id, row["part_repository"], field="part_repository")
 
@@ -749,7 +765,9 @@ def resolve_runtime_pins(repo_root: Path, pin_sources=RUNTIME_PIN_SOURCES, watch
     id/group/path (pin source) or id/group/repository (watch source), a group
     outside RUNTIME_GROUPS, an id that repeats another runtime id or one of
     ``reserved_ids``, a pin source without exactly one RUNTIME_SOURCE_FORMS key, a
-    pointer source with neither repository_pointer nor repository, a requirement
+    pin_pointer, repository_pointer or row "array" that is not an RFC 6901 JSON
+    pointer (JSON_POINTER_RE: "tag" for "/tag", say, would otherwise read as a moved
+    record), a pointer source with neither repository_pointer nor repository, a requirement
     source without a literal repository, a repository literal that is not
     https://github.com/<owner>/<repo>, a path that is absolute or contains "..", or
     a ``tags`` declaration other than RUNTIME_TAG_KEYS describes (a missing or extra

@@ -21,7 +21,14 @@ Covers each stage the GPT runtime workers, SDKs and agents pass through:
   version (ASCII digits only) as the row's upstream latest, and the report marks
   it "(tag)" or lists the rows whose pattern selected no tag. A failed list is
   kept apart from partial_errors, so it changes no row but the runtime row that
-  declares the prefix.
+  declares the prefix. A cut list (matching_tags_truncated) shows the kept tag,
+  is not compared (tag_list_truncated) and is named in the same line.
+- runtime-only failures: a fetch failure on a repository that only
+  runtime-pins.json names counts in runtime_only_errors or
+  runtime_only_partial_errors, never in the errors and partial_errors that hold
+  the propose job, and the runtime table names its rows in one line.
+- declarations: a pointer that is not an RFC 6901 JSON pointer raises when the
+  declaration is checked.
 
 No network. The extraction tests read the checked-in repository; every other
 test uses synthetic fixtures.
@@ -42,6 +49,7 @@ from pathlib import Path
 from unittest import mock
 
 from scripts import freshness_propose as fp
+from scripts import saturation_ledger
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_DIR = ROOT / "tools" / "sota-convergence"
@@ -482,6 +490,37 @@ class ResolveRuntimePinsTests(unittest.TestCase):
             with self.subTest(label=label), self.assertRaises(ValueError):
                 self._resolve(self._row("alpha"), watch_sources=(source,))
 
+    def test_a_pointer_that_is_not_rfc6901_raises_at_declaration_time(self):
+        # Each would otherwise reach resolve_json_pointer and read as a moved record: an
+        # entry with an "error" (a warning in the daily run), not a raise.
+        cases = {
+            "pin_pointer without the leading slash": self._pointer(pin_pointer="tag"),
+            "repository_pointer without the leading slash": self._pointer(repository_pointer="repository"),
+            "row array without the leading slash": self._row("alpha", array="owners"),
+            "a tilde escape other than ~0 or ~1": self._pointer(pin_pointer="/t~2ag"),
+            "a trailing tilde": self._pointer(pin_pointer="/tag~"),
+            "a row array with a bare tilde": self._row("alpha", array="/own~ers"),
+            "repository_pointer that is not a string, beside a literal": self._pointer(
+                repository_pointer=7, repository="https://github.com/example/lit"),
+        }
+        for label, source in cases.items():
+            with self.subTest(label=label), self.assertRaisesRegex(ValueError, "RFC 6901 JSON pointer"):
+                self._resolve(source)
+
+    def test_rfc6901_escapes_and_the_empty_pointer_pass_the_declaration_check(self):
+        self._write("records/escaped.json", json.dumps({
+            "a/b": "v1.0.0", "c~d": "https://github.com/example/escaped", "": "v2.0.0"}))
+        escaped = self._one(self._pointer(path="records/escaped.json", pin_pointer="/a~1b",
+                                          repository_pointer="/c~0d"))
+        self.assertEqual((escaped["repository"], escaped["pin"], escaped["error"]),
+                         ("https://github.com/example/escaped", "v1.0.0", None))
+        # "/" is the member named "" and the empty pointer is the whole document: both pass the
+        # declaration check; the second does not resolve to a pin, which is an entry error.
+        self.assertEqual(self._one(self._pointer(path="records/escaped.json", pin_pointer="/",
+                                                 repository_pointer="/c~0d"))["pin"], "v2.0.0")
+        whole = self._one(self._pointer(path="records/escaped.json", pin_pointer="", repository_pointer="/c~0d"))
+        self.assertIn("pin is not a non-empty string", whole["error"])
+
     WATCH = {"id": "watch:x", "group": "coding-agent", "repository": "https://github.com/example/x"}
 
     def test_a_tags_declaration_is_carried_on_pin_and_watch_entries_as_a_copy(self):
@@ -559,18 +598,25 @@ PLAIN_REPOSITORY = "https://github.com/example/b-plain"
 TAGGED_NAMES = ["0.3.276", "release/2025-11-28", "v1.0", "v1.2"]
 
 
-def _fake_gh_api(calls, failing=()):
+def _fake_gh_api(calls, failing=(), primary_failing=(), releases_failing=()):
     """A github_freshness.gh_api stand-in that records (path, paginate). Every repository
     exists with no release and no tag listing and a resolvable head commit; matching-refs
     lists the TAGGED_NAMES under the prefix for TAGGED_SLUG (none for another repository)
-    unless (slug, prefix) is in ``failing``, which fails like a GitHub 503."""
+    unless (slug, prefix) is in ``failing``, which fails like a GitHub 503. A slug in
+    ``primary_failing`` fails its repos/{slug} call, and one in ``releases_failing`` its
+    releases/latest call, both like a GitHub 503: github_freshness.py keeps the first as
+    the record's "error" and the second, not an ordinary "not found", in "partial_errors"."""
     def fake(path, timeout=60, *, paginate=False):
         calls.append((path, paginate))
         _, owner, repo, *rest = path.split("/")
         slug, rest = f"{owner}/{repo}", "/".join(rest)
         if not rest:
+            if slug in primary_failing:
+                return None, "HTTP 503: Service Unavailable"
             return {"full_name": slug, "default_branch": "main", "pushed_at": "2026-10-02T00:00:00Z"}, None
         if rest == "releases/latest":
+            if slug in releases_failing:
+                return None, "HTTP 503: Service Unavailable"
             return None, "HTTP 404: Not Found"
         if rest == "tags?per_page=1":
             return [], None
@@ -1119,6 +1165,61 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
                 self.assertEqual(row["upstream"], expected)
                 self.assertNotIn("latest_source", row["upstream"])
 
+    def test_a_cut_tag_list_keeps_the_selected_tag_and_is_not_compared(self):
+        """github_freshness.py marks a record whose list it cut at MATCHING_TAGS_CAP: a higher
+        version can be among the names it did not keep, so no definitive comparison."""
+        repositories = {INSPECT_REPOSITORY: _inspect_record(matching_tags_truncated=True)}
+        # The pin at the highest kept tag is not called current either.
+        for pin in ("0.3.273", "0.3.276"):
+            with self.subTest(pin=pin):
+                row = self._row(_inspect_entry(pin=pin), repositories)
+                upstream = row["upstream"]
+                self.assertEqual((upstream["latest"], upstream["latest_source"], upstream["matching_tag_count"]),
+                                 ("0.3.276", "tag_pattern_truncated", 4))
+                self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
+                                 (None, "not_compared", "tag_list_truncated"))
+                # Otherwise the selected tag's upstream is the matching tag's.
+                untruncated = self._row(_inspect_entry(pin=pin), {INSPECT_REPOSITORY: _inspect_record()})["upstream"]
+                self.assertEqual({**upstream, "latest_source": "matching_tag"}, untruncated)
+
+    def test_a_cut_tag_list_with_no_match_keeps_compute_upstream_and_is_not_compared(self):
+        record = _inspect_record(matching_tags={"": ["release/2025-11-28", "0.3.277rc1"]}, matching_tags_truncated=True)
+        repositories = {INSPECT_REPOSITORY: record}
+        row = self._row(_inspect_entry(), repositories)
+        # Not tag_pattern_unmatched: "no listed tag matched" says nothing about the names cut.
+        self.assertEqual(row["upstream"], {**build_manifest.compute_upstream(INSPECT_REPOSITORY, repositories),
+                                           "latest_source": "tag_pattern_truncated"})
+        self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
+                         (None, "not_compared", "tag_list_truncated"))
+
+    def test_a_cut_tag_list_keeps_the_reason_of_a_watch_or_unresolved_row(self):
+        cases = {
+            "watch_only": (_deepagents_entry(), DEEPAGENTS_REPOSITORY,
+                           _deepagents_record(matching_tags_truncated=True), "deepagents==0.7.21"),
+            "source_unresolved": (_inspect_entry(pin=None, error=MOVED_ERROR), INSPECT_REPOSITORY,
+                                  _inspect_record(matching_tags_truncated=True), "0.3.276"),
+        }
+        for reason, (entry, repository, record, latest) in cases.items():
+            with self.subTest(reason=reason):
+                row = self._row(entry, {repository: record})
+                self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                                 (latest, "tag_pattern_truncated"))
+                self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
+                                 (None, "not_compared", reason))
+
+    def test_the_record_level_cut_marks_every_prefix_the_repository_declares(self):
+        # matching_tags_truncated is per record, not per prefix: which list was cut is unknown.
+        record = _inspect_record(matching_tags={"": list(INSPECT_LIKE_TAGS), "v": ["v0.3.276"]},
+                                 matching_tags_truncated=True)
+        entries = [_inspect_entry(),
+                   _inspect_entry(id="new-wsl:inspect-v", tags={"prefix": "v", "pattern": r"^v(\d+\.\d+\.\d+)$"})]
+        rows = build_manifest.build_runtime_freshness({"entries": entries}, {INSPECT_REPOSITORY: record},
+                                                      CHECKED_AT)["entries"]
+        self.assertEqual([(row["id"], row["upstream"]["latest"], row["upstream"]["latest_source"],
+                           row["pin_comparison_reason"]) for row in rows],
+                         [("new-wsl:inspect-ai", "0.3.276", "tag_pattern_truncated", "tag_list_truncated"),
+                          ("new-wsl:inspect-v", "v0.3.276", "tag_pattern_truncated", "tag_list_truncated")])
+
 
 class BuildManifestRuntimeFreshnessCliTests(unittest.TestCase):
     def setUp(self):
@@ -1383,6 +1484,21 @@ class RuntimeReportTests(unittest.TestCase):
                       self._text())
         self.assertEqual((self.work / "upstream-partial-errors.txt").read_text(encoding="utf-8"), "0\n")
 
+    def test_a_cut_tag_list_is_named_in_the_miss_line_and_its_row_is_not_compared(self):
+        self._write_runtime(self._tagged(_inspect_record(matching_tags_truncated=True)))
+        result = fp.build_drift_report(self.work)
+        # The kept tag is shown without the "(tag)" marker, which promises the highest matching
+        # version; the row is not compared and is not behind.
+        self.assertEqual(self._cells("new-wsl:inspect-ai")[2:5],
+                         [fp.md_cell("0.3.273"), fp.md_cell("0.3.276"), fp.md_cell("not compared (tag_list_truncated)")])
+        self.assertIn(f"1 {fp.RUNTIME_TAG_MISS_SENTENCE}:\n\n" + fp.md_cell("new-wsl:inspect-ai (tag_pattern_truncated)")
+                      + "\n", self._text())
+        for meaning in ("`tag_pattern_truncated`: the tag list was cut", "the pin is not compared (`tag_list_truncated`)"):
+            self.assertIn(meaning, fp.RUNTIME_TAG_MISS_SENTENCE)
+        self.assertEqual(result["runtime_behind"], ["new-wsl:behind"])
+        self.assertEqual(result["runtime_unfetched"], [])
+        self.assertEqual((self.work / "upstream-partial-errors.txt").read_text(encoding="utf-8"), "0\n")
+
     def test_tag_rows_never_change_drift_status_or_the_propose_ids(self):
         pins = self._tagged(_inspect_record(), _deepagents_record(matching_tags={"deepagents==": []}))
         for rebuilt_pin, drifted in (("8.30.0", []), ("8.30.1", ["gitleaks"])):
@@ -1400,6 +1516,155 @@ class RuntimeReportTests(unittest.TestCase):
                                  fp.drifted_component_ids(self._text()), with_tags["drifted"]))
                 self.assertEqual(observed[0], observed[1])
                 self.assertEqual(observed[1][1], drifted)
+
+
+RUNTIME_ONLY_REPOSITORY = "https://github.com/example/runtime-only"
+SHARED_REPOSITORY = "https://github.com/example/shared"
+# The other working file names the shared repository in other letter case: slugs are compared.
+SHARED_ALIAS = "https://github.com/Example/Shared"
+# Each working file other than runtime-pins.json, as a document that names one repository.
+NON_RUNTIME_FILES = {
+    "foundation-layers.json": lambda url: {"layers": [{"components": [{"repository": url}]}]},
+    "trading-catalog.json": lambda url: {"entries": [{"repository": url}]},
+    "trading-pins.json": lambda url: {"entries": [{"repository": url}]},
+    "star-candidates.json": lambda url: {"star_candidates": [{"repository": url}], "beyond_stars": []},
+}
+GATE_FILES = ("upstream-errors.txt", "upstream-partial-errors.txt")
+COUNTER_KEYS = ("errors", "partial_errors", "runtime_only_errors", "runtime_only_partial_errors")
+
+
+def _pinned_runtime_entry(entry_id, repository):
+    return {"id": entry_id, "group": "runtime-worker", "kind": "pin_source", "repository": repository,
+            "pin": "v1.0.0", "pin_source": {"path": "plan/install-plan.json",
+                                            "row": {"array": "/owners", "key": "slot", "value": entry_id}},
+            "named_in": None, "error": None, "tags": None}
+
+
+class RuntimeOnlyFetchFailureTests(unittest.TestCase):
+    """A fetch failure on a repository that only runtime-pins.json names, run the way the
+    daily job runs: github_freshness.main (gh_api mocked), build_runtime_freshness on its
+    records, then build_drift_report against a published manifest in the checkout (the
+    current working directory). The failure counts in runtime_only_errors or
+    runtime_only_partial_errors and leaves upstream-errors.txt and
+    upstream-partial-errors.txt, which hold the propose job, at 0 and the saturation
+    ledger's freshness input "read"; the same failure on a repository that another
+    working file names still counts in errors or partial_errors."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        base = Path(self._tmp.name)
+        self.work = base / "work"
+        self.work.mkdir()
+        published = base / "catalogs" / "sota-convergence"
+        published.mkdir(parents=True)
+        original = Path.cwd()
+        os.chdir(base)
+        self.addCleanup(os.chdir, original)
+        row = {"id": "gitleaks", "pin": "8.30.0", "repository": "https://github.com/gitleaks/gitleaks",
+               "upstream": {"latest": "v8.30.1", "pushed_at": "2026-09-20"}, "pin_behind_upstream": True}
+        for path in (published / "manifest-20260929.json", self.work / "manifest-20261002.json"):
+            path.write_text(json.dumps({"foundation": [{"components": [row]}], "trading": [], "counts": {}}),
+                            encoding="utf-8")
+        self.runtime_pins = {"entries": [_pinned_runtime_entry("new-wsl:runtime-only", RUNTIME_ONLY_REPOSITORY),
+                                         _pinned_runtime_entry("new-wsl:shared", SHARED_REPOSITORY)]}
+        (self.work / "runtime-pins.json").write_text(json.dumps(self.runtime_pins), encoding="utf-8")
+        self._name_shared_in("foundation-layers.json")
+
+    def _name_shared_in(self, filename):
+        for name in NON_RUNTIME_FILES:
+            (self.work / name).unlink(missing_ok=True)
+        (self.work / filename).write_text(json.dumps(NON_RUNTIME_FILES[filename](SHARED_ALIAS)), encoding="utf-8")
+
+    def _run(self, **failing):
+        (self.work / "github-freshness.json").unlink(missing_ok=True)
+        with mock.patch.object(github_freshness, "gh_api", _fake_gh_api([], **failing)), redirect_stdout(StringIO()):
+            self.assertEqual(github_freshness.main(["--work-dir", str(self.work), "--workers", "1"]), 0)
+        document = json.loads((self.work / "github-freshness.json").read_text(encoding="utf-8"))
+        runtime = build_manifest.build_runtime_freshness(self.runtime_pins, document["repositories"], CHECKED_AT)
+        (self.work / fp.RUNTIME_FRESHNESS_FILE).write_text(json.dumps(runtime), encoding="utf-8")
+        result = fp.build_drift_report(self.work)
+        gate = tuple((self.work / name).read_text(encoding="utf-8") for name in GATE_FILES)
+        return document, result, gate, (self.work / "drift.md").read_text(encoding="utf-8")
+
+    @staticmethod
+    def _record(document, slug):
+        return next(record for record in document["repositories"].values() if record["slug"] == slug)
+
+    def _assert_runtime_only_failure(self, document, result, gate, text, counters):
+        self.assertEqual(tuple(document[key] for key in COUNTER_KEYS), counters)
+        self.assertEqual(document["runtime_only_repositories"], ["example/runtime-only"])
+        self.assertEqual(gate, ("0\n", "0\n"))
+        # The saturation ledger reads the same two counts as the freshness input's completeness.
+        self.assertEqual(saturation_ledger.freshness_input({}, document), ("read", []))
+        self.assertIn(f"1 {fp.RUNTIME_ONLY_FAILURE_SENTENCE}:\n\n" + fp.md_cell("new-wsl:runtime-only") + "\n", text)
+        # The per-record rule is unchanged: the row is still blanked and listed as unfetched.
+        self.assertEqual(result["runtime_unfetched"], ["new-wsl:runtime-only"])
+
+    def test_a_runtime_only_primary_failure_is_counted_apart_and_holds_nothing(self):
+        document, result, gate, text = self._run(primary_failing={"example/runtime-only"})
+        self.assertEqual(self._record(document, "example/runtime-only")["error"], "HTTP 503: Service Unavailable")
+        self._assert_runtime_only_failure(document, result, gate, text, (0, 0, 1, 0))
+
+    def test_a_runtime_only_release_5xx_is_counted_apart_and_holds_nothing(self):
+        document, result, gate, text = self._run(releases_failing={"example/runtime-only"})
+        self.assertEqual(self._record(document, "example/runtime-only")["partial_errors"],
+                         {"releases": "HTTP 503: Service Unavailable"})
+        self._assert_runtime_only_failure(document, result, gate, text, (0, 0, 0, 1))
+
+    def test_the_same_failures_on_a_repository_another_working_file_names_still_hold_the_gate(self):
+        for filename in NON_RUNTIME_FILES:
+            for failing, counters, gate in (
+                ({"primary_failing": {"example/shared"}}, (1, 0, 0, 0), ("1\n", "0\n")),
+                ({"releases_failing": {"example/shared"}}, (0, 1, 0, 0), ("0\n", "1\n")),
+            ):
+                with self.subTest(file=filename, failing=sorted(failing)):
+                    self._name_shared_in(filename)
+                    document, result, observed_gate, text = self._run(**failing)
+                    self.assertEqual(tuple(document[key] for key in COUNTER_KEYS), counters)
+                    self.assertEqual(document["runtime_only_repositories"], ["example/runtime-only"])
+                    self.assertEqual(observed_gate, gate)
+                    self.assertEqual(saturation_ledger.freshness_input({}, document)[0], "partial")
+                    self.assertNotIn(fp.RUNTIME_ONLY_FAILURE_SENTENCE, text)
+                    self.assertEqual(result["runtime_unfetched"], ["new-wsl:shared"])
+
+    def test_a_retained_record_no_working_file_names_still_counts_in_the_gate(self):
+        results = {
+            "https://github.com/example/runtime-only": {"slug": "example/runtime-only", "error": "timeout"},
+            SHARED_ALIAS: {"slug": "example/shared", "partial_errors": {"releases": "HTTP 503"}},
+            "https://github.com/example/stale": {"slug": "Example/Stale", "error": "timeout"},
+        }
+        document = github_freshness.build_document(results, runtime_only_slugs={"Example/Runtime-Only"})
+        self.assertEqual(tuple(document[key] for key in COUNTER_KEYS), (1, 1, 1, 0))
+        self.assertEqual(document["runtime_only_repositories"], ["example/runtime-only"])
+        # Without the set, as before runtime-pins.json existed, every record counts in the gate.
+        document = github_freshness.build_document(results)
+        self.assertEqual(tuple(document[key] for key in COUNTER_KEYS), (2, 1, 0, 0))
+        self.assertEqual(document["runtime_only_repositories"], [])
+
+    def test_runtime_only_slugs_compare_normalized_slugs(self):
+        work = self.work / "slugs"
+        work.mkdir()
+        self.assertEqual(github_freshness.collect_runtime_only_slugs(work), set())
+        (work / "runtime-pins.json").write_text(json.dumps({"entries": [
+            {"id": "only", "repository": "https://github.com/example/only"},
+            {"id": "aliased", "repository": "https://github.com/example/aliased"},
+            {"id": "cased", "repository": "https://github.com/example/cased"},
+            {"id": "moved", "repository": None},
+            {"id": "off-github", "repository": "https://gitlab.com/example/off"},
+        ]}), encoding="utf-8")
+        (work / "trading-catalog.json").write_text(json.dumps({"entries": [
+            {"repository": "https://github.com/example/aliased/releases/tag/v1"},
+            {"repository": "https://github.com/EXAMPLE/Cased"},
+        ]}), encoding="utf-8")
+        self.assertEqual(github_freshness.collect_runtime_only_slugs(work), {"example/only"})
+
+    def test_a_document_without_the_runtime_only_list_names_no_row(self):
+        # A github-freshness.json written before the list existed: the line is simply absent.
+        self.assertEqual(fp.runtime_only_repository_slugs({"errors": 0, "partial_errors": 0}), set())
+        self.assertEqual(fp.runtime_only_repository_slugs({"runtime_only_repositories": "example/x"}), set())
+        self.assertEqual(fp.runtime_only_repository_slugs({"runtime_only_repositories": ["Example/X", 7]}),
+                         {"example/x"})
 
 
 LEAKY_REPOSITORY = "https://github.com/example/leaky"

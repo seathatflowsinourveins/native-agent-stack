@@ -17,9 +17,23 @@ Reads (repository-relative to --work-dir):
 
 Writes --out (default <work-dir>/github-freshness.json):
   {schema, generated_at, count, errors, partial_errors, matching_tags_errors,
+   runtime_only_errors, runtime_only_partial_errors, runtime_only_repositories,
    fetched_this_run, retained_from_prior_runs, observation_window: {min, max},
    repositories: {repo_url: {..., observed_at, slug, aliases, matching_tags?,
                              matching_tags_truncated?, matching_tags_errors?, partial_errors?}}}
+
+Runtime-only repositories: a repository that runtime-pins.json names and no other
+working file names (compared by normalized slug, collect_runtime_only_slugs) feeds
+only the report-only runtime table. Its record is what any record is, but its
+failures are counted apart: the top-level "errors" and "partial_errors", which hold
+catalog-freshness.yml's propose job (through scripts/freshness_propose.py's
+upstream-errors.txt and upstream-partial-errors.txt) and which
+scripts/saturation_ledger.py reads as the freshness input's completeness, count only
+the other repositories, as they did before runtime-pins.json existed (a retained
+record that no working file names now stays in them too). "runtime_only_errors" and
+"runtime_only_partial_errors" count the runtime-only ones, and
+"runtime_only_repositories" lists their slugs, so the runtime table can name the
+rows whose fetch failed; nothing in the drift or propose path reads the two counts.
 
 Declared tag prefixes: for each tag prefix that a runtime-pins.json entry declares
 (``tags.prefix``, extract_layers.py's RUNTIME_TAG_KEYS) for a repository, one more
@@ -100,6 +114,10 @@ WORKING_FILE_REPO_PATHS = (
         for entry in list(doc.get("star_candidates", [])) + list(doc.get("beyond_stars", []))
     )),
 )
+# The working file that only the report-only runtime table reads. A repository that it
+# alone names is runtime-only (collect_runtime_only_slugs): its fetch failures count in
+# runtime_only_errors and runtime_only_partial_errors, never in errors and partial_errors.
+RUNTIME_WORKING_FILE = "runtime-pins.json"
 
 
 def load_json(path: Path):
@@ -117,6 +135,21 @@ def collect_repository_urls(work_dir: Path) -> set:
             if url:
                 urls.add(url)
     return urls
+
+
+def collect_runtime_only_slugs(work_dir: Path) -> set:
+    """The normalized slugs (github_slug) that RUNTIME_WORKING_FILE names and no
+    other working file in WORKING_FILE_REPO_PATHS names; empty without that file.
+    Slugs, not URLs, are compared, so another file that names the repository through
+    an alias or in other letter case makes it shared, not runtime-only."""
+    runtime, other = set(), set()
+    for filename, extractor in WORKING_FILE_REPO_PATHS:
+        path = work_dir / filename
+        if not path.exists():
+            continue
+        slugs = {github_slug(url) for url in extractor(load_json(path)) if url}
+        (runtime if filename == RUNTIME_WORKING_FILE else other).update(slugs)
+    return {slug for slug in runtime - other if slug}
 
 
 def collect_declared_tag_prefixes(work_dir: Path) -> dict:
@@ -316,8 +349,9 @@ def fetch_repository(slug: str, tag_prefixes=()) -> dict:
             out["matching_tags_errors"] = tags_errors
 
     if partial_errors:
-        # Kept on the record (not discarded) and counted at the top level,
-        # and treated as retryable on resume (see main()'s
+        # Kept on the record (not discarded) and counted at the top level
+        # (partial_errors, or runtime_only_partial_errors for a runtime-only
+        # repository: build_document), and treated as retryable on resume (see main()'s
         # already_covered_slugs) -- a record whose releases, tags or commit
         # sub-request failed is not silently treated as "done". A failed
         # matching-tags list is never one of these ("matching_tags_errors" above).
@@ -325,7 +359,13 @@ def fetch_repository(slug: str, tag_prefixes=()) -> dict:
     return out
 
 
-def build_document(results: dict, slug_aliases: dict | None = None, fetched_this_run: int = 0) -> dict:
+def build_document(results: dict, slug_aliases: dict | None = None, fetched_this_run: int = 0,
+                   runtime_only_slugs=()) -> dict:
+    """The github-freshness.json document. A record whose slug is in
+    ``runtime_only_slugs`` (collect_runtime_only_slugs) counts in
+    runtime_only_errors and runtime_only_partial_errors; every other record, a
+    retained one that no working file names now included, counts in errors and
+    partial_errors. Without ``runtime_only_slugs`` every record counts there."""
     if slug_aliases:
         for record in results.values():
             if not isinstance(record, dict):
@@ -343,17 +383,31 @@ def build_document(results: dict, slug_aliases: dict | None = None, fetched_this
         if isinstance(rec, dict) and rec.get("observed_at")
     )
     retained = max(len(results) - fetched_this_run, 0)
+    runtime_only = {str(slug).lower() for slug in runtime_only_slugs or ()}
+    records = [rec for rec in results.values() if isinstance(rec, dict)]
+    shared = [rec for rec in records if str(rec.get("slug") or "").lower() not in runtime_only]
+    only = [rec for rec in records if str(rec.get("slug") or "").lower() in runtime_only]
     return {
         "schema": "github-freshness/1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(results),
-        "errors": sum(1 for rec in results.values() if isinstance(rec, dict) and rec.get("error")),
-        "partial_errors": sum(1 for rec in results.values() if isinstance(rec, dict) and rec.get("partial_errors")),
+        # The repositories that a working file other than runtime-pins.json names (and any
+        # retained record that no working file names now): the inventory and the counts from
+        # before runtime-pins.json existed. These two hold the propose job and set the
+        # saturation ledger's freshness input (module docstring).
+        "errors": sum(1 for rec in shared if rec.get("error")),
+        "partial_errors": sum(1 for rec in shared if rec.get("partial_errors")),
         # Records whose matching-refs call failed for a declared tag prefix. Report-only:
         # scripts/freshness_propose.py and the propose gate read "errors" and
         # "partial_errors", never this count.
         "matching_tags_errors": sum(1 for rec in results.values()
                                     if isinstance(rec, dict) and rec.get("matching_tags_errors")),
+        # The same two counts for the runtime-only repositories, which only the report-only
+        # runtime table reads: a failure there never holds the propose job. Nothing in the
+        # drift or propose path reads these counts; the runtime table reads the slug list.
+        "runtime_only_errors": sum(1 for rec in only if rec.get("error")),
+        "runtime_only_partial_errors": sum(1 for rec in only if rec.get("partial_errors")),
+        "runtime_only_repositories": sorted(runtime_only),
         "fetched_this_run": fetched_this_run,
         "retained_from_prior_runs": retained,
         # Actual observation dates, not this write's checkpoint/generation
@@ -367,8 +421,9 @@ def build_document(results: dict, slug_aliases: dict | None = None, fetched_this
 
 
 def write_document(out_path: Path, results: dict, slug_aliases: dict | None = None,
-                    fetched_this_run: int = 0) -> dict:
-    document = build_document(results, slug_aliases=slug_aliases, fetched_this_run=fetched_this_run)
+                    fetched_this_run: int = 0, runtime_only_slugs=()) -> dict:
+    document = build_document(results, slug_aliases=slug_aliases, fetched_this_run=fetched_this_run,
+                              runtime_only_slugs=runtime_only_slugs)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(document, indent=1) + "\n", encoding="utf-8")
     return document
@@ -404,6 +459,9 @@ def main(argv=None) -> int:
     slug_aliases = build_slug_aliases(urls)
     non_github = sorted(u for u in urls if u and not github_slug(u))
     tag_prefixes = collect_declared_tag_prefixes(args.work_dir)
+    # Only the counting changes for these (build_document); they are fetched, resumed
+    # and recorded like every other repository.
+    runtime_only_slugs = collect_runtime_only_slugs(args.work_dir)
 
     existing = {"repositories": {}}
     if out_path.exists() and not args.refresh:
@@ -445,19 +503,24 @@ def main(argv=None) -> int:
                     if i % 50 == 0:
                         print(f"fetched {i}", flush=True)
                     if i % CHECKPOINT_INTERVAL == 0:
-                        write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=fetched_count)
+                        write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=fetched_count,
+                                       runtime_only_slugs=runtime_only_slugs)
                         print(f"checkpoint {i} written to {out_path}", flush=True)
         finally:
             # Always leave whatever was fetched so far on disk, even on an
             # unanticipated exception (gh_api itself never raises, but this
             # is the resumability backstop the checkpoint above is not
             # guaranteed to have reached).
-            document = write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=fetched_count)
+            document = write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=fetched_count,
+                                      runtime_only_slugs=runtime_only_slugs)
     else:
-        document = write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=0)
+        document = write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=0,
+                                  runtime_only_slugs=runtime_only_slugs)
 
     print(f"done {len(results)} errors {document['errors']} partial_errors {document['partial_errors']} "
-          f"matching_tags_errors {document['matching_tags_errors']}")
+          f"matching_tags_errors {document['matching_tags_errors']} "
+          f"runtime_only_errors {document['runtime_only_errors']} "
+          f"runtime_only_partial_errors {document['runtime_only_partial_errors']}")
     return 0
 
 
