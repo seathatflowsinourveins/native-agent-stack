@@ -46351,7 +46351,8 @@
     },
     {
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/ci-correction.md",
-      "sha256": "7dbf17b90380631057c36adead9702b95c7d005e0a5c3f33424adfa72eb235d6"
+      "sha256": "27a2d3ca147c79e41ebbd5e1a9cc952b0d6891e6482fd6ae3b7c566751d8916a",
+      "bytes": 2488
     },
     {
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-active-control.exit.txt",
