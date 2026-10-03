@@ -17,8 +17,12 @@
   ],
   "routing_contract": {
     "gateway": "OmniRoute",
-    "model": "cx/gpt-6.1-sol-ultra",
+    "model": "cx/gpt-6.1-sol",
     "requested_effort_contract": "ultra",
+    "source_input_status": "Prospective native model input with explicit Ultra; no active route or comparison amendment is accepted.",
+    "historical_alias": "cx/gpt-6.1-sol-ultra",
+    "source_input_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/native-ultra-alias-inputs-source-proposal-20261003.json",
+    "token_source_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-token-native-source-proposal-20261003.json",
     "per_runtime_effort_mapping": "unqualified; native orchestration and effective inference are distinct",
     "consequential_model": "cx/gpt-6-astra-max",
     "consequential_effort": "max",
@@ -88,6 +92,7 @@
       "title": "Coding task worker",
       "default": null,
       "decision_status": "unmeasured",
+      "source_intake": ["evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk48-originals-reconciliation-20261003.json", "evidence/artifacts/runtime-jobs-source-intake-20261003/native-ultra-alias-inputs-source-proposal-20261003.json"],
       "components": [
         {"id": "openhands-sdk", "repository": "https://github.com/OpenHands/software-agent-sdk", "version": "v1.50.1", "ref": "1e1390acc8788346ba4804c34323284009bf3f5e", "source_file": "examples/01_standalone_sdk/23_responses_reasoning.py", "kind": "sdk", "evidence_class": "source_review"},
         {"id": "codex", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "sdk/typescript/src/threadOptions.ts", "kind": "cli", "evidence_class": "source_review"},
@@ -105,6 +110,7 @@
       "title": "Research gatherer",
       "default": null,
       "decision_status": "unmeasured",
+      "source_intake": ["evidence/artifacts/runtime-jobs-source-intake-20261003/research-native-bounds-source-proposal-20261003.json"],
       "components": [
         {"id": "gpt-researcher", "repository": "https://github.com/assafelovic/gpt-researcher", "version": "v3.7.0", "package_version": "0.16.0", "ref": "0957c301ed06c2a5857b834358c7227c739041d4", "source_file": "pyproject.toml", "kind": "runtime", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-offline-preflight.json", "readiness_scope": "Native isolated requirements install, CLI help/config imports and dependency check only; model delivery, research usefulness and org MCP activation pending."},
         {"id": "deerflow", "repository": "https://github.com/bytedance/deer-flow", "version": "v2.1.0", "ref": "345f08be00c8a9495079b732a39b46aa9af1584e", "source_file": "config.example.yaml", "kind": "runtime", "evidence_class": "source_review"},
@@ -120,7 +126,11 @@
       "title": "PR and design reviewer",
       "default": null,
       "decision_status": "unmeasured",
+      "source_intake": ["evidence/artifacts/runtime-jobs-source-intake-20261003/reviewer-oracle-source-proposal-20261003.json"],
       "components": [
+        {"id": "martian-review-oracle", "repository": "https://github.com/withmartian/code-review-benchmark", "version": "pinned-source", "ref": "e616e849755441da38f18bf3adba2c9583b03803", "source_file": "offline/code_review_benchmark/step3_judge_comments.py", "kind": "evaluator", "evidence_class": "source_review", "disposition": "unadopted source candidate; bug-containing PRs only", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/reviewer-oracle-source-proposal-20261003.json"},
+        {"id": "swrbench-review-oracle", "repository": "https://github.com/ZZR0/SWRench", "version": "pinned-source", "ref": "67ae1d4395ac05f800d62b0e13678eadeb9fa5c7", "source_file": "swrbench/utils.py", "kind": "evaluator", "evidence_class": "source_review", "disposition": "rejected unchanged: import defect; watch for upstream repair", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/reviewer-oracle-source-proposal-20261003.json"},
+        {"id": "factory-review-oracle", "repository": "https://github.com/droid-code-review-evals/review-droid-benchmark", "version": "pinned-source", "ref": "2dfbbd6edcd5eea19495e725d611cb104c9e8f4d", "source_file": "scripts/eval_common.py", "kind": "evaluator", "evidence_class": "source_review", "disposition": "rejected unchanged: excludes Codex PR; no common-all-arms denominator", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/reviewer-oracle-source-proposal-20261003.json"},
         {"id": "codex-review", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "codex-rs/core/src/tasks/review.rs", "kind": "reviewer", "evidence_class": "source_review"},
         {"id": "pr-agent", "repository": "https://github.com/The-PR-Agent/pr-agent", "version": "v0.47.0", "ref": "8e5a9295973b24af4b70cafd0b660a230811ef9e", "source_file": "docs/docs/usage-guide/local_git_provider.md", "kind": "reviewer", "evidence_class": "source_review"},
         {"id": "openhands-pr-review", "repository": "https://github.com/OpenHands/extensions", "version": "v0.27.0", "ref": "62f34e3a7577fbb947687363fa0df485061d0b3d", "source_file": "plugins/pr-review/action.yml", "kind": "org-extension", "evidence_class": "source_review"}
@@ -133,6 +143,7 @@
       "title": "GitHub workflow agents",
       "default": null,
       "decision_status": "unmeasured",
+      "source_intake": ["evidence/artifacts/runtime-jobs-source-intake-20261003/github-native-route-source-proposal-v2-20261003.json"],
       "components": [
         {"id": "codex-action", "repository": "https://github.com/openai/codex-action", "version": "v1.12", "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e", "source_file": "action.yml", "kind": "workflow-agent", "evidence_class": "source_review"},
         {"id": "github-agentic-workflows", "repository": "https://github.com/github/gh-aw", "version": "v0.89.21", "ref": "c35393777e5604a63721d09512263b1383301d4f", "source_file": "docs/src/content/docs/engines/codex.md", "kind": "workflow-agent", "evidence_class": "source_review"},
@@ -172,8 +183,9 @@
       "title": "Multi-worker orchestration",
       "default": null,
       "decision_status": "unmeasured",
+      "source_intake": ["evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk48-originals-reconciliation-20261003.json", "evidence/artifacts/runtime-jobs-source-intake-20261003/native-ultra-alias-inputs-source-proposal-20261003.json"],
       "components": [
-        {"id": "codex-native-workers", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs", "kind": "multi-worker", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json", "readiness_followup_evidence": ["evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-preflight.json", "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-primitive-preflight.json", "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-nonpausing-setup-timeout-20261003.json", "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-nonpausing-native-fixture-20261003.json"], "readiness_scope": "Native source-position primitive and instrumented nonpausing records observed. One unchanged-source selected SDK fixture failed its original5000ms deadline:47 setup records/16 target records/all8 anchors; scoped visible namespace reclamation and independent custody passed. Earlier setup timeout and failed pilots retained. Pristine upstream acceptance, positive SDK roles, provider delivery and all measured defaults remain HOLD."},
+        {"id": "codex-native-workers", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs", "kind": "multi-worker", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json", "readiness_followup_evidence": ["evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-preflight.json", "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-primitive-preflight.json", "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-nonpausing-setup-timeout-20261003.json", "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-nonpausing-native-fixture-20261003.json"], "readiness_scope": "Native source-position primitive and instrumented nonpausing records observed. One unchanged-source selected SDK fixture failed its original5000ms deadline:47 setup records/16 target records/all8 anchors; scoped visible namespace reclamation and independent custody passed. Earlier setup timeout and failed pilots retained. The original5000ms fixture remains FAIL. Separate historical unchanged-source SDK acceptance is48PASS/5suites; positive target-host SDK roles, provider delivery and all measured defaults remain HOLD."},
         {"id": "claude-agent-sdk", "repository": "https://github.com/anthropics/claude-agent-sdk-python", "version": "v0.2.163", "ref": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7", "source_file": "pyproject.toml", "kind": "sdk", "evidence_class": "source_review", "qualification": "SDK617 historical packet and scoped follow-ups remain separate from this GPT comparison"},
         {"id": "openai-agents-python", "repository": "https://github.com/openai/openai-agents-python", "version": "v0.23.1", "ref": "c4a1d047b22488234b2ba81056e1b9b8db2127a5", "source_file": "src/agents/model_settings.py", "kind": "sdk", "evidence_class": "source_review"},
         {"id": "langgraph", "repository": "https://github.com/langchain-ai/langgraph", "version": "1.2.12", "ref": "49cce0ca852be4cfb567a1cbe0e511ff325a1682", "source_file": "libs/langgraph/README.md", "kind": "sdk", "evidence_class": "source_review"},
@@ -188,6 +200,7 @@
       "title": "Trading research and development",
       "default": null,
       "decision_status": "unmeasured",
+      "source_intake": ["evidence/artifacts/runtime-jobs-source-intake-20261003/trading-rnd-native-source-proposal-20261003.json"],
       "components": [
         {"id": "rd-agent", "repository": "https://github.com/microsoft/RD-Agent", "version": "v1.0.0", "ref": "484776c211e4fbbeef03e0ec00d6bbee7362a4f4", "source_file": "rdagent/oai/llm_conf.py", "kind": "research-runtime", "evidence_class": "source_review"},
         {"id": "qlib", "repository": "https://github.com/microsoft/qlib", "version": "v0.9.7", "ref": "da920b7f954f48ab1bb64117c976710de198373e", "source_file": "docs/advanced/PIT.rst", "kind": "org-research-platform", "evidence_class": "source_review"},
