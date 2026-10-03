@@ -1,0 +1,330 @@
+{
+  "schema": "suite-parallelism-fixtures/1",
+  "evidence_class": "synthetic fixture: real local runs of the controls, not a GitHub-hosted runner",
+  "generator": "make_fixtures.py --parallel-python <venv>/bin/python --work <scratch> --crash-timeout 20",
+  "host": {
+    "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python_version": "3.13.16",
+    "machine": "x86_64"
+  },
+  "packages": {
+    "unittest-parallel": "1.8.6",
+    "coverage": "7.16.2",
+    "unittest_parallel_main_py_sha256": "ae1bf2f5831ec21c8dc80f1f2b62dd85530b0f4751cff109c854ca33faa0b179"
+  },
+  "sanitized_prefixes": {
+    "<scratch>": "the scratch root that holds one directory per run",
+    "<venv>": "the virtualenv prefix",
+    "<python>": "the interpreter's base prefix",
+    "<home>": "the home directory"
+  },
+  "runs": [
+    {
+      "file": "real/controls-S-r1.log",
+      "kind": "controls",
+      "config": "S",
+      "repeat": 1,
+      "command": "python3 -m unittest -v",
+      "exit_code": 1,
+      "bound_seconds": 120,
+      "sha256": "49def2cc8cd0c6a328e43490f55e98a1d69f4b8938f4bb23212f3c85923c88fb"
+    },
+    {
+      "file": "real/controls-S-r2.log",
+      "kind": "controls",
+      "config": "S",
+      "repeat": 2,
+      "command": "python3 -m unittest -v",
+      "exit_code": 1,
+      "bound_seconds": 120,
+      "sha256": "25767c880a7a5703495234fb14868afb454870a0fdacbc8683094d7455f9fa94"
+    },
+    {
+      "file": "real/controls-S-r3.log",
+      "kind": "controls",
+      "config": "S",
+      "repeat": 3,
+      "command": "python3 -m unittest -v",
+      "exit_code": 1,
+      "bound_seconds": 120,
+      "sha256": "2b5cea819821c2e557e57a0a2f5c7d193a494090bb2b9a91dd1819cfb72dd6af"
+    },
+    {
+      "file": "real/controls-P3-r1.log",
+      "kind": "controls",
+      "config": "P3",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 3 --level module -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "6e9bd867d3b05367c6f3493ddb7b37e7e7bad9dd2ce325ff90d05798ceb73cb8"
+    },
+    {
+      "file": "real/controls-P3-r2.log",
+      "kind": "controls",
+      "config": "P3",
+      "repeat": 2,
+      "command": "python3 -m unittest_parallel -j 3 --level module -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "073bf362e44420ce82d78f2fd17e314702ae955d9410775e8ce6c41e32cdae0e"
+    },
+    {
+      "file": "real/controls-P3-r3.log",
+      "kind": "controls",
+      "config": "P3",
+      "repeat": 3,
+      "command": "python3 -m unittest_parallel -j 3 --level module -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "3825f0a575a099642e40f84e81367154ff7badfe51572151034247116719f859"
+    },
+    {
+      "file": "real/controls-P3F-r1.log",
+      "kind": "controls",
+      "config": "P3F",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 3 --level module --disable-process-pooling -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "c82d329c79664b89f12a2c608c88f7903b17d7ec7e054b7f4b87e96c8bec0e1b"
+    },
+    {
+      "file": "real/controls-P3C-r1.log",
+      "kind": "controls",
+      "config": "P3C",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 3 --level class -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "5d6b5c01b803d710726657b3709d4d8d950cd63b002600d65d62a8377ab0b502"
+    },
+    {
+      "file": "real/controls-P3C-r2.log",
+      "kind": "controls",
+      "config": "P3C",
+      "repeat": 2,
+      "command": "python3 -m unittest_parallel -j 3 --level class -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "c971c4d509b23c59c31ab538e9c6aee3a72a8f8771b49a3bd67a02a2b3a73d5e"
+    },
+    {
+      "file": "real/controls-P3C-r3.log",
+      "kind": "controls",
+      "config": "P3C",
+      "repeat": 3,
+      "command": "python3 -m unittest_parallel -j 3 --level class -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "233993bba97d89a70b52eb12660ca462745afa034ca92efef9b15a995e6563a2"
+    },
+    {
+      "file": "real/controls-P4-r1.log",
+      "kind": "controls",
+      "config": "P4",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 4 --level module -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "a1c7244c442bbed334b85a305ea5b27e196cfee8c790606a2fbbda7bf39f0000"
+    },
+    {
+      "file": "real/controls-L4F-r1.log",
+      "kind": "controls",
+      "config": "L4F",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "554f1ab2b89f60784342422bd66ea3039c4c5d1d7e10df5b822c861ed6c60d90"
+    },
+    {
+      "file": "real/controls-L4C-r1.log",
+      "kind": "controls",
+      "config": "L4C",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 4 --level class -v",
+      "exit_code": 5,
+      "bound_seconds": 120,
+      "sha256": "cd357cf8b090e8d37c11d145f5b35aed760ee644dce9ed304f4ccdf1d6a9cefe"
+    },
+    {
+      "file": "real/crash-S-r1.log",
+      "kind": "crash",
+      "config": "S",
+      "repeat": 1,
+      "command": "python3 -m unittest -v",
+      "exit_code": 3,
+      "bound_seconds": 20,
+      "sha256": "9755b350b787423925119ef581f153648bd08982bbcc036ee931a39eb05e9f4d"
+    },
+    {
+      "file": "real/crash-P3-r1.log",
+      "kind": "crash",
+      "config": "P3",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 3 --level module -v",
+      "exit_code": 124,
+      "bound_seconds": 20,
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d"
+    },
+    {
+      "file": "real/crash-P3F-r1.log",
+      "kind": "crash",
+      "config": "P3F",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 3 --level module --disable-process-pooling -v",
+      "exit_code": 124,
+      "bound_seconds": 20,
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d"
+    },
+    {
+      "file": "real/crash-P3C-r1.log",
+      "kind": "crash",
+      "config": "P3C",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 3 --level class -v",
+      "exit_code": 124,
+      "bound_seconds": 20,
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d"
+    },
+    {
+      "file": "real/crash-P4-r1.log",
+      "kind": "crash",
+      "config": "P4",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 4 --level module -v",
+      "exit_code": 124,
+      "bound_seconds": 20,
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d"
+    },
+    {
+      "file": "real/crash-L4F-r1.log",
+      "kind": "crash",
+      "config": "L4F",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+      "exit_code": 124,
+      "bound_seconds": 20,
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d"
+    },
+    {
+      "file": "real/crash-L4C-r1.log",
+      "kind": "crash",
+      "config": "L4C",
+      "repeat": 1,
+      "command": "python3 -m unittest_parallel -j 4 --level class -v",
+      "exit_code": 124,
+      "bound_seconds": 20,
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d"
+    }
+  ],
+  "mutations": [
+    {
+      "file": "mutated/dropped-line-parallel.log",
+      "source": "real/controls-P3C-r1.log",
+      "ops": [
+        {
+          "op": "drop_line",
+          "line": "test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok"
+        }
+      ],
+      "why": "a dropped result line: the started test has no result",
+      "sha256": "316cc1c5c873b596d59f11b6ef987cce07be5b14b095f6e00175f3488e3c366a"
+    },
+    {
+      "file": "mutated/dropped-line-serial.log",
+      "source": "real/controls-S-r1.log",
+      "ops": [
+        {
+          "op": "drop_line",
+          "line": "test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok"
+        }
+      ],
+      "why": "a dropped serial line: one started test fewer than Ran N",
+      "sha256": "2cc32fc260d7f73b607dc0091427672fa8dbb0686e82a076c4dd1e7e818d55f8"
+    },
+    {
+      "file": "mutated/changed-outcome.log",
+      "source": "real/controls-P3-r1.log",
+      "ops": [
+        {
+          "op": "replace_line",
+          "old": "test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok",
+          "new": "test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... skipped 'mutated'"
+        },
+        {
+          "op": "replace_suffix",
+          "old": "skipped=1, expected failures=1, unexpected successes=1)",
+          "new": "skipped=2, expected failures=1, unexpected successes=1)"
+        }
+      ],
+      "why": "a self-consistent changed outcome: the log parses, but test_pass differs from S",
+      "sha256": "59df72cb29b6e8dfe0cfc47140e3760394d436cb0bf839bd1852af9451deca77"
+    },
+    {
+      "file": "mutated/changed-outcome-unbalanced.log",
+      "source": "real/controls-P3-r1.log",
+      "ops": [
+        {
+          "op": "replace_line",
+          "old": "test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok",
+          "new": "test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... skipped 'mutated'"
+        }
+      ],
+      "why": "a changed outcome the status line does not count",
+      "sha256": "1db470ca8d7df3ef5dd0db9f27cd7a34f01ae8f551152fe97fc943e4b96e015c"
+    },
+    {
+      "file": "mutated/truncated.log",
+      "source": "real/controls-S-r1.log",
+      "ops": [
+        {
+          "op": "keep_first_lines",
+          "count": 6
+        }
+      ],
+      "why": "a truncated log: no summary",
+      "sha256": "9be7b23f0cde57cd8fe1896a33d4881c1f22ce6bc5844c151f896319123be429"
+    },
+    {
+      "file": "mutated/missing-ran-line.log",
+      "source": "real/controls-P3-r1.log",
+      "ops": [
+        {
+          "op": "drop_matching",
+          "pattern": "^Ran \\d+ tests? in \\d+\\.\\d{3}s$"
+        }
+      ],
+      "why": "the Ran line alone removed",
+      "sha256": "c892f49cf6f21d4325bd2b6710efb4c561537a3f2c223ada1b97eb2e5a1e0508"
+    },
+    {
+      "file": "mutated/extra-id.log",
+      "source": "real/controls-P3-r1.log",
+      "ops": [
+        {
+          "op": "insert_after",
+          "line": "test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok",
+          "lines": [
+            "test_extra (test_zz_trial_controls.TrialControlsA.test_extra) ...",
+            "test_extra (test_zz_trial_controls.TrialControlsA.test_extra) ... ok"
+          ]
+        },
+        {
+          "op": "replace_matching",
+          "pattern": "^Ran 8 tests in ",
+          "new": "Ran 9 tests in "
+        },
+        {
+          "op": "replace_matching",
+          "pattern": "\\(9 total tests\\)",
+          "new": "(10 total tests)"
+        }
+      ],
+      "why": "a self-consistent extra id outside the inventory",
+      "sha256": "55f415d5a6482efd51e0eec9c090c3ce1c52746f802216580ed629dc77cd4584"
+    }
+  ]
+}

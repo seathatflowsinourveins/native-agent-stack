@@ -18,13 +18,13 @@
     "GitHub's 90-day run retention covers the run and job records, and the 18 artifacts expire on 2026-11-02. The full result.json (815,073 bytes), the raw logs and the two 9,823-id inventories are not published; their sha256 values are kept here with sanitized excerpts and a trimmed oracle output.",
     "The cancellation was the coordinator's decision, not part of the preregistered rule. No macOS job had started, so no macOS attempt was voided or hidden. The macOS queue observation counts this repository's macOS jobs only; other repositories that draw on the same account's macOS concurrency were not read.",
     "Sanitization: runner paths in the retained excerpts became <workspace> and <runner-home>, and local paths in the local reproductions became <venv-3.12.3>, <venv-3.13.16>, <cpython-3.12.3> and <cpython-3.13.16>. summary.md, checkout-status.json and the preregistered experiment record are byte copies.",
-    "The convergence record of this trial is the observed record evidence/artifacts/suite-parallelism-trial-20261003/experiment.json (status observed, decision reject, 36 observations), which scripts/validate_convergence.py validates and manifests/evidence.json lists in convergence_records. It lives beside the retained artifacts rather than beside the preregistered experiment.json, because that directory exists only on the unmerged trial branch and adding to it would re-run the trial. This receipt keeps the detailed per-run data and the claim text. The preregistered experiment record is kept as preregistration-experiment.json.txt (sha256 305fc2fa2ddd2c0a0eba4d85d748807db87302bde59a6b6489de866bee416c08, equal to the original at the trial head), because its frozen_inputs name files that exist only on the trial branch, so it cannot validate on main.",
+    "The convergence record of this trial is the observed record evidence/artifacts/suite-parallelism-trial-20261003/experiment.json (status observed, decision reject, 36 observations), which scripts/validate_convergence.py validates and manifests/evidence.json lists in convergence_records. It lives beside the retained artifacts rather than beside the preregistered experiment.json, because that directory exists only on the unmerged trial branch and adding to it would re-run the trial. This receipt keeps the detailed per-run data and the claim text. The preregistered experiment record is kept as preregistration-experiment.json.txt (sha256 305fc2fa2ddd2c0a0eba4d85d748807db87302bde59a6b6489de866bee416c08, equal to the original at the trial head), because its frozen_inputs name files that exist only on the trial branch, so it cannot validate on main. The observed record's frozen_inputs cite byte copies of the 15 files the preregistration froze, written under frozen/ with git show at the trial head 1e4bb5ab, each equal to its original and to its preregistered sha256 (15 of 15), in the preregistration's role lists and order, with the preregistration copy at the end of sources; result-trimmed.json is an observation artifact, not a frozen input.",
     "The local reproductions ran on this worker's WSL2 host in existing virtual environments with unittest-parallel 1.8.6 and coverage 7.16.2 (local integration evidence), not on a hosted runner: the toy modules on CPython 3.12.3 and 3.13.16, the three real modules on 3.12.3 only and the order-throughput module on both. The coordinator also saw the version-probes PicklingError on 3.13.16; that output is not in the retained artifacts.",
     "Usage: the hosted jobs ran deterministic commands and no model. Runner time is the per-job seconds in data.jobs (job_seconds), for the 18 ubuntu-24.04 jobs only, 11,524 s in total, 11,461 s of them in the 16 arm and control jobs that the observed record holds; the 20 macos-15 jobs were never assigned a runner. The observed record keeps token usage null (unknown), not the preregistered observed zeros. The model usage of the planning, build and review sessions is unknown: it is not recorded here and is not counted as zero (data.usage)."
   ],
   "scope": "The preregistered suite-parallelism trial of draft pull request #646 (head 1e4bb5ab) on GitHub-hosted ubuntu-24.04 only: run 37109532421, attempt 1. No macOS evidence, no adoption, no private-repository data and no billing figures.",
   "source": {
-    "description": "The raw downloads of the run's 18 artifacts (read 2026-10-03), the run, job and artifact records read with gh GET, the preregistered files at the trial head and this worker's local reproduction outputs. The raw files are not published; their sha256 values are in data.original_files and data.hosted_artifacts, and data.retained_files lists every file kept in the artifacts directory: the sanitized excerpts, the byte copies, the README and the observed convergence record.",
+    "description": "The raw downloads of the run's 18 artifacts (read 2026-10-03), the run, job and artifact records read with gh GET, the preregistered files at the trial head and this worker's local reproduction outputs. The raw files are not published; their sha256 values are in data.original_files and data.hosted_artifacts, and data.retained_files lists every file kept in the artifacts directory: the sanitized excerpts, the byte copies (among them the 15 files the preregistration froze, under frozen/), the README and the observed convergence record.",
     "run_id": 37109532421,
     "artifacts_expire_at": "2026-11-02",
     "result_json": {
@@ -3066,12 +3066,12 @@
     },
     "retained_files": {
       "evidence/artifacts/suite-parallelism-trial-20261003/README.md": {
-        "sha256": "fae66837809fccb62bfead1493ded2c45010ab87b185552e7e4aa90d8d3ae738",
-        "bytes": 4083
+        "sha256": "00e177142a8c38fd6e403e0e11039684a4ac13b9463ffa330722400562cc360f",
+        "bytes": 8901
       },
       "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json": {
-        "sha256": "0830ff1b66b02aa5402491bca494995eac754ace2ba3efd1483938bc473f461c",
-        "bytes": 117326
+        "sha256": "c28f4da87ad53d7d18af5c996031cd54e7558e06982d40c467e2d279b1f6d55e",
+        "bytes": 122854
       },
       "evidence/artifacts/suite-parallelism-trial-20261003/checkout-status.json": {
         "sha256": "cf7037bb37995b6563e6f4ac26fe1c13080e18affe5506576a062a472aced23c",
@@ -3116,6 +3116,66 @@
       "evidence/artifacts/suite-parallelism-trial-20261003/summary.md": {
         "sha256": "b1450c88a517fafbf7471af6b7f8c3f6051cb2c1952bbeb696038812503a142b",
         "bytes": 1302
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/github-requirements-ci-suite-linux.txt.txt": {
+        "sha256": "76f2a544d1d5c5724fa9607edfcfa2f5afd02bc7e013a0aef8bbcfb63135a92c",
+        "bytes": 1316
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/github-requirements-ci-suite-macos.txt.txt": {
+        "sha256": "673c36d4f323d4e412f61e893ab6183a750856869292b330e325090f9b10a5c3",
+        "bytes": 1136
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/github-workflows-macos-suite-parallel-trial.yml.txt": {
+        "sha256": "0f0bb9e6aa523890c7c783afeb5569e251015fc1ab82f72a62b76fcb43af1db3",
+        "bytes": 56566
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/tests-test_native_maintenance.py.txt": {
+        "sha256": "565ad15ac3f00618ac4504dd25f4764c44292ca246a5aea1ef1df71b8eecf8a1",
+        "bytes": 2389
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-README.md.txt": {
+        "sha256": "6e221d59d5143f94738275e80b8698cbdd670e21e4412f1e154c347bc578f35f",
+        "bytes": 24695
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-compare.py.txt": {
+        "sha256": "415d648bf76c0519571c993191f0c70eaa59c392e54908a5684d54607264a3ad",
+        "bytes": 79570
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-control_expectations.json.txt": {
+        "sha256": "24ad74995d07e13dfd27217af9465390bd1cc3a3a9e510da8661b199eb18308a",
+        "bytes": 3131
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-crash_control-test_crash.py.txt": {
+        "sha256": "b81adbf771eaa7ea789721812d9b98bd9a7f18374edb3662cbe1f59e344f661a",
+        "bytes": 476
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-test_zz_trial_controls.py.txt": {
+        "sha256": "262e368ec33d3854179afc618a7b74f276507b7f403f7af183ba080f608222d1",
+        "bytes": 1975
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-fixtures-index.json.txt": {
+        "sha256": "6b605c4d7bd5b8b4fa9a5343d23f8760d5ba49dbf7b6f11de15c8a5c73312a39",
+        "bytes": 11011
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-fixtures-inventory-controls.txt.txt": {
+        "sha256": "111b7f2d8e3c0b22dd31f6b10bd00b7211aa1007cf4a2ad185c843b791a72d15",
+        "bytes": 492
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-ids.py.txt": {
+        "sha256": "e5d416fb0f50f0d21aadadf0f1c8b3f181cd772f65a705f7db161173f8a9aa9a",
+        "bytes": 3438
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-make_fixtures.py.txt": {
+        "sha256": "930e286d80cd5dc46e73d7f7d0845686f280984d7dc274eabe1be6ea8554e6b2",
+        "bytes": 12699
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-test_b1_failure_mode.py.txt": {
+        "sha256": "3e9678ff0e2fe74557459c1cc06e8239a2fc3a3929533bc9cd5de757464472ca",
+        "bytes": 7586
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-test_compare.py.txt": {
+        "sha256": "0b2dc0633e5e873f926323c97599d18a11c640d4eb133fb0e35a11f0bb0b93e3",
+        "bytes": 57574
       }
     }
   }
