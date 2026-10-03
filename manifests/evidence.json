@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
-      "sha256": "005fa9ee0041ce9a40f6f4ac08db0523866f1a059ac446f7340b6db353f86e90",
-      "bytes": 15311
+      "sha256": "3b7e8bbd3e4007d20b8a4c65ffef83c42ec95ba47a2f87e7079b70c6cbd7e958",
+      "bytes": 16028
     },
     {
       "path": "docs/direct-results.md",
