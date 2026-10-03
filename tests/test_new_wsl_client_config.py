@@ -435,8 +435,9 @@ class ManifestRuleTests(unittest.TestCase):
         planned = {slot for slot, row in plan.items() if row["installed"]}
         self.assertEqual(installing - planned, {"mcp-inspector", "base-distribution"})
         self.assertEqual(planned - installing, set())
-        # 36 rows of the 64-row plan, and the two rows of the layer consensus that install (skill-discovery, skill-authoring).
-        self.assertEqual(len(planned), 38)
+        # 36 rows of the 64-row plan, the two rows of the layer consensus that install (skill-discovery, skill-authoring),
+        # and the two local-model rows settled by their preregistered measurement (local-generation-model, embedding-model).
+        self.assertEqual(len(planned), 40)
 
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
