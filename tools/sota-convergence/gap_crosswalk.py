@@ -6,15 +6,17 @@ Subcommands (run from a catalog checkout root):
   build [--check]                       offline: judgments + retained Opus review -> ledger and summary page
 
 Code owns candidate generation, labels, thresholds and output; the model only answers
-one closed-set question per (gap, receipt) pair and one blocker question per gap.
+one closed-set question per (gap, receipt) pair and one blocker question per gap, and it
+sets no final decision (ROUTING).
 """
-import argparse, concurrent.futures as cf, hashlib, json, os, pathlib, subprocess, sys, time, urllib.request, urllib.error
+import argparse, concurrent.futures as cf, hashlib, json, os, pathlib, re, subprocess, sys, time, urllib.request, urllib.error
 
 MODEL = "jev-1.13.0"
 URL = "https://api.typesafe.ai/v1/systemone"
 SCHEMA_REVISION = "gap-crosswalk-questions-v1"
 LEDGER = "catalogs/landscape/gap-resolution-20260922.json"
 CURRENT_REV = "92bb279a09877e7add057272babbfc78a4d4ef3f"
+CROSSWALK_ID = "gap-crosswalk-92bb279"
 EVID = "evidence/artifacts/gap-crosswalk-92bb279"
 OUT = "catalogs/landscape/gap-crosswalk-92bb279.json"
 DOC = "docs/gap-crosswalk-92bb279.md"
@@ -261,8 +263,69 @@ def sha_file(path):
     return hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
 
 
+# Routing of each (gap, receipt) pair, from section 3.1 of the design report "Jev and TypeSafe: typed judgments for
+# the foundation and north-star R&D" (2026-10-03, revision r1, sha256 6fdd8bc2).
+# A7: the screen orders and filters the review queue but sets no final decision. A pair that no reviewer saw is
+# recorded as screened_out, which is not a final status: it counts toward no gap status, and a consumer treats it as
+# unknown. A3: Jev must not decide a pair whose support can turn on a number or a date, so a pair whose gap text
+# contains a digit always goes to review. The gap text is the claim here; receipts nearly always carry dates and
+# versions, so the same test over them would queue every pair. Number words ("two hosts") are not detected.
+# Every crosswalk takes ROUTING and records it in method.routing, except the retained 92bb279 ledger: it was built
+# and reviewed under the 2026-09-23 rule (P >= THRESHOLD queued, every other unreviewed pair closed as not_addressed),
+# and `build --check` reproduces it under that rule. Its unreviewed not_addressed entries are screen outputs, not
+# review decisions. Re-recording it under ROUTING first needs reviews of its unreviewed pairs whose gap text contains
+# a digit. A crosswalk document without method.routing was built under the 2026-09-23 rule.
+# Overturn: the report's section 7 lets the screen set a final status only after two preregistered held-out
+# replications pass (P1, then P1b with the P1 threshold frozen).
+ROUTING = "a7-screened-out-a3-digit-review-20261003"
+ROUTING_20260923 = "threshold-closes-20260923"
+ROUTING_BY_CROSSWALK = {"gap-crosswalk-92bb279": ROUTING_20260923}
+SCREENED_OUT = "screened_out"
+DIGIT = re.compile(r"\d")
+
+
+class RoutingError(ValueError):
+    """A pair the rule sends to review has no review, or a positive decision has no independent re-check."""
+
+
+def pair_route(gap_text, p_addressed, routing=ROUTING):
+    """Why a (gap, receipt) pair goes to review ("typesafe_threshold" or "digit_in_gap"), or None when the screen
+    keeps it out of review."""
+    if p_addressed >= THRESHOLD:
+        return "typesafe_threshold"
+    if routing != ROUTING_20260923 and DIGIT.search(gap_text):
+        return "digit_in_gap"
+    return None
+
+
+def pair_entry(receipt, answer, gap_text, review, check, routing=ROUTING):
+    """The ledger entry of one (gap, receipt) pair: the screen's answer, its route, the review (a dict with decision
+    and reason, or None) and the final decision, which the independent re-check `check` (or None) can correct."""
+    p_addr = round(answer["probabilities"]["settles"] + answer["probabilities"]["partially"], 4)
+    route = pair_route(gap_text, p_addr, routing)
+    if route is not None and review is None:
+        raise RoutingError("queued pair not reviewed")
+    entry = {"receipt": receipt, "typesafe_choice": answer["choice"], "typesafe_p_addressed": p_addr,
+             "queued": route is not None, "review_decision": review["decision"] if review else None,
+             "review_reason": review["reason"] if review else None}
+    if routing != ROUTING_20260923:
+        entry["review_route"] = route
+    if review is None:
+        entry["final_decision"] = "not_addressed" if routing == ROUTING_20260923 else SCREENED_OUT
+        return entry
+    final = review["decision"]
+    if final != "not_addressed":
+        if check is None:
+            raise RoutingError("positive decision not verified")
+        entry["verify_verdict"], entry["verify_evidence"] = check["verdict"], check["evidence"]
+        final = check["corrected_decision"] if check["verdict"] == "disagree" else final
+    entry["final_decision"] = final
+    return entry
+
+
 def build(args):
     root = pathlib.Path(".").resolve()
+    routing = ROUTING_BY_CROSSWALK.get(CROSSWALK_ID, ROUTING)
     ev = root / EVID
     judg = {(r["catalog"], r["layer"], r["index"]): r for r in load_judgments(ev / "typesafe-current.json")}
     cand = candidates(json.loads((root / LEDGER).read_text()))
@@ -295,24 +358,13 @@ def build(args):
                 pairs = {p["receipt"]: p for p in rv["pairs"]}
                 recs, best = [], "not_addressed"
                 for k, path in enumerate(j["receipts"]):
-                    a = j["answers"][f"addr_r{k}"]
-                    p_addr = round(a["probabilities"]["settles"] + a["probabilities"]["partially"], 4)
-                    queued = p_addr >= THRESHOLD
-                    pr = pairs.pop(path, None)
-                    if queued and pr is None:
-                        raise SystemExit(f"queued pair not reviewed: {lid}[{i}] {path}")
-                    decision = pr["decision"] if pr else "not_addressed"
-                    entry = {"receipt": path, "typesafe_choice": a["choice"], "typesafe_p_addressed": p_addr, "queued": queued,
-                             "review_decision": decision if pr else None, "review_reason": pr["reason"] if pr else None}
-                    final = decision
-                    if decision != "not_addressed":
-                        c = verify.get((lid, i, path))
-                        if c is None:
-                            raise SystemExit(f"positive decision not verified: {lid}[{i}] {path}")
-                        entry["verify_verdict"], entry["verify_evidence"] = c["verdict"], c["evidence"]
-                        final = c["corrected_decision"] if c["verdict"] == "disagree" else decision
-                    entry["final_decision"] = final
-                    if RANK[final] > RANK[best]:
+                    try:
+                        entry = pair_entry(path, j["answers"][f"addr_r{k}"], text, pairs.pop(path, None),
+                                           verify.get((lid, i, path)), routing)
+                    except RoutingError as e:
+                        raise SystemExit(f"{e}: {lid}[{i}] {path}")
+                    final = entry["final_decision"]
+                    if final != SCREENED_OUT and RANK[final] > RANK[best]:
                         best = final
                     recs.append(entry)
                 if pairs:
@@ -325,25 +377,33 @@ def build(args):
                              "receipts": recs})
                 counts[f"{rv['category']}/{status}"] = counts.get(f"{rv['category']}/{status}", 0) + 1
             layers.append({"catalog": cat, "layer_id": lid, "owner": owner(cat, lid), "gaps": gaps})
+    method = {
+        "candidates": "every gap receipt of the gap-resolution ledger whose layer_ids or gap_refs name the gap's layer",
+        "typesafe": {"model": MODEL, "schema_revision": SCHEMA_REVISION, "threshold_p_addressed": THRESHOLD,
+                     "eval": json.loads((ev / "eval-score.json").read_text()),
+                     "judgments_sha256": {n: sha_file(ev / n) for n in ("typesafe-eval.json", "typesafe-current.json")}},
+        "review": ("Every queued pair and every gap's category: one semantic-evidence-reviewer (Opus/high) per packet group; "
+                   "every positive decision re-checked by an independent evidence-reviewer (Opus/high); a disagreement "
+                   "replaces the decision. TypeSafe never sets a status. Categories are the reviewers', not TypeSafe's "
+                   "(its blocker agreement on the eval set was below the preregistered bar)."),
+        "review_results_sha256": sha_file(ev / "review-results.json"),
+        "preregistration": f"{EVID}/PREREGISTRATION.md",
+    }
+    if routing != ROUTING_20260923:
+        method["routing"] = {
+            "id": routing,
+            "rule": ("A pair enters review when P(settles)+P(partially) >= threshold_p_addressed (review_route "
+                     "typesafe_threshold) or when its gap text contains a digit (digit_in_gap). A pair that no reviewer "
+                     "saw is screened_out: no final status, counted toward no gap status, unknown to consumers."),
+        }
     doc = {
-        "schema_version": 1, "id": "gap-crosswalk-92bb279", "checked_at": "2026-09-23",
+        "schema_version": 1, "id": CROSSWALK_ID, "checked_at": "2026-09-23",
         "scope": ("Maps the 2026-09-22 gap-resolution receipts onto every open_gaps entry of the 32 landscape rows at "
                   "source_revision, and gives each gap a blocker category and an owner for the next evidence wave. A status "
                   "here records only whether an existing receipt addresses the gap; it changes no verdict. Rows re-recorded "
                   "after source_revision need a new crosswalk."),
         "source_revision": CURRENT_REV, "source_files_sha256": source_sha,
-        "method": {
-            "candidates": "every gap receipt of the gap-resolution ledger whose layer_ids or gap_refs name the gap's layer",
-            "typesafe": {"model": MODEL, "schema_revision": SCHEMA_REVISION, "threshold_p_addressed": THRESHOLD,
-                         "eval": json.loads((ev / "eval-score.json").read_text()),
-                         "judgments_sha256": {n: sha_file(ev / n) for n in ("typesafe-eval.json", "typesafe-current.json")}},
-            "review": ("Every queued pair and every gap's category: one semantic-evidence-reviewer (Opus/high) per packet group; "
-                       "every positive decision re-checked by an independent evidence-reviewer (Opus/high); a disagreement "
-                       "replaces the decision. TypeSafe never sets a status. Categories are the reviewers', not TypeSafe's "
-                       "(its blocker agreement on the eval set was below the preregistered bar)."),
-            "review_results_sha256": sha_file(ev / "review-results.json"),
-            "preregistration": f"{EVID}/PREREGISTRATION.md",
-        },
+        "method": method,
         "owners": OWNERS, "layers": layers, "counts": dict(sorted(counts.items())),
     }
     text = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
@@ -362,6 +422,8 @@ def render(doc):
     ca = collections.Counter(g["category"] for _, g in gaps)
     ev = doc["method"]["typesafe"]["eval"]
     t = ev["threshold_p_addressed"][str(THRESHOLD)]
+    routed = "routing" in doc["method"]  # absent: the 2026-09-23 rule, whose page text stays as it was
+    digit_rule = " A pair whose gap text contains a digit also enters review, whatever its P." if routed else ""
     out = ["# Gap crosswalk onto the current rows (92bb279)", "",
            f"This page summarizes [`{OUT}`](../{OUT}). It maps the 40 gap receipts of "
            "[`gap-resolution-20260922`](gap-resolution-20260922.md) onto every `open_gaps` entry of the 32 landscape rows at "
@@ -369,7 +431,7 @@ def render(doc):
            "A status here says only whether an existing receipt addresses the gap. No verdict changes.", "",
            "## Method", "",
            f"1. **Candidates.** Code pairs each gap with every receipt that names its layer: {sum(len(g['receipts']) for _, g in gaps)} pairs over {sum(1 for _, g in gaps if g['receipts'])} gaps.",
-           f"2. **TypeSafe screen.** `{MODEL}` (question revision `{SCHEMA_REVISION}`) gives each pair P(settles)+P(partially). A pair enters review at P ≥ {THRESHOLD}. The [preregistration](../{EVID}/PREREGISTRATION.md) fixed that rule before any call, and the eval on the 315 reviewed `bdd04ca` gaps chose the threshold: {t['tp']} of {t['tp'] + t['fn']} addressed gaps were caught, with {t['fp']} false positives out of {t['fp'] + t['tn']}.",
+           f"2. **TypeSafe screen.** `{MODEL}` (question revision `{SCHEMA_REVISION}`) gives each pair P(settles)+P(partially). A pair enters review at P ≥ {THRESHOLD}. The [preregistration](../{EVID}/PREREGISTRATION.md) fixed that rule before any call, and the eval on the 315 reviewed `bdd04ca` gaps chose the threshold: {t['tp']} of {t['tp'] + t['fn']} addressed gaps were caught, with {t['fp']} false positives out of {t['fp'] + t['tn']}.{digit_rule}",
            f"3. **Review.** Opus reviewers decided every queued pair and categorized every gap. A second, independent Opus reviewer re-checked each positive decision, and a disagreement replaces it. TypeSafe's own blocker categories agreed with the reviewed labels on {ev['blocker_agreement']['agree']} of {ev['blocker_agreement']['total']} eval gaps, below the preregistered 0.60 bar, so they are kept only as `typesafe_blocker_advisory`.", "",
            "## Totals", "", "| Status | Gaps |", "| --- | ---: |"]
     out += [f"| {k} | {st.get(k, 0)} |" for k in ("settled_by_receipt", "advanced_by_receipt", "open")]
@@ -383,7 +445,7 @@ def render(doc):
     out += ["", "## Addressed by an existing receipt", ""]
     for l, g in gaps:
         for r in g["receipts"]:
-            if r["final_decision"] != "not_addressed":
+            if r["final_decision"] not in ("not_addressed", SCREENED_OUT):
                 out.append(f"- `{l['layer_id']}[{g['index']}]` {r['final_decision']}: [{pathlib.Path(r['receipt']).stem}](../{r['receipt']}). {r['review_reason']}")
     out += ["", "## Executable next checks by owner", ""]
     for name in doc["owners"]:
@@ -394,7 +456,10 @@ def render(doc):
         out.append("")
     out += ["## Limits", "",
             "- **Indexes.** `index` refers to the rows at the source revision. A later re-record needs a new crosswalk.",
-            "- **Recall.** TypeSafe screens pairs, so a pair below the threshold was not reviewed. On the eval set this missed 2 of 29 addressed gaps.",
+            ("- **Screened out.** A pair below the threshold whose gap text has no digit was not reviewed. It is recorded as "
+             "`screened_out`, which is no decision: it counts toward no status, and a reader treats it as unknown. On the "
+             "eval set the threshold missed 2 of 29 addressed gaps." if routed else
+             "- **Recall.** TypeSafe screens pairs, so a pair below the threshold was not reviewed. On the eval set this missed 2 of 29 addressed gaps."),
             "- **Categories.** They are reviewer judgments under the stated operating context (one WSL2 workstation, paper orders only, no paid data, no second machine). They are not a guarantee that a check will succeed.", ""]
     return "\n".join(out)
 
