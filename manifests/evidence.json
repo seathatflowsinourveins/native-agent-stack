@@ -14956,8 +14956,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1a71e2293de6578ba7099a7b7b8f8c6486ec1a923b38c8bf44ae205f77a95c5c",
-      "bytes": 26007
+      "sha256": "a32f78a8292ca1043e00e10e0e9218f94bce15a720f3386786b73b4ca83edf40",
+      "bytes": 27592
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -15006,8 +15006,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "3a269190055b12b581e24846a157f3691578727f304d2f9f1fe0cccdbc77aa73",
-      "bytes": 474603
+      "sha256": "dbe5f84728502ecc7a09857f23ae7ea003964d322679d7266d818849ac067667",
+      "bytes": 477868
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -15281,7 +15281,7 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "7c435e409c43857e429b369367469fd75e662a6fd8bc9f7a226b381f2afcf1ed",
+      "sha256": "058c0b08700367288d8ba04eb380f59f621c5a0e6594b74a71f191afa5523251",
       "bytes": 755876
     },
     {
@@ -15805,6 +15805,11 @@
       "bytes": 16881
     },
     {
+      "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+      "sha256": "84eb9d10a158761f29661403fa38459e884e18304795ac9b5bec8e878938f15f",
+      "bytes": 9391
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15936,8 +15941,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "3b9c833fdfb36c81e13e64eba29a19803d0f09c0691042381fb202eda7ecef1a",
-      "bytes": 136634
+      "sha256": "b9f0171fd47a973069139157cc680b1ea0bddb4090ad166626580e4a3e87e8c1",
+      "bytes": 138081
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
