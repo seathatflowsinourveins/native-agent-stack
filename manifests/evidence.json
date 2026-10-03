@@ -9211,8 +9211,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "906dc4c9dc4396eae61c87fcc1c4ddbc762ed7f0028fed8190db3e5fa0bb7cc5",
-      "bytes": 19356
+      "sha256": "e18b5640585b8c06e1ce7e0e3cbef101e6be31e9de0d46ee2fc3ad9e81b2d696",
+      "bytes": 19361
     },
     {
       "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
@@ -42018,6 +42018,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-input-read.json",
       "sha256": "35c351f9560fad85de00840e4a310c130434a7df963d8ea93d375a5e31f412cc",
       "bytes": 3027
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-pre-push-classification-repair.json",
+      "sha256": "20f57f8e63f4741a7009ce7e826a24e9aa6c5607ea66d640b716ac74d4344e8c",
+      "bytes": 2029
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-protocol-review-repair.json",

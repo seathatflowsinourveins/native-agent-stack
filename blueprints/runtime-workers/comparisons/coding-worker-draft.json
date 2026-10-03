@@ -139,7 +139,7 @@
       "proposed_gross_input_plus_output_tokens": 200000,
       "native_enforcement_qualified": false,
       "tool_call_limit": null,
-      "disposition": "Unenforced proposed envelope, not measured cap. Before freeze bind source-supported native enforcement and breach disposition, or explicitly amend to uncapped observed study; no invented harness cap or silent breach score0"
+      "enforcement_note": "Unenforced proposed envelope, not measured cap. Before freeze bind source-supported native enforcement and breach disposition, or explicitly amend to uncapped observed study; no invented harness cap or silent breach score0"
     },
     "network": {
       "required_policy": "Identical native allowlist for gateway and exact installation/dependency mirrors, with agent/verifier role boundaries; public networking does not protect public upstream fixes",
