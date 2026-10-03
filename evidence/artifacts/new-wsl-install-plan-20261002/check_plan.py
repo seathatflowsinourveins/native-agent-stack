@@ -130,7 +130,9 @@ def main():
     excluded = [r for r in rows if not r["installed"] and not r.get("measurement_only")]
     by_slot = {r["slot"]: r for r in rows}
 
-    # one row per foundation row of the manifest, with its layer, default and repository
+    # one row per foundation row of the manifest, with its layer, default and repository. A manifest row with an interim
+    # (amendment 3 of the decision rule) is installed as its interim: the plan row names the interim's owner and repository,
+    # and the row's decided default, which installs nothing, stays as the rounds recorded it.
     for slot in manifest:
         if slot not in by_slot:
             bad("manifest", f"manifest row {slot} has no row in install-plan.json")
@@ -141,12 +143,18 @@ def main():
             continue
         if r["layer"] != m["layer_id"]:
             bad("manifest", f"row {r['slot']}: layer {r['layer']!r} differs from the manifest's {m['layer_id']!r}")
-        if not r.get("measurement_only") and (r["owner"], r["repository"]) != (m["default"], m["repository"]):
-            bad("manifest", f"row {r['slot']}: owner/repository differ from the manifest's default/repository")
+        interim = m.get("interim")
+        default, repository = (interim["default"], interim["repository"]) if interim else (m["default"], m["repository"])
+        if not r.get("measurement_only") and (r["owner"], r["repository"]) != (default, repository):
+            bad("manifest", f"row {r['slot']}: owner/repository differ from the manifest's "
+                            + ("interim's default/repository" if interim else "default/repository"))
         state, outcome = m.get("state") or "open", (m.get("resolution") or {}).get("outcome")
         if r["installed"] and r.get("measurement_only"):
             bad("rows", f"row {r['slot']} is both installed and measurement_only")
-        if r["installed"]:
+        if interim:
+            if not r["installed"]:
+                bad("manifest", f"row {r['slot']}: the manifest records an interim install, and the plan does not install it")
+        elif r["installed"]:
             if m["installs_nothing_extra"]:
                 bad("manifest", f"selected row {r['slot']}: the manifest says it installs nothing extra")
             if outcome == "not_installed":

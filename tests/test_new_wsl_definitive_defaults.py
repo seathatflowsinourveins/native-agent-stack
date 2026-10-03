@@ -102,7 +102,12 @@ class Manifest(unittest.TestCase):
         cls.decisions = {d["slot_id"]: d for d in cls.convergence["decisions"] + cls.convergence["added_slots"]}
         cls.combined = load(ROOT / cls.convergence["combined"]["path"])
         cls.consensus = load(CONSENSUS_ART / "consensus.json")
-        cls.consensus_rows = {row["slot_id"]: row for row in cls.consensus["add_rows"]}
+        # The record's own rows and amendments, then its wave-2 batch's (2026-10-03), in the order the assembler applies them.
+        cls.wave2 = cls.consensus["wave2"]
+        cls.added_rows = cls.consensus["add_rows"] + cls.wave2["add_rows"]
+        cls.amend_rows = cls.consensus["amend_rows"] + cls.wave2["amend_rows"]
+        cls.consensus_rows = {row["slot_id"]: row for row in cls.added_rows}
+        cls.interims = {entry["slot_id"]: entry["interim"] for entry in cls.wave2["interim_rows"]}
         cls.rows = cls.manifest["slots"]
 
     def source_slots(self):
@@ -387,9 +392,14 @@ class Manifest(unittest.TestCase):
         self.assertIn("decision-round", rule)
         self.assertNotEqual(rule, self.foundation["decision_rule"])
         self.assertEqual(self.manifest.get("decision_rule_before_amendment_2"), self.foundation["decision_rule"])
-        # The consensus record's rule is appended whole, after the rounds' rule.
-        self.assertTrue(rule.endswith(" " + self.consensus["rule"]))
+        # The consensus record's rule is appended whole, after the rounds' rule, and amendment 3 of its wave-2 batch after it.
+        self.assertTrue(rule.endswith(" " + self.consensus["rule"] + " " + self.wave2["interim_rule"]))
         self.assertLess(rule.index("decision-round"), rule.index(self.consensus["rule"]))
+        self.assertTrue(self.wave2["interim_rule"].startswith("Amendment 3 "))
+        # Amendment 3 states its exception beside the no-install rule, which stays as the first round wrote it.
+        self.assertEqual(self.manifest["no_install_rule"], self.foundation["no_install_rule"])
+        self.assertEqual(self.manifest["no_install_rule_exception"], self.wave2["no_install_rule_exception"])
+        self.assertIn("exception to the no-install rule", self.manifest["no_install_rule_exception"])
 
     def test_counts_include_states_and_installed_rows(self):
         counts = self.manifest["counts"]
@@ -712,34 +722,40 @@ class Manifest(unittest.TestCase):
         counts, by_catalog = self.manifest["counts"], {}
         for row in self.rows:
             by_catalog[row["catalog"]] = by_catalog.get(row["catalog"], 0) + 1
-        self.assertEqual(counts["slots"], 89)
-        self.assertEqual(by_catalog, {"foundation": 69, "us-equities": 20})
+        self.assertEqual(counts["slots"], 90)
+        self.assertEqual(by_catalog, {"foundation": 70, "us-equities": 20})
         self.assertEqual(counts["layers"], 37)
-        self.assertEqual(counts["installed"], 56)
-        self.assertEqual(counts["by_row_kind"]["consensus"], 5)
-        self.assertEqual(counts["by_state"]["resolved"], 22)
+        self.assertEqual(counts["installed"], 57)
+        self.assertEqual(counts["interim"], 3)
+        self.assertEqual(counts["by_row_kind"]["consensus"], 6)
+        self.assertEqual(counts["by_state"]["resolved"], 23)
         self.assertEqual(counts["by_state"]["measurement"], 4)
 
     def test_consensus_rows_are_the_records_rows_with_its_states(self):
         rows = {row["slot_id"]: row for row in self.rows}
         self.assertEqual(sorted(self.consensus_rows), ["credential-custody", "cross-family-review", "research-skill",
-                                                       "skill-authoring", "skill-discovery"])
+                                                       "skill-authoring", "skill-discovery", "statusline"])
         self.assertEqual({row["slot_id"] for row in self.rows if row["row_kind"] == "consensus"}, set(self.consensus_rows))
         # The fields a consensus row must carry are the ones the assembler writes for a row the rounds decided.
         fields = load_assembler().ROW_FIELDS
         self.assertEqual(tuple(key for key in self.rows[0] if key != "amendments"), fields)
+        amended = {}
+        for entry in self.amend_rows:
+            amended.setdefault(entry["slot_id"], []).append(entry["amendment"])
         for sid, recorded in self.consensus_rows.items():
             with self.subTest(slot=sid):
                 self.assertEqual(rows[sid]["state"], recorded["state"])
-                self.assertEqual(rows[sid], recorded)  # copied as the record gives it
-                self.assertEqual(tuple(rows[sid]), fields)
+                # Copied as the record gives it; a later amendment (the wave-2 batch amends one) is recorded beside it.
+                self.assertEqual({key: value for key, value in rows[sid].items() if key != "amendments"}, recorded)
+                self.assertEqual(rows[sid].get("amendments"), amended.get(sid))
+                self.assertEqual(tuple(key for key in rows[sid] if key != "amendments"), fields)
         # Each is placed after the last row the rounds decided in its layer, in the record's order.
         for lid in sorted({row["layer_id"] for row in self.consensus_rows.values()}):
             in_layer = [row for row in self.rows if row["layer_id"] == lid]
             kinds = [row["row_kind"] == "consensus" for row in in_layer]
             self.assertEqual(kinds, sorted(kinds), lid)
             self.assertEqual([row["slot_id"] for row in in_layer if row["row_kind"] == "consensus"],
-                             [row["slot_id"] for row in self.consensus["add_rows"] if row["layer_id"] == lid])
+                             [row["slot_id"] for row in self.added_rows if row["layer_id"] == lid])
 
     def test_no_consensus_row_is_definitive(self):
         for row in self.rows:
@@ -763,12 +779,16 @@ class Manifest(unittest.TestCase):
         before = {row["slot_id"]: row for row in decided}
         self.assertEqual(set(before), {row["slot_id"] for row in self.rows} - set(self.consensus_rows))
         recorded = {}
-        for entry in self.consensus["amend_rows"]:
+        for entry in self.amend_rows:
             self.assertEqual(set(entry), {"slot_id", "amendment"})
             self.assertEqual(set(entry["amendment"]) & PROTECTED, set(), entry["slot_id"])
+            self.assertNotIn("interim", entry["amendment"])
             recorded.setdefault(entry["slot_id"], []).append(entry["amendment"])
         self.assertTrue(recorded)
-        self.assertTrue(set(recorded) <= set(before), "an amendment names a row that no round decided")
+        # The record's own amendments name rows the rounds decided; the wave-2 batch also amends a row the record added.
+        self.assertTrue({entry["slot_id"] for entry in self.consensus["amend_rows"]} <= set(before),
+                        "an amendment names a row that no round decided")
+        self.assertTrue(set(recorded) <= set(before) | set(self.consensus_rows), "an amendment names an unknown row")
         for row in self.rows:
             sid = row["slot_id"]
             with self.subTest(slot=sid):
@@ -780,8 +800,11 @@ class Manifest(unittest.TestCase):
                 else:
                     self.assertNotIn("amendments", row)
                 if row["row_kind"] != "consensus":
-                    # Every other field is the one the assembler builds before the consensus step.
-                    self.assertEqual({key: value for key, value in row.items() if key != "amendments"}, before[sid])
+                    # Every other field is the one the assembler builds before the consensus step; an interim (amendment 3)
+                    # is the one the record gives, beside them.
+                    self.assertEqual({key: value for key, value in row.items() if key not in ("amendments", "interim")},
+                                     before[sid])
+                    self.assertEqual(row.get("interim"), self.interims.get(sid))
 
     def test_consensus_records_are_the_hashed_published_copies(self):
         records = self.consensus["records"]
@@ -843,7 +866,7 @@ class Manifest(unittest.TestCase):
                     self.assertNotIn("decides", label)
                     self.assertNotIn("deciding_measurement", resolution)
         gated = {row["slot_id"]: row for row in rows if "open_acceptance_gates" in row["resolution"]}
-        self.assertEqual(sorted(gated), ["cross-family-review", "skill-authoring", "skill-discovery"])
+        self.assertEqual(sorted(gated), ["cross-family-review", "skill-authoring", "skill-discovery", "statusline"])
         for sid, row in gated.items():
             with self.subTest(gated=sid):
                 # Installed or resolved, not waiting: the gates are acceptance on the destination, not a hold on the install.
@@ -874,7 +897,8 @@ class Manifest(unittest.TestCase):
                          "qualify the update; the selected 5.5.1 stays until the owner of that review accepts it")
         # The amendment carries its qualification into the manifest beside the row; the row's own fields do not change.
         guard = next(row for row in self.rows if row["slot_id"] == "credential-guard")
-        self.assertEqual(guard["amendments"][-1]["qualifications"], amendment["qualifications"])
+        carried = next(item for item in guard["amendments"] if item["decision"] == amendment["decision"])
+        self.assertEqual(carried["qualifications"], amendment["qualifications"])
 
     def test_tables_show_consensus_rows_by_their_label_and_list_the_amendments(self):
         lines = RECORD.read_text(encoding="utf-8").splitlines()
@@ -891,13 +915,23 @@ class Manifest(unittest.TestCase):
         self.assertEqual(table[:2], [["Slot", "Date", "Decision"], ["---"] * 3])
         self.assertEqual(table[2:], [[row["slot_id"], amendment["date_utc"], amendment["decision"]]
                                      for row in self.rows for amendment in row.get("amendments", [])])
-        self.assertEqual(len(table) - 2, len(self.consensus["amend_rows"]))
+        self.assertEqual(len(table) - 2, len(self.amend_rows))
+        # The interim installs of amendment 3 have their own table, before the amendments.
+        start = lines.index("### Interim installs (amendment 3)")
+        stop = lines.index("### Amendments by direct consensus")
+        table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:stop] if line.startswith("| ")]
+        self.assertEqual(table[0], ["Slot", "Date", "Interim", "Authority", "Decided by"])
+        self.assertEqual(table[2:], [[row["slot_id"], row["interim"]["date_utc"], row["interim"]["default"],
+                                      row["interim"]["authority"]["kind"].replace("_", " "), row["interim"]["decided_by"]]
+                                     for row in self.rows if row.get("interim")])
 
     def test_consensus_decision_record_quotes_the_rule_and_the_owner(self):
         text = CONSENSUS_RECORD.read_text(encoding="utf-8")
         self.assertIn(self.consensus["rule"], text)
+        self.assertIn(self.wave2["interim_rule"], text)
+        self.assertIn(self.wave2["no_install_rule_exception"], text)
         self.assertIn(self.consensus["authorization"]["verbatim"], text)
-        for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.consensus["amend_rows"]]:
+        for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.amend_rows] + list(self.interims):
             self.assertIn(f"`{sid}`", text, sid)
         for sentence in self.consensus["not_established"]:
             self.assertIn(sentence, text)
@@ -912,6 +946,134 @@ class Manifest(unittest.TestCase):
                 text = path.read_text(encoding="utf-8")
                 self.assertIsNone(re.search(PRIVATE_SHAPES[0], text), str(path.relative_to(ROOT)))
                 self.assertIsNone(re.search(PRIVATE_SHAPES[1], text, re.I), str(path.relative_to(ROOT)))
+
+    # Amendment 3 (wave 2, 2026-10-03): interim installs on rows whose decided default installs nothing.
+
+    def test_interims_are_the_records_beside_the_decided_rows(self):
+        _, _, decided, _, _ = load_assembler().assemble_rows()
+        before = {row["slot_id"]: row for row in decided}
+        carried = {row["slot_id"]: row for row in self.rows if row.get("interim")}
+        self.assertEqual(sorted(carried), ["code-search", "context-supply", "memory-owner"])
+        self.assertEqual(sorted(carried), sorted(self.interims))
+        self.assertEqual(self.manifest["counts"]["interim"], len(carried))
+        assembler = load_assembler()
+        for sid, row in carried.items():
+            with self.subTest(slot=sid):
+                self.assertEqual(row["interim"], self.interims[sid])
+                # The row stays as the rounds decided it, and its decided default installs nothing.
+                self.assertEqual({key: value for key, value in row.items() if key not in ("interim", "amendments")}, before[sid])
+                self.assertFalse(assembler.installs(row))
+                self.assertTrue(assembler.installs_now(row))
+                self.assertTrue(set(assembler.INTERIM_FIELDS) <= set(row["interim"]))
+                self.assertTrue(row["interim"]["repository"].startswith("https://"))
+                for ref in row["interim"]["records"]:
+                    self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        # The protected rows keep their decided states: one split, one waiting measurement, one definitive no-install row.
+        self.assertEqual({sid: (row["state"], row["definitive"]) for sid, row in carried.items()},
+                         {"code-search": ("split", False), "context-supply": ("definitive", True),
+                          "memory-owner": ("measurement", False)})
+        # The browser hold and the local-model rows carry no interim.
+        for sid in ("playwright-cli", "local-generation-model", "embedding-model"):
+            self.assertNotIn("interim", next(row for row in self.rows if row["slot_id"] == sid))
+
+    def test_interim_labels_name_their_authority_and_what_decides(self):
+        """The rule's label clause for an interim: it starts with 'interim install', names its authority and what decides it,
+        and claims no consensus, measurement or blind result it does not have."""
+        self.assertIn("its label starts with 'interim install'", self.wave2["interim_rule"])
+        for sid, interim in self.interims.items():
+            label, authority = interim["label"], interim["authority"]
+            with self.subTest(slot=sid):
+                self.assertTrue(label.startswith("interim install on the owner's "), label)
+                self.assertEqual(authority["kind"], "owner_decision")
+                self.assertRegex(label, r"\bdecides\b")
+                self.assertIn("not a blind result", label)
+                self.assertNotIn("consensus", label)
+                self.assertTrue(authority["decision"].strip() and authority["relayed_by"].strip())
+                self.assertEqual(set(interim["reviews"]), {"claude", "gpt"})
+                self.assertTrue(interim["decided_by"].strip())
+        # The GPT family's standing position is carried as it was: it disagreed on the context layer and recommended the
+        # holds that the owner's decision lifted; the owner's own words are quoted where the relaying record quotes them.
+        self.assertIn("disagreed", self.interims["context-supply"]["reviews"]["gpt"])
+        for sid in ("memory-owner", "code-search"):
+            self.assertIn("hold", self.interims[sid]["reviews"]["gpt"])
+        self.assertIn("context mode", self.interims["context-supply"]["authority"]["verbatim"])
+        self.assertIn("definitive", self.interims["context-supply"]["label"])
+        self.assertIn("never removed automatically", self.interims["context-supply"]["decided_by"])
+        # The memory server listens where the host and client templates point (wave-2 synthesis X5), not on 21374.
+        self.assertIn("127.0.0.1:29374", self.interims["memory-owner"]["configuration"]["listen"])
+
+    def test_no_installed_job_is_owned_twice_with_the_interims(self):
+        assembler = load_assembler()
+        owners = {}
+        for row in self.rows:
+            if assembler.installs_now(row):
+                self.assertNotIn(row["job"], owners, f"{row['slot_id']} and {owners.get(row['job'])}")
+                owners[row["job"]] = row["slot_id"]
+
+    def test_the_wave2_batch_names_the_acknowledgements_it_owes(self):
+        assembler = load_assembler()
+        acknowledged = assembler.acknowledged_families(self.wave2["acknowledgements"])
+        self.assertEqual(self.wave2["acknowledgements_owed"], sorted(set(assembler.FAMILIES) - acknowledged))
+        self.assertEqual(self.manifest["consensus_wave2"]["acknowledgements_owed"], self.wave2["acknowledgements_owed"])
+        self.assertEqual(self.manifest["consensus_wave2"]["acknowledgements"], self.wave2["acknowledgements"])
+        for name, ref in self.wave2["records"].items():
+            with self.subTest(record=name):
+                self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        # A wave-2 row or amendment says that its acknowledgements are owed while they are.
+        if self.wave2["acknowledgements_owed"]:
+            for row in self.wave2["add_rows"]:
+                self.assertIn("acknowledgements owed", row["label"])
+            for entry in self.wave2["amend_rows"]:
+                self.assertIn("acknowledgements owed", entry["amendment"]["by"])
+
+    def test_the_assembler_refuses_an_interim_outside_the_rule(self):
+        assembler = load_assembler()
+        record = self.wave2["interim_rows"][0]
+
+        def attempt(change, slot="memory-owner"):
+            _, _, rows, _, _ = assembler.assemble_rows()
+            by_slot = {row["slot_id"]: row for row in rows}
+            entry = json.loads(json.dumps(record))
+            entry["slot_id"] = slot
+            change(entry, by_slot)
+            with self.assertRaises(ValueError) as caught:
+                assembler.apply_interims(rows, by_slot, [entry])
+            return str(caught.exception)
+
+        cases = [
+            ("a row whose decided default installs", lambda e, b: None, "serena",
+             "consensus serena: an interim installs only on a row whose decided default installs nothing"),
+            ("an unknown slot", lambda e, b: None, "no-such-slot", "consensus no-such-slot: interim for unknown slot"),
+            ("a missing authority", lambda e, b: e["interim"].pop("authority"), "memory-owner",
+             "consensus memory-owner: an interim carries its fields: missing ['authority']; unknown []"),
+            ("an unknown field", lambda e, b: e["interim"].update(state="definitive"), "memory-owner",
+             "consensus memory-owner: an interim carries its fields: missing []; unknown ['state']"),
+            ("an authority of another kind", lambda e, b: e["interim"]["authority"].update(kind="consensus"), "memory-owner",
+             "consensus memory-owner: an interim's authority is one of owner_decision, direct_consensus, not consensus"),
+            ("an owner's decision without its decision", lambda e, b: e["interim"]["authority"].pop("decision"), "memory-owner",
+             "consensus memory-owner: the owner's decision needs its decision"),
+            ("a direct consensus with one acknowledgement",
+             lambda e, b: e["interim"].update(authority={"kind": "direct_consensus", "acknowledgements": [
+                 {"family": "claude", "url": "https://github.com/example/example/pull/1#issuecomment-1"}]}), "memory-owner",
+             "consensus memory-owner: a direct consensus needs an acknowledgement of each family"),
+            ("one family's review missing", lambda e, b: e["interim"]["reviews"].pop("gpt"), "memory-owner",
+             "consensus memory-owner: an interim records each family's review"),
+            ("a records file whose hash differs", lambda e, b: e["interim"]["records"][0].update(sha256="0" * 64),
+             "memory-owner", "consensus memory-owner interim: evidence sha256 mismatch"),
+            ("no records", lambda e, b: e["interim"].update(records=[]), "memory-owner",
+             "consensus memory-owner: an interim names its hashed records"),
+            ("a repository that is not an https URL", lambda e, b: e["interim"].update(repository="akitaonrails/ai-memory"),
+             "memory-owner", "consensus memory-owner: an interim names its repository by an https URL"),
+            ("a blank pin", lambda e, b: e["interim"].update(pin=" "), "memory-owner",
+             "consensus memory-owner: an interim needs a non-empty pin"),
+            ("a job an installed row owns", lambda e, b: b["memory-owner"].update(job=b["serena"]["job"]), "memory-owner",
+             "consensus memory-owner: installed job also owned by serena"),
+            ("a second interim on the row", lambda e, b: b["memory-owner"].update(interim={"default": "x"}), "memory-owner",
+             "consensus memory-owner: duplicate interim"),
+        ]
+        for name, change, slot, message in cases:
+            with self.subTest(case=name):
+                self.assertTrue(attempt(change, slot).startswith(message), attempt(change, slot))
 
 
 class SkillAuthoringAcceptance(unittest.TestCase):

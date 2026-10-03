@@ -78,7 +78,9 @@ def render():
              f"{counts['layers']} layers, {counts['slots']} slots, {counts['definitive']} definitive, {counts['installed']} rows that install something. "
              "A default in bold is definitive under its recorded rule; a critic's install verdict is resolved, and a pending measurement installs nothing."
              + (f" {by_consensus} rows were added by a recorded direct consensus of the two model families; each says so in its basis, and none is definitive."
-                if by_consensus else ""), "",
+                if by_consensus else "")
+             + (f" {counts['interim']} rows carry an interim install under amendment 3, listed after the decision round's table; the tables print their decided default."
+                if counts.get("interim") else ""), "",
              "### Foundation and cross rows", ""]
     lines += layer_table(man, "foundation", combined)
     lines += ["", "### us-equities (the trading lane's rows)", ""]
@@ -101,6 +103,15 @@ def render():
                              f"{'yes' if row['definitive'] else 'no'} | {row['job']} | {row.get('state') or 'open'} | {basis(row, combined)} |")
                 if slot.get("split_note") and not (row["measurement"] and row["measurement"]["returned"]):
                     lines.append(f"| | | {slot['split_note']} | | | | | | |")
+    interims = [row for row in man["slots"] if row.get("interim")]
+    if interims:
+        # An interim (amendment 3) is recorded beside its row: the tables above print the row's decided default.
+        lines += ["", "### Interim installs (amendment 3)", "",
+                  "An interim install is what the destination installs in its row's place until the named measurement decides; "
+                  "the row's decided default, which installs nothing, stays as the tables above print it.", "",
+                  "| Slot | Date | Interim | Authority | Decided by |", "| --- | --- | --- | --- | --- |"]
+        lines += [f"| {row['slot_id']} | {row['interim']['date_utc']} | {row['interim']['default']} | "
+                  f"{row['interim']['authority']['kind'].replace('_', ' ')} | {row['interim']['decided_by']} |" for row in interims]
     amendments = [(row["slot_id"], amendment) for row in man["slots"] for amendment in row.get("amendments", [])]
     if amendments:
         # An amendment is recorded beside its row: the tables above print the row as the rounds decided it.

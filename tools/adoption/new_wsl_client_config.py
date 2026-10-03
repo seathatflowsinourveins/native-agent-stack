@@ -12,7 +12,8 @@ configures the two clients for that distribution, and the rule that decides ever
 adoption/new-wsl/client-config-map.json names every piece of the client templates (each hook entry, plugin,
 marketplace, status line, group of variables, permission rule, MCP server, Codex key, copied hook or agent file,
 instruction block and step of this tool) and gives it one wiring: `slot:<manifest slot>` (wired while that slot
-installs and its default is the owner the entry names), `practice`, `not_wired:<reason>`, or `authorization:<reason>` (a
+installs and its default is the owner the entry names; a row's interim install, amendment 3 of the manifest's decision rule,
+counts as what the slot installs while the row carries it), `practice`, `not_wired:<reason>`, or `authorization:<reason>` (a
 setting that grants a permission or suppresses a confirmation: written only with --with-authorization-settings and,
 when the entry also names a `slot` and its `owner`, only while that slot installs the owner). The map is a closed world:
 a piece it does not name is an error. The tool does not read the old bootstrap profile
@@ -258,11 +259,19 @@ def load_manifest(root: Path) -> dict:
 
 
 def installs(row: dict) -> bool:
-    """The install plan's rule (evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py L149-160): the row
-    names a default, installs something extra, is not resolved as not installed and is not split."""
+    """The install plan's rule (evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py L146-168): the row
+    carries an interim install (amendment 3 of the manifest's decision rule), or it names a default, installs something
+    extra, is not resolved as not installed and is not split."""
+    if row.get("interim"):
+        return True
     outcome = (row.get("resolution") or {}).get("outcome")
     return (bool(row.get("default")) and not row.get("installs_nothing_extra") and outcome != "not_installed"
             and (row.get("state") or "") != "split")
+
+
+def installed_default(row: dict) -> str:
+    """What the row installs: its interim's default while it carries one, otherwise its decided default."""
+    return str((row.get("interim") or {}).get("default") or row.get("default"))
 
 
 def why_not_installed(slot: str, row: dict) -> str:
@@ -481,12 +490,14 @@ def slot_verdict(piece: Piece, entry: Entry, slot: str, manifest: dict, plan: di
         return False, f"unknown slot {slot}"
     if not installs(row):
         return False, why_not_installed(slot, row)
-    if entry.owner.casefold() not in str(row["default"]).casefold():
-        warnings.append(f"{piece.key}: slot {slot} installs {row['default']!r}; the map wires {entry.owner!r}")
-        return False, f"slot {slot} installs {row['default']!r}, not {entry.owner!r}"
+    default = installed_default(row)
+    interim = " (interim install)" if row.get("interim") else ""
+    if entry.owner.casefold() not in default.casefold():
+        warnings.append(f"{piece.key}: slot {slot} installs {default!r}{interim}; the map wires {entry.owner!r}")
+        return False, f"slot {slot} installs {default!r}{interim}, not {entry.owner!r}"
     if not plan["rows"].get(slot, {}).get("installed"):
         warnings.append(f"{piece.key}: the manifest installs slot {slot}, the install plan does not")
-    return True, f"slot {slot} installs {row['default']}"
+    return True, f"slot {slot} installs {default}{interim}"
 
 
 def verdicts(pieces: list, taken: dict, manifest: dict, plan: dict, authorization: bool = False) -> tuple:
