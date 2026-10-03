@@ -6586,7 +6586,7 @@
   "sources": [
     {
       "path": "adoption/manifest.json",
-      "sha256": "7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a"
+      "sha256": "4aedebfa4528918a008d99c2ef6044b307a6fcf7646afe8857ee8db936241714"
     },
     {
       "path": "adoption/new-wsl-profile.json",

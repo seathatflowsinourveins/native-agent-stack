@@ -1675,8 +1675,8 @@
     },
     {
       "component_id": "claude-hud",
-      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
-      "version": "0.8.0",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+      "version": "0.10.0",
       "profile": "optional",
       "role": "Claude statusline rendering",
       "installation_assessment": "runtime present at retained native operation date",
@@ -1724,6 +1724,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-hud-0100-qualification-20261003",
+            "path": "evidence/receipts/claude-hud-0100-qualification-20261003.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1737,16 +1742,16 @@
       "integration_mode": "Configured optional statusline rendered in the retained foundation-closure native Claude terminal observations.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Retained foundation-closure observations record the configured HUD rendering model, project, context and usage fields before and after a native review. Earlier synthetic and effort-overlay attempts remain historical evidence. The landscape reconciliation performed no new native run.",
+        "scope": "Retained foundation-closure observations record the configured HUD rendering model, project, context and usage fields before and after a native review. Earlier synthetic and effort-overlay attempts remain historical evidence. The landscape reconciliation performed no new native run. Historical lifecycle observations remain bound to 0.8.0. W1 0.10.0 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "75683c6de1ac07f6bbef00d739001679dba0740c",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 0.10.0.",
           "evidence_refs": [
             "evidence/receipts/component-history.json",
             "evidence/receipts/token-practice-coverage-20260920.json",
@@ -1756,7 +1761,7 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Native PTY screen observations and installed-plugin audit qualify visible claude-hud 0.8.0 rendering in Claude 2.1.278. Every statistic, billing reconciliation, Windows dropdown interaction and a new host remain unqualified. No execution was repeated for this catalog reconciliation.",
+          "scope": "Native PTY screen observations and installed-plugin audit qualify visible claude-hud 0.8.0 rendering in Claude 2.1.278. Every statistic, billing reconciliation, Windows dropdown interaction and a new host remain unqualified. No execution was repeated for this catalog reconciliation. W1 pin qualification does not recertify this historical stage at 0.10.0.",
           "evidence_refs": [
             "evidence/receipts/native-claude-hud-interactive-20260920.json",
             "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json",
@@ -1766,22 +1771,22 @@
         },
         "persistence": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.10.0.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.10.0.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.10.0.",
           "evidence_refs": []
         },
         "recovery": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.10.0.",
           "evidence_refs": []
         }
       },
@@ -4114,7 +4119,7 @@
     {
       "component_id": "jcodemunch-mcp",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "version": "1.108.319",
+      "version": "1.108.327",
       "profile": "supporting",
       "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
       "installation_assessment": "Clean isolated upstream uv installation and native uninstall passed on the existing Linux/WSL host; the working installation was preserved.",
@@ -4196,6 +4201,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "jcodemunch-1108327-qualification-20261003",
+            "path": "evidence/receipts/jcodemunch-1108327-qualification-20261003.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
@@ -4250,51 +4260,51 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Selected local index persisted across direct/native-client retrieval. No watcher, cross-repository auto-index or paid summaries.",
+        "scope": "Selected local index persisted across direct/native-client retrieval. No watcher, cross-repository auto-index or paid summaries. Historical lifecycle observations remain bound to 1.108.319. W1 1.108.327 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "source_pin": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
       "lifecycle_stages": {
         "install": {
           "status": "accepted_within_scope",
-          "scope": "New isolated upstream uv tool environment with the accepted pin installed successfully; existing host and package cache reused.",
+          "scope": "New isolated upstream uv tool environment with the accepted pin installed successfully; existing host and package cache reused. W1 pin qualification does not recertify this historical stage at 1.108.327.",
           "evidence_refs": [
             "evidence/receipts/native-token-clean-prefix-20260920.json"
           ]
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Real upstream MCP calls returned exact original content from the selected public fixture; not a new provider-mediated client task.",
+          "scope": "Real upstream MCP calls returned exact original content from the selected public fixture; not a new provider-mediated client task. W1 pin qualification does not recertify this historical stage at 1.108.327.",
           "evidence_refs": [
             "evidence/receipts/native-token-clean-prefix-20260920.json"
           ]
         },
         "persistence": {
           "status": "accepted_within_scope",
-          "scope": "The scoped artifact/index was readable through a new server process after the first server exited; no OS reboot or corruption recovery.",
+          "scope": "The scoped artifact/index was readable through a new server process after the first server exited; no OS reboot or corruption recovery. W1 pin qualification does not recertify this historical stage at 1.108.327.",
           "evidence_refs": [
             "evidence/receipts/native-token-clean-prefix-20260920.json"
           ]
         },
         "restart": {
           "status": "accepted_within_scope",
-          "scope": "Two real server processes per tool completed; all four owned MCP servers exited zero.",
+          "scope": "Two real server processes per tool completed; all four owned MCP servers exited zero. W1 pin qualification does not recertify this historical stage at 1.108.327.",
           "evidence_refs": [
             "evidence/receipts/native-token-clean-prefix-20260920.json"
           ]
         },
         "cleanup": {
           "status": "accepted_within_scope",
-          "scope": "Native uv tool uninstall passed; all created entrypoints absent and zero owned tool processes remained; 82 input/output artifacts retained.",
+          "scope": "Native uv tool uninstall passed; all created entrypoints absent and zero owned tool processes remained; 82 input/output artifacts retained. W1 pin qualification does not recertify this historical stage at 1.108.327.",
           "evidence_refs": [
             "evidence/receipts/native-token-clean-prefix-20260920.json"
           ]
         },
         "recovery": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 1.108.327.",
           "evidence_refs": []
         }
       },
@@ -4871,7 +4881,7 @@
     {
       "component_id": "mcp-inspector",
       "repository": "https://github.com/modelcontextprotocol/inspector",
-      "version": "2.8.0",
+      "version": "2.9.0",
       "profile": "supporting",
       "role": "Upstream direct stdio tool inspection/calls",
       "installation_assessment": "runtime present at retained native operation date",
@@ -4879,7 +4889,7 @@
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/mcp-inspector",
         "documented_commands": [
-          "npx @modelcontextprotocol/inspector@2.8.0 --help"
+          "npx @modelcontextprotocol/inspector@2.9.0 --help"
         ],
         "scope": "Direct upstream Inspector stdio call proved arithmetic execution; full plugin hooks and current desktop scope are separate.",
         "recipe_document": "recipes/README.md",
@@ -4911,6 +4921,11 @@
             "id": "mcp-inspector-280-qualification-20260926",
             "path": "evidence/receipts/mcp-inspector-280-qualification-20260926.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "mcp-inspector-290-qualification-20261003",
+            "path": "evidence/receipts/mcp-inspector-290-qualification-20261003.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4924,7 +4939,7 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability. Historical lifecycle observations remain bound to 2.8.0. W1 2.9.0 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -4933,7 +4948,7 @@
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 2.9.0.",
           "evidence_refs": [
             "evidence/receipts/component-history.json",
             "evidence/receipts/token-practice-coverage-20260920.json",
@@ -4942,31 +4957,31 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance.",
+          "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance. W1 pin qualification does not recertify this historical stage at 2.9.0.",
           "evidence_refs": [
             "evidence/receipts/token-native-retained-functional-20260920.json"
           ]
         },
         "persistence": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 2.9.0.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 2.9.0.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "documented_not_replayed",
-          "scope": "The selected command should exit and leave no owned child process; removal of its package/prefix was not replayed by this matrix.",
+          "scope": "The selected command should exit and leave no owned child process; removal of its package/prefix was not replayed by this matrix. W1 pin qualification does not recertify this historical stage at 2.9.0.",
           "evidence_refs": [
             "adoption/lifecycle.md"
           ]
         },
         "recovery": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 2.9.0.",
           "evidence_refs": []
         }
       },
@@ -5431,7 +5446,7 @@
     {
       "component_id": "openresearch",
       "repository": "https://github.com/alphaXiv/OpenResearch",
-      "version": "0.2.7",
+      "version": "0.2.15",
       "profile": "supporting",
       "role": "Selected public literature discovery and extracted paper retrieval",
       "installation_assessment": "runtime present at retained native operation date",
@@ -5443,7 +5458,7 @@
           "orx --no-telemetry paper \"${PAPER_ID}\" --full"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/native-upgrades-20260921.md",
+        "recipe_document": "recipes/README.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -5482,6 +5497,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "openresearch-0215-qualification-20261003",
+            "path": "evidence/receipts/openresearch-0215-qualification-20261003.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5495,16 +5515,16 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability. Historical lifecycle observations remain bound to 0.2.7. W1 0.2.15 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+      "source_pin": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "September 21 isolated release upgrade with preserved previous installation and qualified candidate operations. This does not establish full uninstall or dependency rollback.",
+          "scope": "September 21 isolated release upgrade with preserved previous installation and qualified candidate operations. This does not establish full uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 0.2.15.",
           "evidence_refs": [
             "evidence/receipts/component-history.json",
             "evidence/receipts/artifact-reductions.json",
@@ -5515,7 +5535,7 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance.",
+          "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance. W1 pin qualification does not recertify this historical stage at 0.2.15.",
           "evidence_refs": [
             "evidence/receipts/artifact-reductions.json",
             "evidence/receipts/token-practice-gap-followup-20260920.json"
@@ -5523,24 +5543,24 @@
         },
         "persistence": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 0.2.15.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 0.2.15.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "documented_not_replayed",
-          "scope": "The selected command should exit and leave no owned child process; removal of its package/prefix was not replayed by this matrix.",
+          "scope": "The selected command should exit and leave no owned child process; removal of its package/prefix was not replayed by this matrix. W1 pin qualification does not recertify this historical stage at 0.2.15.",
           "evidence_refs": [
             "adoption/lifecycle.md"
           ]
         },
         "recovery": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 0.2.15.",
           "evidence_refs": []
         }
       },
@@ -5555,7 +5575,7 @@
     {
       "component_id": "opentelemetry-collector-contrib",
       "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-      "version": "0.161.0",
+      "version": "0.162.0",
       "profile": "observability",
       "role": "Single native core/contrib Collector process; content filtering, metric conversion, upstream exporters and SDK file receiver",
       "installation_assessment": "runtime present at retained native operation date",
@@ -5635,6 +5655,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "otelcol-contrib-0162-qualification-20261003",
+            "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5648,7 +5673,7 @@
       "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability. Historical lifecycle observations remain bound to 0.161.0. W1 0.162.0 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -5657,7 +5682,7 @@
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 0.162.0.",
           "evidence_refs": [
             "observability/receipt.json",
             "observability/followup-receipt.json",
@@ -5671,7 +5696,7 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Native collector validates existing configuration with its required nonsecret unit environment; no service reload.",
+          "scope": "Native collector validates existing configuration with its required nonsecret unit environment; no service reload. W1 pin qualification does not recertify this historical stage at 0.162.0.",
           "evidence_refs": [
             "observability/receipt.json",
             "observability/followup-receipt.json",
@@ -5684,22 +5709,22 @@
         },
         "persistence": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.162.0.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.162.0.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.162.0.",
           "evidence_refs": []
         },
         "recovery": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.162.0.",
           "evidence_refs": []
         }
       },
@@ -5916,7 +5941,7 @@
     {
       "component_id": "playwright-cli",
       "repository": "https://github.com/microsoft/playwright-cli",
-      "version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+      "version": "0.1.22; Playwright 1.64.0-alpha-1790635538000",
       "profile": "optional",
       "role": "Native browser CLI with bounded Linux fixture acceptance and separately scoped Windows history",
       "installation_assessment": "runtime present at retained native operation date",
@@ -5952,6 +5977,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "playwright-cli-0122-qualification-20261003",
+            "path": "evidence/receipts/playwright-cli-0122-qualification-20261003.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5977,7 +6007,7 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Owned browser fixture lifecycle passed after retained protocol/setup correction.",
+        "scope": "Owned browser fixture lifecycle passed after retained protocol/setup correction. Historical lifecycle observations remain bound to 0.1.21; Playwright 1.64.0-alpha-1789764292000. W1 0.1.22; Playwright 1.64.0-alpha-1790635538000 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -5986,7 +6016,7 @@
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 0.1.22; Playwright 1.64.0-alpha-1790635538000.",
           "evidence_refs": [
             "evidence/receipts/component-history.json",
             "evidence/receipts/token-practice-coverage-20260920.json",
@@ -5995,31 +6025,31 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Owned browser fixture completed after retained protocol/setup correction; no new browser session was started by this reconciliation.",
+          "scope": "Owned browser fixture completed after retained protocol/setup correction; no new browser session was started by this reconciliation. W1 pin qualification does not recertify this historical stage at 0.1.22; Playwright 1.64.0-alpha-1790635538000.",
           "evidence_refs": [
             "evidence/receipts/native-cli-gaps.json"
           ]
         },
         "persistence": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.1.22; Playwright 1.64.0-alpha-1790635538000.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.1.22; Playwright 1.64.0-alpha-1790635538000.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "accepted_within_scope",
-          "scope": "Owned browser fixture completed after retained protocol/setup correction; no new browser session was started by this reconciliation.",
+          "scope": "Owned browser fixture completed after retained protocol/setup correction; no new browser session was started by this reconciliation. W1 pin qualification does not recertify this historical stage at 0.1.22; Playwright 1.64.0-alpha-1790635538000.",
           "evidence_refs": [
             "evidence/receipts/native-cli-gaps.json"
           ]
         },
         "recovery": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.1.22; Playwright 1.64.0-alpha-1790635538000.",
           "evidence_refs": []
         }
       },
@@ -8404,7 +8434,7 @@
     {
       "component_id": "syft",
       "repository": "https://github.com/anchore/syft",
-      "version": "1.52.0",
+      "version": "1.54.0",
       "profile": "supporting",
       "role": "Scoped native SDK dependency inventory; no vulnerability verdict",
       "installation_assessment": "runtime present at retained native operation date",
@@ -8416,7 +8446,7 @@
           "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "blueprints/us-equities/supply-chain/README.md",
+        "recipe_document": "recipes/README.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -8439,6 +8469,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "syft-1540-qualification-20261003",
+            "path": "evidence/receipts/syft-1540-qualification-20261003.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -8465,16 +8500,16 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability. Historical lifecycle observations remain bound to 1.52.0. W1 1.54.0 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "02ba369d13b4248395b20a504eca94b0cab564d8",
+      "source_pin": "cc326e45a6213360266dda4b30cc68095946d676",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 1.54.0.",
           "evidence_refs": [
             "blueprints/us-equities/supply-chain/receipt.json",
             "evidence/receipts/token-practice-artifacts-20260920.json",
@@ -8483,7 +8518,7 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings.",
+          "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings. W1 pin qualification does not recertify this historical stage at 1.54.0.",
           "evidence_refs": [
             "blueprints/us-equities/supply-chain/receipt.json",
             "evidence/receipts/token-practice-artifacts-20260920.json"
@@ -8491,24 +8526,24 @@
         },
         "persistence": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 1.54.0.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 1.54.0.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "documented_not_replayed",
-          "scope": "The selected command should exit and leave no owned child process; removal of its package/prefix was not replayed by this matrix.",
+          "scope": "The selected command should exit and leave no owned child process; removal of its package/prefix was not replayed by this matrix. W1 pin qualification does not recertify this historical stage at 1.54.0.",
           "evidence_refs": [
             "adoption/lifecycle.md"
           ]
         },
         "recovery": {
           "status": "not_applicable",
-          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention. W1 pin qualification does not recertify this historical stage at 1.54.0.",
           "evidence_refs": []
         }
       },
@@ -8950,7 +8985,7 @@
     {
       "component_id": "worktrunk",
       "repository": "https://github.com/max-sixty/worktrunk",
-      "version": "0.79.0",
+      "version": "0.80.0",
       "profile": "optional",
       "role": "Native Git worktree convenience CLI",
       "installation_assessment": "runtime present at retained native operation date",
@@ -8961,7 +8996,7 @@
           "wt list"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/native-upgrades-20260921.md",
+        "recipe_document": "recipes/README.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -9005,6 +9040,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "worktrunk-0800-qualification-20261003",
+            "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -9023,16 +9063,16 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Owned disposable create/select/list/remove lifecycle passed; hooks disabled and only original worktree remained.",
+        "scope": "Owned disposable create/select/list/remove lifecycle passed; hooks disabled and only original worktree remained. Historical lifecycle observations remain bound to 0.79.0. W1 0.80.0 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "September 21 isolated release upgrade with preserved previous installation and qualified candidate operations. This does not establish full uninstall or dependency rollback.",
+          "scope": "September 21 isolated release upgrade with preserved previous installation and qualified candidate operations. This does not establish full uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 0.80.0.",
           "evidence_refs": [
             "evidence/receipts/worktrunk-list.json",
             "evidence/receipts/component-history.json",
@@ -9044,31 +9084,31 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Disposable Git repository completed native create/select/list/remove with hooks disabled, leaving only its original worktree. No user branch was removed.",
+          "scope": "Disposable Git repository completed native create/select/list/remove with hooks disabled, leaving only its original worktree. No user branch was removed. W1 pin qualification does not recertify this historical stage at 0.80.0.",
           "evidence_refs": [
             "evidence/receipts/token-native-retained-functional-20260920.json"
           ]
         },
         "persistence": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.80.0.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.80.0.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "accepted_within_scope",
-          "scope": "Disposable Git repository completed native create/select/list/remove with hooks disabled, leaving only its original worktree. No user branch was removed.",
+          "scope": "Disposable Git repository completed native create/select/list/remove with hooks disabled, leaving only its original worktree. No user branch was removed. W1 pin qualification does not recertify this historical stage at 0.80.0.",
           "evidence_refs": [
             "evidence/receipts/token-native-retained-functional-20260920.json"
           ]
         },
         "recovery": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.80.0.",
           "evidence_refs": []
         }
       },

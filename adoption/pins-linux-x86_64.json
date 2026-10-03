@@ -201,11 +201,11 @@
     },
     {
       "id": "orx",
-      "version": "0.2.7",
+      "version": "0.2.15",
       "kind": "tarball",
-      "url": "https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.7/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
-      "sha256": "c0f8c7488cc3ff028e6757ee54957911f754ea3cd80e239e12f7a47a88884d63",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had OpenResearch's `orx` CLI 0.2.7 installed on 2026-09-23 (confirmed there with `orx --version`; alphaXiv/OpenResearch, the local-first research-agent workspace). That is one host's state, not evidence about any other Linux host. Archive re-downloaded and sha256-hashed independently; matches the release's own `openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256` sidecar (`gh api repos/alphaXiv/OpenResearch/releases/tags/v0.2.7`, read 2026-09-23) exactly. `tar -tJf` lists exactly one top-level directory containing `orx`, `README.md` and `LICENSE`, matching `install_single_binary_tarball`'s convention of finding a single file literally named `orx` in the extracted tree.",
+      "url": "https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.15/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
+      "sha256": "f36ed4095f4839767a162a555d9e7eafc04f70f0664ce3767178f81fc0b45c86",
+      "install_note": "2026-10-03 W1 scratch qualification. https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.15/openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256 (release-published sidecar; `sha256sum -c` printed OK, exit 0). Same hash also in the release's sha256.sum line 5 (`sha256sum -c --ignore-missing` OK, exit 0) and in the GitHub API asset digest sha256:f36ed409... (gh api repos/alphaXiv/OpenResearch/releases/tags/v0.2.15); size 11890208 bytes matches the API size. Receipt: evidence/receipts/openresearch-0215-qualification-20261003.json. This is isolated qualification evidence, not a host installation switch.",
       "version_probe": {
         "method": "exec",
         "command": "orx",

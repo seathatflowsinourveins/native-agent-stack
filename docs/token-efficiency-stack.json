@@ -1715,7 +1715,7 @@
       "purpose": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
       "upstream_commands": {
         "install": [
-          "uv tool install jcodemunch-mcp==1.108.319"
+          "uv tool install jcodemunch-mcp==1.108.327"
         ],
         "use": [
           "order({\"action\":\"search_symbols\",\"args\":{\"repo\":\"RETURNED_REPOSITORY_ID\",\"query\":\"requested_function\",\"kind\":\"function\",\"max_results\":1}})",
@@ -6657,14 +6657,14 @@
       "purpose": "Claude statusline rendering",
       "upstream_commands": {
         "install": [
-          "claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user",
+          "claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user",
           "claude plugin install claude-hud@claude-hud --scope user --json"
         ],
         "use": [
           "/claude-hud:setup"
         ],
         "statistics": [],
-        "install_note": "`claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user`; `claude plugin install claude-hud@claude-hud --scope user --json`",
+        "install_note": "`claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user`; `claude plugin install claude-hud@claude-hud --scope user --json`",
         "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
       },
       "returned_result_summary": "Installed 0.8.0 renderer returned the synthetic fixture label and 25% context bar. Actual interactive attempt reached onboarding before live HUD appeared. Native Claude-only display, not a Codex Desktop observer or cumulative saved-token counter.",

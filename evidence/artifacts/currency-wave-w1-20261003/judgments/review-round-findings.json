@@ -1,0 +1,134 @@
+[
+ {
+  "type": "started",
+  "key": "v2:0358f8c532ee2911b47a488dd92920aa37ed293695293a38c5343358fc89b223",
+  "agentId": "a806cdddb865c0daa",
+  "label": "opus:#642",
+  "phase": "Review"
+ },
+ {
+  "type": "started",
+  "key": "v2:f6f76f49df913e46083569b05d844c88778f474414654c4cbff586daaa6088e9",
+  "agentId": "a81564cfd343cdd3a",
+  "label": "sol:#642",
+  "phase": "Review"
+ },
+ {
+  "type": "result",
+  "key": "v2:f6f76f49df913e46083569b05d844c88778f474414654c4cbff586daaa6088e9",
+  "agentId": "a81564cfd343cdd3a",
+  "result": {
+   "pr": 642,
+   "verdict": "repair",
+   "findings": [
+    {
+     "severity": "should-fix",
+     "where": "tests/test_observability_tool_names.py:29; tests/test_observability_run_correlation.py:47; tests/test_observability_writer_identity.py:36",
+     "problem": "These executable test selectors still hard-code otelcol-0.161.0/otelcol-contrib while observability/collector/README.md:12 selects 0.162.0. Their skipUnless guards skip the native checks when only the new version is installed; when both versions exist, they exercise the old binary. tests/test_sdk_usage_scope.py:27 inherits the same stale selector. These are current execution paths missed by the pin move.",
+     "fix": "Make the current-pin checks select 0.162.0, preferably using the canonical stack version or an explicit candidate-binary override. Update the corresponding skip messages and validation instructions. Preserve dated 0.161.0 evidence and provide a separate explicit selector if historical replay remains supported."
+    },
+    {
+     "severity": "blocking",
+     "where": "evidence/receipts/syft-1540-qualification-20261003.json:33; evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:32; evidence/receipts/mcporter-0142-qualification-20261003.json:33",
+     "problem": "The required independent primary-digest verification remains incomplete. gh API reads failed, and in-memory fetches of Syft 1.54.0 checksums.txt, Collector 0.162.0's .sha256 sidecar, and mcporter 0.14.2 npm metadata all returned 'Temporary failure in name resolution'. This is a review validation blocker; no digest mismatch is established. At HEAD ea10c096e8fbc59cf528f9fb600d8b0b261c288b, all nine stack/snapshot/audit/receipt joins, receipt claim-to-recorded-output checks, and registered changed-file hashes were consistent. The Syft workflow edits added no actions or permissions.",
+     "fix": "Complete the public upstream checks from a network-enabled read-only review environment. Compare the exact Syft checksum line and Collector sidecar value with the committed SHA256 values; fetch an npm tarball and verify its published integrity and committed local SHA256. Finish the remaining upstream digest/source checks before approval."
+    }
+   ]
+  }
+ },
+ {
+  "type": "result",
+  "key": "v2:0358f8c532ee2911b47a488dd92920aa37ed293695293a38c5343358fc89b223",
+  "agentId": "a806cdddb865c0daa",
+  "result": {
+   "pr": 642,
+   "verdict": "approve",
+   "findings": [
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/observability/paper-trading-live/collector-paper-trading.yaml:1; <home>/code/.worktrees/native-agent-stack/0c/w1pins/docs/lanes.md:25; <home>/code/.worktrees/native-agent-stack/0c/w1pins/docs/decisions/2026-10-03-currency-wave-w1.md:154-157",
+     "problem": "The PR edits line 1 of a file under observability/paper-trading-live/ (comment changed from otelcol-contrib 0.161.0 to 0.162.0). docs/lanes.md:25 assigns that path to the Trading lane, and AGENTS.md requires handing an owned area to its owner rather than editing it. The decision's statement about which files keep their bytes names only blueprints/us-equities/, so it does not disclose this trading-path edit.",
+     "fix": "Revert the one-line comment and hand it to the trading lane. Alternatively, name this file in the decision record and in the lane:shared acknowledgement request for this head, so the trading ack explicitly covers it."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/receipts/mcporter-0142-qualification-20261003.json:36; <home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/receipts/openresearch-0215-qualification-20261003.json:40; <home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/receipts/claude-hud-0100-qualification-20261003.json:41,47; <home>/code/.worktrees/native-agent-stack/0c/w1pins/scripts/validate.py:29; <home>/code/.worktrees/native-agent-stack/0c/w1pins/docs/decisions/2026-10-03-currency-wave-w1.md:163-167",
+     "problem": "Path sanitization replaced each '/home/<segment>' with '<home>', including scratch paths such as $S/home/..., most likely to satisfy the 'personal home path' regex at validate.py:29. Distinct paths have collapsed into one placeholder, so the recorded commands cannot be reproduced and now misstate what ran. In the mcporter install, '--userconfig $S<home> --globalconfig $S<home>' reads as one shared npm config file, yet the decision (163-167) says npm rejects a double-loaded config path and cites 'the distinct npm config paths in the W1 installation records'. The same collision appears in openresearch ('XDG_CONFIG_HOME=$D<home> ... XDG_CACHE_HOME=$D<home>') and HUD ('CLAUDE_CONFIG_DIR=$S/smoke<home>'). The receipt claims are unaffected.",
+     "fix": "Re-sanitize these commands from the original W1 packet using distinct placeholders the scan accepts, e.g. '$S/<scratch-home>/.npmrc' and '$S/<scratch-home>/.npmrc-global', or the regex's /home/example/ exemption. Then re-register the three receipt sha256/bytes in manifests/evidence.json files[] and rerun scripts/validate.py."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/receipts/mcp-inspector-290-qualification-20261003.json:49; <home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/receipts/mcporter-0142-qualification-20261003.json:48; <home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/receipts/openresearch-0215-qualification-20261003.json:45; <home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/receipts/worktrunk-0800-qualification-20261003.json:45; <home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/receipts/syft-1540-qualification-20261003.json:46",
+     "problem": "Five receipts cite manifests/stack.json line numbers for the rows' documented commands: :609 (inspector), :634 (mcporter), :659-660 (orx), :1067-1069 (wt list) and :1406 (syft scan). Those numbers are correct only at base dcae68bd. At PR head ea10c096 the same lines are '\"commands\": [' (609), mcporter's role (634), openresearch license/profile (659-660), the worktrunk row header (1067-1069) and '},' (1406). The receipts do not record the base commit these citations refer to. Other line citations in these receipts are still correct at head: recipes/README.md:87/99/100, evidence.json:3164 and pins-linux:137-142.",
+     "fix": "Record the base commit for these citations in each receipt's data (e.g. data.citation_base_commit = dcae68bd08a191f37ba564eceda9fc4a9d6d4a6e), or cite by component id and field instead of line. Then re-register the five receipt hashes in manifests/evidence.json."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/adoption/templates/claude.settings.template.json:327; <home>/code/.worktrees/native-agent-stack/0c/w1pins/tests/test_render_config.py:83-124; <home>/code/.worktrees/native-agent-stack/0c/w1pins/docs/decisions/2026-10-03-currency-wave-w1.md:74-76",
+     "problem": "The new guard picks the highest-semver claude-hud cache directory first, then exits 0 if that directory lacks dist/index.js. The cited upstream launcher (jarrodwatts/claude-hud@75683c6 scripts/statusline.mjs:30-39, re-read in this review) instead selects the newest version whose entry exists. So when a complete older version sits beside an incomplete newer directory (e.g. an interrupted update), the template renders nothing while upstream renders the older version. The regression test covers only absent, missing-entry and single-installed cases, and the decision says the template 'adopts' upstream's check. The guard does correctly close the old fallback that ran the project's own dist/index.js.",
+     "fix": "Filter candidate directories on '[ -f \"<dir>dist/index.js\" ]' before the sort/tail, keeping the fail-closed 'exit 0' when no candidate remains, and add a subtest with 0.10.0 missing its entry beside a complete 0.9.x. Alternatively, reword decision lines 74-76 to describe a narrower fail-closed guard."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/tests/test_observability_tool_names.py:29,229; <home>/code/.worktrees/native-agent-stack/0c/w1pins/tests/test_observability_writer_identity.py:36,324; <home>/code/.worktrees/native-agent-stack/0c/w1pins/tests/test_observability_run_correlation.py:47,159; <home>/code/.worktrees/native-agent-stack/0c/w1pins/tests/test_sdk_usage_scope.py:28; <home>/code/.worktrees/native-agent-stack/0c/w1pins/observability/collector/README.md:117",
+     "problem": "observability/collector/README.md:3-12 now pins and installs otelcol-contrib 0.162.0, and README:6 scopes the earlier runtime tests to 0.161.0. However, the native Collector tests still hard-code tools/otelcol-0.161.0/otelcol-contrib, with comments such as '# README pins 0.161.0' that are false at head, and README:117 still calls 0.161.0 'the documented Collector'. On a host that installs the new pin these native integration tests skip, which README:125-126 says is not a pass. As a result, the committed collector.yaml has no native pipeline run against 0.162.0 beyond 'validate'.",
+     "fix": "Either move the test constants and README:117 to 0.162.0 and rerun the native checks with zero skips, or correct the comments and README:117 to say these runtime checks are deliberately bound to the retained 0.161.0 binary."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/docs/foundation-stack.md:18 (table row :15)",
+     "problem": "The table now names jCodeMunch v1.108.327, a 2026-10-03 pin. The next paragraph still says the pins were 're-checked 2026-09-26' and that the 2026-09-20 acceptance receipt 'predates four of them', listing ai-memory, vLLM, RTK and SocratiCode. That receipt now also predates the jCodeMunch pin.",
+     "fix": "Update the date and count, and add jCodeMunch 1.108.319 -> 1.108.327 with a pointer to evidence/receipts/jcodemunch-1108327-qualification-20261003.json."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/docs/decisions/2026-10-03-currency-wave-w1.md:169,171-172; <home>/code/.worktrees/native-agent-stack/0c/w1pins/evidence/artifacts/currency-wave-w1-20261003/native-checks.json:135-171",
+     "problem": "Two claims in the decision have no retained output in the PR. 'Both affected native npm fixture classes then passed (25 tests)' has no matching run in native-checks.json, which keeps only the two failed 229-test runs, the npm pack probes and the 253-test aggregate. 'The required build contract checks passed with their original command lines' has no command, exit code or output retained anywhere.",
+     "fix": "Add the 25-test run and the build-contract check runs (command, exit code, decisive output) to native-checks.json and re-register its hash. Otherwise remove the unsupported specifics from the decision."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/adoption/manifest.json:161,184,189; <home>/code/.worktrees/native-agent-stack/0c/w1pins/recipes/native-upgrades-20260921.md:13-14; <home>/code/.worktrees/native-agent-stack/0c/w1pins/recipes/README.md:101,115; <home>/code/.worktrees/native-agent-stack/0c/w1pins/blueprints/us-equities/supply-chain/README.md:3,41-44,71-91",
+     "problem": "The canonical recipe documents for three moved components still name only the old pins. The recipe_map, mirrored in each audit row's native_integration.recipe_document, points openresearch and worktrunk to recipes/native-upgrades-20260921.md, which lists only 0.2.7/24e404ec and 0.79.0/5ba6f148; the recipes/README.md rows link it as 'qualified archive and rollback'. Syft's recipe_document is the trading-owned blueprints/us-equities/supply-chain/README.md, which still installs syft 1.52.0 and checks the 1.52.0 archive hash caeedb81... The decision keeps that file's bytes but records no handoff for the 1.54.0 update.",
+     "fix": "Add a dated 0.2.15/0.80.0 pointer to the native-upgrades recipe, or repoint recipe_map to recipes/README.md. Record a trading-lane handoff for the syft 1.54.0 recipe update in the decision's next-unit list."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/adoption/new-wsl-profile.json:633-678,989-1046,3636-3681",
+     "problem": "The new-WSL install profile already carries three W1 versions: inspector 2.9.0 (:688-733), worktrunk 0.80.0 (:798-849) and otelcol 0.162.0 (:2862-2907). It still pins mcporter 0.14.1 (sha256 8e489864...), playwright-cli 0.1.21 and syft 1.52.0. The decision's excluded-owner list does not name this file, so a reader cannot tell whether the divergence is intended.",
+     "fix": "Name the file and its owner in the decision's excluded-owner list, or hand the three moves to that owner."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/.github/workflows/native-token-e2e.yml:12-18,57-60; <home>/code/.worktrees/native-agent-stack/0c/w1pins/scripts/native_token_ci.py:1205-1263",
+     "problem": "Verification gap: W1 exercised jcodemunch-mcp 1.108.327 only through get_session_stats, and its receipt states that index_folder, search_symbols and get_symbol_source were not repeated. Upstream changed a lot between v1.108.319 and v1.108.327: 147 commits, including a 6454-line extractor rewrite and changes to search_symbols and get_symbol_source. The selected role, exact symbol retrieval against a frozen source oracle, is exercised only by native-token-e2e. This PR triggers that workflow (it touches stack.json and native_token_ci.py), and the run also installs mcporter 0.14.2. No result was supplied for this SHA.",
+     "fix": "Coordinator: supply the native-token-e2e run result for ea10c096e8fbc59cf528f9fb600d8b0b261c288b. Do not merge until that run and validate are green on this SHA; this is the one check that can falsify the jcodemunch and mcporter moves."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/.github/workflows/supply-chain.yml:15-20,76-89",
+     "problem": "Verification gap: the PR-triggered sbom-vuln job will be the first hosted run of syft 1.54.0 against the reproduced nautilus_trader venv under grype --fail-on high. The receipt's inventory comparison covered only the equity-worker SDK.",
+     "fix": "Supply the supply-chain workflow result for ea10c096e8fbc59cf528f9fb600d8b0b261c288b."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/scripts/validate.py; <home>/code/.worktrees/native-agent-stack/0c/w1pins/scripts/build_ecosystem.py; <home>/code/.worktrees/native-agent-stack/0c/w1pins/scripts/component_matrix.py; <home>/code/.worktrees/native-agent-stack/0c/w1pins/scripts/new_host_grand_list.py; <home>/code/.worktrees/native-agent-stack/0c/w1pins/scripts/saturation_ledger.py",
+     "problem": "Verification gap: no output was supplied for validate.py, build_ecosystem.py --check, component_matrix.py --check, new_host_grand_list.py --check, saturation_ledger.py --check --base origin/main or a full python3 -m unittest. Nor were the 8 required CI buckets, validate-macos or secret scans for this SHA. This review checked the following read-only; each passed, but none replaces the acceptance commands.\n- Re-computed the test_stack_lifecycle assertions and the landscape.py:1373-1381 snapshot-equality assertions for all nine components.\n- Hashed all 40 changed files and confirmed each files[] sha256/bytes entry.\n- Confirmed the nine receipts[] entries match their payloads.\n- Re-matched all nine artifact digests against upstream primaries: syft checksums.txt line 8 = 54a87372...; the otelcol .sha256 sidecar = fcc06374...; npm dist.integrity/shasum plus recomputed sha256 for playwright-cli, inspector and mcporter; the PyPI wheel sha256 for jcodemunch; the orx and worktrunk sidecars; and the HUD tarball rehash.\n- Peeled all nine tags to the recorded commits.\n- Confirmed the syft workflow diffs change only version, URL, checksum, comment and summary strings, with no new action or permission.",
+     "fix": "Supply the command outputs and exit codes, and `gh pr checks 642 --required --json name,bucket` for this SHA."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/docs/lanes.md:22-29",
+     "problem": "Verification gap: the PR changes the shared hot files manifests/stack.json and manifests/evidence.json plus one trading path. It therefore needs the lane:shared label, a trading-lane acknowledgement on head ea10c096, and a non-empty '## SOTA sources' section in the PR body. None of that PR metadata was available to this review.",
+     "fix": "Supply the PR labels, the body and the trading-lane ack comment for this head."
+    },
+    {
+     "severity": "minor",
+     "where": "<home>/code/.worktrees/native-agent-stack/0c/w1pins/.github/workflows/publish-catalog.yml:3-6,96-115",
+     "problem": "Verification gap: publish-catalog.yml runs only on workflow_dispatch or a v* tag, so PR CI does not exercise its syft 1.54.0 download, check and install path. The in-workflow pin 54a87372... equals line 8 of upstream syft_1.54.0_checksums.txt, re-fetched in this review, so the risk is low.",
+     "fix": "Record the next publish-catalog dispatch or tag run as the first execution of this path."
+    }
+   ]
+  }
+ }
+]

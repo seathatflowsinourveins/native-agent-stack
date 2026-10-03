@@ -80,6 +80,56 @@ class RenderConfigTests(unittest.TestCase):
             if name.endswith(".json"):
                 json.loads(rendered)  # still valid JSON once rendered
 
+    def test_hud_statusline_requires_an_installed_entry(self):
+        # Upstream claude-hud v0.10.0 scripts/statusline.mjs checks that the
+        # newest version with an entry is selected. A missing plugin must never fall back to the
+        # open project's dist/index.js during installation or rollback.
+        ecosystem = self.tmp_path / "ecosystem"
+        node = ecosystem / "bin" / "node"
+        node.parent.mkdir(parents=True)
+        node.write_text('#!/bin/sh\nprintf "%s\\n" "$1"\n')
+        node.chmod(0o755)
+        workspace = self.tmp_path / "workspace"
+        (workspace / "dist").mkdir(parents=True)
+        (workspace / "dist" / "index.js").write_text("project code must not run\n")
+        config = self.tmp_path / "claude"
+        values = {**FIXTURE_VALUES, "ECO_ROOT": str(ecosystem)}
+        settings = json.loads(string.Template(
+            (TEMPLATES / "claude.settings.template.json").read_text()
+        ).substitute(values))
+        env = {**os.environ, "CLAUDE_CONFIG_DIR": str(config), "COLUMNS": "120"}
+
+        def invoke():
+            return subprocess.run(
+                ["bash", "-c", settings["statusLine"]["command"]],
+                cwd=workspace, env=env, stdin=subprocess.DEVNULL,
+                capture_output=True, text=True, check=False,
+            )
+
+        with self.subTest(plugin="absent"):
+            result = invoke()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, "")
+        plugin = config / "plugins" / "cache" / "claude-hud" / "claude-hud" / "0.10.0"
+        (plugin / "dist").mkdir(parents=True)
+        with self.subTest(plugin="missing_entry"):
+            result = invoke()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, "")
+        older_entry = plugin.parent / "0.9.0" / "dist" / "index.js"
+        older_entry.parent.mkdir(parents=True)
+        older_entry.write_text("complete older plugin fixture\n")
+        with self.subTest(plugin="incomplete_newer_with_complete_older"):
+            result = invoke()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, str(older_entry) + "\n")
+        entry = plugin / "dist" / "index.js"
+        entry.write_text("installed plugin fixture\n")
+        with self.subTest(plugin="installed"):
+            result = invoke()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, str(entry) + "\n")
+
     def test_versioned_tool_paths_follow_the_linux_pins(self):
         # A pinned install's own path in a template (${ECO_ROOT}/tools/<id>-<version>/) moves with that pin.
         # The templates carry the WSL2 workstation's values, so the Linux pins file is the reference.
