@@ -1,0 +1,74 @@
+== ubuntu-24.04-S-r1 (exit 0, 11103 log lines)
+first: test_default_application_plan_passes_actual_dispatch_source_guard (tests.test_active_recovery_plans.ActiveRecoveryPlanTests.test_default_application_plan_passes_actual_dispatch_source_guard) ... ok
+summary: Ran 9823 tests in 1683.570s
+summary: OK (skipped=967)
+last: }
+== ubuntu-24.04-S-r2 (exit 0, 11103 log lines)
+first: test_default_application_plan_passes_actual_dispatch_source_guard (tests.test_active_recovery_plans.ActiveRecoveryPlanTests.test_default_application_plan_passes_actual_dispatch_source_guard) ... ok
+summary: Ran 9823 tests in 1654.267s
+summary: OK (skipped=967)
+last: }
+== ubuntu-24.04-S-r3 (exit 0, 11103 log lines)
+first: test_default_application_plan_passes_actual_dispatch_source_guard (tests.test_active_recovery_plans.ActiveRecoveryPlanTests.test_default_application_plan_passes_actual_dispatch_source_guard) ... ok
+summary: Ran 9823 tests in 1182.714s
+summary: OK (skipped=967)
+last: }
+== ubuntu-24.04-L4-r1 (exit 1, 20948 log lines)
+first: Running 233 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-L4-r2 (exit 1, 20948 log lines)
+first: Running 233 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-L4-r3 (exit 1, 20948 log lines)
+first: Running 233 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-L4F-r1 (exit 1, 20948 log lines)
+first: Running 233 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-L4F-r2 (exit 1, 20948 log lines)
+first: Running 233 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-L4F-r3 (exit 1, 20948 log lines)
+first: Running 233 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-L4C-r1 (exit 1, 21184 log lines)
+first: Running 1475 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-L4C-r2 (exit 1, 21184 log lines)
+first: Running 1475 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-L4C-r3 (exit 1, 21186 log lines)
+first: Running 1475 test suites (9823 total tests) across 4 workers
+last: TypeError: cannot pickle '_contextvars.Context' object
+== ubuntu-24.04-S-controls (exit 1, 53 log lines)
+first: test_error (test_zz_trial_controls.TrialControlsA.test_error) ... ERROR
+summary: Ran 8 tests in 0.001s
+summary: FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+last: FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+== ubuntu-24.04-S-crash (exit 3, 1 log lines)
+first: test_crash (test_crash.CrashControl.test_crash) ... 
+last: test_crash (test_crash.CrashControl.test_crash) ... 
+== ubuntu-24.04-L4-controls (exit 5, 65 log lines)
+first: Running 1 test suites (9 total tests) across 1 workers
+summary: Ran 8 tests in 0.107s
+summary: FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+last: FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+== ubuntu-24.04-L4-crash (exit 124, 5 log lines)
+first: Running 1 test suites (1 total tests) across 1 workers
+last:   warnings.warn('resource_tracker: There appear to be %d '
+== ubuntu-24.04-L4F-controls (exit 5, 65 log lines)
+first: Running 1 test suites (9 total tests) across 1 workers
+summary: Ran 8 tests in 0.109s
+summary: FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+last: FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+== ubuntu-24.04-L4F-crash (exit 124, 5 log lines)
+first: Running 1 test suites (1 total tests) across 1 workers
+last:   warnings.warn('resource_tracker: There appear to be %d '
+== ubuntu-24.04-L4C-controls (exit 5, 65 log lines)
+first: Running 3 test suites (9 total tests) across 3 workers
+summary: Ran 8 tests in 0.144s
+summary: FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+last: FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+== ubuntu-24.04-L4C-crash (exit 124, 5 log lines)
+first: Running 1 test suites (1 total tests) across 1 workers
+last:   warnings.warn('resource_tracker: There appear to be %d '
