@@ -13,7 +13,9 @@ it runs no provider/model calls, installs or historical trials.
   head `e9bd476cdab11751ee7be00ac2c954ce65ff3c60`.
 - Source merge base: `46365ea812c3a680b19c8c8c9c3bb198bf3b38ab`.
 - Frozen trial base: `29458b4342422c979ad3b9bc62532ea6f05073c1`.
-- Port worktree base: `cac8700ba914950266272347468bff7ad630a4bf`.
+- Content build base (before rebase): `cac8700ba914950266272347468bff7ad630a4bf`.
+  The content commit was then rebased onto main
+  `1f5a791b02a230aced670c88bab3d3d0ebcf401a`, the PR's base at publication.
 - The source branch is left unrewritten. The 13 original artifacts, receipt and
   16 example files are carried at their original paths. The receipt and
   convergence record receive only the two rebindings below; all other carried
@@ -72,7 +74,7 @@ a dated fact and supplies no current version or default claim.
 | --- | --- |
 | OpenHands CLI: 108 passed; standalone SDK: 184 passed | Historical unchanged upstream tests at their pinned revisions. Earlier SDK scope/naming failures remain retained. |
 | DeepAgents: 361 passed plus 1 expected failure | Historical unchanged upstream tests in the separate upstream-lock environment. |
-| One OpenHands OmniRoute Sol-Max round trip: HTTP 200, 85 returned tokens | Historical native execution of the bounded LLM operation; no comparative framework or full-conversation claim. |
+| One OpenHands OmniRoute Sol-Max round trip: HTTP 200, 85 total tokens (36 input; 49 output, 34 of them reasoning; `openhands-llm.json` `provider_usage`) | Historical native execution of the bounded LLM operation; no comparative framework or full-conversation claim. |
 | DeepAgents original 24-step attempt failed; one 32-step saved-context repair passed; fresh-process SQLite continuation passed | Historical native execution with a locally authored task/oracle; original and repaired conditions remain distinct. |
 | 28 scoped requests; 27 unique AI-message usage records | Historical scoped wire observation and independently deduplicated returned usage. Complete provider billing/backend identity and whole-task savings remain unknown; subset counters are not summed twice. |
 | Port hashes, pointers and registration | Structural/local integration checks of the carried bytes; no new runtime or model execution. |
