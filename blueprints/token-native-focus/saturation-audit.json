@@ -268,7 +268,7 @@
           {
             "id": "agent-browser-0382-qualification-20261003",
             "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json",
-            "kind": "native_cli_e2e"
+            "kind": "compatibility_attempt"
           }
         ],
         "retained_operation_ids": [
@@ -280,7 +280,7 @@
           "fresh-browser-result",
           "fresh-browser-close"
         ],
-        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings. The 0.38.2 receipt is compatibility_attempt for installation, version and offline readiness only; the retained browser workflow evidence predates 0.38.2 and does not establish browser acceptance for the current pin."
       },
       "artifact_baselines": [
         {
@@ -299,7 +299,7 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Owned browser open/fill/click/result/close fixture passed.",
+        "scope": "Retained browser open/fill/click/result/close fixture evidence predates 0.38.2. The 0.38.2 compatibility_attempt covers installation, version and offline readiness; no browser installation, Chrome launch or browser workflow was run for 0.38.2.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -321,7 +321,7 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Owned browser open/fill/click/result/close fixture passed; no personal profile was used.",
+          "scope": "Owned browser open/fill/click/result/close fixture passed; no personal profile was used. This is retained evidence from before 0.38.2, not acceptance of the current pin.",
           "evidence_refs": [
             "evidence/receipts/token-practice-gap-followup-20260920.json"
           ]
@@ -338,7 +338,7 @@
         },
         "cleanup": {
           "status": "accepted_within_scope",
-          "scope": "Owned browser open/fill/click/result/close fixture passed; no personal profile was used.",
+          "scope": "Owned browser open/fill/click/result/close fixture passed; no personal profile was used. This is retained evidence from before 0.38.2, not acceptance of the current pin.",
           "evidence_refs": [
             "evidence/receipts/token-practice-gap-followup-20260920.json"
           ]

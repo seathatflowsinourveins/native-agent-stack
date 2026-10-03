@@ -237,7 +237,8 @@ poll stored notifications:
 curl --fail --silent 'http://127.0.0.1:18080/ecosystem-alerts/json?poll=1&since=all'
 ```
 
-Grafana anonymous access and sign-up are disabled. Optional Grafana and Loki
+Sign-up is disabled; anonymous Viewer access is enabled on loopback (see
+[Install and configure](#install-and-configure)). Optional Grafana and Loki
 analytics/update checks are disabled. The other backend endpoints intentionally
 rely on loopback and local-user trust, not authentication. Do not expose these
 ports through a public reverse proxy without separately designing authentication,

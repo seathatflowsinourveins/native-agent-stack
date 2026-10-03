@@ -62,7 +62,7 @@
         "https://github.com/vercel-labs/agent-browser/tree/39a74c70d7759d5a6de7a22c04570bb626bbd081"
       ],
       "source_pin": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
-      "freshness": "Qualified in an isolated Linux x86_64 prefix on 2026-10-03; W1b integrates the recorded W1-r2 qualification. Host activation remains separate."
+      "freshness": "Installation, version and offline skills/config readiness qualified in an isolated Linux x86_64 prefix on 2026-10-03 (compatibility_attempt); W1b integrates the W1-r2 record. Browser installation, Chrome launch and browser workflow on 0.38.2 remain untested; host activation is separate."
     },
     {
       "id": "agentsview",

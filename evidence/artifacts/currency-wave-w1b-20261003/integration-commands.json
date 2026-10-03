@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "native_cli_integration_observations",
-  "scope": "W1b actual returned command outputs. Paths are role markers. W1-r2 install/synthetic smoke are retained separately and were not rerun. A failed npm default-cache read is retained before the supported --cache correction.",
+  "scope": "W1b actual returned command outputs. Paths are role markers. W1-r2 install/synthetic smoke are retained separately and were not rerun. A failed npm default-cache read is retained before the supported --cache correction. retained_output_provenance documents the earlier W1-r2 0.38.1 control; it is not an additional W1b execution.",
   "commands": [
     {
       "id": "agent-browser-version",
@@ -60,5 +60,13 @@
       "output": "2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49  <QUALIFICATION_ROOT>/agent-browser/agent-browser-0.38.2.tgz\n6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235  <QUALIFICATION_ROOT>/grafana/grafana_13.2.3_36482603486_linux_amd64.tar.gz\n"
     }
   ],
-  "source_collection_limitation": "The web open operation returned HTTP 400 (unsupported operation). Installed gh api checks and the publisher checksum URL supplied the current primary evidence."
+  "source_collection_limitation": "The web open operation returned HTTP 400 (unsupported operation). Installed gh api checks and the publisher checksum URL supplied the current primary evidence.",
+  "retained_output_provenance": [
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.1.stdout.txt",
+      "command": "HOME=<QUALIFICATION_ROOT>/agent-browser/home <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.1/bin/agent-browser skills list",
+      "exit_code": 0,
+      "provenance": "Retained W1-r2 0.38.1 control output; qualification-record.json#/facts/smoke records this command family and the control. This was not a W1b execution."
+    }
+  ]
 }

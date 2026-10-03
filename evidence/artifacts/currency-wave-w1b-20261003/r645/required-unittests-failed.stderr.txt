@@ -1,0 +1,1542 @@
+......................................................................FFFFFFFF.FF....................................FFFFFFFFFFFFFF....F.FsFFFFF...FFF.FFF.FFFFFFFFF.FF....FF..FFFFFFFFF.FF..FF..FFFFFFF..FFF..FFFFFFFFFFFFFFFFFEEFFF.FFFFFFFEF..FFFFFFFFFFFFFFFFFFFFFFFF.FFFFF.ssFF....FFFFFFFF..............
+======================================================================
+ERROR: test_invalid_restage_through_start_and_run_records_inputs_changed (tests.test_landscape_sweep_harness.RunnerTests.test_invalid_restage_through_start_and_run_records_inputs_changed) (command='start')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2044, in test_invalid_restage_through_start_and_run_records_inputs_changed
+    self.assertEqual((directory / "exit").read_text().strip(), "2")
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_abc.py", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '<WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-_2nl5do2/gpt6/start/exit'
+
+======================================================================
+ERROR: test_invalid_restage_through_start_and_run_records_inputs_changed (tests.test_landscape_sweep_harness.RunnerTests.test_invalid_restage_through_start_and_run_records_inputs_changed) (command='run')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2044, in test_invalid_restage_through_start_and_run_records_inputs_changed
+    self.assertEqual((directory / "exit").read_text().strip(), "2")
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_abc.py", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '<WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-_2nl5do2/gpt6/run/exit'
+
+======================================================================
+ERROR: test_settings_changed_between_binding_and_launch_are_refused (tests.test_landscape_sweep_harness.RunnerTests.test_settings_changed_between_binding_and_launch_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2221, in test_settings_changed_between_binding_and_launch_are_refused
+    result = json.loads(self.call("result", "snapshot").stdout)
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+======================================================================
+FAIL: test_args_are_compact_and_the_run_is_staged (tests.test_landscape_sweep_harness.BuildArgsTests.test_args_are_compact_and_the_run_is_staged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1164, in test_args_are_compact_and_the_run_is_staged
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-d7b287m8 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_embedded_copy_replaces_the_single_args_line (tests.test_landscape_sweep_harness.BuildArgsTests.test_embedded_copy_replaces_the_single_args_line)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1200, in test_embedded_copy_replaces_the_single_args_line
+    self.assertEqual(build(work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_refusals (tests.test_landscape_sweep_harness.BuildArgsTests.test_refusals)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1241, in test_refusals
+    self.assertIn("already holds 1 job", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'already holds 1 job' not found in 'build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ox1_lpyz is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_smoke_due_report_and_explicit_layer_selection (tests.test_landscape_sweep_harness.BuildArgsTests.test_smoke_due_report_and_explicit_layer_selection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1218, in test_smoke_due_report_and_explicit_layer_selection
+    self.assertEqual(build(work, "--smoke", "beta").returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_a_gap_beyond_the_five_shown_gets_no_followup (tests.test_landscape_sweep_harness.BuildInputsTests.test_a_gap_beyond_the_five_shown_gets_no_followup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 560, in test_a_gap_beyond_the_five_shown_gets_no_followup
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-7jljlv23 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_a_proposal_refuted_by_absence_is_shown_as_not_adjudicated (tests.test_landscape_sweep_harness.BuildInputsTests.test_a_proposal_refuted_by_absence_is_shown_as_not_adjudicated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 586, in test_a_proposal_refuted_by_absence_is_shown_as_not_adjudicated
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ao6yuax3 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_inputs_carry_scope_winners_pins_previous_sweep_and_seeds (tests.test_landscape_sweep_harness.BuildInputsTests.test_inputs_carry_scope_winners_pins_previous_sweep_and_seeds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 471, in test_inputs_carry_scope_winners_pins_previous_sweep_and_seeds
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-km6arjcn is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_inputs_date_the_sealed_verdict_fields_and_join_the_gap_ledgers (tests.test_landscape_sweep_harness.BuildInputsTests.test_inputs_date_the_sealed_verdict_fields_and_join_the_gap_ledgers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 514, in test_inputs_date_the_sealed_verdict_fields_and_join_the_gap_ledgers
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-7me2lr7s is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_two_ledgers_that_record_the_same_followup_share_one_entry (tests.test_landscape_sweep_harness.BuildInputsTests.test_two_ledgers_that_record_the_same_followup_share_one_entry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 543, in test_two_ledgers_that_record_the_same_followup_share_one_entry
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ga_lk8lp is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_unknown_seed_layers_and_unfrozen_layers_are_refused (tests.test_landscape_sweep_harness.BuildInputsTests.test_unknown_seed_layers_and_unfrozen_layers_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 596, in test_unknown_seed_layers_and_unfrozen_layers_are_refused
+    self.assertIn("zeta", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'zeta' not found in 'build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-q5yme17_ is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_v2_blind_input_carries_only_readable_target_requirements_and_separate_hash (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_blind_input_carries_only_readable_target_requirements_and_separate_hash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 825, in test_v2_blind_input_carries_only_readable_target_requirements_and_separate_hash
+    self.assertEqual(self.build().returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_v2_failed_api_facts_stay_unknown_pending_and_later_members_and_layers_continue (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_failed_api_facts_stay_unknown_pending_and_later_members_and_layers_continue)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1009, in test_v2_failed_api_facts_stay_unknown_pending_and_later_members_and_layers_continue
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-cp6khhm6 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_field_catalog_provenance_resolves_to_the_recorded_member (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_field_catalog_provenance_resolves_to_the_recorded_member)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 771, in test_v2_field_catalog_provenance_resolves_to_the_recorded_member
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5pmxn4m2 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_field_includes_known_review_seed_and_all_historical_proposals (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_field_includes_known_review_seed_and_all_historical_proposals)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 794, in test_v2_field_includes_known_review_seed_and_all_historical_proposals
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ljcoau42 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_field_keeps_actual_hugging_face_history_and_fit_refutations_pending (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_field_keeps_actual_hugging_face_history_and_fit_refutations_pending)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 742, in test_v2_field_keeps_actual_hugging_face_history_and_fit_refutations_pending
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-esoakyrf is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_hub_pull_keeps_host_unknowns_null_and_failure_does_not_abort (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_hub_pull_keeps_host_unknowns_null_and_failure_does_not_abort)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1048, in test_v2_hub_pull_keeps_host_unknowns_null_and_failure_does_not_abort
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-chocyoj9 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_malformed_api_payload_retains_its_hash_and_leaves_facts_pending (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_malformed_api_payload_retains_its_hash_and_leaves_facts_pending)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1030, in test_v2_malformed_api_payload_retains_its_hash_and_leaves_facts_pending
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-zpg_k4nw is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_offline_fit_input_withholds_origin_facts_and_keeps_equal_primary_sources (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_offline_fit_input_withholds_origin_facts_and_keeps_equal_primary_sources)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 879, in test_v2_offline_fit_input_withholds_origin_facts_and_keeps_equal_primary_sources
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-dc_vis_e is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_pinned_requirements_and_declarative_gates_survive_without_executed_status (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_pinned_requirements_and_declarative_gates_survive_without_executed_status)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1107, in test_v2_pinned_requirements_and_declarative_gates_survive_without_executed_status
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-q9qzc5jd is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_pull_reuses_one_origin_neutral_snapshot_for_every_membership (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_pull_reuses_one_origin_neutral_snapshot_for_every_membership)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 967, in test_v2_pull_reuses_one_origin_neutral_snapshot_for_every_membership
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-6ucu7vzi is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs) (problem='changed_scope')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 862, in test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs
+    self.assertIn("platform", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'platform' not found in 'build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-as3a53ly is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs) (problem='missing_architecture')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 862, in test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs
+    self.assertIn("platform", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'platform' not found in 'build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-as3a53ly is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs) (problem='duplicate_profile_id')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 862, in test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs
+    self.assertIn("platform", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'platform' not found in 'build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-as3a53ly is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_v2_requirement_keeps_capability_words_that_are_only_repository_owner_fragments (tests.test_landscape_sweep_harness.NeutralFieldTests.test_v2_requirement_keeps_capability_words_that_are_only_repository_owner_fragments)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 765, in test_v2_requirement_keeps_capability_words_that_are_only_repository_owner_fragments
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_inputs.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5s_sy3nu is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_legacy_staging_refuses_v2_inputs_before_writing_a_launchable_runner (tests.test_landscape_sweep_harness.NeutralStagingTests.test_legacy_staging_refuses_v2_inputs_before_writing_a_launchable_runner)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1130, in test_legacy_staging_refuses_v2_inputs_before_writing_a_launchable_runner
+    self.assertIn("V2", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 'V2' not found in 'build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-spztbw33 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_codex_host_accepts_a_private_host_value_file_by_path (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_codex_host_accepts_a_private_host_value_file_by_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1611, in test_codex_host_accepts_a_private_host_value_file_by_path
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-e0hh9ilz is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_framework_instance_lane_stages_static_provider_headers (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_framework_instance_lane_stages_static_provider_headers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1463, in test_framework_instance_lane_stages_static_provider_headers
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-_s4r20wn is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_lane_allows_context_mode_exactly_the_skill_files (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_lane_allows_context_mode_exactly_the_skill_files)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1547, in test_lane_allows_context_mode_exactly_the_skill_files
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-3haqm80w is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_lane_home_carries_provider_mcp_servers_and_profile (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_lane_home_carries_provider_mcp_servers_and_profile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1367, in test_lane_home_carries_provider_mcp_servers_and_profile
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-jtvkh4fd is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_lane_home_carries_the_hosts_codex_user_instructions (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_lane_home_carries_the_hosts_codex_user_instructions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1696, in test_lane_home_carries_the_hosts_codex_user_instructions
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-2hajzhco is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_lane_refuses_quota_gate_missing_host_and_remote_gateways (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_lane_refuses_quota_gate_missing_host_and_remote_gateways)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1598, in test_lane_refuses_quota_gate_missing_host_and_remote_gateways
+    self.assertIn(needle, done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '--quota-stop-percent' not found in 'build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-njtijy4n is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_missing_profile_names_the_flag (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_missing_profile_names_the_flag)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1690, in test_missing_profile_names_the_flag
+    self.assertIn("pass --stack-worker-profile", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'pass --stack-worker-profile' not found in 'build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ep5x0c57 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_native_default_is_unchanged (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_native_default_is_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1721, in test_native_default_is_unchanged
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-qkuv54sq is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_omniroute_header_refusals_stage_nothing (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_omniroute_header_refusals_stage_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1507, in test_omniroute_header_refusals_stage_nothing
+    self.assertIn("per-request switches", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'per-request switches' not found in 'build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-gezbzsq6 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_profile_may_define_a_whole_server (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_profile_may_define_a_whole_server)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1677, in test_profile_may_define_a_whole_server
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-cp1j5wri is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_profile_overlay_for_a_rendered_server_stages (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_profile_overlay_for_a_rendered_server_stages)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1664, in test_profile_overlay_for_a_rendered_server_stages
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-yd3kzfyw is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_profile_overlay_for_an_undefined_server_fails_closed (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_profile_overlay_for_an_undefined_server_fails_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1671, in test_profile_overlay_for_an_undefined_server_fails_closed
+    self.assertIn("absent-server", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'absent-server' not found in 'build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-2eefgu_9 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_require_key_stages_no_placeholder (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_require_key_stages_no_placeholder)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1715, in test_require_key_stages_no_placeholder
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-0499we1o is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_shipped_profile_overlays_only_rendered_servers (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_shipped_profile_overlays_only_rendered_servers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1683, in test_shipped_profile_overlays_only_rendered_servers
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-___weg2r is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_two_slash_model_is_refused_by_builder_and_runner (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_two_slash_model_is_refused_by_builder_and_runner) (entrypoint='build_args.py', model='sharedgw/cx/gpt-6-astra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1437, in test_two_slash_model_is_refused_by_builder_and_runner
+    self.assertIn("fallback metadata", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'fallback metadata' not found in 'build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-73e_s7ct is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_two_slash_model_is_refused_by_builder_and_runner (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_two_slash_model_is_refused_by_builder_and_runner) (entrypoint='codex_call.sh start', model='sharedgw/cx/gpt-6-astra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1444, in test_two_slash_model_is_refused_by_builder_and_runner
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-r1rzm7q7 is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_two_slash_model_is_refused_by_builder_and_runner (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_two_slash_model_is_refused_by_builder_and_runner) (entrypoint='build_args.py', model='my.gw/gpt-6-astra-max')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1437, in test_two_slash_model_is_refused_by_builder_and_runner
+    self.assertIn("fallback metadata", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'fallback metadata' not found in 'build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-9z1xzizw is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)\n'
+
+======================================================================
+FAIL: test_two_slash_model_is_refused_by_builder_and_runner (tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_two_slash_model_is_refused_by_builder_and_runner) (entrypoint='codex_call.sh start', model='my.gw/gpt-6-astra-max')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1444, in test_two_slash_model_is_refused_by_builder_and_runner
+    self.assertEqual(done.returncode, 0, done.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : build_args.py: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-n_0ntr7x is inside the git repository <WORKTREE>; keep it outside every repository (it holds prompts, host paths and raw Codex output)
+
+
+======================================================================
+FAIL: test_keyless_lane_uses_the_placeholder_only_when_the_variable_is_unset (tests.test_landscape_sweep_harness.OmniRouteLaneRunnerTests.test_keyless_lane_uses_the_placeholder_only_when_the_variable_is_unset)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1931, in test_keyless_lane_uses_the_placeholder_only_when_the_variable_is_unset
+    result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ap_1i1kk is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_lane_headers_must_match_the_lane_home_and_are_recorded_per_job (tests.test_landscape_sweep_harness.OmniRouteLaneRunnerTests.test_lane_headers_must_match_the_lane_home_and_are_recorded_per_job)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1971, in test_lane_headers_must_match_the_lane_home_and_are_recorded_per_job
+    result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-xd_6d535 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_lane_overrides_profile_effort_and_web_search_from_staged_settings (tests.test_landscape_sweep_harness.OmniRouteLaneRunnerTests.test_lane_overrides_profile_effort_and_web_search_from_staged_settings)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1909, in test_lane_overrides_profile_effort_and_web_search_from_staged_settings
+    result = self.job("worker", last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ht50q1k1 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_lane_uses_its_codex_home_and_profile (tests.test_landscape_sweep_harness.OmniRouteLaneRunnerTests.test_lane_uses_its_codex_home_and_profile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1890, in test_lane_uses_its_codex_home_and_profile
+    result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-oo7vis8b is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_lane_without_its_key_never_starts_codex (tests.test_landscape_sweep_harness.OmniRouteLaneRunnerTests.test_lane_without_its_key_never_starts_codex)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1919, in test_lane_without_its_key_never_starts_codex
+    result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-3qzhoonx is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_failed_probe_is_recorded_and_never_blocks_the_job (tests.test_landscape_sweep_harness.QuotaGateTests.test_a_failed_probe_is_recorded_and_never_blocks_the_job)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2901, in test_a_failed_probe_is_recorded_and_never_blocks_the_job
+    result = self.job("gpt6-probe", last=LAST, events=[COMPLETED], quota={"error": error})
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-wf0keew8 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_limit_flag_reaches_the_gate_below_the_percent (tests.test_landscape_sweep_harness.QuotaGateTests.test_a_limit_flag_reaches_the_gate_below_the_percent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2888, in test_a_limit_flag_reaches_the_gate_below_the_percent
+    result = self.job("gpt6-flagged", quota={"result": quota_answer(10, reached="rate_limit_reached")})
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-9c7o0a_6 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_bad_stop_percents_are_refused_before_anything_changes (tests.test_landscape_sweep_harness.QuotaGateTests.test_bad_stop_percents_are_refused_before_anything_changes) [0]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2934, in test_bad_stop_percents_are_refused_before_anything_changes
+    self.assertIn("quota_stop_percent", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'quota_stop_percent' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ib2jd3xf is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_bad_stop_percents_are_refused_before_anything_changes (tests.test_landscape_sweep_harness.QuotaGateTests.test_bad_stop_percents_are_refused_before_anything_changes) [101]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2934, in test_bad_stop_percents_are_refused_before_anything_changes
+    self.assertIn("quota_stop_percent", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'quota_stop_percent' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ib2jd3xf is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_bad_stop_percents_are_refused_before_anything_changes (tests.test_landscape_sweep_harness.QuotaGateTests.test_bad_stop_percents_are_refused_before_anything_changes) [95]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2934, in test_bad_stop_percents_are_refused_before_anything_changes
+    self.assertIn("quota_stop_percent", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'quota_stop_percent' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ib2jd3xf is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_bad_stop_percents_are_refused_before_anything_changes (tests.test_landscape_sweep_harness.QuotaGateTests.test_bad_stop_percents_are_refused_before_anything_changes) [True]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2934, in test_bad_stop_percents_are_refused_before_anything_changes
+    self.assertIn("quota_stop_percent", done.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'quota_stop_percent' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ib2jd3xf is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_below_the_stop_percent_the_job_runs_and_the_probe_is_recorded (tests.test_landscape_sweep_harness.QuotaGateTests.test_below_the_stop_percent_the_job_runs_and_the_probe_is_recorded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2842, in test_below_the_stop_percent_the_job_runs_and_the_probe_is_recorded
+    result = self.job("gpt6-probe", last=LAST, events=[COMPLETED],
+                      quota={"log": str(probes), "result": quota_answer(63)})
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-zqvawvzq is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_reaching_the_stop_percent_refuses_like_a_usage_limit (tests.test_landscape_sweep_harness.QuotaGateTests.test_reaching_the_stop_percent_refuses_like_a_usage_limit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2861, in test_reaching_the_stop_percent_refuses_like_a_usage_limit
+    result = self.job("gpt6-fit-alpha", last=LAST, events=[COMPLETED], quota={"result": quota_answer(96)})
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-bjnn_ojt is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_the_gate_is_off_by_default (tests.test_landscape_sweep_harness.QuotaGateTests.test_the_gate_is_off_by_default)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2834, in test_the_gate_is_off_by_default
+    result = self.job("gpt6-probe", last=LAST, events=[COMPLETED],
+                      quota={"log": str(probes), "result": quota_answer(99)})
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-f_3yl36v is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_the_stop_percent_keeps_its_precision (tests.test_landscape_sweep_harness.QuotaGateTests.test_the_stop_percent_keeps_its_precision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2855, in test_the_stop_percent_keeps_its_precision
+    result = self.job("gpt6-precise", last=LAST, events=[COMPLETED], quota={"result": quota_answer(95)})
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-r7tblmh6 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_backoff_longer_than_remaining_budget_preserves_original_failure (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_backoff_longer_than_remaining_budget_preserves_original_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2704, in test_backoff_longer_than_remaining_budget_preserves_original_failure
+    result = self.job("too-long", attempts=[{"exit": 1, "events": self.capacity_events()}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-fla3osor is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_capacity_retries_once_for_duplicate_error_reports_and_retains_the_failure (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_capacity_retries_once_for_duplicate_error_reports_and_retains_the_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2726, in test_capacity_retries_once_for_duplicate_error_reports_and_retains_the_failure
+    result = self.job("recover", attempts=[{"exit": 1, "events": self.capacity_events()},
+                                          {"last": LAST, "events": [COMPLETED]}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ioza4v_9 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_capacity_retry_budget_and_backoff_cap (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_capacity_retry_budget_and_backoff_cap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2738, in test_capacity_retry_budget_and_backoff_cap
+    result = self.job("capacity", attempts=[{"exit": 1, "events": self.capacity_events()}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-giaxdzri is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_idle_failure_can_recover (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_idle_failure_can_recover)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2810, in test_idle_failure_can_recover
+    result = self.job("idle-recover", attempts=[{"sleep": 60}, {"last": LAST, "events": [COMPLETED]}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-kbr8a0ry is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_idle_stops_the_group_retries_once_and_retains_both_failures (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_idle_stops_the_group_retries_once_and_retains_both_failures)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2766, in test_idle_stops_the_group_retries_once_and_retains_both_failures
+    result = self.job("silent", attempts=[{"sleep": 60, "stubborn": str(p)} for p in pid_files])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-v_ikrd6n is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_limits_take_precedence_over_capacity (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_limits_take_precedence_over_capacity) (message='You’ve hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at Sep 30th, 2026 11:50 PM.')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2752, in test_limits_take_precedence_over_capacity
+    result = self.job("limited", attempts=[{"exit": 1, "events":
+        self.capacity_events() + [{"type": "error", "message": message}]}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-v786kj_6 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_limits_take_precedence_over_capacity (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_limits_take_precedence_over_capacity) (message='exceeded retry limit, last status: 429 Too Many Requests')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2752, in test_limits_take_precedence_over_capacity
+    result = self.job("limited", attempts=[{"exit": 1, "events":
+        self.capacity_events() + [{"type": "error", "message": message}]}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-v786kj_6 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_new_complete_events_keep_the_job_alive (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_new_complete_events_keep_the_job_alive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2806, in test_new_complete_events_keep_the_job_alive
+    result = self.job("progress", ticks=ticks, last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-b8_ioh53 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_quoted_capacity_and_stderr_trace_are_not_retryable (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_quoted_capacity_and_stderr_trace_are_not_retryable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2758, in test_quoted_capacity_and_stderr_trace_are_not_retryable
+    result = self.job("quoted", exit=1,
+                      events=[{"type": "item.completed", "item": {"type": "web_search", "text": self.CAPACITY}}],
+                      stderr="2026-09-30 TRACE tool: " + self.CAPACITY + "\n")
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-syy6suar is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_real_quota_probe_runs_before_both_attempts (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_real_quota_probe_runs_before_both_attempts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2681, in test_real_quota_probe_runs_before_both_attempts
+    result = self.job("probe-twice", quota={"log": str(probes), "result": quota_answer(10)},
+                      attempts=[{"exit": 1, "events": self.capacity_events()},
+                                {"last": LAST, "events": [COMPLETED]}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-179v3by2 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_reconnect_error_events_are_not_progress (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_reconnect_error_events_are_not_progress)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2786, in test_reconnect_error_events_are_not_progress
+    result = self.job("reconnect", attempts=[{"sleep": 60, "ticks": ticks}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-ukjowh9n is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_retry_floor_prevents_backoff_with_less_than_300_seconds_after_delay (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_retry_floor_prevents_backoff_with_less_than_300_seconds_after_delay)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2713, in test_retry_floor_prevents_backoff_with_less_than_300_seconds_after_delay
+    result = self.job("retry-floor", attempts=[{"exit": 1, "events": self.capacity_events()}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-nlag7v2g is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_stderr_and_incomplete_json_are_not_progress (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_stderr_and_incomplete_json_are_not_progress)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2780, in test_stderr_and_incomplete_json_are_not_progress
+    result = self.job("partial", attempts=[{"sleep": 60, "ticks": ticks}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-diqupqo9 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_terminal_stderr_capacity_error_is_retryable (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_terminal_stderr_capacity_error_is_retryable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2719, in test_terminal_stderr_capacity_error_is_retryable
+    result = self.job("stderr-capacity", attempts=[{"exit": 1, "stderr": "ERROR: " + self.CAPACITY + "\n"},
+                                                  {"last": LAST, "events": [COMPLETED]}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-6qtomznv is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_total_timeout_remains_terminal (tests.test_landscape_sweep_harness.RecoveryRunnerTests.test_total_timeout_remains_terminal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2817, in test_total_timeout_remains_terminal
+    result = self.job("total-timeout", attempts=[{"sleep": 60}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-wyqcut4r is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_done_job_is_reused_only_for_the_same_inputs (tests.test_landscape_sweep_harness.RunnerTests.test_a_done_job_is_reused_only_for_the_same_inputs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2375, in test_a_done_job_is_reused_only_for_the_same_inputs
+    first = self.job("gpt6-fit-alpha", last=LAST, log=str(log), events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-d2oh5jmb is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_model_outside_the_catalog_takes_every_effort_but_ultra (tests.test_landscape_sweep_harness.RunnerTests.test_a_model_outside_the_catalog_takes_every_effort_but_ultra)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2205, in test_a_model_outside_the_catalog_takes_every_effort_but_ultra
+    result = self.job("outside", last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-8eelk22m is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit (tests.test_landscape_sweep_harness.RunnerTests.test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit) (status='500 Internal Server Error')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2348, in test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit
+    result = self.job(f"gpt6-status-{status.split()[0]}", exit=1, stderr="Reading additional input from stdin...\n",
+                      events=[{"type": "error", "message":
+                               f"exceeded retry limit, last status: {status}, request id: r"}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-fyu8yk1h is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit (tests.test_landscape_sweep_harness.RunnerTests.test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit) (status='502 Bad Gateway')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2348, in test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit
+    result = self.job(f"gpt6-status-{status.split()[0]}", exit=1, stderr="Reading additional input from stdin...\n",
+                      events=[{"type": "error", "message":
+                               f"exceeded retry limit, last status: {status}, request id: r"}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-fyu8yk1h is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit (tests.test_landscape_sweep_harness.RunnerTests.test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit) (status='4290 Unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2348, in test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit
+    result = self.job(f"gpt6-status-{status.split()[0]}", exit=1, stderr="Reading additional input from stdin...\n",
+                      events=[{"type": "error", "message":
+                               f"exceeded retry limit, last status: {status}, request id: r"}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-fyu8yk1h is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit (tests.test_landscape_sweep_harness.RunnerTests.test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit) (status='404 Not Found')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2348, in test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit
+    result = self.job(f"gpt6-status-{status.split()[0]}", exit=1, stderr="Reading additional input from stdin...\n",
+                      events=[{"type": "error", "message":
+                               f"exceeded retry limit, last status: {status}, request id: r"}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-fyu8yk1h is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_a_running_job_is_not_started_twice (tests.test_landscape_sweep_harness.RunnerTests.test_a_running_job_is_not_started_twice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2406, in test_a_running_job_is_not_started_twice
+    self.assertEqual(self.call("start", "gpt6-slow", self.prompt, self.schema).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_a_usage_limit_report_keeps_its_empty_marker_when_a_retry_report_follows (tests.test_landscape_sweep_harness.RunnerTests.test_a_usage_limit_report_keeps_its_empty_marker_when_a_retry_report_follows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2337, in test_a_usage_limit_report_keeps_its_empty_marker_when_a_retry_report_follows
+    result = self.job("gpt6-both", exit=1, stderr="Reading additional input from stdin...\n",
+                      events=[{"type": "error", "message": LIMIT_TEXT},
+                              {"type": "error", "message": RETRY_429_TEXT}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-jn7b1bwd is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_catalog_request_effort_mapping_and_primary_thread_usage (tests.test_landscape_sweep_harness.RunnerTests.test_catalog_request_effort_mapping_and_primary_thread_usage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2092, in test_catalog_request_effort_mapping_and_primary_thread_usage
+    result = self.job("delegated-max", last=LAST, events=[collab, COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-p69aui6b is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_cited_usage_limitation_text_never_sets_the_marker (tests.test_landscape_sweep_harness.RunnerTests.test_cited_usage_limitation_text_never_sets_the_marker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2293, in test_cited_usage_limitation_text_never_sets_the_marker
+    result = self.job("gpt6-discover-workers", last=LAST, events=[cited, search, COMPLETED],
+                      stderr="Reading additional input from stdin...\n")
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-1glbulra is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_codex_command_line_stdin_and_directory (tests.test_landscape_sweep_harness.RunnerTests.test_codex_command_line_stdin_and_directory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2263, in test_codex_command_line_stdin_and_directory
+    result = self.job("gpt6-probe", last=LAST, events=[{"type": "thread.started", "thread_id": "fixture"}, COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-fvy4nrsg is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_codex_sandbox_mount_targets_are_not_repositories (tests.test_landscape_sweep_harness.RunnerTests.test_codex_sandbox_mount_targets_are_not_repositories) (kind='empty-dir')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2498, in test_codex_sandbox_mount_targets_are_not_repositories
+    self.assertEqual(codex_job.inside_repository(root / "w"), expected)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PosixPath('<WORKTREE>') != None
+
+======================================================================
+FAIL: test_codex_sandbox_mount_targets_are_not_repositories (tests.test_landscape_sweep_harness.RunnerTests.test_codex_sandbox_mount_targets_are_not_repositories) (kind='empty-file')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2498, in test_codex_sandbox_mount_targets_are_not_repositories
+    self.assertEqual(codex_job.inside_repository(root / "w"), expected)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PosixPath('<WORKTREE>') != None
+
+======================================================================
+FAIL: test_completion_grace_allows_final_output_after_the_deadline (tests.test_landscape_sweep_harness.RunnerTests.test_completion_grace_allows_final_output_after_the_deadline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2104, in test_completion_grace_allows_final_output_after_the_deadline
+    result = self.job("completed-grace", events=[COMPLETED], output_delay_s=0.5, last=LAST)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-3o9399zn is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_completion_grace_is_bounded (tests.test_landscape_sweep_harness.RunnerTests.test_completion_grace_is_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2111, in test_completion_grace_is_bounded
+    result = self.job("completed-stuck", events=[COMPLETED], output_delay_s=60, last=LAST)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-nv2agzqp is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_effort_is_staged_bound_to_inputs_and_recorded_for_the_attempt (tests.test_landscape_sweep_harness.RunnerTests.test_effort_is_staged_bound_to_inputs_and_recorded_for_the_attempt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2183, in test_effort_is_staged_bound_to_inputs_and_recorded_for_the_attempt
+    first = self.job("worker", last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-jfp3egoq is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_gateway_429_sets_the_marker_with_a_reason_and_blocks_later_starts (tests.test_landscape_sweep_harness.RunnerTests.test_gateway_429_sets_the_marker_with_a_reason_and_blocks_later_starts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2324, in test_gateway_429_sets_the_marker_with_a_reason_and_blocks_later_starts
+    result = self.job("gpt6-gateway-429", exit=1, stderr="Reading additional input from stdin...\n",
+                      events=[{"type": "error", "message": RETRY_429_TEXT},
+                              {"type": "turn.failed", "error": {"message": RETRY_429_TEXT}}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-rhasc_xu is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs (tests.test_landscape_sweep_harness.RunnerTests.test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs) (name='no-turn')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2163, in test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs
+    self.job(name, **config)
+    ~~~~~~~~^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-37zppsh_ is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs (tests.test_landscape_sweep_harness.RunnerTests.test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs) (name='no-output')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2163, in test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs
+    self.job(name, **config)
+    ~~~~~~~~^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-37zppsh_ is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs (tests.test_landscape_sweep_harness.RunnerTests.test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs) (name='empty-output')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2163, in test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs
+    self.job(name, **config)
+    ~~~~~~~~^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-37zppsh_ is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_missing_codex_and_bad_inputs_fail_fast (tests.test_landscape_sweep_harness.RunnerTests.test_missing_codex_and_bad_inputs_fail_fast)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2464, in test_missing_codex_and_bad_inputs_fail_fast
+    self.assertEqual(done.returncode, 127)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 127
+
+======================================================================
+FAIL: test_model_and_usage_across_turns (tests.test_landscape_sweep_harness.RunnerTests.test_model_and_usage_across_turns)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2283, in test_model_and_usage_across_turns
+    result = self.job("gpt6-probe", last=LAST, events=[COMPLETED, COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-175n5j8n is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_nonzero_exit_is_a_failure_even_with_completed_turn_and_output (tests.test_landscape_sweep_harness.RunnerTests.test_nonzero_exit_is_a_failure_even_with_completed_turn_and_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2178, in test_nonzero_exit_is_a_failure_even_with_completed_turn_and_output
+    result = self.job("failed-turn", exit=1, last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-bfl1fc2a is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_other_failures_do_not_set_the_marker_and_rerun_on_the_next_start (tests.test_landscape_sweep_harness.RunnerTests.test_other_failures_do_not_set_the_marker_and_rerun_on_the_next_start)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2356, in test_other_failures_do_not_set_the_marker_and_rerun_on_the_next_start
+    result = self.job("gpt6-flaky", exit=1, log=str(log), events=[{"type": "error", "message": "stream error"}])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-cavhtzhc is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_refusal_paths_write_terminal_failure_receipts (tests.test_landscape_sweep_harness.RunnerTests.test_refusal_paths_write_terminal_failure_receipts) (name='bad-schema')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2124, in test_refusal_paths_write_terminal_failure_receipts
+    self.assertTrue((directory / "done").exists())
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_refusal_paths_write_terminal_failure_receipts (tests.test_landscape_sweep_harness.RunnerTests.test_refusal_paths_write_terminal_failure_receipts) (name='large-prompt')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2124, in test_refusal_paths_write_terminal_failure_receipts
+    self.assertTrue((directory / "done").exists())
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_rust_log_is_not_passed_to_codex_and_trace_text_never_sets_the_marker (tests.test_landscape_sweep_harness.RunnerTests.test_rust_log_is_not_passed_to_codex_and_trace_text_never_sets_the_marker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2436, in test_rust_log_is_not_passed_to_codex_and_trace_text_never_sets_the_marker
+    result = self.job("gpt6-traced", last=LAST, events=[COMPLETED], stderr=trace)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-a4pr35eg is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_slots_bound_concurrent_codex_processes (tests.test_landscape_sweep_harness.RunnerTests.test_slots_bound_concurrent_codex_processes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2422, in test_slots_bound_concurrent_codex_processes
+    self.assertEqual(self.call("start", name, self.prompt, self.schema).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_timeout_kills_children_that_ignore_term (tests.test_landscape_sweep_harness.RunnerTests.test_timeout_kills_children_that_ignore_term)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2444, in test_timeout_kills_children_that_ignore_term
+    result = self.job("gpt6-stubborn", sleep=60, stubborn=str(pid_file))
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-_goja50_ is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_timeout_stops_codex_with_exit_124 (tests.test_landscape_sweep_harness.RunnerTests.test_timeout_stops_codex_with_exit_124)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2455, in test_timeout_stops_codex_with_exit_124
+    result = self.job("gpt6-hang", sleep=60)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-rz5736a1 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_ultra_defaults_and_idle_refusal_precede_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_ultra_defaults_and_idle_refusal_precede_state_changes) (idle=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2082, in test_ultra_defaults_and_idle_refusal_precede_state_changes
+    self.assertIn("above 3600 s", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'above 3600 s' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-do9md6oi is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_ultra_defaults_and_idle_refusal_precede_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_ultra_defaults_and_idle_refusal_precede_state_changes) (idle=1800)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2082, in test_ultra_defaults_and_idle_refusal_precede_state_changes
+    self.assertIn("above 3600 s", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'above 3600 s' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-do9md6oi is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_ultra_defaults_and_idle_refusal_precede_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_ultra_defaults_and_idle_refusal_precede_state_changes) (idle=3599)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2082, in test_ultra_defaults_and_idle_refusal_precede_state_changes
+    self.assertIn("above 3600 s", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'above 3600 s' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-do9md6oi is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_ultra_defaults_and_idle_refusal_precede_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_ultra_defaults_and_idle_refusal_precede_state_changes) (idle=3600)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2082, in test_ultra_defaults_and_idle_refusal_precede_state_changes
+    self.assertIn("above 3600 s", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'above 3600 s' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-do9md6oi is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='gpt-6.1-sol', effort='unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='gpt-6.1-sol', effort='none')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='gpt-6.1-sol', effort='minimal')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='gpt-6.1-sol', effort='persistent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='gpt-6.1-sol', effort=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='gpt-6.1-sol', effort=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='gpt-6-luna', effort='ultra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='cx/gpt-6-luna', effort='ultra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='gpt-5.5', effort='max')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='codex-auto-review', effort='ultra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='unknown-model', effort='ultra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (model='cx/unknown-model', effort='ultra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2235, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.effort", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.effort' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (web_search='unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2242, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.web_search", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.web_search' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (web_search=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2242, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.web_search", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.web_search' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_unsupported_effort_and_web_search_are_refused_before_state_changes (tests.test_landscape_sweep_harness.RunnerTests.test_unsupported_effort_and_web_search_are_refused_before_state_changes) (web_search=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2242, in test_unsupported_effort_and_web_search_are_refused_before_state_changes
+    self.assertIn("codex.web_search", refused.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'codex.web_search' not found in 'codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-5e6j51e5 is inside the git repository <WORKTREE>; use a directory outside every repository\n'
+
+======================================================================
+FAIL: test_usage_limit_in_json_error_events_sets_the_marker (tests.test_landscape_sweep_harness.RunnerTests.test_usage_limit_in_json_error_events_sets_the_marker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2316, in test_usage_limit_in_json_error_events_sets_the_marker
+    result = self.job(f"gpt6-{name}", exit=1, events=events, stderr="Reading additional input from stdin...\n")
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-rhiuiff2 is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_usage_limit_in_stderr_sets_the_marker_and_blocks_later_starts (tests.test_landscape_sweep_harness.RunnerTests.test_usage_limit_in_stderr_sets_the_marker_and_blocks_later_starts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2299, in test_usage_limit_in_stderr_sets_the_marker_and_blocks_later_starts
+    result = self.job("gpt6-fit-alpha", exit=1, stderr="Reading additional input from stdin...\nERROR: " + LIMIT_TEXT + "\n")
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-itp3vmtk is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_web_search_modes_are_staged_bound_and_recorded (tests.test_landscape_sweep_harness.RunnerTests.test_web_search_modes_are_staged_bound_and_recorded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2246, in test_web_search_modes_are_staged_bound_and_recorded
+    first = self.job("search", last=LAST, events=[COMPLETED])
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-xg4k_44_ is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_zero_exit_requires_a_completed_turn_and_nonempty_output (tests.test_landscape_sweep_harness.RunnerTests.test_zero_exit_requires_a_completed_turn_and_nonempty_output) (name='no-evidence')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2149, in test_zero_exit_requires_a_completed_turn_and_nonempty_output
+    result = self.job(name, **config)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-lxjekvmr is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_zero_exit_requires_a_completed_turn_and_nonempty_output (tests.test_landscape_sweep_harness.RunnerTests.test_zero_exit_requires_a_completed_turn_and_nonempty_output) (name='no-turn')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2149, in test_zero_exit_requires_a_completed_turn_and_nonempty_output
+    result = self.job(name, **config)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-lxjekvmr is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_zero_exit_requires_a_completed_turn_and_nonempty_output (tests.test_landscape_sweep_harness.RunnerTests.test_zero_exit_requires_a_completed_turn_and_nonempty_output) (name='no-output')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2149, in test_zero_exit_requires_a_completed_turn_and_nonempty_output
+    result = self.job(name, **config)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-lxjekvmr is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_zero_exit_requires_a_completed_turn_and_nonempty_output (tests.test_landscape_sweep_harness.RunnerTests.test_zero_exit_requires_a_completed_turn_and_nonempty_output) (name='empty-output')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2149, in test_zero_exit_requires_a_completed_turn_and_nonempty_output
+    result = self.job(name, **config)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-lxjekvmr is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_zero_exit_requires_a_completed_turn_and_nonempty_output (tests.test_landscape_sweep_harness.RunnerTests.test_zero_exit_requires_a_completed_turn_and_nonempty_output) (name='blank-output')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2149, in test_zero_exit_requires_a_completed_turn_and_nonempty_output
+    result = self.job(name, **config)
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 1763, in job
+    self.assertEqual(started.returncode, 0, started.stderr + started.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : codex_call.sh: work directory <WORKTREE>/.r645-tmp/test-tmp/landscape-sweep-test-lxjekvmr is inside the git repository <WORKTREE>; use a directory outside every repository
+
+
+======================================================================
+FAIL: test_staged_copy_needs_no_work_dir_argument (tests.test_landscape_sweep_harness.ShellTests.test_staged_copy_needs_no_work_dir_argument)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2955, in test_staged_copy_needs_no_work_dir_argument
+    self.assertEqual(build(work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_staged_quota_gate_uses_the_staged_probe (tests.test_landscape_sweep_harness.ShellTests.test_staged_quota_gate_uses_the_staged_probe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 2971, in test_staged_quota_gate_uses_the_staged_probe
+    self.assertEqual(build(work, "--quota-stop-percent", "90").returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_a_layer_the_critic_names_twice_gets_one_followup_round (tests.test_landscape_sweep_harness.SweepScriptTests.test_a_layer_the_critic_names_twice_gets_one_followup_round)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 3993, in setUp
+    self.assertEqual(build(self.work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_a_lost_followup_round_is_kept_as_a_lost_round_of_its_layer (tests.test_landscape_sweep_harness.SweepScriptTests.test_a_lost_followup_round_is_kept_as_a_lost_round_of_its_layer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 3993, in setUp
+    self.assertEqual(build(self.work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_bad_args_stop_before_any_agent (tests.test_landscape_sweep_harness.SweepScriptTests.test_bad_args_stop_before_any_agent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 3993, in setUp
+    self.assertEqual(build(self.work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_commands_quote_a_work_directory_with_spaces_and_shell_metacharacters (tests.test_landscape_sweep_harness.SweepScriptTests.test_commands_quote_a_work_directory_with_spaces_and_shell_metacharacters)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 3993, in setUp
+    self.assertEqual(build(self.work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_embedded_copy_runs_without_args_and_smoke_stops_after_the_first_round (tests.test_landscape_sweep_harness.SweepScriptTests.test_embedded_copy_runs_without_args_and_smoke_stops_after_the_first_round)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 3993, in setUp
+    self.assertEqual(build(self.work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_roles_labels_models_cap_and_followup (tests.test_landscape_sweep_harness.SweepScriptTests.test_roles_labels_models_cap_and_followup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 3993, in setUp
+    self.assertEqual(build(self.work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_slug_is_the_same_function_as_sweep_common_slug (tests.test_landscape_sweep_harness.SweepScriptTests.test_slug_is_the_same_function_as_sweep_common_slug)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 3993, in setUp
+    self.assertEqual(build(self.work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+======================================================================
+FAIL: test_syntax_of_the_script_and_its_embedded_copy (tests.test_landscape_sweep_harness.SweepScriptTests.test_syntax_of_the_script_and_its_embedded_copy)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_landscape_sweep_harness.py", line 3993, in setUp
+    self.assertEqual(build(self.work).returncode, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0
+
+----------------------------------------------------------------------
+Ran 264 tests in 10.897s
+
+FAILED (failures=140, errors=3, skipped=3)

@@ -6191,7 +6191,7 @@
   ],
   "scoped_refreshes": [
     {
-      "checked_at": "2026-10-03T07:21:55.083556Z",
+      "checked_at": "2026-10-03T07:15:38.637092+00:00",
       "component_ids": [
         "agent-browser",
         "grafana"

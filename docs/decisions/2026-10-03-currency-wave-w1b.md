@@ -18,7 +18,7 @@ trading blueprint paths, and sealed historical records stay with their owners.
 | Component | Selected source | Verified artifact SHA-256 | Recorded qualification |
 | --- | --- | --- | --- |
 | Grafana 13.2.3 | [grafana/grafana v13.2.3](https://github.com/grafana/grafana/releases/tag/v13.2.3), public tag commit `6193dc03311b631b9727b560d24369e683dc396e` | `6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235` | [Qualification receipt](../../evidence/receipts/grafana-1323-qualification-20261003.json) |
-| agent-browser 0.38.2 | [vercel-labs/agent-browser v0.38.2](https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2), commit `39a74c70d7759d5a6de7a22c04570bb626bbd081` | `2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49` | [Qualification receipt](../../evidence/receipts/agent-browser-0382-qualification-20261003.json) |
+| agent-browser 0.38.2 | [vercel-labs/agent-browser v0.38.2](https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2), commit `39a74c70d7759d5a6de7a22c04570bb626bbd081` | `2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49` | [Offline readiness receipt](../../evidence/receipts/agent-browser-0382-qualification-20261003.json) |
 
 Grafana's release notes list fixes for
 [CVE-2026-13719](https://grafana.com/security/security-advisories/cve-2026-13719),
@@ -43,6 +43,16 @@ integration observations, not Grafana's unchanged upstream test suite or a
 restart onto the host's real database. Browser rendering, production cardinality
 and Grafana-managed alerting remain untested.
 
+Reachability for all three CVEs is assessed only against repository provisioning.
+The templates provision no Grafana-managed alert rules or Editor accounts and
+configure proxy-access datasources without stored credentials; they establish
+neither the absence of UI-created state nor the host's exposure. The supported
+upgrade preserves the database (`observability/backends/configure.py:113-119`).
+Existing users and Editor memberships, alert rules, shared dashboards and sharing
+tokens, and additional datasource/credential configuration were not inspected.
+Checking that preserved live database remains an open host item in the
+[corrected qualification record](../../evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json).
+
 agent-browser's npm tarball integrity matches registry SHA-512 and SHA-1;
 W1-r2 records a verified registry signature and attestation, and seven bundled
 native binaries matching release asset digests. Its install exited 0 and
@@ -52,6 +62,10 @@ against the 0.38.1 control; skills outputs were identical. The
 and the recorded independent review cover the documented recipe's use path.
 The live fixture workflow, browser download and WSL2 Chrome launch were not run.
 The contract explicitly accepts a version check and offline command here.
+The receipt is classified as `compatibility_attempt`, matching
+`scripts/validate.py`'s receipt kinds. Its 0.38.2 evidence covers installation,
+version and offline readiness; the retained browser lifecycle evidence predates
+this pin and supplies no new 0.38.2 browser acceptance.
 
 W1b independently repeated both components' version commands, agent-browser's
 offline `skills list`, both artifact hashes, the live Grafana sidecar and npm
@@ -72,8 +86,10 @@ qualification gaps for those five, moving the first two and retaining the
 following three. The complete W1-r2 review reasons and the original W1 excerpts
 are preserved in
 [review-decisions.json](../../evidence/artifacts/currency-wave-w1b-20261003/review-decisions.json).
-Each original W1 hold string is a 600-character excerpt ending mid-text; it is
-not represented as a complete judge record.
+Each original W1 hold string was truncated at 600 characters. The retained
+sanitized copies are shorter where role markers replaced host paths, and the
+Dagu copy omits its incomplete trailing host-path fragment. These excerpts are
+not represented as complete judge records.
 
 | Component | Retained / candidate | Reason and next decision-changing condition |
 | --- | --- | --- |
@@ -139,6 +155,35 @@ Corrections retained with verification paths:
   and verifies the pinned archive, installs it with npm and links `bin/*`.
   npm SHA-512 integrity remains in the pin's established `install_note` shape.
 
+R645 corrects three evidence overstatements: offline agent-browser readiness
+had been labelled `native_cli_e2e`; selected Grafana 13.2.3 had been shown beside
+a host restart claim belonging to 13.2.2; and missing repository provisioning
+had been treated as absence of live Grafana rules, Editors and shared state.
+The correction paths are the validator's `RECEIPT_KINDS`, the retained command
+outputs, and the unchanged database/provisioning paths in `configure.py` and its
+templates. The acceptance artifact retains the fresh release and GHSA API
+responses used to verify the pinned upstream sources. R645's scoped ai-memory
+CLI searches (limit 2, narrow then component-only) returned no relevant result.
+
+The installed Gitleaks launcher could not create its lock on the read-only
+host runtime directory; setting `XDG_RUNTIME_DIR` did not change its fixed
+`/run/user` path, as inspection of `adoption/tools/gitleaks-guarded` confirmed.
+The staged scan therefore uses the installed upstream 8.30.1 binary directly,
+the repository pre-commit command, and a temporary Git index/object directory.
+Both failed help attempts and the native command's returned output are retained
+in the acceptance artifact. The original index remains untouched.
+
+The first R645 test run used a temporary directory inside the checkout and hit
+the sweep harness's existing outside-repository guard
+(`tools/sota-convergence/landscape-sweep/sweep_common.py:78-92`). The failed
+outputs are retained. Moving `TMPDIR` to this session's writable builds
+workspace, outside every Git repository, made the existing focused test and
+the full required five-module command pass. No harness or test was changed.
+The first final publication check also rejected untracked R645 scratch logs
+and temporary Git objects inside the checkout. All R645 scratch state was then
+moved to the owned builds workspace; the failed validator output is retained
+before the corrected final run. The publication checker itself is unchanged.
+
 The completeness critic checked live pin sites against both facts packets and
 an independent `git grep`, the supported installer routes, source commits and
 artifact integrity, dated/current distinctions, receipt indexing and generated
@@ -147,11 +192,23 @@ next lifecycle sweep should cover agent-browser's live use/cleanup on the target
 host and Grafana browser rendering/production queries/real-database restart;
 RTK parsing/pipeline exactness, headroom log required-facts/counts and agentsview
 archive migration stay with their held units. Dagu authentication and recovery
-stay with the trading owner. The pre-existing contradictory anonymous-access
-sentence in `observability/backends/README.md` is an owner follow-up, not a
-claim resolved by this currency move.
+stay with the trading owner. R645 corrects the anonymous-access sentence in
+`observability/backends/README.md` to match the repository's anonymous Viewer
+and disabled sign-up configuration.
 
-Required repository acceptance and the per-component file inventory are retained
-in the W1b handoff report. Changed registered evidence is refreshed with
+Required repository acceptance is retained in
+[acceptance.json](../../evidence/artifacts/currency-wave-w1b-20261003/acceptance.json),
+including R645's commands, exit codes, returned outputs and final validation.
+The R645 repair inventory is recorded there as well. Changed registered evidence is refreshed with
 `scripts/host_receipts.py`'s `register_file`; both report generators use their
 native `--write` mode, and `scripts/build_ecosystem.py` remains check-only.
+
+R645's completeness critic checked receipt kinds and their stack/audit/index
+mirrors, all five retained stdout files and their producing commands, the
+selected/deployed Grafana distinction, every CVE reachability statement, and
+publication hash registration. It found no additional repair within this
+contract. The next host lifecycle sweep must inspect the preserved Grafana
+database before assessing exposure and must qualify 0.38.2 browser use and
+cleanup. Repository validation and the staged secret scan do not close those
+host items. The coordinator retains the hot-file commit ordering, PR labels,
+trading acknowledgement and full-suite CI checks.

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "agent-browser-0382-qualification-20261003",
-  "kind": "native_cli_e2e",
+  "kind": "compatibility_attempt",
   "recorded_at_utc": "2026-10-03T07:21:55.083556Z",
   "component_ids": [
     "agent-browser"
@@ -32,6 +32,21 @@
     "integration_commands": "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
     "independent_review_decision": "move",
     "host_switched": false,
-    "overturn_when": "A publisher digest mismatch, an applicable security advisory or a regression on the documented native recipe invalidates this qualification; require a freshly qualified maintained replacement."
+    "overturn_when": "A publisher digest mismatch, an applicable security advisory or a regression on the documented native recipe invalidates this qualification; require a freshly qualified maintained replacement.",
+    "repository_acceptance": "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
+    "retained_stdout": [
+      {
+        "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.1.stdout.txt",
+        "command": "HOME=<QUALIFICATION_ROOT>/agent-browser/home <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.1/bin/agent-browser skills list",
+        "exit_code": 0,
+        "provenance": "Retained W1-r2 0.38.1 control output; qualification-record.json#/facts/smoke records this command family and the control. This was not a W1b execution."
+      },
+      {
+        "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.2.stdout.txt",
+        "command": "rtk proxy <QUALIFICATION_ROOT>/agent-browser/tools/agent-browser-0.38.2/bin/agent-browser skills list",
+        "exit_code": 0,
+        "provenance": "W1b integration-commands.json command id agent-browser-skills-list; published stdout matches its retained output exactly."
+      }
+    ]
   }
 }
