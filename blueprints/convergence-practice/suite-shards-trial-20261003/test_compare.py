@@ -31,6 +31,7 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import compare  # noqa: E402
+import inventory  # noqa: E402
 import logparse  # noqa: E402
 import make_fixtures  # noqa: E402
 import make_shards  # noqa: E402
@@ -382,8 +383,37 @@ class InventoryTests(unittest.TestCase):
         self.assertIn("loaded by no test file", done.stderr)
 
     def test_an_exception_at_import_fails_the_gate(self):
-        done, _ = self.build({"tests/test_raises.py": "raise RuntimeError('planted')\n"})
+        done, out = self.build({"tests/test_raises.py": "raise RuntimeError('planted')\n"})
         self.assertEqual(done.returncode, 1)
+        report = json.loads((out / "report.json").read_text())
+        self.assertTrue(report["problems"], "a finding")
+        self.assertEqual(report["execution_problems"], [])
+
+    @unittest.skipUnless(hasattr(signal, "SIGKILL"), "POSIX signals")
+    def test_a_child_stopped_from_outside_is_an_execution_problem_not_a_finding(self):
+        # F12: the discovery child ends by SIGTERM, as a runner or the out-of-memory killer (SIGKILL) would end it.
+        # The gate still fails, but report.json records no finding, so compare.py makes the run incomplete.
+        stopped = "import os\nimport signal\n\nos.kill(os.getpid(), signal.SIGTERM)\n"
+        done, out = self.build({"tests/test_stopped.py": stopped})
+        self.assertEqual(done.returncode, 1, done.stderr)
+        report = json.loads((out / "report.json").read_text())
+        self.assertFalse(report["ok"])
+        self.assertIsNone(report["parity"])
+        self.assertEqual(report["problems"], [])
+        self.assertEqual(len(report["execution_problems"]), 1, report["execution_problems"])
+        self.assertIn("the discover child interpreter was stopped by SIGTERM from outside",
+                      report["execution_problems"][0])
+
+    @unittest.skipUnless(hasattr(signal, "SIGKILL"), "POSIX signals")
+    def test_only_a_signal_from_outside_is_an_execution_problem(self):
+        # F12: a child that ends itself by a fault (SIGSEGV, SIGABRT), exits non-zero or prints no JSON is a finding.
+        self.assertIsInstance(inventory.child_failure("discover", -signal.SIGKILL, ""), inventory.ChildStopped)
+        self.assertIsInstance(inventory.child_failure("by-name", -signal.SIGINT, ""), inventory.ChildStopped)
+        for code in (-signal.SIGSEGV, -signal.SIGABRT, 1, 2):
+            with self.subTest(code=code):
+                failure = inventory.child_failure("discover", code, "")
+                self.assertIsInstance(failure, RuntimeError)
+                self.assertNotIsInstance(failure, inventory.ChildStopped)
 
 
 # --------------------------------------------------------------------------- record.py
@@ -575,7 +605,8 @@ class VerdictTests(TreeCase):
 
     def test_a_started_shard_that_never_reached_its_command_is_ineligible_not_incomplete(self):
         # The test phase started (the clock step succeeded): a shard step that then fails before its command is a
-        # property of the sharded arm, so its run is ineligible and the other arm may still be selected.
+        # property of the sharded arm, so its run is ineligible and the other arm may still be selected. F11: the
+        # passed-over arm, ineligible only through that step, is flagged for the outcome record.
         self.tree.full()
         run = self.tree.run_dir(f"{OS}-G4-r1")
         for name in ("shard-2.command", "shard-2.log", "shard-2.exit", "shard-2.probe.json"):
@@ -583,7 +614,56 @@ class VerdictTests(TreeCase):
         result = self.tree.result()
         self.assertFalse(self.run_entry(result, f"{OS}-G4-r1")["eligible"])
         self.assertTrue(self.run_entry(result, f"{OS}-G4-r1")["test_phase_started"])
-        self.assertEqual((self.verdict(result)["outcome"], self.verdict(result)["selected_arm"]), ("adopt", "G4T"))
+        verdict = self.verdict(result)
+        self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("adopt", "G4T"))
+        self.assertTrue(verdict["arms"]["G4"]["ineligible_only_through_unfinished_steps"])
+        self.assertEqual(verdict["arms"]["G4"]["unfinished_steps"], {f"{OS}-G4-r1": ["shard-2"]})
+        self.assertEqual(len(verdict["flags"]), 1, verdict["flags"])
+        self.assertIn("arm G4 was ineligible only because steps never wrote an exit status (ubuntu-24.04-G4-r1: "
+                      "shard-2)", verdict["flags"][0])
+        self.assertIn("FLAG ubuntu-24.04: arm G4", compare.summary_markdown(result))
+
+    def test_a_step_stopped_before_its_exit_status_is_flagged_too(self):
+        # F11: a shard step stopped after its first test line, without an exit status (as a lost step would be).
+        self.tree.full()
+        run = self.tree.run_dir(f"{OS}-G4-r2")
+        (run / "shard-2.log").write_text((run / "shard-2.log").read_text().split("\n", 1)[0] + "\n")
+        (run / "shard-2.exit").unlink()
+        verdict = self.verdict()
+        self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("adopt", "G4T"))
+        self.assertEqual(verdict["arms"]["G4"]["unfinished_steps"], {f"{OS}-G4-r2": ["shard-2"]})
+        self.assertEqual(len(verdict["flags"]), 1, verdict["flags"])
+
+    def test_a_passed_over_arm_with_another_problem_is_not_flagged(self):
+        # F11: besides the unfinished step, a finished shard of the same run changed an outcome, which is the arm's
+        # own failure: no flag.
+        self.tree.full()
+        run = self.tree.run_dir(f"{OS}-G4-r1")
+        for name in ("shard-2.command", "shard-2.log", "shard-2.exit", "shard-2.probe.json"):
+            (run / name).unlink()
+        self.edit(run / "shard-0.log", "test_passes (tests.test_alpha.AlphaTests.test_passes) ... ok",
+                  "test_passes (tests.test_alpha.AlphaTests.test_passes) ... skipped 'mutated'")
+        self.edit(run / "shard-0.log", "OK (skipped=1, expected failures=1)", "OK (skipped=2, expected failures=1)")
+        verdict = self.verdict()
+        self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("adopt", "G4T"))
+        self.assertFalse(verdict["arms"]["G4"]["ineligible_only_through_unfinished_steps"])
+        self.assertEqual(verdict["arms"]["G4"]["unfinished_steps"], {})
+        self.assertEqual(verdict["flags"], [])
+
+    def test_a_reject_with_no_eligible_arm_flags_an_arm_lost_to_unfinished_steps(self):
+        # F11: G4 lost only a shard step's exit status, G4T changed an outcome: no sharded arm is eligible, reject, and
+        # the flag names G4 only.
+        self.tree.full()
+        (self.tree.run_dir(f"{OS}-G4-r3") / "shard-1.exit").unlink()
+        shard = self.tree.run_dir(f"{OS}-G4T-r1") / "shard-0.log"
+        self.edit(shard, "test_passes (tests.test_alpha.AlphaTests.test_passes) ... ok",
+                  "test_passes (tests.test_alpha.AlphaTests.test_passes) ... skipped 'mutated'")
+        self.edit(shard, "OK (skipped=1, expected failures=1)", "OK (skipped=2, expected failures=1)")
+        verdict = self.verdict()
+        self.assertEqual((verdict["outcome"], verdict["reasons"]), ("reject", ["no sharded arm is eligible"]))
+        self.assertEqual(len(verdict["flags"]), 1, verdict["flags"])
+        self.assertIn("arm G4 was ineligible only because", verdict["flags"][0])
+        self.assertIn("no sharded arm eligible", verdict["flags"][0])
 
     def test_checkout_attempt_and_head_rules(self):
         mutations = {
@@ -638,12 +718,74 @@ class VerdictTests(TreeCase):
         self.assertEqual((self.verdict(result)["outcome"], self.verdict(result)["reasons"]),
                          ("reject", ["no sharded arm is eligible"]))
 
-    def test_a_failed_controls_check_job_fails_the_controls(self):
+    def test_a_failed_controls_check_job_whose_checks_pass_here_is_incomplete_not_reject(self):
+        # F1: compare.py's own check of the same control artifact passes, so the controls-check job failed outside the
+        # checks it repeats (a setup step, the head assertion, the download, a lost runner). Previous head: the controls
+        # failed, every sharded arm became ineligible, and the OS got reject.
         needs = json.loads(json.dumps(NEEDS))
         needs["controls-check"]["result"] = "failure"
         result = self.tree.full().result(needs=needs)
+        self.assertTrue(result["controls"][OS]["passed"], result["controls"][OS]["problems"])
+        self.assertEqual(result["controls"][OS]["controls_check_result"], "failure")
+        self.assertIncomplete(self.verdict(result), "job controls-check: result 'failure', although compare.py's own "
+                                                    "check of the same control artifact passed")
+
+    def test_a_failed_controls_check_job_and_a_failed_check_here_reject(self):
+        # F1: both checks fail on the recorded evidence: the controls failed, so no sharded arm is eligible.
+        needs = json.loads(json.dumps(NEEDS))
+        needs["controls-check"]["result"] = "failure"
+        self.tree.full()
+        (self.tree.control_dir / "shard-2.exit").write_text("0\n")
+        result = self.tree.result(needs=needs)
         self.assertFalse(result["controls"][OS]["passed"])
+        self.assertEqual((self.verdict(result)["outcome"], self.verdict(result)["reasons"]),
+                         ("reject", ["no sharded arm is eligible"]))
+
+    def test_unrecorded_control_step_outcomes_give_no_verdict_not_reject(self):
+        # F4 and S2: the control run records the foreground step's outcome but none of the four control steps', and
+        # every other expectation holds: the steps context carries no background step's outcome on this platform, so
+        # the controls cannot be judged. Previous head: the controls failed and the OS got reject, final under the
+        # deciding-run rule; incomplete would repeat for ever.
+        needs = json.loads(json.dumps(NEEDS))
+        needs["controls-check"]["result"] = "failure"  # the check job fails on the same evidence
+        self.tree.full()
+        rewrite_json(self.tree.control_dir / "meta.json",
+                     steps={compare.FOREGROUND_STEP: {"outcome": "success", "conclusion": "success"}})
+        result = self.tree.result(needs=needs)
+        verdict = self.verdict(result)
+        self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("no verdict", None), verdict["reasons"])
+        self.assertTrue(any(reason.startswith("the controls are unmeasurable") for reason in verdict["reasons"]),
+                        verdict["reasons"])
+        self.assertIn("UNMEASURABLE", compare.summary_markdown(result))
+
+    def test_a_recorded_wrong_control_step_outcome_still_rejects(self):
+        # F4: a recorded outcome that is wrong (the failing step masked as success) fails the controls.
+        self.tree.full()
+        rewrite_json(self.tree.control_dir / "meta.json",
+                     steps={**CONTROL_STEPS, "control-1": {"outcome": "success", "conclusion": "success"}})
+        result = self.tree.result()
+        self.assertFalse(result["controls"][OS]["unmeasurable"])
+        self.assertEqual((self.verdict(result)["outcome"], self.verdict(result)["reasons"]),
+                         ("reject", ["no sharded arm is eligible"]))
+
+    def test_unrecorded_outcomes_beside_another_failed_expectation_reject(self):
+        # F4: with no control step outcome recorded, a control that misbehaved on the recorded evidence (the crashing
+        # control exited 1, not 3) still fails the controls.
+        self.tree.full()
+        rewrite_json(self.tree.control_dir / "meta.json",
+                     steps={compare.FOREGROUND_STEP: {"outcome": "success", "conclusion": "success"}})
+        (self.tree.control_dir / "shard-2.exit").write_text("1\n")
+        result = self.tree.result()
+        self.assertTrue(result["controls"][OS]["outcomes_unrecorded"])
+        self.assertFalse(result["controls"][OS]["unmeasurable"])
         self.assertEqual(self.verdict(result)["outcome"], "reject")
+
+    def test_a_cancelled_control_job_status_is_incomplete_not_reject(self):
+        # F6: the control run's own job status cancelled (for example after a job-level timeout that the needs context
+        # reports as a failure). Previous head: only a failed control expectation, so reject.
+        self.tree.full()
+        rewrite_json(self.tree.control_dir / "meta.json", job_status="cancelled")
+        self.assertIncomplete(self.verdict(), f"cancelled jobs: {OS}-controls")
 
     def test_partial_and_cancelled_runs_are_incomplete_not_a_rule_outcome(self):
         cases = {
@@ -668,10 +810,21 @@ class VerdictTests(TreeCase):
         self.assertTrue(any("no run directory" in reason for reason in verdict["reasons"]), verdict["reasons"])
 
     def test_a_failed_inventory_gate_gives_no_verdict(self):
-        rewrite_json(self.tree.inventory / "report.json", ok=False)
+        rewrite_json(self.tree.inventory / "report.json", ok=False, parity=False,
+                     problems=["1 ids are loaded twice by name: [tests.test_zeta.Unused.test_one (planted)]"])
         needs = {**NEEDS, "inventory": {"result": "failure"}, "serial": {"result": "skipped"},
                  "shards": {"result": "skipped"}}
         self.assertEqual(self.verdict(self.tree.result(needs=needs))["outcome"], "no verdict")
+
+    def test_an_inventory_gate_stopped_from_outside_is_incomplete_not_no_verdict(self):
+        # F12: the gate's own child interpreter was stopped by a signal from outside (the out-of-memory killer, a
+        # runner fault): report.json records an execution problem and no finding. Previous head: no verdict, final.
+        rewrite_json(self.tree.inventory / "report.json", ok=False, parity=None, problems=[],
+                     execution_problems=["the discover child interpreter was stopped by SIGKILL from outside: "])
+        needs = {**NEEDS, "inventory": {"result": "failure"}, "serial": {"result": "skipped"},
+                 "shards": {"result": "skipped"}}
+        self.assertIncomplete(self.verdict(self.tree.result(needs=needs)),
+                              "(execution problems: the discover child interpreter was stopped by SIGKILL")
 
     def test_an_inventory_job_that_failed_before_its_gate_reported_is_incomplete(self):
         # E2: a setup failure of the inventory job (checkout, setup-python, the upload) is a partial run; on the
@@ -753,10 +906,23 @@ class RerunTests(TreeCase):
             with self.subTest(controls_check=case["controls-check"]["result"]):
                 self.assertIncomplete(self.verdict(self.tree.result(needs=case)), "the control run: run_attempt '2'")
 
-    def test_an_unrecorded_attempt_is_incomplete(self):
+    def test_an_unrecorded_attempt_is_a_partial_run_not_a_rerun(self):
+        # F8: no runtime.json is what a setup step that failed before the run directory was prepared leaves; it is
+        # reported as an unrecorded attempt, never as a re-run.
         self.tree.full()
         (self.tree.run_dir(f"{OS}-G4T-r2") / "runtime.json").unlink()
-        self.assertIncomplete(self.verdict(), "ubuntu-24.04-G4T-r2: run_attempt None (runtime.json is missing)")
+        verdict = self.verdict()
+        self.assertIncomplete(verdict, "ubuntu-24.04-G4T-r2: the run attempt is unrecorded (runtime.json is missing or "
+                                       "not JSON)")
+        self.assertFalse(any(reason.startswith("a re-run") for reason in verdict["reasons"]), verdict["reasons"])
+
+    def test_an_unrecorded_control_attempt_is_a_partial_run_not_a_rerun(self):
+        # F8, for the control run.
+        self.tree.full()
+        (self.tree.control_dir / "runtime.json").unlink()
+        verdict = self.verdict()
+        self.assertIncomplete(verdict, "the control run: the run attempt is unrecorded")
+        self.assertFalse(any(reason.startswith("a re-run") for reason in verdict["reasons"]), verdict["reasons"])
 
     def test_the_compare_jobs_own_attempt_decides_before_anything_else(self):
         # Previous head: build_result took no attempt (TypeError) and the CLI had no --run-attempt (exit 2).
@@ -903,8 +1069,12 @@ class ControlTests(TreeCase):
         self.assertEqual([item["step_outcome"] for item in report["shards"]],
                          ["success", "failure", "failure", "failure"])
         self.assertFalse(report["background_ignores_sigquit"])
+        self.assertFalse(report["outcomes_unrecorded"] or report["unmeasurable"])
         hang = report["hang"]
-        self.assertGreaterEqual(hang["alive_after_probe_seconds"], compare.HANG_ALIVE_MIN_NS / 1e9)
+        # make_fixtures.py stops the hang control's own process at 60 s, so its step's stop is its last heartbeat.
+        self.assertEqual(hang["stop_seen_as"], "last heartbeat")
+        self.assertGreaterEqual(hang["stop_after_probe_seconds"], compare.HANG_STOP_MIN_NS / 1e9)
+        self.assertLess(hang["stop_after_probe_seconds"], hang["stop_deadline_after_probe_seconds"])
         self.assertLess(hang["group_end_after_probe_seconds"], compare.HANG_GROUP_MAX_NS / 1e9)
         self.assertGreaterEqual(hang["group_end_after_probe_seconds"], 120, "the crash control ends the group")
         self.assertFalse(hang["outlived_step"], "make_fixtures.py stops the hang control's own process")
@@ -938,8 +1108,12 @@ class ControlTests(TreeCase):
             "the passing step failed on its own": steps(**{"control-0": "failure"}),
             "the step outcomes are unrecorded": lambda d: rewrite_json(d / "meta.json", steps={
                 "foreground": {"outcome": "success", "conclusion": "success"}}),
-            "the steps did not run together": lambda d: self.probe(d, "shard-1", shift=31 * SECOND),
+            "one control step's outcome is unrecorded": lambda d: rewrite_json(d / "meta.json", steps={
+                key: value for key, value in CONTROL_STEPS.items() if key != "control-3"}),
+            # F5: 16 s apart is beyond the 15 s spread.
+            "the steps did not run together": lambda d: self.probe(d, "shard-1", shift=16 * SECOND),
             "a probe holds no start time": lambda d: self.probe(d, "shard-2", drop="monotonic_ns"),
+            "the failing control's probe holds no start time": lambda d: self.probe(d, "shard-1", drop="monotonic_ns"),
             "the hang was stopped before its limit": lambda d: self.beats(d, keep_until=40 * SECOND),
             "the group waited for the hang": lambda d: self.beats(d, end_after=300 * SECOND),
             "no heartbeat": lambda d: (d / "heartbeat.json").unlink(),
@@ -952,6 +1126,7 @@ class ControlTests(TreeCase):
                 report = compare.check_controls(tree.control_artifact, OS, "failure", SHA)
                 self.assertFalse(report["passed"], label)
                 self.assertTrue(report["started"], label)
+                self.assertEqual(report["unmeasurable"], label == "the step outcomes are unrecorded", label)
 
     def probe(self, directory: Path, label: str, env=True, python=None, shift=0, drop=None):
         path = directory / f"{label}.probe.json"
@@ -981,15 +1156,71 @@ class ControlTests(TreeCase):
             data["beats_after_recheck"] = after_recheck
         (directory / "heartbeat.json").write_text(json.dumps(data))
 
-    def test_a_process_that_outlived_its_step_is_reported_not_judged(self):
-        # S4: the runner signals only a stopped step's shell (actions/runner v2.337.0, ProcessInvoker.cs), so its
-        # python child may live on, re-parented, until the job ends: recorded and reported, not judged.
-        data = json.loads((self.directory / "heartbeat.json").read_text())
-        self.beats(self.directory, parent=(50 * SECOND, 1), after_recheck=len(data["beats"]) + 3)
+    def synthesize(self, directory: Path, last: int, lost=None, pid=1):
+        """Rewrite heartbeat.json as a process that beat once a second from the hang control's probe until `last`
+        seconds, its parent pid changing to `pid` from `lost` seconds on (None: never), with the finish step at
+        `last` + 1 s and the process still beating during the recheck."""
+        start = json.loads((directory / "shard-3.probe.json").read_text())["monotonic_ns"]
+        data = json.loads((directory / "heartbeat.json").read_text())
+        parent = data["beats"][0][1]
+        data["beats"] = [[start + second * SECOND + SECOND // 25, parent if lost is None or second < lost else pid]
+                         for second in range(last + 1)]
+        data["end_monotonic_ns"] = start + (last + 1) * SECOND
+        data["beats_after_recheck"] = len(data["beats"]) + 3
+        (directory / "heartbeat.json").write_text(json.dumps(data))
+
+    def test_a_process_that_outlived_a_step_stopped_at_its_limit_passes(self):
+        # S4 and F2: the runner signals only a stopped step's shell (actions/runner v2.337.0, ProcessInvoker.cs), so
+        # its python child may live on, re-parented, until the job ends. The README's expected hosted case: the shell
+        # ends about 67.5 s after the step started (SIGINT at 60 s, SIGTERM 7.5 s later) and the process beats on.
+        self.synthesize(self.directory, last=120, lost=67)
         report = self.check()
         self.assertTrue(report["passed"], report["problems"])
-        self.assertTrue(report["hang"]["outlived_step"])
-        self.assertGreaterEqual(report["hang"]["parent_lost_after_probe_seconds"], 50)
+        hang = report["hang"]
+        self.assertTrue(hang["outlived_step"])
+        self.assertEqual(hang["stop_seen_as"], "parent pid changed")
+        self.assertEqual((hang["stop_after_probe_seconds"], hang["parent_lost_after_probe_seconds"]), (67.04, 67.04))
+        self.assertGreaterEqual(hang["alive_after_probe_seconds"], 120)
+
+    def test_a_hang_step_stopped_early_fails_though_its_process_beats_on(self):
+        # F2: the shell ended 20 s after the step started and the re-parented process beat on to the group's end.
+        # Previous head: judged by the last heartbeat (120 s after the probe), the controls passed.
+        self.synthesize(self.directory, last=120, lost=20)
+        report = self.check()
+        self.assertFalse(report["passed"])
+        self.assertTrue(any("before its 1-minute limit" in problem for problem in report["problems"]),
+                        report["problems"])
+
+    def test_a_hang_step_stopped_only_after_the_failing_control_could_fail_fails(self):
+        # F2: a shell that ended 95 s after the step started, after the failing control's probe plus 90 s, may have
+        # been stopped by a sibling's failure rather than by its own 1-minute limit. Previous head: passed.
+        self.synthesize(self.directory, last=120, lost=95)
+        report = self.check()
+        self.assertFalse(report["passed"])
+        self.assertTrue(any("not attributable to the 1-minute limit" in problem for problem in report["problems"]),
+                        report["problems"])
+
+    def test_a_hang_process_that_kept_its_parent_to_the_end_fails(self):
+        # F2: the parent pid never changed and the process beat until the group ended: nothing shows that the step
+        # was stopped at its limit. Previous head: passed.
+        self.synthesize(self.directory, last=120, lost=None)
+        report = self.check()
+        self.assertFalse(report["passed"])
+        self.assertTrue(any("not attributable to the 1-minute limit" in problem for problem in report["problems"]),
+                        report["problems"])
+
+    def test_unrecorded_control_step_outcomes_alone_are_unmeasurable(self):
+        # F4: only the four control steps' outcomes are missing; the foreground step's is recorded.
+        rewrite_json(self.directory / "meta.json", steps={compare.FOREGROUND_STEP: {"outcome": "success",
+                                                                                     "conclusion": "success"}})
+        report = self.check()
+        self.assertFalse(report["passed"])
+        self.assertTrue(report["outcomes_unrecorded"] and report["unmeasurable"])
+        self.assertTrue(report["started"])
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(compare.main(["controls", "--artifact", str(self.tree.control_artifact), "--os", OS,
+                                           "--job-result", "failure", "--expected-sha", SHA]), 1)
+        self.assertIn("controls ubuntu-24.04: UNMEASURABLE", out.getvalue())
 
     def test_the_controls_outlive_the_hang_limit(self):
         # E3: control shards 1 and 2 fail only after control shard 3's 1-minute limit, 1 before 2, and the hang
@@ -1000,10 +1231,16 @@ class ControlTests(TreeCase):
 
         fail, crash = constant("test_ctl_fail", "SLEEP_SECONDS"), constant("test_ctl_crash", "SLEEP_SECONDS")
         hang = constant("test_ctl_hang", "SLEEP_SECONDS")
-        self.assertGreaterEqual(fail, 90)
+        self.assertEqual(fail * SECOND, compare.FAIL_CONTROL_AFTER_NS)
         self.assertGreater(crash, fail)
         self.assertGreater(hang, compare.HANG_GROUP_MAX_NS // SECOND)
-        self.assertGreater(fail * SECOND, compare.HANG_ALIVE_MIN_NS + 30 * SECOND)
+        # F5: the hang step is stopped at most 70 s after its start (the 60 s limit, then SIGINT, 7.5 s, SIGTERM,
+        # 2.5 s and a kill: ProcessInvoker.cs at v2.337.0). With every probe within the start spread, the failing
+        # control fails only after that stop, and the crashing control only after the failing control's failure.
+        stop_ceiling = 70 * SECOND
+        self.assertGreater(fail * SECOND, stop_ceiling + compare.CONTROL_START_SPREAD_MAX_NS)
+        self.assertGreater(crash * SECOND, fail * SECOND + compare.CONTROL_START_SPREAD_MAX_NS)
+        self.assertLess(compare.HANG_STOP_MIN_NS, 60 * SECOND)
         self.assertEqual(constant("test_ctl_hang", "HEARTBEAT_SECONDS"), 1)
 
     def test_ignored_signals_are_reported_not_judged(self):

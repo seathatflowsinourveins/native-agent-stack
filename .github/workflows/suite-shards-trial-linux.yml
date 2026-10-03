@@ -23,15 +23,19 @@ name: Suite shards trial, ubuntu-24.04 (draft pull request only)
 #
 # Repetition (preregistered, experiment.json quality_rule): the first workflow run whose compare result
 # (compare_run_attempt 1) is adopt, reject or no verdict decides this OS; later runs are reported and cannot
-# overturn it. A repeat is allowed only after a run that ended incomplete, by closing and reopening the pull request
-# when no run of either trial workflow is in progress. Never re-run any job, the compare job included: compare.py
-# makes the OS incomplete when its own GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control directory, is
-# not 1. Whether a re-run job's upload (overwrite: false) would fail on the first attempt's artifact name, and
-# whether its data would reach a compare job, is unverified; the outcome is incomplete either way.
-# cancel-in-progress is true: a reopen during a run cancels that run (incomplete, never a rule outcome) and starts
-# one attended run, instead of queueing an unattended second run behind it. Its cost: one reopen starts both trial
-# workflows, so a repeat for one OS made while the other OS's run is still going cancels that run; a repeat
-# therefore waits until both runs have ended.
+# overturn it. A repeat is allowed only after a run that ended incomplete, or in which compare.py did not run or
+# exited non-zero (so it wrote no result.json), by closing and reopening the pull request when no run of either
+# trial workflow is in progress. A run in which compare.py exited 0 decides even if its upload failed (its outcome
+# lines in that step's log then stand for result.json). No run is cancelled by hand, and the pull request is never
+# closed or reopened while a run of either trial workflow is in progress: a run that ends incomplete through a hand
+# cancellation or such a reopen after its first serial, shards or controls job started is a protocol deviation,
+# which ends this OS's trial without a verdict and draws no repeat. Never re-run any job, the compare job included:
+# compare.py makes the OS incomplete when its own GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control
+# directory, is not 1. Whether a re-run job's upload (overwrite: false) would fail on the first attempt's artifact
+# name, and whether its data would reach a compare job, is unverified; the outcome is incomplete either way.
+# cancel-in-progress is true: a reopen during a run, which the protocol forbids, cancels that run instead of
+# queueing an unattended second run behind it. Its cost: one reopen starts both trial workflows, so a repeat for one
+# OS waits until the other OS's run has ended too.
 #
 # Jobs: inventory (the fail-closed parity and coverage gate, shard lists built at run time from the head);
 # serial (arm S x 3) and shards (arms G4 and G4T x 3; at most 2 + 2 timed jobs at once); controls (a passing, a
@@ -777,6 +781,9 @@ jobs:
       # the run decides nothing (README.md, "Which run decides").
       - name: Run the oracle's own tests on this interpreter (fail-closed)
         run: python3 -m unittest discover -s "$TRIAL_DIR" -p "test_*.py" -v
+      # compare.py repeats the controls-check job's check on the same control artifact: when that job failed but this
+      # check passes, the check job failed outside its checks (a setup step, the download, the runner), and the OS is
+      # incomplete, never reject; when both fail, the controls failed.
       - name: Keep the needs context (each job's result) for compare.py
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}

@@ -88,6 +88,11 @@ out head, so the lists always cover the head that runs. Rules (`make_shards.py`)
 3. No import failure: no loader error and no loader-made id in either load, and neither child interpreter fails.
 4. Every test file is in exactly one shard list or the tail of each arm, read back from the written files.
 
+A child interpreter stopped from outside, by SIGKILL, SIGTERM, SIGINT or SIGHUP (the kernel's out-of-memory killer, a
+runner that stops a job), is an execution problem, not a finding: `report.json` lists it under `execution_problems`,
+with `parity` null, and the gate still fails, so no arm runs, but the run is incomplete, not a failed gate (rule 5).
+Any other failure of a child (a non-zero exit, an end by another signal, output that is not JSON) is a finding under 3.
+
 The macOS workflow's inventory job runs on ubuntu-24.04 with `actions/setup-python` 3.13 from the same pin as its
 arms (the same Python line, another platform build), so that a stalled macOS queue cannot hold it.
 
@@ -157,19 +162,30 @@ another shard's:
 | `control-2` | `test_ctl_crash`: the process ends itself with `os._exit(3)` after 120 s | exit 3, no summary; step outcome `failure` |
 
 Control shards 1 and 2 fail only after control shard 3's 1-minute limit, and 2 only after 1 has failed, so both must
-outlive the stop of a sibling step and a sibling's failure to write their exit statuses. The job is expected to
-fail; `controls-check` (`needs: controls`, `if: always()`) runs `compare.py controls` and fails unless:
+outlive the stop of a sibling step and a sibling's failure to write their exit statuses (checks 4 and 5 make sure of
+it). The job is expected to fail; `controls-check` (`needs: controls`, `if: always()`) runs `compare.py controls` and
+fails unless:
 
 1. the job's result is `failure`, and the control artifact holds exactly `<os>-controls`;
 2. every shard behaved as listed, with the exact command, and each step's own outcome is `success`, `failure`,
-   `failure`, `failure` as listed (an unrecorded outcome fails the controls);
+   `failure`, `failure` as listed (a missing or wrong outcome fails the controls; but when the run records the
+   foreground step's outcome and none of the four control steps' outcomes, and every other expectation holds, the
+   controls are **unmeasurable** instead, because the steps context then carries no background step's outcome on
+   this platform: the check still fails, and the OS gets no verdict, not reject; see "Decision rule");
 3. every background step ran the foreground step's Python version and saw `SUITE_SHARDS_ENV_PROBE`, exported through
    `GITHUB_ENV` by an earlier step;
-4. the four steps started together: their probes' monotonic timestamps lie within 30 s;
-5. the hang control's test process was alive at least 50 s after its step's probe (the 60 s limit less 10 s for the
-   heartbeat interval and the step's start-up: the step was not stopped early), and the finish step, which runs
-   only after the whole group ended, began less than 240 s after that probe (the group did not wait for the 300 s
-   sleep). Its expected value is about 120 s, set by the crashing control.
+4. the four steps started together: their probes' monotonic timestamps lie within 15 s. The hang step is stopped at
+   most 70 s after its start (the 60 s limit, then SIGINT, up to 7.5 s, SIGTERM, up to 2.5 s and a kill, from the
+   runner source below), so the failing control (90 s) is still running at that stop and the crashing control (120 s)
+   at the failing control's failure;
+5. the hang control's step was stopped at least 50 s after its probe (the 60 s limit less 10 s for the heartbeat
+   interval and the step's start-up: the step was not stopped early) and before the failing control's probe plus 90 s
+   (before any sibling could fail, so the 1-minute limit stopped it). The stop is the first heartbeat with another
+   parent pid (the step's shell ended while the test process lived on) or, when the parent pid never changed, the
+   process's last heartbeat (it ended with its shell); a process that kept its parent and still beat when the group
+   ended fails this check, since nothing then shows the stop. And the finish step, which runs only after the whole
+   group ended, began less than 240 s after the hang step's probe (the group did not wait for the 300 s sleep). Its
+   expected value is about 120 s, set by the crashing control.
 
 Reported, not judged: whether background steps start with SIGINT or SIGQUIT ignored (a shell's background job starts
 its children so, which skipped a SIGQUIT subtest in the local preflight; any such effect on the suite shows up as a
@@ -180,29 +196,39 @@ stopped step's own process: on a timeout `ProcessInvoker.cs` (actions/runner v2.
 one process, with `killProcessOnCancel: false` from `ScriptHandler.cs` line 346, and `BackgroundStepCoordinator.cs`
 lines 244-248 give a timed-out background step the result `Failed`. None of these signals is sent to the step's
 Python child, so the expected hosted behaviour, unmeasured, is that the stopped step fails while its Python process
-lives on, re-parented, until the job ends; the heartbeat measures this and when the parent shell ended. A control
-run whose parallel group never started (the foreground probe step, `id: foreground`, did not succeed or left no
-probe) makes the OS incomplete, never a rule outcome.
+lives on, re-parented, until the job ends; the heartbeat measures this, and the time the parent shell ended is the
+stop that check 5 judges. A control run whose parallel group never started (the foreground probe step,
+`id: foreground`, did not succeed or left no probe) makes the OS incomplete, never a rule outcome.
 
 ## Decision rule (preregistered, per OS, fixed before any hosted run)
 
 1. An arm is eligible when it has three runs, every run is eligible, and (for G and GT) the OS controls passed.
-2. S must be eligible, or the OS gets **no verdict**.
+2. S must be eligible and the controls measurable, or the OS gets **no verdict**.
 3. No eligible sharded arm gives **reject**.
 4. Otherwise take the eligible sharded arm with the smaller median step time (a tie goes to G, the arm without a
    tail). **Adopt** it only if its median is at most 3/5 of the S median and its slowest run at most 3/4 of the
    fastest S run, both compared as exact fractions of nanoseconds with no rounding before the comparison;
    otherwise **reject**, with no fall-through to the other arm.
-5. The OS is **incomplete**, which is recorded as such and is never a rule outcome, when any of these holds,
-   checked before anything else (the controls-check result and the inventory gate included): a re-run (the compare
-   job's own `GITHUB_RUN_ATTEMPT`, or the `run_attempt` of any run or control directory, is not `"1"` or is
-   unrecorded); a cancelled or skipped job; a missing run directory; a job status `cancelled`; a run whose test
-   phase never started (its clock-start step, `id: start`, has an outcome other than `success` in `meta.json`, or
-   `timing.json` records no clock start: a setup step failed or the job stopped before the test phase); a missing
-   control run, or one whose parallel group never started; an inventory job that failed before its gate reported (no
-   `report.json` recording a failed gate). A failed inventory gate (`report.json` with `ok` false), or an unusable
-   inventory artifact, gives **no verdict**. A shard step that started but never reached its command, or never wrote
-   its exit status, is a failure of the sharded arm: its run is ineligible.
+5. The OS is **incomplete**, which is recorded as such and is never a rule outcome, when any of these holds: a
+   re-run (the compare job's own `GITHUB_RUN_ATTEMPT` is not `"1"`, or a run or control directory records a
+   `run_attempt` other than `"1"`); a cancelled or skipped job; a missing run directory; a job status `cancelled`, of
+   an arm run or of the control run; an unrecorded run attempt (`runtime.json` missing, or without `run_attempt`: a
+   setup step failed before the run directory was prepared); a run whose test phase never started (its clock-start
+   step, `id: start`, has an outcome other than `success` in `meta.json`, or `timing.json` records no clock start: a
+   setup step failed or the job stopped before the test phase); a missing control run, or one whose parallel group
+   never started; a `controls-check` job that failed although the compare job's own check of the same control
+   artifact passed (the check job failed outside its checks: a setup step, the download or the runner); an inventory
+   job that failed without a `report.json` that records a gate finding (the gate never reported, or its own child
+   interpreter was stopped from outside). The OS gets **no verdict** when the inventory gate failed on a finding
+   (`report.json` with `ok` false and at least one problem), when the inventory artifact is unusable, when S is
+   ineligible, or when the controls are unmeasurable (Controls, check 2). The order: re-runs first; then a failed or
+   unreported inventory gate (a finding gives no verdict, anything else incomplete); then the other incomplete
+   conditions; then an unusable inventory artifact, an ineligible S or unmeasurable controls (no verdict); then rules
+   3 and 4. A shard step that started but never reached its command, or never wrote its exit status, is a failure of
+   the sharded arm: its run is ineligible, even when a runner fault caused it. When the rule rejects or adopts while
+   passing over a sharded arm that was ineligible only for that reason (every problem of its ineligible runs is a file
+   such a step never wrote, its unfinished log or ids that only such a step owned), `result.json` flags the arm under
+   `flags`, and the outcome record must address the flag.
 
 Every OS is listed in `result.json` and `summary.md`; each workflow measures its own OS, and the other OS is listed
 with `no verdict` and the reason `no run directory`.
@@ -215,9 +241,19 @@ it goes to a separate records pull request.
 
 **Which run decides (preregistered).** Per OS, the first workflow run whose compare result (`compare_run_attempt`
 `"1"`) is adopt, reject or no verdict decides; later runs are reported and cannot overturn it. A repeat is allowed
-only after a run that ended incomplete, or whose compare job left no `result.json` (for example when the oracle's
-own tests failed), by closing and reopening the draft pull request when no run of either trial workflow is in
-progress. The outcome record reports every run, its outcome and the reason for each repeat.
+only after a run that ended incomplete, or in which `compare.py` did not run or exited non-zero, so that it wrote no
+`result.json` (for example when the oracle's own tests failed), by closing and reopening the draft pull request when
+no run of either trial workflow is in progress. A run in which `compare.py` exited 0 decides even if its artifact
+did not upload; its outcome lines in that step's log then stand for `result.json`.
+
+**No hand cancellation, no reopen during a run (preregistered).** No run is cancelled by hand, and the pull request
+is never closed or reopened while a run of either trial workflow is in progress. A run that ends incomplete through a
+hand cancellation, or through a reopen made while it was in progress, after its first serial, shards or controls job
+started is a protocol deviation: it ends that OS's trial without a verdict, and no repeat is drawn. Its
+`result.json`, if any, still says incomplete; the outcome record names the deviation. A run cancelled before any of
+those jobs started is incomplete. The outcome record reports every run, its outcome, the reason for each repeat and,
+for every cancelled run, what cancelled it and the evidence (a reopen shows as a newer run of the same workflow that
+started while the cancelled run was in progress).
 
 **Re-runs.** Never re-run any job, the compare job included, and never use "Re-run failed jobs" or "Re-run all
 jobs" (the control job fails by design, so they would always re-run it). Any re-run makes the OS incomplete: the
@@ -230,13 +266,12 @@ need it (the re-run page of github/docs at `a3e0414f` does not say). The outcome
 re-run happens anyway, the run's attempts and artifact listing (GET) settle which applied.
 
 **Concurrency.** `cancel-in-progress: true` (github/docs `data/reusables/actions/actions-group-concurrency.md` at
-`336b7f54`, line 11): a reopen during a run cancels that run, which is then incomplete, and starts one attended run.
-With `false`, a reopen during a run would queue a second full run that starts unattended when the first ends,
-holding on macOS up to three of the five slots for hours. Under the deciding-run rule neither setting can change an
-outcome; the choice is about slots and attendance. Its cost: one reopen starts both trial workflows, so a repeat
-for one OS made while the other OS's run is still going cancels that run, which is then incomplete and has to be
-repeated too. A repeat therefore waits until both runs have ended; in particular a Linux repeat waits for the
-macOS run, however long the macOS queue is.
+`336b7f54`, line 11): a reopen during a run, which the protocol above forbids, cancels that run instead of queueing a
+second full run that would start unattended when the first ends and hold on macOS up to three of the five slots for
+hours. No setting lets a reopen void a run for a fresh draw: a reopen during a run after its first serial, shards or
+controls job started is the protocol deviation above, which ends that OS's trial without a verdict. Its cost: one
+reopen starts both trial workflows, so a repeat for one OS waits until the other OS's run has ended too; in
+particular a Linux repeat waits for the macOS run, however long the macOS queue is.
 
 ## Run it
 
@@ -260,28 +295,36 @@ result or an artifact.
 
 ## First-run checklist (GET requests and artifact downloads only)
 
-1. Before opening: read the macOS queue (queued and in-progress macos-15 jobs of the repository). This pull request
-   changes `manifests/evidence.json`, so `adoption-bootstrap.yml` also starts bootstrap-macos, bootstrap-macos-brew
-   and validate-macos at the opening: with this workflow's three, up to six macOS jobs against five slots. The
-   coordinator opens the pull request when the macOS queue is not saturated and reads the queue again after it opens;
-   record both readings and every macOS job's queue time.
+1. Before the opening and before every reopen: read the macOS queue (queued and in-progress macos-15 jobs of the
+   repository). This pull request changes `manifests/evidence.json`, so `adoption-bootstrap.yml`, whose
+   `pull_request` trigger takes the default types, also starts bootstrap-macos, bootstrap-macos-brew and
+   validate-macos at the opening and again at every reopen: with this workflow's three, up to six macOS jobs against
+   five slots. The coordinator opens, and reopens, the pull request only when the macOS queue is not saturated and
+   reads the queue again after each; record every reading and every macOS job's queue time.
 2. For each workflow run: the run object's `run_attempt` and every job's attempt are 1, and `result.json`'s
    `inputs.compare_run_attempt` is `"1"`; the artifact listing holds the nine `arm-*` artifacts, `inventory`,
-   `controls` and `compare`, and `inputs.ignored_entries` is empty.
+   `controls` and `compare`, and `inputs.ignored_entries` is empty. For a cancelled run, what cancelled it and when
+   (see "No hand cancellation, no reopen during a run").
 3. Controls: in the controls artifact, `meta.json` `steps` holds `foreground` and `control-0` to `control-3` with
    outcomes `success`, `success`, `failure`, `failure`, `failure` (this settles whether the steps context carries a
-   background step's outcome after the group's implicit wait); the probes' monotonic starts; `heartbeat.json`, read
-   through `result.json` `controls.<os>.hang` (the alive span, whether and when the parent shell ended, whether the
-   process still ran during the recheck; `outlived_step` true with a `parent_lost_after_probe_seconds` near 60 to
-   70 s, the expectation from the runner source, and `outlived_step` false, the process stopped with its step, both
-   pass the controls, and the record states which was observed); and, from the jobs API, the controls job's step
-   list with each step's conclusion, `started_at` and `completed_at` (the hang step's span on the service clock
-   should be at least 60 s and well under 300 s).
+   background step's outcome after the group's implicit wait; when it records none of the four, `result.json` marks
+   the controls unmeasurable and the OS gets no verdict); the probes' monotonic starts; `heartbeat.json`, read
+   through `result.json` `controls.<os>.hang`: the stop (`stop_after_probe_seconds`, `stop_seen_as`), its deadline
+   (`stop_deadline_after_probe_seconds`), the alive span, whether and when the parent shell ended, and whether the
+   process still ran during the recheck. A stop seen as a parent pid change near 60 to 70 s with `outlived_step`
+   true, the expectation from the runner source, and a stop seen as the last heartbeat of a process that ended with
+   its step both pass when the stop lies at or after 50 s and before the deadline; the record states which was
+   observed. And, from the jobs API, the controls job's step list with each step's conclusion, `started_at` and
+   `completed_at` (the hang step's span on the service clock should be at least 60 s and well under 300 s).
 4. Probes: every background step's SIGINT and SIGQUIT dispositions, the exported names and the Python version, in
    the controls and in each arm-run.
 5. Read the harden-runner step log of one macos-15 job; if its agent did not start, write "macOS egress unaudited" in
    the outcome record.
-6. Take every number of the outcome record from `result.json`, the exit files and the jobs API, never from the step
+6. Record the result of the hosted `validate` job's online zizmor step (`.github/workflows/validate.yml` line 70) on
+   the pushed head; the local offline zizmor run is not that check.
+7. `result.json` `verdicts.<os>.flags`: every flag (a sharded arm passed over while it was ineligible only through
+   steps that never wrote an exit status) is addressed in the outcome record.
+8. Take every number of the outcome record from `result.json`, the exit files and the jobs API, never from the step
    summary or log annotations.
 
 ## Local evidence recorded on 2026-10-03 (local integration, synthetic fixtures and a probe, not a hosted run)
@@ -319,7 +362,9 @@ result or an artifact.
   `artipacked` on the action; with the trigger changed to `pull_request_target`, `github-env` also fired on the
   planted write in either place. The unchanged workflow gave no finding. Other audits were not probed, and zizmor
   still warns that its parallel-step support is experimental.
-- **`test_compare.py`**: 85 tests OK on CPython 3.13.16 and the bare 3.12.3 (synthetic fixtures).
+- **`test_compare.py`**: 101 tests OK on CPython 3.13.16 and the bare 3.12.3 (synthetic fixtures). The tests added for
+  the second review round's controls-check, hang-stop and unmeasurable-controls rules fail on the previous head
+  `66da2bd9` (run there with only `test_compare.py` replaced) and pass on this one.
 
 ## Limits
 
@@ -334,22 +379,44 @@ result or an artifact.
   (the hang control); whether the steps context carries a background step's outcome after the group's implicit wait,
   which GitHub's published workflow schema (actions/languageservices `workflow-parser/src/workflow-v1.0.json` at
   `880ac43b`, lines 2168-2197 and 2255-2270: a `parallel:` item is a step that may carry an `id`) and the runner
-  source (`CompleteWaitedSteps`, lines 371-392, flushes each waited step's outcome and conclusion) both imply. If the
-  outcomes do not arrive, the controls fail and the OS gets reject (fail-closed).
+  source (`CompleteWaitedSteps`, lines 371-392, flushes each waited step's outcome and conclusion) both imply. If none
+  of the four control steps' outcomes arrives while every other control expectation holds, the controls are
+  unmeasurable and the OS gets no verdict, final under the deciding-run rule, since a repeat would meet the same
+  platform; a wrong outcome, an outcome missing beside recorded ones, or any other failed control expectation still
+  fails the controls (reject).
 - A shard that hangs is expected to be stopped by its step limit (25 min on Linux, 40 min on macOS), which makes its
   run ineligible (no exit status); its Python process may live on until the job ends (the hang control measures it),
   and every job's own `timeout-minutes` bounds it.
+- A runner fault after the clock step that stops a shard step before its command or its exit status (a background
+  step whose shell never starts, a lost step) makes that run ineligible, not incomplete (rule 5), so it can hand the
+  decision to the other arm or give reject. `result.json` flags a sharded arm that the rule passed over while it was
+  ineligible only so (`verdicts.<os>.flags`), and the outcome record must address the flag; the rule itself does not
+  change.
 - zizmor 1.30.1 calls its parallel-step support experimental (its `docs/usage.md` at v1.30.1, "Parallel steps"); the
   probe above measured four audits inside a group, not all. The shard and control steps carry no expression, action,
-  `if:` or `GITHUB_ENV`/`GITHUB_PATH` write inside a group, which `test_compare.py` checks. actionlint 1.17.0 parses
-  the groups, their step ids and their scripts with shellcheck.
+  `if:` or `GITHUB_ENV`/`GITHUB_PATH` write inside a group, which `test_compare.py` checks in the trial's compare job
+  and locally; the repository's required suite does not collect `test_compare.py` (`blueprints/` is not a package),
+  so an adoption pull request moves that plain-text check into `tests/test_workflow_hardening.py`. actionlint 1.17.0
+  parses the groups, their step ids and their scripts with shellcheck. The hosted `validate` job's online zizmor step
+  on the pushed head has not run yet (checklist item 6).
+- Artifact layout: the control artifact is downloaded by pattern into `results/controls`. The pinned
+  `actions/download-artifact` extracts into the target directory itself when the download is a single artifact,
+  `merge-multiple` is set or exactly one artifact matched (`src/download-artifact.ts` at `3e5f45b2`, lines 185-198,
+  re-read with a GET request on 2026-10-03), so `results/controls/<os>-controls/` holds the control run; a nested
+  path (`results/controls/controls/<os>-controls/`) would leave the control run absent, which `compare.py` counts as
+  incomplete, never as a wrong attribution.
+- No agent definition changes on this branch: `git diff --name-only 9b0b8d6d 66da2bd9 -- .claude/agents
+  adoption/agents examples/claude-native/agents .codex` was empty on 2026-10-03, and no later commit of the branch
+  touches those paths.
 - Artifact attribution checks names and layout, not authorship: every arm job runs the pull request head, so a head
   that writes another run's directory into its own artifact makes its own run ineligible, but code that rewrites its
   own run directory is not detected beyond the oracle's rules.
 - macOS slots: this pull request changes `manifests/evidence.json`, an `adoption-bootstrap.yml` path, so the opening
-  also starts bootstrap-macos, bootstrap-macos-brew and validate-macos: up to six macOS jobs against the plan's five
-  slots. Queueing delays a job but does not enter `step_seconds`; a stalled queue that ends in cancellation makes the
-  OS incomplete. The first trial's macOS jobs never started while five adoption-bootstrap macOS jobs held the pool.
+  and every reopen also start bootstrap-macos, bootstrap-macos-brew and validate-macos: up to six macOS jobs against
+  the plan's five slots, each time. Queueing delays a job but does not enter `step_seconds`; a stalled queue that ends
+  in cancellation makes the OS incomplete, unless the run was cancelled by hand after its first serial, shards or
+  controls job started (the protocol deviation in "Trigger, repetition and re-runs"). The first trial's macOS jobs
+  never started while five adoption-bootstrap macOS jobs held the pool.
 - `step-security/harden-runner` audits egress on macos-15 only if its agent starts; a previous hosted validate-macos
   run logged a non-fatal installation warning (`evidence/artifacts/wsl-retrieval-retirement-20261003/ci-correction.md`,
   line 7). Checked on the first run (checklist item 5); the jobs hold no secret and a read-only token.

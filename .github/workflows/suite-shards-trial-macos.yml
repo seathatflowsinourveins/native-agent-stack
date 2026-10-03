@@ -24,15 +24,19 @@ name: Suite shards trial, macos-15 (draft pull request only)
 #
 # Repetition (preregistered, experiment.json quality_rule): the first workflow run whose compare result
 # (compare_run_attempt 1) is adopt, reject or no verdict decides this OS; later runs are reported and cannot
-# overturn it. A repeat is allowed only after a run that ended incomplete, by closing and reopening the pull request
-# when no run of either trial workflow is in progress. Never re-run any job, the compare job included: compare.py
-# makes the OS incomplete when its own GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control directory, is
-# not 1. Whether a re-run job's upload (overwrite: false) would fail on the first attempt's artifact name, and
-# whether its data would reach a compare job, is unverified; the outcome is incomplete either way.
-# cancel-in-progress is true: a reopen during a run cancels that run (incomplete, never a rule outcome) and starts
-# one attended run, instead of queueing an unattended second run behind it, which would hold up to three macOS slots.
-# Its cost: one reopen starts both trial workflows, so a repeat for Linux made while this macOS run is still going
-# cancels this run; a Linux repeat therefore waits until this run has ended.
+# overturn it. A repeat is allowed only after a run that ended incomplete, or in which compare.py did not run or
+# exited non-zero (so it wrote no result.json), by closing and reopening the pull request when no run of either
+# trial workflow is in progress. A run in which compare.py exited 0 decides even if its upload failed (its outcome
+# lines in that step's log then stand for result.json). No run is cancelled by hand, and the pull request is never
+# closed or reopened while a run of either trial workflow is in progress: a run that ends incomplete through a hand
+# cancellation or such a reopen after its first serial, shards or controls job started is a protocol deviation,
+# which ends this OS's trial without a verdict and draws no repeat. Never re-run any job, the compare job included:
+# compare.py makes the OS incomplete when its own GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control
+# directory, is not 1. Whether a re-run job's upload (overwrite: false) would fail on the first attempt's artifact
+# name, and whether its data would reach a compare job, is unverified; the outcome is incomplete either way.
+# cancel-in-progress is true: a reopen during a run, which the protocol forbids, cancels that run instead of
+# queueing an unattended second run behind it, which would hold up to three macOS slots. Its cost: one reopen starts
+# both trial workflows, so a Linux repeat waits until this macOS run has ended too.
 #
 # Jobs: inventory (ubuntu-24.04 with the arms' Python line from actions/setup-python: the fail-closed parity and
 # coverage gate, shard lists built at run time from the head); serial (arm S x 3) and shards (arms G3 and G3T x 3),
@@ -41,9 +45,9 @@ name: Suite shards trial, macos-15 (draft pull request only)
 # and controls-check (asserts each step's own outcome); compare (the oracle's own tests, then compare.py; needs every
 # job, runs always). Every job checks out the pull request head (a pull_request checkout is otherwise the merge
 # commit) and asserts it. Queueing risk: this pull request also changes manifests/evidence.json, an
-# adoption-bootstrap.yml path, so bootstrap-macos, bootstrap-macos-brew and validate-macos start at the same opening:
-# up to six macOS jobs against five slots (README.md, "Limits"; the coordinator opens the pull request when the
-# macOS queue is not saturated).
+# adoption-bootstrap.yml path, so bootstrap-macos, bootstrap-macos-brew and validate-macos start at the same opening
+# and again at every reopen: up to six macOS jobs against five slots (README.md, "Limits"; the coordinator opens and
+# reopens the pull request only when the macOS queue is not saturated).
 #
 # Suite environment: as validate-macos, actions/setup-python 3.13, plus the two npm pins that validate.yml installs,
 # because their tripwires (tests/test_shell_parser_ci.py, tests/test_landscape_sweep_skills.py) fail any Actions job
@@ -739,6 +743,9 @@ jobs:
       # the run decides nothing (README.md, "Which run decides").
       - name: Run the oracle's own tests on this interpreter (fail-closed)
         run: python3 -m unittest discover -s "$TRIAL_DIR" -p "test_*.py" -v
+      # compare.py repeats the controls-check job's check on the same control artifact: when that job failed but this
+      # check passes, the check job failed outside its checks (a setup step, the download, the runner), and the OS is
+      # incomplete, never reject; when both fail, the controls failed.
       - name: Keep the needs context (each job's result) for compare.py
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}

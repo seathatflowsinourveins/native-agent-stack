@@ -23,9 +23,15 @@ It exits 0 only when all of these hold, and 1 otherwise (the inventory job then 
   (d) make_shards.py builds every shard arm of the OS from the frozen weights, and every test file is in
       exactly one shard list or the tail of each arm, read back from the written files.
 
+A child interpreter stopped from outside, by one of EXTERNAL_SIGNALS (the kernel's out-of-memory killer sends
+SIGKILL; a runner that stops a job sends SIGINT, SIGTERM or SIGKILL), is an execution problem of the gate, not a
+finding: report.json lists it under execution_problems, with parity null, and the gate still fails (exit 1), but
+compare.py then counts the run as incomplete rather than as a failed gate. Any other failure of a child (a non-zero
+exit, an end by another signal, output that is not JSON) is a finding under (c).
+
 It writes DIR/inventory.txt (the sorted discovery ids), DIR/module_ids.json ({file module: [ids in load
-order]}), DIR/shards/<arm>/ (make_shards.py's lists) and DIR/report.json (counts, the interpreter and every
-problem). report.json is written whatever the outcome.
+order]}), DIR/shards/<arm>/ (make_shards.py's lists) and DIR/report.json (counts, the interpreter, every
+finding under problems and every execution problem). report.json is written whatever the outcome.
 """
 
 from __future__ import annotations
@@ -35,6 +41,7 @@ import collections
 import json
 import os
 import platform
+import signal
 import subprocess
 import sys
 import unittest
@@ -48,6 +55,11 @@ import make_shards  # noqa: E402  (this directory's frozen shard generator)
 SCHEMA = "suite-shards-inventory/1"
 LOADER_MADE = ("unittest.loader._FailedTest.", "unittest.loader.ModuleSkipped.")
 LIST_CAP = 50
+EXTERNAL_SIGNALS = ("SIGKILL", "SIGTERM", "SIGINT", "SIGHUP")
+
+
+class ChildStopped(RuntimeError):
+    """A child interpreter that one of EXTERNAL_SIGNALS stopped: an execution problem, not a finding."""
 
 
 def iter_ids(suite):
@@ -77,11 +89,25 @@ def child_phase(phase: str, root: Path) -> dict:
     return {"modules": owned, "errors": errors}
 
 
+def child_failure(phase: str, returncode: int, stderr: str) -> RuntimeError:
+    """The error for a child that did not exit 0: ChildStopped when one of EXTERNAL_SIGNALS ended it (subprocess
+    gives a negative return code for a signal), a RuntimeError (a finding) otherwise."""
+    if returncode < 0:
+        try:
+            name = signal.Signals(-returncode).name
+        except ValueError:
+            name = f"signal {-returncode}"
+        if name in EXTERNAL_SIGNALS:
+            return ChildStopped(f"the {phase} child interpreter was stopped by {name} from outside: {stderr[-2000:]}")
+        return RuntimeError(f"the {phase} child interpreter ended by {name}: {stderr[-2000:]}")
+    return RuntimeError(f"the {phase} child interpreter exited {returncode}: {stderr[-2000:]}")
+
+
 def run_child(phase: str, root: Path) -> dict:
     done = subprocess.run([sys.executable, str(Path(__file__).resolve()), "--phase", phase, "--root", str(root)],
                           capture_output=True, text=True, check=False)
     if done.returncode != 0:
-        raise RuntimeError(f"the {phase} child interpreter exited {done.returncode}: {done.stderr[-2000:]}")
+        raise child_failure(phase, done.returncode, done.stderr)
     return json.loads(done.stdout)
 
 
@@ -166,11 +192,15 @@ def main(argv=None) -> int:
     modules = make_shards.test_modules(root)
     report = {"schema": SCHEMA, "os": args.os, "python_version": platform.python_version(),
               "python_implementation": platform.python_implementation(), "platform": platform.platform(),
-              "test_files": len(modules), "parity": False, "problems": []}
-    problems = report["problems"]
+              "test_files": len(modules), "parity": False, "problems": [], "execution_problems": []}
+    problems, execution = report["problems"], report["execution_problems"]
     try:
         discovered = run_child("discover", root)
         by_name = run_child("by-name", root)
+    except ChildStopped as error:
+        execution.append(str(error))
+        report["parity"] = None  # not judged: a child stopped from outside never finished its load
+        discovered = by_name = None
     except (RuntimeError, ValueError) as error:
         problems.append(str(error))
         discovered = by_name = None
@@ -186,18 +216,20 @@ def main(argv=None) -> int:
         (args.out / "module_ids.json").write_text(json.dumps(by_name["modules"], indent=0, sort_keys=True) + "\n",
                                                   encoding="utf-8")
     problems.extend(shard_problems(args.os, modules, args.weights, args.out / "shards", report))
-    report["ok"] = not problems
+    report["ok"] = not problems and not execution
     (args.out / "report.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"inventory.py: {report['test_files']} test files, {report.get('discovery_ids')} discovery ids, "
           f"{report.get('ids_loaded_by_name')} ids loaded by name, parity {report['parity']}, "
-          f"{len(problems)} problems", file=sys.stderr)
+          f"{len(problems)} problems, {len(execution)} execution problems", file=sys.stderr)
     for problem in problems:
         print(f"inventory.py: {problem}", file=sys.stderr)
+    for problem in execution:
+        print(f"inventory.py: execution problem (not a finding): {problem}", file=sys.stderr)
     for arm, entry in (report.get("arms") or {}).items():
         print(f"inventory.py: {arm}: modules per shard {entry['modules_per_shard']}, predicted seconds "
               f"{[round(value, 1) for value in entry['predicted_seconds']]}, tail {entry['tail'] or 'none'}, "
               f"default weight for {entry['default_weight_modules'] or 'no module'}", file=sys.stderr)
-    return 0 if not problems else 1
+    return 0 if report["ok"] else 1
 
 
 if __name__ == "__main__":
