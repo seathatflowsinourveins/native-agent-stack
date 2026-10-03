@@ -40,7 +40,11 @@ These four came from the Codex lane's note, section "Scoped novelty source dispo
 lane recorded receipt of that agreement in comment 5959996494 (2026-10-02T19:35:35Z). Its earlier comments,
 5959059286 (18:45:13Z) and 5959205007 (18:51:56Z), came before that version and acknowledge none of these four. Of
 the 36 claims the review checks, 27 are confirmed, 9 are qualified and none is refuted; where `consensus.json` states a
-qualified claim, its text carries the qualification, and no decision changed.
+qualified claim, its text carries the qualification, and no decision changed. Three further facts of the review are
+carried as `qualifications` of the amendment, the evaluation harness and Docker Compose 5.6.0: the comparison pins HOL
+Guard 3.17.2 or later; AgentCompass's Claude adapter writes its API key in plaintext into a settings file under /tmp by
+default; Docker's apt channel already carries Compose 5.6.0 and nothing holds the package, so 5.5.1 is held only at
+install time.
 
 | Item | Proposal | Independent review | Acknowledgements |
 | --- | --- | --- | --- |

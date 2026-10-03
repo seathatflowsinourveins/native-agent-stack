@@ -152,7 +152,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "19cd8898150d685af371d564b0ca3e118000c495b0b07aefde7731b69d6e7e72"
+          "sha256": "e47e7a98053a7a83a5eecdf9da2b42cbeb68e635c71fcd4feda443fa26e37e83"
         },
         "convergence": {
           "file": "convergence.json",
@@ -6312,6 +6312,9 @@
                 "by": "direct consensus of both model families",
                 "date_utc": "2026-10-02",
                 "decision": "keep the guard; hold one enforcement comparison",
+                "qualifications": [
+                  "The comparison pins HOL Guard 3.17.2 or later: v3.17.2 was released on 2026-10-02 at 21:12:17Z, after the note named 3.17.1 (https://github.com/hashgraph-online/hol-guard/releases/tag/v3.17.2; claude-review-held-topics.md, topic 1, claim 10)."
+                ],
                 "sources": [
                   "https://github.com/hashgraph-online/hol-guard/blob/85090ce61ed5bb5457104b5a73cb2bbc9443fda0/docs/guard/harness-support.md#L9"
                 ],
@@ -6707,7 +6710,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "47f454589e9d89ddb3202e2e3bfeb678e46680fd9f265a18608ba88f0137a47a"
+      "sha256": "cfd08b85efca343f428fadd8253a06ce9c08afb944a4f66a2aaae15d3c08fa96"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -6731,7 +6734,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "19cd8898150d685af371d564b0ca3e118000c495b0b07aefde7731b69d6e7e72"
+      "sha256": "e47e7a98053a7a83a5eecdf9da2b42cbeb68e635c71fcd4feda443fa26e37e83"
     }
   ],
   "stage_order": [

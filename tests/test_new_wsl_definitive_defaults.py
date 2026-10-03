@@ -851,6 +851,31 @@ class Manifest(unittest.TestCase):
                 self.assertIsNone(row["measurement"])
                 self.assertTrue(row["resolution"]["open_acceptance_gates"])
 
+    def test_consensus_carries_the_reviews_qualifications_without_changing_a_decision(self):
+        """Three facts of the Claude lane's review qualify the credential-guard amendment and two held topics: the
+        comparison pins HOL Guard 3.17.2 or later; AgentCompass's Claude adapter writes its API key in plaintext; Docker's
+        apt channel already carries Compose 5.6.0 and nothing holds the package. The decisions stay as they were."""
+        amendment = next(entry["amendment"] for entry in self.consensus["amend_rows"] if entry["slot_id"] == "credential-guard")
+        held = {topic["topic"]: topic for topic in self.consensus["held_without_a_row_change"]}
+        expected = {
+            "credential-guard": (amendment, ("3.17.2 or later", "21:12:17Z", "topic 1, claim 10")),
+            "evaluation harness": (held["evaluation harness"], ("plaintext", "/tmp", "0600", "topic 2, omission 2")),
+            "Docker Compose 5.6.0": (held["Docker Compose 5.6.0"], ("5.6.0", "only at install time", "topic 4, omission 2")),
+        }
+        for name, (item, phrases) in expected.items():
+            with self.subTest(item=name):
+                text = " ".join(item["qualifications"])
+                for phrase in phrases:
+                    self.assertIn(phrase, text)
+        self.assertEqual(amendment["decision"], "keep the guard; hold one enforcement comparison")
+        self.assertEqual(held["evaluation harness"]["decision"],
+                         "keep Inspect AI 0.3.273 and Harbor 0.23; AgentCompass 1.0.0 only for an identified unmet evaluation requirement")
+        self.assertEqual(held["Docker Compose 5.6.0"]["decision"],
+                         "qualify the update; the selected 5.5.1 stays until the owner of that review accepts it")
+        # The amendment carries its qualification into the manifest beside the row; the row's own fields do not change.
+        guard = next(row for row in self.rows if row["slot_id"] == "credential-guard")
+        self.assertEqual(guard["amendments"][-1]["qualifications"], amendment["qualifications"])
+
     def test_tables_show_consensus_rows_by_their_label_and_list_the_amendments(self):
         lines = RECORD.read_text(encoding="utf-8").splitlines()
         for sid, row in self.consensus_rows.items():

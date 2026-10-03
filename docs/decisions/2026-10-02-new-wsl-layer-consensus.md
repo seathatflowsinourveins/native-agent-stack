@@ -205,7 +205,8 @@ alternatives it admits and the comparison that would overturn the row.
   (`codex-decisions.md`, version of 2026-10-02T18:57:10Z, "Scoped novelty source dispositions"). Independent review:
   the Claude lane's, in `claude-review-held-topics.md`, topic 1: eight claims confirmed and two qualified, the managed
   launches (for Codex only, now in the text above) and, for the review's brief, whether 3.17.1 is the current release
-  (3.17.2 followed on the same day). Acknowledgements: the Claude lane's comment 5959684384 (2026-10-02T19:16:53Z)
+  (3.17.2 followed on the same day). Qualification: the comparison pins HOL Guard 3.17.2 or later, released on
+  2026-10-02 at 21:12:17Z. Acknowledgements: the Claude lane's comment 5959684384 (2026-10-02T19:16:53Z)
   agreed to this amendment and the held topics below, from the note and before that review, and the Codex lane's
   comment 5959996494 (2026-10-02T19:35:35Z) recorded receipt of that agreement.
 
@@ -222,7 +223,9 @@ comment 5959996494 (2026-10-02T19:35:35Z).
   comparative advantage is unmeasured. Its Codex and Claude adapters turn permission bypass on by default, and both
   supply provider API configuration (each needs an API key and a base URL and writes its own client configuration, so
   neither runs on a native sign-in as shipped), so equivalence with the native account route is not established. No
-  adapter or permission change is adopted. Proposal: the Codex lane's note. Independent review: the Claude lane's,
+  adapter or permission change is adopted. Qualification: the Claude adapter writes its API key in plaintext into a
+  settings file, by default under /tmp (its file mode was not verified), which conflicts with the repository's rule
+  that a provider key stays in a 0600 env file passed by pointer. Proposal: the Codex lane's note. Independent review: the Claude lane's,
   topic 2: ten claims confirmed and one qualified, that only the Claude adapter supplies provider configuration (the
   Codex adapter does too, as the text above now says). Acknowledgements: comments 5959684384 (the Claude lane,
   19:16:53Z) and 5959996494 (the Codex lane, 19:35:35Z), on the note's version of 18:57:10Z.
@@ -231,12 +234,14 @@ comment 5959996494 (2026-10-02T19:35:35Z).
   among them manually triggered jobs, provider-service relay networks, warnings for unsupported Compose-file
   attributes, --parallel across all bulk engine calls, and docker/cli 29.8.2 with newer moby, containerd and buildkit
   libraries. The Codex lane holds the isolated version and help binding review; no daemon, container, global or
-  destination installation is part of it. This record moves no pin. Proposal: the Codex lane's note. Independent
-  review: the Claude lane's, topic 4: four claims confirmed and two qualified, the list of changes (incomplete in the
-  note; the text above names the main further ones, and the review lists more) and, for the review's brief, that
-  nothing in the release changes what the install plan or the rootless engine relies on (no rootless change and
-  preserved configuration hashes upstream, not checked on a host). Acknowledgements: comments 5959684384 (the Claude
-  lane, 19:16:53Z) and 5959996494 (the Codex lane, 19:35:35Z), on the note's version of 18:57:10Z.
+  destination installation is part of it. This record moves no pin. Qualification: Docker's apt channel for Ubuntu
+  26.04 already carries Compose 5.6.0 and nothing in the install plan holds the package, so 5.5.1 is held only at
+  install time, and a later apt upgrade would move to 5.6.0 without the review. Proposal: the Codex lane's note.
+  Independent review: the Claude lane's, topic 4: four claims confirmed and two qualified, the list of changes
+  (incomplete in the note; the text above names the main further ones, and the review lists more) and, for the review's
+  brief, that nothing in the release changes what the install plan or the rootless engine relies on (no rootless change
+  and preserved configuration hashes upstream, not checked on a host). Acknowledgements: comments 5959684384 (the
+  Claude lane, 19:16:53Z) and 5959996494 (the Codex lane, 19:35:35Z), on the note's version of 18:57:10Z.
 - **Catalog freshness and the session-start notice.** Keep the existing automation; the Codex lane owns a daily
   report-only cadence and the notice documentation. The existing freshness workflow, weekly at the revision the note
   cites and daily since pull request 613 (merged 2026-10-02), already supplies metadata and drift reports with guarded
@@ -300,10 +305,13 @@ Beyond that list:
 - The Claude lane acknowledged the Codex lane's scoped dispositions and the `credential-guard` amendment (comment
   5959684384) from the note, before it read their sources. Its review, `claude-review-held-topics.md`, came afterwards:
   of 36 claims it confirms 27, qualifies 9 and refutes none. Where this record states a qualified claim, its text now
-  carries the qualification; no decision changed. Two of the review's facts are reported here but not carried into the
-  text of `consensus.json`, which states no claim they bear on: HOL Guard 3.17.2 followed 3.17.1 on 2026-10-02, and the
-  record's link for AgentCompass's metadata points to line 5 of its `pyproject.toml`, while the values are on lines 7,
-  10 and 11. The review's other findings that this record does not carry are in the review only.
+  carries the qualification; no decision changed. Three further facts of the review are carried as `qualifications` in
+  `consensus.json`, again without a change of decision or label: the `credential-guard` comparison pins HOL Guard 3.17.2
+  or later; AgentCompass's Claude adapter writes its API key in plaintext into a settings file under /tmp by default;
+  Docker's apt channel already carries Compose 5.6.0 and nothing holds the package. One fact is reported here but not
+  carried into `consensus.json`, which states no claim it bears on: the record's link for AgentCompass's metadata
+  points to line 5 of its `pyproject.toml`, while the values are on lines 7, 10 and 11. The review's other findings
+  that this record does not carry are in the review only.
 - The request note says 99 reports; the folder held 103 report folders when it was counted later the same day. The
   count is discovery metadata and no decision rests on it (`copy-notes.json`).
 
