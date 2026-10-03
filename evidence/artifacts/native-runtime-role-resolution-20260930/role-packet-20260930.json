@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "kind": "native_runtime_role_source_review",
+  "lane": "foundation",
+  "checked_at": "2026-10-01T00:52:25Z",
+  "status": "scoped_native_setup_and_provider_trials_completed",
+  "scope": "Task-specific native runtime roles and enhancements beyond OpenHands; no universal winner or automatic alternate installation.",
+  "discovery": {
+    "public_starred_repositories": 352,
+    "meaning": "Discovery coverage reported by the bounded read-only research wave, not 352 accepted runtimes.",
+    "curated_sources": [
+      {
+        "url": "https://github.com/bradAGI/awesome-cli-coding-agents/tree/889e3e8d25342a8a224408815299c95c1dc412d3",
+        "revision": "889e3e8d25342a8a224408815299c95c1dc412d3"
+      },
+      {
+        "url": "https://github.com/e2b-dev/awesome-ai-agents/tree/9596ab1e69fbbb6c95291141c8dab5c181083216",
+        "revision": "9596ab1e69fbbb6c95291141c8dab5c181083216"
+      },
+      {
+        "url": "https://github.com/punkpeye/awesome-mcp-servers/tree/3c30195615095be4f22ac120a7cee82f215cf547",
+        "revision": "3c30195615095be4f22ac120a7cee82f215cf547"
+      },
+      {
+        "url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/4bf51ab704fb2c5b3803cd5191b30d7dcdb51dc2",
+        "revision": "4bf51ab704fb2c5b3803cd5191b30d7dcdb51dc2"
+      }
+    ]
+  },
+  "architecture": {
+    "trigger": "Consequential choice of multiple runtime/framework roles and persisted state, with conflicting source/package version evidence.",
+    "reviewer": "Astra/Max",
+    "decision": "Retain qualified native Codex/Dagu; separately qualify OpenHands CLI/SDK and a DeepAgents persistent-research candidate; OpenAI SandboxAgent remains a valid source-reviewed alternate.",
+    "acceptance": "Source-level architecture accepted for isolated scoped trials; execution/default promotion depends on original native results."
+  },
+  "enhancement_policy": [
+    "Give each native worker an explicit task/role/model/effort, owned workspace/state, bounded lifecycle and deterministic task oracle.",
+    "Load the task's source-pinned skills and selected MCP tools progressively; optional extensions qualify independently.",
+    "Use native caching, compaction/condenser, supported checkpoint and provider formats; preserve all failed attempts and unknown counters.",
+    "Parent native sign-ins and provider routes remain native; selected framework requests use child-scoped OmniRoute20128 Responses.",
+    "A framework source review, install, unchanged upstream test and live provider run are different evidence classes."
+  ],
+  "candidates": [
+    {
+      "role": "coordination",
+      "name": "Native Codex / Claude",
+      "resolution": "retain",
+      "version": "0.159.2 / 2.1.286",
+      "repository": "https://github.com/openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "source": "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "additional_source": "https://github.com/anthropics/claude-code/releases/tag/v2.1.286",
+      "fit": "Native parent accounts, explicit role/model/effort, one integrator.",
+      "boundary": "Native CLI version/help and prior scoped acceptance; global settings are owner-managed."
+    },
+    {
+      "role": "coding-worker",
+      "name": "Codex Python SDK + Dagu",
+      "resolution": "retain scoped acceptance",
+      "version": "0.159.2 / 2.16.6",
+      "repository": "https://github.com/openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "source": "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "additional_source": "https://github.com/dagucloud/dagu/tree/58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "fit": "General engineering with structured native events, task skills, selected MCP and native judge.",
+      "boundary": "Draft PR551 demonstrates bounded enhanced graph; comparative three-arm SDK gate remains unresolved."
+    },
+    {
+      "role": "terminal-acp",
+      "name": "OpenHands CLI",
+      "resolution": "installed capability; strict cache isolation held",
+      "version": "1.16.0",
+      "repository": "https://github.com/OpenHands/OpenHands-CLI",
+      "revision": "2963442dacc7cea44e39b7c4e73724295c853465",
+      "source": "https://github.com/OpenHands/OpenHands-CLI/tree/2963442dacc7cea44e39b7c4e73724295c853465",
+      "fit": "Terminal/headless/ACP and native persisted sessions.",
+      "boundary": "Python3.12, SDK/tools1.21.0, workspace1.11.1; separate from latest standalone SDK/O1. Native version/help/pip check and108 tests passed; SDK1.21 Jinja cache hard-codes real user home."
+    },
+    {
+      "role": "openhands-sdk",
+      "name": "OpenHands SDK / extensions",
+      "resolution": "installed native capabilities and one LLM round-trip passed",
+      "version": "1.50.1 / 0.25.0",
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "revision": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "source": "https://github.com/OpenHands/software-agent-sdk/tree/1e1390acc8788346ba4804c34323284009bf3f5e",
+      "additional_source": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "fit": "Native LLM Responses, skills/plugins, MCP, condenser and task agents.",
+      "boundary": "Patched LiteLLM1.93.2 override; original released lock differs. O1 sandbox/quality/observer gates stay with owner. Final184 unchanged tests/private SDK cache passed; native Responses/SolMax exact-output generation passed with supported openai/cx provider-qualified client alias. Production MCP/Conversation/condenser not executed."
+    },
+    {
+      "role": "persistent-research",
+      "name": "DeepAgents",
+      "resolution": "locally qualified bounded research and continuation trial",
+      "version": "0.7.21",
+      "repository": "https://github.com/langchain-ai/deepagents",
+      "revision": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "source": "https://github.com/langchain-ai/deepagents/tree/4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "additional_source": "https://github.com/langchain-ai/langgraph/tree/b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4/libs/checkpoint-sqlite",
+      "fit": "Research with progressive skill loading, explicit specialist context and cross-process checkpoint continuation.",
+      "boundary": "Native supported graph/checkpointer composition; local filesystem roots are not OS confinement; no default promotion. Original361 tests passed plus1 expected failure; actual one-specialist task passed after preserved24-step failure and one32-step repair; fresh-process continuation and same-oracle controls passed."
+    },
+    {
+      "role": "sandbox-harness",
+      "name": "OpenAI Agents SDK",
+      "resolution": "source-reviewed alternate",
+      "version": "0.22.3",
+      "repository": "https://github.com/openai/openai-agents-python",
+      "revision": "fdf21db62c303a3db54b0dfbee82de2141fa2799",
+      "source": "https://github.com/openai/openai-agents-python/tree/fdf21db62c303a3db54b0dfbee82de2141fa2799",
+      "additional_source": "https://developers.openai.com/api/docs/guides/agents/sandboxes",
+      "fit": "Beta native sandbox agent, manifests, built-in capabilities, skills and lifecycle.",
+      "boundary": "Overlaps current workspace worker; a future same-role Responses trial must qualify isolation/provider/recovery separately."
+    },
+    {
+      "role": "typed-decisions",
+      "name": "Pydantic AI",
+      "resolution": "conditional task trial",
+      "version": "2.52.0",
+      "repository": "https://github.com/pydantic/pydantic-ai",
+      "revision": "4de1ee3cf6026caa7f58b293ae929a1130b6b388",
+      "source": "https://github.com/pydantic/pydantic-ai/tree/4de1ee3cf6026caa7f58b293ae929a1130b6b388",
+      "fit": "Typed extraction/ranking/structured application judgments.",
+      "boundary": "Use when typed validation is the workload; no installation or comparative acceptance in this follow-up."
+    },
+    {
+      "role": "explicit-graph",
+      "name": "LangGraph",
+      "resolution": "conditional task trial",
+      "version": "1.2.12",
+      "repository": "https://github.com/langchain-ai/langgraph",
+      "revision": "49cce0ca852be4cfb567a1cbe0e511ff325a1682",
+      "source": "https://github.com/langchain-ai/langgraph/tree/49cce0ca852be4cfb567a1cbe0e511ff325a1682",
+      "fit": "Explicit graph state and interrupted workflow continuation.",
+      "boundary": "DeepAgents consumes supported graph primitives; keep Dagu for current scheduling. SQLite3.1.1 release has a distinct source pin."
+    },
+    {
+      "role": "durable-execution",
+      "name": "Temporal Python",
+      "resolution": "defer until workload gap",
+      "version": "1.34.0",
+      "repository": "https://github.com/temporalio/sdk-python",
+      "revision": "a4c2bb38c3bad43498dfa6bd849e8d85bb684e94",
+      "source": "https://github.com/temporalio/sdk-python/tree/a4c2bb38c3bad43498dfa6bd849e8d85bb684e94",
+      "fit": "Application execution replay across process failure.",
+      "boundary": "More infrastructure than saved conversations; no local server/deployment started."
+    },
+    {
+      "role": "extensible-terminal",
+      "name": "Pi",
+      "resolution": "coordinate existing trial owner",
+      "version": "0.99.2",
+      "repository": "https://github.com/earendil-works/pi",
+      "revision": "005af57d88ee23b33778f343a9595b32e67ff788",
+      "source": "https://github.com/earendil-works/pi/tree/005af57d88ee23b33778f343a9595b32e67ff788",
+      "fit": "Print/JSON/RPC/SDK and executable extensions.",
+      "boundary": "Latest discovery supersedes0.99.1 source snapshot; PR524 remains its dated conditional trial."
+    },
+    {
+      "role": "session-server",
+      "name": "OpenCode",
+      "resolution": "conditional interface trial",
+      "version": "1.18.34",
+      "repository": "https://github.com/anomalyco/opencode",
+      "revision": "aec0b9a6d8898f68f923aaf08b7306d931fd9d76",
+      "source": "https://github.com/anomalyco/opencode/tree/aec0b9a6d8898f68f923aaf08b7306d931fd9d76",
+      "fit": "Server/session/ACP interface.",
+      "boundary": "Latest discovery supersedes1.18.33; no new installation or model comparison."
+    },
+    {
+      "role": "extensions-acp",
+      "name": "Goose",
+      "resolution": "defer until distinct gap",
+      "version": "1.52.0",
+      "repository": "https://github.com/aaif-goose/goose",
+      "revision": "302b60806639ea9f0ae8f053f49f8bf0e88b26f4",
+      "source": "https://github.com/aaif-goose/goose/tree/302b60806639ea9f0ae8f053f49f8bf0e88b26f4",
+      "fit": "Extension-driven runtime and ACP.",
+      "boundary": "GDK provider library is separate; no extension acceptance transfer."
+    },
+    {
+      "role": "node-sdk",
+      "name": "Cline",
+      "resolution": "source-reviewed experimental candidate",
+      "version": "CLI3.0.66 / extension4.1.22",
+      "repository": "https://github.com/cline/cline",
+      "revision": "20d70ceed8b749f9350bc8c573a81faaa236b289",
+      "source": "https://github.com/cline/cline/tree/20d70ceed8b749f9350bc8c573a81faaa236b289",
+      "additional_source": "https://github.com/cline/cline/blob/f58bc118bdeef1bd2813cd08e00d98bdcda96475/sdk/README.md",
+      "fit": "Programmatic Node agent loop and host tools/persistence/teams.",
+      "boundary": "CLI, extension and SDK package versions are distinct; SDK marked experimental."
+    },
+    {
+      "role": "typescript-product",
+      "name": "Mastra",
+      "resolution": "conditional product trial",
+      "version": "core1.72.0",
+      "repository": "https://github.com/mastra-ai/mastra",
+      "revision": "5306a14346d2edc79cf885646182bc131e6e1c34",
+      "source": "https://github.com/mastra-ai/mastra/tree/5306a14346d2edc79cf885646182bc131e6e1c34",
+      "additional_source": "https://github.com/mastra-ai/mastra/blob/5306a14346d2edc79cf885646182bc131e6e1c34/LICENSE.md",
+      "fit": "TypeScript application agents and persisted suspend/resume workflows.",
+      "boundary": "Non-ee Apache2.0; enterprise directories separately licensed; no platform install."
+    },
+    {
+      "role": "served-platform",
+      "name": "Agno",
+      "resolution": "defer platform deployment",
+      "version": "3.0.11",
+      "repository": "https://github.com/agno-agi/agno",
+      "revision": "8063a7ec3ac6ab4902bdc7966870d3b5c5f51ffc",
+      "source": "https://github.com/agno-agi/agno/tree/8063a7ec3ac6ab4902bdc7966870d3b5c5f51ffc",
+      "fit": "Served SDK/AgentOS/storage/control plane.",
+      "boundary": "Overlaps existing foundation services until a demonstrated serving requirement."
+    },
+    {
+      "role": "microsoft-runtime",
+      "name": "Microsoft Agent Framework",
+      "resolution": "defer until integration gap",
+      "version": "Python1.19.0",
+      "repository": "https://github.com/microsoft/agent-framework",
+      "revision": "703fbce285ee0f026e5effcadfb9e65aab7f5d84",
+      "source": "https://github.com/microsoft/agent-framework/tree/703fbce285ee0f026e5effcadfb9e65aab7f5d84",
+      "fit": "Python/.NET agents and maintained migration destination.",
+      "boundary": "Use when Microsoft/.NET integration is requested; no general worker replacement."
+    },
+    {
+      "role": "independent-evaluator",
+      "name": "Inspect AI / Inspect SWE",
+      "resolution": "source-reviewed evaluator trial",
+      "version": "0.3.273 / 0.2.71",
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "revision": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "source": "https://github.com/UKGovernmentBEIS/inspect_ai/tree/9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "additional_source": "https://github.com/meridianlabs-ai/inspect_swe/tree/7eb8dd64309db4cd0f6bdf1d0ffd9786a74a4088",
+      "fit": "Independent common-envelope external-agent evaluation.",
+      "boundary": "Registry version0.3.273 and source9e44f1b are distinct evidence: GitHub v0.3.273 tag lookup returned404. Source9e44f1b contains its release-note update; current source main674e62823b226b5cf2449db8dd014276533841f7 was checked separately. Keep executable task oracle authoritative; no package byte-identity or evaluator execution is claimed."
+    },
+    {
+      "role": "terminal-benchmark",
+      "name": "Harbor",
+      "resolution": "conditional benchmark trial",
+      "version": "0.23.0",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "revision": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "source": "https://github.com/harbor-framework/harbor/tree/1e5c5c6db929a10a140d05e606882c671ae20729",
+      "fit": "Containerized terminal task evaluator.",
+      "boundary": "Benchmark choice follows task contract; does not replace O1 SWE-bench grading."
+    },
+    {
+      "role": "research-workspace",
+      "name": "OpenResearch / native retrieval",
+      "resolution": "retain recorded narrow research scope",
+      "version": "0.2.14",
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "revision": "ea3b9689c2e0d3820d07bd1f62a8b9592c5d7d95",
+      "source": "https://github.com/alphaXiv/OpenResearch/tree/ea3b9689c2e0d3820d07bd1f62a8b9592c5d7d95",
+      "fit": "Research/retrieval with scoped sources and accepted literature operations.",
+      "boundary": "Latest workspace features exceed historical receipt; alternatives need one frozen research question."
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "Agents SDK is merely a basic orchestration library without a native coding harness.",
+      "correction": "0.22.3 includes beta SandboxAgent and built-in capabilities; pinned native source and official sandbox documentation confirm it.",
+      "source": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/docs/sandbox_agents.md"
+    },
+    {
+      "claim": "Equal SQLite3.1.1 version in LangGraph1.2.12 establishes published-package byte identity.",
+      "correction": "Published sdist differs from49cce0ca. Release b2926a0 matches sqlite/__init__.py,aio.py,pyproject.toml byte-for-byte; source review and package identity remain separate.",
+      "source": "https://github.com/langchain-ai/langgraph/tree/b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4/libs/checkpoint-sqlite"
+    },
+    {
+      "claim": "Latest OpenHands SDK/CLI released uv.lock is a suitable patched dependency baseline.",
+      "correction": "SDK1.50.1 pins affected LiteLLM1.93.0; CLI1.16.0 pins1.83.14. Candidate environments explicitly resolve patched1.93.2, allowed by declared requirements; upstream lock acceptance is not claimed.",
+      "source": "https://github.com/advisories/GHSA-3cv6-jpf6-8222"
+    },
+    {
+      "claim": "CLI persistence variable controls newer standalone SDK cache.",
+      "correction": "SDK1.50.1 requires native OH_PERSISTENCE_DIR before import; final private path ends .openhands to satisfy unchanged native tests. CLI1.21 retains hard-coded home Jinja cache.",
+      "source": "https://github.com/OpenHands/software-agent-sdk/blob/1e1390acc8788346ba4804c34323284009bf3f5e/openhands-sdk/openhands/sdk/utils/path.py"
+    },
+    {
+      "claim": "Bare cx model alias configuration construction proves native provider compatibility.",
+      "correction": "Installed LiteLLM1.93.2 resolves supported openai/cx prefix to OpenAI provider and wire cx model. Exact provider-qualified native generation passed.",
+      "source": "https://github.com/BerriAI/litellm/blob/cd1bd0f4b8af865f8d05fbd938392fdd4703babc/litellm/litellm_core_utils/get_llm_provider_logic.py"
+    }
+  ],
+  "cooperation": {
+    "runtime_handoff": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/535#issuecomment-5921005952",
+    "claude_defaults_handoff": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/548#issuecomment-5921006227",
+    "acknowledgement": "unconfirmed",
+    "new_native_claude_peer": "Opus/Max read-only native call exit124 after180 seconds; no returned verdict. Later research/review peers reached account usage limit.",
+    "prior_claude_dispatch_acceptance": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/548#issuecomment-5918936194"
+  },
+  "receipts": [
+    "evidence/receipts/native-runtime-role-resolution-20260930.json"
+  ],
+  "limits": [
+    "No installation of every source-reviewed alternate.",
+    "Frozen three-arm SDK winner, O1 sandbox isolation/grading, compression benefit and complete provider billing remain unresolved under their own acceptance gates.",
+    "New setup results will update only their explicitly exercised scope."
+  ]
+}
