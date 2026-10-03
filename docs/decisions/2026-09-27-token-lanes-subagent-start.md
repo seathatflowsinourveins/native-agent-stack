@@ -683,3 +683,156 @@ previous revision.
 | Earlier assumption | Correction and verification path |
 | --- | --- |
 | The builder's own preload gives it the evidence rule, so a block line would only duplicate it | Since 2026-09-28 no agent preloads the skill. The builder block's last line carries the evidence sentence, and the builder's key-phrase test keeps it there. |
+
+## Addendum 2026-09-27: jCodeMunch route arguments
+
+Ported 2026-10-03 by session native-agent-stack-0c from #435 (head 319af22d)
+
+**Need.** The four carriers that name jCodeMunch offered `route(task, repo?, execute?)` and
+`order(action, args)`. The default and researcher also named `menu(query?)`. In jcodemunch-mcp
+1.108.319, `route` builds an action's arguments from its own inputs. The installed package's
+`counter.py` and `server.py` are byte-identical to upstream
+[`8f7b34ab`](https://github.com/jgravelle/jcodemunch-mcp/tree/8f7b34abe16fb459e0bf1c04747d584216dfe32e):
+
+- `_QUERY_ARG` maps `search_symbols` and `search_text` to `query`
+  ([`counter.py` L584-590](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py#L584-L590)).
+- `shape_execute_args` returns `{"repo": repo, qarg: task}`, and returns None when repo is empty
+  ([L616-630](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py#L616-L630)).
+- `_handle_route` uses that shape for each recommendation's `args_template` (L5549) and, with
+  `execute`, for the dispatched call (L5562)
+  ([`server.py` L5535-5580](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/server.py#L5535-L5580)).
+
+The October 3 source check also compared `counter.py` at
+[v1.108.327](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.327/src/jcodemunch_mcp/counter.py#L616-L630)
+(published October 2) and upstream main. All three revisions have Git blob
+`0605443d87ed6ec035b14831e99fb7c6540f7b12`, 33,194 bytes and SHA-256
+`d56ba52f8ed5716f6ec9e2d79ab53d4333972fe1ad2a36cb981ff4752c0c97aa`. This port changes no component pin.
+A symbol search run through `route(execute=true)` therefore searches for the whole task text.
+
+The coordinator's native probes on 2026-09-27
+([record](../../evidence/artifacts/jcodemunch-route-args-20260927/README.md)) showed three results:
+
+- `order search_symbols {repo: ".", query: "register_file", kind: "function", max_results: 1}`
+  returned the target in one call.
+- `route("register_file", repo: ".", execute: true)` ranked the state-changing `register_edit`
+  first and executed nothing.
+- `route(<sentence>, repo: ".")` recommended `search_symbols` with the whole sentence as its
+  template query.
+
+Another session's Codex-lane gate,
+[PR #433](https://github.com/seathatflowsinourveins/native-agent-stack/pull/433)
+(`tools/capability-gate`, merged on 2026-09-27 as `55fc8d17`), measured the same failure. In its first
+smoke (run 2026-09-27T20:09:50Z), `route` with the sentence and `execute: true` returned neither
+target symbol in 6 of 6 runs. Its gate case, `order search_symbols` with the identifier, passed 6
+of 6 rows with exactly one completed call each (run 2026-09-27T20:16:19Z, promptfoo 0.123.1
+`openai:codex-sdk`). Under the gate's repaired scoring its rows passed again, 6 of 6, each with
+exactly one completed `order search_symbols` that returned the signature. PR #433 classes all
+these runs as workstation smoke, not receipts, and lists its pre-repair smokes (20:09Z-20:31Z)
+as superseded by the repaired-scoring rows. These are dated observations, not new executions.
+
+**Change.** Only the jCodeMunch clause changes in each of the four carrier blocks:
+
+- Default: `jcodemunch route(task, repo: ".") (no execute), menu(query?), order(action, own args) on indexed repos;`
+- Researcher: the same clause, ending `on indexed repos.` Its line has no SocratiCode clause and
+  still ends with "Open original source before judging or editing."
+- Builder and reviewer: `jcodemunch route(task, repo: ".") (no execute), order(action, own args) on indexed repos;`
+
+Serena `find_symbol`, earlier on the same line, already covers a known name for Claude
+subagents. The jCodeMunch clause serves open tasks: `route` recommends, and the caller writes
+the `order` arguments. The default and researcher retain `menu(query?)`; builder and reviewer
+have no menu grant and name no `menu(` call. All ToolSearch ids and every other carrier line
+stay as they were. The handbook mirrors all three line variants verbatim, cites the source
+lines and probes, and gives `order("search_symbols", {repo, query: NAME})` for a known name.
+The scout and verifier blocks name no jCodeMunch tool and remain unchanged.
+
+Two comment lines beside the jcodemunch approval list in
+[`project.codex.config.template.toml`](../../adoption/templates/project.codex.config.template.toml)
+repeat the rule, cite `counter.py` L616-630 and identify the identical blob at v1.108.327.
+The parsed TOML stays unchanged. The two probe files are copied byte for byte from #435's pinned
+head; their README describes that original change, including its original Codex scope. The
+residuals below define what this port actually carries.
+
+**Size at the port base.** The worktree's base is `1f5a791b02a230aced670c88bab3d3d0ebcf401a`.
+Each block keeps the existing **4,100-byte** bound. Clause bytes include the terminating
+semicolon or period; default/researcher clauses have the menu form, builder/reviewer omit it.
+
+| Block | Former clause bytes | Former block bytes | New clause bytes | New block bytes | Bytes below bound |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Default | 92 | 4,088 | 103 | 4,099 | 1 |
+| Researcher | 92 | 3,075 | 103 | 3,086 | 1,014 |
+| Builder | 78 | 2,877 | 89 | 2,888 | 1,212 |
+| Reviewer | 78 | 2,088 | 89 | 2,099 | 2,001 |
+
+**Alternatives rejected.** These retain #435's alternatives but recompute their sizes on this
+base. For a common alternative clause, block bytes are former block bytes minus former clause
+bytes plus alternative clause bytes. Numbers do not authorize changing a role's tool set.
+
+| Alternative clause | Clause bytes | Default bytes | Researcher bytes | Builder bytes | Reviewer bytes | Reason |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| `jcodemunch order(search_symbols, {repo: ".", query: NAME}) or route(task, repo: ".") on indexed repos;` | 102 | 4,098 | 3,085 | 2,901 | 2,112 | It now fits the default, but drops its required menu call and does not say execute stays off or that the caller writes order's arguments. Serena on the same line already covers known names. |
+| `jcodemunch order(search_symbols, {repo: ".", query: NAME}) for a known name, else route(task, repo: ".") then order on indexed repos;` | 133 | 4,129 | 3,116 | 2,932 | 2,143 | Default exceeds the bound; default/researcher lose menu. |
+| `jcodemunch order(search_symbols, {repo: ".", query: NAME}) for a known name; for open tasks route(task, repo: ".") (no execute), then order(action, own args) on indexed repos;` | 175 | 4,171 | 3,158 | 2,974 | 2,185 | Default exceeds the bound; default/researcher lose menu. |
+| `jcodemunch route(task, repo: ".") (no execute), menu(query?), then order(action, own args) on indexed repos;` | 108 | 4,104 | 3,091 | 2,907 | 2,118 | Keeping menu and "then" exceeds the default bound; menu is ungranted to builder/reviewer. Removing "then" gives the accepted 103-byte menu clause. |
+| #435's `jcodemunch route(task, repo: ".") (no execute) then order(action, own args) on indexed repos;` | 93 | 4,089 | 3,076 | 2,892 | 2,103 | Fits, but drops the default/researcher menu call. |
+| Keep the former role-specific clause with `execute?` | 92 / 78 | 4,088 | 3,075 | 2,877 | 2,088 | `route(execute)` returned neither target symbol in 6 of 6 runs of #433's first smoke. |
+| Pass the identifier alone as the task | n/a | n/a | n/a | n/a | n/a | Misroutes: `route("register_file", repo: ".", execute: true)` ranked the state-changing `register_edit` first and executed nothing. |
+
+The accepted default retains menu because the later base is six bytes smaller than #435's
+4,094-byte pre-change default, and this port omits the five-byte "then " connector. No other
+line is shortened and the budget is not raised.
+
+**Dated erratum and anti-pattern (2026-09-27).**
+
+| Earlier assumption or omission | Correction and verification path |
+| --- | --- |
+| The carrier offered a tool's auto-execute mode from its signature, `route(task, repo?, execute?)` (the handler's docstring at `server.py` L5536), without reading how the tool shapes arguments. | `shape_execute_args` (`counter.py` L616-630) passes the whole task as the query, and the probes and #433's first smoke confirmed wrong targets. Read the argument-shaping code before recommending an execute or auto mode. The carrier now leaves `execute` off; `test_injected_jcodemunch_rule_leaves_execute_off` checks the five injected role contexts and their corrected clauses, and `test_jcodemunch_carriers_and_handbook_omit_execute_option` checks all carrier files and the entire handbook. |
+
+The general lesson is also ported as one row in the anti-pattern log of
+[harness defaults](../harness-defaults.md#anti-pattern-log). The new tests failed against the
+old text first: `python3 -m unittest tests.test_token_lanes_subagent_start` returned exit 1,
+`Ran 19 tests`, `FAILED (failures=10)`. Five failing subtests covered the required role
+contexts, four covered the old carrier files and one covered the handbook. Corrected text
+must pass the same module and the full contract's local acceptance before publication.
+
+**Evidence classes.**
+
+- Upstream source read at a pinned commit, with the installed package byte-identical to it;
+  the October 3 comparison also verifies the unchanged counter blob at v1.108.327 and main.
+- The coordinator's historical native tool probes: one call each, against a local index.
+- Another session's historical workstation smoke (#433).
+- This port's structural and local integration tests, run failing first and then with corrected text.
+
+No subagent or Codex worker run with the changed text is claimed, and no token saving or new
+native probe execution. Installing changed carriers on a host is a separate step, not done here.
+
+**Freeze and carrier hashes.** The old #381 hash note is replaced by the October 1 program's
+explicit current-distro freeze lift
+([decision, L10-12 and L408](2026-10-01-definitive-sota-wsl-program.md#decision)). The new
+distribution leaves these carriers unwired
+([map, L138-149](../../adoption/new-wsl/client-config-map.json)); this port changes none of its
+map, records, generated blocks or tests. The four new
+[`SHA256SUMS`](../../adoption/hooks/claude/SHA256SUMS) rows are:
+
+```text
+dcd6996e9247f3c8f3d543545eb958518236b21449492ddf92721590aa3f60c8  token-lanes-block.md
+2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3  token-lanes-block.builder.md
+149ac69352a788ad67c84b4d545cab461015c4e73a9ba4c8675259402c955e4a  token-lanes-block.researcher.md
+ec7c6b2a80c58e0156daab25b7cfd4eea6f2e3eac77137067051601045f9d2f8  token-lanes-block.reviewer.md
+```
+
+**Residuals and overturn.**
+
+- The Codex managed-block section is not ported. The configuration-owner coupling in
+  `tests/test_new_wsl_client_config.py` L2861-2869 at this base (L2828-2838 in the contract's
+  earlier locator) requires that owner's record to describe
+  its dropped template clauses. The decision belongs to the configuration owner or token
+  lane. The two original Codex test edits and the two instruction templates stay unchanged.
+- The three custom Codex agents and host rollout are out of scope. Installed carriers keep
+  the old text until the host owner runs `install_claude_profile.py --only guard`. No installer
+  or host managed-block writer ran in this port.
+- A merged decision that removes jCodeMunch from the carriers, or an upstream change to
+  `shape_execute_args`, overturns this port. The wave-2 "context-mode-only lane sentence"
+  is a coordination draft, not a decision on this base. Restore an execute form only after
+  upstream extracts identifiers or otherwise shapes search queries from tasks (a change
+  at `counter.py` L616-630 or `_handle_route`), or a gate returns the target symbol using
+  `route(execute=true)` in #433's fixture. Revisit wording if the carrier byte bound changes.
