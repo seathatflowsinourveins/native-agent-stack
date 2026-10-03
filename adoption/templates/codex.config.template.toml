@@ -21,14 +21,15 @@ check_for_update_on_startup = false
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
-# Generic children use Sol/Max: effort alone keeps the parent's model, while a model alone selects its catalog
+# Generic children use the selected coordinator model at Ultra: effort alone keeps the parent's model, while a model alone selects its catalog
 # default (low for Sol). Explicit spawn selections replace these defaults, then the selected role config applies,
 # preserving Astra judgment-role overrides (openai/codex rust-v0.159.2 core/src/agent/child_config.rs L62-73,
 # L204-249). Max sends API max and delegates only when asked; Ultra above sends xhigh and delegates proactively
-# (protocol/src/openai_models/reasoning_effort.rs and models-manager/models.json at the same pin). The child model is
-# the coordinator's CODEX_MODEL, so a pin before 0.159.1 runs gpt-6-astra children at max.
+# (protocol/src/openai_models/reasoning_effort.rs and models-manager/models.json at the same pin). The current 0.160
+# selection supports Ultra. CODEX_MODEL remains version-gated: a pin before 0.159.1 selects gpt-6-astra instead of Sol;
+# this portable default does not upgrade that pin. Explicit role/profile effort selections retain precedence.
 default_subagent_model = "${CODEX_MODEL}"
-default_subagent_reasoning_effort = "max"
+default_subagent_reasoning_effort = "ultra"
 
 # The skills catalog the model sees. Unset, Codex budgets it at 2% of the model's context window (5,440 tokens for the
 # 272,000-token window of gpt-6.1-sol and gpt-6-astra in models-manager/models.json) and at 8,000 characters only when

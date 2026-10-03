@@ -1,0 +1,63 @@
+{
+  "schema": "adaptive-paper-source-acceptance/1",
+  "schema_version": 1,
+  "id": "adaptive-recovery-f1-sdk-contracts-20261002",
+  "kind": "compatibility_attempt",
+  "component_ids": [
+    "nautilus-trader",
+    "alpaca-py"
+  ],
+  "claim": "Source2c669e18 fixes explicit/forced recovery quote admission; official hash-locked native SDK runtime passed523 unique source-contract tests in14 bounded complete runs with zero skips/failures.",
+  "limitations": [
+    "Deterministic fake broker ports; actual SDK/native execution is not paper-account or native broker-fault acceptance.",
+    "Initial133 dependency skips, two incomplete controller-limited runs, fail-before-fix tests and corrected uv flag conflict are preserved and excluded from the final unique-test total.",
+    "Pinned rc5 upstream callback loss still requires the existing guard; IBKR5007/5057/5060 and exact rc5 recovery qualification remain open.",
+    "No global, model, account or provider mutation; whole-task usage and net savings unknown.",
+    "The retained native-fault paper receipt still binds the old runner; the corrected runner requires a new native paper fault qualification."
+  ],
+  "generated_utc": "2026-10-02T19:39:36.425139+00:00",
+  "source_commit": "2c669e18f705212f6f407b80f668d2a253591167",
+  "evidence_class": "SYN: actual selected SDKs/native engine with deterministic fake broker ports; no paper-broker acceptance",
+  "behavior": "Explicit and forced recovery startup require fresh benchmark quotes; owned residual exits still require a fresh quote for the symbol being exited. Missing quotes for other held symbols do not block a safe owned exit.",
+  "source_sha256": {
+    "blueprints/us-equities/adaptive-paper/README-recovery.md": "71ef9cdfe871596d63fea41cbac7b2f5e237e6e661e5b4a1cd5710377e7f0a4b",
+    "blueprints/us-equities/adaptive-paper/runner.py": "d2c2944fe24a39c4304c976f49b09b553999d8f102ab08eeb0e28856c7e7ca7b",
+    "tests/test_adaptive_paper_recovery.py": "c78f59b430d71da5679888784082e82dff2d6d4849b27e6707fe6c7badba22e3",
+    "tests/test_adaptive_paper_recovery_wiring.py": "e5dac5420289e6f454d945c3a10b9cf599eb8ca2931fa2046211da92fa27317a"
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "platform": "macOS ARM64",
+    "alpaca_py": "0.44.0",
+    "nautilus_trader": "2.0.0rc5",
+    "official_binary_wheels": 20,
+    "installation": "Isolated task runtime; offline hash-locked official wheels; no source build",
+    "pip_check_exit": 0,
+    "lock_sha256": "31f5ef188b855d5eb40a707a0086ed4a5d4376d84c49b1b710e15b1c96cac8f4",
+    "artifact_provenance_sha256": "a491313505218a782b142e6af30fb58a21f8066562deeb2d54dc879e9d9eb468"
+  },
+  "acceptance": {
+    "unique_tests": 523,
+    "passed": 523,
+    "skipped": 0,
+    "failed": 0,
+    "complete_bounded_runs": 14,
+    "all_complete_run_exit_codes": 0,
+    "original_record_sha256": "78c2d1050eb7d11baa5cf2e8069ddbbc99355cc7fee0fab2046ad3de3276645e",
+    "contracts": ["Explicit and forced F1 startup", "Residual-only reconciliation after partial fill", "Durable ambiguous submission across reopen", "STOP survives restart and is not a new-trial admission", "Native callback guard, accounting and fault paths"]
+  },
+  "preserved_prior_attempts": {
+    "baseline": "282 passed and133 dependency skips at415 tests; not treated as final SDK qualification",
+    "red_before_fix": "Two recovery startup tests failed at the base source and passed after the constructor fix",
+    "incomplete_runs": 2,
+    "incomplete_scope": "Original full batch terminated at55s; first combined mover group timed out at60s. Neither contributes to the523 unique accepted-test total.",
+    "install_failure": "Initial uv option conflict exited2; removing the redundant no-build flag preserved binary-only/hash-locked installation."
+  },
+  "limits": {
+    "actual_paper_execution": "NOT_RUN; native authentication and paper admission required",
+    "historical_paper_source_binding": "One of six native-fault-behaviour bindings is stale: the historical runner SHA25634ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e differs from this corrected source. The historical native receipt and its recorded source hashes remain unchanged; the current integrity index records corrected tree bytes without rebinding that receipt. Actual paper requalification must bind the new measured bytes.",
+    "ibkr": "Upstream5007/5057/5060 remain open; no local IBKR adapter fix or recovery acceptance claimed",
+    "callback_exception_loss": "Pinned rc5 reproducer still confirms upstream callback loss; the existing callback guard remains required",
+    "whole_task_usage": "unknown"
+  }
+}

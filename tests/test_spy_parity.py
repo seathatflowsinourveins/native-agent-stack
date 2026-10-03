@@ -4,13 +4,19 @@ These are synthetic boundary fixtures for the gate G-a harness. They do not run
 the engine, do not touch a broker and do not establish parity by themselves.
 """
 import hashlib
+import ast
+from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
+import io
 import json
 import re
 from decimal import Decimal
 from pathlib import Path
 import tempfile
+import shutil
+import sys
 import unittest
+from unittest.mock import patch
 import uuid
 import zipfile
 
@@ -37,6 +43,16 @@ EFFECTIVE_V2 = COMPARE.effective_manifest(MANIFEST_V2, MANIFEST)
 RECEIPT_V2 = SOURCE / "receipt-v2.json"
 VERDICT_V2 = SOURCE / "verdict-v2.json"
 LEAN_RECEIPT = ROOT / "blueprints/us-equities/historical-simulation/receipt.json"
+
+
+def historical_v2_sources():
+    """Original reviewed source bytes, independently bound to the frozen receipt."""
+    snapshot = json.loads((SOURCE / "historical-source-v2-a2ad39a.json").read_text())
+    directory = SOURCE / snapshot["directory"]
+    hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.iterdir() if p.is_file()}
+    if hashes != snapshot["files"]:
+        raise ValueError("historical_v2_source_files_sha256_mismatch")
+    return hashes
 
 
 class _TrackingLimits(dict):
@@ -765,7 +781,7 @@ class BindingTests(unittest.TestCase):
 
     def test_bind_reports_a_missing_harness_file(self):
         with tempfile.TemporaryDirectory() as tmp:
-            with self.assertRaisesRegex(ValueError, "local_source_missing:"):
+            with self.assertRaisesRegex(ValueError, "source_directory_not_declared"):
                 COMPARE.check_local_sources(self.receipt, Path(tmp))
 
     def test_bind_pins_the_frozen_plan_and_case_configuration(self):
@@ -993,6 +1009,159 @@ class FixtureGuardTests(unittest.TestCase):
             FIXTURE.assert_commission("1.00", "0", "USD", "USD")
         with self.assertRaisesRegex(ValueError, "unexpected_commission_currency:EUR"):
             FIXTURE.assert_commission("0.00", "0", "EUR", "USD")
+
+
+class StressMappingTests(unittest.TestCase):
+    def test_stress_oco_trigger_encoding_preserves_spacing_at_native_precision(self):
+        self.assertTrue(callable(getattr(FIXTURE, "oco_trigger_strings", None)),
+                        "instrument precision must govern native trigger encoding")
+        self.assertEqual(FIXTURE.oco_trigger_strings(304, Decimal("321.8600"), 6),
+                         {"STOP_MARKET": "321.860100", "MARKET_IF_TOUCHED": "321.859900"})
+        self.assertEqual(FIXTURE.oco_trigger_strings(-304, Decimal("293.2100"), 4),
+                         {"STOP_MARKET": "293.2099", "MARKET_IF_TOUCHED": "293.2101"})
+
+    def test_stress_case_declares_six_decimal_prices_without_changing_zero_case(self):
+        self.assertTrue(callable(getattr(RUN, "case_settings", None)), "stress case selection missing")
+        case, instrument, venue = RUN.case_settings("one_stress")
+        self.assertEqual((case["id"], case["fee_usd"], case["slippage"]),
+                         ("one_stress", "1", "0.002"))
+        self.assertEqual((instrument["price_precision"], instrument["price_increment"]),
+                         (6, "0.000001"))
+        self.assertEqual(case["oco_trigger_increment"], "0.0001")
+        self.assertEqual(RUN.case_settings("one_zero"), (RUN.CASE, RUN.INSTRUMENT, RUN.VENUE))
+        with self.assertRaisesRegex(ValueError, "unsupported_case"):
+            RUN.case_settings("two_stress")
+
+    def test_adverse_prices_match_frozen_oracle_exactly(self):
+        costs = RUN.load_cost_models(RUN.case_settings("one_stress")[0])
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
+        for side, raw, wanted in (("BUY", "323.5800", "324.227160"),
+                                  ("SELL", "291.6900", "291.106620")):
+            self.assertEqual(costs.adverse_price(raw, side, "0.002", 6), Decimal(wanted))
+        self.assertEqual([f["price"] for f in oracle["fills"]],
+                         [Decimal("324.22716"), Decimal("291.10662")])
+        self.assertEqual(costs.adverse_price("1.2345675", "BUY", "0", 6),
+                         Decimal("1.234568"))
+        self.assertEqual(costs.adverse_price("1.2345665", "SELL", "0", 6),
+                         Decimal("1.234566"))
+        with self.assertRaisesRegex(ValueError, "invalid_order_side"):
+            costs.adverse_price("100", "UNKNOWN", "0.002", 6)
+
+    def test_stress_cash_reconstructs_without_a_second_rounding_stage(self):
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
+        fills = [{"utc_seconds": f["utc_seconds"], "quantity": f["quantity"],
+                  "price": str(f["price"]), "fee": str(f["fee"])} for f in oracle["fills"]]
+        ledger = FIXTURE.cash_ledger(Decimal("100000"), fills,
+                                    [{"utc_seconds": DIVIDEND_TS, "amount": "428.64"}])
+        self.assertEqual(Decimal(ledger[-1]["cash"]), Decimal("90357.995840"))
+        self.assertEqual(oracle["fees_usd"], Decimal("2"))
+        self.assertEqual(TOLERANCES["cash_usd_abs"], "0.01")
+        self.assertEqual(TOLERANCES["fill_price_usd_abs"], "0")
+
+    def test_stress_manifest_is_separate_and_inherits_frozen_v2(self):
+        path = SOURCE / "mapping-manifest-stress-20261002.json"
+        self.assertTrue(path.is_file(), "new frozen stress manifest missing")
+        raw, effective = RUN.load_bound_manifests("one_stress")
+        self.assertEqual(raw["extends_v2"]["sha256"], COMPARE.SEALED_V2_MANIFEST_SHA256)
+        self.assertEqual(effective["case_configuration"]["case"], "one_stress")
+        self.assertEqual(effective["inputs"], EFFECTIVE_V2["inputs"])
+        self.assertEqual(effective["tolerances"], EFFECTIVE_V2["tolerances"])
+        self.assertEqual(COMPARE.load_effective_stress(json.loads(path.read_text()), SOURCE), effective)
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(),
+                         COMPARE.SEALED_STRESS_MANIFEST_SHA256)
+        row = next(r for r in effective["mappings"] if r["id"] == "costs_and_rounding")
+        self.assertEqual(row["status"], "preregistered")
+
+    def test_stress_review_gate_refuses_missing_or_changed_review_before_engine(self):
+        self.assertTrue(callable(getattr(RUN, "require_stress_review", None)), "stress review gate missing")
+        hashes = {n: hashlib.sha256((SOURCE / n).read_bytes()).hexdigest()
+                  for n in RUN.stress_reviewed_files()}
+        with self.assertRaisesRegex(ValueError, "stress_review_required_before_engine"):
+            RUN.require_stress_review(None, hashes, "2026-10-02T20:00:00+00:00")
+        review = {"completed_utc": "2026-10-02T19:00:00+00:00", "unresolved_findings": 0,
+                  "reviewed_local_source_sha256": dict(hashes)}
+        self.assertIsNone(RUN.require_stress_review(review, hashes, "2026-10-02T20:00:00+00:00"))
+        review["reviewed_local_source_sha256"]["cost_models.py"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "stress_review_source_mismatch"):
+            RUN.require_stress_review(review, hashes, "2026-10-02T20:00:00+00:00")
+
+    def test_stress_oco_checker_uses_native_slipped_price_without_widening(self):
+        receipt = _v2_receipt()
+        receipt["case"] = "one_stress"
+        receipt["case_configuration"]["slippage"] = "0.002"
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
+        for event in receipt["order_events"]:
+            if event["event"] == "OrderFilled":
+                event["last_px"] = str(oracle["fills"][0 if event["last_qty"] == "304" and
+                                       event["ts_event_ns"] == ENTRY_FILL_TS * 10 ** 9 else 1]["price"])
+        checks = []
+        COMPARE.v2_oco_checks(checks, receipt, oracle, V2_BARS)
+        price_checks = [c for c in checks if c["field"] == "moo_proxy_not_open"]
+        self.assertEqual([c["status"] for c in price_checks], ["PASS", "PASS"])
+        receipt["order_events"][-2]["last_px"] = "291.1066"
+        checks = []
+        COMPARE.v2_oco_checks(checks, receipt, oracle, V2_BARS)
+        self.assertEqual([c["status"] for c in checks if c["field"] == "moo_proxy_not_open"],
+                         ["PASS", "FAIL"])
+
+    def test_stress_review_comparison_covers_cost_model_and_manifest_bytes(self):
+        receipt = _v2_receipt(case="one_stress")
+        receipt["local_source_sha256"] = {n: "a" * 64 for n in RUN.stress_reviewed_files()}
+        reviewed = dict(receipt["local_source_sha256"])
+        reviewed["cost_models.py"] = "b" * 64
+        self.assertEqual(COMPARE._harness_files_differing(reviewed, receipt), ["cost_models.py"])
+
+    def test_native_cost_api_returns_adverse_books_and_one_dollar_commission(self):
+        if importlib.util.find_spec("nautilus_trader") is None:
+            self.skipTest("official pinned native runtime not installed in this interpreter")
+        from nautilus_trader.core import UUID4
+        from nautilus_trader.model import (BookOrder, Currency, Equity, InstrumentId, OrderSide, Price,
+            Quantity, StopMarketOrder, Symbol, TraderId, StrategyId, ClientOrderId,
+            TriggerType, TimeInForce)
+        case, instrument, _ = RUN.case_settings("one_stress")
+        usd = Currency.from_str("USD")
+        equity = Equity(InstrumentId.from_str("SPY.SIM"), Symbol("SPY"), usd, 6,
+                        Price.from_str("0.000001"), 0, 0, lot_size=Quantity.from_int(1))
+        fill_model, fee_model = RUN.load_cost_models(case).build_models(case, instrument)
+        for side, raw, expected in ((OrderSide.BUY, "323.580000", "324.227160"),
+                                    (OrderSide.SELL, "291.690000", "291.106620")):
+            order = StopMarketOrder(trader_id=TraderId("TEST-001"), strategy_id=StrategyId("TEST-001"),
+                instrument_id=equity.id, client_order_id=ClientOrderId("ORDER-" + side.name),
+                order_side=side, quantity=Quantity.from_int(304), trigger_price=Price.from_str(raw),
+                trigger_type=TriggerType.DEFAULT, time_in_force=TimeInForce.GTC,
+                reduce_only=False, quote_quantity=False, init_id=UUID4(), ts_init=0)
+            book = fill_model.get_orderbook_for_fill_simulation(equity, order,
+                                                                Price.from_str(raw), Price.from_str(raw))
+            probe = Price.from_str("999.000000" if side == OrderSide.BUY else "0.000001")
+            fills = book.simulate_fills(BookOrder(side, probe, Quantity.from_int(304), 0))
+            self.assertEqual([(str(p), str(q)) for p, q in fills], [(expected, "304")])
+            self.assertEqual(str(fee_model.get_commission(order, Quantity.from_int(304),
+                                                        Price.from_str(expected), equity)), "1.00 USD")
+
+    def test_stress_native_cost_provenance_refuses_wrong_reference_and_quantity(self):
+        self.assertTrue(callable(getattr(COMPARE, "stress_cost_checks", None)),
+                        "independent native stress cost checks missing")
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
+        case, instrument, venue = RUN.case_settings("one_stress")
+        fills = [{"client_order_id": str(i), "utc_seconds": f["utc_seconds"],
+                  "quantity": f["quantity"], "price": str(f["price"])}
+                 for i, f in enumerate(oracle["fills"])]
+        calls = [{"client_order_id": str(i), "side": "BUY" if i == 0 else "SELL",
+                  "reference_price": "323.580000" if i == 0 else "291.690000",
+                  "fill_price": str(f["price"]), "quantity": "304"}
+                 for i, f in enumerate(oracle["fills"])]
+        receipt = {"case_configuration": {**case, **venue, "instrument": instrument},
+                   "fills": fills, "stress_fill_model_calls": calls}
+        checks = []
+        COMPARE.stress_cost_checks(checks, receipt, V2_BARS)
+        self.assertTrue(checks)
+        self.assertTrue(all(c["status"] == "PASS" for c in checks))
+        calls[0]["reference_price"] = "323.870000"
+        calls[1]["quantity"] = "303"
+        checks = []
+        COMPARE.stress_cost_checks(checks, receipt, V2_BARS)
+        failures = [c for c in checks if c["status"] == "FAIL"]
+        self.assertEqual({c["field"] for c in failures}, {"reference_price", "quantity"})
 
 
 class UnsupportedMappingSourceTests(unittest.TestCase):
@@ -1632,13 +1801,12 @@ class V2PublishedResultTests(unittest.TestCase):
         self.assertEqual(self.receipt["tolerances"]["sha256"], MANIFEST_V2["tolerances"]["sha256"])
         self.assertEqual(self.receipt["unsupported_mappings"], [])
 
-    # The published receipt ran the f079f6c harness; the 2026-09-23 pre-run
-    # review round changed exactly these files, so the receipt is superseded.
-
-    def test_published_receipt_is_the_qualifying_run_of_the_harness_on_disk(self):
+    def test_published_receipt_is_the_qualifying_run_of_the_preserved_historical_source(self):
+        self.assertEqual(historical_v2_sources(), self.receipt["local_source_sha256"])
+        # The new stress-capable harness is not qualified by the historical review.
         changed = {name for name, recorded in self.receipt["local_source_sha256"].items()
                    if hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() != recorded}
-        self.assertEqual(changed, set())
+        self.assertEqual(changed, {"run.py", "compare.py", "fixture_strategy.py"})
         entry = next(r for r in RUN.load_replay_history()["replays"] if r["id"] == "bwrap-cc4503f-qualifying")
         self.assertTrue(entry["reviewed_before_run"])
         self.assertTrue(entry["status"].startswith("qualifying"))
@@ -1787,7 +1955,7 @@ class V2DeviationAcceptanceTests(unittest.TestCase):
         self.assertIsNotNone(acceptance)
         self.assertEqual(acceptance["deviation_id"], COMPARE.ACCEPTED_DEVIATION)
         self.assertEqual(acceptance["reviewed_harness_local_source_sha256"],
-                         {f: hashlib.sha256((SOURCE / f).read_bytes()).hexdigest() for f in RUN.REVIEWED_HARNESS_FILES})
+                         {f: historical_v2_sources()[f] for f in RUN.REVIEWED_HARNESS_FILES})
         self.assertEqual(COMPARE.DEVIATION_ACCEPTANCE_FIELDS, RUN.DEVIATION_ACCEPTANCE_FIELDS)
         self.assertEqual(COMPARE.REPLAY_HISTORY, RUN.REPLAY_HISTORY)
         self.assertIn(COMPARE.ACCEPTED_DEVIATION, [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS])
@@ -2093,6 +2261,104 @@ class V2VerdictRuleTests(unittest.TestCase):
                       RUN.sizing_limitation(intents, receipt["distribution_ledger"]))
         self.assertIn("no intent of this run follows",
                       RUN.sizing_limitation(receipt["intents"][:1], receipt["distribution_ledger"]))
+
+class ReviewThreadRegressionTests(unittest.TestCase):
+    def test_runner_import_does_not_execute_unbound_cost_models(self):
+        original = importlib.util.spec_from_file_location
+        def refuse_costs(name, path, *args, **kwargs):
+            if Path(path).name == "cost_models.py":
+                raise AssertionError("unbound cost module executed during runner import")
+            return original(name, path, *args, **kwargs)
+        with patch.object(importlib.util, "spec_from_file_location", side_effect=refuse_costs):
+            runner = _load("spy_parity_import_without_costs", SOURCE / "run.py")
+        with patch.object(runner, "_load", side_effect=AssertionError("zero case loaded costs")):
+            self.assertIsNone(runner.load_cost_models(runner.case_settings("one_zero")[0]))
+        token = object()
+        with patch.object(runner, "_load", return_value=token) as loaded:
+            self.assertIs(runner.load_cost_models(runner.case_settings("one_stress")[0]), token)
+            loaded.assert_called_once_with("spy_parity_costs", SOURCE / "cost_models.py")
+
+    def test_production_receipt_identity_matches_each_selected_case(self):
+        main = next(n for n in ast.parse((SOURCE / "run.py").read_text()).body
+                    if isinstance(n, ast.FunctionDef) and n.name == "main")
+        receipt = next(n.value for n in ast.walk(main) if isinstance(n, ast.Assign)
+                       and any(isinstance(t, ast.Name) and t.id == "receipt" for t in n.targets))
+        expression = next(value for key, value in zip(receipt.keys, receipt.values)
+                          if isinstance(key, ast.Constant) and key.value == "id")
+        for case, wanted in [("one_zero", "spy-parity-one-zero-v2"), ("one_stress", "spy-parity-one-stress-v2")]:
+            with self.subTest(case=case):
+                self.assertEqual(eval(compile(ast.Expression(expression), "receipt identity", "eval"),
+                                      vars(RUN), {"case": {"id": case}}), wanted)
+
+    def test_comparator_rejects_a_receipt_identity_contradicting_its_bound_case(self):
+        plan = ROOT / "blueprints/us-equities/historical-simulation/plan.json"
+        for case, wanted, wrong in [
+                ("one_zero", "spy-parity-one-zero-v2", "spy-parity-one-stress-v2"),
+                ("one_stress", "spy-parity-one-stress-v2", "spy-parity-one-zero-v2")]:
+            _, effective = RUN.load_bound_manifests(case)
+            name = RUN.MANIFEST_STRESS if case == "one_stress" else RUN.MANIFEST_V2
+            prereg = RUN.PREREGISTRATION_STRESS if case == "one_stress" else "PREREGISTRATION-v2.md"
+            receipt = _rebound_to_current_harness(json.loads(RECEIPT_V2.read_text()))
+            receipt.update(case=case, id=wanted,
+                           mapping_manifest={"path": name, "sha256": COMPARE.digest(SOURCE / name)},
+                           preregistration={"sha256": COMPARE.digest(SOURCE / prereg)},
+                           case_configuration={**receipt["case_configuration"],
+                                               **RUN.case_settings(case)[0],
+                                               **effective["case_configuration"],
+                                               "venue_modules": receipt["case_configuration"]["venue_modules"]})
+            if case == "one_stress":
+                receipt["local_source_sha256"].update(
+                    {n: COMPARE.digest(SOURCE / n) for n in RUN.stress_reviewed_files()})
+            with self.subTest(case=case):
+                COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / name, LEAN_RECEIPT, plan)
+                for invalid in (wrong, None):
+                    receipt["id"] = invalid
+                    with self.subTest(invalid=invalid), self.assertRaisesRegex(
+                            ValueError, "receipt_id_disagrees_with_case"):
+                        COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / name,
+                                     LEAN_RECEIPT, plan)
+
+    def test_production_cli_explicitly_binds_original_receipt_to_archive(self):
+        argv = ["compare.py", "--receipt", str(RECEIPT_V2), "--source-dir",
+                str(SOURCE / "historical-source-v2-a2ad39a")]
+        with patch.object(sys, "argv", argv), redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()), \
+                patch.object(COMPARE, "load_bars", return_value=None), \
+                patch.object(COMPARE, "precondition_context", return_value={}), \
+                patch.object(COMPARE, "compare", return_value={"checks": [], "verdict": "PASS"}):
+            # Actual source/manifest/oracle/plan binding runs; only the subsequent
+            # economic stage is synthetic. No engine or new qualification.
+            self.assertEqual(COMPARE.main(), 0)
+
+    def test_explicit_archive_rejects_metadata_file_drift_and_invalid_selection(self):
+        receipt = json.loads(RECEIPT_V2.read_text())
+        with tempfile.TemporaryDirectory(prefix="spy-archive-binding-") as folder:
+            fixture = Path(folder)
+            name = "historical-source-v2-a2ad39a"
+            shutil.copytree(SOURCE / name, fixture / name)
+            metadata = fixture / (name + ".json")
+            metadata.write_bytes((SOURCE / metadata.name).read_bytes())
+            with patch.object(COMPARE, "SOURCE", fixture):
+                COMPARE.check_local_sources(receipt, fixture / name)
+                before = metadata.read_bytes()
+                metadata.write_bytes(before + b"\n")
+                with self.assertRaisesRegex(ValueError, "historical_source_metadata"):
+                    COMPARE.check_local_sources(receipt, fixture / name)
+                metadata.write_bytes(before)
+                archived = fixture / name / "run.py"
+                before = archived.read_bytes()
+                archived.write_bytes(before + b"\n")
+                with self.assertRaises(ValueError):
+                    COMPARE.check_local_sources(receipt, fixture / name)
+                archived.write_bytes(before)
+                archived.unlink()
+                archived.symlink_to(SOURCE / name / "run.py")
+                with self.assertRaises(ValueError):
+                    COMPARE.check_local_sources(receipt, fixture / name)
+                with self.assertRaises(ValueError):
+                    COMPARE.check_local_sources(receipt, SOURCE / name)
+        with self.assertRaisesRegex(ValueError, "local_source_sha256_mismatch"):
+            COMPARE.check_local_sources(receipt)  # No automatic archive fallback.
+
 
 if __name__ == "__main__":
     unittest.main()

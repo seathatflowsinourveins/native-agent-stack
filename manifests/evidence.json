@@ -2,6 +2,105 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "nautilus-spy-stress-review-fixes-two-processes-20261003",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "Corrected source ae6778e passes142/142 strict checks in each of two fresh fenced native rc5 stress processes, with case-specific receipt identity, four matching UUID-normalized exports, zero skips/failures and unchanged cash tolerance.",
+      "limitations": [
+        "Task-owned Linux ARM64 simulation on the Mac; no surviving NativeStack WSL2 or broker acceptance.",
+        "Native per-order Money rounding yields90357.99USD versus Decimal90357.995840 under the unchanged0.01USD allowance.",
+        "One frozen stress case; changed-source one_zero engine replay, maintenance/liquidation/adaptive, production data fitness and paper gates remain separate.",
+        "Original contradictory stress receipt IDs, historical failed attempts and719 CI are preserved at their own source and scope.",
+        "No model, account or provider call; full-stack readiness is false; whole-task usage and net savings unknown."
+      ],
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-review-fixes-20261003.json"
+    },
+    {
+      "id": "nautilus-spy-initial-margin-refusal-review-fixes-two-processes-20261003",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "Corrected source e73af98 passes98/98 strict frozen over_limit checks in each of two fresh fenced native rc5 processes. Four matching UUID-normalized exports retain Initialized/Denied callback events exactly equal to cached native order events, the original initial-margin denial reason, zero fills/fees/positions and100000.00USD free/total cash.",
+      "limitations": [
+        "Frozen economic refusal only; no general MOO execution, maintenance/liquidation/adaptive, strategy merit, production data fitness or paper acceptance.",
+        "Task-owned Linux ARM64 VM on the Mac; no surviving NativeStack WSL2 activation by this receipt.",
+        "Original callback/API failures, two20261002 receipts and old seals remain immutable and historical. The original manifest defaults to its unchanged seal and refuses corrected source; use this selected successor in both run and compare.",
+        "No model/account/provider call; full-stack readiness false; whole-task usage and net savings unknown."
+      ],
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-review-fixes-20261003.json"
+    },
+    {
+      "id": "north-star-publication-security-convergence-20261002",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "A bounded native Claude review conditionally supported the inactive historical WSL retrieval archive policy, and the same-host peer acknowledged non-overlapping ownership. Implemented guard, mutation and attribution checks passed; ordinary controls still detect the historical advisory, while the isolated expiring archive scan and all three inventory scans pass. Fresh exact-head required CI remains pending at publication.",
+      "limitations": [
+        "This is an archive-only security exception through 2026-11-02T00:00:00Z; braces 3.0.3 is not patched or declared safe. QMD activation is refused and future runnable retrieval requires separate normally scanned qualified source and lock.",
+        "The first native review timed out without a verdict. The completed review exceeded its 450-word constraint with 566 words and reported an internal Claude Fable 5.1 advisor alongside Opus 5.5.",
+        "Native policy agreement and peer acknowledgement do not establish implementation, runtime or CI acceptance. The model reviewed base revision 999eebd; independent source controls qualify the subsequent implementation.",
+        "Two of 193 affected source tests skipped: no frozen workflow exemptions existed, and PyYAML was unavailable. The text workflow parser was tested. Nine portable-default tests also passed.",
+        "The first archive publication head 122700335726e9782633ce13a03d5c08cc99e1b8 failed the same four assertions in both Linux and macOS full suites: missing documentary lock binding, stale source quotation and two generic-effort expectations. Narrow documentation/test corrections preserve the guard, scanner policy, actual template, explicit Max roles and historical evidence; this failed head is not counted as accepted.",
+        "The native three-part SARIF controller uses the exact inventory and pinned scanner, but does not execute GitHub's Bash mapfile block or upload SARIF. Exact workflow execution remains a fresh CI gate.",
+        "The installed Codex 0.160.0 default service tier and Sol/Ultra fields were source/schema checked without a model request. The generic Ultra template correction does not qualify older portable pins, SDK routes or explicit Max profiles.",
+        "Full-stack readiness remains false. Surviving workstation, account, historical-data fitness, native paper faults and broader lifecycle gates retain their separate ownership and acceptance requirements.",
+        "Whole-task usage, failed-request settlement, escaped-descendant cleanup, billing and net savings remain unknown. Raw sessions, personal paths and authentication/configuration details remain private."
+      ],
+      "path": "evidence/receipts/north-star-publication-security-convergence-20261002.json"
+    },
+    {
+      "id": "nautilus-spy-stress-two-processes-20261002",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "Prospectively reviewed frozen one_stress source648228d passed142/142 strict checks in each of two fresh isolated native rc5 processes; four matching declared UUID-normalized exports, zero skipped/failed checks and unchanged cash tolerance.",
+      "limitations": [
+        "Task-owned Linux ARM64 simulation on the Mac, not NativeStack WSL2 or broker acceptance.",
+        "Native per-order Money rounding produces90357.99USD versus Decimal90357.995840; the unchanged0.01USD tolerance passes.",
+        "One frozen case; maintenance-margin, adaptive, data-fitness and paper gates remain separate.",
+        "C1/C2 isolation failures and controller exit137 after successful engine exit0 remain in private original evidence; original receipt/review digests are published.",
+        "No model, account or provider call; full-stack readiness is false and whole-task usage/savings unknown."
+      ],
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-20261002.json"
+    },
+    {
+      "id": "adaptive-recovery-f1-sdk-contracts-20261002",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "nautilus-trader",
+        "alpaca-py"
+      ],
+      "claim": "Source2c669e18 fixes explicit/forced recovery quote admission; official hash-locked native SDK runtime passed523 unique source-contract tests in14 bounded complete runs with zero skips/failures.",
+      "limitations": [
+        "Deterministic fake broker ports; actual SDK/native execution is not paper-account or native broker-fault acceptance.",
+        "Initial133 dependency skips, two incomplete controller-limited runs, fail-before-fix tests and corrected uv flag conflict are preserved and excluded from the final unique-test total.",
+        "Pinned rc5 upstream callback loss still requires the existing guard; IBKR5007/5057/5060 and exact rc5 recovery qualification remain open.",
+        "No global, model, account or provider mutation; whole-task usage and net savings unknown.",
+        "The retained native-fault paper receipt still binds the old runner; the corrected runner requires a new native paper fault qualification."
+      ],
+      "path": "blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json"
+    },
+    {
+      "id": "nautilus-spy-initial-margin-refusal-two-processes-20261002",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "Prospectively reviewed source deff844 passes 86/86 strict frozen over_limit checks in each of two fresh isolated native rc5 processes; four matching UUID-normalized exports. Native initial-margin risk denies the 1217-share MARKET request with its original DENIED event/reason, no fills/fees/positions and 100000.00 USD free/total cash.",
+      "limitations": [
+        "Frozen economic refusal only; no general MOO execution, maintenance/liquidation/adaptive, strategy merit, production data fitness or paper acceptance.",
+        "Task-owned Linux ARM64 VM on the Mac; surviving NativeStack WSL2 is not enrolled by this receipt.",
+        "Original first native callback failure at473b7282/exit1 and its prospective review are preserved. The one-line compiled Strategy API repair passes15 targeted tests; accepted replay/compare exits0 and sleeping-controller timeout exits137 are distinguished.",
+        "No model/account/provider call by these offline replay procedures; full-stack readiness false and whole-task usage/savings unknown."
+      ],
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-20261002.json"
+    },
+    {
       "id": "memory-lifecycle-probe-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -3950,8 +4049,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "51dae9e9907bda6c3a5de21c1c3dfdea79c5e0a379494ba4c6e42906abc6e114",
-      "bytes": 10704
+      "sha256": "76f5b378687a6fa32977c7d51d66de89ae195b4a4b7edab2a3c458fe530e7d6e",
+      "bytes": 11020
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4405,8 +4504,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "87aed5466cb8cb4bf14227e763dbe9f9a7f270f5cbedfb407bc5d39ea9912679",
-      "bytes": 14510
+      "sha256": "6f14c8635290b5f1da350fb6f6dc784087eac4a36c571dbd5767adc28cd0d497",
+      "bytes": 14682
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -6650,6 +6749,11 @@
       "bytes": 8389
     },
     {
+      "path": "blueprints/convergence-practice/wsl-retrieval/archive-policy-20261002.json",
+      "sha256": "99962aba83c708efd1eb54351a43f1c06d685e4b3496e3d9a8fdd9d4e39273a2",
+      "bytes": 1575
+    },
+    {
       "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
       "sha256": "da2c4d58d7012febb1ce70d49111ecdbf22f46867fe84c098e01c75c7af0eabd",
       "bytes": 14819
@@ -6708,6 +6812,11 @@
       "path": "blueprints/convergence-practice/wsl-retrieval/retirement-assessment.json",
       "sha256": "88f1919546dcf8b9fda7b425c7d3ea2ea114b975ccdc6356e0775a3f4e81a9f0",
       "bytes": 4162
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-future-before-archive-20261002.py.txt",
+      "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
+      "bytes": 16427
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/run-initial.py.txt",
@@ -11136,8 +11245,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-recovery.md",
-      "sha256": "aee5231130eb08d2f3008a1b62ef3d0f302e5527c7ea6843d1f9e8bd820199a2",
-      "bytes": 8721
+      "sha256": "71ef9cdfe871596d63fea41cbac7b2f5e237e6e661e5b4a1cd5710377e7f0a4b",
+      "bytes": 8609
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-research.md",
@@ -11440,6 +11549,11 @@
       "bytes": 79558
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json",
+      "sha256": "4d6d1b47f40c59e858013831b8cbe1a2fd88117ffb323fc524abb8e9e99ae83a",
+      "bytes": 4618
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
       "sha256": "9bd58237bd11890010855a7508d36cb03ad3c7500774a403aadb8891757f569c",
       "bytes": 63197
@@ -11466,7 +11580,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e",
+      "sha256": "d2c2944fe24a39c4304c976f49b09b553999d8f102ab08eeb0e28856c7e7ca7b",
       "bytes": 153832
     },
     {
@@ -11491,7 +11605,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "0c4c2df382c7d263b393f80ab5c0ff5116d149258b8d10140c37d5003a1ec6b9",
+      "sha256": "d9656d028641e1ab8d7153658244a060455ef6793e7c39f3b6b2dee29c2e16a2",
       "bytes": 7076
     },
     {
@@ -13220,24 +13334,49 @@
       "bytes": 5117
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-over-limit-20261002.md",
+      "sha256": "d1843ab5c264ed3c60b209f4f2cae0271da19fa8a8b63c5efdab54211a7ac316",
+      "bytes": 5482
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-six-cases-20261003.md",
+      "sha256": "f0b352bfce252fea424cfeeb45188ab26dcd077a9e485f802f4111b4a98a3926",
+      "bytes": 5905
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-stress-20261002.md",
+      "sha256": "c7c80352d49296fd7fcb30040605e175077dbe76bb25d48a37a661931cbc7799",
+      "bytes": 3464
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md",
       "sha256": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c",
       "bytes": 8223
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "da89a1f33349bbc6c88a051d04c52f5bb9558a75e8a46a6b15a79b9116e9e3e5",
-      "bytes": 13979
+      "sha256": "3f29505b7f9aa8e38a4d1908c90678a2c4c370040eda6386cced3435295cc6b2",
+      "bytes": 18960
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
-      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
-      "bytes": 67588
+      "sha256": "31062a88d78d2188e18305141e474247d089f1ab79de218269ed4bf9572843a5",
+      "bytes": 75660
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare_six.py",
+      "sha256": "1bf2ce4291e338527035aa80bfc428b6d70b7b68a11ec61ed1b6f1150700109b",
+      "bytes": 20850
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
       "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
       "bytes": 14090
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/cost_models.py",
+      "sha256": "734d1471d9d614619ebd23959e00cf83931c70fc0a9621c351931c735f77c2be",
+      "bytes": 3070
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-v2.json",
@@ -13256,8 +13395,93 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
+      "sha256": "90ed38609de9082c5a8ba3f3fd13967b1520a371b970a04c523b8ebdfe70df4e",
+      "bytes": 24076
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-review-fixes-e73af98/README.md",
+      "sha256": "0889931bc9b546ecfeb8fec631b354f43e21d96f44edec72804f7c915cdc9a02",
+      "bytes": 1066
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-review-fixes-e73af98/compare.py",
+      "sha256": "64bc8e2812a3a70a38bf25f0efdf0df5f3f44753d87663f004ccd92f943c17fa",
+      "bytes": 74808
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-review-fixes-e73af98/cost_models.py",
+      "sha256": "5b46bbe7042d60851eb22bde4a00430c9e7e793356e1460fd32672424a163b92",
+      "bytes": 2980
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-review-fixes-e73af98/run.py",
+      "sha256": "8918c8f776557dc078c91f2f8638ad2fe783753a04febf2a3371c665e743b0bc",
+      "bytes": 55703
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a.json",
+      "sha256": "19f568f037570322ea49575a0f2dd4ab93b4bf47e6cf16b1ec95a6c85617709e",
+      "bytes": 1065
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/compare.py",
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "bytes": 67588
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/convert.py",
+      "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "bytes": 14090
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/distribution_module.py",
+      "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "bytes": 10088
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/fixture_strategy.py",
       "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
       "bytes": 23733
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/mapping-manifest-v2.json",
+      "sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+      "bytes": 37153
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/mapping-manifest.json",
+      "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+      "bytes": 19081
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/run.py",
+      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "bytes": 51307
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/tolerances.json",
+      "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+      "bytes": 2333
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-over-limit-20261002.json",
+      "sha256": "a2aaa9fe469d2ee1a9b1783a91935f0afbc5e260ba1377ffc8bedff166a0f74a",
+      "bytes": 7703
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-over-limit-review-fixes-20261003.json",
+      "sha256": "e881a728a693575b185f7ebbb00b5bd2248703431fe687b149b0f7f394f608e9",
+      "bytes": 10029
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-six-cases-20261003.json",
+      "sha256": "ee16424558a04cdb0084e2f8f9025f08b04e995ba9ac443d312582f9d318836a",
+      "bytes": 4968
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-stress-20261002.json",
+      "sha256": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039",
+      "bytes": 6098
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
@@ -13273,6 +13497,21 @@
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-status-20260923.json",
       "sha256": "519b6d56207c27945db1bda33e22a4098a0ad3063edf40c0ed293271d9ae66bf",
       "bytes": 1894
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/margin_policy.py",
+      "sha256": "b6fce02d0fa5e8529996ede73e6c55b05f60083efce5d825fe580f6ef9a39bba",
+      "bytes": 5728
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/margin_strategy.py",
+      "sha256": "a299da57a019ce1706e053e64b47c380a889fa27152db5fb0bb7be6c7cd557fe",
+      "bytes": 13324
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/over_limit.py",
+      "sha256": "df7ab60dffcd9e2fc859c0bd46d1baf1d06c98125dd3c19c1be415d8a895e280",
+      "bytes": 31310
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/dividend-symbol-scan.json",
@@ -13405,6 +13644,26 @@
       "bytes": 4266
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-20261002.json",
+      "sha256": "45a7c5e2c54ac25ebfe1035e015cbb0815c844a325b8c9792bc16a863ac82216",
+      "bytes": 11516
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-review-fixes-20261003.json",
+      "sha256": "99bc8654c620cc43168ece101b524e6b3108bb53e9c516397c08c685901995ce",
+      "bytes": 14688
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-20261002.json",
+      "sha256": "71c8696bea88d89be9cecd86e9fa637027c8a96ed6334a30bd1c7fc1a65ef415",
+      "bytes": 7384
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-review-fixes-20261003.json",
+      "sha256": "93f0481545ffb8e583dada2b9e9215b35a8008d06d7808f43a8b9a9b28570e40",
+      "bytes": 10903
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
       "sha256": "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c",
       "bytes": 48161
@@ -13420,14 +13679,34 @@
       "bytes": 10844
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/requirements-stress-linux-arm64-py313.lock",
+      "sha256": "8d6564b26f093a9da4383f74d06a47e0b212fbae2fd3058fbc7b9ca4a1e5a878",
+      "bytes": 489
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/requirements-stress-macos-arm64-py313.lock",
+      "sha256": "2f8e40e1b75a4fe28b13da8f054d838c3fdee746d16603bb350e63fed7226539",
+      "bytes": 489
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/review-record-v2-cc4503f.json",
       "sha256": "7fdf6d104f7e75b07718b33873fd2d32f06113e3cc42a14adfa934aeb0fb01f6",
       "bytes": 2475
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
-      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
-      "bytes": 51307
+      "sha256": "dd2ccf6de287ddf82b1fcdd244902fab19f64bbfb8e7a45f407be9898b38d221",
+      "bytes": 56240
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/six_bindings.py",
+      "sha256": "4df2620a63f952aa9df9b5eaddae13bcd2020faefc9f45d01c2fe6c515164ea9",
+      "bytes": 7150
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/six_run.py",
+      "sha256": "2e727dd09da92f3542329cc6541a2587a3d0ed051772537324478e27c302c3a4",
+      "bytes": 18868
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
@@ -14936,8 +15215,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "74b65f1acb6712c431c8b0e7d5c5261efdff75e51a3952f9558db326526c1c6f",
-      "bytes": 15681
+      "sha256": "ed9792b4b62865a322dffe0567a434edcbe9bb955e96d4e95b201c27581ee85e",
+      "bytes": 16851
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -14956,8 +15235,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1a71e2293de6578ba7099a7b7b8f8c6486ec1a923b38c8bf44ae205f77a95c5c",
-      "bytes": 26007
+      "sha256": "883a9ee821dcbc45ded90dd385000a4d6b2e7183651f603595e2817863136c00",
+      "bytes": 29997
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -14991,8 +15270,8 @@
     },
     {
       "path": "catalogs/landscape/candidate-quality-review.json",
-      "sha256": "dbb5de39e9f5af58c20e3b75b560386776a29a994207ebf73b499e22f7d46ed8",
-      "bytes": 152069
+      "sha256": "f3c1658cee951076b22e12c5e267bd025ea294c419c944437ace0843ee0f372b",
+      "bytes": 152521
     },
     {
       "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -15071,8 +15350,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618",
-      "bytes": 445299
+      "sha256": "a3960abdd4e5df64c999668798d8c13fc55a260b51e01c4219a33ca004aa9683",
+      "bytes": 448993
     },
     {
       "path": "catalogs/saturation/README.md",
@@ -15396,8 +15675,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "6cdc57719ada786b46fe8c27d6d36ce162ffe66304b4e21d9e4e5131f6fa153d",
-      "bytes": 22531
+      "sha256": "821876ddac90057b1b3e82d5b55963e2ad6fb2eac2adead0f4cba56783db4dae",
+      "bytes": 27430
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -15760,6 +16039,16 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+      "sha256": "39b7e7d1205ad4fa11628b0922fadfd2881fdfa705c9d649a285ba4c79e2bbc1",
+      "bytes": 10110
+    },
+    {
+      "path": "docs/decisions/2026-09-30-task-model-routing.md",
+      "sha256": "13f434565c93b8b287a7ae3d0b6ab9a0eb254411367b01b0c49e0bbd9d1dfea5",
+      "bytes": 42715
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
       "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
       "bytes": 8312
@@ -15795,6 +16084,21 @@
       "bytes": 4885
     },
     {
+      "path": "docs/decisions/2026-10-02-north-star-host-paper-activation.md",
+      "sha256": "b9bb95c9fb52292b5943d9ffc6a1d38c03098cfd7c763f75fffc32a3ee409b28",
+      "bytes": 11529
+    },
+    {
+      "path": "docs/decisions/2026-10-02-north-star-readiness-execution.md",
+      "sha256": "1f1b3aca7f8bfd25db1d5197e0c8a44d93dafce4d607421370005ec39f4f9793",
+      "bytes": 15486
+    },
+    {
+      "path": "docs/decisions/2026-10-02-north-star-runtime-qualification.md",
+      "sha256": "36e2b9ab8b14b41472014c136544c8f95ea6c244b62557b4a6ec29dd8c3a73c8",
+      "bytes": 16423
+    },
+    {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
       "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
       "bytes": 6141
@@ -15803,6 +16107,21 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
       "bytes": 16881
+    },
+    {
+      "path": "docs/decisions/2026-10-02-wsl-retrieval-archive.md",
+      "sha256": "0c4b8023143444a07810034012f833e6718de3c3d1c161c72560d22dbf9ec461",
+      "bytes": 4839
+    },
+    {
+      "path": "docs/decisions/2026-10-03-north-star-archive-policy-supersession.md",
+      "sha256": "50b2b2582885ba329fe7089176d9a0757efa5e68fc21ee0c8c62a4640b8ee90e",
+      "bytes": 1825
+    },
+    {
+      "path": "docs/decisions/2026-10-03-north-star-workstation-handoff.md",
+      "sha256": "7231b8f277f52293ffee91747414f95475b5a58147ad07dc9db201f853968512",
+      "bytes": 4583
     },
     {
       "path": "docs/direct-results.md",
@@ -16066,12 +16385,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "159d381dd77a3066feee265220de9f6c1142c5236f448ba1d762c4b06769d7dc",
+      "sha256": "0b8e695cc6d24f26b5b025e9ea562657e8dfafc084e064f98ceb005034dfd829",
       "bytes": 510040
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "6833563e5718a5f8fc75b2b16b064722e0aa5aea180e88f44d2ff0059f522ee7",
+      "sha256": "415b85991dda3a8066b77c9df34035ed4471270e427b2686bc718521249eb4da",
       "bytes": 312114
     },
     {
@@ -37266,8 +37585,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "ba8cfd7fa91b2d413a7f9dad7dfb05e46c250b19037112fad47d24088d9181e6",
-      "bytes": 4174
+      "sha256": "bb0e17c68f92aca2e5ed56dd2c78da6f40120510d77ad9fc9135c7d47db66ad0",
+      "bytes": 4935
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -48290,6 +48609,11 @@
       "bytes": 9846
     },
     {
+      "path": "evidence/receipts/north-star-publication-security-convergence-20261002.json",
+      "sha256": "edaac4fec56117577e258fce2a0216fc492a5bfef931d32a708a0656e7b2261c",
+      "bytes": 9810
+    },
+    {
       "path": "evidence/receipts/notification-types-20260929.json",
       "sha256": "7f5422e2b4d7c60801b48d735619689802b3b353199e149c2667c586cc90cf5d",
       "bytes": 24695
@@ -49021,8 +49345,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "e7136a2188ca4e7dcfe57affad586ff45faf297f3d71aab66fa60f92cb61f6bc",
-      "bytes": 19333
+      "sha256": "557979908ad894f5bedf06eeb482039b09d29f45559bfddbbf4743a96e9c52b8",
+      "bytes": 21548
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -49516,8 +49840,13 @@
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
-      "sha256": "6da67e1b83d887cbaaeaf289434a595dacc79517a6b74b61e2adf622f84462cb",
-      "bytes": 34451
+      "sha256": "c78f59b430d71da5679888784082e82dff2d6d4849b27e6707fe6c7badba22e3",
+      "bytes": 38168
+    },
+    {
+      "path": "tests/test_adaptive_paper_recovery_wiring.py",
+      "sha256": "e5dac5420289e6f454d945c3a10b9cf599eb8ca2931fa2046211da92fa27317a",
+      "bytes": 7649
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
@@ -49721,8 +50050,8 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "98f8071ed61b3a78e584f01bece20511b08446ac753984ce41896d5fcdcd4000",
-      "bytes": 33199
+      "sha256": "df4e4cf07abaf1971e473103dd1576360dee89728ffcbcbfd3a7ad0e41677901",
+      "bytes": 33258
     },
     {
       "path": "tests/test_codex_worker_lane.py",
@@ -50201,8 +50530,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "6f1ecd5731cb676c0b50ee54a15375eeea4858742b460723046211b756ea3448",
-      "bytes": 43257
+      "sha256": "0a79268e2e97bb57584db28e2c9bc01fc38695252649536082e42c4af5c50407",
+      "bytes": 43290
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -50305,9 +50634,39 @@
       "bytes": 163940
     },
     {
+      "path": "tests/test_spy_margin_policy.py",
+      "sha256": "f41ec6853bf0bf598cd48e8c9e2cc83f0198e543dcccf3654291ff4b1986e678",
+      "bytes": 5006
+    },
+    {
+      "path": "tests/test_spy_over_limit.py",
+      "sha256": "2f96efa7e3e208c0c292fce36c7e7d2946005e29738a700293cb6aa5a0901a45",
+      "bytes": 28970
+    },
+    {
       "path": "tests/test_spy_parity.py",
-      "sha256": "f210e6f4fc1ff37173fc42e84ace878245e3448f03a2d1bee93d4be04ae6ab5e",
-      "bytes": 121917
+      "sha256": "ad509627042721ee634776da3975fa9c116ade924f9a9d3a34583c763990afdc",
+      "bytes": 139519
+    },
+    {
+      "path": "tests/test_spy_review_fix_publication.py",
+      "sha256": "6bded716c68d31855e8ea12b20a992e4d47100214932a09ffa9258ca61f5ad86",
+      "bytes": 12606
+    },
+    {
+      "path": "tests/test_spy_six_bindings.py",
+      "sha256": "0d9ad12c665a89cdbf06cf5dd079cf70fe3e75770cea9f6696c8fef32bddb6a4",
+      "bytes": 5197
+    },
+    {
+      "path": "tests/test_spy_six_cases.py",
+      "sha256": "9979a968a0b9ba13b94cd7c61f19255cc3d64a2221c4be145ac32e63d40cdff9",
+      "bytes": 16485
+    },
+    {
+      "path": "tests/test_spy_six_comparator.py",
+      "sha256": "523e4b49f91fa028dc4cfbc4bf3a1ee7b0c4c53490587fb8d1fa51e4b2b211a8",
+      "bytes": 5983
     },
     {
       "path": "tests/test_stack_lifecycle.py",
@@ -50318,6 +50677,11 @@
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
+    },
+    {
+      "path": "tests/test_task_model_routing.py",
+      "sha256": "5d5744bf187ed8aa99501e67c3f07a2b07f49fa55b3c03e340bd673227736ad1",
+      "bytes": 23395
     },
     {
       "path": "tests/test_token_e2e_grader.py",
@@ -50616,8 +50980,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
-      "bytes": 55711
+      "sha256": "411ff7db992e19e4eb7d856aa1d1d0a7a7cf5c789a9aff3707847fe96017e25b",
+      "bytes": 55855
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

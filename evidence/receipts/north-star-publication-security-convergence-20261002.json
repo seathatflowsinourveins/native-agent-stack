@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "id": "north-star-publication-security-convergence-20261002",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "A bounded native Claude review conditionally supported the inactive historical WSL retrieval archive policy, and the same-host peer acknowledged non-overlapping ownership. Implemented guard, mutation and attribution checks passed; ordinary controls still detect the historical advisory, while the isolated expiring archive scan and all three inventory scans pass. Fresh exact-head required CI remains pending at publication.",
+  "limitations": [
+    "This is an archive-only security exception through 2026-11-02T00:00:00Z; braces 3.0.3 is not patched or declared safe. QMD activation is refused and future runnable retrieval requires separate normally scanned qualified source and lock.",
+    "The first native review timed out without a verdict. The completed review exceeded its 450-word constraint with 566 words and reported an internal Claude Fable 5.1 advisor alongside Opus 5.5.",
+    "Native policy agreement and peer acknowledgement do not establish implementation, runtime or CI acceptance. The model reviewed base revision 999eebd; independent source controls qualify the subsequent implementation.",
+    "Two of 193 affected source tests skipped: no frozen workflow exemptions existed, and PyYAML was unavailable. The text workflow parser was tested. Nine portable-default tests also passed.",
+      "The first archive publication head 122700335726e9782633ce13a03d5c08cc99e1b8 failed the same four assertions in both Linux and macOS full suites: missing documentary lock binding, stale source quotation and two generic-effort expectations. Narrow documentation/test corrections preserve the guard, scanner policy, actual template, explicit Max roles and historical evidence; this failed head is not counted as accepted.",
+    "The native three-part SARIF controller uses the exact inventory and pinned scanner, but does not execute GitHub's Bash mapfile block or upload SARIF. Exact workflow execution remains a fresh CI gate.",
+    "The installed Codex 0.160.0 default service tier and Sol/Ultra fields were source/schema checked without a model request. The generic Ultra template correction does not qualify older portable pins, SDK routes or explicit Max profiles.",
+    "Full-stack readiness remains false. Surviving workstation, account, historical-data fitness, native paper faults and broader lifecycle gates retain their separate ownership and acceptance requirements.",
+    "Whole-task usage, failed-request settlement, escaped-descendant cleanup, billing and net savings remain unknown. Raw sessions, personal paths and authentication/configuration details remain private."
+  ],
+  "recorded_at_utc": "2026-10-03T02:08:23Z",
+  "evidence_class": "Bounded native policy convergence, independent source validation and task-local pinned scanner measurements.",
+  "data": {
+    "decision_unit": "north-star-publication-security-archive-20261002",
+    "base_revision": "999eebd76f57f459294fa4c3d5626676aff66451",
+    "policy_disposition": "inactive_archive_only",
+    "source_controls_pass": true,
+    "exact_head_required_ci": "pending_at_publication",
+    "full_stack_ready": false,
+    "native_review": {
+      "initial_receipt_sha256": "c629442b70be33c87d4ed31b8d6fc7d4dc9f804c0e747309625ef44cfc4987b8",
+      "initial_timeout_seconds": 300.1962660829886,
+      "initial_verdict_received": false,
+      "completed_receipt_sha256": "ec649e4b0d63967a936d9cb80da7d6b53f79bb4e36292eed5e8a5de866656c96",
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "provider": "firstParty",
+      "internal_advisor": "claude-fable-5-1",
+      "tools": [],
+      "mcp_servers": [],
+      "elapsed_seconds": 461.60338341700844,
+      "exit_code": 0,
+      "requested_words": 450,
+      "observed_words": 566,
+      "word_limit_pass": false,
+      "five_global_hash_guards_unchanged": true
+    },
+    "native_peer": {
+      "fresh_unique_discovery": true,
+      "send_message_calls": 1,
+      "receipt_sha256": "f47587a1e8b5af3e1046e8f92c329679c9e866968b3a534a89379d2ce8c7e9c3",
+      "actual_reply_in_owned_review_session": true,
+      "peer_reported_no_overlapping_ownership": true,
+      "peer_history_read": false
+    },
+    "implementation": {
+      "handoff_sha256": "ecbcf828b0c52a158e29b7e0b2bc8380bdee5c224ddbcdbde9f587ad42f910fe",
+      "independent_bounded_review": "no_material_issues_found",
+      "archive_expiry_utc": "2026-11-02T00:00:00Z",
+      "protected_prior_files_byte_identical": 16,
+      "historical_artifact_pairs_verified": 21,
+      "explicit_evaluation_attribution_mappings": 1,
+      "affected_tests": {
+        "run": 193,
+        "failures": 0,
+        "errors": 0,
+        "skips": 2,
+        "raw_log_sha256": "e1934f20394beba0d9b2dd8e17024890474a331d952afcf18d17c01aefb46f03"
+      },
+      "portable_default_tests": {
+        "run": 9,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "raw_log_sha256": "3921368d4b06b167db0687c7fab224b266acd85af0a6ffdb5f7628886825ee42"
+      },
+      "negative_controls": "Actual QMD entrypoint refusal and guard-removal, metadata, lock, expiry and scope mutants reject before recorder effects; no QMD benchmark or model execution.",
+      "failure_contract_correction": {
+        "handoff_sha256": "e47759a13a3313290c05366aad1184fb6921971e8f103bcc1e9b780e29d22bb7",
+        "source_parent_revision": "122700335726e9782633ce13a03d5c08cc99e1b8",
+        "tests": 22,
+        "seconds": 0.722,
+        "exit_code": 0,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "test_log_sha256": "2cc0e961b299555609f71bd314527afff463649b711b83d3f32f17150927be02",
+        "protected_source_files_verified": 135,
+        "correction_paths": [
+          "docs/decisions/2026-10-02-wsl-retrieval-archive.md",
+          "docs/decisions/2026-09-30-task-model-routing.md",
+          "tests/test_task_model_routing.py"
+        ]
+      }
+    },
+    "scanner": {
+      "version": "2.6.0",
+      "platform": "darwin_arm64",
+      "publisher_verified_binary_sha256": "98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4",
+      "advisory": "GHSA-vfj7-8cjw-p6xm",
+      "ordinary_history": {
+        "exit_code": 1,
+        "result_sha256": "471284442142cb3498fbb30034b68e3fbe503082b76540f67974b5e52e9ca5a2",
+        "extracted_packages": 170,
+        "affected_packages": 1
+      },
+      "unrelated_ordinary_copy": {
+        "exit_code": 1,
+        "result_sha256": "8141bb50964a5fc51518e916947b6bc6450a65ab562732dc107d073bd8b62bbc",
+        "affected_packages": 1
+      },
+      "isolated_archive": {
+        "exit_code": 0,
+        "result_sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+        "filtered_vulnerabilities": 1
+      },
+      "inventory_sarif": {
+        "receipt_sha256": "dde41c07019d5e04e25c1220085f7969d474b1e830299533211be4cbdf2059d1",
+        "preflight_exit_code": 0,
+        "disjoint_counts": {
+          "ordinary": 50,
+          "macos": 1,
+          "wsl": 1
+        },
+        "exit_codes": {
+          "ordinary": 0,
+          "macos": 0,
+          "wsl": 0
+        },
+        "worst_exit_code": 0,
+        "reports_retained": 3,
+        "upload_executed": false
+      }
+    },
+    "ci_failure_history": {
+      "source_head": "122700335726e9782633ce13a03d5c08cc99e1b8",
+      "linux": {
+        "tests": 9848,
+        "seconds": 1427.112,
+        "failures": 4,
+        "errors": 0,
+        "skips": 972,
+        "exit_code": 1,
+        "raw_log_sha256": "dc15440d9b1f9b05bfd0565e6f929f442e40a5cb567bd8c4056b63199a2ae19d"
+      },
+      "failed_methods": [
+        "test_each_grant_is_recorded_by_the_receipt_it_names",
+        "test_every_quoted_value_is_in_its_cited_file",
+        "test_the_user_template_renders_on_each_platform_the_model_its_rows_name (Linux and macOS subcases)"
+      ],
+      "repair_scope": "Full immutable lock-path/hash citation and current generic Ultra source/test expectations, preserving explicit Max and legacy-model boundaries.",
+      "macos": {
+        "tests": 9848,
+        "seconds": 1755.723,
+        "failures": 4,
+        "errors": 0,
+        "skips": 1333,
+        "exit_code": 1,
+        "verbose_log_sha256": "2aeb81f30b120d7ce4d0090f84c93e85b6830001ed5d7cc75f5d4593a4022289"
+      }
+    }
+  },
+  "provenance": {
+    "canonical_repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "pull_request": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/615",
+    "source_sha256": {
+      "blueprints/convergence-practice/wsl-retrieval/run.py": "728f4e52d6929cde6ef64c731f9c6aeb06e21703616ceb2face33ee10996c116",
+      "scripts/wsl_retrieval_archive.py": "0a72c6f465ce259104743969d7034c639c2a9602f75238298530a4e739fcd9a6",
+      ".github/workflows/security-scan.yml": "3a390947f34d0b244dee7adfe97ade5b4e22cc9cc130dde94c2d852d39aeb7da",
+      ".github/osv-scanner-lockfiles.json": "76f5b378687a6fa32977c7d51d66de89ae195b4a4b7edab2a3c458fe530e7d6e",
+      ".github/osv-scanner-frozen-wsl-retrieval.toml": "949738750fff3878608d44b873001a91bdb903661bf46bc1b7fb2ad0becff2cc",
+      "blueprints/convergence-practice/wsl-retrieval/archive-policy-20261002.json": "99962aba83c708efd1eb54351a43f1c06d685e4b3496e3d9a8fdd9d4e39273a2"
+    },
+    "official_scanner_release": "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+    "private_convergence_record_sha256": "ba0a66d6c56d42fc542df499a7bfd52ae0234ef25b4d8063aca0e5d63e514b3f",
+    "decision_path": "docs/decisions/2026-10-02-wsl-retrieval-archive.md",
+    "private_inputs": "Coordinator-retained originals are referenced by digest; raw sessions, configuration, personal paths and credentials are omitted."
+  }
+}

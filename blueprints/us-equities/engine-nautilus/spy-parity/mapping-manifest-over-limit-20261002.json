@@ -1,0 +1,199 @@
+{
+  "schema_version": "spy-over-limit-native-refusal-mapping/1",
+  "id": "spy-over-limit-native-refusal-20261002",
+  "status": "preregistered_source_preparation",
+  "scope": "Only frozen over_limit no-fill economics/native initial-margin refusal. No MOO execution, maintenance/liquidation/adaptive parity or other-case promotion.",
+  "inherits": {
+    "path": "mapping-manifest-stress-20261002.json",
+    "sha256": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039"
+  },
+  "sealed_stress_source_sha256": {
+    "PREREGISTRATION-stress-20261002.md": "c7c80352d49296fd7fcb30040605e175077dbe76bb25d48a37a661931cbc7799",
+    "compare.py": "7745662652c6e9ec590812f8e0849f0dc22d10356791c55fdc2478fc5f1332d8",
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "cost_models.py": "5b46bbe7042d60851eb22bde4a00430c9e7e793356e1460fd32672424a163b92",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "fixture_strategy.py": "90ed38609de9082c5a8ba3f3fd13967b1520a371b970a04c523b8ebdfe70df4e",
+    "mapping-manifest-stress-20261002.json": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039",
+    "requirements-stress-linux-arm64-py313.lock": "8d6564b26f093a9da4383f74d06a47e0b212fbae2fd3058fbc7b9ca4a1e5a878",
+    "requirements-stress-macos-arm64-py313.lock": "2f8e40e1b75a4fe28b13da8f054d838c3fdee746d16603bb350e63fed7226539",
+    "run.py": "d1b0b0e1261e71bbaca5fb40ca76aef3209e4846fd8ea4de971308b37aa1b10b"
+  },
+  "oracle": {
+    "path": "blueprints/us-equities/historical-simulation/receipt.json",
+    "sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9"
+  },
+  "frozen_plan": {
+    "path": "blueprints/us-equities/historical-simulation/plan.json",
+    "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+  },
+  "tolerances": {
+    "path": "tolerances.json",
+    "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "changed": false
+  },
+  "configuration": {
+    "case": {
+      "id": "over_limit",
+      "initial_cash_usd": "100000",
+      "target": "4",
+      "sizing_buffer": "0.98",
+      "entry_decision_date": "2019-12-31",
+      "exit_decision_date": "2020-04-29",
+      "fee_usd": "1",
+      "slippage": "0.002",
+      "currency": "USD",
+      "reject": true,
+      "adaptive": false
+    },
+    "instrument": {
+      "instrument_id": "SPY.SIM",
+      "symbol": "SPY",
+      "venue": "SIM",
+      "currency": "USD",
+      "price_precision": 6,
+      "price_increment": "0.000001",
+      "size_precision": 0,
+      "lot_size": 1,
+      "bar_type": "SPY.SIM-1-HOUR-LAST-EXTERNAL",
+      "margin_init": "0.5",
+      "margin_maint": "0.5"
+    },
+    "venue": {
+      "oms_type": "NETTING",
+      "account_type": "MARGIN",
+      "use_random_ids": false,
+      "fill_model": "TwentyBasisPointFillModel",
+      "fee_model": "FixedFeeModel(1.00 USD,charge_commission_once=true)",
+      "latency_model": null,
+      "bar_execution": true,
+      "bar_adaptive_high_low_ordering": false,
+      "reject_stop_orders": true,
+      "support_contingent_orders": false,
+      "frozen_account": false,
+      "default_leverage": "2",
+      "margin_model": "StandardMarginModel",
+      "liquidation_enabled": true,
+      "liquidation_trigger_ratio": "1",
+      "liquidation_cancel_open_orders": true
+    },
+    "risk": {
+      "bypass": false,
+      "max_notional_per_order": {}
+    }
+  },
+  "economic_refusal_mapping": {
+    "frozen_native_order_type": "MarketOnOpen",
+    "frozen_native_status": "Invalid",
+    "rc5_native_order_type": "MARKET",
+    "rc5_native_status": "DENIED",
+    "rc5_native_event": "OrderDenied",
+    "comparison": "one economic intent and actual native initial-margin refusal; all native values retained, no native status/type relabelling",
+    "requires_exact_reason": "INITIAL_MARGIN_EXCEEDS_FREE_BALANCE: free=<native USD Money>, margin=<native USD Money>"
+  },
+  "decision": {
+    "utc_seconds": 1577826000,
+    "local_close": "2019-12-31T16:00:00 America/New_York",
+    "sizing": "floor(native initial equity100000 * target4 * .98 / actual received decision bar close)",
+    "expected_quantity_comparator_only": 1217
+  },
+  "review": {
+    "schema_version": "spy-over-limit-native-refusal-review/1",
+    "runtime_source_files": [
+      "convert.py",
+      "fixture_strategy.py",
+      "distribution_module.py",
+      "run.py",
+      "compare.py",
+      "cost_models.py",
+      "mapping-manifest-stress-20261002.json",
+      "PREREGISTRATION-stress-20261002.md",
+      "requirements-stress-macos-arm64-py313.lock",
+      "requirements-stress-linux-arm64-py313.lock",
+      "over_limit.py",
+      "mapping-manifest-over-limit-20261002.json",
+      "PREREGISTRATION-over-limit-20261002.md"
+    ],
+    "test_path": "tests/test_spy_over_limit.py",
+    "requires_independent_review_before_engine": true,
+    "requires_exact_authorized_argv_arrays": true
+  },
+  "isolation": "Unchanged strict v2 loopback-only/cleared-env/read-only-source-data-runtime/Python-I/noninitial-user-ns/bwrap-PID1; root controls container and invocation.",
+  "normalization": {
+    "applied_generated_uuid4_fields": [
+      "init_id",
+      "event_id"
+    ],
+    "raw_exports_mutated": false
+  },
+  "required_exports": [
+    "one raw native MARKET cached order and original initialized/denied events",
+    "all native callback events/account events/native commissions",
+    "725 native total/free/initial/maintenance/position marks",
+    "native account/positions/fills reports and full engine logs",
+    "pre-engine source/input/review/configuration/argv/fence hashes",
+    "two native exports per fresh process and two independent fresh processes"
+  ],
+  "upstream_sources": [
+    {
+      "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/risk/src/engine/mod.rs",
+      "line_ranges": [
+        [
+          1647,
+          1724
+        ],
+        [
+          1976,
+          2013
+        ],
+        [
+          2216,
+          2250
+        ]
+      ],
+      "sha256": "204e32e8aec96552dbe740a79216813935c82a64c640b3f7aed6410827b80160",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/risk/src/engine/mod.rs"
+    },
+    {
+      "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/model/src/events/order/denied_reason.rs",
+      "line_ranges": [
+        [
+          251,
+          257
+        ]
+      ],
+      "sha256": "3e85d8fc73ae5011c2258ca273163a3e96822ccc76ce72d807b32909315c0bb5",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/events/order/denied_reason.rs"
+    },
+    {
+      "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/model/src/accounts/margin_model.rs",
+      "line_ranges": [
+        [
+          250,
+          292
+        ],
+        [
+          313,
+          358
+        ]
+      ],
+      "sha256": "740575a85697f2a2931a91e7dfd676cb6a2bb4f93249d6e60909669b9da06553",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/accounts/margin_model.rs"
+    },
+    {
+      "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/backtest/src/python/engine.rs",
+      "line_ranges": [
+        [
+          1572,
+          1587
+        ]
+      ],
+      "sha256": "011e60c63ef545ccde9b39f094ab1eca2963edc8aeaf0de5f8aeb1b0562f2955",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/backtest/src/python/engine.rs"
+    }
+  ]
+}

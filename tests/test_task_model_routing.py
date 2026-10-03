@@ -51,10 +51,10 @@ EXTENSIONS = r"(?:md|json|toml|py|js|mjs|sh|yml)"
 CITE = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)`")
 # A quoted value runs from "says" to the next ";" or the end of the cell, one or more backticked strings.
 SAYS = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+)(?:-(\d+))?` says ([^;]+)")
-# GPT-6.1 Sol's routes as docs/decisions/2026-09-30-sol-primary-quality-defaults.md sets them: Sol/Ultra coordinates
-# Codex, and Sol/Max runs the primary workers and the generic children. Each key is part of one row's task class, and
-# the value is the effort that row names.
-SOL_ROUTES = {"interactive codex": "ultra", "primary codex workers": "max", "generic codex children": "max"}
+# The Sol-primary record's 2026-10-02 addendum sets generic children to Ultra with the coordinator. Explicit
+# stack-worker profiles retain Max. CODEX_MODEL stays version-gated, including legacy Mac/Astra renders; this
+# source contract qualifies no host. Each key is part of one row's task class and names that row's effort.
+SOL_ROUTES = {"interactive codex": "ultra", "primary codex workers": "max", "generic codex children": "ultra"}
 USER_TEMPLATE = "adoption/templates/codex.config.template.toml"
 STACK_WORKER = "adoption/templates/codex.stack-worker.config.toml"
 PLACEHOLDER = "${CODEX_MODEL}"

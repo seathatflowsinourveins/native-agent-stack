@@ -300,7 +300,8 @@ class WorkerRoleSourceTests(unittest.TestCase):
     def test_the_builder_takes_the_lanes_model_at_max(self):
         # D4 runs primary workers at Sol/Max and substitutes Astra per task, through the spawn's model. The builder's
         # file names no model, so a builder child takes the model its spawn names, else the user template's
-        # default_subagent_model, which is the coordinator's CODEX_MODEL (gpt-6.1-sol from Codex 0.159.1), at max.
+        # default_subagent_model, which is version-gated CODEX_MODEL. Generic children now use Ultra; this explicit
+        # role retains Max after those defaults apply.
         module = roles(self)
         self.assertEqual(set(module.INHERITED_MODEL_ROLES), {"isolated-builder"})
         builder = load(WORKER_SOURCE / "isolated-builder.toml")
@@ -308,7 +309,7 @@ class WorkerRoleSourceTests(unittest.TestCase):
         self.assertEqual(builder["model_reasoning_effort"], "max")
         agents = tomllib.loads(CODEX_USER_TEMPLATE.read_text(encoding="utf-8"))["agents"]
         self.assertEqual((agents["default_subagent_model"], agents["default_subagent_reasoning_effort"]),
-                         ("${CODEX_MODEL}", "max"))
+                          ("${CODEX_MODEL}", "ultra"))
         # The carriers keep their pins: they are the frozen E2E's judgment roles.
         for name in NAMES:
             with self.subTest(carrier=name):

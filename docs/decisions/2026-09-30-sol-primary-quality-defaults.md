@@ -133,3 +133,19 @@ claiming task-level quality. Count every attempt once, keep cache/provider
 subsets distinct, and retain failures and unknown usage. Reopen routing when a
 comparable workload demonstrates better accepted resolution or lower complete
 task cost at the same acceptance bar.
+
+## Addendum: portable generic worker default (2026-10-02)
+
+The current generic Codex worker default follows the selected GPT-6.1 Sol/Ultra
+coordinator. The portable template keeps the dynamic `CODEX_MODEL` resolution and
+sets `default_subagent_reasoning_effort = "ultra"`; current Codex 0.160 supports
+that effort. Explicit role and profile selections still apply after generic
+defaults: the isolated builder and frozen Astra judgment roles retain their Max
+settings. The September 30 decision, Max receipts and OmniRoute Sol/Max evidence
+above remain historical observations without replacement.
+
+This template change does not upgrade or qualify a host. The legacy Linux lane's
+0.159.3 pin and old Mac portable 0.155.1/Astra resolution remain version-bound;
+their profiles, SDK evidence, frozen qualifications and runtime bytes are
+unchanged. No global configuration, account, model service or host activation is
+changed by this source alignment.

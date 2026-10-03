@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-01T19:18:16Z",
-  "meaning": "Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held.",
+  "recorded_at_utc": "2026-10-03T07:06:14Z",
+  "meaning": "Source checkpoint prepares workstation continuation and an unexecuted six-case successor; historical receipts and failures retain their original revisions. Twenty foundation layers and 21 carried gate dispositions remain represented; full-stack/two-host readiness is false. Receiver acknowledgement, destination enrollment and native/paper acceptance remain unobserved. No new host, account, shared inference, timer emission or settlement is claimed.",
   "lanes": [
     {
       "kind": "lane",
@@ -26,6 +26,34 @@
     }
   ],
   "gates": [
+    {
+      "kind": "gate",
+      "id": "north-star-workstation-continuation-20261003",
+      "title": "Workstation six-case and separate paper continuation",
+      "state": "source controls only / native UNRUN / six LEAN audits missing / destination profile Claude review owner claim and paper gates pending",
+      "evidence_ref": "docs/decisions/2026-10-03-north-star-workstation-handoff.md"
+    },
+    {
+      "kind": "gate",
+      "id": "north-star-frozen-stress-20261002",
+      "title": "Frozen cost and rounding stress",
+      "state": "two fresh processes each 142 of 142 strict checks / four equal normalized exports / maintenance adaptive and destination gates separate",
+      "evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-20261002.json"
+    },
+    {
+      "kind": "gate",
+      "id": "north-star-initial-margin-refusal-20261002",
+      "title": "Frozen native initial-margin refusal",
+      "state": "two fresh processes each 86 of 86 strict checks / native margin denial / no fills or positions / maintenance adaptive and destination gates separate",
+      "evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-20261002.json"
+    },
+    {
+      "kind": "gate",
+      "id": "north-star-recovery-f1-20261002",
+      "title": "Recovery startup and durable source contracts",
+      "state": "523 unique pinned SDK tests pass with zero skips / fake broker ports / paper account and IBKR rc5 recovery remain unqualified",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json"
+    },
     {
       "kind": "gate",
       "id": "memory-scheduled-learning",
@@ -364,6 +392,13 @@
     }
   ],
   "workers": [
+    {
+      "kind": "worker",
+      "id": "north-star-runtime-review-20261002",
+      "title": "North Star bounded implementation and independent review",
+      "state": "historical stress 142/142 refusal 98/98 / SDK 523 / successor controls 248 pass 5 skip / workstation native Claude review and paper pending",
+      "evidence_ref": "docs/decisions/2026-10-02-north-star-runtime-qualification.md"
+    },
     {
       "kind": "worker",
       "id": "paper-foundation-claude-review",

@@ -2084,7 +2084,7 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80` |
 | [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `84c65a395145efe884a70b561205a3359b2b21022bd6fd4107d35d18016efdf6` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1` |
-| [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618` |
+| [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `a3960abdd4e5df64c999668798d8c13fc55a260b51e01c4219a33ca004aa9683` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json) | `ad86d1d4c2cddeeebc2bc327fddc897b161cec092706db24c779603321246bc7` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json) | `eff4adb3683062fb31acb63f494fb15c39d08bd50627a68ca32262c007adb519` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json) | `dc62fdbbebd6ed1ab837663ee00407a78031f86c8f302f6fcc1139ab1744505c` |

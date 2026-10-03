@@ -1,0 +1,119 @@
+{
+  "schema_version": "spy-six-case-successor/1",
+  "id": "spy-six-frozen-cases-prospective-20261003",
+  "status": "UNEXECUTED",
+  "evidence_class": "HIST",
+  "cases": {
+    "one_zero": {
+      "id": "one_zero",
+      "target": "1",
+      "fee_usd": "0",
+      "slippage": "0",
+      "adaptive": false,
+      "reject": false
+    },
+    "one_stress": {
+      "id": "one_stress",
+      "target": "1",
+      "fee_usd": "1",
+      "slippage": "0.002",
+      "adaptive": false,
+      "reject": false
+    },
+    "two_zero": {
+      "id": "two_zero",
+      "target": "2",
+      "fee_usd": "0",
+      "slippage": "0",
+      "adaptive": false,
+      "reject": false
+    },
+    "two_stress": {
+      "id": "two_stress",
+      "target": "2",
+      "fee_usd": "1",
+      "slippage": "0.002",
+      "adaptive": false,
+      "reject": false
+    },
+    "adaptive_stress": {
+      "id": "adaptive_stress",
+      "target": "2",
+      "fee_usd": "1",
+      "slippage": "0.002",
+      "adaptive": true,
+      "reject": false
+    },
+    "over_limit": {
+      "id": "over_limit",
+      "target": "4",
+      "fee_usd": "1",
+      "slippage": "0.002",
+      "adaptive": false,
+      "reject": true
+    }
+  },
+  "native": {
+    "account_type": "MARGIN",
+    "oms_type": "NETTING",
+    "margin_init": "0.5",
+    "margin_maint": "0.5",
+    "margin_model": "StandardMarginModel",
+    "default_leverage": "2",
+    "risk_bypass": false,
+    "liquidation_enabled": false,
+    "use_random_ids": false,
+    "bar_adaptive_high_low_ordering": false,
+    "support_contingent_orders": true
+  },
+  "runtime": {
+    "package": "nautilus_trader",
+    "version": "2.0.0rc5",
+    "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "python_version": "3.13.16",
+    "official_image": "docker.io/library/python@sha256:110e8d1de526341568b8fcdb1773b0d47ad63309df21980c6028803226a2dab0",
+    "extension_sha256": {
+      "_libnautilus.cpython-313-aarch64-linux-gnu.so": "d03e4ac01a3675f91a3c7edde999735fefcc89bfb910f1fdaab946ab5e0beed3"
+    }
+  },
+  "base": {
+    "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+    "mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67"
+  },
+  "frozen": {
+    "plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+    "oracle_sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+    "tolerances_sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "input_sha256": {
+      "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf",
+      "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899"
+    }
+  },
+  "preregistration": {
+    "path": "PREREGISTRATION-six-cases-20261003.md",
+    "sha256": "f0b352bfce252fea424cfeeb45188ab26dcd077a9e485f802f4111b4a98a3926"
+  },
+  "source_seal_sha256": {
+    "run.py": "dd2ccf6de287ddf82b1fcdd244902fab19f64bbfb8e7a45f407be9898b38d221",
+    "compare.py": "31062a88d78d2188e18305141e474247d089f1ab79de218269ed4bf9572843a5",
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "fixture_strategy.py": "90ed38609de9082c5a8ba3f3fd13967b1520a371b970a04c523b8ebdfe70df4e",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "cost_models.py": "734d1471d9d614619ebd23959e00cf83931c70fc0a9621c351931c735f77c2be",
+    "margin_policy.py": "b6fce02d0fa5e8529996ede73e6c55b05f60083efce5d825fe580f6ef9a39bba",
+    "margin_strategy.py": "a299da57a019ce1706e053e64b47c380a889fa27152db5fb0bb7be6c7cd557fe",
+    "six_bindings.py": "4df2620a63f952aa9df9b5eaddae13bcd2020faefc9f45d01c2fe6c515164ea9",
+    "six_run.py": "2e727dd09da92f3542329cc6541a2587a3d0ed051772537324478e27c302c3a4",
+    "compare_six.py": "1bf2ce4291e338527035aa80bfc428b6d70b7b68a11ec61ed1b6f1150700109b",
+    "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+    "mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+    "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "requirements-stress-linux-arm64-py313.lock": "8d6564b26f093a9da4383f74d06a47e0b212fbae2fd3058fbc7b9ca4a1e5a878"
+  },
+  "scope": "Frozen LEAN fixture policy plus native Nautilus execution; no automatic-maintenance/paper/host promotion",
+  "native_phase_qualification": "UNEXECUTED",
+  "destination_profile": "Linux ARM64 CPython3.13.16 only; destination owner must preregister independently before execution"
+}
