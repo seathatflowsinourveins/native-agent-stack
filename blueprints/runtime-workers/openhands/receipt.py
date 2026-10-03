@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -38,6 +39,11 @@ COLUMNS = (
 )
 EFFORTS = {"none", "minimal", "low", "medium", "high", "xhigh", "max", "auto"}
 AGENT_TERMINATIONS = {"finished", "error", "stuck", "max_iterations_reached"}
+# Any other recorded stage reads as None. Resolver mode adds "gates" (host.run) and the
+# driver's host-side stages after the export (resolver.ResolverAttempt.finish).
+FAILURE_STAGES = frozenset({"preflight", "prepare", "skills", "qmd_setup", "agent", "export", "grader", "start",
+                            "probe", "wait", "result", "deadline",
+                            "gates", "clone", "apply", "commit", "push", "pr"})
 NOT_COLLECTED = "not_collected"
 NOT_COLLECTED_REASON = (
     "The model terminal runs under the agent-server's UID, which can write both /run-output "
@@ -48,11 +54,12 @@ NOT_COLLECTED_REASON = (
     "fields are not read.")
 
 
-def read_bounded(path, limit=4 * 1024 * 1024):
+def read_bounded(path, limit=4 * 1024 * 1024, errors="strict"):
     """CPython@v3.13.15 os.open dir_fd/O_NOFOLLOW; refuse every symlink hop.
 
     Worker files are untrusted even if their content parses. O_NONBLOCK avoids
     hanging on a malicious FIFO; fstat checks the opened object, not its name.
+    `errors` is the UTF-8 decoding's error handler (bytes.decode).
     """
     path = Path(path).absolute()
     directory = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY)
@@ -71,7 +78,7 @@ def read_bounded(path, limit=4 * 1024 * 1024):
         data = stream.read(limit + 1)
         if len(data) > limit:
             raise ValueError("receipt_input_too_large")
-    return data.decode("utf-8")
+    return data.decode("utf-8", errors)
 
 
 def gateway_database(arm):
@@ -217,6 +224,174 @@ def isolation_summary(result):
     return summary
 
 
+# Resolver mode (RESOLVER.md "Stage 2"). The outcomes resolver.ResolverAttempt.finish and
+# dispatch.finish_resolver write; the writes resolver/gh_harness.py journals; its branch
+# names (resolver/gh_harness.py BRANCH) and lane labels (docs/lanes.md).
+RESOLVER_OUTCOMES = frozenset({"pr_opened", "patch_empty", "patch_refused", "text_refused", "agent_not_finished"})
+RESOLVER_WRITES = frozenset({"push", "pr_create", "review", "pr_comment"})
+RESOLVER_BRANCH = re.compile(r"openhands/issue-[1-9][0-9]{0,8}(?:-(?:[2-9]|1[01]))?")
+RESOLVER_LANES = frozenset({"lane:foundation", "lane:trading", "lane:shared"})
+REASON_CODE = re.compile(r"[a-z][a-z0-9_]{0,63}")
+HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
+
+
+def _matching(value, pattern):
+    return value if isinstance(value, str) and pattern.fullmatch(value) else None
+
+
+# Plan acceptance A7 (review item D7): the containment evidence an attempt leaves on the host.
+# The environment names come from host.record_env_names; forbidden are the plan's GH_*, GITHUB_*,
+# OMNIROUTE_* and *_TOKEN. The proxy's access log (host.teardown_attempt's proxy.log) has two
+# formats (config/proxy-nginx.conf): nginx's default "combined" on the agent side (gw:8081) and
+# "ingress" ($time_iso8601 $request_method $status) on the host side (gw:8080).
+ENV_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]{0,127}")
+FORBIDDEN_ENV_PREFIXES, FORBIDDEN_ENV_SUFFIX = ("GH_", "GITHUB_", "OMNIROUTE_"), "_TOKEN"
+ALLOWLISTED_ROUTES = ("POST /v1/responses", "POST /v1/chat/completions", "GET /v1/models")  # proxy-nginx.conf:64-66
+AGENT_LINE = re.compile(r'\S+ - \S+ \[(?P<time>[^\]]+)\] "(?P<request>[^"]*)" (?P<status>[0-9]{3}) \S+ "[^"]*" "[^"]*"')
+HOST_LINE = re.compile(r"(?P<time>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[+-][0-9]{2}:[0-9]{2}|Z))"
+                       r" [A-Z]{1,16} [0-9]{3}")
+PROXY_LOG_LIMIT = 16 * 1024 * 1024
+
+
+def env_names_summary(result):
+    """The server's environment names, and the forbidden ones among them; never a value."""
+    empty = {"names": [], "forbidden": []}
+    try:
+        record = json.loads(read_bounded(Path(result) / "server-env-names.json", limit=256 * 1024))
+    except FileNotFoundError:
+        return {"status": "absent", **empty}
+    except (OSError, ValueError):
+        return {"status": "unreadable", **empty}
+    names = record.get("names") if isinstance(record, dict) and record.get("status") == "observed" else None
+    if not isinstance(names, list) or not all(isinstance(name, str) and ENV_NAME.fullmatch(name) for name in names):
+        return {"status": "unreadable", **empty}
+    names = sorted(set(names))
+    return {"status": "observed", "names": names,
+            "forbidden": [name for name in names
+                          if name.startswith(FORBIDDEN_ENV_PREFIXES) or name.endswith(FORBIDDEN_ENV_SUFFIX)]}
+
+
+def _proxy_lines(result, window):
+    """Classify each proxy.log line: "before_start" (before the dispatch start, so the P0-P2 probe's
+    and the health gate's traffic), an allowlisted route, "denied" (a 403 for any other request
+    line), "not_allowlisted", "host_side" or "other". Returns (start known, [(kind, line)]).
+
+    The start is the window's started_at, cut to whole seconds as nginx logs them, so a line in the
+    start's second counts as the agent's. Only the exact request line of an allowlisted route
+    counts as allowlisted; a line nginx would normalize to one (dot segments) is reported."""
+    text = read_bounded(Path(result) / "proxy.log", limit=PROXY_LOG_LIMIT, errors="replace")
+    try:
+        start = time_value(window.get("started_at")).replace(microsecond=0)
+    except (ValueError, TypeError, OverflowError, OSError):
+        start = None
+    classified = []
+    for line in text.splitlines():
+        agent, host = AGENT_LINE.fullmatch(line), HOST_LINE.fullmatch(line)
+        try:
+            when = (datetime.strptime(agent["time"], "%d/%b/%Y:%H:%M:%S %z") if agent
+                    else time_value(host["time"]) if host else None)
+        except (ValueError, TypeError, OverflowError):
+            when, agent, host = None, None, None
+        if when is None:
+            kind = "other"
+        elif start is not None and when < start:
+            kind = "before_start"
+        elif host:
+            kind = "host_side"
+        else:
+            method, _, rest = agent["request"].partition(" ")
+            target, _, protocol = rest.partition(" ")
+            route = f"{method} {target}"
+            if route in ALLOWLISTED_ROUTES and protocol in ("HTTP/1.0", "HTTP/1.1"):
+                kind = route
+            else:
+                kind = "denied" if agent["status"] == "403" else "not_allowlisted"
+        classified.append((kind, line))
+    return start is not None, classified
+
+
+def proxy_log_summary(result, window):
+    """The proxy access log as counts only (plan A7). The request lines stay in the private log:
+    the model chose them (not_allowlisted_lines returns them for the coordinator's triage)."""
+    try:
+        split, classified = _proxy_lines(result, window)
+        sha256 = hashlib.sha256(Path(result, "proxy.log").read_bytes()).hexdigest()
+    except FileNotFoundError:
+        return {"status": "absent"}
+    except (OSError, ValueError):
+        return {"status": "unreadable"}
+    counts = Counter(kind for kind, _ in classified)
+    return {"status": "observed", "sha256": sha256, "split_at_start": split, "before_start": counts["before_start"],
+            "agent_allowlisted": {route: counts[route] for route in ALLOWLISTED_ROUTES},
+            "agent_not_allowlisted": counts["denied"] + counts["not_allowlisted"],
+            "agent_denied_403": counts["denied"], "host_side": counts["host_side"], "other_lines": counts["other"]}
+
+
+def not_allowlisted_lines(result):
+    """The agent-side proxy log lines after dispatch start that are no allowlisted route, for the
+    coordinator's private A7 triage (RESOLVER.md live runbook). Never publish them."""
+    window = json.loads(read_bounded(Path(result) / "window.json"))
+    return [line for kind, line in _proxy_lines(result, window)[1] if kind in ("denied", "not_allowlisted")]
+
+
+def _count(value):
+    return value if type(value) is int and value >= 0 else None
+
+
+def resolver_summary(result, window):
+    """The resolver attempt's host-written identity and outcome, projected onto fixed fields.
+
+    Both files are written by host code outside every model mount; the projection
+    still keeps only codes, counts, hashes and names of the expected shapes, so no
+    free text (a path, a title, model output) reaches the receipt. `review` stays None
+    until resolver.py adds the review loop's outcome. None outside resolver mode.
+    """
+    try:
+        identity = json.loads(read_bounded(Path(result) / "resolver-identity.json", limit=64 * 1024))
+    except (OSError, ValueError):
+        return None
+    identity = identity if isinstance(identity, dict) else {}
+    try:
+        outcome = json.loads(read_bounded(Path(result) / "resolver-outcome.json", limit=1024 * 1024))
+    except (OSError, ValueError):
+        outcome = {}
+    outcome = outcome if isinstance(outcome, dict) else {}
+    sota = outcome.get("sota_sources")
+    try:
+        probe = hashlib.sha256(Path(result, "isolation-probe.json").read_bytes()).hexdigest()
+    except OSError:
+        probe = None
+    return {
+        "issue": identity.get("issue") if type(identity.get("issue")) is int and identity["issue"] > 0 else None,
+        "base_sha": _matching(identity.get("base_sha"), HEX40),
+        "lane": identity.get("lane") if identity.get("lane") in RESOLVER_LANES else None,
+        "instruction_sha256": _matching(identity.get("instruction_sha256"), HEX64),
+        "status": outcome.get("status") if outcome.get("status") in RESOLVER_OUTCOMES else None,
+        "reasons": sorted({reason for reason in outcome.get("reasons") or []
+                           if _matching(reason, REASON_CODE)}) if isinstance(outcome.get("reasons"), list) else [],
+        "paths_changed": _count(outcome.get("paths_changed")),
+        "patch_sha256": _matching(outcome.get("patch_sha256"), HEX64),
+        "branch": _matching(outcome.get("branch"), RESOLVER_BRANCH),
+        "pr": _count(outcome.get("pr")) or None,
+        "head": _matching(outcome.get("head"), HEX40),
+        "sota_sources": ({"kept": sota["kept"], "dropped": sota["dropped"]}
+                         if isinstance(sota, dict) and _count(sota.get("kept")) is not None
+                         and _count(sota.get("dropped")) is not None else None),
+        "writes": [{"op": write["op"], "exit_code": write.get("exit_code") if type(write.get("exit_code")) is int
+                    else None}
+                   for write in outcome.get("writes") or []
+                   if isinstance(write, dict) and write.get("op") in RESOLVER_WRITES]
+        if isinstance(outcome.get("writes"), list) else [],
+        "gates": {"stage_gates_sha256": _matching(window.get("stage_gates_sha256"), HEX64),
+                  "isolation_probe_sha256": probe,
+                  # Gate G4's qualified reviewer argv (host.verify_reviewer_gate), by hash only.
+                  "reviewer_argv_sha256": _matching(identity.get("reviewer_argv_sha256"), HEX64)},
+        # Plan acceptance A7 (review item D7): names and counts only.
+        "containment": {"env_names": env_names_summary(result), "proxy_log": proxy_log_summary(result, window)},
+        "review": None,
+    }
+
+
 def create_receipt(result, database=None):
     result = Path(result)
     window = read_json(result / "window.json")
@@ -261,7 +436,7 @@ def create_receipt(result, database=None):
             except (OSError, ValueError, AttributeError):
                 found.append(False)
         return {"attempts": len(found), "confirmed_removed": sum(found), "complete": bool(found) and all(found)}
-    return {
+    receipt = {
         "schema_version": 6, "evidence_class": "SDK inference adapter with official SWE-bench grading",
         **{k: selection[k] for k in ("arm", "base_url", "gateway_upstream", "requested_model", "gateway_model",
                                      "gateway_path", "compression_combo")},
@@ -274,7 +449,7 @@ def create_receipt(result, database=None):
         "agent_termination": termination if termination in AGENT_TERMINATIONS else None,
         "agent_termination_basis": ("agent-server REST status and latest ConversationErrorEvent; the server shares "
                                     "the model terminal's UID and store, so this selects exit 1 or 3 only"),
-        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"preflight", "prepare", "skills", "qmd_setup", "agent", "export", "grader", "start", "probe", "wait", "result", "deadline"} else None,
+        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in FAILURE_STAGES else None,
         "task_passed": task_passed,
         # The terminal shares the SDK's UID and writable persistence. Source:
         # SDK@fcc102a tools/terminal/terminal/subprocess_terminal.py:157-170.
@@ -311,3 +486,11 @@ def create_receipt(result, database=None):
         "limits": ["Not unchanged benchmark inference or an upstream SDK test suite",
                    "No matched A/B or token-savings comparison", "No SDK cold-start/crash-resume acceptance"],
     }
+    summary = resolver_summary(result, window)
+    if summary is not None:
+        # No official grader runs in resolver mode; CI and the owner judge the change.
+        receipt.pop("upstream_grader")
+        receipt["evidence_class"] = ("OpenHands resolver attempt: host-validated patch and a draft pull request "
+                                     "through the gh harness; no task verdict")
+        receipt["resolver"] = summary
+    return receipt

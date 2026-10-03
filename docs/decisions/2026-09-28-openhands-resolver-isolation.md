@@ -205,6 +205,61 @@ hold:
 The narrowing takes effect only when this record merges, and the owner may reject it. The
 SWE-bench mode reads no issue text and needs no narrowing.
 
+### Resolver-mode amendment (proposed 2026-09-28, pending the owner's decision)
+
+Independent review of the resolver's stage 2 found that resolver mode does not meet conditions 2
+and 3 as written (`blueprints/runtime-workers/openhands/RESOLVER.md`, "The push runs the model's
+code in CI"):
+- **Condition 2.** The driver grades nothing. It pushes the agent's commit to a branch of this
+  repository and opens a draft PR. main's `pull_request` workflows then run repository code from
+  the PR's merge commit, including files in the owned paths, on GitHub-hosted runners whose
+  egress is audited, not blocked. So the patch runs with network.
+- **Condition 3.** Besides the validated patch, the PR body publishes up to 6000 characters of the
+  agent's final message, fenced and guarded, and its resolvable SOTA lines.
+
+The bounds were read at origin/main b0fb65b4 by parsing every workflow file
+(`blueprints/runtime-workers/openhands/evidence/stage2-repair-fail-first.txt`, "observations").
+11 of the 20 workflows run on `pull_request`. Each sets `contents: read` at the workflow level,
+and none uses a secret other than `GITHUB_TOKEN`. No workflow uses `pull_request_target` or
+`workflow_run`, and the only jobs with a write scope among the 11 skip `pull_request`. Check
+results on `openhands/*` are model-controlled and are not evidence.
+
+The owner decides between two options:
+1. **Accept CI execution** for resolver mode within those bounds, re-checked whenever a workflow
+   changes, and accept the final message as a second, guarded output. The resolver as built
+   needs no code change for this option.
+2. **Push agent branches to an owner fork**, so that PR runs get no secret and a read-only token
+   whatever a workflow declares. This is the review's proposal. GitHub's fork-PR token and secret
+   limits, and its rules on which account may hold the fork, were not re-read for this amendment,
+   so that guarantee is unverified here.
+   - **Owner.** The fork's owner is this repository's owner, the User account
+     `seathatflowsinourveins`. The repository is public and has no fork
+     (`gh api repos/seathatflowsinourveins/native-agent-stack`, read 2026-10-03). That account is
+     also the admin login the resolver acts through (ruleset section above), so the fork needs
+     its own rules.
+   - **A harness change.** The resolver as built pushes to and opens PRs only in this repository.
+     `resolver/gh_harness.py:44` fixes `REPO`. `op_push` (`:241-254`) pushes only to `origin`,
+     and `push` (`:704-709`) refuses unless the origin push URL equals `ORIGIN_URL`. `op_pr_create`
+     (`:257-259`) and its allowlist entry (`:448`) pass `--head <branch>` in this repository.
+     `check_repository` (`:627-628`) requires `full_name` to equal `REPO`, and `branch_rules`
+     (`:684-689`) reads this repository's rules. The ruleset section above binds only this
+     repository's `openhands/*` refs.
+   - **Before a first run**, option 2 therefore needs a separately reviewed change: a fork remote
+     and push-URL check, `gh pr create --head <owner>:<branch>`, the branch-rules lookup and a
+     `non_fast_forward` ruleset on the fork, and its own independent review.
+   - **Condition 3.** A fork does not change what the PR body publishes. `build_pr_body`
+     (`blueprints/runtime-workers/openhands/resolver.py:547-550`, `:590-592`) includes the final
+     message wherever the branch lives. Under option 2 the owner either accepts the final message
+     as a second, guarded output, as in option 1, or has it dropped from the PR body, which is a
+     further change to `build_pr_body`.
+
+Neither option blocks CI egress. With a fork, main's `pull_request` workflows still run the pushed
+code on the same GitHub-hosted runners, whose egress is audited, not blocked. Either option can
+add an egress block to the PR jobs that run repository code; that is a workflow change outside the
+resolver PR. Until the owner accepts one option, and for option 2 until its harness change has
+passed its own review, this narrowing does not cover resolver mode's CI execution, and the
+resolver's first live run waits.
+
 ## GitHub harness (follow-up PR)
 
 The resolver's GitHub side is compared and built in the follow-up PR that adds resolver mode
@@ -253,7 +308,58 @@ No attempt network or container was created. No gateway or model request was mad
 host evidence for this design is the live P0-P2 probe
 ([sequence](../../blueprints/runtime-workers/openhands/README.md#live-probe-sequence-coordinator-not-run-yet)).
 
+## Portable alias-refusal fixture repair (2026-10-03)
+
+The custody repair serves the research-worker qualification step: exercise the resolver's
+existing path-refusal policy on both Linux and macOS before any separately gated live run.
+At PR head `501bcc9e`, the historical macOS full-suite artifact from run `36524134513`,
+job `109263298833`, artifact `11015337319` reports three failures in
+`PatchValidatorTests.test_case_unicode_and_filesystem_aliases_are_refused`: `docs/A.md`,
+`Docs/z.md` and the NFD spelling of `docs/café.md`. The fixture wrote these through the
+filesystem and exported them with `git add -A`; filesystem aliases and Git's filename
+normalization can remove the intended spellings before the validator sees the patch.
+`GitTree` instead reads the base with `ls-tree` and `cat-file`, and the refusal policy
+compares the patch's names with the base's casefold/NFD keys.
+
+**Chosen:** construct all seven test entries directly in the scratch repository's index,
+following git/git `v2.43.0` `t/t2107-update-index-basic.sh:59-69`: write each blob with
+`git hash-object -w --stdin`, then use `git update-index --add --cacheinfo
+100644,<oid>,<path>`. Export the cached diff without restaging the worktree, and assert
+that every intended path reached the validator. Keep every case, Unicode, trailing-dot,
+NTFS-short-name, NTFS-stream and HFS-ignorable-character refusal assertion.
+
+**Source-completeness finding:** index plumbing alone still allows Git's macOS argument
+normalization. `git.c:449` calls `precompose_argv_prefix`, and
+`compat/precompose_utf8.c:67-105` converts arguments when `core.precomposeUnicode` is true.
+The test therefore passes `-c core.precomposeunicode=false` only to its scratch-index
+insertion commands. This follows `Documentation/config/core.txt:44-51` and preserves the
+decomposed name without changing repository configuration or the production validator.
+
+**Alternatives:** a filesystem-prerequisite skip would leave these refusal checks unexercised
+on the failing host; the maintained Git plumbing makes that fallback unnecessary. A blanket
+platform skip would hide the regression and is not used. Worktree writes remain the default
+for the other fixtures, which exercise the actual dispatch export path.
+
+**Evidence and limits:** the original regression passes on Linux. Remapping only its three
+alias writes to their canonical spellings reproduces the same three failures with the
+existing unittest oracle; the repaired fixture passes that same synthetic check and all
+11 patch-validator tests with real local Git 2.43.0. This is local integration and synthetic
+evidence, not a new macOS run or upstream Git acceptance. Native macOS acceptance still
+requires the pushed head's `validate-macos` full-suite artifact. The production refusal
+gates and the proposed resolver-mode amendment above are unchanged.
+
+**Overturn:** if a native macOS run on the repaired head still loses an intended spelling,
+inspect that installed Git revision's argument/index handling and adjust the fixture from
+its versioned primary sources. Do not weaken or skip the validator's refusal assertions.
+
 ## Sources
+
+- [git/git `v2.43.0`](https://github.com/git/git/tree/v2.43.0),
+  `Documentation/RelNotes/2.43.0.txt`, `Documentation/git-hash-object.txt:18-35`,
+  `Documentation/git-update-index.txt:44-47,75-80,253-267`,
+  `t/t2107-update-index-basic.sh:59-69`, `builtin/update-index.c:421-446`, `git.c:449`,
+  `compat/precompose_utf8.c:44-105` and `Documentation/config/core.txt:29-51`, read
+  2026-10-03 after the installed `git version 2.43.0` and native command help.
 
 - docker/docs@4e9a5751518ed8223a8dcde53693badddd72604f
   `content/manuals/engine/network/port-publishing.md:121-131,186-192` (gateway modes; the
