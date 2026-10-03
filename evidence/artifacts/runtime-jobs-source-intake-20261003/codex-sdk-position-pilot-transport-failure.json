@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "native-runtime-readiness-failure",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "FAILED: native tool non-TTY input carrier closed before first debugger command; SDK positions and positive-role qualification HOLD",
+  "preregistration": {
+    "public_sha256": "e2885ebcc270cbb1a4977d8c1521ad33348d578a1eeaab2dc294f616afa8f13e",
+    "public_bytes": 19187,
+    "private_recipe_sha256": "b8dca1778ac4a3e6beaa47efe77ee979f8bca6c749a428ec655fede6865e0f18",
+    "private_recipe_bytes": 32568,
+    "source_review": "Astra/max accepted ONE exact position-only pilot. Compact inline-team read is not provider transport or usage evidence."
+  },
+  "scope": {
+    "original_fixture_timeout_ms": 5000,
+    "test_name_pattern": "(?!)",
+    "positive_fixture_callbacks": 0,
+    "provider_turns": "not exercised",
+    "target_phase": "Native initial Jest entry pause before first controller command; adapter pause not reached",
+    "unchanged_prefix": "Root exact equality after outer RTK replacement and native FD13 insertion",
+    "no_adaptive_retry": true
+  },
+  "native_execution": {
+    "launch_chunk": "8b45ac",
+    "launch_initial_return": "running",
+    "tool_session_id": 65613,
+    "stdin_write_return": "stdin is closed for this session; rerun exec_command with tty=true to keep stdin open",
+    "stdin_commands_delivered": 0,
+    "nominal_TERM_seconds": 180,
+    "nominal_KILL_grace_seconds": 10,
+    "hard_190_second_guarantee": false,
+    "completion_chunk": "adce1d",
+    "completion_exit_code": 124,
+    "completion_observed_utc": "2026-10-03T14:45:59Z",
+    "actual_wall_seconds": null,
+    "bwrap_terminal_command_exit": null,
+    "jest_final_json_observed": false,
+    "jest_exit": null,
+    "actual_sdk_script_ids": null,
+    "actual_pausable_positions": null
+  },
+  "independent_cleanup": {
+    "before_native_exit": 0,
+    "before_chunk": "71bb18",
+    "before_phase": "Initial pause after tool transport failure; not the preregistered adapter-phase gate",
+    "before": {
+      "stdout_bytes": 7068,
+      "stdout_sha256": "1db9607bf892e4c0c1ede137f69360a96a64a84c1b61c2c3585e885aa50357db",
+      "rows": 372,
+      "complete_decimal_fields": true,
+      "owned_pair_count": 1,
+      "owned_namespace_count": 3,
+      "stderr_bytes": 0
+    },
+    "after_native_exit": 0,
+    "after_chunk": "97aec9",
+    "after": {
+      "stdout_bytes": 6973,
+      "stdout_sha256": "0c73c590fdb94f2cbba2d7d48654fa210808b28751d9e4ea764ecd18178ecb3c",
+      "rows": 367,
+      "complete_decimal_fields": true,
+      "owned_pair_count": 0,
+      "owned_namespace_count": 0,
+      "stderr_bytes": 0
+    },
+    "visible_owned_namespace_endpoint": true,
+    "limits": "Independent visible-process endpoint only; no terminal command/Jest status reconstruction, kernel-wide guarantee or position-gate acceptance"
+  },
+  "retained_native_outputs": {
+    "repl-native.stdout.txt": {
+      "bytes": 405,
+      "sha256": "d9bdbf89b49c78a9cf08051fba81871cb53d718c9a31d036970be9aafb280892"
+    },
+    "repl-native.stderr.txt": {
+      "bytes": 68,
+      "sha256": "8f5ceda9ffa631e0b8fde056fb8e293ef79345ce84c3c02f427495ced000ded8"
+    },
+    "bwrap-native-status.jsonl": {
+      "bytes": 202,
+      "sha256": "0cc73731c1cfad22b95bc0473368d65bc34a636645191ffb2e4c1c9b209b3059"
+    }
+  },
+  "original_custody": "Unmodified native stdout/stderr/status/process snapshots remain in the task-owned private preregistration directory; public receipt contains sanitized original byte/hash bindings.",
+  "correction": {
+    "incorrect_carrier_assumption": "Native tool non-TTY exec would keep an interactive stock Node REPL input pipe open",
+    "verification": "First write_stdin rejected before input transmission; tool explicitly requires tty=true to keep stdin open",
+    "next_step": "Astra bounded source adjudication of a prospective native TTY carrier amendment after this attempt's cleanup; no second attempt admitted here"
+  },
+  "primary_sources": [
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "files": [
+        "lib/internal/debugger/inspect_repl.js",
+        "lib/internal/debugger/inspect.js"
+      ]
+    },
+    {
+      "repository": "coreutils/coreutils",
+      "pin": "9530a14420fc1a267e90d45e8a0d710c3668382d",
+      "file": "src/timeout.c"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "file": "bubblewrap.c"
+    },
+    {
+      "repository": "procps-ng/procps",
+      "pin": "4ddcef2fd843170c8e2d59a83042978f41037a2b",
+      "file": "src/ps/output.c"
+    }
+  ],
+  "quality_result": null,
+  "provider_usage": null,
+  "token_savings": null
+}

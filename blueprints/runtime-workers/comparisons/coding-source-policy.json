@@ -1,0 +1,220 @@
+{
+  "rules": [
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.django_1776_django-14034:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.django_1776_django-14034:latest@sha256:a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.django_1776_django-15569:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.django_1776_django-15569:latest@sha256:1e9a54d724442423798d68fb4fa505f9db5ba0ad782c067df3d40eb6c4902d50"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.django_1776_django-11211:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.django_1776_django-11211:latest@sha256:cc5bba0d622e2e2f94038f6e968a832578d94266af460386341afefaf87fa497"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.django_1776_django-15572:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.django_1776_django-15572:latest@sha256:675e046b90690bebc1de1d46ea5dc44445e4228c748eccae69309ecc17e03c90"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-23824:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-23824:latest@sha256:285c1306bddef950459d6002de5c21e7a448b46208bfba030a828830af997ae8"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-13647:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-13647:latest@sha256:d27b2eed2f5d195f63c48acf32a64c562a0121d7ee28effd548702507b4ada8a"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-24066:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-24066:latest@sha256:1f27465fafb60413525ae17b82582723e697e37ec47ffd21621fb05cb51c20ac"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-12489:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-12489:latest@sha256:97d5e3120174bd85719c4e96148c9a1fefc3360f9c276fbea417f9167d0ee8f9"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-13496:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-13496:latest@sha256:50a7f61f8c04f76a665865e6431306d64e741a9447fb9ee23edfac0fad72e00a"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-12585:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-12585:latest@sha256:cdd7ee1f8be0ad736dad1a201aedd1683f8535f9cc7a1aa489e992a71fcc81f8"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-13328:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-13328:latest@sha256:bf8c3425ac315ced20986def6adcd580ce4536ded6247d80f99d4c4352c85dab"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-14983:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-14983:latest@sha256:671ab629659e48085e86b54f3d83f6aba03b6183f3d569ff9c417c67dd64f343"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6197:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6197:latest@sha256:15d39592171743355fdade433454d2dbd5cd7d7db21bdcf0e2f125edecabaf09"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-7521:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-7521:latest@sha256:2fd3c0b4d923cd4eb81d39c3fe5adfb416753b09ce567a25896acb970cea3cfc"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6202:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6202:latest@sha256:46c4cba4147a424e386808760d3b96fb362388556b00e9257661ac294c52c62b"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-5840:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-5840:latest@sha256:f2e8a2039f31a889902cb311f03b58fb85c1840b51172d1e7ff30727eb3945d8"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pydata_1776_xarray-7393:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pydata_1776_xarray-7393:latest@sha256:15d79e643a94b7fba2a8138cdc5daf011bc2d99f61a7ce30508689a90ab9042f"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pydata_1776_xarray-2905:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pydata_1776_xarray-2905:latest@sha256:1fb7fb411d115d06cf2f34fde3b6f8a33427f2d6f36e1ab8df3b1b977195bd61"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pydata_1776_xarray-4075:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pydata_1776_xarray-4075:latest@sha256:64cba3e907a0c4fa08652422573abe19a43d12299e15ce08d8ff84a3a1f39a18"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pydata_1776_xarray-4629:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.pydata_1776_xarray-4629:latest@sha256:583ef721ebfc24858c10704ad28fb935adef5f18f493d29751b68fb467c66994"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-25122:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-25122:latest@sha256:7dac4e6faa3be2af10d4cf48d8d53cd765191df5584a1f2b2ec139e7221ff742"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24627:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24627:latest@sha256:526b4c5c1b786ecf4dbfecb7c3ef847a0749d2de721932871abb46d8ca3dd6d8"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24026:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24026:latest@sha256:8fa7a329667ea2b146fdf2ab5746bd2a7d831e1eb4094bb2c56f7163e7cd304a"
+      }
+    },
+    {
+      "action": "CONVERT",
+      "selector": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-25332:latest"
+      },
+      "updates": {
+        "identifier": "docker-image://docker.io/swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-25332:latest@sha256:8fe08c1a8888990862bbdb9a9ad38c740e0910f08bca0b6cecb87f0bdb012dbc"
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-9.0.2, pluggy-1.6.0 -- ${UV_TEST_OVERLAY}/bin/python
+cachedir: .pytest_cache
+rootdir: ${SOURCE_CHECKOUT}
+configfile: pyproject.toml
+plugins: asyncio-1.3.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 14 items
+
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_successful_command_is_never_classified PASSED [  7%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_rate_limit_output_raises_api_rate_limit_error[litellm.RateLimitError: RateLimitError ...] PASSED [ 14%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_rate_limit_output_raises_api_rate_limit_error[Error code: 429 - rate_limit_exceeded] PASSED [ 21%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_rate_limit_output_raises_api_rate_limit_error[{"type":"error","error":{"type":"rate_limit_error"}}] PASSED [ 28%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_rate_limit_output_raises_api_rate_limit_error[HTTP/1.1 429 Too Many Requests] PASSED [ 35%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_rate_limit_output_raises_api_rate_limit_error[Rate limit reached for gpt-5 in organization org-x] PASSED [ 42%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_rate_limit_output_raises_api_rate_limit_error[RATE LIMIT] PASSED [ 50%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_authentication_output_is_classified[Not logged in] PASSED [ 57%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_authentication_output_is_classified[Failed to authenticate. API Error: 401 API key is invalid.] PASSED [ 64%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_authentication_output_is_classified[Invalid API key \xb7 Fix external API key] PASSED [ 71%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_authentication_output_is_classified[unexpected status 401 Unauthorized: Incorrect API key provided] PASSED [ 78%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_authentication_output_is_classified[unexpected status 401 Unauthorized: request rejected] PASSED [ 85%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_authentication_output_is_classified["auth error code":"invalid_api_key"] PASSED [ 92%]
+tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_authentication_output_is_classified[fatal: could not read Username for 'https://github.com': No such device or address] PASSED [100%]
+
+============================== 14 passed in 0.54s ==============================
+Installed 6 packages in 17ms

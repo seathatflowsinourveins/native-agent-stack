@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "study_id": "runtime-jobs-github-workflows-20261003",
+  "status": "draft-not-frozen",
+  "freeze_eligible": false,
+  "shared_execution_contract": "shared-execution-contract.json",
+  "scope": "Native GitHub workflow-agent job; disposable issue/CI/review tasks, never production issues or existing lane PRs",
+  "arms": [
+    {
+      "id": "native-codex-gh",
+      "baseline": true,
+      "runtime_ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "bundle": "OpenAI own-org GitHub plugin and task-matched skills at the existing recorded pins"
+    },
+    {
+      "id": "codex-action",
+      "baseline": false,
+      "repository": "https://github.com/openai/codex-action",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "version": "v1.12",
+      "native_codex_version": "0.160.0"
+    },
+    {
+      "id": "github-agentic-workflows",
+      "baseline": false,
+      "repository": "https://github.com/github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "version": "v0.89.21",
+      "native_codex_version": "0.160.0",
+      "bundle": "GitHub's native MCP and safe-output configuration; exact fixture/config hashes pending"
+    }
+  ],
+  "task_inputs": {
+    "issue_to_patch": {
+      "source": "coding-worker-draft.json: pinned SWE-bench Verified task instructions and unchanged swebench4.0.3 graders",
+      "task_ids": [
+        "django__django-14034",
+        "sympy__sympy-23824",
+        "scikit-learn__scikit-learn-13496",
+        "pytest-dev__pytest-6197",
+        "pydata__xarray-7393",
+        "matplotlib__matplotlib-25122"
+      ],
+      "sampling": "First preregistered hash-ranked task within each of the six coding repositories, before any outcome; task/image/fixture bindings remain open",
+      "native_quality_oracle": "Same unchanged FAIL_TO_PASS and PASS_TO_PASS task reward across all arms",
+      "effects": "Exact triggering fixture issue, target checkout/base, resulting patch/branch/PR and immutable head; native posting lifecycle separately observed"
+    },
+    "ci_repair": {
+      "repository": "https://github.com/github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "path": ".github/workflows/daily-yamllint-fixer.md",
+      "source_bytes": 10721,
+      "source_sha256": "cabbe39acb1655d277dcdd0711109f7b58c93960a9b3f0b146591ec7fadb7b34",
+      "quality_binding": "Freeze a real nonzero yamllint baseline, exact lint config/native evaluator and expected unaffected checks before choosing repair tasks. Source recipe is not an executed CI benchmark; zero warnings is a no-op control."
+    },
+    "review": {
+      "source": "Reviewer protocol's frozen known-defect inputs/common upstream rubric",
+      "quality_binding": "Posting a review comment does not prove finding quality. Bind the exact target PR/base/head and retained findings/false positives separately from posting lifecycle."
+    }
+  },
+  "lifecycle_source_controls": [
+    {
+      "path": "pkg/cli/workflows/test-claude-create-pull-request.md",
+      "bytes": 445,
+      "sha256": "fbc2a844a8e4a6718d9ee55272d555fb79d7b5219b43d143d0f4c30f95a7bf66",
+      "limit": "PR creation recipe, not an issue-solving oracle; source frontmatter lacks an explicit PR safe-output declaration"
+    },
+    {
+      "path": "pkg/cli/workflows/test-copilot-create-pull-request-review-comment.md",
+      "bytes": 400,
+      "sha256": "4caea3a4605271784e7d1136e14cb4bc1f08fa233c4b1e99ebdf392f3e4b7c9c",
+      "limit": "Posting lifecycle recipe, not known-defect finding quality"
+    },
+    {
+      "path": "actions/setup/js/create_pull_request_validation_push_parity.test.cjs",
+      "git_blob": "45ff5f5d2bcab893e5d2873a02296eadb3498b36",
+      "binding": "source lead pending final fixture read"
+    },
+    {
+      "path": "actions/setup/js/create_pr_review_comment.test.cjs",
+      "git_blob": "7ef2d0a73823de1732492ea89a1359dd787558f6",
+      "binding": "source lead pending final fixture read"
+    },
+    {
+      "path": "actions/setup/js/submit_pr_review.test.cjs",
+      "git_blob": "82128e352684fec6657c174f92c17392b6f84709",
+      "binding": "source lead pending final fixture read"
+    }
+  ],
+  "routing": {
+    "model": "cx/gpt-6.1-sol-ultra",
+    "native_effort": "ultra",
+    "native_v2_and_hint": "Must observe supported effective V2/config/catalog contract; action protected flags are restricted",
+    "wire_and_gateway": "Exact running build/carry, alias transform and effective inference effort separately observed",
+    "keyless": "Supported nonsecret-placeholder/custom-provider source paths are leads. Qualify destination acceptance, runner reachability and provider precedence without reading/copying credentials or auth stores.",
+    "native_sign_in": "Placeholder custom-provider execution does not prove retained Codex sign-in was used; OmniRoute's pooled native sign-ins stay with its owner",
+    "action_gap": "Empty-key fresh-runner control flow and trusted-home configuration require native qualification; do not treat a key input name as a requirement to extract a credential",
+    "gh_aw_gap": "Generated AWF provider/reflection, allowed endpoints and effective native overrides require observation; no silent sandbox-disable flag"
+  },
+  "proposed_execution": {
+    "repetitions": 2,
+    "retry": 0,
+    "order": "Freeze alternating paired arm order before execution",
+    "window": "Architecture-allocated exclusive throwaway host/project/account pool; no fixture or model request launched",
+    "accounting": "Non-overlapping attempt usage, native child/auxiliary calls, failed attempts, cache/reasoning subsets and agent/evaluator time; missing stays unknown"
+  },
+  "decision_rule": {
+    "quality": "Require no lower useful-task outcome on every frozen task and greater on at least one; lifecycle and native keyless/no-prompt/route conditions are mandatory gates",
+    "quality_tie": "Require at least5 percent lower paired median uncached-input-plus-output tokens (reported gross input minus reported cache reads, plus reported output including reasoning), complete counters and no greater paired median agent time",
+    "rank": [
+      "successful trials descending",
+      "paired median uncached-input-plus-output tokens ascending, with complete authoritative same-scope original gross-input/cache-read/output operands",
+      "paired median agent time ascending"
+    ],
+    "fallback": "Keep the measured native baseline; record invalid/unqualified comparisons separately from task failures"
+  },
+  "required_before_freeze": [
+    "Actual source-bound CI/review quality task IDs and common upstream grader; native positive/wrong/empty/no-op/lifecycle controls",
+    "All task trees, images, provider/runner/workflow/config/org-extension hashes",
+    "Exact actor/repository/write-access provenance, trigger/run/attempt and target base/head",
+    "Supported keyless runner route, effective V2/hint/inference and complete raw usage capture",
+    "Independent consequential read and Claude prefreeze read at one concrete final protocol head",
+    "Exclusive throwaway window ACK and cleanup/restoration contract"
+  ],
+  "limits": "Native upstream lifecycle tests/dry-run/compile are separate from model-quality results. No complete CI/review corpus or installed/action/provider acceptance is claimed."
+}

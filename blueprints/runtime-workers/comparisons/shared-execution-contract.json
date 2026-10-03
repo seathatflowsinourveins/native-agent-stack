@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "status": "draft_not_frozen",
+  "scope": "Shared execution rules for the eight job protocols; this file authorizes no freeze or default.",
+  "comparison_modes": {
+    "default": "full_usage",
+    "selected_mode": null,
+    "selection_policy": "Absent or null selection retains the prior full_usage contract. quality_only can be selected only by an accepted prospective per-job/shared amendment and new preregistration before any candidate quality output; this draft selects no mode and admits no run.",
+    "full_usage": {
+      "semantics": "All prior complete-usage, original-operand, coverage, efficiency and selection requirements remain in force without change. Missing usage cannot fall through a usage tiebreak to elapsed time."
+    },
+    "quality_only": {
+      "status": "proposal_only_not_accepted_or_frozen",
+      "amendment": "quality-only-contract-amendment-20261003.md",
+      "usage_gate_scope": "Complete provider usage and original efficiency operands are not quality prerequisites in this mode. Original missingness, field presence/types, scoped observations and independent treatment identity remain required; no aggregate is described as complete without complete coverage.",
+      "attempt_inventory": "Retain every planned and emitted task/repeat/arm/role/grading attempt, native internal retry, helper call, interruption and recovery with original outcomes and disposition. Bind inventory to the frozen ordered list and independently observed execution. A replaced native trial summary or partial numeric aggregate does not establish exhaustive attempts or outcomes.",
+      "native_outcomes": "Retain original reward/value, reason, status, exception, refusal, no-response and timeout records before applying the frozen oracle and failure classes. A native success value, including CORRECT with no_response, does not override its frozen disposition. Infrastructure-invalid quality remains null and whole-block recovery remains mandatory.",
+      "partial_usage": "Retain each reported original field with presence/type, value, source, attempt/role identity and observed coverage. Complete-provider totals stay null when coverage is unknown or partial. Absent fields, normalized/history zeros, estimates and extrapolation never become observed zero or complete usage; keep main/child/helper/grader/infrastructure scopes distinct and do not double count.",
+      "independent_treatment_identity": "Require actual installed client/runtime version, configured and delivered route/model/effort/parallel metadata, native orchestration, helper/child/grader identities, request-to-attempt binding and gateway interventions independently of usage availability. Unknown treatment identity prevents freeze; counter availability cannot establish delivery.",
+      "quality_rule": "Before outputs, freeze each job's numeric useful-task quality rule, oracle/input bindings, all challenger ordering and incumbent tie retention. Use no usage, cost, savings, efficiency or elapsed-time tiebreak in quality_only; ties retain the standing incumbent. Unknown usage cannot qualify a challenger.",
+      "held_claims": [
+        "cost or billing",
+        "token efficiency or savings",
+        "token-feature adoption",
+        "complete-provider accounting from partial counters"
+      ],
+      "preserved_gates": "Keep native budget/tool enforcement and breach disposition, retries, deadlines, recovery, lifecycle, images/content identity, network/allowlist, task/oracle/negative controls, no-prompt, credential isolation, extensions and owner pool/window admission. The proposed 200000-token cap remains unenforced and a freeze gate; this patch introduces no uncapped exception. An uncapped study requires a separate source-bound prospective proposal and acceptance.",
+      "required_reads": "Exact amended shared/job contracts and preregistration require both-family and consequential reads plus existing owner admission before freeze. The source-proposal acceptance is not acceptance of this patch, study freeze, run admission or a measured default."
+    }
+  },
+  "source": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "ref": "b095cd2e11e7387e1bcfa107558743429714d8b9",
+    "files": [
+      "docs/convergence-architecture.md",
+      "docs/acceptance-evidence-policy.md"
+    ],
+    "review": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/633#issuecomment-5966568938",
+    "review_head": "9a29de48b9046e6fb16e3475e802faf90e8e0273"
+  },
+  "route": {
+    "sol_alias": "cx/gpt-6.1-sol-ultra",
+    "astra_alias": "cx/gpt-6-astra-max",
+    "native_effort": "Per-runtime supported mapping and native orchestration retained separately",
+    "qualified": false,
+    "required_observations": [
+      "actual installed gateway composition",
+      "delivered reasoning effort",
+      "delivered parallel_tool_calls",
+      "Chat correlation join plus exclusive-window and per-attempt client-row binding for Responses; preserve upstream-attempt rows separately",
+      "gateway interventions"
+    ],
+    "destination": {
+      "port": 21128,
+      "ref": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "carry_commits": [
+        "24bbadbad15eec0d598c908416e4b01be4e37671",
+        "6c7990058c4ce9677de79452c8cefb10b4bf1b3d"
+      ],
+      "canary_pr_head": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "status": "owner-observed wire max on reviewed request shapes; per-runtime actual transport, complete usage and admission remain unqualified",
+      "morning_20128": "different composition; historical readiness only",
+      "wire_receipts": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966860846",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966873323"
+      ]
+    }
+  },
+  "freeze": {
+    "complete_ordered_attempt_list": "Required task, repeat, arm, role and grading order with a retained hash before any quality output",
+    "block": "One task-repeat across all arms, including its separate grading phase",
+    "window": "Only a recorded owner allocation; unresolved isolation/coexistence terms prevent quality freeze",
+    "claude_read": "Exact accepted protocol head plus scoped amendments before freeze",
+    "current_owner_allocation": {
+      "start_utc": "2026-10-03T13:00:00Z",
+      "end_utc": "2026-10-03T19:00:00Z",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5969406829",
+      "original_comment_bytes": 3639,
+      "original_comment_sha256": "5815886b8c4cc87b3bbd71b6762459e67c5be3204103d891e1d60eab3c0d6d83",
+      "status": "Owner allocation only; runtime, original-counter and both-family freeze gates remain HOLD. No runtime-worker comparison has started.",
+      "scope": "21128 pipeline capture ON; raw chunk capture OFF. Owner allocation does not establish original token operands or attempt completeness.",
+      "historical_proposal": "The earlier 13:00-16:00 proposed window below remains retained with its failed 195-minute coding-block condition; it is not the current owner allocation."
+    },
+    "proposed_window": {
+      "start_utc": "2026-10-03T13:00:00Z",
+      "end_utc": "2026-10-03T16:00:00Z",
+      "admission_due_utc": "2026-10-03T12:45:00Z",
+      "status": "reserved conditional; no quality freeze",
+      "preconditions": [
+        "Claude repaired-head ACCEPT",
+        "root admission read",
+        "owner value-free destination wire-effort/parallel/request-counter receipt",
+        "disposable Docker readiness"
+      ],
+      "coding_admission": "Unchanged first three-arm coding block bounds 195 minutes before overhead; exceeds the 180-minute reservation. Require a recorded sufficient schedule without silently reducing tasks, native verifier bounds or arms."
+    }
+  },
+  "failure_classes": {
+    "infrastructure_invalid": {
+      "criteria": [
+        "observed quota refusal or HTTP429",
+        "owner-observed gateway account rotation joined to the attempt",
+        "planned window end interrupts an incomplete block",
+        "grader transport, timeout or unparseable result",
+        "missing native task/oracle prerequisite"
+      ],
+      "quality_score": null,
+      "action": "Stop dispatch, retain every original attempt and reason; rerun the entire invalid block in a later recorded window with identical frozen hashes",
+      "model_effort_downgrade": false
+    },
+    "valid_native_failure": {
+      "criteria": "Runtime failure, empty/unsupported report, refusal or native agent timeout after valid infrastructure admission, classified by the frozen job oracle",
+      "quality_score": 0,
+      "action": "Retain and grade under the frozen rule; no independent retry"
+    },
+    "token_or_tool_bound": {
+      "criteria": "Only an observed breach of a predeclared natively enforced bound",
+      "action": "Job protocol must declare enforcement and score/validity disposition before freeze; an unenforced proposed cap is not a measured bound"
+    }
+  },
+  "recovery": {
+    "independent_arm_retries": 0,
+    "native_internal_retries": "Declare every runtime/helper/SDK retry separately; unsupported zero claims prevent freeze",
+    "maximum_invalid_blocks": 2,
+    "on_third_invalid_block": "Abort the study and report all retained failures; no winner",
+    "maximum_excluded_tasks": 0,
+    "invalid_task": "Retain task for all arms and recover the entire block, or abort; no selective dropping",
+    "recovery_receipt": "Names old/new allocation, original invalid attempts, unchanged hashes and recovery ordinal; not a silent retry"
+  },
+  "usage": {
+    "completeness_and_metric_gates_apply_to": "full_usage",
+    "common_requirements": "Missingness, original field presence/types, nonoverlapping scopes and request_controls.row_counting remain mandatory in both modes. quality_only follows comparison_modes.quality_only for scoped partial observations and held accounting claims.",
+    "authoritative_aggregate": "Exactly one native or owner-returned complete aggregate per arm/attempt, named before freeze",
+    "efficiency_metric": "Original gross input minus original cache reads only, plus original output; output includes reasoning",
+    "required_cache_read_for_metric": true,
+    "cache_write_for_metric": "Optional reported breakdown; preserve missing as null. Unknown writes do not by themselves block gross-minus-known-read plus output, but no complete cache or cost claim follows",
+    "metric_formula": "For each distinct provider attempt i: U_i=reported_gross_input_i-reported_cached_read_i; M=sum_i(U_i+reported_output_i), output includes reasoning",
+    "operand_validation": "Require original reported finite nonnegative gross/read/output fields and0<=read<=gross; no clamping, estimates or normalized-zero substitutions",
+    "provider_attempt_coverage_required": true,
+    "source_clarification_status": "Prospective; Astra/max source ACCEPT conditional, actual counter binding and both-family amendment read pending",
+    "gross_input_output": "Retained separately; cached input and reasoning output subsets are not added twice",
+    "missingness": "Unknown stays null; normalized zeros, estimates and price-table costs are not observed consumption or billing",
+    "scopes": [
+      "target main/children/helpers",
+      "grader",
+      "infrastructure",
+      "cache replay",
+      "coordination overhead"
+    ]
+  },
+  "request_controls": {
+    "every_arm": [
+      "unique correlation id for Chat; exclusive Responses window plus retained native provider-attempt identities/start/end and presentation-row mapping; correlation alone is not attempt identity",
+      "semantic-response-cache no-cache bypass",
+      "compression-off baseline",
+      "fresh owned native state"
+    ],
+    "cache_limits": "No-cache does not disable upstream prompt caching",
+    "metadata": "Allowlisted values only; no accounts, tokens, request bodies or auth/configuration exports",
+    "row_counting": "Count each distinct actual provider attempt once. Duplicate client/upstream observations of one attempt are not additive; distinct retries are separate attempts. One native aggregate may replace constituent rows only with established complete attempt/role coverage. Retain original field presence/types, status and main/child/helper/grading coverage; normalized or history zeros do not establish reported zero."
+  },
+  "amendments": "Every changed task/model/route/evaluator/limit/rule is a prospective recorded amendment read by both families; historical gates and earlier failures retain their original conditions."
+}

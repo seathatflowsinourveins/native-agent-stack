@@ -1,0 +1,34 @@
+[DB] Driver: better-sqlite3 | file: <private-test-data>/storage.sqlite
+[DB] Added provider_connections.last_ping_at column
+[DB] Added provider_connections.last_pinged_reset_key column
+[DB] Added usage_history.combo_strategy column
+[DB] Added call_logs.video_content_removed column
+[DB] Added call_logs.ttft_ms column
+[DB] Added call_logs.model_pinned column
+[DB] Added call_logs.session_tag column
+[DB] Added call_logs.reasoning_duration_ms column
+[DB] Added call_logs.reasoning_effort_requested column
+[DB] Added call_logs.reasoning_effort_upstream column
+[DB] Added call_logs.reasoning_encrypted column
+[DB] Added call_logs.has_content column
+[DB] Added call_logs.usage_provenance column
+[DB] Added call_logs.resilience_actions column
+[DB] Changing cache_size from 65536KB to 16384KB
+[DB] cache_size changed to 16384KB
+[DB] auto_vacuum drift detected (configured=INCREMENTAL, live=NONE); scheduling reconcile on the next vacuum-scheduler run
+[DB] SQLite database ready: <private-test-data>/storage.sqlite (DATA_DIR=<private-test-data>, SQLITE_FILE=<private-test-data>/storage.sqlite)
+[DB] SQLite WAL checkpoint completed (TRUNCATE)
+✔ checkSemanticCache returns null when the x-omniroute-no-cache header forces a bypass (1.437427ms)
+✔ checkSemanticCache returns a non-streaming JSON HIT with cache headers + logging side effects (44.699517ms)
+✔ checkSemanticCache returns a streaming SSE HIT (text/event-stream) when stream=true (2.560275ms)
+✔ checkSemanticCache HIT bills 0 incremental cost and reports the original cost in X-OmniRoute-Cost-Saved (1.976575ms)
+✔ checkSemanticCache returns null when cacheDefaultMode is 'bypass' (even with cacheable body) (0.400213ms)
+✔ checkSemanticCache HIT includes X-OmniRoute-Cache-Latency: synthetic header (0.93356ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3855.937293

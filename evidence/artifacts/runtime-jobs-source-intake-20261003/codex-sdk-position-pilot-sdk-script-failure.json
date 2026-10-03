@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "recorded_at_utc": "2026-10-03T15:33:03Z",
+  "artifact_type": "codex_sdk_stock_source_position_pilot_failure",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "FOURTH_OFFLINE_PILOT_FAILED_AT_SDK_SCRIPT_RESOLUTION",
+  "preregistration": {
+    "amendment": "codex-sdk-position-fileurl-selector-amendment.json",
+    "relative_private_recipe": "work/native-sdk-position-fileurl-v2-owned-20261003/operational-recipe.json",
+    "bytes": 36534,
+    "sha256": "06a6e8fcb75e34818e8353ec7233f57384c8150ec4534377d7a8015590062141",
+    "exact_astra_read": "ACCEPT exactly one offline source-position pilot; not positive SDK/provider acceptance"
+  },
+  "prior_failures_retained": [
+    "codex-sdk-position-pilot-transport-failure.json",
+    "codex-sdk-position-pilot-global-getter-failure.json",
+    "codex-sdk-position-pilot-adapter-pause-failure.json"
+  ],
+  "native_execution": {
+    "launch_chunk": "1f11e4",
+    "supervisor_command_exit": 0,
+    "completion_chunk": "85e3ba",
+    "bwrap_native_command_exit": 0,
+    "jest_numeric_exit": null,
+    "jest_final_report_exists": false,
+    "actual_wall_seconds": null,
+    "nominal_supervision": "GNU TERM180s, KILL-after10s; not a hard elapsed guarantee",
+    "failure": "Uncaught TypeError: sdk_script_unresolved",
+    "failed_stage": "resolve_each_sdk_file",
+    "failed_file_id": 0,
+    "failed_selector": "file:///state/codex-source/sdk/typescript/src/exec.ts",
+    "control_stop": "Declared stock kill then .exit; no adaptive retry or later SDK hash/map/position stage.",
+    "prompt_gates": "Each dependent input followed an observed native prompt/applicable gate. The initial post-cont prompt lacked a pause; only a later native return/read showed the adapter pause before the next input."
+  },
+  "observed_metadata": [
+    {
+      "stage": "adapter_breakpoint",
+      "breakpoint_id_sha256": "5b76589b9a3ca7643ae1265bd89e95c9ea04f424a36c8bcb5842c7c81b81e4d2",
+      "locations": []
+    },
+    {
+      "stage": "adapter_pause",
+      "script_id": "775",
+      "line": 78,
+      "column": 18
+    },
+    {
+      "stage": "adapter_source_binding",
+      "script_id": "775",
+      "source_body_sha256": "5decde9c87b3ef7946ca7b45068bf99f55a266333873adf8b3c99ba86b4ebc82",
+      "script_source_sha256": "5decde9c87b3ef7946ca7b45068bf99f55a266333873adf8b3c99ba86b4ebc82",
+      "script_source_bytes": 3678,
+      "prefix_bytes": 0,
+      "prefix_newlines": 0
+    }
+  ],
+  "metadata_limits": "The SDK callback threw before emitting its locations record. Do not infer whether the unretained response had zero locations or multiple script IDs; either fails the frozen gate.",
+  "scope": {
+    "positive_callbacks_selected": 0,
+    "original_fixture_timeout_ms": 5000,
+    "sdk_scripts_hash_bound": 0,
+    "sdk_anchors_qualified": 0,
+    "provider_or_model_comparison": false,
+    "actual_gpt_pool_attempts": 0
+  },
+  "independent_cleanup": {
+    "before_native_exit": 0,
+    "before_chunk": "2f4bb1",
+    "before_phase": "After real adapter pause and source-location metadata, before SDK script qualification",
+    "before": {
+      "stdout_bytes": 7410,
+      "stdout_sha256": "06948464ebbf38e4ceb668e5b91d3f4173e27ef4e83d307a5cbf11cf2d2a90dc",
+      "rows": 390,
+      "complete_decimal_fields": true,
+      "owned_pair_count": 1,
+      "owned_namespace_count": 3,
+      "stderr_bytes": 0
+    },
+    "after_native_exit": 0,
+    "after_chunk": "b628a2",
+    "after": {
+      "stdout_bytes": 7334,
+      "stdout_sha256": "527ef4ad9e0fab8e5cdeb4e91ab3df76b1feabc5ccaeef9d1c165cd90ebac692",
+      "rows": 386,
+      "complete_decimal_fields": true,
+      "owned_pair_count": 0,
+      "owned_namespace_count": 0,
+      "stderr_bytes": 0
+    },
+    "visible_owned_namespace_endpoint": true,
+    "limits": "Complete native ps observation of the owned pair/namespace endpoint; no kernel destruction guarantee or unreturned Jest exit reconstruction."
+  },
+  "retained_native_outputs": {
+    "repl-native.stdout.txt": {
+      "exists": true,
+      "bytes": 1420,
+      "sha256": "04103e27f7179350c042510264027076fdb7f5ace6720513f79061f422e1cd84"
+    },
+    "repl-native.stderr.txt": {
+      "exists": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bwrap-native-status.jsonl": {
+      "exists": true,
+      "bytes": 221,
+      "sha256": "aff3a340e58a8626a85b072556d34ea2f1a3d9ef42ca750ab4846ff393044786"
+    },
+    "jest-native.json": {
+      "exists": false
+    }
+  },
+  "analysis_failures_preserved": [
+    {
+      "message": "ValueError: '/state/codex-source' is not in list",
+      "processor_exit": 1,
+      "scope": "Read-only adapter-path derivation after OBSJSON was returned",
+      "correction": "Actual protected mount binds owned state at /state; direct owned codex-source adapter read succeeded. Native observations returned before the exception remain separately bound to their original files and native exits."
+    },
+    {
+      "message": "Ordinary Uncaught TypeError was missed by analysis helper matching only Uncaught: or Error [",
+      "old_error_projection": false,
+      "actual_native_error_observed": true,
+      "correction": "Literal Uncaught detection matches retained native stdout. Metadata-record advancement gate already stopped this attempt at the missing expected SDK record; no dependent SDK stage ran."
+    },
+    {
+      "message": "First post-cont native read had no pause; orchestrator prematurely printed stop_required while the frozen gate permits waiting for its native pause",
+      "correction": "No later stage was submitted then. A subsequent existing native return/read observed the actual pause, after which stage3 ran. No runtime retry or extra observer."
+    }
+  ],
+  "root_primary_read": {
+    "repository": "jestjs/jest",
+    "pin": "4e56991693da7cd4c3730dc3579a1dd1403ee630",
+    "file": "packages/jest-circus/src/legacy-code-todo-rewrite/jestAdapter.ts",
+    "native_exit": 0,
+    "bytes": 4000,
+    "sha256": "84221c57d5cdf36ddb2ab371eeacc916f9c94f254fa847453d2430be29dbef1b",
+    "lines": "70-105",
+    "compiled_adapter": {
+      "bytes": 3678,
+      "sha256": "5decde9c87b3ef7946ca7b45068bf99f55a266333873adf8b3c99ba86b4ebc82",
+      "lines": "74-87"
+    },
+    "conclusion": "Test-module import precedes the paused results call; missing import is not inferred from the unresolved selector."
+  },
+  "cause_status": "SOURCE DIAGNOSIS PENDING; actual SDK protocol URL/locations were not retained and cannot be reconstructed.",
+  "fifth_attempt_admitted": false,
+  "quality_result": null,
+  "provider_usage": null,
+  "token_savings": null
+}

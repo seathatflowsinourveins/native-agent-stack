@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "class": "native_registry_metadata_observation",
+  "date": "2026-10-03",
+  "source_map": "../../../blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
+  "command": [
+    "rtk",
+    "docker",
+    "buildx",
+    "imagetools",
+    "inspect",
+    "<from_reference>",
+    "--format",
+    "{{json .Manifest}}"
+  ],
+  "native_cli_version": "v0.37.1",
+  "native_cli_pin": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+  "observations": [
+    {
+      "task_id": "django__django-14034",
+      "from_reference": "swebench/sweb.eval.x86_64.django_1776_django-14034:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:90e8d93cd5268291ab32adc671d6bef6f58eae6ab571140c98e677f31fc1070d\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:35e633a9bd6fab73c9661df78f65271809f27d84e0a7cdfffb16c83a0825e368\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "django__django-15569",
+      "from_reference": "swebench/sweb.eval.x86_64.django_1776_django-15569:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:13d3ee8c6e4aa4d5c34024f32ada971a11153bfe0023339ddc4bdfb0ca48925d\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:1e9a54d724442423798d68fb4fa505f9db5ba0ad782c067df3d40eb6c4902d50\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:6f7675b7fbe44b732ecc202b52b1e17e3ad825ab3511b03dbcdf7c5bf2979134\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:1e9a54d724442423798d68fb4fa505f9db5ba0ad782c067df3d40eb6c4902d50\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "django__django-11211",
+      "from_reference": "swebench/sweb.eval.x86_64.django_1776_django-11211:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:22312ea6c7a536440aa0bae32e97a213d617b58dcbba962d7630c1b6ea635e0c\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:cc5bba0d622e2e2f94038f6e968a832578d94266af460386341afefaf87fa497\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:fa9c94f2659441ff14107605f51f046464150b31a0f0b7d3e5f3da46b182160d\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:cc5bba0d622e2e2f94038f6e968a832578d94266af460386341afefaf87fa497\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "django__django-15572",
+      "from_reference": "swebench/sweb.eval.x86_64.django_1776_django-15572:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:0409b51743d552658e20a8e54fc461186f67e6998f589e3321b4c4b6c29e23c7\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:675e046b90690bebc1de1d46ea5dc44445e4228c748eccae69309ecc17e03c90\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:5f516cc8ad04ef818760c248ed006b4d77c74ec7b8b57cc94088556637bdfe48\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:675e046b90690bebc1de1d46ea5dc44445e4228c748eccae69309ecc17e03c90\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "sympy__sympy-23824",
+      "from_reference": "swebench/sweb.eval.x86_64.sympy_1776_sympy-23824:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:678693d9a72aa779447ca2d9f0e85d4752e5b28e646edf083cd735aa6144f770\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:285c1306bddef950459d6002de5c21e7a448b46208bfba030a828830af997ae8\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:2a7c6c57b8bffd634f0e234b64e1bcdcb93e6d07e00ed8bf9d7a9eef6c7f1a20\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:285c1306bddef950459d6002de5c21e7a448b46208bfba030a828830af997ae8\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "sympy__sympy-13647",
+      "from_reference": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13647:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:dfa0b51faf18208c3b9fdb505eafc2db866fed25c158d211617d23606c3539fe\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:d27b2eed2f5d195f63c48acf32a64c562a0121d7ee28effd548702507b4ada8a\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:1a41d06a48f5c159e121556404a4452fb7544fac2f33c8e33d4a5ed65f53dc6e\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:d27b2eed2f5d195f63c48acf32a64c562a0121d7ee28effd548702507b4ada8a\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "sympy__sympy-24066",
+      "from_reference": "swebench/sweb.eval.x86_64.sympy_1776_sympy-24066:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:ec5b2dae801e4f826626498228a2579a6bf1600fc4b7bf9091670b5dca3343bf\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:1f27465fafb60413525ae17b82582723e697e37ec47ffd21621fb05cb51c20ac\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:51c1f56a6d5341393a35c9ed10d0057aac396ec66908b6004473daa3e2406142\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:1f27465fafb60413525ae17b82582723e697e37ec47ffd21621fb05cb51c20ac\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "sympy__sympy-12489",
+      "from_reference": "swebench/sweb.eval.x86_64.sympy_1776_sympy-12489:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:da745b29eda94f68cb55a6648fb5767ea6709c242d7cc1c93caee41256ca02c6\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:97d5e3120174bd85719c4e96148c9a1fefc3360f9c276fbea417f9167d0ee8f9\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:aa4022e4f70685e18dac0c8180999e7257818f48a3df7404e6057c4958ebc686\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:97d5e3120174bd85719c4e96148c9a1fefc3360f9c276fbea417f9167d0ee8f9\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-13496",
+      "from_reference": "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-13496:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:adee9f4911a853e64f9ae4ebd7b1bf32615cbf52c3210873e9a752fb5fb975e6\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:50a7f61f8c04f76a665865e6431306d64e741a9447fb9ee23edfac0fad72e00a\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:6c231f7a8b8f40c47f6a586ecccb4d18021ac2897d0118ea06d834d8cf11c8c0\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:50a7f61f8c04f76a665865e6431306d64e741a9447fb9ee23edfac0fad72e00a\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-12585",
+      "from_reference": "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-12585:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:88b5a356d2f5a8d8bec254dff955b1e89746f4c2b01ddf01d70bcc85bb1a3e85\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:cdd7ee1f8be0ad736dad1a201aedd1683f8535f9cc7a1aa489e992a71fcc81f8\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:fcdce5d43028bf1dd2535c45bb8e5cada4be1d76a47f0b60ed264e259e800ffc\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:cdd7ee1f8be0ad736dad1a201aedd1683f8535f9cc7a1aa489e992a71fcc81f8\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-13328",
+      "from_reference": "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-13328:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:4561ea7d239224b3ab1c7d645add8e86c0b435dd158c11c41ed4494d28d855e8\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:bf8c3425ac315ced20986def6adcd580ce4536ded6247d80f99d4c4352c85dab\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:78210308ed0886a61e0f3d38b2d56b54ace87693f108e63a2d573e93d4fa22e4\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:bf8c3425ac315ced20986def6adcd580ce4536ded6247d80f99d4c4352c85dab\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "scikit-learn__scikit-learn-14983",
+      "from_reference": "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-14983:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:96e1896b74d100457d8d82f3683ea4c6f807235755f89cc61862f0da7f5f5836\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:671ab629659e48085e86b54f3d83f6aba03b6183f3d569ff9c417c67dd64f343\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:842eed9490816c266f461a479240ea3c41772a027884ad9c5a1d3ea8d94c828b\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:671ab629659e48085e86b54f3d83f6aba03b6183f3d569ff9c417c67dd64f343\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "pytest-dev__pytest-6197",
+      "from_reference": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6197:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:5dbfbcf23210a5a0ccdc4dbf1a55c894255b28fe6c56c13c9a4724d6c13bab4e\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:15d39592171743355fdade433454d2dbd5cd7d7db21bdcf0e2f125edecabaf09\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:91eff0c9682ea5dac1f2cbbe2caa33db49ef3d591c85a21c4e0dd88e164d1722\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:15d39592171743355fdade433454d2dbd5cd7d7db21bdcf0e2f125edecabaf09\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "pytest-dev__pytest-7521",
+      "from_reference": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-7521:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:570a5872f1a0250ef52d735285f64dff43ce02ba79f7750e7c4dd9de9c7ebcb5\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:2fd3c0b4d923cd4eb81d39c3fe5adfb416753b09ce567a25896acb970cea3cfc\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:0b14eb41aa10b0175bd7a78a5754194c8abdcce1f02ec50e5ce7c83ddf0947d0\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:2fd3c0b4d923cd4eb81d39c3fe5adfb416753b09ce567a25896acb970cea3cfc\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "pytest-dev__pytest-6202",
+      "from_reference": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6202:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:d2d9f0bf1ed8a5f50799291be86144768c3f7ad9400482d6dab7f05830f3e226\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:46c4cba4147a424e386808760d3b96fb362388556b00e9257661ac294c52c62b\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:7c36e6e32f447d63f845c1c41a9f7f7b75716443d2a63d910f9da71a319c25ca\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:46c4cba4147a424e386808760d3b96fb362388556b00e9257661ac294c52c62b\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "pytest-dev__pytest-5840",
+      "from_reference": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-5840:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:21a4deef9114348ab02986927e057d6bc0caf46fceca06414493f91ce4c64283\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:f2e8a2039f31a889902cb311f03b58fb85c1840b51172d1e7ff30727eb3945d8\",\n      \"size\": 2199,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:7106770f66e3ebfae32baadad4d7fb64148b7740f628733f639fa3fbba0526b4\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:f2e8a2039f31a889902cb311f03b58fb85c1840b51172d1e7ff30727eb3945d8\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "pydata__xarray-7393",
+      "from_reference": "swebench/sweb.eval.x86_64.pydata_1776_xarray-7393:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:8d92f63564f3cfa7497bdc9fd4bacb5cfac11459f658621a00ebe3eb55832278\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:15d79e643a94b7fba2a8138cdc5daf011bc2d99f61a7ce30508689a90ab9042f\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:325b17d7645fb10eceeb1abe935bc8ab530214bbe38be5d16c418c8bae7fe228\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:15d79e643a94b7fba2a8138cdc5daf011bc2d99f61a7ce30508689a90ab9042f\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "pydata__xarray-2905",
+      "from_reference": "swebench/sweb.eval.x86_64.pydata_1776_xarray-2905:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:23c72d6ce177631efc8094bf28418e3a960d96ca23e8ad727a18c644de257e9f\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:1fb7fb411d115d06cf2f34fde3b6f8a33427f2d6f36e1ab8df3b1b977195bd61\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:1f325b5a4c6156d88f210a9fe362887dfea838b44150ea6fc0e441445b4979de\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:1fb7fb411d115d06cf2f34fde3b6f8a33427f2d6f36e1ab8df3b1b977195bd61\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "pydata__xarray-4075",
+      "from_reference": "swebench/sweb.eval.x86_64.pydata_1776_xarray-4075:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:3d56429d0a07d2b74c0342c12e19f4d7b1510023f87edb6a11cadbfd993de56d\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:64cba3e907a0c4fa08652422573abe19a43d12299e15ce08d8ff84a3a1f39a18\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:eef8732d14a5be6b2d612e59ec13350c57191bfddfd245829ff5faff496c907b\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:64cba3e907a0c4fa08652422573abe19a43d12299e15ce08d8ff84a3a1f39a18\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "pydata__xarray-4629",
+      "from_reference": "swebench/sweb.eval.x86_64.pydata_1776_xarray-4629:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:033589865b8522fd28ad477db28dccb4fcfcc3e56174bbc95e7996b2a948135b\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:583ef721ebfc24858c10704ad28fb935adef5f18f493d29751b68fb467c66994\",\n      \"size\": 2200,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:9ab085babcdd3384bba0634cd79f7ae7f9997c08f72699b67883c3ebccf2fe28\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:583ef721ebfc24858c10704ad28fb935adef5f18f493d29751b68fb467c66994\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "matplotlib__matplotlib-25122",
+      "from_reference": "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-25122:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:0fa06f48ba2c929c68f74e8bf02673e9f8cb007059d4455289feb18805aaca38\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:7dac4e6faa3be2af10d4cf48d8d53cd765191df5584a1f2b2ec139e7221ff742\",\n      \"size\": 2201,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:d8211e856af5ff6b55e2fbbc8498a373c93c0a240e867b2ac025567f33603f3c\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:7dac4e6faa3be2af10d4cf48d8d53cd765191df5584a1f2b2ec139e7221ff742\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "matplotlib__matplotlib-24627",
+      "from_reference": "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24627:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:476e2188798df71e5e904360d15fe2c6fe23c7f215eb3dafd3001688cbc40adc\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:526b4c5c1b786ecf4dbfecb7c3ef847a0749d2de721932871abb46d8ca3dd6d8\",\n      \"size\": 2201,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:989c43620136075f5b39320dfcab947211659f12b83d28d5143211c05d5fc46e\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:526b4c5c1b786ecf4dbfecb7c3ef847a0749d2de721932871abb46d8ca3dd6d8\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "matplotlib__matplotlib-24026",
+      "from_reference": "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-24026:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:17553d6f09cbc0b9e5b3d7a8c527f609caced536a09056d72d97917eb5f877eb\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:8fa7a329667ea2b146fdf2ab5746bd2a7d831e1eb4094bb2c56f7163e7cd304a\",\n      \"size\": 2201,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:960f1d84b86f63fc9efd8a96e0f8fbb34ad1b5b6d26b5bdc4d1df794c8806b9f\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:8fa7a329667ea2b146fdf2ab5746bd2a7d831e1eb4094bb2c56f7163e7cd304a\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    },
+    {
+      "task_id": "matplotlib__matplotlib-25332",
+      "from_reference": "swebench/sweb.eval.x86_64.matplotlib_1776_matplotlib-25332:latest",
+      "native_exit": 0,
+      "stdout": "{\n  \"schemaVersion\": 2,\n  \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n  \"digest\": \"sha256:e730789910800c84441072e81399d623440a0b03838867d203e54a5f65058cb3\",\n  \"size\": 856,\n  \"manifests\": [\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:8fe08c1a8888990862bbdb9a9ad38c740e0910f08bca0b6cecb87f0bdb012dbc\",\n      \"size\": 2201,\n      \"platform\": {\n        \"architecture\": \"amd64\",\n        \"os\": \"linux\"\n      }\n    },\n    {\n      \"mediaType\": \"application/vnd.oci.image.manifest.v1+json\",\n      \"digest\": \"sha256:b5c913c54a6df1461a2c177dcdf3892a08f0a3341a72a5baa1efc2b3e34d3aad\",\n      \"size\": 564,\n      \"annotations\": {\n        \"vnd.docker.reference.digest\": \"sha256:8fe08c1a8888990862bbdb9a9ad38c740e0910f08bca0b6cecb87f0bdb012dbc\",\n        \"vnd.docker.reference.type\": \"attestation-manifest\"\n      },\n      \"platform\": {\n        \"architecture\": \"unknown\",\n        \"os\": \"unknown\"\n      }\n    }\n  ]\n}"
+    }
+  ],
+  "capture_correction": "An initial orchestration guard incorrectly treated the tool's approximate original_token_count field as truncation. All24 exits were0; retained outputs parse as complete manifest JSON. The same captures were reused without repeating registry requests.",
+  "limits": [
+    "Registry metadata only; no Docker image pull, build, runtime task or model execution.",
+    "Image source tags are mutable; these observations do not freeze the study or prove builder digest enforcement.",
+    "The actual future execution-host platform, image identity and unchanged-task build must be observed separately."
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "codex_sdk_stock_locator_column_origin_amendment",
+  "source_head": "eae4c151839dc30a7b5fec7550ee7643296de294",
+  "status": "EXECUTED; independent ACCEPT of bounded metadata position primitive; positive SDK tests HOLD",
+  "prior_failure": "codex-sdk-position-pilot-sdk-script-failure.json",
+  "all_four_failures_retained": true,
+  "correction": {
+    "defect": "The locator requested line0,column0 although the frozen Jest transform supplies first-line columnOffset82. V8 strict source-offset conversion rejects the resulting negative column for the expected transformed script.",
+    "only_stock_input_change": "resolve_each_sdk_file columnNumber uses files[activeFileId].column_offset_requested82 instead of0.",
+    "unchanged": "Four filesystem/CDP URL identities, source/code/map hashes, all anchors and map roundtrips, adapter selector/condition, remaining11stock inputs, protected104argument prefix, (?!) zero selection/original5000ms, TTY and GNU180/+10 supervision.",
+    "no_blanket_map_column_subtraction": true,
+    "limitations": "This repairs a source-proven locator defect. It does not reconstruct the fourth unretained locations, actual SDK URL/script ID or import state. sdk_script_unresolved can mean no locations or differing script IDs."
+  },
+  "private_operational_freeze": {
+    "relative_path": "work/native-sdk-position-columnorigin-owned-20261003/operational-recipe.json",
+    "bytes": 37528,
+    "sha256": "0271eb85b38ab484d67789bc70e1eb53817ce673f8b9a6b7c4159d3371eed106",
+    "parent": {
+      "relative_path": "work/native-sdk-position-fileurl-v2-owned-20261003/operational-recipe.json",
+      "bytes": 36534,
+      "sha256": "06a6e8fcb75e34818e8353ec7233f57384c8150ec4534377d7a8015590062141"
+    },
+    "root_checks": {
+      "only_changed_stock_input_stage": 5,
+      "targets_exact": true,
+      "output_normalized_argv_equal": true,
+      "all_six_owned_outputs_fresh": true,
+      "positive_callbacks_selected": 0,
+      "original_fixture_timeout_ms": 5000
+    }
+  },
+  "root_primary_reads": [
+    {
+      "repository": "jestjs/jest",
+      "pin": "4e56991693da7cd4c3730dc3579a1dd1403ee630",
+      "file": "packages/jest-runtime/src/index.ts",
+      "native_exit": 0,
+      "bytes": 79668,
+      "sha256": "95813539b997c94729612a6a57a219c0cfcab74849ccb65204ed8f071e06a440",
+      "expected_match": true,
+      "stderr_bytes": 0
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "src/node_contextify.cc",
+      "native_exit": 0,
+      "bytes": 72206,
+      "sha256": "839b0f41cb8cacd8b000ad17f34bf4a95745c38fbcc11ffccaf1d6b4211d6476",
+      "expected_match": true,
+      "stderr_bytes": 0
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "deps/v8/src/debug/debug-interface.h",
+      "native_exit": 0,
+      "bytes": 22921,
+      "sha256": "4a26adfd50beece22ab405340d802d8c873ee14775c70cd8961dec566465e569",
+      "expected_match": true,
+      "stderr_bytes": 0
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "deps/v8/src/debug/debug-interface.cc",
+      "native_exit": 0,
+      "bytes": 56968,
+      "sha256": "f745b3c0ae71d0900b3c2d0bb8c28f4b323f68e4c22ec0a9b2fb8dceaed9d741",
+      "expected_match": true,
+      "stderr_bytes": 0
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "deps/v8/src/inspector/v8-debugger-agent-impl.cc",
+      "native_exit": 0,
+      "bytes": 96579,
+      "sha256": "3146c84ba00f4ccf073fb8dc6dc3436dd2c453ab5f08d947741466a6d2cc854b",
+      "expected_match": true,
+      "stderr_bytes": 0
+    }
+  ],
+  "review": {
+    "trigger": "Fourth source-position pilot stopped after the bounded source/selector repair; exact consequential source adjudication.",
+    "astra_source_verdict": "REJECT reuse of line0,column0; no fifth admitted by source diagnosis alone.",
+    "exact_new_recipe_read": "SOURCE-ACCEPT for exactly one offline metadata-only pilot: 37528 bytes / SHA256 0271eb85b38ab484d67789bc70e1eb53817ce673f8b9a6b7c4159d3371eed106; four source/map/code identities, protected prefix, output ownership and unchanged stop/cleanup gates verified; positive SDK tests and provider/model execution HOLD.",
+    "actual_delivered_model": null,
+    "provider_usage": null
+  },
+  "fifth_execution_started": true,
+  "actual_sdk_positions": {
+    "four_actual_script_identities": 4,
+    "eight_original_anchor_roundtrips": 8,
+    "eight_resolved_false_condition_breakpoints": 8,
+    "independent_result_read": "ACCEPT bounded position primitive only; native observation receipt retains scope and remaining holds",
+    "receipt": "codex-sdk-position-column-origin-native-observation.json"
+  },
+  "positive_sdk_tests": null,
+  "provider_usage": null,
+  "quality_result": null,
+  "token_savings": null
+}

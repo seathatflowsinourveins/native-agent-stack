@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "native_guard_failure_retained_scoped_metadata_repair",
+  "failed_push_head": "978a74db1f96c6a08b8ef1f09145741af4f801f7",
+  "native_push_exit": 1,
+  "native_guard_tests": {"run": 3, "passed": 2, "failed": 1},
+  "failed_test": "tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified",
+  "returned_assertion": "AssertionError: Lists differ: ['Unenforced proposed envelope, not measur[77 chars]pos'] != []",
+  "returned_failure_summary": "Ran 3 tests in 0.201s\nFAILED (failures=1)",
+  "finding": "The descriptive proposed-enforcement paragraph was placed under the classifier's reserved disposition key",
+  "diagnosis_source": {"repository": "seathatflowsinourveins/native-agent-stack", "ref": "978a74db1f96c6a08b8ef1f09145741af4f801f7", "file": "tests/test_blind_checkout.py", "lines": "347-369"},
+  "repair": {"file": "blueprints/runtime-workers/comparisons/coding-worker-draft.json", "path": "proposed_execution.token_and_tool_bounds", "old_key": "disposition", "new_key": "enforcement_note", "value_changed": false, "meaning": "Prospective enforcement readiness note, not a selected decision or a trial outcome"},
+  "native_rerun": {"command": "rtk python3 -m unittest tests.test_blind_checkout.RepositoryClassificationTests tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered", "exit": 0, "returned_output": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.593s\n\nOK\n", "classification": "Repository integration, not upstream runtime acceptance"},
+  "limits": ["All tasks, ordering, arms, runtime pins and limits remain unchanged", "No classifier, scanner, hook or allowlist change", "Native guard rerun and publication remain separate observations"],
+  "provider_calls": 0,
+  "selected_defaults": 0
+}

@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "artifact_type": "root_source_review_and_local_integration_followup",
+  "scope": "Source-review and local integration evidence only; no provider turns, frozen comparison or new default",
+  "source_amendment_after_160e": {
+    "reviewed_head": "160e4f8439250bafd3f43a5b9cca308cf7a1a8ee",
+    "reviewed_parent": "cdbf1872b87bcbaa15bc3f14d157d9a61765ca7b",
+    "original_comment_reads_native_exit": 0,
+    "reads": [
+      {"family": "Claude", "head": "cdbf1872b87bcbaa15bc3f14d157d9a61765ca7b", "comment_id": 5969035814, "body_bytes": 4460, "body_sha256": "569969a09e066f33d1bcaa4819021ce2f43fd25ecac6a0f23753325c0e6f1e59", "verdict": "FINDINGS"},
+      {"family": "Codex", "head": "cdbf1872b87bcbaa15bc3f14d157d9a61765ca7b", "comment_id": 5969323198, "body_bytes": 3936, "body_sha256": "8b915521198d7c86e4d28607478ec3f2a9522ab15d36c026bb1e4bdab451cba1", "verdict": "Additional bounded source findings"},
+      {"family": "Codex", "head": "160e4f8439250bafd3f43a5b9cca308cf7a1a8ee", "comment_id": 5969525659, "body_bytes": 5054, "body_sha256": "9751075f3d50da59d8a25b8460e6a8239cf5d43d9c07a24e8ff13154663895af", "verdict": "SOURCE ACCEPT for three named repairs, two source-record notes"},
+      {"family": "Claude", "head": "160e4f8439250bafd3f43a5b9cca308cf7a1a8ee", "comment_id": 5969563898, "body_bytes": 4164, "body_sha256": "9dbfd4224ea041b8a65b8c0f75d9ea5f3e27488e8265cd9f406090c4722981ca", "verdict": "ACCEPT WITH NOTES; runtime/counter/freeze HOLD"},
+      {"family": "Codex", "head": "160e4f8439250bafd3f43a5b9cca308cf7a1a8ee", "comment_id": 5969740764, "body_bytes": 2316, "body_sha256": "da063c76001e7b0a647369e26b87488d791e531cf4c773fd6fc1c9e4de5b1cbd", "verdict": "Worker public-history lookup unresolved; no ancestry assertion established"}
+    ],
+    "hash_scope": "Earlier receipt digests and original-output observations in this document bind the then-read immutable public or worker snapshots. Subsequent source-record clarifications have current hashes in manifests/evidence.json; they do not replace or rerun those originals.",
+    "clarifications": [
+      "Metric labels explicitly exclude cache reads only; original G/R/O and exhaustive attempts remain required.",
+      "Grader dependency-repair scope, prospective SDK alias, retained historical worker provenance and immutable Go source pin are clarified.",
+      "N3 per-job complete-cache subset wording remains open before freeze; missing writes alone do not block the metric.",
+      "Freshness JSON syntax step now uses !cancelled(); Bash still stops at the first malformed JSON. This is coverage strengthening, not a finding of false-green parsing.",
+      "Component source descriptions still expose family/qualification status. They are not evidence of blind execution acceptance."
+    ],
+    "native_coding_image_controls": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-native-controls.json",
+    "native_coding_image_controls_scope": "Three unchanged upstream Harbor unit cases passed; runtime source provenance checked separately. No image build/pull, provider/model, candidate task or freeze acceptance.",
+    "workflow_check": {"actionlint_repository": "kjanat/actionlint", "actionlint_pin": "08bb2c4f0d039744455b87aef1c647fb8b66d37b", "actionlint_version": "1.17.0", "native_version_exit": 0, "native_changed_workflow_exit": 0, "zizmor_version": "1.30.1", "zizmor_offline_exit": 0, "zizmor_suppressed_findings": 2, "hosted_run_at_new_head": null},
+    "hosted_ci_read_at_160e": {"observed_at_utc": "2026-10-03T13:48:46Z", "native_exit": 0, "success": 19, "queued": 3, "skipped": 3, "failed": 0, "required_checks_complete": false},
+    "source_reads_for_this_amendment": "pending; prior verdicts do not accept the new delta",
+    "sdk_positions_consequential_read": {
+      "trigger": "SDK positive fixture failure remained unresolved after one bounded Sol repair; actual positions and cleanup are consequential qualification boundaries",
+      "requested_review_model": "gpt-6-astra",
+      "requested_effort": "max",
+      "verdict": "REJECT executable recipe until finite native deadline, grace and independent owned-process cleanup are bound; source-supported position-only REPL design",
+      "retained_compact_judgment": {"artifact_name": "CODEX-SDK-POSITIONS-ASTRA-READ-20261003.md", "bytes": 3093, "sha256": "fc246f6e1ec8df7a94c784056a1b0c54e2c9426f2bed8cc94f7219a0b54051c9", "scope": "Compact private judgment record, not a verbatim transport, OmniRoute delivery witness or usage receipt"},
+      "root_primary_rereads": [
+        {"repository": "nodejs/node", "pin": "955266bfdd854cd280dffd47548673914484e4c0", "file": "lib/internal/debugger/inspect.js", "http_status": 200, "bytes": 9875, "sha256": "ec378a59d544640d9e649d33127019ed1e51173c129459358b4cbb90f920e3e9"},
+        {"repository": "nodejs/node", "pin": "955266bfdd854cd280dffd47548673914484e4c0", "file": "deps/v8/include/js_protocol.pdl", "http_status": 200, "bytes": 70146, "sha256": "9541b1454d1c352ef852dc0b6321569438271731068c803f980afb65def58982"},
+        {"repository": "jestjs/jest", "pin": "4e56991693da7cd4c3730dc3579a1dd1403ee630", "file": "packages/jest-circus/src/legacy-code-todo-rewrite/jestAdapter.ts", "http_status": 200, "bytes": 4000, "sha256": "84221c57d5cdf36ddb2ab371eeacc916f9c94f254fa847453d2430be29dbef1b"},
+        {"repository": "jridgewell/sourcemaps", "pin": "74fc8e11d30641b82e3ca3532cd89477671afeab", "file": "packages/trace-mapping/src/trace-mapping.ts", "http_status": 200, "bytes": 15414, "sha256": "f37d9db53896dd9adb199cb75b79ab33c8c588b5a25793b714e20dad2f77187b"}
+      ],
+      "boundaries": ["ScriptId and BreakpointId are strings; coordinates are integers", "Real pending breakpoint resolution and paused frame required; no sb fabricated fallback", "Maps are candidate coordinates until actual script/hash and pausable locations agree", "REPL exit0 is not target completion, cleanup or positive SDK acceptance"],
+      "position_pilot_executed": false,
+      "positive_5000ms_fixture": "HOLD",
+      "gateway_provider_operation": false,
+      "delivered_review_model_or_effort_attested": false,
+      "study_usage": null
+    },
+    "comparative_provider_attempts": 0,
+    "measured_defaults": 0,
+    "freeze": false
+  },
+  "prior_public_head": "65a0d370ed8c075d922ff60857287e33d3a14788",
+  "claude_read": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/633#issuecomment-5968001264",
+    "created_at_utc": "2026-10-03T09:58:15Z",
+    "body_sha256": "8dff42b2b51a0472af6d9cd58ed663931f33ccf7857aa9ede92378fbc4645ce8",
+    "verdict": "ACCEPT WITH NOTES",
+    "scope": "Complete source-packet delta review at the named public head; no native comparative execution acceptance",
+    "followup": [
+      "Catalog incumbent parent renamed to current_choice, already stripped by the unchanged native blind-checkout helper; some component labels clarified. Source descriptions still expose family/qualification status; this is not blind execution acceptance",
+      "Standing Inspect0.3.273 receipt added;0.3.276 update-candidate receipt bound separately",
+      "Explicit native CodexUltra/V2 Harbor carrier qualification added before freeze"
+    ],
+    "unresolved_execution_gaps": [
+      "Authoritative complete uncached-input-plus-output accounting and matched cache condition",
+      "All frozen original task budgets and built runtime/network identities",
+      "Actual freshness-workflow duration after merge",
+      "Runtime, delivered model/effort, limits, lifecycle and comparative task qualification"
+    ]
+  },
+  "blind_strip_control": {
+    "source_file": "tools/sota-convergence/blind_checkout.py",
+    "source_sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
+    "function": "strip_catalog_unconditional",
+    "original_blob": "7403a105e6ac4362df9129a7ba6fa7e5cc9e0885:catalogs/foundation/runtime-jobs.json",
+    "native_blob_read_exit": 0,
+    "old_selection_in_use_fields": 8,
+    "before_current_choice_fields": 8,
+    "after_current_choice_fields": 0,
+    "stripped_fields_count": 8,
+    "result": "passed",
+    "scope": "Unchanged repository helper executed in memory; no exported blind checkout or upstream runtime acceptance"
+  },
+  "owner_allocation": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5968010839",
+    "created_at_utc": "2026-10-03T09:59:10Z",
+    "start_utc": "2026-10-03T13:00:00Z",
+    "end_utc": "2026-10-03T19:00:00Z",
+    "gateway": "NativeStack21128",
+    "study_admission": "pending",
+    "terms": [
+      "Pool membership frozen13:00-19:00; sign-ins before13:00 or after19:00 unless an explicit coordination change is accepted",
+      "Owner captures value-free provider-limit snapshots12:58 and19:02; native Responses request attribution uses time because the correlation header is ignored",
+      "Whole coding block admitted only when actual setup, grading, cleanup and recovery bounds fit the remaining window",
+      "Actual study-pool exclusivity requires a native receipt; tagged traffic alone is not isolation"
+    ],
+    "coding_serial_budget_minutes_before_overhead": 195,
+    "historical_180_minute_window": "Insufficient for one full three-arm block; retained in the earlier dated receipt",
+    "isolation_followup": {
+      "owner_reply": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5968345811",
+      "root_allocation_ack": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5968494765",
+      "native_comment_reads_exit_code": 0,
+      "composition": "One study connection; account sharing with workstation is an inference from quota/reset observations",
+      "selected_proposal": "Owner temporarily excludes inferred shared study connection from workstation rotation13:00-19:00; restore after final snapshot",
+      "acceptance": "Native control/source binding, eligible membership digests and drained traffic receipt pending; no model admission"
+    }
+  },
+  "new_processing_failures_retained": [
+    "Two guessed draft Markdown paths were not found; actual comparison JSON paths recovered",
+    "Pre-print guards rejected oversized path or selected-source output without displaying it; narrowed reads recovered",
+    "An exact source-line pattern omitted native JSON spacing and raised StopIteration; spacing-aware recovery preserved formatting",
+    "A context-free registry insertion appended rows after the document; native validator1 reported invalid JSON. Repair derived from the valid committed registry with contextual patches; no evidence rows intentionally removed",
+    "Two review links initially used an unverified GitHub owner; native gh repo view0 established seathatflowsinourveins/native-agent-stack and both links were corrected",
+    "The same context-free insertion appended the coding draft carrier requirement after its JSON document. The registry validator0 establishes integrity/scope only and did not catch this syntax error; direct JSON parsing caught it before freeze. Contextual repair and explicit parsing of all changed JSON files are required before the next publication",
+    "Coordinator host alias NativeRuntimeLab was unverified; native WSL list0 established RuntimeLab2604. Native executable lookup1 found no default-PATH Harbor; targeted executable discovery1 found the owned Harbor prefix with unrelated Docker overlay permission errors. Native source/version/help recovery is independent of those locator failures",
+    "Root post-resume processing guards rejected oversized comment/owner-record selections and one aggregate patch had no returned patch marker; recovered with bounded metadata, three original comments and separate contextual patches. Scoped ai-memory rejected an absolute project identifier; omitted it, checked relevance and retried without pin priority. None was a runtime failure"
+  ],
+  "explicit_json_syntax_followup": {
+    "inventory_base": "65a0d370ed8c075d922ff60857287e33d3a14788",
+    "native_inventory_exit": 0,
+    "changed_json_files_parsed": 13,
+    "syntax_failures_after_repair": [],
+    "coding_carrier_requirement_in_native_array": true,
+    "scope": "Standard-library JSON parsing of every changed JSON document; distinct from registry integrity and upstream runtime acceptance",
+    "native_cli_regression_control": {
+      "installed_python": "3.13.15",
+      "help_exit": 0,
+      "source_url": "https://github.com/python/cpython/blob/v3.13.15/Lib/json/tool.py",
+      "source_read_exit": 0,
+      "source_sha256": "64c02770e63ca360df426d28b003c087da34f1dc3fdb56e8ebc8710aff8cea91",
+      "original_broken_head": "d8ee66b72b076ab910f05342eeb0c824cf0a8695",
+      "original_broken_file_sha256": "032cbd2f6b4aea81f19912ca5292ef724b8e6c211a13cb0ecc714ea63ce2236d",
+      "original_blob_read_exit": 0,
+      "broken_native_parser_exit": 1,
+      "broken_native_parser_stderr": "Extra data: line 290 column 5 (char 19363)",
+      "corrected_native_parser_exit": 0,
+      "all_catalog_comparison_cli_documents": 12,
+      "all_catalog_comparison_cli_failures": [],
+      "corrected_cli_stdout_stderr_empty": true,
+      "workflow": ".github/workflows/runtime-worker-skills-freshness.yml",
+      "actionlint_initial_caller_exit": 127,
+      "actionlint_initial_caller_output": "[rtk: No such file or directory (os error 2)]",
+      "actionlint_recovery_source": "kjanat/actionlint@v1.17.0",
+      "actionlint_recovered_version_exit": 0,
+      "actionlint_recovered_workflow_exit": 0,
+      "zizmor_version": "1.30.1",
+      "zizmor_workflow_exit": 0,
+      "zizmor_actual_output": "No findings to report. Good job! (2 suppressed)",
+      "scope": "Actual native parser and workflow syntax/security checks. Broken document is our integration regression; none is upstream SDK acceptance"
+    },
+    "hosted_old_failure": {
+      "run": 37116666241,
+      "head": "d8ee66b72b076ab910f05342eeb0c824cf0a8695",
+      "native_run_read_exit_code": 0,
+      "conclusion": "failure",
+      "failed_step": "Validate declared convergence evidence and scope"
+    }
+  },
+  "astra_sdk_judgment": {
+    "role": "Astra/max",
+    "trigger": "Positive native SDK fixture still failed after one bounded Sol repair",
+    "acceptance_result": "HOLD repair and positive-fixture/native-role acceptance",
+    "root_observation": {
+      "probe_sha256": "c6cd86a938b087a6b9c5f452bc5867d7c42ab2a70f9dfe0267c729766cb859f0",
+      "jest_sha256": "9bcdab7d81bd96d861c30403c5aa3f57f6559161628dad038dcabd841de2ab48",
+      "hit_records": 16,
+      "hit_probes": 7,
+      "terminal_code": "probe_target_exit",
+      "target_exit": 1,
+      "pending_probes": 0,
+      "jest_duration_ms": 5009,
+      "passing_asserts": 0
+    },
+    "source_correction": "Pinned SDK exec.ts buffers stderr, iterates readline then awaits child exit; no stderrDone or child-close await. Thread.run records turn.completed usage and continues consuming the generator before return",
+    "root_original_source_reads": [
+      {
+        "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/src/exec.ts",
+        "native_exit": 0,
+        "sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79"
+      },
+      {
+        "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/src/thread.ts",
+        "native_exit": 0,
+        "sha256": "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c"
+      }
+    ],
+    "remaining_observation": "Verified executable bindings and common-clock test/deadline timeline, stdout EOF/readline closure, SDK generator/run return, assertions and proxy cleanup. Instrumentation overhead stays explicit; original timeout/source/namespace preserved",
+    "cause": null,
+    "provider_usage": null
+  },
+  "coding_task_original_root_reads": {
+    "source_pin": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+    "receipt": "coding-task-source-identities.json",
+    "receipt_sha256": "22fa8d867f17db85aa2e92f871024dc47ec255c2f75b529cfc4f83085b3cfe6f",
+    "original_source_reads": 48,
+    "native_exit_zero": 48,
+    "source_hashes_match": 48,
+    "tasks": 24,
+    "agent_seconds": 3000,
+    "verifier_seconds": 3000,
+    "build_seconds": 1800,
+    "environment": "CPU1/memory4G/storage10G",
+    "dockerfiles_with_latest_from": 24,
+    "actual_build_or_task_execution": false,
+    "scope": "Independent pinned original task.toml/Dockerfile reads; mutable source tags are not frozen platform or built-image identities"
+  },
+  "astra_counter_source_judgment": {
+    "role": "Astra/max",
+    "trigger": "Upstream quota counter scope differs from declared study metric; unresolved provenance",
+    "acceptance_result": "ACCEPT source contract conditionally; HOLD actual counter qualification and freeze",
+    "metric": "Sum reported gross input minus reported cached read plus reported output per distinct provider attempt; output includes reasoning",
+    "required": "Original reported finite nonnegative operands,0<=read<=gross, complete attempt/role coverage and matched cache conditions",
+    "unknown_write": "Preserved null; optional for this narrow metric, no complete-cache or monetary-cost claim",
+    "correction": "Both pinned official OpenAI schemas define cache_write_tokens. Missing normalized writes do not prove provider omission; OmniRoute stream selector recognizes nested input_tokens_details.cache_write_tokens while this nonstream Responses branch omits that spelling",
+    "root_official_original_reads": [
+      {
+        "url": "https://github.com/openai/openai-python/blob/03b3ec474241fe3a73c4818dc6b886da28faaf91/src/openai/types/responses/response_usage.py",
+        "native_exit": 0,
+        "sha256": "10254bc2ea19f6fa9fc701dcc187a9991e8888b2613f37577570f581c1d0e998"
+      },
+      {
+        "url": "https://github.com/openai/openai-python/blob/03b3ec474241fe3a73c4818dc6b886da28faaf91/src/openai/types/completion_usage.py",
+        "native_exit": 0,
+        "sha256": "324038531e00674dcda7d234f0105815690622a0dfef10036fa87f91786c9d9e"
+      }
+    ],
+    "prospective_amendment": "Required cache-read and optional cache-write distinguished; duplicate observations distinguished from distinct retries; both-family read pending",
+    "hosted_counter_semantics": null,
+    "feature_enablement": false,
+    "root_streaming_write_source_read": {
+      "source": "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/utils/pickCacheCreationTokens.ts#L29",
+      "sha256": "83d52811615fda1daf8f36e5f95ad6a4b159a37bc68900e084acc0a75a134802",
+      "native_read_exit_code": 0,
+      "finding": "Streaming selector recognizes nested cache_write_tokens; nonstreaming Responses branch differs. Missing normalized writes do not prove original omission; deployment path unqualified"
+    }
+  },
+  "measured_defaults": 0,
+  "jobs_total": 8,
+  "default_or_freeze_qualification": false,
+  "provider_usage": null,
+  "root_latest_source_read": {
+    "pr": 633,
+    "head": "1695dc686aa28299c184982b316591de2f65514d",
+    "declared_base": "d2777ee76a6ca14e020856fcd76421ceebc1e4f0",
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/633#issuecomment-5968524449",
+    "body_sha256": "1e763e689509c7ec0124b6b74692dd32c663c5703e77bd6b14f9e0d721a318a5",
+    "native_read_exit_code": 0,
+    "verdict": "ACCEPT source publication/readiness delta only; not this subsequent amendment, a freeze, native role or default acceptance",
+    "reviewer_family": "Codex"
+  },
+  "org_extension_inventory_correction": {
+    "correction": "Selected openai/skills pin is historical: its README explicitly deprecates the repository and directs current Codex skill/plugin examples to openai/plugins. Catalog activation wording now preserves that distinction; existing skills manifest untouched",
+    "root_original_reads": [
+      {
+        "source": "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/README.md",
+        "exit_code": 0,
+        "bytes": 1840,
+        "sha256": "0f6a07580f3c627253e15a58dd0439e135049ec38eb16cf3587f7e50abc6f590"
+      },
+      {
+        "source": "https://github.com/openai/plugins/blob/5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f/README.md",
+        "exit_code": 0,
+        "bytes": 1283,
+        "sha256": "b3681ebd15797bdee1d638c6520c7ba10a36e676760ea5c251530f53f843c852"
+      }
+    ],
+    "native_plugin_loader_and_selected_asset_activation": "pending; source inventory is not installation or measured enhancement"
+  },
+  "harbor_codex_carrier_root_followup": {
+    "receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-codex-native-carrier-readiness.json",
+    "receipt_sha256": "e7dbd9ee243123f7d7e509260fe56150c2a005470f43d29624d939447255a4b0",
+    "worker_commit": "2674035d1b847c02b39bde1d280d54f2502f9da4",
+    "commit_scope": "Historical worker provenance only; published receipt hash and native artifact custody bind the evidence. No claim that this worker commit is PR633 ancestry or publicly reachable",
+    "root_original_source_reads": 28,
+    "root_native_source_read_exit_codes": {
+      "0": 28
+    },
+    "root_original_source_hash_matches": 28,
+    "root_private_native_artifact_read_exit_code": 0,
+    "matched_original_outputs": {
+      "network_unit_stdout": "84288acd42cc6a81fce972defeb9d16802ee4de5b35b4c9fe65175ee7179209d",
+      "harbor_codex_schema_stdout": "545d0dcf2f13ffa72f53a41fb367b6338920866f69aa454cc6df2538ab6c1669",
+      "codex_version_stdout": "f6464b8cc67af75deb2589fe1dbcde152fc15ffb76a91de1cf0686b4623afb1e"
+    },
+    "selected_source_and_lock_snapshots": "Six entries exactly equal before/after; root independently read native retained snapshots",
+    "native_control_limit": "Four unchanged mocked planner/Compose/kernel selection tests passed; no real egress or model. Recorded native outputs were read, not rerun",
+    "ultra_source_carrier": "Use native inline model_reasoning_effort=ultra, not Harbor reasoning_effort kwargs whose schema stops at max. Child model/effort needs explicit role binding; runtime delivery pending",
+    "default_or_freeze_acceptance": false
+  },
+  "gateway_running_source_followup": {
+    "owner_record_sha256": "a7a6474cf6edc5927cb3d500d93dc74dc40ffdfa53961efe0ba6090683d1cde0",
+    "owner_record_bytes": 11681,
+    "root_record_read": "Original sanitized source record reread; installed BUILD_SHA720e881a4/30 blob matches remain owner attestation",
+    "primary_repository": "diegosouzapw/OmniRoute",
+    "primary_pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+    "root_original_native_source_reads": 12,
+    "root_original_distinct_files": 10,
+    "root_original_native_exit_codes": {
+      "0": 12
+    },
+    "original_source_sha256": [
+      {
+        "file": "open-sse/utils/usageTracking.ts",
+        "sha256": "4e83b8aa5975dcb0b3a0f78183aa90e5dbe0f2337f46223299832b2d7dcf44a8"
+      },
+      {
+        "file": "src/lib/usage/callContentProvenance.ts",
+        "sha256": "39d61505d0e136cbc8d2cd804c58f3f4574e93256525841d75439c0fb811f31d"
+      },
+      {
+        "file": "open-sse/utils/pickCacheCreationTokens.ts",
+        "sha256": "83d52811615fda1daf8f36e5f95ad6a4b159a37bc68900e084acc0a75a134802"
+      },
+      {
+        "file": "open-sse/handlers/chatCore/nonStreamingProviderLeg.ts",
+        "sha256": "39a7e2502e19e25d0e6f2ea3b2ab2e8a956eb7e3f84381786769ac137eb16bc2"
+      },
+      {
+        "file": "open-sse/handlers/usageExtractor.ts",
+        "sha256": "68216996f54ff908bdb4b0998b27539a30e1db0442550b33f4258a87dc722be9"
+      },
+      {
+        "file": "open-sse/utils/stream.ts",
+        "sha256": "d2ad762d03b7c13eaff6630c8daaca16f31a254ee0fd05a576cd988b71ee83d5"
+      },
+      {
+        "file": "open-sse/utils/streamFailureFinalization.ts",
+        "sha256": "8b608090e842407e3762fa8e5c6e20da8efd7667112384de61140f716894dc80"
+      },
+      {
+        "file": "src/lib/usage/callLogs.ts",
+        "sha256": "7eb258920170be946e3045a519418c72d143277516df47008ee28c8d1e229c27"
+      },
+      {
+        "file": "open-sse/handlers/chatCore/attemptLogging.ts",
+        "sha256": "92d9c6c8eb432562f84bc0e6ce5acbb0dc9d5d94143550b6b8fb2b0d8436bdbf"
+      },
+      {
+        "file": "open-sse/handlers/chatCore/semanticCache.ts",
+        "sha256": "32d19e9e2870d22c4a3ca6b5086a6316f3a12ead8753ac6043b1710ea228c899"
+      }
+    ],
+    "corrections": [
+      "cacheWrite=0 is not an unambiguous rewrite marker: the picker preserves an actual provider zero too",
+      "Nonstream cache writes are not always null: sanitation injects top-level zero that the extractor reads; with plausible usage nested cache_write_tokens is omitted"
+    ],
+    "finding": "Sanitation can replace input/cache counters before downstream forwarding while positive usage remains classified reported. Streaming extractor accepts completed/done, not incomplete; absent terminal usage may be estimated. Failure logging null usage becomes default zeros. Semantic replay explicitly has no upstream call",
+    "metric_judgment": "Gross-minus-original-read plus reasoning-inclusive output remains conditional; call-log summaries alone do not establish original operands or complete attempts",
+    "actual_counter_and_freeze_acceptance": false,
+    "astra_judgment": {
+      "role": "Astra/max",
+      "trigger": "Conflicting primary evidence in owner zero-write marker and nonstream missingness claims",
+      "verdict": "ACCEPT source corrections and prospective contract clarification; HOLD actual counter qualification and freeze",
+      "observed_receipt_sha256": "6b73dff909080ac1744590694a2c11b4b7e45f30e234dbae319c6f00422f1b6d",
+      "original_base_hash_matches": 10,
+      "minimum_binding": [
+        "Supported native usage boundary before sanitation or per-attempt original-operand preservation, bound to loaded build/executed transport",
+        "Original field presence/type/finite/nonnegative predicates and read<=gross; missing remains unknown",
+        "Complete native starts/terminal/retry/helper/grader/failed/incomplete attempt coverage; duplicate observations counted once",
+        "Only value-free predicates/opaque bindings returned; no raw provider logs, prompts, content, headers or credentials"
+      ],
+      "supported_end_to_end_carrier_for_deployed_profile": "Not established by current packet; no new shim or workaround accepted",
+      "sdk_judgment": "HOLD unchanged",
+      "native_role_or_model_execution": false
+    }
+  },
+  "publication_hook_failure_retained": {
+    "normal_commit_exit_code": 1,
+    "installed_gitleaks_version": "8.30.1",
+    "native_version_and_help_exit_code": 0,
+    "native_upstream_release_read_exit_code": 0,
+    "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+    "native_redacted_scan_exit_code": 1,
+    "redacted_stdout_bytes": 718,
+    "redacted_stdout_sha256": "f086f0222eca155840d57d066959b31eaf2416b989c334a571c86a590859aa75",
+    "finding": {
+      "rule": "generic-api-key",
+      "file": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-followup-20261003.json",
+      "historical_line": 255
+    },
+    "correction": "Source filename pickCacheCreationTokens.ts used as a JSON key next to its independently verified upstream SHA256 triggered generic-api-key. Render the same bindings as ordinary file/sha256 records; no value, hook, scanner rule or acceptance policy changed",
+    "normal_hook_after_correction": "Unchanged native pre-commit script returned0: no leaks found. Final normal commit return is separate"
+  },
+  "native_egress_root_original_read": {
+    "receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-native-egress-runtime-readiness.json",
+    "worker_commit": "2c4af4462b98393590163bf5acf72f114f6d040b",
+    "commit_scope": "Historical worker provenance only, not PR633 ancestry. Public comparison returned404 with no ancestry result; published receipt and independently reread native artifacts are separate bindings",
+    "receipt_sha256": "05bb025c16bc08187f439a14d9bc20190025805c974b901ada6826d99a811c07",
+    "original_log_read_exit": 0,
+    "original_logs_reread": 12,
+    "collection_stdout_sha256": "ee0b67e2c121b6956e7ec628b5d7b9cc1ff0f55fb8c2528b2f1b2f7d24b90d9a",
+    "runtime_stdout_sha256": "06e4d0c0073b03546dba4d7b47fdfdd9dafefaf68f51bac0410e944575fcec83",
+    "runtime_stderr_bytes": 0,
+    "native_stdout_result": "3 passed, 4 warnings in 149.04s",
+    "independent_observation": "Root reread the retained original collection/runtime outputs, pre/post container and post Compose network/volume query outputs, source diff/head, and native built-sidecar metadata. Original stdout hashes match the receipt; queried cleanup/diff outputs are empty and source head is 1e5c5c6db929a10a140d05e606882c671ae20729. This is an independent retained-output read, not a second execution or independent rerun of the process exit.",
+    "native_built_sidecar": "harbor-prebuilt@sha256:9822153c366f940202508403a3af2f1e0784904bae79ac537efbadbef69413ab",
+    "scope": "Unchanged upstream real-Docker egress controls using Oracle agents; no coding candidate, provider/model, frozen SWE task, gateway-container reachability or default qualification. Python/Gost effective base digests remain unknown."
+  },
+  "native_gateway_host_liveness": {
+    "route_source": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/src/app/api/health/route.ts",
+    "source_sha256": "129fdf8eebcb6667b978d0a75dae16b923bb17447fbe61374973ff3528ac44d5",
+    "native_curl_version": "8.18.0",
+    "native_version_help_exit": 0,
+    "source_original_read_exit": 0,
+    "native_get_exit": 0,
+    "http_code": 200,
+    "returned_stdout_sha256": "c11e3f4837efde2441e23a7b9da02131f53bf59fddeb7147c4ab81afe400460f",
+    "returned_stderr_bytes": 0,
+    "scope": "RuntimeLab2604 host to owner 21128 native no-auth /api/health liveness only. Native curl disabled curlrc, bypassed proxies and used five-second connection/ten-second total bounds. No body/header/auth read, DB readiness, task-container route, provider/model or study admission claim."
+  },
+  "claude_historical_delta_findings_followup": {
+    "read_pr": 633,
+    "read_head": "d8ee66b72b076ab910f05342eeb0c824cf0a8695",
+    "comment_id": 5968894995,
+    "comment_body_sha256": "ef126bd15e5504fe007017bcf340274d14713cd7665daca49e8546f50d4f6ef6",
+    "status": "Historical d8 findings retained. Claude's cdbf exact-head read completed with FINDINGS in5969035814. The cdbf-to-160e amendment subsequently received both families' bounded source reads; this new follow-up still needs its own exact-head read.",
+    "B1": "Invalid coding JSON was fixed at1695. Root current cdbf1872 read verifies the explicit pinned native CodexUltra/V2 Harbor carrier item in required_before_freeze. It remains unqualified.",
+    "M1": "Component kinds clarified in this follow-up; family and qualification evidence remain visible in source descriptions. No claim that all role-bearing source labels are removed or a blind run is qualified. Every default remains null.",
+    "M2": "The dependency-readiness-repair condition now appears in catalog, evaluation summary and grader test_status, matching the original Inspect0.3.273 receipt. Live grading remains unqualified.",
+    "M3": "The SDK receipt's prospective, unexecuted canary previously named cx/gpt-6.1-sol; it was not historical execution. This follow-up changes it to the catalog alias cx/gpt-6.1-sol-ultra and retains the prior proposal in a correction note. Actual delivery remains pending.",
+    "M4": {
+      "go_tag": "go1.27.0",
+      "native_gh_tag_read_exit": 0,
+      "resolved_commit": "8af21751f066eced273ca3ce49506b366847c623",
+      "source_path": "src/os/file.go",
+      "original_commit_source_bytes": 30343,
+      "original_commit_source_sha256": "d77653afbcbec5256b56aee25dce3df3ed001f964c9b245b848a5d378884bcb3",
+      "result": "Matches prior cited tag bytes; source records now explicitly bind commit and preserve tag. No repeated native scheduler execution."
+    },
+    "M5": "77821801bc720e8ecd369f38ff64fdfc7b4d61f6 is retained as historical worker_commit, explicitly not PR633 ancestry. Root reread current public production-install receipt25271bytes/SHA2568eb44ebfbb0e07485373d33843b0519fbb4795c266b461189bee38c97ea8258f.",
+    "github_gross_token_tie": "Prospective native input-plus-output tie text now names uncached-input-plus-output as in the shared amendment; full original attempt counters and both-family amendment acceptance remain required.",
+    "remaining_review_gaps": "N3 per-job complete-cache subset wording remains open before freeze; unknown writes alone do not block G-R+O. N4 syntax-step success gating is changed prospectively to !cancelled(), but Bash still stops at the first malformed JSON when reached. N5 historical2674035d worker/public-history scope is now explicit, not ancestry evidence. Local-clone coverage, older unbound Astra verdicts, DNS4 provenance and historical Gitleaks coverage remain separate gaps. None supplies admission or a default."
+  },
+  "sdk_zero_selected_original_read_and_exit_correction": {
+    "worker_commit": "94e8b6a64c8d3e101e553d85053cd207d684b61d",
+    "commit_scope": "Historical worker provenance only; no PR633 ancestry assertion. Public comparison returned404 with no ancestry result; original receipt and retained output bindings remain independently checked",
+    "receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-preflight.json",
+    "receipt_sha256": "aca0cc66e5fdf573f322a4de74f74e30f3a3cfc74a5ca3d1ec6be6e0972407ba",
+    "root_original_read": "Original frozen recipe30112bytes/SHA2567c9942c4a32bf88747e4069b5213a75fa84e823a3c7fd1c52daff42597d40e43, probe JSON5608bytes/SHA256f22384e782ca8f91a79515d04425429a1bdc31b6cfcba0c038e819af1d7559ab, Jest JSON7438bytes/SHA25676ebda4abcbb3b4d07dff8091fda1f69da0cae43b65d14f72f0e32930acd421a and empty stderr were independently reread.",
+    "actual_result": "Native Jest success=true,0passed0failed23pending23total0runtime errors. Eight hits returned only type=object/description=Object; file/code/map/hash binding failed.",
+    "exit_distinction": {
+      "observer_native_exit": 0,
+      "separately_returned_numeric_jest_exit": null,
+      "source_derived_target_exit": 0,
+      "basis": "Original final terminal is exactly miss/pending[1]. Pinned Node inspect_probe595\u2013614 only emits this terminal when started and child code0/signalnull. Inspector exit0 alone and hit-limit completed terminal do not establish child completion."
+    },
+    "root_original_node_sources": {
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "probe_sha256": "a87f17a8fb7e50d3b0a029b4ef46e0b9fd2fd41b933bef88f63f62461750b128",
+      "protocol_sha256": "9541b1454d1c352ef852dc0b6321569438271731068c803f980afb65def58982",
+      "repl_sha256": "44921d05caa0947caa30dcfe4e1c11e707732ba0cdb96746ab2f597525f15e65"
+    },
+    "astra_correction": "Object-value expectation rejected. One bounded source-qualified primitive-string correction accepted, with validated allowlisted metadata, fresh native cache, unchanged source/fixtures/protected namespace and zero test selection. SDK pausable positions, timeline and positive fixture acceptance remain held.",
+    "study_usage": null,
+    "default_or_freeze": false
+  },
+  "sdk_primitive_binding_root_original_read": {
+    "worker_commit": "696c764a8d56db8734358b9ee67c5a38816f1476",
+    "commit_scope": "Historical worker provenance only; no PR633 ancestry assertion. Public comparison returned404 with no ancestry result; original receipt and retained output bindings remain independently checked",
+    "receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-binding-primitive-preflight.json",
+    "receipt_sha256": "bd323d13dff35c0e3c6021b37a8fe5b5908267aa47fb26ef8c69ea9846ec8cea",
+    "frozen_recipe_bytes": 44711,
+    "frozen_recipe_sha256": "3016ed5c03b3c7ed8955839bcf2818f107f5d876042251571d2c5cda6524a6ab",
+    "probe_stdout_bytes": 16216,
+    "probe_stdout_sha256": "b0cfd9e8c9aeb4defd4aaa66eba56b587ac12dd89dc81e2ba9455e8e0f7597ae",
+    "probe_stderr_bytes": 0,
+    "jest_json_sha256": "cc4568cda74df9c71cdc278d54a4b2b4d45bf93c5a9b2da1f3b56d827325b116",
+    "tool_returns_sha256": "67592fc7a92b30e96b38451ed41892bc5b301f12d45f02c1e3f601dd96127b9a",
+    "root_actual_metadata": "Eight original hit records are native string/value JSON,456bytes per CJS and649bytes per transform, with no expression errors. Four IDs0..3 appear exactly once in each stage. Original source hashes match exec/thread/run.test/responsesProxy at a956; each constructor code hash equals its transform code hash; transform map hashes present. CJS wrapper_length and requested column_offset are82. Root reread retained originals, not a repeated observer.",
+    "native_test_result": "success=true,0passed0failed23pending0runtime errors; authentic final miss/pending[1] gives source-derived normal child completion0, separately returned numeric exitnull.",
+    "accepted_scope": "Source/transform/cache and CJS constructor-input binding only; V8 actual script IDs/pausable positions, SDK timeline, unchanged positive5000ms fixture and role acceptance remain held.",
+    "provider_or_model_requests": false,
+    "default_or_freeze": false,
+    "root_generated_cache_reverification": {
+      "native_original_read_exit": 0,
+      "modules": 4,
+      "source_content_sha256_matches": 4,
+      "cjs_unwrapped_equals_transform_code": 4,
+      "transform_code_sha256_matches": 4,
+      "map_sha256_matches": 4,
+      "native_sha1_header_prefix_matches": 4,
+      "actual_tool_return_projection_exit": 0,
+      "observer_final_exit": 0,
+      "source_position_or_positive_fixture_acceptance": false,
+      "scope": "Original generated code/maps reread in owned cache; actual V8 script IDs and pausable positions remain unobserved"
+    }
+  },
+  "counter_metadata_source_followup": {
+    "receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-original-usage-source-boundaries.json",
+    "astra_role": "Astra/max",
+    "trigger": "Conflicting primary claims about preservation of original provider usage",
+    "acceptance_result": "REJECT evidence sufficiency; retain counter/freeze HOLD",
+    "metric": "G-R+O remains conditional; output includes reasoning",
+    "model_or_provider_execution": false,
+    "current_logging_ack_scope": "Native operational pipeline logging ON12:59/OFF19:00 acknowledged; raw stream chunks OFF; not counter or comparison admission"
+  },
+  "review_attribution_and_grader_operand_correction": {
+    "reviewed_public_head": "cdbf1872b87bcbaa15bc3f14d157d9a61765ca7b",
+    "root_review_comments": [
+      {
+        "id": 5968980342,
+        "body_bytes": 6152,
+        "body_sha256": "32e25687a994a4ed57be86faeac8e9fec74dece8669931cb11c34d105de76e27",
+        "native_read_exit": 0
+      },
+      {
+        "id": 5969258889,
+        "body_bytes": 4071,
+        "body_sha256": "05bad04e4cc314c10e8de0c3d8123e521bb423f280bf7c5df14a961bccfba35b",
+        "native_read_exit": 0
+      }
+    ],
+    "corrections": [
+      "Prior1695 read was Codex root, not Claude. Rename its field and preserve actual65a Claude read, head/digest/limited scopes.",
+      "Inspect normalized input excludes both reads and writes, so normalized input plus output disagreed with contract G-R+O. Grader map now requires original operands and retains normalized counters separately; unknown reconstruction is rejected."
+    ],
+    "inspect_repository": "UKGovernmentBEIS/inspect_ai",
+    "inspect_pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+    "root_original_http_reads": [
+      {
+        "file": "src/inspect_ai/model/_openai_responses.py",
+        "bytes": 103737,
+        "sha256": "d5167d330fe2a0da5a9a0ab9cb8763ff7b387c0f6f377468f94d9747db7c4317",
+        "status": 200
+      },
+      {
+        "file": "src/inspect_ai/model/_openai.py",
+        "bytes": 66605,
+        "sha256": "febf8a04be8a97057f6f14aa59b4e58f2acf9bb0cda480b65788c0091fd32b19",
+        "status": 200
+      },
+      {
+        "file": "src/inspect_ai/model/_providers/openai_responses.py",
+        "bytes": 23825,
+        "sha256": "7a9f9998f4942e2fe18e86609c034f9eebf699cfa5600fd6382dbdef7aaa140a",
+        "status": 200
+      }
+    ],
+    "operand_observation": false,
+    "family_amendment_or_freeze_acceptance": false,
+    "comparative_execution_error_established": false
+  }
+}

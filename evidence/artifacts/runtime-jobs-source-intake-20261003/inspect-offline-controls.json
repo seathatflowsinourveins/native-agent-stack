@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "class": "unchanged_upstream_offline_control_execution",
+  "date": "2026-10-03",
+  "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+  "version": "0.3.276",
+  "pin": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+  "installation": {
+    "scope": "Isolated source checkout and its own .venv, separate from the adopted host CLI and Claude-owned installation plan.",
+    "recipe": "CONTRIBUTING.md: uv sync --extra dev; the native --locked guard preserves the committed development resolution.",
+    "clone_exit": 0,
+    "head_verification_exit": 0,
+    "sync_argv": ["rtk", "uv", "sync", "--locked", "--extra", "dev"],
+    "sync_exit": 0,
+    "native_install_output": "Resolved339 packages; prepared121 packages; installed253 packages. Returned installation output was truncated by its output budget; no complete install stdout is claimed.",
+    "uv_version": "0.12.17",
+    "python_version": "3.14.7",
+    "inspect_version_argv": ["rtk", "uv", "run", "--no-sync", "inspect", "--version"],
+    "inspect_version_exit": 0,
+    "inspect_version_stdout": "0.3.276\n"
+  },
+  "source_identities": [
+    {"path": "CONTRIBUTING.md", "bytes": 8543, "sha256": "1bb7f3ad6e5bfc5e2f37d75d047e6f0cb8ef450bb1f054061ed029ca344456bb"},
+    {"path": "pyproject.toml", "bytes": 5660, "sha256": "ce5713f4a354c3d2fd3b01f08e247a06b240a21eda481581b3cd270c867c1d2b"},
+    {"path": "requirements-dev.txt", "bytes": 1246, "sha256": "c3e116e72bb9ba49745ef1cae6b5b2842b8ba9dc55b3cdf2837844202646e119"},
+    {"path": "uv.lock", "bytes": 1339533, "sha256": "7a9cda6292467a4812a9d4bef2ab61fcc8b06bd6e7448e0fc20dc5dd91a83eb2"},
+    {"path": "tests/conftest.py", "bytes": 46572, "sha256": "dc6fab64d2d350b5dbd4e73f57357fbfc96269b17eebc2f34f6f625d29e06eb6"},
+    {"path": "tests/scorer/test_match.py", "bytes": 12442, "sha256": "6b8d733f513bf1eb84d1e3b2396461f0e36fb7ebbecee1bc81112fb06ef59f56"},
+    {"path": "tests/model/test_generate_attempt_timeout.py", "bytes": 9508, "sha256": "143de82c54bd3a1326fca34a6b590657e35cdae27391f2e40c937de24c05f00a"},
+    {"path": "tests/agent/test_bridge_provider_errors.py", "bytes": 9247, "sha256": "ba8e6f6d0f067df9bb5d1a5b943aff8b2900849e70a7500278d7ec794d0203c0"}
+  ],
+  "control": {
+    "argv": [
+      "rtk", "uv", "run", "--no-sync", "pytest", "-n", "0", "--color=no",
+      "tests/scorer/test_match.py::test_numeric_negative_target_wrong_sign",
+      "tests/scorer/test_match.py::test_numeric_negative_target_correct",
+      "tests/model/test_generate_attempt_timeout.py::test_attempt_timeout_wins_when_idle_timeout_is_larger",
+      "tests/agent/test_bridge_provider_errors.py::test_provider_error_payload_raw_sdk_exception",
+      "tests/agent/test_bridge_provider_errors.py::test_provider_error_payload_bare_exception"
+    ],
+    "exit": 0,
+    "collected": 8,
+    "passed": 5,
+    "skipped": 3,
+    "native_elapsed_seconds": 4.87,
+    "skip_reason": "Upstream default requires --runtrio for the three additional Trio variants.",
+    "stdout": "inspect-offline-controls.stdout.txt",
+    "stdout_provenance": "Transcribed returned native tool output; one rootdir host path replaced with ${SOURCE_CHECKOUT}. No byte-exact original stdout hash is claimed.",
+    "positive_and_negative_behavior": "Numeric matcher distinguishes wrong/correct sign; mocked stalled generation enforces attempt timeout with one attempt; provider-error helper preserves429 and missing-statusNone.",
+    "expected_live_model_calls_from_selected_source": 0,
+    "independent_network_trace_captured": false,
+    "provider_usage": null,
+    "usage_scope": "No provider request in selected unchanged mock fixtures; this is not a measured token-saving result."
+  },
+  "post_execution_observation": {
+    "git_status_exit": 0,
+    "working_tree_clean": true,
+    "original_pyproject_lock_and_three_test_file_identities_unchanged": true
+  },
+  "limits": [
+    "Only these selected native offline fixtures passed; the full upstream suite and skipped Trio variants were not run.",
+    "This demonstrates component-control readiness, not real provider transport, Ultra delivery, complete useful-task evaluation or a winning evaluator default.",
+    "No frozen comparison, shared GPT-pool run, credentials read/copy, daemon start or active client configuration change occurred.",
+    "Original process start/end timestamps were not captured; parent observed completion before2026-10-03T05:19:58Z."
+  ]
+}

@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "scope": "Admitted offline instrumented SDK positive-fixture diagnostic and independent custody; no model/provider run",
+  "reviewed_repository_head": "ae6010f1111ef8edab35b57f32c87623d897b033",
+  "frozen_inputs": {
+    "recipe": {
+      "bytes": 79195,
+      "sha256": "ba760c816be4ee0a8efd5d221ae7d231fecab0c432975911719e2b8bf4f45ef1"
+    },
+    "caller": {
+      "bytes": 12039,
+      "sha256": "9e5f7ac9432c784664cd7635e775ccb8e24b25633e829ef48d683d44e22ca02a"
+    },
+    "reader": {
+      "bytes": 1804,
+      "sha256": "78fc5dcb64eb85f2d0ef80b8444da2f0edf9776a647750dffd4daaae89462362"
+    },
+    "caller_freeze": {
+      "bytes": 6638,
+      "sha256": "4cf039ccc263679e05b74b322373951d7a085fcdf52c69db7d7327cf664ca59a"
+    },
+    "source_admission": "ONE exact source-qualified prospective diagnostic; failed ed22 freeze not replayed",
+    "final_read_only_preflight": {
+      "bytes": 27585,
+      "sha256": "2b046d906b9dab20ce362aa22891fd17b7a8f6db260003c250305e589a525031",
+      "unchanged_native_input_checks_reused": true,
+      "fresh_output_directory_and_eight_paths_absent": true
+    }
+  },
+  "supervision": {
+    "outer_gnu_timeout_s": 180,
+    "term_kill_grace_s": 10,
+    "original_fixture_timeout_ms": 5000,
+    "fixture_source_modified": false,
+    "coordinator_clock_start": "2026-10-03 18:33:01 UTC",
+    "coordinator_clock_end": "2026-10-03 18:33:41 UTC",
+    "controller_check_count": 50,
+    "original_coordinator_record": {
+      "bytes": 47131,
+      "sha256": "8275cdf54a1742b691b543c40803cf39ff4302387adb6f4f15d1a7649753e968",
+      "tool_return_inventory": 113,
+      "scope": "Original coordinator clock/check/tool observations retained separately; not provider or pristine upstream acceptance"
+    },
+    "clock_and_check_provenance": "Original coordinator native clock returns and checks now separately retained; not remeasured by custody reviewer"
+  },
+  "native_result": {
+    "original_jest": {
+      "success": false,
+      "numTotalTests": 23,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 22,
+      "numRuntimeErrorTestSuites": 0
+    },
+    "selected_assertion": {
+      "fullName": "Codex returns thread events",
+      "status": "failed",
+      "duration_ms": 5008,
+      "failure_kind": "fixture_timeout",
+      "original_timeout_ms": 5000,
+      "bounded_error_lines": [
+        "Error: thrown: \"Exceeded timeout of 5000 ms for a test."
+      ]
+    },
+    "outer_terminal": {
+      "chunk": "cfb0dd",
+      "exit_code": 0,
+      "output": ""
+    },
+    "fd13_exit_code": 0,
+    "jest_child_exit": null,
+    "terminal_tool_return": {
+      "bytes": 126,
+      "sha256": "f7e3c74c5de60bccef4ff4120cf72e569b8c4e7ff33fcc79c57fb72452115954"
+    },
+    "outer_zero_scope": "Native outer inspector/bwrap command only; separate from original JestFAIL"
+  },
+  "actual_observations": {
+    "setup_metadata_count": 47,
+    "source_matched_native_scripts": 4,
+    "map_and_native_roundtrip_anchors": 8,
+    "nonpausing_conditions_installed": 8,
+    "actual_adapter_breakpoint_removed": true,
+    "final_resume_admitted": 1,
+    "selected_positive_fixture": 1,
+    "target_record_count": 16,
+    "target_stages": 8,
+    "recorded_condition_exceptions": 0,
+    "recorded_unexpected_pauses": 0,
+    "recorder_overflow": 0,
+    "condition_sha256": [
+      "793b18ff39e38da21fd700443e26893525fe3239fcd3f9da52ddd36e26d2ae2f",
+      "31ed0c91862a1cc8c241e2b9bbd1563444f1d3e7895f9eeba4df92810001c229",
+      "4f705f94c58efa902e147ff95b7eb1e8405783eba643c09837328470104b3eb3",
+      "0003f55d182cfdff4aabf8357fa196c1395c4a5be989aa9c867cc27a9b085582",
+      "baaa7a576f4705bb198b585e78b72503ed74cf9af3be3419bb318d98ac6b430d",
+      "b735a0742e6660f77af70ded3b95d2eb0718963dc65ac02698e0eb5aa42c00ec",
+      "a3984ff4e1c0684afc0dc2ee475b560297452f775b15f77c6c812939a426b955",
+      "36cc5ba26614423b8e266e7b1e754dcd068ad2a7482f4f78b59db158c8c0fee4"
+    ],
+    "per_stage": {
+      "test29": {
+        "records": 1,
+        "hit_counts": [
+          1
+        ],
+        "first_relative_ns": "0",
+        "last_relative_ns": "0"
+      },
+      "thread124": {
+        "records": 5,
+        "hit_counts": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "first_relative_ns": "889730",
+        "last_relative_ns": "208907829"
+      },
+      "exec237": {
+        "records": 5,
+        "hit_counts": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "first_relative_ns": "7891074",
+        "last_relative_ns": "209331414"
+      },
+      "exec243": {
+        "records": 1,
+        "hit_counts": [
+          1
+        ],
+        "first_relative_ns": "5239528024",
+        "last_relative_ns": "5239528024"
+      },
+      "exec250": {
+        "records": 1,
+        "hit_counts": [
+          1
+        ],
+        "first_relative_ns": "5240134955",
+        "last_relative_ns": "5240134955"
+      },
+      "thread140": {
+        "records": 1,
+        "hit_counts": [
+          1
+        ],
+        "first_relative_ns": "5240468416",
+        "last_relative_ns": "5240468416"
+      },
+      "test38": {
+        "records": 1,
+        "hit_counts": [
+          1
+        ],
+        "first_relative_ns": "5240779666",
+        "last_relative_ns": "5240779666"
+      },
+      "proxy138": {
+        "records": 1,
+        "hit_counts": [
+          1
+        ],
+        "first_relative_ns": "5242542855",
+        "last_relative_ns": "5242542855"
+      }
+    }
+  },
+  "source_anchor_meaning": {
+    "test29": "Await thread.run",
+    "thread124": "Consume generated events",
+    "exec237": "Consume child stdout readline iterator",
+    "exec243": "Entry to await exitPromise",
+    "exec250": "Finally close readline",
+    "thread140": "Return thread result",
+    "test38": "Item assertion",
+    "proxy138": "Server-close cleanup"
+  },
+  "timing_limits": [
+    "Recorded relative times do not identify timer-arm/fire instants or instrumentation overhead",
+    "The five thread124 and exec237 records finish within209.332ms; later anchors occur5239.528–5242.543ms aftertest29",
+    "These observations do not identify a startup, network, shutdown or source-bug cause"
+  ],
+  "captures": [
+    {
+      "file": "bwrap-native-status.jsonl",
+      "bytes": 220,
+      "sha256": "dd3d5a663b7cd990abca947a32e3f181dd1f87dbaedf0a36a64f700e31259fb1"
+    },
+    {
+      "file": "jest-native.json",
+      "bytes": 9442,
+      "sha256": "d26ec17d367888d5ed775e106c010d5709996156ae12bb6d03a7ab292736d05e"
+    },
+    {
+      "file": "ps-owned-after.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "ps-owned-after.stdout.txt",
+      "bytes": 6479,
+      "sha256": "4a435714e8d457f0dace214362393bc6bcd9ba2dfd842ed73da9347d2df5acb6"
+    },
+    {
+      "file": "ps-owned-before.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "ps-owned-before.stdout.txt",
+      "bytes": 6745,
+      "sha256": "a0fc47203441c4cf2366b1da7a9453453d55cc81ed42fd82a25bda1a448f72f5"
+    },
+    {
+      "file": "repl-native.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "repl-native.stdout.txt",
+      "bytes": 15043,
+      "sha256": "cf06f473191eb3f79caef9a65aa9c3c8f2cfb8cec4e2d43d34f4b27aed6278c6"
+    }
+  ],
+  "process_observation": {
+    "before": {
+      "native_ps_exit": 0,
+      "valid_rows": 355,
+      "malformed_rows": 0,
+      "owned_pair_rows": 1,
+      "owned_namespace_rows": 3,
+      "stderr_bytes": 0
+    },
+    "after": {
+      "native_ps_exit": 0,
+      "valid_rows": 341,
+      "malformed_rows": 0,
+      "owned_pair_rows": 0,
+      "owned_namespace_rows": 0,
+      "stderr_bytes": 0
+    },
+    "scope": "Complete original value-free PID/namespace captures; owned positive integers privately bound by FD13. Visible-process endpoint only"
+  },
+  "independent_custody_read": {
+    "status": "CUSTODYCONFIRMED native JestFAIL5000",
+    "native_sha256sum_exit": 0,
+    "native_typed_read_exit": 0,
+    "capture_and_terminal_hashes_matched": 9,
+    "immutable_inputs_matched": 4,
+    "metadata_and_source_bindings_matched": true,
+    "no_replay": true,
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "max",
+    "actual_model": null,
+    "actual_effort": null,
+    "provider_usage": null,
+    "clock_and_50checks": "Coordinator reported in first custody read; original coordinator result subsequently retained separately"
+  },
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "paths": [
+        "sdk/typescript/tests/run.test.ts",
+        "sdk/typescript/src/exec.ts",
+        "sdk/typescript/src/thread.ts",
+        "sdk/typescript/tests/responsesProxy.ts"
+      ]
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "path": "lib/internal/debugger/inspect_repl.js"
+    },
+    {
+      "repository": "jestjs/jest",
+      "pin": "4e56991693da7cd4c3730dc3579a1dd1403ee630",
+      "paths": [
+        "packages/jest-circus/src/utils.ts",
+        "packages/jest-core/src/runJest.ts"
+      ]
+    }
+  ],
+  "preserved_failures": {
+    "ed22_setup_timeout": "Unchanged failed pre-runner180s attempt",
+    "rejected_caller_72b": "11487B/72b48d92e5ccb69e8ed041c2dcbd13c7a6641d230a7eed7089184b5847084a45 retained exact; no launch",
+    "this_fixture": "FAILED original5000ms selected assertion; no same-freeze retry"
+  },
+  "acceptance": {
+    "instrumented_position_and_fixed_record_custody": "PASS bounded observation",
+    "native_fixture": "FAIL",
+    "scoped_visible_process_reclamation": "PASS",
+    "pristine_unchanged_upstream_acceptance": "NOTCLAIMED; dynamic instrumentation is locally authored",
+    "positive_sdk_role": "HOLD",
+    "provider_model_attempts": 0,
+    "comparisons_and_all_eight_defaults": "HOLD",
+    "cost_efficiency_and_token_features": "HOLD"
+  }
+}

@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "runtime_jobs_bounded_readiness_followup",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "SOURCE_AND_OFFLINE_READINESS_ONLY; ALL_EIGHT_DEFAULTS_HOLD",
+  "exact_head_review": {
+    "codex": {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/633#issuecomment-5970149915",
+      "verdict": "SOURCE ACCEPT WITH NOTES",
+      "bytes": 3465,
+      "sha256": "19ffffdfa2a277d76a013131d6ffee764035c2e30e5f1b93b8320df6c6099a98"
+    },
+    "claude": {
+      "status": "Not found in the latest twelve PR633 comments returned natively 2026-10-03; prior160e review remains historical",
+      "latest_read_covered_head": "160e4f8439250bafd3f43a5b9cca308cf7a1a8ee"
+    },
+    "acceptance_limits": "No new comparison freeze, SDK positive behavior, delivered model identity, complete provider usage, token savings or measured default."
+  },
+  "per_job_metric_wording": {
+    "note": "N3 per-job cache-subset wording aligned with the already accepted shared-execution-contract metric.",
+    "files": [
+      "evaluation-draft.json",
+      "github-workflow-draft.json",
+      "research-gatherer-draft.json",
+      "reviewer-draft.json",
+      "scheduled-automation-draft.json",
+      "gateway-token-draft.json"
+    ],
+    "rule": "Every distinct provider attempt needs original gross input, original cache reads and original output with preserved presence/types. Compute G-R+O once; reasoning remains included in output. Cache-write detail remains separately reported or null. Missing operands or incomplete attempt scope still hold the comparison.",
+    "thresholds_and_defaults_unchanged": true,
+    "primary_source_binding": "inspect-grader-binding.json retains the pinned native adapter source and original-versus-normalized operand distinction."
+  },
+  "owned_builder": {
+    "reviewed_artifact": "coding-image-owned-builder-amendment.json",
+    "bytes": 28780,
+    "sha256": "5b58864aba598b25b1721b37faf5241b833d3056708313d09838fa7783bf2942",
+    "root_original_source_reads": [
+      {
+        "group": "buildkit",
+        "path": "docs/buildkitd.toml.md",
+        "exit": 0,
+        "bytes": 9523,
+        "sha256": "086b004b379bcddce01a886f7990e531d6a385817f30193470bac7bb358cae5c",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildkit",
+        "path": "cmd/buildkitd/config/config.go",
+        "exit": 0,
+        "bytes": 7689,
+        "sha256": "0b45a57bc510058e36d2ece38c12e51ac991ccc98a4586d29ee5b5c7f30f524a",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildkit",
+        "path": "cmd/buildkitd/main_oci_worker.go",
+        "exit": 0,
+        "bytes": 17798,
+        "sha256": "37cd8038301d2f461c80a545a2254a04e0b979c8ed286854080052abb220b9ec",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildkit",
+        "path": "cmd/buildkitd/main_containerd_worker.go",
+        "exit": 0,
+        "bytes": 12335,
+        "sha256": "024ca2534289c5df197ec41b19a8c7e6b48dcbbfc7a1ca3491f656277bb59ca2",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildx",
+        "path": "builder/builder.go",
+        "exit": 0,
+        "bytes": 19962,
+        "sha256": "d0d0c73ac8a54083131a55cc2f1ff43bc419ac444e95e8751f79aaefb3de0811",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildx",
+        "path": "driver/docker-container/factory.go",
+        "exit": 0,
+        "bytes": 3068,
+        "sha256": "6517cc03d64c2e23790c3799915f1659faf754aad6eb9dc1a0d3e95749110792",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildx",
+        "path": "driver/docker-container/driver.go",
+        "exit": 0,
+        "bytes": 19377,
+        "sha256": "d7fc0ef706b398f5c2fd9e3d1f3ea4fef5c08daf40f89e74809944eedfd2220b",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildx",
+        "path": "commands/create.go",
+        "exit": 0,
+        "bytes": 4264,
+        "sha256": "1e8051482524d2ba25364ca49b650ce595335cf8647966b77b344f0429245f2d",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildx",
+        "path": "commands/rm.go",
+        "exit": 0,
+        "bytes": 5808,
+        "sha256": "b70ed983663c9e295473ac050ab59ca1a844e29b7ca56a76a0a177b39507745d",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildx",
+        "path": "bake/bake.go",
+        "exit": 0,
+        "bytes": 51157,
+        "sha256": "b44eb688eefcc9f1f6494c6cf5ba222127724e52563b90184e7f1ff49e53c303",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildx",
+        "path": "build/build.go",
+        "exit": 0,
+        "bytes": 39245,
+        "sha256": "9a940ebd99fad80d7b552f52018b6f12c00076aa0fd667cb39eacbb1ad03feeb",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "buildx",
+        "path": "docs/reference/buildx_bake.md",
+        "exit": 0,
+        "bytes": 19526,
+        "sha256": "0c0f90f1d839aad29550d99195dec7e4c1f72b77ec6fd024265310aaf12441b3",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "compose",
+        "path": "docs/reference/compose.md",
+        "exit": 0,
+        "bytes": 17127,
+        "sha256": "6f1e26115a4d2b3824a189d39ef794c2ea2227587128278e3c3ab7be124c0ce5",
+        "hash_match": true,
+        "stderr_bytes": 0
+      },
+      {
+        "group": "compose",
+        "path": "pkg/compose/build_bake.go",
+        "exit": 0,
+        "bytes": 21071,
+        "sha256": "d70bedb44c898aa09e24ebb0177e4567669e5e3b7db2997c7add70770262b80d",
+        "hash_match": true,
+        "stderr_bytes": 0
+      }
+    ],
+    "source_contract": "Explicit owned config prevents default config discovery; OCI parallelism1 is a build-step semaphore. docker-container driver is privileged and its restart policy/config/image are frozen explicitly. rm can remove builder metadata despite driver failure and skip a state volume when the container is already absent, so independent exact container/volume checks remain required.",
+    "actual_owned_builder_created": false,
+    "actual_image_build": false,
+    "actual_model_attempt": false,
+    "native_configuration_effectiveness": "UNOBSERVED",
+    "concrete_paths_rendered_bake_and_main_container_cleanup": "PENDING worker freeze and exact review"
+  },
+  "sdk_failures": {
+    "actual_pilots": 3,
+    "positive_callbacks_selected": 0,
+    "source_positions_qualified": 0,
+    "records": [
+      "codex-sdk-position-pilot-transport-failure.json",
+      "codex-sdk-position-pilot-global-getter-failure.json",
+      "codex-sdk-position-pilot-adapter-pause-failure.json"
+    ],
+    "cleanup": "Each failed attempt has a retained native pre/post full PID/namespace observation with an empty visible owned namespace endpoint. This is not a kernel-level destruction guarantee.",
+    "next_amendment": "codex-sdk-position-fileurl-selector-amendment.json",
+    "fourth_pilot_admitted": false
+  },
+  "failures_preserved": [
+    {
+      "scope": "Combined six-file N3 patch derivation",
+      "message": "Literal apply_patch marker was absent from the returned processing output; the orchestrator raised no patch before any apply_patch call.",
+      "native_exit": null,
+      "cause": "UNOBSERVED in the retained top-level return; no inferred shell/test failure",
+      "recovery": "Read-only counts all1; six bounded independent single-file computations returned patches, applied sequentially."
+    }
+  ],
+  "counter_and_window": {
+    "allocation": "13:00-19:00Z reserved but not admitted for this study",
+    "original_gross_read_output_and_inner_attempt_coverage": "HOLD",
+    "raw_provider_chunks_enabled_by_this_lane": false,
+    "runtime_worker_comparative_provider_attempts": 0,
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5969406829"
+  },
+  "provider_usage": null,
+  "quality_result": null,
+  "token_savings": null
+}

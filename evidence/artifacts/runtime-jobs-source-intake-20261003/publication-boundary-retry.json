@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "publication_failure_and_retry",
+  "recorded_date": "2026-10-03",
+  "scope": "Normal evidence-registry commit after source commit4d9f0c80415143e27bb9b738794b4932d7491f37; publication controls only.",
+  "attempts": [
+    {"operation": "normal_registry_commit", "native_exit_code": 1, "returned_output": "ecosystem-bounded-run: cannot read the user manager cgroup; command was not started"},
+    {"operation": "installed_wrapper_help_probe", "native_exit_code": 78, "returned_output": "command not found: --help; command was not started; containment was not established or verified (launcher exit78); command was not started", "interpretation": "The installed wrapper treated --help as a command; no capability absence is inferred."},
+    {"operation": "read_only_guessed_wrapper_path_existence", "exists": false, "interpretation": "An incorrect guessed path was corrected by native executable discovery."},
+    {"operation": "native_installed_executable_discovery", "native_exit_code": 0, "installed_executable_found": true},
+    {"operation": "native_user_manager_ControlGroup_observation", "native_exit_code": 0, "valid_manager_cgroup_returned": true, "host_path_retained_publicly": false},
+    {"operation": "same_normal_registry_commit_retry", "native_exit_code": 0, "result_head": "9a29de48b9046e6fb16e3475e802faf90e8e0273"},
+    {"operation": "normal_push", "native_exit_code": 0, "unchanged_pre_push_tests": 3, "test_seconds": 0.205}
+  ],
+  "hook_bypass": false,
+  "manager_restart_or_configuration_change": false,
+  "source_edits_for_retry": false,
+  "correction": "The initially failed boundary did not start the registry command; a later healthy manager observation and unchanged native retry completed it. No persistent boundary defect is established.",
+  "other_retained_preparation_failures": [
+    "Private PR-body replacement rejected before mutation: multiple apply_patch operations targeted one path. Separate native patches succeeded; repository artifacts were unaffected.",
+    "The private checkpoint title guessed05:52Z before a clock read returned05:48:31Z. The guessed timestamp was removed; no invocation timestamp is inferred from that title.",
+    "An initial original-source summarizer printed oversized historical JSON. The original bytes stayed in context-mode; a bounded key-based derivation returned the needed decision and status counts. No model comparison or credential read resulted.",
+    "Resume path probes guessed scripts/tests/test_runtime_job_classification.py, scripts/tests/test_runtime_job_catalog.py and .pre-commit-config.yaml: native rg exited2 for missing paths. A later rg --files probe also exited2 for the nonexistent .githooks path. The retained publication receipt supplied the actual tests.test_blind_checkout.RepositoryClassificationTests command; its native rerun passed2 tests, exit0. No missing-capability claim was made.",
+    "A native register_file call passed a Path where the upstream repository helper requires a relative str: exit1, InvalidDecisionIndex: source path must be text. Repeating the native helper with the relative string exited0. The independent13-file registry hash/size comparison then matched13/13.",
+    "The GPTR venv command receipt omitted a space in --python 3.13. The receipt was corrected to the actual native command and re-registered; no install was rerun or new model execution inferred.",
+    "A worker initially parsed the source SHA prefix0957 as GPTR version0.9.57; public tag/release probes returned404. The exact provided source identity v3.7.0@0957c301ed06c2a5857b834358c7227c739041d4 corrected that interpretation before constructor or model execution.",
+    "Token lane PR608#5966289633 reported Context Mode1.0.169 legacy-content cleanup outside CONTEXT_MODE_DIR. Content-store search/index calls were withheld after reading the notice. Earlier content-store impact remains unknown; no host legacy/auth state was inspected to infer impact. Compact computation output limits are used for subsequent processing.",
+    "A validation started before the corrected GPTR receipt was re-registered exited1 with SHA-256 and byte-count mismatch. After native re-registration, the sequential native validation exited0 (69 components/9447 hashed files/4 profiles/187 receipts). The transient mismatch is preserved; it is not an upstream runtime failure."
+  ],
+  "provider_usage": null,
+  "billing": null,
+  "role_or_default_acceptance": false
+}

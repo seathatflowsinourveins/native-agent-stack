@@ -1,0 +1,491 @@
+{
+  "schema_version": 1,
+  "kind": "Codex SDK 0.160 native zero-selected metadata/cache preflight",
+  "recorded_at_utc": "2026-10-03 11:59:15 UTC",
+  "repository_base": "cdbf1872b87bcbaa15bc3f14d157d9a61765ca7b",
+  "evidence_class": "Native upstream selection/cache operation with local integration instrumentation",
+  "status": "failed_incomplete_binding_metadata",
+  "review": {
+    "reviewer": "Astra",
+    "effort": "max",
+    "acceptance": "SOURCE ONLY conditional; execution not preaccepted",
+    "reported_by": "coordinator",
+    "trigger": "Earlier native SDK positive suite remained 1 failed and 22 filtered skips after one bounded Sol companion-staging repair. Cause remained unproven.",
+    "sdk_acceptance": "HOLD"
+  },
+  "scope": {
+    "zero_selected_fixture_callbacks": true,
+    "fixture_callbacks_executed": 0,
+    "fixture_timeout_setting_ms": 5000,
+    "fixture_timer_started": false,
+    "observer_deadline_ms": 10000,
+    "observer_attempts": 1,
+    "provider_or_model_execution": false,
+    "proxy_request_execution": false,
+    "source_or_fixture_changes": false,
+    "launch_flags_changed": false,
+    "mount_or_network_expansion": false,
+    "full_bubblewrap_acceptance_claim": false
+  },
+  "source_pins": {
+    "codex": {
+      "repository": "openai/codex",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "material": "Unchanged SDK TypeScript source"
+    },
+    "node": {
+      "repository": "nodejs/node",
+      "commit": "955266bfdd854cd280dffd47548673914484e4c0",
+      "version": "24.21.0"
+    },
+    "jest": {
+      "repository": "jestjs/jest",
+      "commit": "4e56991693da7cd4c3730dc3579a1dd1403ee630",
+      "version": "29.7.0"
+    },
+    "ts_jest": {
+      "repository": "kulshekhar/ts-jest",
+      "commit": "89a4f9f3d7a9c78b94f6c636a600b181accc1f98",
+      "version": "29.4.4"
+    },
+    "ts_jest_mock_import_meta": {
+      "package": "ts-jest-mock-import-meta",
+      "registry_url": "https://registry.npmjs.org/ts-jest-mock-import-meta/1.3.1",
+      "commit": "dd0459a41b9e9851d571c1a4cf7783a6da9d8bfd",
+      "version": "1.3.1"
+    }
+  },
+  "native_source_identities": [
+    {
+      "source_id": "node_probe",
+      "path": "lib/internal/debugger/inspect_probe.js",
+      "bytes": 40385,
+      "sha256": "a87f17a8fb7e50d3b0a029b4ef46e0b9fd2fd41b933bef88f63f62461750b128"
+    },
+    {
+      "source_id": "jest_runtime_installed",
+      "path": "node_modules/jest-runtime/build/index.js",
+      "bytes": 76254,
+      "sha256": "4afb88009e1b907c4d5b098930834a0f09115ebf5a2fe0551349d5a17bc3ef03"
+    },
+    {
+      "source_id": "jest_transform_installed",
+      "path": "node_modules/@jest/transform/build/ScriptTransformer.js",
+      "bytes": 30828,
+      "sha256": "e07cd7a88714d6600d2d0cf88071f2df5635ece2bab9428bf5ae5b396d8d36ff"
+    },
+    {
+      "source_id": "jest_cli_installed",
+      "path": "node_modules/jest-cli/build/args.js",
+      "bytes": 22761,
+      "sha256": "512ce9ca64e773ea2b2fd04bdb75fbfffbb4794ac6f8e71d9dc786372de84f76"
+    }
+  ],
+  "target_sources": [
+    {
+      "file_id": 0,
+      "path": "sdk/typescript/src/exec.ts",
+      "bytes": 14203,
+      "sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79",
+      "after_run_matches_frozen_pin": true
+    },
+    {
+      "file_id": 1,
+      "path": "sdk/typescript/src/thread.ts",
+      "bytes": 4971,
+      "sha256": "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c",
+      "after_run_matches_frozen_pin": true
+    },
+    {
+      "file_id": 2,
+      "path": "sdk/typescript/tests/run.test.ts",
+      "bytes": 26283,
+      "sha256": "2ebd05b461504a53c0a9453efb877f3fee06202284fd6dc5ddef035f3be33255",
+      "after_run_matches_frozen_pin": true
+    },
+    {
+      "file_id": 3,
+      "path": "sdk/typescript/tests/responsesProxy.ts",
+      "bytes": 5679,
+      "sha256": "53f86d2a5c313966a9e5c9dd9fc69676755f7dbf50be530558d254571424b0f6",
+      "after_run_matches_frozen_pin": true
+    }
+  ],
+  "protected_namespace": {
+    "reused_existing_contract": true,
+    "private_host_state_excluded": true,
+    "network_isolated": true,
+    "public_runtime_mounts_readonly": true,
+    "writable_state_owned": true,
+    "environment_cleared_by_existing_launcher": true,
+    "external_home_override": false,
+    "external_codex_home_override": false,
+    "owned_bwrap_sha256": "75d6e611c1d41cf3a183a54085d4e83342901b91d058dd2c655692ff13207216"
+  },
+  "frozen_recipe": {
+    "artifact_key": "private-frozen-recipe",
+    "bytes": 30112,
+    "sha256": "7c9942c4a32bf88747e4069b5213a75fa84e823a3c7fd1c52daff42597d40e43",
+    "frozen_before_observer": true,
+    "probe_count": 3,
+    "max_hit_each": 8,
+    "selection": "(?!)",
+    "file_target_count": 4,
+    "cache_fresh_before_run": true,
+    "exact_commands_expressions_conditions_schema_retained_privately": true
+  },
+  "native_help": {
+    "exit_code": 0,
+    "tool_chunk": "13d889",
+    "stdout": {
+      "name": "jest-help.stdout.txt",
+      "bytes": 26122,
+      "sha256": "de13b517f654e55df93dbe8253c32d97d967cafdfd95e1fe934949e13e288cdc",
+      "native_help_flag_lines": [
+        "      --cacheDirectory              The directory where Jest should store its",
+        "  -t, --testNamePattern             Run only tests with a name that matches the",
+        "                                    with `--testNamePattern` to re-record"
+      ]
+    },
+    "stderr": {
+      "name": "jest-help.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "actual_flag_lines": [
+      "      --cacheDirectory              The directory where Jest should store its",
+      "  -t, --testNamePattern             Run only tests with a name that matches the",
+      "                                    with `--testNamePattern` to re-record"
+    ]
+  },
+  "native_observer": {
+    "exit_code": 0,
+    "initial_tool_chunk": "6f402b",
+    "session_id": 2039,
+    "completion_tool_chunk": "b909c6",
+    "stdout": {
+      "name": "probe-native.stdout.json",
+      "present": true,
+      "bytes": 5608,
+      "sha256": "f22384e782ca8f91a79515d04425429a1bdc31b6cfcba0c038e819af1d7559ab"
+    },
+    "stderr": {
+      "name": "probe-native.stderr.txt",
+      "present": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "terminal_native_event": {
+      "event": "miss",
+      "pending": [
+        1
+      ]
+    },
+    "expected_inactive_alternative_probe_id": 1,
+    "observed_path": "CJS emitted VM.Script boundary",
+    "cjs_probe_hit_count": 4,
+    "esm_probe_hit_count": 0,
+    "transform_probe_hit_count": 4,
+    "per_hit_file_ids": null,
+    "per_hit_source_code_map_hashes": null,
+    "vm_capability_values": null,
+    "wrapper_and_column_offset_values": null
+  },
+  "native_jest_json": {
+    "artifact": {
+      "name": "jest-native.json",
+      "present": true,
+      "bytes": 7438,
+      "sha256": "76ebda4abcbb3b4d07dff8091fda1f69da0cae43b65d14f72f0e32930acd421a"
+    },
+    "exit_code": null,
+    "exit_attribution": "Native JSON success observed; a separate Jest process exit code was not returned.",
+    "actual_fields": {
+      "numPassedTests": 0,
+      "numFailedTests": 0,
+      "numPendingTests": 23,
+      "numTotalTests": 23,
+      "numRuntimeErrorTestSuites": 0,
+      "success": true,
+      "wasInterrupted": false
+    },
+    "actual_assertion_status_counts": {
+      "pending": 23
+    },
+    "actual_suite_statuses": [
+      "skipped"
+    ],
+    "no_native_runtime_suite_errors": true
+  },
+  "actual_native_hit_observations": [
+    {
+      "probe_id": 2,
+      "hit": 1,
+      "location": {
+        "source_id": "jest_transform_installed",
+        "line": 514,
+        "column": 5
+      },
+      "result": {
+        "type": "object",
+        "description": "Object"
+      },
+      "expression_exception_observed": false
+    },
+    {
+      "probe_id": 0,
+      "hit": 1,
+      "location": {
+        "source_id": "jest_runtime_installed",
+        "line": 1505,
+        "column": 7
+      },
+      "result": {
+        "type": "object",
+        "description": "Object"
+      },
+      "expression_exception_observed": false
+    },
+    {
+      "probe_id": 2,
+      "hit": 2,
+      "location": {
+        "source_id": "jest_transform_installed",
+        "line": 514,
+        "column": 5
+      },
+      "result": {
+        "type": "object",
+        "description": "Object"
+      },
+      "expression_exception_observed": false
+    },
+    {
+      "probe_id": 0,
+      "hit": 2,
+      "location": {
+        "source_id": "jest_runtime_installed",
+        "line": 1505,
+        "column": 7
+      },
+      "result": {
+        "type": "object",
+        "description": "Object"
+      },
+      "expression_exception_observed": false
+    },
+    {
+      "probe_id": 2,
+      "hit": 3,
+      "location": {
+        "source_id": "jest_transform_installed",
+        "line": 514,
+        "column": 5
+      },
+      "result": {
+        "type": "object",
+        "description": "Object"
+      },
+      "expression_exception_observed": false
+    },
+    {
+      "probe_id": 0,
+      "hit": 3,
+      "location": {
+        "source_id": "jest_runtime_installed",
+        "line": 1505,
+        "column": 7
+      },
+      "result": {
+        "type": "object",
+        "description": "Object"
+      },
+      "expression_exception_observed": false
+    },
+    {
+      "probe_id": 2,
+      "hit": 4,
+      "location": {
+        "source_id": "jest_transform_installed",
+        "line": 514,
+        "column": 5
+      },
+      "result": {
+        "type": "object",
+        "description": "Object"
+      },
+      "expression_exception_observed": false
+    },
+    {
+      "probe_id": 0,
+      "hit": 4,
+      "location": {
+        "source_id": "jest_runtime_installed",
+        "line": 1505,
+        "column": 7
+      },
+      "result": {
+        "type": "object",
+        "description": "Object"
+      },
+      "expression_exception_observed": false
+    }
+  ],
+  "cache_artifact_checks": {
+    "class": "Local post-completion artifact verification",
+    "scope": "Jest transform cache",
+    "read_after_observer_completed": true,
+    "enumeration_exit_code": 0,
+    "total_native_cache_file_count": 20,
+    "checksum_contract": {
+      "algorithm": "sha1",
+      "hex_prefix_chars": 32,
+      "separator_bytes": 1,
+      "emitted_body_offset_bytes": 33
+    },
+    "entries": [
+      {
+        "file_id": 0,
+        "cache_bytes": 51704,
+        "whole_cache_sha256": "4b0cd2c8d5a102bec7f9f7d24de77cb40062398e30caa27d99098d127c5ff9f5",
+        "native_checksum_valid": true,
+        "emitted_code_sha256": "f93de4dc6fec0a6166f1b39b9a291e4b5132d5450a5c67b33e174c30d589bd0d",
+        "inline_map_bytes": 27872,
+        "inline_map_sha256": "b63e01d83279a62584341446c279424a9f3ca3e29a5e1e52681a1c2e0e04bb2e",
+        "map_sources_count": 1,
+        "map_file_is_expected": true,
+        "map_source_contents_present": true,
+        "map_source_contents_hashes": [
+          "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79"
+        ],
+        "sources_content_matches_frozen_pin": true
+      },
+      {
+        "file_id": 1,
+        "cache_bytes": 16129,
+        "whole_cache_sha256": "a6097fbbf1ac2fe93fb6b17ea89be38b264433e2a2082c811d7a37531d177a2f",
+        "native_checksum_valid": true,
+        "emitted_code_sha256": "c4a8b11323ef9adba1bdf7336aceee8a8d50596e1a03792fe93520e21ea6f77e",
+        "inline_map_bytes": 8839,
+        "inline_map_sha256": "ef2d3b0540f0ab7a4243df72be1ca4996f0ff2b3a50bca8fedf2bcb4f82818b8",
+        "map_sources_count": 1,
+        "map_file_is_expected": true,
+        "map_source_contents_present": true,
+        "map_source_contents_hashes": [
+          "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c"
+        ],
+        "sources_content_matches_frozen_pin": true
+      },
+      {
+        "file_id": 2,
+        "cache_bytes": 105678,
+        "whole_cache_sha256": "f9f5db040cef19cadf5a67accd9e4457ef50bac7bbbc23fa54f2417e37025b9e",
+        "native_checksum_valid": true,
+        "emitted_code_sha256": "87f1c95accd7fc5eefe62055607ac72a1ee7750faa64144d1e9f21a7cc9340f0",
+        "inline_map_bytes": 54286,
+        "inline_map_sha256": "47ced8b69acf7ac83936effc09547b0dbbf7c17f43696bfa78cad9184ab8bd08",
+        "map_sources_count": 1,
+        "map_file_is_expected": true,
+        "map_source_contents_present": true,
+        "map_source_contents_hashes": [
+          "2ebd05b461504a53c0a9453efb877f3fee06202284fd6dc5ddef035f3be33255"
+        ],
+        "sources_content_matches_frozen_pin": true
+      },
+      {
+        "file_id": 3,
+        "cache_bytes": 20039,
+        "whole_cache_sha256": "f537faf8ca4bd5c052656b4f95b0db7a1723b31c4cc5fb3f62de85a91dfa0ad7",
+        "native_checksum_valid": true,
+        "emitted_code_sha256": "ae48388400e9984ad3d316ed61f3f69de0147536067a2778fcddb8d1e67bd1f8",
+        "inline_map_bytes": 10860,
+        "inline_map_sha256": "8b250446fd22c89eaa48e7c384233fcaaab41e051728a5aecb1befd186581a91",
+        "map_sources_count": 1,
+        "map_file_is_expected": true,
+        "map_source_contents_present": true,
+        "map_source_contents_hashes": [
+          "53f86d2a5c313966a9e5c9dd9fc69676755f7dbf50be530558d254571424b0f6"
+        ],
+        "sources_content_matches_frozen_pin": true
+      }
+    ],
+    "whole_cache_hash_is_emitted_code_hash": false,
+    "constructor_stage_hash_binding_recovered": false,
+    "sdk_v8_pausable_positions_verified": false
+  },
+  "gate": {
+    "result": "FAIL",
+    "native_help_flags": "PASS",
+    "native_zero_selected_jest_json": "PASS",
+    "four_target_cache_source_and_map_artifacts": "PASS",
+    "required_file_stage_binding_pairs": 8,
+    "accepted_file_stage_binding_pairs": 0,
+    "unique_observed_constructor_file_ids": null,
+    "unique_observed_transform_file_ids": null,
+    "reason": "Default native inspector JSON retained object type/description without requested object-property values. Four hits per stage do not prove the required file/hash binding matrix.",
+    "repair_or_observer_rerun_performed": false,
+    "next_observation": "HOLD pending coordinator and Astra source adjudication"
+  },
+  "correction": {
+    "claim_corrected": "An ordinary object returned by native probe expression is not serialized by value merely by using --json.",
+    "verification_path": "Original pinned Node source and all eight actual native hit results.",
+    "source_url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect_probe.js",
+    "decisive_original_lines": [
+      "175-191 trim CDP RemoteObject",
+      "194-211 strip preview property",
+      "727-728 evaluateOnCallFrame requests generatePreview without returnByValue",
+      "735-742 preserve error or trimmed RemoteObject",
+      "1079-1083 default JSON output strips preview when --preview is absent"
+    ],
+    "actual_returned_result": {
+      "type": "object",
+      "description": "Object"
+    },
+    "returned_result_count": 8
+  },
+  "preserved_failures": [
+    {
+      "kind": "Earlier native SDK positive-suite failure",
+      "scope": "Historical trigger; no positive fixture rerun in this preflight",
+      "remaining_status": "HOLD"
+    },
+    {
+      "kind": "Current binding metadata failure",
+      "native_operation_exits_zero": true,
+      "required_fields_not_returned": true,
+      "source_or_test_repair": false
+    }
+  ],
+  "artifact_retention": {
+    "exact_native_stdout_stderr_jest_json_frozen_recipe_and_api_tool_return_copies": "Private owned readiness directory",
+    "public_sanitization": "No source bodies, expressions, environment values, machine paths or conversations. Only source pins, logical references, hashes and bounded native result fields.",
+    "stdout_and_stderr_not_rewritten": true,
+    "registration": "Coordinator-owned; pending integration"
+  },
+  "structural_validation": {
+    "json_syntax_exit_code": 0,
+    "staged_diff_check_exit_code": 0,
+    "repository_validator_exit_code": 1,
+    "repository_validator_only_failure": "Owned evidence file is not hash-listed; coordinator registration is pending.",
+    "validator_stdout_bytes": 165,
+    "validator_stdout_sha256": "47be7c600168e3791b07d32a33063f603c33eccbbdac0d4d22cb687dd37d00fb",
+    "actual_tool_return_copies": {
+      "private_artifact_key": "actual-tool-returns",
+      "bytes": 699,
+      "sha256": "dd58e2738525844012a57fea2643e48c51c1b9282bc53ae666d0ea1ba7e790a7",
+      "attribution": "Verbatim API-return metadata; not a reconstructed native status artifact."
+    }
+  },
+  "provider_usage": {
+    "gross_input_tokens": null,
+    "cached_read_input_tokens": null,
+    "output_tokens": null,
+    "cache_creation_input_tokens": null
+  },
+  "acceptance_limits": [
+    "No selected SDK test callback passed or ran.",
+    "Native cache artifacts establish compiler-input/code/map identity only.",
+    "No SDK inner-method V8 pausable locations, lifecycle timeline, common-clock boundaries, provider route, effort, role, usage completeness, quality or savings acceptance.",
+    "No further observation occurred after this single incomplete attempt."
+  ]
+}

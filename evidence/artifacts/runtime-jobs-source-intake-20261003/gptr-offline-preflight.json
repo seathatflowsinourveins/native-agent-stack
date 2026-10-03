@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "kind": "native_runtime_offline_preflight",
+  "recorded_date": "2026-10-03",
+  "evidence_class": "local_integration",
+  "repository": "assafelovic/gpt-researcher",
+  "tag": "v3.7.0",
+  "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+  "native_clone_exit_code": 0,
+  "native_source_head_exit_code": 0,
+  "native_source_head": "0957c301ed06c2a5857b834358c7227c739041d4",
+  "source_files": [
+    {"path": "requirements.txt", "bytes": 1252, "sha256": "6d11deb240ef10a18f2d2ad1f51c0e3c273d65d8f988d3e51e7c85da2cb3259d"},
+    {"path": "docs/docs/gpt-researcher/getting-started/cli.md", "bytes": 2886, "sha256": "10a67d33c5a85cdc84863f21abab6dade392235492e4bb18c6f2734b7af58e89"},
+    {"path": "cli.py", "bytes": 12555, "sha256": "b0cdeb184d592aadc32cb54e20d09b47aca23e0f34f2092cb8ead4f8940f52de"},
+    {"path": "gpt_researcher/config/config.py", "bytes": 14152, "sha256": "48ec5ed000d635f906735412f6fbc99e80be42661621d6f7efdd1876e22a9878"},
+    {"path": "gpt_researcher/utils/llm.py", "bytes": 8497, "sha256": "f22942e27b1356724daa3fc8dc0629ecbffe361f84455ee278a72b75668a2768"},
+    {"path": "gpt_researcher/agent.py", "bytes": 31736, "sha256": "49c7b6be798b628c32b4d59c3e36055c098910c6f79177ab280e45eea44f3492"},
+    {"path": "gpt_researcher/context/select.py", "bytes": 4273, "sha256": "4b19c2abecbc5da096aa2eb9bd23fb7e572f65f68b82432c6558efa16e1b0abc"}
+  ],
+  "installation": {
+    "source_recipe": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/getting-started/cli.md",
+    "native_venv_command": "uv venv --python 3.13 --seed",
+    "native_venv_exit_code": 0,
+    "python": "3.13.15",
+    "pip": "26.2.1",
+    "native_install_command": "python -m pip install --no-input -r requirements.txt python-dotenv==1.2.4 langchain-openai==1.6.7",
+    "native_install_exit_code": 0,
+    "cleared_environment": true,
+    "upstream_dependency_ranges_preserved_with_two_explicit_selected_versions": true,
+    "complete_install_stdout_retained": false,
+    "dependency_snapshot": "gptr-dependency-snapshot.json",
+    "native_pip_check_exit_code": 0,
+    "native_pip_check_returned_output": "No broken requirements found."
+  },
+  "dotenv_guard": {
+    "repository": "theskumar/python-dotenv",
+    "version": "1.2.4",
+    "pin": "a565c2cc41599c48eabc6b7b7f5b826d43c5a6d7",
+    "source_file": "src/dotenv/main.py",
+    "bytes": 15179,
+    "sha256": "697eb33eee75d78b73db61eaf96bf9a6547548c1811c93501b67e056e5470dea",
+    "original_guard_lines": [418, 422, 425],
+    "control": "PYTHON_DOTENV_DISABLED=1 returns before .env discovery/loading. Both this setting and PYTHONNOUSERSITE=1 were explicit in the otherwise cleared environment."
+  },
+  "observed_controls": [
+    {"native_command": "python cli.py --help", "native_exit_code": 0, "returned_contract": "query plus required --report_type; --report_source web/local/hybrid/azure/langchain_documents/langchain_vectorstore/static; --no-pdf and --no-docx"},
+    {"native_command": "from gpt_researcher.config import Config; Config(); print('GPTR_CONFIG_IMPORT_OK')", "native_exit_code": 0, "returned_output": "GPTR_CONFIG_IMPORT_OK"},
+    {"native_command": "Config() with native FAST_LLM/SMART_LLM/STRATEGIC_LLM/RETRIEVER/CONTEXT_FILTER env fields; print only provider/model/retriever/filter primitives", "native_exit_code": 0, "returned_output": "openai cx/gpt-6.1-sol openai cx/gpt-6.1-sol openai cx/gpt-6.1-sol keyword ['duckduckgo']"}
+  ],
+  "native_source_status_exit_code": 0,
+  "native_source_status_returned_output": "",
+  "limits": [
+    "These are native CLI/configuration integration checks, not unchanged upstream tests or useful research execution.",
+    "The observed plain cx/gpt-6.1-sol config is not the final Ultra suffix/profile. Native field parsing does not establish model delivery.",
+    "The native REASONING_EFFORT enum accepts low/medium/high; requested Ultra uses the documented LLM_KWARGS escape hatch, subject to downstream and gateway qualification.",
+    "Keyword filtering defers embedding construction on ordinary context selection; specialized section/vector paths remain separate and unqualified.",
+    "The stock report CLI makes an additional fast-model title request; future usage must include that request and retries.",
+    "GPTR callback USD costs are not a complete provider token ledger. Actual missing counters remain unknown.",
+    "No research report, provider transport, activated MCP surface, freeze, final default or token saving is established. Source predicts no provider calls for these controls; no independent network trace was captured."
+  ],
+  "provider_usage": null,
+  "billing": null
+}

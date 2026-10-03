@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "class": "pinned_source_qualification_controls",
+  "date": "2026-10-03",
+  "repository": "https://github.com/diegosouzapw/OmniRoute",
+  "version": "3.8.51",
+  "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+  "root_original_sources": [
+    {"path": "src/shared/constants/headers.ts", "bytes": 878, "sha256": "22819a17abd61321bfcd238dc6d345189ea23e8441422ff06333a9c6b0b701c6"},
+    {"path": "src/lib/semanticCache.ts", "bytes": 19900, "sha256": "c71b2c555584370bad3d90de8c5b43a550e68a31d2050d7d78361f5c98a1390a"},
+    {"path": "tests/unit/chatcore-semantic-cache.test.ts", "bytes": 26810, "sha256": "b9b865004322fee8876f3fff8b1fa7212952c8ed7fbf90e3b1e7a49b9efa8d39"},
+    {"path": "open-sse/handlers/chatCore/streamingSemanticCacheStore.ts", "bytes": 4355, "sha256": "c6b8504d1ba2c7692e5e4726b6565ee5b68b9a1c33e24ce356c426b4bc38ef21"},
+    {"path": "open-sse/handlers/chatCore.ts", "bytes": 280134, "sha256": "15e4eae668dc790a5dad1995f6f9e3c9e87bd7ace7cc76cfe5acc89b0c4343ac"}
+  ],
+  "semantic_response_cache_bypass": {
+    "supported_request_headers": [{"X-OmniRoute-No-Cache": "true"}, {"Cache-Control": "no-cache"}],
+    "read_guard": "src/lib/semanticCache.ts:483",
+    "write_guard": "src/lib/semanticCache.ts:501",
+    "streaming_write_guard": "open-sse/handlers/chatCore/streamingSemanticCacheStore.ts:107",
+    "matching": "Header names are case-insensitive. No-cache value is lowercased but not trimmed; Cache-Control is lowercased and checked for the no-cache substring. no-store alone does not trigger these guards.",
+    "cache_enabled_request_gate": "Explicit numeric temperature0 plus existing cache enablement is required; removing bypass does not force caching.",
+    "scope": "Gateway semantic-response-cache read and write only. No upstream prompt-cache purge, compression/reasoning-cache isolation or idempotency bypass is established."
+  },
+  "response_metadata_allowlist": [
+    "X-OmniRoute-Cache", "X-OmniRoute-Cache-Hit", "X-OmniRoute-Cache-Latency",
+    "X-OmniRoute-Cache-Similarity", "X-OmniRoute-Savings-Tokens", "X-OmniRoute-Cost-Saved",
+    "X-OmniRoute-Compression", "X-OmniRoute-Provider", "X-OmniRoute-Model",
+    "X-OmniRoute-Request-Id", "X-OmniRoute-Tokens-In", "X-OmniRoute-Tokens-Out", "X-OmniRoute-Response-Cost"
+  ],
+  "counter_limits": [
+    "Cached usage describes a retained response, not new provider consumption.",
+    "Savings and costs in gateway headers are estimates/calculations, separate from returned provider billing.",
+    "Capture only the named metadata; full headers and request/event bodies are excluded."
+  ],
+  "compression_off_limit": {
+    "source": "open-sse/handlers/chatCore.ts:1442",
+    "observation": "Per-key compression opt-out and x-omniroute-compression:off disable proactive prompt compression without disabling independent reactive context-fit safety passes. Actual master/exclusion/configuration and interventions remain unobserved."
+  },
+  "native_fixture_limit": {
+    "fixture": "checkSemanticCache returns null when the x-omniroute-no-cache header forces a bypass",
+    "source_line": 94,
+    "observed_assertion": "Null response is asserted for temperature0 and explicit no-cache header.",
+    "existing_hit_seeded": false,
+    "interpretation": "This unrun fixture alone does not distinguish bypass from an ordinary miss; source read/write gates provide the narrower control contract.",
+    "executed": false
+  },
+  "limits": [
+    "Pinned source controls only; the installed process/build, model/effort route and feature activation remain unqualified.",
+    "No settings/account/authentication store, management endpoint or model request was read or changed.",
+    "No feature saving, cold provider cache, complete cache namespace or final default is measured."
+  ]
+}

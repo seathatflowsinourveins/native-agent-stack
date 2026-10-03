@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "kind": "coding-image-stopped-network-amendment",
+  "recorded_date": "2026-10-03",
+  "evidence_class": "source-bound prospective correction and native nonactivating file-transfer preparation",
+  "receipt_base_commit": "eae4c151839dc30a7b5fec7550ee7643296de294",
+  "original_freeze": {
+    "file": "concrete-freeze-private-bindings.json",
+    "bytes": 25296,
+    "sha256": "e56e50bba94783874f230999d4ce4816a4a2fec91a63839c53c5c78fc6e4a8b6",
+    "preserved_unchanged": true
+  },
+  "corrected_private_freeze": {
+    "file": "concrete-freeze-stopped-network-bindings.json",
+    "bytes": 26164,
+    "sha256": "a5fce5ebfad52f531049b7057852bda282a57a105ccfe62e0019f57c4ed24677",
+    "source_stage": "owned shared staging",
+    "destination": "owned runtime builder-inputs",
+    "copy_exit": 0,
+    "native_destination_hash_exit": 0,
+    "native_source_and_destination_hash_equal": true
+  },
+  "material_defect": "The original predicate required a never-started stopped main container to be a live endpoint of the project network. At these pinned sources creation stores network configuration; starting creates and joins the live endpoint.",
+  "corrected_network_contract": {
+    "main_container": {
+      "configured_network_name": "nas-coding-image-readiness-20261003_default",
+      "configured_names_field": ".NetworkSettings.Networks keys",
+      "configured_name_relationship": "Equal the frozen exact project-network name; record separately from live attachment.",
+      "running": false,
+      "start_action_added": false,
+      "network_id_or_endpoint_id_coupling_required": false
+    },
+    "project_network": {
+      "name": "nas-coding-image-readiness-20261003_default",
+      "labels": {
+        "com.docker.compose.project": "nas-coding-image-readiness-20261003",
+        "com.docker.compose.network": "default"
+      },
+      "full_id_field": ".Id",
+      "full_id_observation": "Capture independently alongside exact .Name and frozen Compose labels; no fabricated full network ID.",
+      "live_endpoints_field": ".Containers",
+      "expected_live_endpoints": {},
+      "unknown_policy": "Absent/null/unreadable fields remain unknown and HOLD; unexpected live endpoints are HOLD and cleanup on unknown project membership is refused."
+    }
+  },
+  "recursive_delta": {
+    "changed_or_added_leaf_count": 8,
+    "changes": [
+      {
+        "pointer": "/identity_predicates/main_full_id/network_membership",
+        "before": "The captured full main ID must be attached to the captured full ID of the exact project default network.",
+        "after": "At main-create-without-start, capture the configured project-network name from .NetworkSettings.Networks independently of live attachment. The configured name must equal the exact project network name. Do not require this never-started main as a live network endpoint, or equate its NetworkID/EndpointID fields with the separately captured network .Id.",
+        "operation": "replace"
+      },
+      {
+        "pointer": "/identity_predicates/main_full_id/configured_network_name",
+        "before": null,
+        "after": "nas-coding-image-readiness-20261003_default",
+        "operation": "add"
+      },
+      {
+        "pointer": "/identity_predicates/main_full_id/configured_network_names_field",
+        "before": null,
+        "after": ".NetworkSettings.Networks keys",
+        "operation": "add"
+      },
+      {
+        "pointer": "/identity_predicates/project_network/ownership",
+        "before": "Record full network ID and only the owned main full container ID in membership; refuse cleanup on unknown project membership.",
+        "after": "Capture the full network .Id, exact .Name and the frozen Compose project/network labels independently. For the never-started main phase, native network inspect .Containers must be an empty object. Unexpected live endpoints are HOLD; refuse cleanup on unknown project membership. No main NetworkID/EndpointID equality is required to prove stored configuration.",
+        "operation": "replace"
+      },
+      {
+        "pointer": "/identity_predicates/project_network/full_id_field",
+        "before": null,
+        "after": ".Id",
+        "operation": "add"
+      },
+      {
+        "pointer": "/identity_predicates/project_network/live_endpoints_field",
+        "before": null,
+        "after": ".Containers",
+        "operation": "add"
+      },
+      {
+        "pointer": "/identity_predicates/project_network/expected_live_endpoints",
+        "before": null,
+        "after": {},
+        "operation": "add"
+      },
+      {
+        "pointer": "/identity_predicates/project_network/missing_live_endpoint_field",
+        "before": null,
+        "after": "HOLD; absent/null or unreadable .Containers is unknown, never coerced to empty.",
+        "operation": "add"
+      }
+    ]
+  },
+  "preservation_observation": {
+    "native_read_compare_exit": 0,
+    "tool_return": "f5cdf6",
+    "all_other_top_level_fields_equal": true,
+    "builder_predicate_equal": true,
+    "main_non_network_predicates_equal": true,
+    "operational_docker_argv_preserved": 14,
+    "duplicated_main_identity_selection_argv_preserved": 1,
+    "total_literal_docker_arrays_unchanged": 15,
+    "endpoint_selection_preserved": true,
+    "builder_amd64_driver_preserved": true,
+    "all_source_file_binary_and_env_identity_records_preserved": true,
+    "all_native_phase_and_witness_argv_unchanged": true,
+    "supervision_parameters_unchanged": "original120s TERM +10s KILL grace; cleanup observation30s +10s grace; original duration_semantics unchanged",
+    "duration_parameter_claim": "source-reviewed nominal parameters; no executed lifecycle or guaranteed wall deadline claim",
+    "original_duration_semantics_and_pending_metadata_unchanged": true
+  },
+  "original_review": {
+    "requested_family": "Astra",
+    "requested_effort": "max",
+    "actual_delivered_model": null,
+    "review_provider_usage": null,
+    "status": "SOURCE-ACCEPT scoped inputs/commands; HOLD complete activation under original freeze",
+    "source_accept_scope": [
+      "all14 single-endpoint operational Docker argv",
+      "owned assets/source policy carrier",
+      "GNU9.7 nominal cleanup120/+10 and observation30/+10 parameters"
+    ],
+    "activation_defect": "Stopped-main live-network predicate conflicts with exact Moby/Compose source lifecycle.",
+    "reported_lookup_failures": {
+      "astra_guessed_raw_tag_or_paths_http404": 7,
+      "exact_failed_paths_or_tool_returns": null,
+      "root_resolution": "native release-tag resolution0 to Moby8af9fe3a36bab3e039862a2ab1cef1880c9b4d03; four Moby and Compose originals HTTP200/hashmatched",
+      "scope": "Parent-retained source lookup history, not candidate execution; no reconstructed raw receipts."
+    }
+  },
+  "corrected_freeze_review": {
+    "root_exact_file_acceptance": "SOURCE-ACCEPT exact26164/SHAa5fce5e and eight network-only predicates",
+    "astra_exact_file_acceptance": "SOURCE-ACCEPT at most one native image-readiness/lifecycle attempt; no study",
+    "activation_admission": "AT_MOST_ONE_CONDITIONAL_ON_FRESH_MATCHING_NATIVE_PREFLIGHT_AND_ALL_INHERITED_GATES",
+    "input_snapshot_only": true,
+    "requested_role": "Astra/max consequential corrected lifecycle admission",
+    "actual_delivered_model": null,
+    "provider_usage": null,
+    "result": "SOURCE-ACCEPT at most one prospective native image-readiness/lifecycle attempt using exactly26164B/SHAa5fce5ebfad52f531049b7057852bda282a57a105ccfe62e0019f57c4ed24677",
+    "verified": "Eight network-only predicates; all14operational argv and repeated selector, builder predicates/otherfields unchanged; configured network keys and separate empty live endpoints supported by pinned Compose/Moby source.",
+    "retained_gates": [
+      "matching frozen inputs/executables/endpoint and fresh owned-object absence before activation",
+      "one build and main creation without start",
+      "independent builder/output-image/container identities",
+      "inherited cleanup supervision and all independent absence witnesses",
+      "unknown/mismatch=>HOLD"
+    ],
+    "actual_execution": "NOT STARTED; root-owned readonly preflight running; no build, main creation or cleanup acceptance yet",
+    "study_freeze": "HOLD",
+    "runtime_default": "HOLD"
+  },
+  "native_preparation": {
+    "current_host_cp": {
+      "version": "GNU9.4",
+      "version_exit": 0,
+      "help_exit": 0,
+      "allowed_update_values": [
+        "all",
+        "none",
+        "older"
+      ],
+      "scope": "Current-host observation; not the runtime selected for this transfer."
+    },
+    "owned_runtime_cp": {
+      "version": "GNU9.7",
+      "source_pin": "8e075ff8ee11692c5504d8e82a48ed47a7f07ba9",
+      "expected_and_observed_binary_sha256": "8fcdb2485ebc68f00392d647b3d3d9130f0d4bb9f72c69ee258086dd63e1c122",
+      "version_exit": 0,
+      "help_exit": 0,
+      "binary_hash_exit": 0,
+      "supported_update_values": [
+        "all",
+        "none",
+        "none-fail",
+        "older"
+      ]
+    },
+    "transfer": {
+      "native_program": "/usr/bin/cp",
+      "argv": [
+        "--update=none-fail",
+        "--no-target-directory",
+        "--",
+        "<owned-staged-new-freeze>",
+        "<owned-runtime-new-freeze>"
+      ],
+      "exit": 0,
+      "tool_return": "58316c",
+      "activation": false
+    },
+    "destination_checksum": {
+      "native_program": "sha256sum",
+      "installed_version": "uutils coreutils0.8.0",
+      "version_exit": 0,
+      "hash_exit": 0,
+      "tool_return": "c0049b",
+      "sha256": "a5fce5ebfad52f531049b7057852bda282a57a105ccfe62e0019f57c4ed24677",
+      "scope": "Native checksum independently matched current-host Python hashlib.sha256; no checksum-tool adoption or whole-runtime identity claim."
+    },
+    "failures_and_corrections": [
+      {
+        "stage": "read_only_runtime_cp_version_probe",
+        "exit": 1,
+        "tool_return": "d6fa27",
+        "error": "Bare wsl.exe was not found on the current PATH.",
+        "correction": "Use the already-known installed absolute WSL executable with --cd /tmp.",
+        "corrected_probe_exit": 0,
+        "corrected_tool_return": "20d484",
+        "scope": "Executable lookup failure on the coordinator; not runtime cp absence."
+      }
+    ]
+  },
+  "source_refs": [
+    {
+      "path": "daemon/create.go",
+      "url": "https://raw.githubusercontent.com/moby/moby/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/create.go",
+      "bytes": 13412,
+      "sha256": "7337eee29d341b24825f61fe48a3935877c0321905968d20b0a864a1d60839ad",
+      "meaning": "Container creation stores supplied endpoint configurations, lines242–251."
+    },
+    {
+      "path": "daemon/start.go",
+      "url": "https://raw.githubusercontent.com/moby/moby/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/start.go",
+      "bytes": 11291,
+      "sha256": "adf962729f6e7358295c0cb9e7639ca9864891260ba228fed133d25e04c0ac40",
+      "meaning": "Networking initialization happens during container start, line140."
+    },
+    {
+      "path": "daemon/network.go",
+      "url": "https://raw.githubusercontent.com/moby/moby/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/network.go",
+      "bytes": 40094,
+      "sha256": "c76765bf29f1c52f199c88d09fa961dbafa6c1d5f972960f5cc10f928a30180a",
+      "meaning": "Network .Containers derives from actual libnetwork endpoints, lines755–768; stored configuration is separate."
+    },
+    {
+      "path": "daemon/container_operations.go",
+      "url": "https://raw.githubusercontent.com/moby/moby/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/container_operations.go",
+      "bytes": 39577,
+      "sha256": "cc31fb20f1cef9563a4210e5d8fced0bc19446e45cf359740a674cd2db0cedd0",
+      "meaning": "Creation stores per-network configuration by name at363–425; start networking creates sandbox493, endpoint761 and join809."
+    },
+    {
+      "path": "pkg/compose/create.go",
+      "url": "https://raw.githubusercontent.com/docker/compose/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/pkg/compose/create.go",
+      "bytes": 49579,
+      "sha256": "6b74d3e216b2984fc654193af30f3a6fcb0bef7fd5d93ef24f8ad0fbf7bfe314",
+      "meaning": "Compose constructs endpoint configuration at510–519; configuration does not imply live endpoint attachment."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/coreutils/coreutils/8e075ff8ee11692c5504d8e82a48ed47a7f07ba9/src/cp.c",
+      "bytes": 42619,
+      "sha256": "bd80e7765ca45d675d8bb0e32d208e4e91a89f1c432e297395376ee728ca7436",
+      "meaning": "GNU cp9.7 native all/none/none-fail/older argument support at106–108 and230–232; no-target-directory at227."
+    }
+  ],
+  "boundaries": {
+    "builder_create": false,
+    "container_create": false,
+    "main_start": false,
+    "bootstrap": false,
+    "pull": false,
+    "image_build": false,
+    "compose_down": false,
+    "container_or_volume_removal": false,
+    "provider_or_model_execution": false,
+    "auth_or_active_client_configuration_access": false,
+    "install_or_permission_change": false,
+    "registry_write": false,
+    "commit": false,
+    "publish": false,
+    "study_comparison": false
+  },
+  "sanitization": "Personal/host paths and raw conversations omitted. Exact prospective operational paths/argv remain in the private freeze; original unchanged packet and both current hashes retained."
+}

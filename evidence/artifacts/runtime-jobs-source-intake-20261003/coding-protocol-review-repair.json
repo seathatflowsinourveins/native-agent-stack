@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "kind": "coding-protocol-source-review-repair",
+  "date": "2026-10-03",
+  "evidence_class": "primary-source protocol preparation and local artifact consistency; not candidate execution",
+  "review": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/633#issuecomment-5966568938",
+    "head": "9a29de48b9046e6fb16e3475e802faf90e8e0273",
+    "body_sha256": "9c94768186aa380c224743f4406dc968e142fc34df72c8fbf2aa878cf296a584",
+    "owned_findings": [
+      3,
+      8,
+      9,
+      10,
+      15
+    ],
+    "review_claims_are_leads": true
+  },
+  "repair_base": "b095cd2e11e7387e1bcfa107558743429714d8b9",
+  "owned_files": [
+    "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
+    "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-protocol-review-repair.json"
+  ],
+  "proposal_status": "partial source-cited repair; draft not frozen, no defaults or comparative execution",
+  "corrections": [
+    "Standing OpenHands1.50.1 is baseline; nativeCodex0.160 is agent arm and Pi1.0 challenger. Earlier baseline inversion is corrected against original e7a consensus",
+    "New24-task/Ultra/route/metrics/limits/setup are an explicit prospective amendment through existing owner; historical Gate A records/results remain unchanged",
+    "900-second agent budget is named modified setup; original native3000-second verifier budget retained. Native source carriers leave original task files unchanged",
+    "Efficiency uses complete authoritative uncached input plus output; gross/cache/reasoning subsets and failure/helper/grader scopes remain separate",
+    "Shared whole-task-repeat block recovery: infra-invalid quality null, preserve every attempt, next authorized window/same hashes, no independent arm retries, maximum invalid blocks2 then abort on third, exclusions0",
+    "Six repository coverage rationale is explicit and prior/new task outcomes are not selection criteria. The unretained72-fetch HTTP200 claim is replaced by native source-map/tree identity",
+    "Native --extra-docker-compose is eligible disposable declarative integration; stock built-in Compose has no explicit main networks at this pin. A fabricated --ek network_mode carrier is not proposed",
+    "Host networking does not qualify allowlist: pinned Harbor excludes explicit network_mode/networks services from egress sidecar routing",
+    "21128 target is proposed/unqualified. Morning20128 composition/readiness is historical, with no matched quality or current Ultra delivery acceptance"
+  ],
+  "sources": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "ref": "e7a83d495a344fc4ed70bedab0f6cf09ffa876a3",
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "cfd08b85efca343f428fadd8253a06ce9c08afb944a4f66a2aaae15d3c08fa96",
+      "original_read_native_exit": 0,
+      "scope": "agent-runtime-worker standing selection/amendment only"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "ref": "e7a83d495a344fc4ed70bedab0f6cf09ffa876a3",
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/codex-decisions.md",
+      "sha256": "464608b928709f5fd987b44ce2a019b29bb85f886b38c1bc095dc326c02cbac6",
+      "original_read_native_exit": 0,
+      "scope": "selected versions, arm roles, existing owner and preservation/amendment contract"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "ref": "1195e212c49ecf9cd6024bffda9ecddb9b2d54ed",
+      "path": "blueprints/runtime-workers/openhands/config/worker.json",
+      "sha256": "0363f132b82aa838b45b8d612508cf6c2ff636ca891aae29b25caf65ecb73c2f",
+      "bytes": 1283,
+      "original_read_native_exit": 0,
+      "scope": "public prior recipe example; not actual sealed-run configuration or acceptance"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "ref": "1195e212c49ecf9cd6024bffda9ecddb9b2d54ed",
+      "path": "blueprints/runtime-workers/openhands/e2e/task.py",
+      "sha256": "832043a6733b112cc9cc79d5a82524849bc357374bb1eb0ba267747cf24fcaa7",
+      "bytes": 2956,
+      "original_read_native_exit": 0,
+      "scope": "hash-checked single native JSON/JSONL task loader; actual sealed manifest not supplied by source"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/cli/jobs.py",
+      "sha256": "dd9cb7dd62b34b195d21e1d017e3a577c2aa226e671568c9c00924e96b1befd5",
+      "bytes": 102441,
+      "original_read_native_exit": 0,
+      "lines": [
+        477,
+        487,
+        934,
+        1726
+      ],
+      "scope": "supported agent/verifier timeout multipliers and extra Compose file carrier"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/trial/trial.py",
+      "sha256": "757f34424e35ea6e924484bff9ae75464e94acd5dec3d769bc65a9518ada79a8",
+      "bytes": 68864,
+      "original_read_native_exit": 0,
+      "lines": [
+        1438,
+        1443,
+        1449,
+        1459
+      ],
+      "scope": "native agent/verifier override and multiplier computation; setup separate"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "adapters/swebench/src/swebench_adapter/adapter.py",
+      "sha256": "6751e9e28ab3216911376d9e3c2bb9f5ca22f2261c214696cb597ce528189db7",
+      "bytes": 9528,
+      "original_read_native_exit": 0,
+      "lines": [
+        113
+      ],
+      "scope": "native adapter default max_timeout_sec3000; selected task deadlines still need full original binding"
+    },
+    {
+      "repository": "laude-institute/harbor-datasets",
+      "ref": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+      "path": "datasets/swebench-verified/django__django-14034/task.toml",
+      "sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+      "bytes": 417,
+      "original_read_native_exit": 0,
+      "scope": "one original task has agent/verifier3000, build1800; not all24 deadline qualification"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/environments/base.py",
+      "sha256": "fc4b18b96dd7885d3cb9eff59fc3d78d8183af95350489e5676f97bf41d9bf97",
+      "bytes": 54148,
+      "original_read_native_exit": 0,
+      "lines": [
+        124,
+        178,
+        244
+      ],
+      "scope": "constructor kwargs and overlay existing-file check"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/environments/docker/docker.py",
+      "sha256": "8757d3fbc19e58c7ccd14c9b613a0d00dccd1b514375fa0e546ff41ca963a15e",
+      "bytes": 54365,
+      "original_read_native_exit": 0,
+      "lines": [
+        395,
+        410,
+        421,
+        433,
+        444,
+        466,
+        1334
+      ],
+      "scope": "overlay order, explicit networking excluded from egress, PyYAML scan and native egress policies"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/environments/docker/__init__.py",
+      "sha256": "77283b61cd219d01b795d940bd8ca608e04be43f696f6d0ffbce14499ceef7e5",
+      "original_read_native_exit": 0,
+      "scope": "stock Compose paths and generated resource/env/volume fields; no base-network template"
+    },
+    {
+      "repository": "docker/compose",
+      "ref": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "go.mod",
+      "sha256": "cdf5424bec2a7c75fa955a56efc88fb1731db5cca019cf63d4a1980a218e0868",
+      "original_read_native_exit": 0,
+      "scope": "Compose5.5.1 selects compose-go/v2 v2.15.0"
+    },
+    {
+      "repository": "compose-spec/compose-go",
+      "ref": "4ddbf11f8bd3da1e9276f9185bad14596d388ece",
+      "tag": "v2.15.0",
+      "path": "loader/reset.go",
+      "sha256": "b542dfc0eb1c54ff78987dc0e34f0ae719f43c0b69fcdffa0dc29ac37f269977",
+      "bytes": 9951,
+      "original_read_native_exit": 0,
+      "lines": [
+        83
+      ],
+      "scope": "Compose !reset support, conditional on actual existing networks; Harbor allowlist overlay-tag compatibility unqualified"
+    }
+  ],
+  "source_preparation_bindings": {
+    "root_shared_contract": {
+      "path": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
+      "sha256_at_read": "0330fdfb533cf2c81b9d9a8074bacd427f0686f03223f862b60fd5ee49a92047",
+      "status": "root-owned working source; must bind final published hash before freeze"
+    },
+    "source_map": {
+      "path": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
+      "sha256": "f37312793dd6b641a31294c5c42269c00212e91fb6a756b74bc67bb64be2a66e"
+    },
+    "source_policy": {
+      "path": "blueprints/runtime-workers/comparisons/coding-source-policy.json",
+      "sha256": "a82998d636ab0f645cdfe426015bbd7c9ae411562f693b55b5f995ca1abe26c2",
+      "status": "declarative input only; this worker did not build or verify enforcement"
+    },
+    "objective_brief_sha256": "4adab81895d6849532bbfd6544d9bc99d27934c31c778c60a6b9edcafc64dfc5",
+    "objective_brief_scope": "ownership, standing selections and method; private path intentionally omitted"
+  },
+  "time_envelope": {
+    "proposed_agent_seconds": 900,
+    "retained_verifier_seconds": 3000,
+    "arms": 3,
+    "repeats": 2,
+    "tasks": 24,
+    "planned_arm_attempts": 144,
+    "serial_agent_budget_seconds_total": 129600,
+    "serial_agent_budget_hours_total": 36,
+    "serial_verifier_budget_seconds_total": 432000,
+    "serial_verifier_budget_hours_total": 120,
+    "serial_combined_budget_hours_total": 156,
+    "one_serial_task_repeat_block_agent_seconds": 2700,
+    "one_serial_task_repeat_block_verifier_seconds": 9000,
+    "one_serial_task_repeat_block_combined_seconds": 11700,
+    "one_serial_task_repeat_block_combined_minutes": 195,
+    "values_are_declared_budget_arithmetic_not_observed_runtime": true,
+    "setup_build_cleanup_overhead_bound": null,
+    "reservation": {
+      "start_utc": "2026-10-03T13:00:00Z",
+      "end_utc": "2026-10-03T16:00:00Z",
+      "admission_due_utc": "2026-10-03T12:45:00Z",
+      "status": "conditional proposed allocation; no quality freeze"
+    },
+    "recommendation": "Keep24 tasks/two repeats/original graders; continue complete frozen blocks across recorded allocations. At concurrency1, reserve a later window exceeding195minutes plus qualified overhead, or accept an explicit native parallelism/timeout amendment before freeze. Do not silently shrink tasks, stop/retry individual arms, or start a block whose worst bound does not fit",
+    "parallelism_alternative": "Concurrency3 is only an amendment lead: native mixed-arm job ordering/admission/resource effects and bounded overhead must be source-qualified and accepted; it is not activated by this repair",
+    "maximum_recovery_arm_attempts": 6,
+    "maximum_recorded_arm_attempts_before_abort": 150,
+    "maximum_recovery_budget_hours_total": 6.5,
+    "maximum_combined_budget_hours_including_recovery": 162.5
+  },
+  "codex_isolated_install_lead": {
+    "target": "0.160.0",
+    "source_ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "source_url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/README.md",
+    "readme_sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+    "source_read_native_exit": 0,
+    "supported_recipe": "First-party README supports downloading the platform release archive, extracting its single binary and renaming it to codex. Put it in a private prefix and invoke its absolute path; do not replace global workstation client/config",
+    "asset_url": "https://github.com/openai/codex/releases/download/rust-v0.160.0/codex-x86_64-unknown-linux-musl.tar.gz",
+    "release_api": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.160.0",
+    "release_api_native_exit": 0,
+    "asset_id": 604047805,
+    "asset_bytes": 109304578,
+    "github_asset_digest": "sha256:306865417d4ee7a927785852910a527f41e1e159add390ac5ae3accb67d44a13",
+    "actual_download_digest": null,
+    "actual_installation": null,
+    "npm_metadata_url": "https://registry.npmjs.org/@openai%2fcodex/0.160.0",
+    "npm_metadata_sha256": "d61a592473442230ebfa5cc32976967bd023c6ed1243871c38cedcbed26f0733",
+    "npm_http_status": 200,
+    "npm_dist_integrity": "sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg==",
+    "npm_dist_shasum": "62ab3e7bd1cb858135374c25674f6a92d51289a6",
+    "installed_workstation_version_owner_reported": "0.159.3",
+    "installed_target_qualified": false,
+    "release_metadata_sha256": "98dc7f274fc242a9dbc07073eae15f04d58de46f79fb1b5346eb5837aa51d4da"
+  },
+  "readiness": {
+    "root_reported": "Exact Harbor1e5c installed0.23/native0; stock unchanged Docker Oracle reward1 and Nop reward0/native0 independently observed by root",
+    "original_output_receipt_binding": null,
+    "classification": "relayed offline container/verifier controls only, pending root-owned receipt identity; not new worker execution by this agent",
+    "coding_images": false,
+    "candidate_versions": false,
+    "gateway_connectivity": false,
+    "usage": false,
+    "limits": false,
+    "study": false,
+    "freeze": false
+  },
+  "failures_preserved": [
+    {
+      "phase": "source preparation",
+      "native_exit": 1,
+      "error": "SyntaxError: closing parenthesis '}' does not match opening parenthesis '['",
+      "effect": "processor rejected before reads; one corrected processor completed0"
+    },
+    {
+      "phase": "source preparation",
+      "native_exit": 2,
+      "error": "rg: src/harbor/network: No such file or directory (os error 2)",
+      "effect": "guessed directory corrected to original src/harbor/models/task/config.py; scoped subsequent searches0"
+    },
+    {
+      "phase": "source preparation",
+      "native_exit": 1,
+      "error": "gh: Not Found (HTTP 404)",
+      "path": "docker/compose/vendor/github.com/compose-spec/compose-go/v2/loader/reset.go",
+      "effect": "not vendored at proposed path; original go.mod then dependency tag/source resolved0"
+    },
+    {
+      "phase": "source processing",
+      "native_exit": 0,
+      "error": "Several over-cap excerpts were suppressed or explicitly clipped; one broad Gate-A regex also matched gateway strings",
+      "effect": "no completeness claim for those excerpts; corrected exact word-boundary searches and narrower original reads retained"
+    },
+    {
+      "phase": "artifact edit",
+      "error": "apply_patch verification failed: invalid patch: multiple operations target coding-worker-draft.json",
+      "effect": "rejected before changes; corrected to one native Update File operation"
+    },
+    {
+      "phase": "publication validation",
+      "command": "rtk proxy python3 scripts/validate.py",
+      "native_exit": 1,
+      "returned_output": "Publication validation failed:\nblueprints/runtime-workers/comparisons/coding-worker-draft.json: SHA-256 mismatch\nblueprints/runtime-workers/comparisons/coding-worker-draft.json: byte count mismatch\nblueprints/runtime-workers/comparisons/coding-worker-draft.json: contains possible local companion task handle\nevidence/artifacts/runtime-jobs-source-intake-20261003/coding-protocol-review-repair.json: evidence file is not hash-listed\n",
+      "correction": "Source scripts/validate.py28 matches task-[a-z0-9]{8}-[a-z0-9]{6}; the proposed label's eight-character model name and agent-budget suffix accidentally matched. Reworded label. Registry/hash registration remains root-owned; no registry edit by worker"
+    },
+    {
+      "phase": "native commit guard",
+      "native_exit": 1,
+      "returned_output": "4:02AM INF 0 commits scanned.\n4:02AM INF scanned ~36118 bytes (36.12 KB) in 159ms\n4:02AM WRN leaks found: 1\n",
+      "redacted_diagnostic": {
+        "command": "rtk proxy gitleaks git --pre-commit --staged --redact=100 --no-banner --report-format=json --report-path=-",
+        "native_exit": 1,
+        "rule": "generic-api-key",
+        "file": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-protocol-review-repair.json",
+        "line": 242
+      },
+      "correction": "The source-publication field named release_api_sha256 carried only the original GitHub release response digest. Renamed it release_metadata_sha256, preserving its original value/source. No guard disabled or credential value accessed"
+    }
+  ],
+  "verification": {
+    "status": "local_consistency_passed_publication_pending_root_owned_registry",
+    "commands": [
+      {
+        "command": "rtk proxy python3 - (stdin artifact consistency assertions)",
+        "native_exit": 0,
+        "returned_output": "{\"json_parse\":\"two files valid\",\"original_tasks_order_and_arm_pins_preserved\":true,\"baseline\":\"openhands-sdk\",\"planned_valid_attempts\":144,\"recovery_bound\":6,\"max_recorded_attempts\":150,\"serial_block_minutes\":195,\"draft_sha256\":\"906dc4c9dc4396eae61c87fcc1c4ddbc762ed7f0028fed8190db3e5fa0bb7cc5\"}\n",
+        "classification": "Locally authored structural assertions, not upstream evaluator/acceptance tests"
+      },
+      {
+        "command": "rtk git diff --check",
+        "native_exit": 0,
+        "returned_output": "",
+        "classification": "Native whitespace/diff consistency only"
+      },
+      {
+        "command": "rtk proxy python3 scripts/validate.py",
+        "native_exit": 1,
+        "returned_output": "Publication validation failed:\nblueprints/runtime-workers/comparisons/coding-worker-draft.json: SHA-256 mismatch\nblueprints/runtime-workers/comparisons/coding-worker-draft.json: byte count mismatch\nevidence/artifacts/runtime-jobs-source-intake-20261003/coding-protocol-review-repair.json: evidence file is not hash-listed\n",
+        "classification": "Publication not accepted; root owns registry and must update old coding entry/add receipt then rerun"
+      },
+      {
+        "command": "rtk proxy gitleaks git --pre-commit --staged --redact=100 --no-banner",
+        "native_exit": 0,
+        "returned_output": "4:03AM INF 0 commits scanned.\n4:03AM INF scanned ~36952 bytes (36.95 KB) in 153ms\n4:03AM INF no leaks found\n",
+        "classification": "Native staged guard after public-metadata field rename; no guard bypass"
+      }
+    ],
+    "expected_root_integration": [
+      "Update registered coding draft hash and byte count",
+      "Register new repair receipt under its final bytes/hash",
+      "Bind current shared contract/source-policy publication",
+      "Run native publication validator on integrated head"
+    ],
+    "limits": "Checks establish JSON/task-order/pin/declaration consistency only. No models, candidate task outcomes, benchmark truth, install, network enforcement, auth store, gateway connectivity or freeze acceptance"
+  },
+  "provider_calls": 0,
+  "model_trials": 0,
+  "container_builds_or_starts_by_this_worker": 0,
+  "installs": 0,
+  "credentials_or_active_client_config_read": false,
+  "token_usage": null,
+  "billing": null,
+  "consequential_review": {
+    "trigger": [
+      "host-network services are excluded from native Harbor egress enforcement",
+      "serial native grading envelope cannot fit proposed three-hour window",
+      "actual historical sealed bindings and complete wire/usage evidence remain unqualified"
+    ],
+    "required": "Astra/max consequential read and Claude exact repaired-head ACCEPT through root owner",
+    "acceptance_result": null
+  }
+}

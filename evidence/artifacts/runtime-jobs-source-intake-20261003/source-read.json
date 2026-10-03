@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "class": "source_review",
+  "reviewer": "native Codex via OmniRoute, GPT-6 Astra/max",
+  "trigger": "Consequential conflict between native Ultra orchestration, released gateway Sol aliases and evaluator effort contracts",
+  "base": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "artifact_state": "uncommitted initial source intake",
+  "native_exit_code": 0,
+  "original_answer": {"public_copy": false, "bytes": 12685, "sha256": "f8d59aca9c7a14564d5d9da183f8fdbc5c9e6b0ae2383e67cea5101121a85a4d"},
+  "reviewed_sha256": {
+    ".github/workflows/runtime-worker-skills-freshness.yml": "af56deffb177f4692b39d75e6b541f42dae979d0faf25b4209e2c579f65c8695",
+    "blueprints/runtime-workers/PLAN.md": "1a27524ecf49ef252953098e5607331dd1865b853ebb1c83e405f6320563c1d3",
+    "blueprints/runtime-workers/README.md": "5fc7cffa1c5283a95b83798c32d71c3cca29cae842413a05393516fef2dfc430",
+    "catalogs/foundation/runtime-jobs.json": "853df19652276c293f3b7d9970153ecc87f97c509944c98ec0c80f7c1020cd06",
+    "docs/decisions/2026-10-03-runtime-job-qualification.md": "742d187c366f89d7c3dd10d76da9bfcc952bce1e07db1af3b4709524bdfd73c0"
+  },
+  "accepted": ["Provisional source intake", "Eight job rows with null defaults and unmeasured status", "Nineteen resolved repository/version identities and twenty pinned source-file locations", "Native collector input shape", "Ordinary fetch-error/partial-error retention", "Source-only versus measurement boundary"],
+  "held": ["Publication pending registration and checks", "Uniform native Ultra contract", "Startup notice delivery", "Complete role and org-extension inventory", "Any default, route, activation, native-test or token-saving acceptance"],
+  "correction_response": "Rules now require per-runtime mappings; notice delivery is explicitly pending with an architecture-owner carrier; source/watch entries and role sources were expanded. This summary does not accept the later corrected artifacts or comparison drafts.",
+  "native_usage_scope": "Single terminal turn.completed; source-review overhead only",
+  "native_usage": {"input_tokens": 1992617, "output_tokens": 24179, "cached_input_subset": 1822208, "cache_write_input_tokens": 0, "reasoning_output_subset": 10705, "provider_billed_cost": null},
+  "preserved_failure_exit_codes": {"source_gh_connection": 1, "actionlint_not_on_review_path": 127, "pre_registration_validate": 1},
+  "limitations": ["Raw source judgment remains private; this public JSON is derived", "Initial scope excludes comparison drafts and org-extension inventory", "No candidate provider run or comparative freeze", "No installed gateway carry evidence", "Native usage subsets are not added to input/output totals"]
+}

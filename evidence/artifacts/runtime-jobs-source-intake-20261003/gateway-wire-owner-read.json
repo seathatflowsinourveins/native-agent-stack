@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "status": "owner_observed_wire_controls_sdk_roles_unqualified",
+  "gateway": {"port": 21128, "base_ref": "23a11484862b3bb589a55e85b00e4ac53ffeb234", "carry_commits": ["24bbadbad15eec0d598c908416e4b01be4e37671", "6c7990058c4ce9677de79452c8cefb10b4bf1b3d"], "effort_head": "0585aba5589d5a1f49243a13a8db249558e7c9e3"},
+  "owner_receipts": [
+    {"url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966860846", "created_at": "2026-10-03T07:41:32Z", "body_sha256": "90d0d077024c41e7e848595cb3b38c90e56ab580dd9d732ff8e41a23c5ee0c22", "root_original_read_exit": 0},
+    {"url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966873323", "created_at": "2026-10-03T07:43:25Z", "body_sha256": "98e864c0fef71ce8e1455da81f1d9f0f3afa5ffdf0d6b2d491d168106ac88834", "root_original_read_exit": 0}
+  ],
+  "owner_observations": {
+    "first_window": "2026-10-03T07:39:25Z/2026-10-03T07:39:56Z",
+    "wire_window": "2026-10-03T07:42:36Z/2026-10-03T07:43:01Z",
+    "request_shapes": 8,
+    "http_status_each": 200,
+    "delivered_model": "gpt-6.1-sol",
+    "delivered_reasoning_effort_each": "max",
+    "requested_ultra": "Delivered max by gateway design; native client orchestration is a separate property",
+    "parallel_tool_calls": "absent on the exercised provider requests; neither false nor an actual SDK/Codex Lite guarantee",
+    "chat_correlation_header": "honoured",
+    "responses_correlation_header": "ignored; gateway generates UUID",
+    "rows_per_request": "two rows sharing correlationId: upstream-attempt and client",
+    "counting": "count client rows with requestedModel and read their tokens; preserve attempt rows without summing duplicates",
+    "scoping": "Responses requires an exclusive time window plus retained per-attempt mapping",
+    "capture_afterwards": "owner disabled pipeline capture"
+  },
+  "root_upstream_reads": [
+    {"repository": "diegosouzapw/OmniRoute", "ref": "0585aba5589d5a1f49243a13a8db249558e7c9e3", "file": "open-sse/executors/codex.ts", "sha256": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd", "lines": "1428-1441", "claim": "Ultra wire mapping to max"},
+    {"repository": "diegosouzapw/OmniRoute", "ref": "0585aba5589d5a1f49243a13a8db249558e7c9e3", "file": "open-sse/handlers/chatCore.ts", "sha256": "2cd37bedd047aac8add19cf6194bc58309e69a7c9e6077349e311bbeb948a7fd", "lines": "1063-1067", "claim": "pipeline capture uses settings.call_log_pipeline_enabled"},
+    {"repository": "diegosouzapw/OmniRoute", "ref": "0585aba5589d5a1f49243a13a8db249558e7c9e3", "file": "src/lib/usage/callLogs.ts", "sha256": "f031baadb70a9730e9b391b7a63c948cb759110ff8672b05d301dd299e589b56", "lines": "479-490", "claim": "returned token fields retain nullable cache counters"}
+  ],
+  "limitations": ["Owner execution, not a new runtime-worker model run", "No actual Codex Responses Lite exercised", "No per-runtime/helper completeness, Astra route, uncached-input normalization or missing-field completeness qualified", "No quality, default or token-saving conclusion"],
+  "credential_or_auth_file_read_by_lane": false,
+  "raw_pipeline_or_settings_export_read_by_lane": false,
+  "complete_study_usage": null,
+  "selected_defaults": 0
+}

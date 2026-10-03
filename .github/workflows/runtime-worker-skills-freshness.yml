@@ -1,8 +1,8 @@
-name: Runtime-worker skills freshness (report-only)
+name: Runtime-worker and skills freshness (report-only)
 
 on:
   schedule:
-    - cron: '43 7 * * 1'
+    - cron: '43 7 * * *'
   workflow_dispatch:
 
 permissions:
@@ -28,7 +28,15 @@ jobs:
           check-latest: false
       - name: Validate the runtime skills contract
         run: python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills
+      - name: Validate runtime job and comparison JSON syntax
+        if: ${{ !cancelled() }}
+        run: |
+          python3 -m json.tool catalogs/foundation/runtime-jobs.json /dev/null
+          for runtime_job_document in blueprints/runtime-workers/comparisons/*.json; do
+            python3 -m json.tool "$runtime_job_document" /dev/null
+          done
       - name: Report pins against upstream HEAD and native check semantics
+        if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -48,6 +56,71 @@ jobs:
         with:
           name: runtime-worker-skills-freshness-${{ github.run_id }}
           path: ${{ runner.temp }}/runtime-skills/
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 30
+      - name: Use the native freshness working-file contract
+        id: runtime_inputs
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/runtime-jobs"
+          cp catalogs/foundation/runtime-jobs.json "$RUNNER_TEMP/runtime-jobs/foundation-layers.json"
+      - name: Observe runtime and extension repositories without replacing defaults
+        if: ${{ !cancelled() && steps.runtime_inputs.outcome == 'success' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/sota-convergence/github_freshness.py \
+            --work-dir "$RUNNER_TEMP/runtime-jobs" --workers 4 \
+            --out "$RUNNER_TEMP/runtime-jobs/github-freshness.json"
+      - name: Publish runtime metadata summary
+        if: ${{ !cancelled() }}
+        # GitHub's native job-summary environment file:
+        # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#adding-a-job-summary
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          import os
+          from pathlib import Path
+
+          work_dir = Path(os.environ["RUNNER_TEMP"]) / "runtime-jobs"
+          spec = importlib.util.spec_from_file_location(
+              "github_freshness", "tools/sota-convergence/github_freshness.py"
+          )
+          collector = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(collector)
+          # Use the collector's normalization and deduplication, not a job count.
+          expected_count = (
+              len(collector.build_targets(collector.collect_repository_urls(work_dir)))
+              if (work_dir / "foundation-layers.json").is_file() else "unknown"
+          )
+          report_path = work_dir / "github-freshness.json"
+          report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.is_file() else {}
+          if report and report["schema"] != "github-freshness/1":
+              raise ValueError("Unsupported runtime freshness report schema")
+          window = report.get("observation_window")
+          observation_window = f"{window['min']} to {window['max']}" if window else "unknown"
+          summary = [
+              "### Runtime repository freshness (metadata only)",
+              "",
+              f"- count: {report.get('count', 'unknown')}",
+              f"- expected count: {expected_count}",
+              f"- errors: {report.get('errors', 'unknown')}",
+              f"- partial_errors: {report.get('partial_errors', 'unknown')}",
+              f"- observation_window: {observation_window}",
+          ]
+          if not report_path.is_file():
+              summary += ["", "Collector report unavailable; see failed steps and retained artifacts."]
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as output:
+              output.write("\n".join(summary) + "\n")
+          PY
+      - name: Retain runtime metadata including unknown or failed fetches
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: runtime-worker-jobs-freshness-${{ github.run_id }}
+          path: ${{ runner.temp }}/runtime-jobs/
           if-no-files-found: error
           include-hidden-files: false
           retention-days: 30

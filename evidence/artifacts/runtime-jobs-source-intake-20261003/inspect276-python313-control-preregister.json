@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "kind": "inspect276-python313-native-control-preregistration",
+  "repository": "UKGovernmentBEIS/inspect_ai",
+  "candidate_version": "0.3.276",
+  "source_pin": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+  "receipt_base_commit": "eae4c151839dc30a7b5fec7550ee7643296de294",
+  "selected_evaluator": {
+    "version": "0.3.273",
+    "source_pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+    "unchanged": true
+  },
+  "evidence_class": "unchanged scoped upstream native mock controls",
+  "source_files": [
+    {
+      "path": "CONTRIBUTING.md",
+      "bytes": 8543,
+      "sha256": "1bb7f3ad6e5bfc5e2f37d75d047e6f0cb8ef450bb1f054061ed029ca344456bb"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 5660,
+      "sha256": "ce5713f4a354c3d2fd3b01f08e247a06b240a21eda481581b3cd270c867c1d2b"
+    },
+    {
+      "path": "uv.lock",
+      "bytes": 1339533,
+      "sha256": "7a9cda6292467a4812a9d4bef2ab61fcc8b06bd6e7448e0fc20dc5dd91a83eb2"
+    },
+    {
+      "path": "tests/conftest.py",
+      "bytes": 46572,
+      "sha256": "dc6fab64d2d350b5dbd4e73f57357fbfc96269b17eebc2f34f6f625d29e06eb6"
+    },
+    {
+      "path": "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py",
+      "bytes": 55480,
+      "sha256": "2aa7c138cad0c7772446c6d04dc8ec08302f6118f5598bc66d381f18a7df1980"
+    },
+    {
+      "path": "tests/util/sandbox/test_local_sandbox.py",
+      "bytes": 8872,
+      "sha256": "5487025780228552b4c458a109adcf4fe6c2da181c8b95523ca878c35c431ac9"
+    },
+    {
+      "path": "tests/model/providers/test_openai_responses.py",
+      "bytes": 96039,
+      "sha256": "b6f95f7f389fa374703ba3900055db348bea61154e37915566b401831b9d8358"
+    },
+    {
+      "path": "tests/scorer/test_model_graded.py",
+      "bytes": 39843,
+      "sha256": "ab5309766c1112aaf92b116722d9ad246a038c5f90795618a11e575c3badf34a"
+    },
+    {
+      "path": "tests/scorer/test_match.py",
+      "bytes": 12442,
+      "sha256": "6b8d733f513bf1eb84d1e3b2396461f0e36fb7ebbecee1bc81112fb06ef59f56"
+    },
+    {
+      "path": "tests/model/test_generate_attempt_timeout.py",
+      "bytes": 9508,
+      "sha256": "143de82c54bd3a1326fca34a6b590657e35cdae27391f2e40c937de24c05f00a"
+    },
+    {
+      "path": "tests/agent/test_bridge_provider_errors.py",
+      "bytes": 9247,
+      "sha256": "ba8e6f6d0f067df9bb5d1a5b943aff8b2900849e70a7500278d7ec794d0203c0"
+    },
+    {
+      "path": "Makefile",
+      "bytes": 629,
+      "sha256": "5af9ec1c6ac93667e4b111a1cddeddff68f86bdd6e59265893e9706fc984851d"
+    },
+    {
+      "path": "tests/test_helpers/sandbox.py",
+      "bytes": 4816,
+      "sha256": "1d4c4e1f28c1107bca0fa2891b4c1ad1f85c9f484f9ac6ade43fafd6efffff19"
+    },
+    {
+      "path": "src/inspect_ai/model/_providers/mockllm.py",
+      "bytes": 5562,
+      "sha256": "7b4038e930b8669389f51bc40b2353ba18ca561fc1c79ac6bf7d88f250dbdb2c"
+    }
+  ],
+  "identities": {
+    "bubblewrap": {
+      "version": "0.12.0",
+      "source_pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "bytes": 194848,
+      "sha256": "75d6e611c1d41cf3a183a54085d4e83342901b91d058dd2c655692ff13207216",
+      "version_exit": 0,
+      "acceptance": "retained private build and scoped namespace probe; full bubblewrap suite not accepted"
+    },
+    "python": {
+      "version": "3.13.15",
+      "bytes": 31375608,
+      "sha256": "93a93f4c8af5ae6f127fb0310f923d5fab89eb7257a0b801eec2e44b3f199840",
+      "version_exit": 0
+    },
+    "uv": {
+      "version": "0.12.17",
+      "bytes": 50162872,
+      "sha256": "553a67a24d306a803d5c45678b7c54ed0c8b698d9fe3835d54905811348ccf2a",
+      "version_exit": 0,
+      "sync_help_exit": 0
+    },
+    "public_tokenizer_asset": {
+      "name": "o200k_base.tiktoken",
+      "upstream_cache_filename_sha1": "fb374d419588a4632f3f557e76b4b70aebbca790",
+      "bytes": 3613922,
+      "sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+      "expected_package": "tiktoken0.14.0",
+      "source_pin": "4e71bbe0c078468e00fefbf94b39849389f346e5",
+      "url": "https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken"
+    }
+  },
+  "isolation": {
+    "reused_reference": "inspect-0273-native-readiness.json",
+    "reused_private_manifest_sha256": "f79c35d8718005d8246d84ccbcc3b4e1838a7919bad943b7fd4fe133b8ba6a43",
+    "fresh_owned_state": true,
+    "flags": [
+      "--unshare-all",
+      "--die-with-parent",
+      "--new-session",
+      "--clearenv"
+    ],
+    "cleared_outer_env": true,
+    "home_override": false,
+    "codex_home_override": false,
+    "host_home_auth_or_active_config_mounted": false,
+    "read_only_public_runtime_and_source": true,
+    "tests_network": "isolated; no share-net, resolver, external provider credentials or backend",
+    "install_network": "share-net + public resolver only, stock locked dependency installation",
+    "tests_checkout_and_tokenizer_cache_read_only": true,
+    "uv_run_flags": [
+      "--no-sync",
+      "--no-env-file",
+      "--offline",
+      "--no-config"
+    ],
+    "python_guards": [
+      "PYTHONNOUSERSITE=1",
+      "PYTHONDONTWRITEBYTECODE=1",
+      "PYTHON_DOTENV_DISABLED=1"
+    ]
+  },
+  "prior_control_nodes": [
+    "tests/scorer/test_match.py::test_numeric_negative_target_wrong_sign",
+    "tests/scorer/test_match.py::test_numeric_negative_target_correct",
+    "tests/model/test_generate_attempt_timeout.py::test_attempt_timeout_wins_when_idle_timeout_is_larger",
+    "tests/agent/test_bridge_provider_errors.py::test_provider_error_payload_raw_sdk_exception",
+    "tests/agent/test_bridge_provider_errors.py::test_provider_error_payload_bare_exception"
+  ],
+  "additional_control_nodes": [
+    "tests/util/sandbox/test_local_sandbox.py::test_local_exec_requires_current_user",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_root_access_is_probed_once_on_first_use_without_sample_init",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_tools_surface_a_failed_probe_instead_of_falling_back",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_inject_errors_on_root_failure_after_usable_verdict",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_inject_warns_once_per_process_when_root_access_ambiguous",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_sample_init_records_root_access_for_every_sandbox_last",
+    "tests/model/providers/test_openai_responses.py::test_responses_api_terminal_bio_policy_converts",
+    "tests/model/providers/test_openai_responses.py::test_model_usage_from_response_preserves_cache_write_tokens",
+    "tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored",
+    "tests/scorer/test_model_graded.py::test_off_menu_verdict_is_unscored",
+    "tests/scorer/test_model_graded.py::test_partial_verdict_is_unscored_without_partial_credit"
+  ],
+  "selection_contract": "16 unchanged node groups; native upstream parameter cases retained; default Trio variants skipped without --runtrio, skips individually retained",
+  "install_argv": [
+    "uv",
+    "sync",
+    "--directory",
+    "<owned-checkout>",
+    "--frozen",
+    "--extra",
+    "dev",
+    "--python",
+    "<read-only-python3.13>",
+    "--no-python-downloads",
+    "--no-config"
+  ],
+  "test_argv": [
+    "/uv/uv",
+    "run",
+    "--directory",
+    "<owned-checkout>",
+    "--no-sync",
+    "--no-env-file",
+    "--offline",
+    "--no-config",
+    "pytest",
+    "-vv",
+    "-n",
+    "0",
+    "--color=no",
+    "--basetemp=<owned-tmp>/pytest276-py313",
+    "-o",
+    "cache_dir=<owned-tmp>/pytest-cache276-py313",
+    "--junitxml=<owned-logs>/inspect276-python313-native-controls.xml",
+    "tests/scorer/test_match.py::test_numeric_negative_target_wrong_sign",
+    "tests/scorer/test_match.py::test_numeric_negative_target_correct",
+    "tests/model/test_generate_attempt_timeout.py::test_attempt_timeout_wins_when_idle_timeout_is_larger",
+    "tests/agent/test_bridge_provider_errors.py::test_provider_error_payload_raw_sdk_exception",
+    "tests/agent/test_bridge_provider_errors.py::test_provider_error_payload_bare_exception",
+    "tests/util/sandbox/test_local_sandbox.py::test_local_exec_requires_current_user",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_root_access_is_probed_once_on_first_use_without_sample_init",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_tools_surface_a_failed_probe_instead_of_falling_back",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_inject_errors_on_root_failure_after_usable_verdict",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_inject_warns_once_per_process_when_root_access_ambiguous",
+    "tests/tools/sandbox_tools_utils/test_sandbox_tools_injection.py::test_sample_init_records_root_access_for_every_sandbox_last",
+    "tests/model/providers/test_openai_responses.py::test_responses_api_terminal_bio_policy_converts",
+    "tests/model/providers/test_openai_responses.py::test_model_usage_from_response_preserves_cache_write_tokens",
+    "tests/scorer/test_model_graded.py::test_grade_parse_failure_is_unscored",
+    "tests/scorer/test_model_graded.py::test_off_menu_verdict_is_unscored",
+    "tests/scorer/test_model_graded.py::test_partial_verdict_is_unscored_without_partial_credit"
+  ],
+  "required_outcomes": {
+    "source_pin_and_hashes_match": true,
+    "python_version_family": "3.13",
+    "native_install_exit": 0,
+    "native_test_exit": 0,
+    "failures": 0,
+    "errors": 0,
+    "zero_selected_rejected": true,
+    "expected_skip_scope": "native Trio and explicit upstream backend decorators; individually retained; no full backend parity claim"
+  },
+  "mock_safety": {
+    "real_services": "not selected; CannedSandbox and monkeypatch fixtures only",
+    "refusal_test": "AsyncMock Responses.create, synthetic bio_policy error",
+    "cache_test": "synthetic150gross/40read/30write/20output/170total; Inspect input_tokens80; not measured provider usage",
+    "parser_tests": "native model_graded_fact mocks; no native QA/grader quality acceptance"
+  },
+  "sources": [
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/CONTRIBUTING.md#L109",
+      "meaning": "supported uv lockfile workflow and dev extra"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/Makefile#L27",
+      "meaning": "native pytest test entry"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/tests/conftest.py#L36",
+      "meaning": "native asyncio default/Trio skip contract and auto anyio parametrization"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/tests/conftest.py#L210",
+      "meaning": "native ctl server disabled except explicit real_ctl_server marker"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/tests/test_helpers/sandbox.py#L44",
+      "meaning": "CannedSandbox returns per-test policies and does not execute a real sandbox"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/tests/model/providers/test_openai_responses.py#L379",
+      "meaning": "native Responses AsyncMock; no HTTP/provider transport"
+    },
+    {
+      "url": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/bwrap.xml",
+      "meaning": "native explicit mounts, cleared environment and namespace controls"
+    }
+  ],
+  "boundaries": {
+    "adoption": false,
+    "pin_change": false,
+    "provider_or_model_call": false,
+    "real_grader_quality": false,
+    "actual_wire_effort": false,
+    "complete_provider_usage": null,
+    "savings": null
+  },
+  "stop_conditions": [
+    "source or runtime identity mismatch",
+    "auth-excluding mount/cleared environment binding failure",
+    "missing native install/test interface",
+    "native install or scoped test failure preserved; no source/fixture edits or broadened suite"
+  ],
+  "public_projection": {
+    "recorded_date": "2026-10-03",
+    "scope": "Post-run public identifier-label projection; exact original preregistration remains frozen and retained",
+    "original_bytes": 12155,
+    "original_sha256": "99b4182c756fdc08252f6a9795b8a71cbfedc781bc86fb9a2cfa2e1aec99a86f",
+    "changed_path": "identities.public_tokenizer_asset identifier field spelling only",
+    "treatment_task_nodes_argv_inputs_and_deadlines_changed": false,
+    "native_recipe_changed": false,
+    "source": "https://github.com/openai/tiktoken/blob/4e71bbe0c078468e00fefbf94b39849389f346e5/tiktoken/load.py#L51",
+    "reason": "Native secret gate false positive on a public URL-derived SHA1 cache filename; scan remains enabled",
+    "original_custody": "Unchanged pre-execution worker source and unchanged native frozen24912-byte recipe; original textual bytes can be reconstructed by dropping this projection record and restoring the identifier field spelling",
+    "native_preregistration_reference": "native-controls.json preregistration original_bytes/original_sha256 remains the pre-execution original, not the public projection."
+  }
+}

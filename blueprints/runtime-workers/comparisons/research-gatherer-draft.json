@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "study_id": "runtime-jobs-gatherer-sol-ultra-20261003",
+  "status": "draft_not_frozen",
+  "freeze_eligible": false,
+  "shared_execution_contract": "shared-execution-contract.json",
+  "scope": "Inherited DeerFlow2.1.0 versus Onyx4.8.3 comparison, with fixed GPTR3.7.0 as a matched baseline; source-only proposals do not decide the winner",
+  "comparison_modes": {
+    "default": "full_usage",
+    "selected_mode": null,
+    "selection_policy": "Absent or null selection preserves the prior full_usage rules. quality_only requires accepted exact shared/job/preregistration bindings before candidate outputs; this draft selects no mode and remains ineligible for freeze.",
+    "full_usage": {
+      "decision_rule": "proposed_evaluation.decision_rule",
+      "usage_requirements": "All prior complete authoritative aggregate, all-call usage, original-operand and efficiency-tie conditions remain unchanged. Unknown usage cannot fall through to agent time."
+    },
+    "quality_only": {
+      "status": "proposal_only_not_accepted_or_frozen",
+      "shared_binding": "shared-execution-contract.json#comparison_modes.quality_only",
+      "amendment": "quality-only-contract-amendment-20261003.md",
+      "quality_decision": {
+        "baseline": "deerflow",
+        "challenger": "onyx",
+        "fixed_reference": "gpt-researcher cannot be replaced by this study",
+        "strict_supported_reports": "Per unchanged question/arm, integer count from 0 to 2 of native C verdicts over exactly two valid repeats under the frozen Inspect strict criterion; I=0. Native UNSCORED/errors invalidate the whole matched block and cannot shrink the denominator.",
+        "official_rubric": "Per question/arm, arithmetic mean of the two unchanged official DRB-II total scores, with original rubric item values, dimension scores, blocked_rate, field presence and failures retained separately. Bind complete original rubric coverage and its native disposition before freeze; do not substitute the rubric total for strict citation support.",
+        "minimum": "Onyx strict-supported report count and mean official rubric score must each be greater than or equal to DeerFlow on every one of the eight matched questions.",
+        "improvement": "At least one question must have strict-supported count greater by at least 1 or mean official rubric score strictly greater than DeerFlow, without any loss under minimum. Freeze the native numeric field, complete-coverage and failure dispositions before outputs; no post-hoc rounding or tolerance.",
+        "qualifying_challenger_order": ["onyx is the sole challenger for the DeerFlow slot"],
+        "quality_tie": "If every quality value ties, retain DeerFlow2.1.0. No usage, elapsed-time or footprint tiebreak.",
+        "otherwise": "Keep DeerFlow2.1.0; GPTR3.7.0 stays the fixed matched reference."
+      },
+      "grader_binding_scope": "Keep inspect-grader-binding.json native scorer, default instructions/pattern, required grader role, partial_credit=false, strict Sample.target criterion, parse/coverage acceptance and all negative controls unchanged. Its original efficiency-operand and complete-accounting prerequisites apply to full_usage; quality_only still requires original missingness/presence, scoped grader/helper observations and independent actual grader delivery identity.",
+      "outcome_inventory": "Retain all 16 task-repeat blocks, 48 planned reports and every grading/helper/retry/invalid/recovery attempt, original report/source observations and native values/reasons/dispositions. No selective exclusions, altered denominator, replacement scorer or independent retry.",
+      "usage_and_identity": "Complete usage may remain null; partial counters retain original fields and explicit scope. Independently bind actual runtime/route/model/effort/parallel/child/helper/grader identities and attempt coverage. Cost, efficiency, savings and token-feature adoption remain HOLD.",
+      "budget_gate": "Keep enforced time/token/search/fetch limits and all shared non-usage gates. The proposed 200000-token envelope is still unenforced and blocks freeze; this amendment supplies no uncapped exception."
+    }
+  },
+  "task_source": {
+    "repository": "https://github.com/imlrz/DeepResearch-Bench-II",
+    "ref": "b38f360603db9531b102aef8c166cedb8509b6f6",
+    "file": "tasks_and_rubrics.jsonl",
+    "sha256": "263aaabb8c279fb16cbe7c9499afe82d657a8ab3ccfb07ace084387e367d921a",
+    "rows": 132
+  },
+  "task_selection": {
+    "seed_utf8": "runtime-jobs-gatherer-sol-ultra-v1\n",
+    "rule": "Eight lowest SHA256(seed_utf8 + decimal idx) from the pinned132-row question pool. This small bilingual sample is not domain/language-balanced.",
+    "tasks": [
+      {
+        "idx": 14,
+        "id": "task57",
+        "prompt_bytes": 2676,
+        "prompt_sha256": "0ad03a94ac688a6570e844ccf9efbee63e9620ad3446dd2616a683ea01372f30"
+      },
+      {
+        "idx": 67,
+        "id": "task26+",
+        "prompt_bytes": 2303,
+        "prompt_sha256": "19c15f585a748fcb4a9b90ddc9e24c6bbf2f3130270bfe90fdf32a5c6efef4b2"
+      },
+      {
+        "idx": 128,
+        "id": "task48",
+        "prompt_bytes": 3758,
+        "prompt_sha256": "c355132b0efeb62e938788be092e1a2e4f9ea9ec02606cd2ae7ee901d5366cad"
+      },
+      {
+        "idx": 104,
+        "id": "task40",
+        "prompt_bytes": 2422,
+        "prompt_sha256": "5d6840ea8fe9408998e99c299be53b2dfb96abc323a366e666e62a17d9f654ee"
+      },
+      {
+        "idx": 34,
+        "id": "task64",
+        "prompt_bytes": 2587,
+        "prompt_sha256": "501a415ff6c995b2090f3fbc0b60313ec01dda685cc055aea5e09084bc3f5803"
+      },
+      {
+        "idx": 106,
+        "id": "task41",
+        "prompt_bytes": 3212,
+        "prompt_sha256": "441699fcab6225230cd8c7356fcd5966a979effb278ab9cffe13c03574af0004"
+      },
+      {
+        "idx": 79,
+        "id": "task80",
+        "prompt_bytes": 2333,
+        "prompt_sha256": "044310a2514d4ddecc2d1811ab87ca166519106e9d74122f3c7719149e09a448"
+      },
+      {
+        "idx": 7,
+        "id": "task53",
+        "prompt_bytes": 2795,
+        "prompt_sha256": "cb68eba4260dd38f61985c94e69411712d205ea90f3223dcac422c358fc86a22"
+      }
+    ],
+    "worker_view": "Exact top-level prompt bytes plus one common frozen output contract only; content.rubric and content.blocked are grader-only."
+  },
+  "arms": [
+    {
+      "id": "gpt-researcher",
+      "tag": "v3.7.0",
+      "package_version": "0.16.0",
+      "ref": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "baseline": false,
+      "role": "fixed matched reference; this study cannot replace GPTR"
+    },
+    {
+      "id": "deerflow",
+      "tag": "v2.1.0",
+      "ref": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "baseline": true,
+      "role": "standing second gatherer"
+    },
+    {
+      "id": "onyx",
+      "tag": "v4.8.3",
+      "ref": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "baseline": false,
+      "role": "challenger for the second-gatherer slot"
+    }
+  ],
+  "proposed_execution": {
+    "model": "cx/gpt-6.1-sol-ultra",
+    "judge_model": "cx/gpt-6-astra-max",
+    "repeats_per_question_arm": 2,
+    "maximum_report_attempts": 48,
+    "concurrent_model_tasks": 1,
+    "independent_arm_retries": 0,
+    "native_internal_retries": "Unqualified; GPTR helper max_attempts10 differs from SDK max_retries0. Bind each runtime before freeze.",
+    "order": "For each question in pinned order, run repeat1 then repeat2; rotate GPTR/DeerFlow/Onyx, DeerFlow/Onyx/GPTR, Onyx/GPTR/DeerFlow by zero-based question position for repeat1 and reverse that arm list for repeat2. Freeze all48 attempt records and grading order before outputs.",
+    "fresh_state": "One fresh native thread/session/index scope per attempt, identical public-source access rules and same frozen search/fetch services across arms.",
+    "timeout_seconds_per_question_arm_repeat": 900,
+    "proposed_gross_input_plus_output_observation_threshold": 200000,
+    "token_bound_status": "Unenforced proposal; choose native enforcement, uncached/gross basis and breach disposition after canary and before freeze.",
+    "maximum_searches": 40,
+    "maximum_fetches": 80,
+    "quota_rule": "Shared contract:429/account rotation/planned window end invalidates the whole task-repeat block including grading; retain failures and recover the whole block in the next recorded window. Maximum2 invalid blocks, no excluded tasks; third invalid block aborts.",
+    "source_policy": "Preserve each question's original time constraints. Bind an observation cutoff, archived/versioned eligibility where the prompt requires historical availability, URL/time/content hashes and fetch failures. Neither a current page nor a judge verdict proves historical availability.",
+    "compression": "off control; semantic no-cache bypass and unique correlation id required in every arm; retain upstream cache subsets and gateway interventions",
+    "window": "Exclusive architecture-owned throwaway GPT-pool window coordinated with session0c and client-token/GPU trials"
+  },
+  "proposed_evaluation": {
+    "runner": {
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "tag": "0.3.273",
+      "ref": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "source_files": [
+        "src/inspect_ai/scorer/_model.py",
+        "src/inspect_ai/scorer/_metric.py",
+        "src/inspect_ai/model/_providers/openai_responses.py",
+        "src/inspect_ai/model/_openai.py",
+        "src/inspect_ai/model/_model_output.py"
+      ],
+      "source_binding_status": "Root original sources read at adopted0.3.273 pin; native binary C/I scorer, required grader role, criterion-in-Sample.target and zero-UNSCORED/full-coverage contract declared in inspect-grader-binding.json. Unchanged adopted-version controls, local rubric negative controls and live grader transport remain unrun/unqualified."
+    },
+    "citation_quality": "Frozen locally authored strict support/attribution criterion in native Sample.target, run by standing Inspect model_graded_qa with unchanged default grading instructions/pattern, required grader role and partial_credit=false. Independently retained numbered passages are blinded to runtime identity. Missing evidence, wrong attribution, failed temporal eligibility, unsupported material claims, incorrect numeric values, units or denominators require I; only C counts as a supported report pass. Malformed/missing/off-menu/P verdicts are native UNSCORED, not success or quality zero; the whole matched task-repeat block becomes infrastructure-invalid. Require zero UNSCORED/errors and full frozen sample coverage.",
+    "rubric_quality": "Retain the unchanged official DRB-II report-rubric grader separately. Its report-text evidence is not source entailment; its score is never substituted for citation support.",
+    "aggregation": "Per question/arm, sum strict-supported report passes across two valid repeats (denominator2) and take the arithmetic mean of the unchanged official DRB-II rubric scores across those repeats. Report per-question scores, not only a pooled mean.",
+    "footprint": "Decision-relevant acceptance gate for passwordless admission and declared host resources; measured CPU/RAM/disk/service footprint otherwise report-only, not a post-hoc tiebreaker.",
+    "decision_rule": "Full_usage mode, unchanged lane reading of the inherited role labels: Onyx4.8.3 replaces DeerFlow2.1.0 only with no lower strict-supported report count and mean official rubric score on every matched question and at least one strict quality improvement. If every quality value ties, require at least5% lower paired median uncached-input-plus-output tokens with complete authoritative same-scope original gross-input/cache-read/output operands and no greater paired median agent time. Otherwise keep DeerFlow; incomparable admission or missing usage yields no claimed efficiency win. Fixed GPTR3.7.0 cannot be replaced by this study.",
+    "limitations": "No calibrated claim percentage, universal quality or statistical superiority follows this eight-question screen. The local citation rubric requires native fail-closed parse behavior and its negative controls before candidate outputs.",
+    "native_grader_binding": "inspect-grader-binding.json"
+  },
+  "required_before_freeze": [
+    "Astra/max consequential read and Claude-lane read of finalized source/task/rubric/route/extension contract, exact accepted head/hash and freeze receipt",
+    "Allocated native host/project/window, installed GPTR/DeerFlow entrypoints and separately scoped Onyx-Lite provisioning with immutable service/image pins",
+    "Same source-backed keyless search/fetch service pins, exact engine/language/result-count/quotas, common output contract and automated clarification-off setting",
+    "Exact org-owned extension/plugin/skill/MCP inventory and useful loader activation checks: GPTR plugin executable/Python-version contract; DeerFlow0.2 extensions; Onyx research/sandbox tools",
+    "Native configured OmniRoute build/carry and actual all-call effort across main/child/summary/title/auxiliary calls; preserve differing native/API effort semantics",
+    "Shared execution-contract acceptance, all48 ordered attempt records, owner-observed delivered reasoning/parallel fields and request-to-attempt binding in both modes; one complete authoritative usage aggregate per arm additionally required in full_usage",
+    "Native binary C/I grader contract accepted and unchanged parse controls plus locally authored support/numeric negative controls pass; any UNSCORED invalidates the block and cannot shrink the denominator",
+    "Source-backed evaluator/judge transport and frozen strict rubric; wrong-source, wrong-attribution, unsupported-claim, missing-source and temporal-violation negative controls before candidate outputs",
+    "Observable all-call native usage completeness in full_usage; original usage missingness/presence/types, scoped partial counters and independently bound treatment/attempt identities in quality_only; enforced time/token/search/fetch bounds, terminal results and independent actual report/source observations remain required in both modes",
+    "Quality_only requires accepted numeric per-question quality/challenger/tie rules and exact shared/job/preregistration reads; frozen strict Inspect and official DRB-II graders, original outcomes/coverage and all non-usage gates remain mandatory",
+    "Exact independent archive/availability rules and blinded source/report/rubric bindings; all failed attempts and unknown counters retained"
+  ],
+  "failures_preserved": [
+    "The first prompt-hash probe looked inside content instead of the top-level prompt field and returned eight empty-string hashes. Those hashes are invalid; the corrected top-level probe asserts nonempty UTF8 prompts and supplies the bindings above.",
+    "The inherited source report used Sol max and proposed DeepEval citation scoring. This separate user-directed ultra study uses the requested upstream evaluator family, with source/quality transport qualification still open."
+  ]
+}

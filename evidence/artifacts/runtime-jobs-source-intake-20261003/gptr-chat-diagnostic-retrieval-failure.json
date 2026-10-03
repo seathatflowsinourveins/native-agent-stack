@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "kind": "native_live_readiness_retrieval_failure",
+  "recorded_date": "2026-10-03",
+  "runtime": {
+    "repository": "https://github.com/assafelovic/gpt-researcher",
+    "tag": "v3.7.0",
+    "ref": "0957c301ed06c2a5857b834358c7227c739041d4"
+  },
+  "scope": "Separate native stock CLI diagnostic; no freeze, comparison or default selection.",
+  "start_clock_utc": "2026-10-03 06:55:35 UTC",
+  "terminal_observed_clock_utc": "2026-10-03 06:59:39 UTC",
+  "requested": {
+    "all_role_alias": "openai:cx/gpt-6.1-sol-ultra",
+    "use_responses_api": false,
+    "reasoning": null,
+    "reasoning_effort": "max",
+    "parallel_tool_calls": true,
+    "sdk_max_retries": 0,
+    "native_helper_max_attempts": 10,
+    "correlation_id": "lane:runtime-jobs-20261003:gptr-chat-diagnostic-2",
+    "semantic_cache_bypass": true,
+    "compression": "off"
+  },
+  "invocation": {
+    "native_entrypoint": "python cli.py <unchanged landscape query> --report_type research_report --report_source web --no-pdf --no-docx",
+    "cleared_environment": true,
+    "dotenv_disabled": true,
+    "bytecode_disabled": true,
+    "fresh_owned_output_scope": true,
+    "nonsecret_key_placeholder": true,
+    "timeout_seconds": 600,
+    "kill_after_seconds": 10
+  },
+  "result": {
+    "native_exit_code": 0,
+    "choose_agent_boundary_passed": true,
+    "retrieved_sources": 0,
+    "scraped_pages": 0,
+    "report_accepted": false,
+    "returned_output_excerpts": [
+      "INFO:     [02:57:26] 🌐 Scraping content from 0 URLs...",
+      "INFO:     [02:57:26] 📄 Scraped 0 pages of content",
+      "Task title: Agent Runtime Survey  ->  filename stem: Agent_Runtime_Survey",
+      "Report written to 'outputs/Agent_Runtime_Survey.md'"
+    ],
+    "error_summary": "DDGS returned empty responses with DNSError while resolving wt.wikipedia.org.mynetworksettings.com; native stdout was truncated in the terminal observation, so excerpts do not claim full stdout custody.",
+    "independent_report_observation": {
+      "relative_path": "outputs/Agent_Runtime_Survey.md",
+      "bytes": 2894,
+      "sha256": "f8336b597a61c40bb514665ceff8e7e96568dc8711ffe9a6a92ae686cc15723b",
+      "lines": 12,
+      "sources_count": 0,
+      "source_url_count": 0,
+      "native_frontmatter_estimated_total_cost_usd": 0.055805,
+      "raw_report_published": false
+    }
+  },
+  "counter_scopes": {
+    "provider_requests": null,
+    "gross_input_tokens": null,
+    "gross_output_tokens": null,
+    "cache_read_tokens": null,
+    "reasoning_tokens": null,
+    "provider_billing": null,
+    "delivered_reasoning": null,
+    "delivered_parallel_tools": null,
+    "correlation_join": null
+  },
+  "primary_sources": [
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "ref": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+      "path": "open-sse/translator/request/openai-responses/toResponses.ts",
+      "bytes": 21253,
+      "sha256": "8748f79212487ad1909db5ee9b62580ad2f2868c9319b49c9bab8aa97bee0da5"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "ref": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+      "path": "open-sse/translator/index.ts",
+      "bytes": 43519,
+      "sha256": "142916a24d36690284c314465a076fd6d51fb3532ee44960a2c4166d0cce12de"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "ref": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+      "path": "open-sse/handlers/responseTranslator.ts",
+      "bytes": 37621,
+      "sha256": "e4005ce9e27f856cb541f65498672c29d28926ca712fbe0ea1afac2e7a79d94d"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "ref": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+      "path": "open-sse/handlers/chatCore/passthroughHelpers.ts",
+      "bytes": 13191,
+      "sha256": "bdb22304db8e8a3d95e64db8c734d93855a6164635cea28e2206638c5c03bcbf"
+    },
+    {
+      "repository": "openai/openai-python",
+      "ref": "03b3ec474241fe3a73c4818dc6b886da28faaf91",
+      "path": "src/openai/types/chat/chat_completion_message.py",
+      "bytes": 2828,
+      "sha256": "2616d7f61183c39dec4f26e8cbd6ded487defa505c8dfe67ab72295d147194b4"
+    }
+  ],
+  "limits": [
+    "Native CLI0 is not sourced research success.",
+    "The stock report's estimated USD field is not observed provider billing or complete native usage.",
+    "Ultra suffix and body max are requested; delivered effort remains unobserved.",
+    "Pinned Chat-to-Responses conversion does not copy the explicit parallel_tool_calls field; this is not proof that parallel calls are disabled.",
+    "Retrieval backend repair requires its own supported upstream source and a separate retained attempt.",
+    "Unknown usage remains unknown."
+  ]
+}

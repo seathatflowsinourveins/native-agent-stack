@@ -1,0 +1,551 @@
+{
+  "schema_version": 1,
+  "kind": "runtime-jobs-source-readiness-binding",
+  "class": "source_review",
+  "checked_at": "2026-10-03",
+  "scope": {
+    "job": "research-gatherer",
+    "runtime": "Onyx",
+    "repository": "onyx-dot-app/onyx",
+    "tag": "v4.8.3",
+    "commit": "23be912c204deb0a087ea2ca0ae476e83541297f",
+    "record_base": "65a0d370ed8c075d922ff60857287e33d3a14788",
+    "source_reads_precede_this_record": true,
+    "installed_client_help_run": false,
+    "native_compose_config_run": false,
+    "installation_run": false,
+    "deployment_or_services_started": false,
+    "provider_runs": 0,
+    "api_mutations": 0,
+    "credentials_or_authentication_stores_read": false,
+    "active_client_or_service_configuration_read": false,
+    "quality_evaluated": false,
+    "default_selected": false,
+    "execution_contract_frozen": false
+  },
+  "native_metadata_observations": {
+    "installed_client_presence": {
+      "sanitized_command": "rtk env -i PATH=$GPTR_READY_VENV/bin:$DEERFLOW_READY_VENV/bin:/usr/bin:/bin /usr/bin/which onyx-cli",
+      "exit_code": 1,
+      "stdout_bytes": 0,
+      "scope": "Only the two owned GPT Researcher and DeerFlow readiness virtual environments plus /usr/bin and /bin were searched. Variable names sanitize the actual private paths; this display was not a separately executed command.",
+      "result": "onyx-cli was not found on that bounded PATH.",
+      "whole_host_or_foreign_setup_absence_claim": false,
+      "help_or_version_capability_acceptance": false
+    },
+    "release_queries": [
+      {
+        "command": "rtk gh api repos/onyx-dot-app/onyx/releases/tags/v4.8.3",
+        "exit_code": 0,
+        "tag_name": "v4.8.3",
+        "published_at": "2026-10-01T22:26:59Z",
+        "target_commitish": "main",
+        "url": "https://github.com/onyx-dot-app/onyx/releases/tag/v4.8.3"
+      },
+      {
+        "command": "rtk gh api repos/onyx-dot-app/onyx/releases/latest",
+        "exit_code": 0,
+        "tag_name": "v4.8.4",
+        "published_at": "2026-10-02T21:07:02Z",
+        "url": "https://github.com/onyx-dot-app/onyx/releases/tag/v4.8.4",
+        "claim_boundary": "Freshness only. The held v4.8.3 comparison arm was not moved or qualified by this result."
+      }
+    ],
+    "source_tree_query": {
+      "command": "rtk gh api repos/onyx-dot-app/onyx/git/trees/23be912c204deb0a087ea2ca0ae476e83541297f?recursive=1",
+      "exit_code": 0,
+      "truncated": false,
+      "claim_boundary": "Path discovery, followed by original pinned file reads; not an installation or executable capability check."
+    },
+    "returned_output_custody": "These native exit codes and selected returned metadata were observed in the preceding bounded source task. This receipt does not claim retained complete stdout artifacts or a fresh rerun of those queries."
+  },
+  "smallest_supported_setup_candidate": {
+    "form": "Stock Onyx Lite composition serving the native public chat/research API.",
+    "stock_command": "docker compose -f docker-compose.yml -f docker-compose.onyx-lite.yml up -d",
+    "command_source": "compose_lite:10-15",
+    "command_executed": false,
+    "source_predicted_default_service_count": 5,
+    "source_predicted_default_services": [
+      "api_server",
+      "web_server",
+      "relational_db",
+      "nginx",
+      "code-interpreter"
+    ],
+    "service_count_method": "Static reading of the base services block and Lite profiles. code-interpreter has no default-excluding profile in the base. No native Compose merge/config result was obtained.",
+    "required_data_service": "PostgreSQL",
+    "lite_native_settings": {
+      "DISABLE_VECTOR_DB": "true",
+      "FILE_STORE_BACKEND": "postgres",
+      "CACHE_BACKEND": "postgres",
+      "AUTH_BACKEND": "postgres"
+    },
+    "source_supported_lite_boundary": "The upstream header disables connectors/RAG, vector DB, Redis, model servers and background workers; core chat, tools, user files, Projects, Agent knowledge and code interpreter remain available. Fresh web research is a candidate; indexed connector/RAG acceptance is a different setup.",
+    "image_identity_boundary": "The base uses overridable Onyx image tags with latest defaults, PostgreSQL 15.2-alpine, nginx 1.25.5-alpine and code-interpreter 0.4.7. No image digest, image-to-Git-commit correspondence, pull or container execution was qualified.",
+    "embedding_and_gpu_boundary": "The reviewed Lite composition does not require the vector/embedding/model-server services. Full indexed RAG enables additional services; no resource benchmark or whole-application dependency absence was established.",
+    "native_deploy_cli_lead": {
+      "source": "deploy_install:55-65",
+      "supported_flags": [
+        "--lite",
+        "--project",
+        "--tag",
+        "--local",
+        "--offline",
+        "--no-prompt",
+        "--dry-run"
+      ],
+      "claim_boundary": "Pinned source flags only. The CLI was not installed or run, and image-tag normalization and a concrete deployment invocation remain unqualified."
+    },
+    "owner_handoff": "RuntimeLab's existing authorization covers Harbor/task images only. An Onyx service deployment needs that owner's bounded service/image/state/port and lifecycle allocation; NativeStack setup remains with its owner. This is an ownership prerequisite, not a new user permission request."
+  },
+  "authentication_contract_and_correction": {
+    "preliminary_claim": "The user-management function's warning was initially used as a lead that AUTH_TYPE=disabled is unsupported.",
+    "correction": "A warning in users.py alone does not establish whole-application authentication behavior or the absence of anonymous chat. Global startup, auth routers, deployment environment documentation, settings defaults and permission dependencies were then read.",
+    "global_source_findings": [
+      "users.py describes AUTH_TYPE as inert and warns that disabled is no longer supported.",
+      "main.py startup unconditionally calls verify_auth_setting and verify_user_auth_secret, and registers the native auth routers.",
+      "env.template lists AUTH_TYPE among legacy pre-v4.4 SSO variables rather than the active Lite settings.",
+      "current_chat_accessible_user can accept an anonymous user when anonymous_user_enabled is true.",
+      "settings/store.py initializes a missing anonymous-user flag to false.",
+      "The native admin settings PATCH requires FULL_ADMIN_PANEL_ACCESS; the chat route permits anonymous access through the permission dependency but does not bypass the global anonymous setting."
+    ],
+    "qualified_claim": "Native anonymous chat is supported after the setting is enabled. A fresh AUTH_TYPE=disabled passwordless bootstrap is not qualified by these sources.",
+    "unqualified_claims": [
+      "A supported first-admin bootstrap without a native account/authentication step.",
+      "An environment-only default-provider plus anonymous-chat bootstrap.",
+      "The absence of every possible passwordless Onyx access path."
+    ],
+    "no_auth_shim_or_empty_password_workaround_created": true,
+    "sources": [
+      "auth_users:194-202,2318-2385",
+      "main:395-398,634",
+      "env_template:302-310",
+      "settings_store:73-83,127-130",
+      "settings_api:64-69",
+      "auth_permissions:323-338"
+    ]
+  },
+  "native_research_and_export_binding": {
+    "standalone_engine_claim": "No standalone research engine was qualified. The positive supported surfaces found were an Onyx server composition, its public API, and a first-party CLI client of that server.",
+    "cli_contract": {
+      "source": "cli_readme:37-39,66-73,96,213",
+      "native_command_lead": "onyx-cli ask --json \"<question>\"",
+      "server_required": true,
+      "native_pat_documented": true,
+      "json_contract": "The README describes --json as NDJSON stream events.",
+      "deep_research_boundary": "The reviewed ask flags and SendMessageStream payload construction do not set deep_research. This is scoped to those originals, not a whole-client absence claim or a claim about unreviewed custom serialization.",
+      "sources": [
+        "cli_readme",
+        "cli_ask:203-208",
+        "cli_stream:17-50"
+      ]
+    },
+    "public_api_contract": {
+      "source": "chat_backend:775-806",
+      "route": "/chat/send-chat-message",
+      "api_prefix_boundary": "The CLI's default API prefix is /api; direct-backend deployments may use an empty prefix. A concrete deployment URL was not exercised.",
+      "request_schema_candidate": {
+        "message": "<frozen question supplied later>",
+        "chat_session_info": {
+          "persona_id": "<native web-only agent identifier supplied later>"
+        },
+        "deep_research": true,
+        "stream": false,
+        "allowed_tool_ids": [
+          "<native web-search identifier supplied later>",
+          "<native open-URL identifier supplied later>"
+        ],
+        "file_descriptors": []
+      },
+      "request_source": "query_chat_models:77-149",
+      "response_type": "ChatFullResponse",
+      "native_response_fields": [
+        "answer",
+        "answer_citationless",
+        "pre_answer_reasoning",
+        "tool_calls",
+        "top_documents",
+        "citation_info",
+        "message_id",
+        "chat_session_id",
+        "error_msg"
+      ],
+      "response_source": "chat_models:80-102",
+      "export_boundary": "The native non-stream response exposes answer text directly. Markdown formatting, complete report custody and an unchanged external evaluator report importer were not executed or bound. No thin adapter, driver, normalizer or scorer was written."
+    },
+    "fresh_corpus_boundary": "An isolated project with fresh native state and no connector corpus is the proposed Lite form. Allowed tool IDs, the web-only agent, empty native state, no private uploads, MCP exclusion and public-fetch scope still need native preflight."
+  },
+  "gateway_model_and_key_contract": {
+    "native_schema_fields": [
+      "provider",
+      "api_key",
+      "api_base",
+      "api_version",
+      "custom_config",
+      "model_configurations[].name",
+      "model_configurations[].reasoning_effort_max",
+      "model_configurations[].reasoning_effort_default"
+    ],
+    "sources": [
+      "llm_manage_models:134-148,236-245",
+      "llm_factory:386-397"
+    ],
+    "candidate_values_only": {
+      "api_base": "<owner-qualified OmniRoute OpenAI-compatible endpoint>",
+      "api_key": "<deliberately nonsecret keyless placeholder>",
+      "model_name_candidates": [
+        "cx/gpt-6.1-sol",
+        "cx/gpt-6.1-sol-ultra"
+      ]
+    },
+    "key_boundary": "An application API-key string in this provider schema can be a deliberately nonsecret placeholder for a keyless owner endpoint. It is not a copied provider credential and does not satisfy Onyx user/PAT authentication. No actual provider was registered or called.",
+    "loopback_boundary": "A container's loopback is not the host gateway's loopback. A reachable owner-qualified endpoint and network scope remain required; no gateway, host networking or NativeStack setting was changed.",
+    "effort_boundary": "Arbitrary model names are accepted by the reviewed schema. The native ReasoningEffort enum/validation, maximum gateway effort mapping, main/helper model selection, parallel-tool fields, headers, correlation and retry behavior are not qualified by this receipt. A gateway Ultra alias is distinct from native Codex Ultra orchestration.",
+    "provisioning_lead": "app_configs.py has AUTO_PROVISION_DEFAULT_LLM_PROVIDERS with a true default. A false value is a source configuration lead for avoiding unrelated provider provisioning, not an executed setup.",
+    "paid_account_boundary": "The Lite/server and compatible provider schemas do not establish a need for a paid external LLM account when an owned keyless gateway is supplied. Native Onyx account/authentication setup remains separate and unqualified; this is not an all-provider paid-account absence claim."
+  },
+  "keyless_web_contract": {
+    "search": {
+      "source": "searxng_client:17-56",
+      "native_client": "SearXNGClient",
+      "configuration": "searxng_base_url",
+      "behavior": "The client GETs /search at the supplied base URL and truncates returned results locally.",
+      "keyless_boundary": "No API-key parameter appears in the inspected native client. It requires a working owner-supplied SearXNG endpoint; no endpoint was selected, tested or deployed.",
+      "other_provider_boundary": "Other source paths include credential-dependent providers. This receipt neither selects them nor infers that all Onyx web search needs a paid key."
+    },
+    "fetch": {
+      "source": "onyx_web_crawler",
+      "native_client": "OnyxWebCrawler",
+      "behavior": "The built-in crawler imports ssrf_safe_get and outbound_allow_private_network, uses 5-second connect and 15-second read timeout constants, and has an optional Playwright fallback setting.",
+      "firecrawl_boundary": "The reviewed built-in public-fetch path does not require selecting Firecrawl. Firecrawl-dependent historical benchmark setup is not a prerequisite established for this candidate.",
+      "public_scope_boundary": "The effective private-network policy, redirect behavior, allowed public source scope and fallback configuration remain native-preflight gates. Imports alone do not prove the effective security setting."
+    }
+  },
+  "role_and_counter_observation_contract": {
+    "native_surfaces": [
+      "ChatFullResponse.tool_calls, top_documents and citation_info",
+      "ResearchAgentStart stream events carrying research_task",
+      "ResearchAgentCallResult.intermediate_report and citation_mapping",
+      "CombinedResearchAgentCallResult.intermediate_reports, whose None entries can retain failed helper results"
+    ],
+    "sources": [
+      "chat_models:80-102",
+      "streaming_models:368",
+      "deep_research_models:12-17"
+    ],
+    "claim_boundary": "These are source-defined logical agent/tool/result observation surfaces. No helper count, process count, role competence, lifecycle recovery or complete usage was measured.",
+    "native_usage_source": "model_response:44,191-198",
+    "native_usage_fields": [
+      "completion_tokens",
+      "prompt_tokens",
+      "total_tokens",
+      "cache_creation_input_tokens",
+      "cache_read_input_tokens"
+    ],
+    "missingness_warning": "Usage conversion uses missing-or-zero fallbacks, including a cached-token fallback. Normalized zero does not prove actual zero native usage; preserve raw missingness and do not infer missing provider calls or billing as zero.",
+    "provider_usage": null,
+    "billing": null,
+    "uncached_input_tokens": null,
+    "output_tokens": null,
+    "gross_tokens": null,
+    "complete_usage_required": "One authoritative complete aggregate including main, research helpers, native retries, tools and grading is still unbound. Do not sum overlapping cumulative snapshots or provider/cache subset counters. App cost estimates do not replace actual native usage."
+  },
+  "first_party_enhancement_sources": {
+    "cli_skill": {
+      "repository": "onyx-dot-app/onyx",
+      "commit": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "carrier_path": ".cursor/skills/onyx-cli/SKILL.md",
+      "carrier_type": "Git symlink",
+      "carrier_text": "../../../cli/internal/embedded/SKILL.md",
+      "carrier_bytes": 39,
+      "carrier_sha256": "d407f3fa74636d1bad034d19f86d40deab89b812c2d2c6ec8f3e71e6b5389a9c",
+      "resolved_path": "cli/internal/embedded/SKILL.md",
+      "resolved_bytes": 10611,
+      "resolved_sha256": "9fba48acbd0bab1918e57068501136487c8b69b714dbb93515f2e28f1ff1cafb",
+      "resolved_url": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/cli/internal/embedded/SKILL.md",
+      "activated_or_installed": false
+    },
+    "python_sandbox": {
+      "repository": "onyx-dot-app/python-sandbox",
+      "commit": "e53850d68701e5e62440a36ed311164dafc89465",
+      "readme_sha256": "7630af25883806b271e2df3967063f150821cb535b134d82c7118b9326ff5bfb",
+      "url": "https://github.com/onyx-dot-app/python-sandbox/blob/e53850d68701e5e62440a36ed311164dafc89465/README.md",
+      "claim": "Maintained first-party execution helper powering Onyx code interpreter, not a standalone research gatherer.",
+      "compatibility_boundary": "This current source HEAD was not resolved to the pinned Onyx code-interpreter image 0.4.7 or executed."
+    },
+    "historical_research_submission": {
+      "repository": "onyx-dot-app/onyx_deep_research_bench",
+      "commit": "41f404cc61e287ffff18df0f23ce8456503a94bc",
+      "readme_sha256": "d762924f4891e0044b629a33b2e4022b5f190b0c3794c0f51e396625fd0d3b4e",
+      "url": "https://github.com/onyx-dot-app/onyx_deep_research_bench/blob/41f404cc61e287ffff18df0f23ce8456503a94bc/README.md",
+      "claim_boundary": "Historical GPT-5.2, Serper and Firecrawl Onyx submission/results for Ayanami0730/deep_research_bench. It is not the held DeepResearch-Bench-II pin, a qualified standalone runtime, an unchanged local evaluator run, or keyless OmniRoute acceptance."
+    },
+    "additional_distinct_org_forms_reviewed": [
+      {
+        "repository": "onyx-dot-app/agent-wiki",
+        "commit": "117b5872de55539bceb39388ef24381b7da1e7a9",
+        "readme_sha256": "b18417e04fafe70bf7e372b0a8d5b1951dc763bbb8c5bab9b33f5e8abd0a905a",
+        "claim_boundary": "Separate Compose-backed knowledge/wiki application with native sign-up/admin setup; not qualified as a thinner Onyx research runtime."
+      },
+      {
+        "repository": "onyx-dot-app/onyx-foss",
+        "commit": "95d9bd138a76a0d513f2f0ea73c3d75ba69c8e31",
+        "readme_sha256": "2ebc96d323d1f84c5f902db6e899ff2eb9b1f34efe42ba2db81cae2885c4e229",
+        "claim_boundary": "Automatically synchronized MIT mirror; its README recommends the main project for most users. No lighter standalone engine was qualified from that README."
+      }
+    ]
+  },
+  "native_evaluator_lead_and_flag_correction": {
+    "repository": "onyx-dot-app/onyx",
+    "commit": "23be912c204deb0a087ea2ca0ae476e83541297f",
+    "native_entrypoint": "backend/onyx/evals/eval_cli.py",
+    "source_supported_parser_flags": [
+      "--local-data-path",
+      "--local-only",
+      "--no-send-logs",
+      "--base-url",
+      "--api-key"
+    ],
+    "parser_source": "eval_cli:179-233",
+    "readme_drift": "The pinned eval README's example uses --local-dataset-path; the pinned argparse definition instead uses --local-data-path. The actual parser name supersedes the stale example for a source candidate, without claiming an installed-help or execution result.",
+    "local_candidate_boundary": "The native local-only and no-send-logs flags are leads for avoiding remote experiment/logging dependencies. No data fixture, deep-research pipeline, judge model/effort, report importer, evaluator invocation or complete counter contract was frozen or executed.",
+    "no_new_scorer_or_adapter": true,
+    "held_external_evaluator_boundary": "The existing imlrz/DeepResearch-Bench-II source proposal is separate. The historical Onyx DRB submission and this CLI are not evidence of an unchanged DRB-II importer or grader binding."
+  },
+  "primary_sources": [
+    {
+      "id": "compose_lite",
+      "path": "deployment/docker_compose/docker-compose.onyx-lite.yml",
+      "bytes": 3156,
+      "sha256": "c41c2c2bb2ba72ef2d08b0fc79052124d0619484725ede9d1e5b339afccc99c3"
+    },
+    {
+      "id": "compose_base",
+      "path": "deployment/docker_compose/docker-compose.yml",
+      "bytes": 23635,
+      "sha256": "86c4940752fb75cf902eb3dc492fa073e913dea62547a372f901c359117423f9"
+    },
+    {
+      "id": "compose_readme",
+      "path": "deployment/docker_compose/README.md",
+      "bytes": 5677,
+      "sha256": "3a11fd5d27a1ad9fe53bd0c5a5922762be54381891f41b08e009823f06d716b2"
+    },
+    {
+      "id": "env_template",
+      "path": "deployment/docker_compose/env.template",
+      "bytes": 18556,
+      "sha256": "daf2ed0d054d8d81dac86b76ce4dddb6d1d5399b09e2d927f228cbf43815a4c9"
+    },
+    {
+      "id": "auth_users",
+      "path": "backend/onyx/auth/users.py",
+      "bytes": 118027,
+      "sha256": "ca0b4e3116996ed5706fbea16184dcf5c7690680d90bdc015cd797b42172f43f"
+    },
+    {
+      "id": "main",
+      "path": "backend/onyx/main.py",
+      "bytes": 34871,
+      "sha256": "68ec03de3fa5b37b29e48299743da37b06c41a78fb9e28e1ffb9e3e77e05a299"
+    },
+    {
+      "id": "settings_store",
+      "path": "backend/onyx/server/settings/store.py",
+      "bytes": 5124,
+      "sha256": "9977e5e8d2770cad9b2314b7b6e671a009b2ffba3b4e2ffa4d4fd33cc3c0ad9a"
+    },
+    {
+      "id": "settings_api",
+      "path": "backend/onyx/server/settings/api.py",
+      "bytes": 10313,
+      "sha256": "83298ab17da00ae653839471f29c15037a16ce46d0d121626aafda0dde892347"
+    },
+    {
+      "id": "auth_permissions",
+      "path": "backend/onyx/auth/permissions.py",
+      "bytes": 14448,
+      "sha256": "266d2803104792c77c21c2f6f52e7c8c3d547a30c09908093e740a2344868579"
+    },
+    {
+      "id": "cli_readme",
+      "path": "cli/README.md",
+      "bytes": 10744,
+      "sha256": "ec103a7f23db452bd3b1d30257f5ea879c578a0114b77d67a62c678a5eb2062d"
+    },
+    {
+      "id": "cli_ask",
+      "path": "cli/cmd/ask.go",
+      "bytes": 7377,
+      "sha256": "7b037ed6dda4ae46abdce48c91fdf685f1965a203038e7626443865610e95f68"
+    },
+    {
+      "id": "cli_stream",
+      "path": "cli/internal/api/stream.go",
+      "bytes": 3131,
+      "sha256": "c8735c6732097f2104d82e9f0ca7e985b1e106cb2fab00a480874b2d3e922b45"
+    },
+    {
+      "id": "deploy_install",
+      "path": "cli/cmd/deploy_install.go",
+      "bytes": 4394,
+      "sha256": "3306810828217cd4adc67e4f286cc4d5fc010eb3920584ae16eb27b2a97dd94a"
+    },
+    {
+      "id": "query_chat_models",
+      "path": "backend/onyx/server/query_and_chat/models.py",
+      "bytes": 10544,
+      "sha256": "adfb0aeda7c2b0cb74f89b3c439a081fdf52d6a6d82d40c620d381385155b338"
+    },
+    {
+      "id": "chat_backend",
+      "path": "backend/onyx/server/query_and_chat/chat_backend.py",
+      "bytes": 52145,
+      "sha256": "a3751fe46c61896a4b60fe6cdab79c51e0f9168b256d09d22873b4440a6f0343"
+    },
+    {
+      "id": "chat_models",
+      "path": "backend/onyx/chat/models.py",
+      "bytes": 8838,
+      "sha256": "6b5f0bdccaf540a5a7f068be041c85786b176cc24acf764d0e0579752304e69c"
+    },
+    {
+      "id": "llm_manage_models",
+      "path": "backend/onyx/server/manage/llm/models.py",
+      "bytes": 30853,
+      "sha256": "8492d2c5cf1d5ac4122b07538e806d50ece00c7ca92971433aeb0c9e5fcd839a"
+    },
+    {
+      "id": "llm_factory",
+      "path": "backend/onyx/llm/factory.py",
+      "bytes": 19822,
+      "sha256": "cd04c04e8df334885516c49ed10c609eef074c0dcb9c14f8c66f2b3a1c8be381"
+    },
+    {
+      "id": "app_configs",
+      "path": "backend/onyx/configs/app_configs.py",
+      "bytes": 97699,
+      "sha256": "38954e662a0ffbf2812b2e48162a80e9e2c63ada236e188da17191de5e738fed"
+    },
+    {
+      "id": "searxng_client",
+      "path": "backend/onyx/tools/tool_implementations/web_search/clients/searxng_client.py",
+      "bytes": 5401,
+      "sha256": "f93df0b0485e41814df96830167d3f84ffbdc5eb126bc9cbac5529dd1c3a2987"
+    },
+    {
+      "id": "onyx_web_crawler",
+      "path": "backend/onyx/tools/tool_implementations/open_url/onyx_web_crawler.py",
+      "bytes": 15798,
+      "sha256": "b6bd9eb1a54bb6ecf0f39ccf8dbf68fa9cd47a92374f8fa7f9951754a06bd44d"
+    },
+    {
+      "id": "deep_research_models",
+      "path": "backend/onyx/deep_research/models.py",
+      "bytes": 682,
+      "sha256": "ccb159685572e84adb18e903bfcc2ede4c3b6cd2a42cf769f0d02f9b2401842c"
+    },
+    {
+      "id": "streaming_models",
+      "path": "backend/onyx/server/query_and_chat/streaming_models.py",
+      "bytes": 14815,
+      "sha256": "03e1a6c6616e527e9631e05c8a713260dffd64eb1c34ff5713e592875f408653"
+    },
+    {
+      "id": "model_response",
+      "path": "backend/onyx/llm/model_response.py",
+      "bytes": 8741,
+      "sha256": "65ffb56dad9a0302ec70d19765fbbaab4c8ea01bede4bbf6610900554b221277"
+    },
+    {
+      "id": "eval_readme",
+      "path": "backend/onyx/evals/README.md",
+      "bytes": 5692,
+      "sha256": "c40bbe1091358e638d019a355e60421c26fa3776804295e8706a5e8d4f15b561"
+    },
+    {
+      "id": "eval_cli",
+      "path": "backend/onyx/evals/eval_cli.py",
+      "bytes": null,
+      "sha256": "eee324eeed830582b6cd5be250dfe721055549b7669d07681ed02c670d19ffe4"
+    }
+  ],
+  "source_identity_contract": {
+    "repository": "onyx-dot-app/onyx",
+    "commit": "23be912c204deb0a087ea2ca0ae476e83541297f",
+    "original_url_template": "https://github.com/onyx-dot-app/onyx/blob/23be912c204deb0a087ea2ca0ae476e83541297f/{path}",
+    "original_raw_url_template": "https://raw.githubusercontent.com/onyx-dot-app/onyx/23be912c204deb0a087ea2ca0ae476e83541297f/{path}",
+    "hash_scope": "SHA256 of original pinned file bytes, not a rendered HTML page, extracted excerpt or generated summary. A null byte count means that count was not retained in the compact source observations.",
+    "current_repo_enhancement_pin_boundary": "The separate org repository HEADs are source-discovery pins observed in this bounded task, not qualified compatible Onyx v4.8.3 extensions or activated installations."
+  },
+  "source_failures_and_corrections": [
+    {
+      "failure": "Guessed cli/internal/client/chat.go original URL returned HTTP 404.",
+      "resolution": "The exact tree and caller source identified cli/internal/api/stream.go; that original was read and hashed.",
+      "provider_or_service_failure": false
+    },
+    {
+      "failure": "Guarded compact extraction attempts produced 7759, 5167, 5831 and 3014 byte payloads and stopped before emitting their proposed extracts.",
+      "resolution": "Focused subsequent source reads retained bounded original identities and decisive excerpts. No persistent context search/index/memory was used.",
+      "claim_boundary": "These were source-processing failures, not native runtime failures or complete output artifacts."
+    },
+    {
+      "failure": "An initial services parser included commented lines or volume keys.",
+      "resolution": "A parser restricted to the base services block corrected the source-only default service prediction to five, including unprofiled code-interpreter."
+    },
+    {
+      "failure": "A user-management warning could have been overread as global authentication or anonymous-mode absence.",
+      "resolution": "The global startup, native auth dependencies, environment documentation and settings path established anonymous chat support with a false fresh default. Fresh passwordless bootstrap remains unqualified."
+    },
+    {
+      "failure": "The pinned evaluator README flag differs from the original argparse definition.",
+      "resolution": "Record --local-data-path as the source parser contract and retain the stale --local-dataset-path example; no passing evaluator command was invented."
+    },
+    {
+      "failure": "The bounded official-doc web queries for Lite/PostgreSQL, anonymous access and OpenAI-compatible API returned empty search results.",
+      "resolution": "Use the pinned original deployment and application sources; empty search results do not establish absence of a feature or recipe."
+    }
+  ],
+  "remaining_hard_bindings": [
+    "RuntimeLab owner allocation for the stock services, pinned images/digests, fresh project/volumes, ports, resources, cleanup and recovery.",
+    "Supported first-admin/bootstrap and native anonymous-chat setting, distinct from model provider keylessness and CLI PAT authentication.",
+    "Owner-qualified reachable OmniRoute endpoint from the isolated service network; NativeStack owner retains gateway setup.",
+    "Native provider registration and main/helper model plus effort/parallel/header/correlation/retry wire fields.",
+    "Working owner-supplied SearXNG endpoint and native public-fetch policy, with native web-only agent and exact allowed tool identifiers.",
+    "Native answer/report output custody and unchanged evaluator/importer compatibility; no custom driver or scorer.",
+    "Frozen tasks, controls, ordered repeats/arms, complete raw usage/missingness and lifecycle failure/recovery evidence under the shared execution contract."
+  ],
+  "publication_validation": {
+    "registration_owned_by_root": true,
+    "registry_edited_in_this_task": false,
+    "baseline_validate_command": "rtk python3 scripts/validate.py",
+    "baseline_validate_exit_code": 0,
+    "baseline_validate_returned_summary": {
+      "components": 69,
+      "hashed_files": 9477,
+      "profiles": 4,
+      "receipts": 187,
+      "status": "passed"
+    },
+    "post_edit_validate_command": "rtk python3 scripts/validate.py",
+    "post_edit_validate_exit_code": 1,
+    "post_edit_validate_returned_output": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/onyx-lite-source-readiness-binding.json: evidence file is not hash-listed\n",
+    "post_edit_registry_gap_retained": true,
+    "claim_boundary": "The passed baseline result applies to record_base before this new artifact. Post-edit validation reports the owned new artifact's missing hash registration. Root owns that registration; this receipt cannot certify its own exact-head publication or live runtime acceptance."
+  },
+  "evidence_policy": {
+    "source_review_is_native_execution": false,
+    "metadata_presence_probe_is_role_qualification": false,
+    "native_smoke_is_quality_comparison": false,
+    "historical_submission_is_current_gateway_acceptance": false,
+    "normalized_missing_usage_is_zero": false,
+    "source_only_receipt_is_default_selection": false,
+    "raw_conversations_or_credentials_published": false
+  },
+  "limits": [
+    "This receipt is a source and native metadata binding, not a runnable acceptance contract or qualification of a second gatherer.",
+    "No installation, daemon/container start, model call, public search/fetch test, provider/account mutation or active private configuration read occurred.",
+    "Unknown usage and unretained counts remain null. Missing source or execution evidence is scoped to named originals and bounded environments.",
+    "Only this new receipt is owned; registry, comparison selections, shared files, gateway setup and trading files remain with their respective owners."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "original_pinned_source_read_not_live_wire_acceptance",
+  "repository": "https://github.com/diegosouzapw/OmniRoute",
+  "pr_read_head": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+  "original_sources": [
+    {"ref": "f5d8e150b79e0901fa18241c7f29bff889b87c14", "file": "open-sse/translator/request/openai-responses/helpers.ts", "bytes": 3832, "sha256": "9400107370e111560d733fcebb93cd13ee662b25c35eaecb81ac13ce905f841e", "read_exit_code": 0},
+    {"ref": "0585aba5589d5a1f49243a13a8db249558e7c9e3", "file": "open-sse/translator/request/openai-responses/helpers.ts", "bytes": 3842, "sha256": "bd0ea6243bdcf29d931c1fc117973a14debe61d09f282ca4dbbb77e05f9dd72d", "read_exit_code": 0}
+  ],
+  "source_finding": "At f5d8e150, the native-max predicate matches gpt-6-(astra|sol|luna) and misses the gpt-6.1 family. Its Chat-to-Responses normalizer consequently changes a flat max to xhigh for those names. The0585aba5 predicate permits the optional numeric minor suffix and preserves max. Root re-read both original pinned files; these are source semantics, not an observed provider request.",
+  "owner_observation": {"source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966806902", "scope": "Owner reports20128 carries f5d8e150 and21128 carries0585aba5; Codex Responses traffic is separate from affected Chat callers. The owner promised the wire/counter receipt against21128."},
+  "comparison_destination": {
+    "port": 21128,
+    "base_ref": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+    "carry_commits": ["24bbadbad15eec0d598c908416e4b01be4e37671", "6c7990058c4ce9677de79452c8cefb10b4bf1b3d"],
+    "canary_pr_head": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+    "status": "proposed composition; actual destination build, request wire, feature controls and complete counters remain prerequisites"
+  },
+  "correction": "Earlier morning20128 canaries cannot qualify matched Ultra/Max execution: Chat max may be clamped while Codex Responses max is preserved. Their failures and unknown delivered effort remain historical readiness evidence. Do not compare arm quality or efficiency across these different effort paths.",
+  "feature_evidence_boundary": "Existing source controls and six native cache mock fixtures at c1e30b7676975feb298b49eff6ff58923c04b89e remain separate. They do not qualify the selected composed21128 build or prove live compression/cache savings. Rebind relevant control source identities and actual intervention/counter scopes before a feature freeze.",
+  "quality_freeze": false,
+  "provider_run": false,
+  "provider_usage": null,
+  "new_default": false
+}

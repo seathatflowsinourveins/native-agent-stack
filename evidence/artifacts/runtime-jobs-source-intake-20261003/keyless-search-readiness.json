@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "kind": "native_keyless_search_readiness",
+  "class": "foundation-native-operation-smoke",
+  "scope": {
+    "job": "research-gatherer",
+    "runtime_dependency": "DDGS",
+    "installed_version": "9.14.1",
+    "upstream_repository": "deedy5/ddgs",
+    "upstream_commit": "d3194a3ab05454e354ac59c3d1ccc0189470e80a",
+    "deerflow_parent_commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+    "record_base": "b095cd2e11e7387e1bcfa107558743429714d8b9",
+    "quality_evaluated": false,
+    "default_selected": false,
+    "unchanged_native_cli": true,
+    "upstream_test_suite_run": false,
+    "model_calls": 0
+  },
+  "primary_sources": [
+    {
+      "repository": "deedy5/ddgs",
+      "tag": "v9.14.1",
+      "commit": "d3194a3ab05454e354ac59c3d1ccc0189470e80a",
+      "path": "ddgs/cli.py",
+      "sha256": "6e1df78a6402c01079c93cce3a5da5bafeb7f7115a681201c57c4bcab7ce1671",
+      "installed_bytes_equal": true,
+      "url": "https://github.com/deedy5/ddgs/blob/d3194a3ab05454e354ac59c3d1ccc0189470e80a/ddgs/cli.py"
+    },
+    {
+      "repository": "deedy5/ddgs",
+      "tag": "v9.14.1",
+      "commit": "d3194a3ab05454e354ac59c3d1ccc0189470e80a",
+      "path": "ddgs/ddgs.py",
+      "sha256": "a2a64a96cd1e4e50b9f3018de1b77c90d9a0690b2eff1157a71342cb635c87e5",
+      "installed_bytes_equal": true,
+      "url": "https://github.com/deedy5/ddgs/blob/d3194a3ab05454e354ac59c3d1ccc0189470e80a/ddgs/ddgs.py"
+    },
+    {
+      "repository": "deedy5/ddgs",
+      "tag": "v9.14.1",
+      "commit": "d3194a3ab05454e354ac59c3d1ccc0189470e80a",
+      "path": "ddgs/engines/yahoo.py",
+      "sha256": "4c7f75b736a2a767c77ea53370a16aaad65c56fb11c6fd73ba3624c9a5ec61c7",
+      "installed_bytes_equal": true,
+      "url": "https://github.com/deedy5/ddgs/blob/d3194a3ab05454e354ac59c3d1ccc0189470e80a/ddgs/engines/yahoo.py"
+    }
+  ],
+  "native_help": {
+    "command": "rtk env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHON_DOTENV_DISABLED=1 <owned-deerflow-venv>/bin/ddgs text --help",
+    "native_exit_code": 0,
+    "confirmed_flags": [
+      "--query",
+      "--backend",
+      "--region",
+      "--max_results",
+      "--no-color"
+    ],
+    "allowed_backend_values": [
+      "auto",
+      "all",
+      "bing",
+      "brave",
+      "duckduckgo",
+      "google",
+      "grokipedia",
+      "mojeek",
+      "yandex",
+      "yahoo",
+      "wikipedia"
+    ],
+    "limit": "Help accepts names which may map to disabled engines; positive help is not runtime engine availability."
+  },
+  "upstream_release": {
+    "tag": "v9.14.1",
+    "gh_api_exit_code": 0,
+    "published_at": "2026-04-20T12:09:00Z",
+    "url": "https://github.com/deedy5/ddgs/releases/tag/v9.14.1",
+    "relevant_change": "The official release disables Google until fixed."
+  },
+  "shared_command": {
+    "template": "rtk env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHON_DOTENV_DISABLED=1 /usr/bin/timeout --kill-after=5s 30s <owned-deerflow-venv>/bin/ddgs text --query <public-primary-query> --backend <requested-backend> --region us-en --max_results 3 --no-color",
+    "query": "site:docs.python.org asyncio timeout",
+    "region": "us-en",
+    "max_results": 3,
+    "process_budget_seconds": 30,
+    "environment_cleared": true,
+    "proxy_flag_used": false,
+    "output_or_download_flags_used": false,
+    "searches_in_two_independent_batches": [
+      [
+        "duckduckgo",
+        "bing",
+        "google"
+      ],
+      [
+        "brave",
+        "mojeek",
+        "yahoo"
+      ]
+    ],
+    "per_backend_elapsed_scope": "wall time around the full native subprocess, including process startup; not backend-only latency"
+  },
+  "outcomes": [
+    {
+      "requested_backend": "duckduckgo",
+      "effective_backend_mode": "duckduckgo",
+      "actual_engine_for_auto_result": null,
+      "started_at_utc": "2026-10-03T07:23:40.997631+00:00",
+      "native_exit_code": 0,
+      "elapsed_seconds": 0.347,
+      "printed_result_count": 0,
+      "source_urls": [],
+      "stdout": {
+        "bytes": 50,
+        "sha256": "048bafed53739298153ccc116dc1a82beeda1aece0a9c6ab3fbac2bbf6066184",
+        "retained_error_line": "DDGSException: DDGSException('No results found.')"
+      },
+      "stderr": {
+        "bytes": 0,
+        "text": ""
+      },
+      "outcome": "empty-results despite exit 0"
+    },
+    {
+      "requested_backend": "bing",
+      "effective_backend_mode": "auto",
+      "actual_engine_for_auto_result": null,
+      "started_at_utc": "2026-10-03T07:23:40.997856+00:00",
+      "native_exit_code": 0,
+      "elapsed_seconds": 1.284,
+      "printed_result_count": 3,
+      "source_urls": [
+        "https://docs.python.org/3/library/asyncio-task.html",
+        "https://docs.python.org/3/library/asyncio-api-index.html",
+        "https://docs.python.org/3/library/asyncio-sync.html"
+      ],
+      "stdout": {
+        "bytes": 900,
+        "sha256": "d4979fa5a02004b74c8745b6a76bf7ff1b1937cb4f1be5a1a38a161d10149d76",
+        "retained_error_line": null
+      },
+      "stderr": {
+        "bytes": 160,
+        "text": "WARNING:ddgs.ddgs:KeyError('bing') - backend is not exist or disabled. Available: brave, duckduckgo, grokipedia, mojeek, wikipedia, yahoo, yandex. Using 'auto'\n"
+      },
+      "outcome": "source URLs returned after native fallback; requested engine not qualified"
+    },
+    {
+      "requested_backend": "google",
+      "effective_backend_mode": "auto",
+      "actual_engine_for_auto_result": null,
+      "started_at_utc": "2026-10-03T07:23:40.998601+00:00",
+      "native_exit_code": 0,
+      "elapsed_seconds": 1.415,
+      "printed_result_count": 3,
+      "source_urls": [
+        "https://docs.python.org/3/library/asyncio-task.html",
+        "https://docs.python.org/3/library/asyncio.html",
+        "https://docs.python.org/3/library/asyncio-api-index.html"
+      ],
+      "stdout": {
+        "bytes": 1540,
+        "sha256": "453d4c676547cfbb489d8a69d2d73b292f8d7aa5938a3b8cd50ddc064b438f21",
+        "retained_error_line": null
+      },
+      "stderr": {
+        "bytes": 162,
+        "text": "WARNING:ddgs.ddgs:KeyError('google') - backend is not exist or disabled. Available: brave, duckduckgo, grokipedia, mojeek, wikipedia, yahoo, yandex. Using 'auto'\n"
+      },
+      "outcome": "source URLs returned after native fallback; requested engine not qualified"
+    },
+    {
+      "requested_backend": "brave",
+      "effective_backend_mode": "brave",
+      "actual_engine_for_auto_result": null,
+      "started_at_utc": "2026-10-03T07:24:39.811514+00:00",
+      "native_exit_code": 0,
+      "elapsed_seconds": 0.443,
+      "printed_result_count": 0,
+      "source_urls": [],
+      "stdout": {
+        "bytes": 50,
+        "sha256": "048bafed53739298153ccc116dc1a82beeda1aece0a9c6ab3fbac2bbf6066184",
+        "retained_error_line": "DDGSException: DDGSException('No results found.')"
+      },
+      "stderr": {
+        "bytes": 0,
+        "text": ""
+      },
+      "outcome": "empty-results despite exit 0"
+    },
+    {
+      "requested_backend": "mojeek",
+      "effective_backend_mode": "mojeek",
+      "actual_engine_for_auto_result": null,
+      "started_at_utc": "2026-10-03T07:24:39.812069+00:00",
+      "native_exit_code": 0,
+      "elapsed_seconds": 0.612,
+      "printed_result_count": 0,
+      "source_urls": [],
+      "stdout": {
+        "bytes": 50,
+        "sha256": "048bafed53739298153ccc116dc1a82beeda1aece0a9c6ab3fbac2bbf6066184",
+        "retained_error_line": "DDGSException: DDGSException('No results found.')"
+      },
+      "stderr": {
+        "bytes": 0,
+        "text": ""
+      },
+      "outcome": "empty-results despite exit 0"
+    },
+    {
+      "requested_backend": "yahoo",
+      "effective_backend_mode": "yahoo",
+      "actual_engine_for_auto_result": null,
+      "started_at_utc": "2026-10-03T07:24:39.812558+00:00",
+      "native_exit_code": 0,
+      "elapsed_seconds": 0.792,
+      "printed_result_count": 3,
+      "source_urls": [
+        "https://docs.python.org/3/library/asyncio-task.html",
+        "https://docs.python.org/3/library/asyncio.html",
+        "https://docs.python.org/3/library/asyncio-api-index.html"
+      ],
+      "stdout": {
+        "bytes": 1248,
+        "sha256": "62ce094aa9bf47cb57fb69d05009667bc6cde746e50a4a80b270bec620a8d044",
+        "retained_error_line": null
+      },
+      "stderr": {
+        "bytes": 0,
+        "text": ""
+      },
+      "outcome": "explicit Yahoo returned source URLs on this single query"
+    }
+  ],
+  "independent_observation": {
+    "method": "Native stdout was captured in memory, hashed, and filtered for printed result headings and href rows outside model context; stderr fallback/error messages were retained. No result bodies or snippets are published.",
+    "raw_success_stdout_custody": "No separate raw stdout artifact retained outside execution trace; sanitized metadata and returned source URLs retained here.",
+    "raw_failed_stdout_custody": "Native error line retained here with whole-output hash.",
+    "local_parser_is_upstream_test": false,
+    "page_fetch_or_content_verification_performed": false
+  },
+  "exit_semantics": {
+    "native_cli_safe_entry_point_catches_exceptions": true,
+    "source": "ddgs/cli.py:166",
+    "consequence": "The empty-result failures returned exit 0. Exit code must be assessed with native error/result output."
+  },
+  "gptr_binding_limit": {
+    "upstream_repository": "assafelovic/gpt-researcher",
+    "tag": "v3.7.0",
+    "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+    "path": "gpt_researcher/retrievers/duckduckgo/duckduckgo.py",
+    "sha256": "171d27253cb461f5322e381a49228fdce1fe0c46c884ddd6d824e0cf03b95656",
+    "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/retrievers/duckduckgo/duckduckgo.py",
+    "caller": "DDGS() then text(query, region='wt-wt', max_results=...); backend omitted.",
+    "status": "No source-supported backend/region override binding was found in the reviewed native caller/config paths. This Yahoo smoke does not establish GPTR backend selection."
+  },
+  "gptr_installed_dependency_source_only": {
+    "version": "9.16.0",
+    "repository": "deedy5/ddgs",
+    "commit": "70a5635510fb8d5b15d5ba6ceced6a67e212149b",
+    "release_url": "https://github.com/deedy5/ddgs/releases/tag/v9.16.0",
+    "sources": [
+      {
+        "path": "ddgs/ddgs.py",
+        "sha256": "1cd33c4c5dd81ab865d6257327c4f079fae0cbe2e37ec8c7a9c575df771f27b1",
+        "installed_bytes_equal": true,
+        "url": "https://github.com/deedy5/ddgs/blob/70a5635510fb8d5b15d5ba6ceced6a67e212149b/ddgs/ddgs.py"
+      },
+      {
+        "path": "ddgs/engines/wikipedia.py",
+        "sha256": "ab70cb8392181f449e55949e51281d8621a441f3bd1df77bb8b02db1c7045afb",
+        "installed_bytes_equal": true,
+        "url": "https://github.com/deedy5/ddgs/blob/70a5635510fb8d5b15d5ba6ceced6a67e212149b/ddgs/engines/wikipedia.py"
+      },
+      {
+        "path": "ddgs/cli.py",
+        "sha256": "a3e21f5f2e2c49ba8e0b9e3354bb85c6cbe0583964995445effe88c0a6173e8f",
+        "installed_bytes_equal": true,
+        "url": "https://github.com/deedy5/ddgs/blob/70a5635510fb8d5b15d5ba6ceced6a67e212149b/ddgs/cli.py"
+      }
+    ],
+    "failure_path_lead": "Auto text includes Wikipedia; Wikipedia derives its language hostname from the second region component. GPTR's wt-wt yields wt.wikipedia.org. This is compatible with the reported DNS failure, not proof of the sole cause of zero results.",
+    "native_searches_run_in_this_pass": false
+  },
+  "usage": {
+    "complete_provider_usage": null,
+    "network_request_count": null,
+    "billing": null,
+    "limit": "No LLM provider call was made by these native CLI invocations. HTTP request/fallback counts were not instrumented; absent counters are not inferred as zero."
+  },
+  "remaining_gates": [
+    "Qualify successful page retrieval and useful research completion separately from URL discovery.",
+    "Bind a supported common retrieval configuration before freezing a gatherer comparison.",
+    "Retain complete attempt/counter/failure records and run the upstream evaluator contract before any default selection."
+  ],
+  "evidence_policy": "docs/acceptance-evidence-policy.md",
+  "limits": [
+    "One short public-primary query per requested backend is readiness evidence only.",
+    "Bing and Google successes belong to native auto fallback; they cannot be attributed to their requested backend.",
+    "The explicit Yahoo success does not measure general search coverage, report quality, token efficiency or lifecycle recovery.",
+    "No model rerun, profile change, installation, service start, copied credential, explicit proxy or result state file was used by this receipt worker."
+  ],
+  "publication_validation": {
+    "command": "rtk python3 scripts/validate.py",
+    "native_exit_code": 1,
+    "observed_failures": [
+      "evidence/artifacts/runtime-jobs-source-intake-20261003/deerflow-native-readiness.json: evidence file is not hash-listed",
+      "evidence/artifacts/runtime-jobs-source-intake-20261003/keyless-search-readiness.json: evidence file is not hash-listed"
+    ],
+    "registry_changed": false,
+    "limit": "This worker owns only these two receipts. Registration and repository acceptance remain integration work for the coordinator."
+  }
+}

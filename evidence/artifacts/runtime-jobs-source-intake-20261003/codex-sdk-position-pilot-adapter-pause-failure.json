@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "native-source-position-gate-failure",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "FAILED: native adapter breakpoint remained without an observed adapter pause before zero-selected Jest completion; SDK positions HOLD",
+  "preregistration": {
+    "amendment": "codex-sdk-position-crypto-binding-amendment.json",
+    "private_recipe_bytes": 34438,
+    "private_recipe_sha256": "169625702f54b976b5673b0385139f2cc71de6dbe09adab3013f15acfae33d15",
+    "source_review": "Astra/max accepted exactly one source-position-only pilot of this frozen correction; no further retry admitted"
+  },
+  "prior_failures_retained": [
+    "codex-sdk-position-pilot-transport-failure.json",
+    "codex-sdk-position-pilot-global-getter-failure.json"
+  ],
+  "native_execution": {
+    "start_observed_utc": "2026-10-03T15:04:18Z",
+    "launch_chunk": "c02bbc",
+    "tool_session_id": 93951,
+    "constants_input_chunk": "21a64d",
+    "breakpoint_input_chunk": "aa7190",
+    "resume_chunk": "3ce47d",
+    "crypto_metadata_result": {
+      "stage": "adapter_breakpoint",
+      "breakpoint_id_sha256": "83d52a5a6f60bcf5a9c1af5d4be21788eeb319d0141b3a9b33a9bd2b3946c164",
+      "locations": []
+    },
+    "scope_of_crypto_result": "Native metadata receiver correction succeeded for the first bounded record only; pending locations before load are not an observed adapter pause or SDK positions",
+    "adapter_pause_observed": false,
+    "SDK_script_source_or_map_bindings": null,
+    "actual_pausable_positions": null,
+    "target_final_observation": "Jest JSON written,23 tests skipped; target waits for debugger disconnect",
+    "stop_inputs": [
+      "kill",
+      ".exit"
+    ],
+    "kill_chunk": "8307e8",
+    "completion_chunk": "bdc924",
+    "completion_exit_code": 0,
+    "completion_observed_utc": "2026-10-03T15:06:55Z",
+    "nominal_TERM_seconds": 180,
+    "nominal_KILL_grace_seconds": 10,
+    "actual_wall_seconds": null,
+    "bwrap_terminal_command_exit": [
+      0
+    ],
+    "independently_returned_Jest_exit": null
+  },
+  "Jest_native_report": {
+    "bytes": 7438,
+    "sha256": "ee6cfe7afcf8e3c5814b0c298038a056f6770cc2a3a65e716ad63d2acea72597",
+    "counters": {
+      "success": true,
+      "numPassedTests": 0,
+      "numFailedTests": 0,
+      "numPendingTests": 23,
+      "numTotalTests": 23,
+      "numPassedTestSuites": 0,
+      "numPendingTestSuites": 1,
+      "numFailedTestSuites": 0
+    },
+    "classification": "Native generated all-skipped report. No positive fixture passed; report success and REPL command0 are not independent positive Jest/SDK acceptance."
+  },
+  "scope": {
+    "original_fixture_timeout_ms": 5000,
+    "test_name_pattern": "(?!)",
+    "positive_fixture_callbacks": 0,
+    "provider_turns": "not exercised",
+    "controller_metadata_bound": true,
+    "all_three_failed_attempts_preserved": true
+  },
+  "independent_cleanup": {
+    "before_native_exit": 0,
+    "before_chunk": "0ec922",
+    "before_phase": "After native all-skipped Jest report while waiting for debugger disconnect; not the adapter-phase gate",
+    "before": {
+      "stdout_bytes": 7030,
+      "stdout_sha256": "fbd23cdcb652738bd4a2a1f0e0a6436ec676090d23f1f23701a1b64ce10cb15b",
+      "rows": 370,
+      "complete_decimal_fields": true,
+      "owned_pair_count": 1,
+      "owned_namespace_count": 3,
+      "stderr_bytes": 0
+    },
+    "after_native_exit": 0,
+    "after_chunk": "e824a4",
+    "after": {
+      "stdout_bytes": 6878,
+      "stdout_sha256": "ab17b7f25491c7ef59cc9c7309a2962ba82ede6572152c9236b521eec9a4596e",
+      "rows": 362,
+      "complete_decimal_fields": true,
+      "owned_pair_count": 0,
+      "owned_namespace_count": 0,
+      "stderr_bytes": 0
+    },
+    "visible_owned_namespace_endpoint": true,
+    "limits": "Observed endpoint only; no target/Jest numeric status reconstruction"
+  },
+  "retained_native_outputs": {
+    "repl-native.stdout.txt": {
+      "bytes": 923,
+      "sha256": "c4c185fc349b82ed364f3fdba16f250a8e1b24d57488c661be7a278ffa040711"
+    },
+    "repl-native.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bwrap-native-status.jsonl": {
+      "bytes": 221,
+      "sha256": "0eacb58b5901c37f2cda599fb124f380f83ec2858c0207afae0f8e9d5b24e8d2"
+    }
+  },
+  "original_custody": "Unmodified native files remain in task-owned private crypto-binding attempt directory; public receipt retains sanitized byte/hash bindings",
+  "cause_status": "Literal native adapter URL/loading/condition source diagnosis pending; no fourth run/observer admitted",
+  "primary_sources": [
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "files": [
+        "lib/internal/debugger/inspect_repl.js",
+        "deps/v8/include/js_protocol.pdl"
+      ]
+    },
+    {
+      "repository": "jestjs/jest",
+      "pin": "4e56991693da7cd4c3730dc3579a1dd1403ee630",
+      "file": "packages/jest-circus/src/legacy-code-todo-rewrite/jestAdapter.ts"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "file": "bubblewrap.c"
+    },
+    {
+      "repository": "procps-ng/procps",
+      "pin": "4ddcef2fd843170c8e2d59a83042978f41037a2b",
+      "file": "src/ps/output.c"
+    }
+  ],
+  "quality_result": null,
+  "provider_usage": null,
+  "token_savings": null
+}

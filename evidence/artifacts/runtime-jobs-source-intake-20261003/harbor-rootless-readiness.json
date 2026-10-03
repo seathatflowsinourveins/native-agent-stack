@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "native_container_and_verifier_readiness_only",
+  "source": {"repository": "https://github.com/harbor-framework/harbor", "tag": "v0.23.0", "ref": "1e5c5c6db929a10a140d05e606882c671ae20729"},
+  "host_scope": "Architecture-owner-authorized disposable Linux host; Harbor installation and task images only. Rootless Unix Docker endpoint was independently observed. No native-stack installation, daemon change or provider sign-in was performed by this lane.",
+  "native_install": {
+    "recipe": "Supported uv tool install, selecting Python3.13 and the exact public Harbor VCS pin in owned tool/cache/Python prefixes with cleared environment and uv --no-config.",
+    "exit_code": 0,
+    "observed_version": "0.23.0",
+    "version_exit_code": 0,
+    "python": "3.13.15",
+    "distribution_count": 90,
+    "sorted_inventory_sha256": "bd45d9d31f81eff557a9fe544553bd7e699ea4d66401af69c9913c9132c5bce6",
+    "dependency_scope": "Actual native VCS-install resolution, not an unchanged upstream development lock or a complete reproducibility claim.",
+    "key_versions": {"openai": "2.54.0", "litellm": "1.103.2", "python-dotenv": "1.2.4", "uvicorn": "0.54.0", "websockets": "15.0.1"},
+    "uv": {"version": "0.12.17", "ref": "635500036e1705961315e86447f0fab0a8ddb309", "official_installer_sha256": "37b82230b28617c6c24fa52364fa28aa37f2aa40c114809a623f6b064a9730e5", "native_install_exit_code": 0, "native_version_exit_code": 0}
+  },
+  "docker_observation": {
+    "version": "29.8.2",
+    "version_exit_code": 0,
+    "security_options": ["name=seccomp,profile=builtin", "name=rootless", "name=cgroupns"],
+    "security_observation_exit_code": 0,
+    "buildx": "v0.37.1 at0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+    "compose": "v5.5.1",
+    "scope": "Value-free selected native metadata; no Docker authentication configuration was read or copied."
+  },
+  "unchanged_upstream_task": {
+    "path": "examples/tasks/hello-world",
+    "instruction_sha256": "2a753a51dba6bdec8b64b73ef9e25f64ffa40369dc21059b58fbd2999510e076",
+    "task_toml_sha256": "8df59d13077f5da3cb525722fe81f9b90fa177c26fdcbb54e3e7049bc610896e",
+    "solution_sha256": "7e830a7de2f007b0a02ae7fcd5a7a7ce2bc96f6a2be533314f789344ceadfa31",
+    "test_sh_sha256": "0aefd5b2381807175220c8a7e87d0eb43686be07a38aa82ae124778377c47c60",
+    "test_state_sha256": "f219416b41d952452cc109c8aea5d4627d9793554dfa78535cee8a69123e048f",
+    "source_head_native_exit_code": 0,
+    "source_status": "Native status exit0 with empty output; exact pinned checkout unchanged.",
+    "native_invocation_shape": "harbor run --path <pinned-source>/examples/tasks/hello-world --agent <oracle|nop> --env docker --n-concurrent 1 --n-attempts 1 --max-retries 0 --env-file /dev/null --yes; separate owned job directories, cleared environment and owned Docker client state",
+    "dependency_limitation": "Original Dockerfile uses ubuntu:24.04, and verifier installs packages and fixed UV/pytest tools over the network. This unchanged readiness smoke is not the coding study's immutable image or dependency qualification."
+  },
+  "actual_results": [
+    {"agent": "oracle", "native_exit_code": 0, "trials": 1, "exceptions": 0, "mean_reward": 1.0, "displayed_runtime_seconds": 32, "job_result_sha256": "79054a0f2625d8f6909d97b1105b2f96be5b0de8377ae68b7a5643b0a04eab64", "trial_result_sha256": "3c30fb5aa7b61e2082ea66f18c59ffc5632deaeb4cc0241cf54e3302e3267360", "ctrf_sha256": "82b9ea5d8dbe24c7da9e83037d0b13e13039583bb739e96d038931e19873249d", "tests": 2, "passed": 2, "failed": 0},
+    {"agent": "nop", "native_exit_code": 0, "trials": 1, "exceptions": 0, "mean_reward": 0.0, "displayed_runtime_seconds": 31, "job_result_sha256": "c0aa23ad7f9ec448eb9ef7bdae43a6ce4d775f0849f9863fef71691f3f62edd8", "trial_result_sha256": "3acd65782632940a7717fa0ef269535f52febf6ddc1aa8c970b322d9f8e66146", "ctrf_sha256": "ec8ab8480398414885200ce8200aabc6c42f068983fc7c84c5d3f190f8fe0484", "tests": 2, "passed": 0, "failed": 2}
+  ],
+  "independent_observation": "Separately read native job/trial result and CTRF artifacts. The no-op agent's two verifier failures are the expected negative control, preserved alongside its native job exit0/reward0. Selected Docker ps -a observation of hello-world trial names returned exit0 with empty output after both runs.",
+  "cleanup": {"native_exit_code": 0, "remaining_matching_trial_containers": 0, "task_images": "Retained for the authorized comparison lifecycle; no global prune."},
+  "usage": {"native_input_tokens": null, "native_cache_tokens": null, "native_output_tokens": null, "billing_usd": null, "scope": "Native result fields are null. Oracle/nop are stock deterministic agents; these runs qualify no LLM quality, effort, token saving or gateway route."},
+  "retained_failures": [
+    {"action": "Bare Windows WSL executable name", "exit_code": 127, "correction": "Use its actual absolute executable; native exit0. Add explicit disposable working directory to avoid the earlier UNC translation warning."},
+    {"action": "Initial native UV availability", "exit_code": 127, "correction": "Official pinned UV unmanaged installation into the owned prefix; native exit0."},
+    {"action": "Installer redirect fetch", "result": "HTTP403", "correction": "Official GitHub installer asset downloaded with native curl; expected checksum matched."},
+    {"action": "Guessed UV environment-document source", "result": "HTTP404", "correction": "Exact pinned tree resolves crates/uv-static/src/env_vars.rs; original source verifies owned prefix variables."},
+    {"action": "First task command used --environment-type", "exit_code": 2, "actual_error": "No such option: --environment-type", "correction": "Pinned src/harbor/cli/jobs.py:799 names --env; native corrected oracle and nop commands both exited0."}
+  ],
+  "qualification": {"coding_task_images": false, "immutable_image_policy_applied": false, "coding_runtime_versions": false, "gateway_reachability_from_task_container": false, "provider_effort_and_counters": false, "quality_freeze": false, "new_default": false}
+}

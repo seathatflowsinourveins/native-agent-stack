@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "study_id": "runtime-jobs-coding-sol-ultra-20261003",
+  "status": "draft_not_frozen",
+  "freeze_eligible": false,
+  "scope": "Prospective matched-task comparison of standing OpenHands1.50.1 coding worker against native Codex0.160 and Pi1.0; no historical gate regrade or new default",
+  "comparison_modes": {
+    "default": "full_usage",
+    "selected_mode": null,
+    "selection_policy": "Absent or null selection preserves the prior full_usage rules. quality_only is a proposal requiring accepted exact shared/job/preregistration bindings before outputs; this draft remains ineligible for freeze.",
+    "full_usage": {
+      "decision_rule": "proposed_decision_rule.selection",
+      "usage_requirements": "All prior usage_contract required_fields, complete authoritative coverage and efficiency conditions remain unchanged. Unknown usage cannot fall through to agent time."
+    },
+    "quality_only": {
+      "status": "proposal_only_not_accepted_or_frozen",
+      "shared_binding": "shared-execution-contract.json#comparison_modes.quality_only",
+      "amendment": "quality-only-contract-amendment-20261003.md",
+      "quality_decision": {
+        "baseline": "openhands-sdk",
+        "measure": "For each of the unchanged 24 tasks, count native reward=1 across exactly two valid admitted repeats; task count is an integer from 0 to 2. Preserve native reward=0 and all frozen failure dispositions. Each arm's total successful valid trials is an integer from 0 to 48.",
+        "minimum": "Every challenger task count must be greater than or equal to the OpenHands1.50.1 count on the same task.",
+        "improvement": "At least one challenger task count must exceed the baseline count by at least 1.",
+        "qualifying_challenger_order": [
+          "total successful valid trials descending",
+          "if greatest totals tie between qualifying challengers, retain standing OpenHands1.50.1"
+        ],
+        "quality_tie": "If all task counts tie the incumbent, retain standing OpenHands1.50.1; no usage or agent-time tiebreak.",
+        "otherwise": "Retain standing OpenHands1.50.1; no measured default before qualified decision acceptance."
+      },
+      "outcome_inventory": "All 48 task-repeat blocks and 144 planned arm attempts plus every invalid/recovery/helper/grading attempt remain bound and retained. Infrastructure-invalid quality is null; native non-infrastructure failures score 0 only under the unchanged frozen oracle/disposition. No selective exclusions, altered denominator or independent retry.",
+      "usage_and_identity": "Complete usage may remain null and partial counters retain original missingness/presence/types and explicit scope. Actual runtime/client/route/model/effort/parallel/child/helper identities and attempt binding remain required independently; cost, efficiency, savings and token-feature adoption remain HOLD.",
+      "budget_gate": "The proposed 200000-token envelope remains unenforced and blocks freeze until source-supported native enforcement and breach disposition are qualified. This amendment does not make the study uncapped; a separate source-bound prospective proposal is required for that change."
+    }
+  },
+  "sources": {
+    "harbor": {
+      "tag": "v0.23.0",
+      "ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "files": [
+        "registry.json",
+        "src/harbor/agents/installed/codex.py",
+        "src/harbor/agents/installed/pi.py",
+        "src/harbor/agents/installed/openhands_sdk.py",
+        "src/harbor/cli/jobs.py",
+        "src/harbor/models/task/config.py",
+        "src/harbor/environments/base.py",
+        "src/harbor/environments/docker/docker.py"
+      ]
+    },
+    "registry_sha256": "da1446bce05eabbd72a25eb9eef5a2f5db94645ce88c28e2497581433b3d2e60",
+    "dataset": {
+      "name": "swebench-verified",
+      "version": "1.0",
+      "repository": "https://github.com/laude-institute/harbor-datasets",
+      "ref": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+      "task_prefix": "datasets/swebench-verified",
+      "upstream_task_grader": "tests/test.sh",
+      "swebench_version_in_task_grader": "4.0.3"
+    },
+    "source_map": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
+    "source_map_sha256": "f37312793dd6b641a31294c5c42269c00212e91fb6a756b74bc67bb64be2a66e",
+    "source_policy": "blueprints/runtime-workers/comparisons/coding-source-policy.json",
+    "source_policy_sha256": "a82998d636ab0f645cdfe426015bbd7c9ae411562f693b55b5f995ca1abe26c2"
+  },
+  "arms": [
+    {
+      "id": "native-codex",
+      "runtime_tag": "rust-v0.160.0",
+      "runtime_ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "harbor_agent": "codex",
+      "baseline": false,
+      "role": "agent arm"
+    },
+    {
+      "id": "openhands-sdk",
+      "runtime_tag": "v1.50.1",
+      "runtime_ref": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "harbor_agent": "openhands-sdk",
+      "baseline": true,
+      "role": "standing selection and baseline"
+    },
+    {
+      "id": "pi",
+      "runtime_tag": "v1.0.0",
+      "runtime_ref": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "harbor_agent": "pi",
+      "baseline": false,
+      "role": "challenger"
+    }
+  ],
+  "task_selection": {
+    "seed_utf8": "runtime-jobs-coding-sol-ultra-v1\n",
+    "rule": "Four lowest SHA256(seed_utf8 + full task name), independently within each of the six named repositories, from the pinned 500-task registry. No outcomes were used.",
+    "tasks": [
+      "django__django-14034",
+      "django__django-15569",
+      "django__django-11211",
+      "django__django-15572",
+      "sympy__sympy-23824",
+      "sympy__sympy-13647",
+      "sympy__sympy-24066",
+      "sympy__sympy-12489",
+      "scikit-learn__scikit-learn-13496",
+      "scikit-learn__scikit-learn-12585",
+      "scikit-learn__scikit-learn-13328",
+      "scikit-learn__scikit-learn-14983",
+      "pytest-dev__pytest-6197",
+      "pytest-dev__pytest-7521",
+      "pytest-dev__pytest-6202",
+      "pytest-dev__pytest-5840",
+      "pydata__xarray-7393",
+      "pydata__xarray-2905",
+      "pydata__xarray-4075",
+      "pydata__xarray-4629",
+      "matplotlib__matplotlib-25122",
+      "matplotlib__matplotlib-24627",
+      "matplotlib__matplotlib-24026",
+      "matplotlib__matplotlib-25332"
+    ],
+    "source_preflight": "The source map binds24 native task-tree OIDs and original Dockerfile byte hashes/FROM references. coding-input-read.json retains the untruncated500-entry pool observation and root original verification. No retained72-fetch HTTP200 success claim is made; actual built image identity/digest enforcement remain unqualified",
+    "repository_selection_reason": "Balanced bounded coverage of web applications(Django), symbolic mathematics(SymPy), machine learning(scikit-learn), test tooling(pytest), labeled arrays(xarray) and visualization(Matplotlib). Four per repository bounds the screen to24; this is not a representative random sample of all500 tasks",
+    "outcome_conditioning": "Prior Gate A outcomes and new comparative outcomes are not repository/task selection or exclusion criteria. No study outcomes exist here; all24 remain included, maximum exclusions0"
+  },
+  "proposed_execution": {
+    "repeats_per_task_arm": 2,
+    "concurrent_model_tasks": 1,
+    "order": "Pinned task-list order; cycle native-codex/openhands-sdk/pi, openhands-sdk/pi/native-codex, pi/native-codex/openhands-sdk by task index; reverse that task's order for repeat2.",
+    "isolation": "Fresh per-task native state and identical qualified immutable execution image across arms. Local reference/test visibility and public-upstream access prevention require actual native qualification",
+    "native_effort_requirement": "Bind each runtime's native effort and actual gateway inference envelope separately. Preserve Codex Ultra orchestration; do not equate Pi max-to-ultra serialization or OpenHands provider strings with that orchestration.",
+    "compression": "off control; token-feature conditions are a separate reviewed amendment on the same tasks, not stacked client compression",
+    "window": "Recorded owner allocations exclusive of session0c and GPU/token studies; proposed13:00–16:00Z conditional, admission due12:45Z",
+    "independent_arm_retries": 0,
+    "native_internal_retries": null,
+    "native_retry_gate": "Freeze every runtime/helper/SDK retry policy; zero independent retries does not establish zero internal retries",
+    "complete_ordered_attempt_list": null,
+    "ordered_attempt_list_sha256": null,
+    "block": "One task-repeat across all three arms and separate unchanged native grading phases",
+    "infrastructure_invalid": {
+      "quality_score": null,
+      "criteria": [
+        "HTTP429 or observed quota refusal",
+        "owner-observed gateway account rotation joined to attempt",
+        "planned window end interrupts block",
+        "grader transport/timeout/unparseable result",
+        "missing task or oracle prerequisite"
+      ],
+      "recovery": "Retain every attempt/usage; rerun entire invalid block in next authorized window under identical frozen hashes, never an independent arm retry",
+      "maximum_invalid_blocks": 2,
+      "third_invalid_block": "Abort study; preserve failures and report no winner",
+      "maximum_excluded_tasks": 0
+    },
+    "valid_native_failure": "Only after valid infrastructure admission, frozen runtime failure/refusal/empty report/native agent timeout scores0; retain without independent retry",
+    "time_setup": {
+      "study_label": "prospective24-SolUltra-900s-agent-3000s-verifier-modified-setup",
+      "native_task_agent_seconds": 3000,
+      "native_task_verifier_seconds": 3000,
+      "proposed_agent_seconds": 900,
+      "proposed_verifier_seconds": 3000,
+      "named_deviation_reason": "Bound exploratory screen's agent time; retain modified-setup label because tighter budget may change outcomes",
+      "native_agent_carrier": "--agent-timeout-multiplier 0.3, after every selected original3000-second budget is bound and effective native deadline observed",
+      "native_verifier_carrier": "--verifier-timeout-multiplier 1.0",
+      "actual_deadline_enforcement_qualified": false,
+      "overhead_bounds": null
+    },
+    "token_and_tool_bounds": {
+      "proposed_gross_input_plus_output_tokens": 200000,
+      "native_enforcement_qualified": false,
+      "tool_call_limit": null,
+      "enforcement_note": "Unenforced proposed envelope, not measured cap. Before freeze bind source-supported native enforcement and breach disposition, or explicitly amend to uncapped observed study; no invented harness cap or silent breach score0"
+    },
+    "network": {
+      "required_policy": "Identical native allowlist for gateway and exact installation/dependency mirrors, with agent/verifier role boundaries; public networking does not protect public upstream fixes",
+      "allowed_hosts": null,
+      "declarative_carrier": "Harbor --extra-docker-compose accepts disposable overlay files without patching original tasks/Compose/Dockerfiles; no invented --ek network_mode=host",
+      "host_network_allowlist_gate": "Pinned Docker loader excludes services with network_mode or networks from egress sidecar routing; main.network_mode=host connectivity does not establish native allowlist enforcement",
+      "actual_allowlist_enforcement_qualified": false
+    },
+    "window_admission": "Start whole block only when frozen worst-case bound plus qualified setup/grading/cleanup fits remaining allocation; carry complete ordered blocks to future coordinated windows. Serial900-second agents plus3000-second graders already total195minutes/block;3-hour reservation admits no block under this conservative bound without reviewed amendment",
+    "planned_valid_arm_attempts": 144,
+    "maximum_recovery_arm_attempts": 6,
+    "maximum_recorded_arm_attempts_before_abort": 150,
+    "attempt_count_scope": "144 planned valid arm attempts plus at most two whole-block recoveries of three arms each; retain all infrastructure-invalid attempts. Native internal retries/helper calls are separate declared request usage, not hidden independent arm retries"
+  },
+  "proposed_decision_rule": {
+    "quality": "Unchanged native FAIL_TO_PASS/PASS_TO_PASS reward for valid admitted attempts. Infrastructure-invalid carries null quality and whole-block recovery; native non-infrastructure failures score0 only under frozen rule",
+    "selection": {
+      "comparison_mode": "full_usage",
+      "baseline": "openhands-sdk",
+      "quality": {
+        "measure": "two-repeat success count per frozen task",
+        "minimum": "No task lower than OpenHands1.50.1 baseline",
+        "improvement": "At least one task greater than OpenHands1.50.1 baseline"
+      },
+      "quality_tie": {
+        "usage": "Complete same-scope authoritative uncached-input-plus-output counters",
+        "agent_time": "Paired median no greater than baseline",
+        "minimum_paired_median_uncached_input_plus_output_reduction_percent": 5
+      },
+      "qualifying_challenger_order": [
+        "total successful valid trials descending",
+        "paired median uncached input plus output ascending",
+        "paired median agent time ascending"
+      ],
+      "otherwise": "Retain standing OpenHands1.50.1; measured default remains unset until qualified decision acceptance"
+    },
+    "limitations": "24-task/two-repeat screen supports this workload and modified setup only. Conservative no-task-loss rule is noise-sensitive; no universal or statistically significant superiority. Different gate requires explicit prefreeze amendment"
+  },
+  "required_before_freeze": [
+    "Existing owner binds applicable Gate A original sealed task/question/frozen-term identities and accepts prospective amendment; historical gates unchanged",
+    "Exact repaired protocol/shared/config/source hashes receive Astra/max consequential read, Claude ACCEPT and root admission",
+    "Retained complete ordered task-repeat-arm/role/grading list/hash; native internal retry policies; whole-block recovery receipt, maxinvalid2/maxexclusions0",
+    "Owner-returned21128 actual composition, delivered effort/parallel metadata and request-to-attempt binding in both modes; complete per-arm/helper wire counters additionally required in full_usage;20128 historical",
+    "Every original task budget/tree/Dockerfile, platform manifests, actual source-policy enforcement and built-image identity; registry metadata is not build acceptance",
+    "Actual installed Codex0.160/OpenHands1.50.1/Pi1.0 inside clean execution environments; workstationCodex0.159.3 is not target qualification",
+    "Pinned native CodexUltra/V2 Harbor carrier qualification: unchanged installed model catalog and inline config, actual ResponsesLite delivery with parallel_tool_calls false, explicit V2 activation, child model/effort observation, native lifecycle and allowlist acceptance",
+    "Org-owned final-form skill/extension/plugin/MCP inventory, pinned activation and useful native loader observations per arm",
+    "Keyless route including Codex prefix loss, Pi native thinking/provider mapping, OpenHands Responses/effort; native auth uploads disabled, no sign-in/config copying",
+    "Actual worker reference isolation and identical natively enforced allowlist; host networking alone does not establish policy",
+    "Named900-second modified setup, all native deadlines and setup/build/grading/cleanup bounds; adequate windows or accepted parallelism/timeout amendment",
+    "Native token/tool enforcement and breach disposition or explicit uncapped amendment; no fabricated cap",
+    "Full_usage only: one complete authoritative uncached-input-plus-output aggregate per arm/attempt, cache subsets/no-cache/correlation and all helper/grading scopes; unknown stays null",
+    "Quality_only: accepted numeric quality/challenger/tie rule, complete original attempt/outcome inventory, independent treatment identities and original field presence/missingness/scoped partial counters under the shared amendment; all non-usage gates still required",
+    "Lifecycle interruption/recovery/no-prompt/no-credential-copy under frozen setup before comparison"
+  ],
+  "failures_preserved": [
+    "The first GitHub contents read of the13.65MB registry returned empty content; JSON decoding failed. Direct pinned raw-source retrieval then established its bytes/hash.",
+    "The inherited source-only proposal used Sol max. This user's ultra objective governs this separate study; the old source report and its model assumptions remain historical leads.",
+    "Earlier draft inverted standing baseline and used gross efficiency; this source repair corrects declarations without changing historical results",
+    "Earlier72-fetch HTTP200 statement has no full retained fetch receipt in this source-preparation record; corrected to source-map/tree identities"
+  ],
+  "shared_execution_contract": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
+  "standing_selection": {
+    "arm": "openhands-sdk",
+    "runtime_version": "1.50.1",
+    "measured_default": null,
+    "replacement": "Retain standing OpenHands until a qualified frozen comparison and both-family decision accept a replacement",
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/e7a83d495a344fc4ed70bedab0f6cf09ffa876a3/evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+    "source_sha256": "cfd08b85efca343f428fadd8253a06ce9c08afb944a4f66a2aaae15d3c08fa96"
+  },
+  "prospective_amendment": {
+    "status": "proposed_for_existing_owner_and_both_family_read_not_accepted_or_frozen",
+    "source_consensus": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/e7a83d495a344fc4ed70bedab0f6cf09ffa876a3/evidence/artifacts/new-wsl-layer-consensus-20261002/codex-decisions.md",
+    "source_consensus_sha256": "464608b928709f5fd987b44ce2a019b29bb85f886b38c1bc095dc326c02cbac6",
+    "prior_runtime_qualification_head": "1195e212c49ecf9cd6024bffda9ecddb9b2d54ed",
+    "preserved_gate_a_terms": [
+      "sealed tasks",
+      "sealed questions",
+      "model",
+      "routes",
+      "metrics",
+      "arms",
+      "failed attempts and original conditions"
+    ],
+    "historical_disposition": "Keep original sealed records/results under their original hashes; this prospective study supplies no new score or reinterpretation",
+    "changed_terms": {
+      "tasks_and_questions": "New24-task SWE-bench Verified pool, two repeats per task/arm, unchanged public instruction files",
+      "arms": "Standing OpenHands1.50.1 baseline, native Codex0.160 agent arm and Pi1.0 challenger; owned final-form extensions remain separate pending bindings",
+      "model_and_effort": "Common SolUltra across all coding arms; AstraMax requires a separate matched condition/amendment",
+      "route": "Owner-proposed21128 composition; morning20128 is different historical readiness",
+      "metrics": "Full_usage retains native task reward plus complete authoritative uncached-input-plus-output efficiency; gross/cache/reasoning subsets separate. quality_only uses only comparison_modes.quality_only.quality_decision and holds efficiency/cost/savings/token-feature claims",
+      "limits": "144 planned arm attempts; named900-second agent deviation from native3000-second task budgets; verifier3000 retained; proposed token/tool envelopes remain unenforced",
+      "environment_and_recovery": "Disposable native Harbor Docker, original tasks plus declarative image/network carriers, frozen ordered blocks and shared infrastructure-invalid recovery"
+    },
+    "original_sealed_task_question_manifest": null,
+    "historical_binding_limit": "Prior immutable recipe and hash-checked single-task loader are source-read. Actual sealed task/question manifest and complete prior frozen terms are not established by these reads; existing owner must bind them and accept this amendment before freeze"
+  },
+  "model_and_route": {
+    "sol_alias": "cx/gpt-6.1-sol-ultra",
+    "astra_alias": "cx/gpt-6-astra-max",
+    "coding_condition": "SolUltra common across all three arms; any AstraMax coding condition needs separately frozen matched amendment",
+    "native_effort": "Preserve native supported effort/orchestration separately from API Ultra labels; delivered reasoning and parallel_tool_calls must be observed for every arm/helper",
+    "destination": {
+      "port": 21128,
+      "release_ref": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "carry_commits": [
+        "24bbadbad15eec0d598c908416e4b01be4e37671",
+        "6c7990058c4ce9677de79452c8cefb10b4bf1b3d"
+      ],
+      "canary_pr_head": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "status": "owner-proposed; actual composition/connectivity/effort/parallel metadata/complete usage unqualified",
+      "morning20128": "Different composition; historical readiness only"
+    },
+    "credential_scope": "Keyless owner gateway, fresh per-arm native state, nonsecret placeholder only where natively required; native sign-ins remain native with no host auth/config-store copying",
+    "codex_auth_upload_controls": [
+      "--ae CODEX_AUTH_JSON_PATH=",
+      "--ae CODEX_FORCE_AUTH_JSON=false"
+    ],
+    "codex_route_gate": "Harbor strips the model prefix using split('/')[-1]; supported alias/config mapping and delivered cx/gpt-6.1-sol-ultra need source and wire qualification",
+    "pi_effort_gate": "Native Pi thinking/provider mapping is distinct from Codex Ultra orchestration; serialized effort labels do not establish parity"
+  },
+  "usage_contract": {
+    "required_fields_apply_to": "full_usage",
+    "quality_only_requirements": "Retain original usage field presence/types/missingness and explicitly partial attempt/role coverage; complete totals remain null when incomplete. Independent delivery/attempt identities, no-cache, compression-off, fresh state, helper/grading inventory and gateway interventions remain required. The full_usage operand/aggregate prerequisites are held accounting gates, not quality_only prerequisites.",
+    "authoritative_aggregate_per_arm": null,
+    "primary_efficiency": "Complete uncached input tokens plus output tokens",
+    "required_fields": [
+      "complete input",
+      "complete output",
+      "cached input subset",
+      "Original gross input, original cache reads and original output with preserved presence/types, allowing exact G-R+O derivation; normalized uncached input is not an operand witness",
+      "reasoning output subset when delivered",
+      "authoritative complete aggregate identity",
+      "main/child/helper coverage",
+      "grading separate",
+      "correlation join",
+      "semantic-cache bypass",
+      "delivered reasoning effort",
+      "delivered parallel_tool_calls",
+      "gateway interventions"
+    ],
+    "gross_metric": "Retain input plus output separately; never add cached/reasoning subsets twice or substitute gross for efficiency",
+    "cache_limit": "No-cache per arm/request does not disable upstream prompt caching",
+    "missingness": "Unknown stays null, including failures/incomplete attempts; normalized0 usage or price-table costs are not complete observed consumption",
+    "measured_usage": null
+  },
+  "readiness_scope": {
+    "owner_reported": "RuntimeLab rootless Docker/exact Harbor1e5c installed; stock Oracle reward1 and Nop reward0/native0 independently observed by root",
+    "receipt_binding": null,
+    "limits": "Relayed controls concern Docker/verifier readiness only. This repair executed none; coding images/candidate versions/gateway/usage/limits/quality/freeze remain unqualified"
+  }
+}
