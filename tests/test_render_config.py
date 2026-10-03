@@ -82,7 +82,7 @@ class RenderConfigTests(unittest.TestCase):
 
     def test_hud_statusline_requires_an_installed_entry(self):
         # Upstream claude-hud v0.10.0 scripts/statusline.mjs checks that the
-        # selected entry exists. A missing plugin must never fall back to the
+        # newest version with an entry is selected. A missing plugin must never fall back to the
         # open project's dist/index.js during installation or rollback.
         ecosystem = self.tmp_path / "ecosystem"
         node = ecosystem / "bin" / "node"
@@ -116,6 +116,13 @@ class RenderConfigTests(unittest.TestCase):
             result = invoke()
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(result.stdout, "")
+        older_entry = plugin.parent / "0.9.0" / "dist" / "index.js"
+        older_entry.parent.mkdir(parents=True)
+        older_entry.write_text("complete older plugin fixture\n")
+        with self.subTest(plugin="incomplete_newer_with_complete_older"):
+            result = invoke()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, str(older_entry) + "\n")
         entry = plugin / "dist" / "index.js"
         entry.write_text("installed plugin fixture\n")
         with self.subTest(plugin="installed"):

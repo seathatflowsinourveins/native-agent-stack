@@ -30,22 +30,22 @@
       "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz",
       "sha256": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
       "integrity_checked": true,
-      "integrity_source": "Checked against four published sources, all matched. (1) npm registry dist.integrity sha512-3ajjKzPLe/39hN582XqMuOw3S9vHQfLpSBq72zVakT03xso3GDXHcht/eVLu/l2MDqulIOtLevnTKreUxymHJQ== equals `openssl dgst -sha512 -binary | base64` of the downloaded tarball, and dist.shasum ee7d91e7362e7dc5b44b5fcc5cfdea7cfaedb1fd equals sha1sum. (2) GitHub release v0.14.2 asset digest sha256:f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b for mcporter-0.14.2.tgz equals the local sha256sum; the release checksums.txt line matches (sha256sum -c: OK, exit 0); the release asset is byte-identical to the npm tarball (cmp exit 0); size 3585823 bytes. (3) npm SLSA provenance attestation (https://registry.npmjs.org/-/npm/v1/attestations/mcporter@0.14.2): subject sha512 dda8e32b...8725 equals the tarball sha512 hex, workflow .github/workflows/release.yml at refs/tags/v0.14.2, gitCommit aa0f55f9bffcde9d2070c86145f37d4dd3525f6c; the release provenance.json asset also names commit aa0f55f9 and the tgz sha256. (4) `npm audit signatures` exit 0: audited 40 packages, 40 verified registry signatures, 12 verified attestations."
+      "integrity_source": "Checked against four published sources, all matched. (1) npm registry version metadata https://registry.npmjs.org/mcporter/0.14.2: dist.integrity sha512-3ajjKzPLe/39hN582XqMuOw3S9vHQfLpSBq72zVakT03xso3GDXHcht/eVLu/l2MDqulIOtLevnTKreUxymHJQ== equals `openssl dgst -sha512 -binary | base64` of the downloaded tarball, and dist.shasum ee7d91e7362e7dc5b44b5fcc5cfdea7cfaedb1fd equals sha1sum. (2) GitHub release v0.14.2 asset digest sha256:f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b for mcporter-0.14.2.tgz equals the local sha256sum; the release checksums.txt line matches (sha256sum -c: OK, exit 0); the release asset is byte-identical to the npm tarball (cmp exit 0); size 3585823 bytes. (3) npm SLSA provenance attestation (https://registry.npmjs.org/-/npm/v1/attestations/mcporter@0.14.2): subject sha512 dda8e32b...8725 equals the tarball sha512 hex, workflow .github/workflows/release.yml at refs/tags/v0.14.2, gitCommit aa0f55f9bffcde9d2070c86145f37d4dd3525f6c; the release provenance.json asset also names commit aa0f55f9 and the tgz sha256. (4) `npm audit signatures` exit 0: audited 40 packages, 40 verified registry signatures, 12 verified attestations."
     },
     "install_recorded": {
-      "command": "S=<qualification-root>/mcporter; env -i HOME=$S/home PATH=<host-prefix>/bin:/usr/bin:/bin npm install --global --prefix $S/prefix --cache $S/npm-cache --userconfig $S<home> --globalconfig $S<home> --no-audit --no-fund --no-update-notifier $S/mcporter-0.14.2.tgz   (installs from the verified local tarball, the same file-based route manifests/evidence.json:3164 records for 0.14.1; spec form is `npm install --global --prefix <dir> mcporter@0.14.2` per recipes/README.md:100; it was run via `rtk proxy` with output `added 28 packages in 8s`)",
+      "command": "S=<qualification-root>/mcporter; env -i HOME=$S/<scratch-home> PATH=<host-prefix>/bin:/usr/bin:/bin npm install --global --prefix $S/prefix --cache $S/npm-cache --userconfig $S/<scratch-home>/.npmrc --globalconfig $S/<scratch-home>/.npmrc-global --no-audit --no-fund --no-update-notifier $S/mcporter-0.14.2.tgz   (installs from the verified local tarball, the same file-based route manifests/evidence.json:3164 records for 0.14.1; spec form is `npm install --global --prefix <dir> mcporter@0.14.2` per recipes/README.md:100; it was run via `rtk proxy` with output `added 28 packages in 8s`)",
       "exit": 0,
       "prefix": "<qualification-root>/mcporter/prefix"
     },
     "version_recorded": {
-      "command": "S=<qualification-root>/mcporter; env -i HOME=$S/home PATH=<host-prefix>/bin:/usr/bin:/bin $S/prefix/bin/mcporter --version   (the row's version_probe is `mcporter --version`, adoption/pins-linux-x86_64.json:137-142)",
+      "command": "S=<qualification-root>/mcporter; env -i HOME=$S/<scratch-home> PATH=<host-prefix>/bin:/usr/bin:/bin $S/prefix/bin/mcporter --version   (the row's version_probe is `mcporter --version`, adoption/pins-linux-x86_64.json:137-142)",
       "exit": 0,
       "output": "0.14.2"
     },
     "smoke_recorded": {
       "command": "mcporter --config \"${MCPORTER_CONFIG}\" list socraticode --brief --no-oauth",
       "exit": -1,
-      "output_excerpt": "NOT RUN; exit -1 is a placeholder because no process ran. The row's documented smoke command (manifests/stack.json:634) needs the host MCPORTER_CONFIG ($STACK_HOME/config/mcporter.json, recipes/README.md:29), which the task forbids touching, and a live `socraticode` MCP server; prior evidence records that a mcporter call started a daemon (manifests/evidence.json:3164), which the task forbids. Extra offline checks (not the smoke): `mcporter --help` exit 0, 57 lines, showing `--log-level <debug|info|warn|error>  Adjust CLI logging (defaults to warn)`; importing dist/serve.js exit 0.",
+      "output_excerpt": "NOT RUN; exit -1 is a placeholder because no process ran. The row's documented smoke command (manifests/stack.json (component id mcporter, JSON pointer /commands)) needs the host MCPORTER_CONFIG ($STACK_HOME/config/mcporter.json, recipes/README.md:29), which the task forbids touching, and a live `socraticode` MCP server; prior evidence records that a mcporter call started a daemon (manifests/evidence.json:3164), which the task forbids. Extra offline checks (not the smoke): `mcporter --help` exit 0, 57 lines, showing `--log-level <debug|info|warn|error>  Adjust CLI logging (defaults to warn)`; importing dist/serve.js exit 0.",
       "ran": false
     },
     "input_packet": {
@@ -119,6 +119,7 @@
       "bytes": 3585823,
       "matches_recorded_sha256": true,
       "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
-    }
+    },
+    "command_sanitization": "Restored from the hashed W1-moves.json packet. Qualification and host prefixes remain distinct; scratch HOME path segments use <scratch-home>, retaining all child paths including separate npm user/global config files and XDG directories."
   }
 }

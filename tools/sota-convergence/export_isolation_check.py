@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -516,7 +517,10 @@ def prose_exposure(export_dir: Path, packets_dir: Path, winners: dict, packet_ke
         cited = set()
         for ref in refs:
             path = export_dir / ref
-            cited |= {path} if path.is_file() else ({q for q in path.rglob("*") if q.is_file()} if path.is_dir() else set())
+            # os.path.isfile/isdir answer False for a value that cannot name a file (ENAMETOOLONG, NUL), where
+            # Path.is_file/is_dir raise on Python 3.13.
+            cited |= {path} if os.path.isfile(path) else ({q for q in path.rglob("*") if q.is_file()}
+                                                       if os.path.isdir(path) else set())
         for path in list(cited):
             if path.suffix == ".json":
                 try:
@@ -524,7 +528,7 @@ def prose_exposure(export_dir: Path, packets_dir: Path, winners: dict, packet_ke
                 except (OSError, UnicodeError, ValueError):
                     continue
                 cited |= {export_dir / bare for bare in (bare_reference(v) for v in values)
-                          if bare and (export_dir / bare).is_file()}
+                          if bare and os.path.isfile(export_dir / bare)}
         exposing = sorted(path.relative_to(export_dir).as_posix() for path, found in statements.items()
                           if any(_statement_exposes(text, headed, winner_matchers, other_matchers)
                                  for text, headed in found))

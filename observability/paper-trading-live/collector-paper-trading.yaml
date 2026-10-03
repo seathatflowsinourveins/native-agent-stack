@@ -1,4 +1,4 @@
-# Merge into the ecosystem OpenTelemetry Collector config (otelcol-contrib 0.162.0).
+# Merge into the ecosystem OpenTelemetry Collector config (otelcol-contrib 0.161.0).
 # Paper-trading run records -> local Loki. Bodies are kept (they are the manifest);
 # account identifiers and AccountState balances/margins are redacted before export. Paths use the collector user's HOME.
 receivers:

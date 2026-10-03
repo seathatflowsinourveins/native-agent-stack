@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "observed_date_utc": "2026-10-03",
+  "evidence_class": "native_local_integration",
+  "repair_contract": "R642",
+  "source_head": "ea10c096e8fbc59cf528f9fb600d8b0b261c288b",
+  "upstream_sources": [
+    "https://github.com/jarrodwatts/claude-hud/blob/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L30-L39",
+    "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0",
+    "https://docs.astral.sh/uv/guides/scripts/#running-a-script-with-dependencies",
+    "https://pypi.org/project/PyYAML/6.0.3/"
+  ],
+  "native_recipe": "observability/collector/README.md (optional PyYAML==6.0.3 via uv run)",
+  "collector_environment": {
+    "OTELCOL_TEST_BIN": "<qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib",
+    "UV_CACHE_DIR": "<repair-scratch>/uv-cache"
+  },
+  "collector_version": {
+    "command": "<qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib --version",
+    "exit_code": 0,
+    "returned_output": "otelcol-contrib version 0.162.0\n"
+  },
+  "hud_control": {
+    "command": "python3 -B -m unittest tests.test_render_config.RenderConfigTests.test_hud_statusline_requires_an_installed_entry",
+    "negative_template": "Pre-repair guarded template at source_head, with the new mixed-install subtest",
+    "negative_exit_code": 1,
+    "negative_output": "F\n======================================================================\nFAIL: test_hud_statusline_requires_an_installed_entry (tests.test_render_config.RenderConfigTests.test_hud_statusline_requires_an_installed_entry) (plugin='incomplete_newer_with_complete_older')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<repository>/tests/test_render_config.py\", line 125, in test_hud_statusline_requires_an_installed_entry\n    self.assertEqual(result.stdout, str(older_entry) + \"\\n\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '' != '<fixture-scratch>/claude/plugins/cache/cla[36 chars]js\\n'\n+ <fixture-scratch>/claude/plugins/cache/claude-hud/claude-hud/0.9.0/dist/index.js\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.042s\n\nFAILED (failures=1)\n",
+    "positive_exit_code": 0,
+    "positive_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.043s\n\nOK\n",
+    "scope": "Instrumented Node fixture. An incomplete 0.10.0 directory beside a complete 0.9.0 entry must select 0.9.0; after 0.10.0 completes, it must select 0.10.0."
+  },
+  "required_unittest_attempts": [
+    {
+      "command": "python3 -B -m unittest tests.test_stack_lifecycle tests.test_render_config tests.test_adoption_contract tests.test_grand_dashboard tests.test_landscape_sweep_harness tests.test_observability_tool_names tests.test_observability_run_correlation tests.test_sdk_usage_scope",
+      "environment": {
+        "OTELCOL_TEST_BIN": "<qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib"
+      },
+      "python_version": "3.13.15",
+      "exit_code": 0,
+      "returned_output": ".........................................................................................................................................s.................................................................................................ss............................ssssssss..s...sssss\n----------------------------------------------------------------------\nRan 284 tests in 45.862s\n\nOK (skipped=17)\nInstalled dashboard and two units; service activation remains explicit.\nstarted start-race\nnot started launch-refused: the job runner could not start\n",
+      "scope": "Initial interpreter lacked PyYAML; 17 skips do not qualify the native Collector paths."
+    },
+    {
+      "command": "uv run --no-project --with PyYAML==6.0.3 python3 -B -m unittest tests.test_stack_lifecycle tests.test_render_config tests.test_adoption_contract tests.test_grand_dashboard tests.test_landscape_sweep_harness tests.test_observability_tool_names tests.test_observability_run_correlation tests.test_sdk_usage_scope",
+      "environment": {
+        "OTELCOL_TEST_BIN": "<qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib",
+        "UV_CACHE_DIR": "<repair-scratch>/uv-cache"
+      },
+      "python_version": "3.14.7",
+      "exit_code": 0,
+      "returned_output": "Installed 1 package in 10ms\n.........................................................................................................................................s.................................................................................................ss...........................................<home>/.local/share/uv/python/cpython-3.14.7-linux-x86_64-gnu/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 503: 'Service Unavailable'>\n  _warnings.warn(self.warn_message, ResourceWarning)\n...Installed dashboard and two units; service activation remains explicit.\nstarted start-race\nnot started launch-refused: the job runner could not start\n{\"dashboard_result\": [], \"stage\": \"start_and_resume\"}\n{\"dashboard_result\": [], \"stage\": \"same_id_replay_and_new_id_republication\"}\n{\"dashboard_result\": [], \"stage\": \"unavailable_and_legacy_without_additive_baseline\"}\n.\n----------------------------------------------------------------------\nRan 284 tests in 104.986s\n\nOK (skipped=3)\n",
+      "scope": "Native supported uv wrapper adds the documented optional PyYAML in a scratch cache. The command ran 284 tests, with three unrelated optional landscape harness skips."
+    },
+    {
+      "command": "uv run --no-project --python 3.13 --with PyYAML==6.0.3 python3 -B -m unittest tests.test_stack_lifecycle tests.test_render_config tests.test_adoption_contract tests.test_grand_dashboard tests.test_landscape_sweep_harness tests.test_observability_tool_names tests.test_observability_run_correlation tests.test_sdk_usage_scope",
+      "environment": {
+        "OTELCOL_TEST_BIN": "<qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib",
+        "UV_CACHE_DIR": "<repair-scratch>/uv-cache",
+        "UV_PYTHON_DOWNLOADS": "never"
+      },
+      "python_version": "3.13.15",
+      "exit_code": 0,
+      "returned_output": ".........................................................................................................................................s.................................................................................................ss..............................................Installed dashboard and two units; service activation remains explicit.\nstarted start-race\nnot started launch-refused: the job runner could not start\n{\"dashboard_result\": [], \"stage\": \"start_and_resume\"}\n{\"dashboard_result\": [], \"stage\": \"same_id_replay_and_new_id_republication\"}\n{\"dashboard_result\": [], \"stage\": \"unavailable_and_legacy_without_additive_baseline\"}\n.\n----------------------------------------------------------------------\nRan 284 tests in 104.216s\n\nOK (skipped=3)\n",
+      "scope": "Required suite on the original Python 3.13 line with the documented optional PyYAML. The three skips are the optional context-mode security JS fixture, missing ShellCheck and unavailable real Bash 3.2 in test_landscape_sweep_harness; native Collector checks execute."
+    }
+  ],
+  "validation_checks": [
+    {
+      "id": "validate",
+      "command": "python3 scripts/validate.py",
+      "started_at_utc": "2026-10-03T07:09:44.011Z",
+      "returned_at_utc": "2026-10-03T07:10:31.086Z",
+      "exit_code": 0,
+      "returned_output": "{\"components\": 69, \"hashed_files\": 9422, \"profiles\": 4, \"receipts\": 196, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "output_sha256_original": "e6ac2f4e28d35828e6e2798646edd1577d8d3990901ca2fc55f597ba2f66d22e"
+    },
+    {
+      "id": "convergence",
+      "command": "python3 scripts/validate_convergence.py --all-recorded --root . --json",
+      "started_at_utc": "2026-10-03T07:09:44.024Z",
+      "returned_at_utc": "2026-10-03T07:10:31.089Z",
+      "exit_code": 0,
+      "returned_output": "{\"records\": [{\"errors\": [], \"observations\": 3, \"path\": \"blueprints/blind-catalog-convergence/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/blind-catalog-convergence/memory-experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 4, \"path\": \"blueprints/catalog-runtime-review/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 15, \"path\": \"blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/application-delivery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/ci-security/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/document-ingestion/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 0, \"path\": \"blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/gpu-inference/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-macos.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 7, \"path\": \"blueprints/convergence-practice/local-inference-latest-20260926/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/mac-memory-patch/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/claude/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/native-worker/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 20, \"path\": \"blueprints/convergence-practice/omniroute-routing-20260928/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-memory-maintenance/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 0, \"path\": \"blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-retrieval/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/wsl-transport-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 8, \"path\": \"blueprints/us-equities/sim-capacity/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 6, \"path\": \"evidence/artifacts/local-model-workloads-20260924/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 24, \"path\": \"evidence/artifacts/memory-stack-20260925/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json\", \"valid\": true}], \"valid\": true}\n",
+      "output_sha256_original": "672ad5b6c96651f6d613a584d812f00e78339b7db50fec643a27aaaf148c906c"
+    },
+    {
+      "id": "landscape",
+      "command": "python3 scripts/landscape.py --root .",
+      "started_at_utc": "2026-10-03T07:09:44.024Z",
+      "returned_at_utc": "2026-10-03T07:09:44.835Z",
+      "exit_code": 0,
+      "returned_output": "{\"counts\": {\"applied_skills\": 3, \"comparison_candidates\": 365, \"comparison_repositories\": 161, \"current_public_stars\": 343, \"dispositions\": {\"conditional\": 164, \"measured_tradeoff\": 9, \"out_of_scope\": 9, \"overlap\": 14, \"selected\": 136, \"unqualified\": 33}, \"domain_layers\": 4, \"explained_components\": 69, \"foundation_decisions\": 54, \"foundation_layers\": 20, \"foundation_statuses\": {\"accepted_within_scope\": 44, \"partial_acceptance\": 2, \"source_review\": 8}, \"historical_candidate_cards\": 154, \"layers\": 32, \"quality_review_repositories\": 16, \"research_queue_layers\": 32, \"research_repositories\": 875, \"selected_components\": 69}, \"scope\": \"Coverage and reference integrity; no new runtime or ranking acceptance.\", \"status\": \"passed\"}\n",
+      "output_sha256_original": "f2ffcf6bb1442024fdf17236278925740ad8416a239fe8aa8133c7b75cabeadb"
+    },
+    {
+      "id": "catalogs",
+      "command": "python3 scripts/validate_catalogs.py",
+      "started_at_utc": "2026-10-03T07:09:44.024Z",
+      "returned_at_utc": "2026-10-03T07:09:44.358Z",
+      "exit_code": 0,
+      "returned_output": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n",
+      "output_sha256_original": "8f241daedb4f7a5eaaff358e5653981120ee9436a8959c7b968eedb30dbe9a01"
+    },
+    {
+      "id": "foundation",
+      "command": "python3 scripts/validate_foundation.py --root . --json",
+      "started_at_utc": "2026-10-03T07:09:44.024Z",
+      "returned_at_utc": "2026-10-03T07:09:44.282Z",
+      "exit_code": 0,
+      "returned_output": "{\n  \"ok\": true,\n  \"counts\": {\n    \"layers\": 20,\n    \"decisions\": 54,\n    \"foundation_components\": 61,\n    \"domain_components\": 7,\n    \"evidence_receipts\": 84,\n    \"candidates\": 3\n  },\n  \"errors\": []\n}\n",
+      "output_sha256_original": "b6535ffab61c1faafa85b93dbe965f253fa479ac0c58dfb6af61c0094a001d3f"
+    },
+    {
+      "id": "component-matrix",
+      "command": "python3 scripts/component_matrix.py --check",
+      "started_at_utc": "2026-10-03T07:09:44.024Z",
+      "returned_at_utc": "2026-10-03T07:09:44.386Z",
+      "exit_code": 0,
+      "returned_output": "{\"rows\": 32, \"status\": \"checked\"}\n",
+      "output_sha256_original": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd"
+    },
+    {
+      "id": "new-host",
+      "command": "python3 scripts/new_host_grand_list.py --check",
+      "started_at_utc": "2026-10-03T07:09:44.024Z",
+      "returned_at_utc": "2026-10-03T07:09:44.261Z",
+      "exit_code": 0,
+      "returned_output": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}\n",
+      "output_sha256_original": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226"
+    },
+    {
+      "id": "ecosystem",
+      "command": "python3 scripts/build_ecosystem.py --check",
+      "started_at_utc": "2026-10-03T07:09:44.024Z",
+      "returned_at_utc": "2026-10-03T07:10:31.091Z",
+      "exit_code": 0,
+      "returned_output": "{\"architecture_pin_drift\": [{\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/native-clients\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.79.0\", \"row\": \"foundation/workers\", \"stack_pin\": \"0.80.0\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.79.0\", \"row\": \"foundation/isolation\", \"stack_pin\": \"0.80.0\"}, {\"component_id\": \"jcodemunch-mcp\", \"edition_pin\": \"1.108.319\", \"row\": \"foundation/code-navigation\", \"stack_pin\": \"1.108.327\"}, {\"component_id\": \"openresearch\", \"edition_pin\": \"0.2.7\", \"row\": \"foundation/web-research\", \"stack_pin\": \"0.2.15\"}, {\"component_id\": \"syft\", \"edition_pin\": \"1.52.0\", \"row\": \"foundation/ci-supply-chain\", \"stack_pin\": \"1.54.0\"}, {\"component_id\": \"nextjs\", \"edition_pin\": \"16.3.6\", \"row\": \"foundation/hosting-services\", \"stack_pin\": \"16.3.8\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.161.0\", \"row\": \"foundation/observation-inference\", \"stack_pin\": \"0.162.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/agent-sdks\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"mcporter\", \"edition_pin\": \"0.14.1\", \"row\": \"foundation/mcp-surfaces\", \"stack_pin\": \"0.14.2\"}, {\"component_id\": \"mcp-inspector\", \"edition_pin\": \"2.8.0\", \"row\": \"foundation/mcp-surfaces\", \"stack_pin\": \"2.9.0\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.79.0\", \"row\": \"foundation/git-github-automation\", \"stack_pin\": \"0.80.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.161.0\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.162.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.161.0\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.162.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.161.0\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.162.0\"}, {\"component_id\": \"syft\", \"edition_pin\": \"1.52.0\", \"row\": \"us-equities/security-supply-chain\", \"stack_pin\": \"1.54.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"cross/cross:gpt6-harnesses\", \"stack_pin\": \"0.159.3\"}], \"bytes\": 15133644, \"input_sha256\": \"0095070fcf373bf0e9f48cb127e080a4e9a62face5f1133f2220cb9a80f01b47\", \"output_sha256\": \"c3898a15da5cae3880fcd9b033a30b92391056b14d4f8d63ab236005d1a42307\", \"status\": \"passed\"}\n",
+      "output_sha256_original": "094109f93729cd8ad822797326dc480fbde45fb12032fca2ce5fa317587aea1b"
+    },
+    {
+      "id": "pre-push-registry",
+      "command": "python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "started_at_utc": "2026-10-03T07:09:44.024Z",
+      "returned_at_utc": "2026-10-03T07:09:44.494Z",
+      "exit_code": 0,
+      "returned_output": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.221s\n\nOK\n",
+      "output_sha256_original": "b156155ebdfc8e14121e2f6c0e9305a1291afc8d9dbc64547f47c785c416e61f"
+    }
+  ],
+  "limitations": [
+    "Local repository integration checks and synthetic fixtures, not unchanged upstream tests, provider runs or host deployment acceptance.",
+    "Command outputs below are retained exactly except portable repository, home and scratch-path sanitization; commands executed via rtk proxy.",
+    "HUD controls and the initial unittest runs did not capture start/end UTC timestamps; no timestamp is inferred.",
+    "Hosted CI and other owners remain separate scopes. PR metadata observations bind to the unchanged source_head, not a future repair commit."
+  ],
+  "native_collector_checks": {
+    "command": "uv run --no-project --python 3.13 --with PyYAML==6.0.3 python3 -B -m unittest tests.test_observability_tool_names tests.test_observability_run_correlation tests.test_sdk_usage_scope tests.test_observability_writer_identity",
+    "environment": {
+      "OTELCOL_TEST_BIN": "<qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib",
+      "UV_CACHE_DIR": "<repair-scratch>/uv-cache",
+      "UV_PYTHON_DOWNLOADS": "never"
+    },
+    "python_version": "3.13.15",
+    "exit_code": 0,
+    "returned_output": "Installed 1 package in 16ms\n..................{\"dashboard_result\": [], \"stage\": \"start_and_resume\"}\n{\"dashboard_result\": [], \"stage\": \"same_id_replay_and_new_id_republication\"}\n{\"dashboard_result\": [], \"stage\": \"unavailable_and_legacy_without_additive_baseline\"}\n.................\n----------------------------------------------------------------------\nRan 35 tests in 65.620s\n\nOK\n",
+    "scope": "35 repository native/structural tests with zero skips, covering logs, run/tool/cost correlation, SDK file receipts and metrics/writer identity through pinned Collector 0.162.0; synthetic fixtures only."
+  },
+  "additional_writer_identity": {
+    "command": "uv run --no-project --with PyYAML==6.0.3 python3 -B -m unittest tests.test_observability_writer_identity",
+    "environment": {
+      "OTELCOL_TEST_BIN": "<qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib",
+      "UV_CACHE_DIR": "<repair-scratch>/uv-cache"
+    },
+    "python_version": "3.14.7",
+    "exit_code": 0,
+    "returned_output": "................\n----------------------------------------------------------------------\nRan 16 tests in 9.687s\n\nOK\n",
+    "scope": "Additional variant selector check before fixing the acceptance interpreter to the original Python 3.13 line."
+  },
+  "hosted_observation": {
+    "command": "gh pr checks 642 --required --json name,bucket; gh pr view 642 --json headRefOid,labels,body,comments",
+    "exit_code": 0,
+    "head": "ea10c096e8fbc59cf528f9fb600d8b0b261c288b",
+    "required_buckets": [
+      {
+        "bucket": "fail",
+        "name": "validate"
+      },
+      {
+        "bucket": "pass",
+        "name": "verdict-review-gate"
+      },
+      {
+        "bucket": "pass",
+        "name": "token-report"
+      },
+      {
+        "bucket": "pass",
+        "name": "secret-scan"
+      },
+      {
+        "bucket": "pass",
+        "name": "osv-scanner"
+      },
+      {
+        "bucket": "pass",
+        "name": "dependency-review"
+      },
+      {
+        "bucket": "pass",
+        "name": "sota-sources"
+      },
+      {
+        "bucket": "pending",
+        "name": "validate-macos"
+      }
+    ],
+    "labels": [
+      "lane:shared"
+    ],
+    "sota_sources_section_present": true,
+    "candidate_ack_comment_found": false,
+    "scope": "Read-only PR observation at source_head. Review acknowledgements were not fetched; absent candidate comments do not prove absence of an acknowledgement review. Hosted results for a future repair commit remain a coordinator handoff."
+  },
+  "memory_attempts": [
+    {
+      "command": "ai-memory search '\"currency-wave-w1\" OR \"R642\"' --project native-agent-stack --limit 2 --json",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "2026-10-03T07:05:59.484944Z  INFO ai_memory_cli: ai-memory starting version=\"2.4.2\" server_url=http://127.0.0.1:49474 data_dir=<home>/.local/share/ai-memory bind=127.0.0.1:49474\nError: GET /admin/search: server returned 404 Not Found: {\"error\":\"project 'native-agent-stack' not found in workspace 'default'\"}\n",
+      "scope": "Initial default workspace lookup failed; this does not imply service unavailability."
+    },
+    {
+      "command": "ai-memory search '\"currency-wave-w1\" OR \"R642\"' --workspace local --project native-agent-stack --limit 2 --json",
+      "exit_code": 0,
+      "stdout": "[]\n",
+      "stderr": "2026-10-03T07:08:44.366140Z  INFO ai_memory_cli: ai-memory starting version=\"2.4.2\" server_url=http://127.0.0.1:49474 data_dir=<home>/.local/share/ai-memory bind=127.0.0.1:49474\n",
+      "scope": "Correct recipe workspace returned no hits; no memory claim adopted. Installed CLI help does not expose pin-priority arguments."
+    }
+  ],
+  "optional_skip_observation": {
+    "method": "unittest.defaultTestLoader.loadTestsFromModule and __unittest_skip__ / __unittest_skip_why__ inspection",
+    "skips": [
+      "OmniRouteLaneBuildTests.test_context_mode_reads_only_the_listed_skill_files: set CONTEXT_MODE_SECURITY_JS to an installed context-mode build/security.js",
+      "ShellTests.test_runs_under_bash_3_2: no real bash 3.2 binary",
+      "ShellTests.test_shellcheck: shellcheck is not installed"
+    ]
+  },
+  "publication_check_environment": {
+    "guarded_preflight": {
+      "command": "gitleaks protect --help",
+      "exit_code": 1,
+      "returned_output": "<host-prefix>/bin/gitleaks: line 22: /run/user/1000/ecosystem-gitleaks.lock: Read-only file system\n",
+      "scope": "No scan started. The installed containment wrapper cannot create its per-user lock in this sandbox."
+    },
+    "native_scanner": {
+      "version": "8.30.1",
+      "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+      "help_checked": "protect --help exposes --staged and --redact"
+    },
+    "git_index_plan": {
+      "version": "2.43.0",
+      "source": "https://github.com/git/git/blob/v2.43.0/Documentation/git.txt",
+      "method": "Native GIT_INDEX_FILE and GIT_OBJECT_DIRECTORY in writable repair scratch; GIT_ALTERNATE_OBJECT_DIRECTORIES reads existing repository objects without writing them. read-tree HEAD seeds the clean initial tree, git add -A stages the actual worktree, git reset -- . clears that scratch index."
+    },
+    "scope": "Bounded native staged publication scan in the existing execution sandbox; not acceptance of host-local guarded job containment. The ordinary worktree Git index is outside writable roots and is kept unchanged."
+  }
+}

@@ -42,7 +42,7 @@
       "output": "wt v0.80.0"
     },
     "smoke_recorded": {
-      "command": "wt list (the row's documented command, manifests/stack.json:1067-1069). Binary: <prefix>/worktrunk-x86_64-unknown-linux-musl/wt. cwd: <qualification-root>/worktrunk/smoke/repo, a one-commit synthetic scratch repo (not 0c/base). Run as env -i with HOME, XDG_*, WORKTRUNK_CONFIG_PATH and WORKTRUNK_SYSTEM_CONFIG_PATH in the scratch dir, GIT_CONFIG_GLOBAL=/dev/null, GIT_CONFIG_NOSYSTEM=1, stdin /dev/null.",
+      "command": "wt list (the row's documented command, manifests/stack.json (component id worktrunk, JSON pointer /commands)). Binary: <prefix>/worktrunk-x86_64-unknown-linux-musl/wt. cwd: <qualification-root>/worktrunk/smoke/repo, a one-commit synthetic scratch repo (not 0c/base). Run as env -i with HOME, XDG_*, WORKTRUNK_CONFIG_PATH and WORKTRUNK_SYSTEM_CONFIG_PATH in the scratch dir, GIT_CONFIG_GLOBAL=/dev/null, GIT_CONFIG_NOSYSTEM=1, stdin /dev/null.",
       "exit": 0,
       "output_excerpt": "  Branch  Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path  Commit    Age  Message\n@ main        ^                                             .     54a02d5    1w  synthetic fixture\n\n\u25cb Showing 1 worktree",
       "ran": true

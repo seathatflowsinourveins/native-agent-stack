@@ -71,12 +71,14 @@ not establish signature verification or SPDX output on the new release.
 
 ## HUD integration and M14 amendment
 
-The template now checks that the selected plugin directory and entry file exist
-before invoking Node. This adopts the entry-existence check in upstream
+The template now filters cached plugin directories for `dist/index.js` before
+sorting versions and invoking Node. It selects the newest complete installation,
+including an older complete version beside an incomplete newer directory, as in upstream
 [scripts/statusline.mjs at the selected commit](https://github.com/jarrodwatts/claude-hud/blob/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L35).
 The previous command could resolve a missing plugin to the open project's
 `dist/index.js`. The regression test invokes the rendered command with an
-instrumented Node fixture for absent plugin, missing entry and installed entry
+instrumented Node fixture for absent plugin, missing entry, incomplete newer
+installation beside a complete older version, and newest installed entry
 conditions; it does not execute arbitrary project code. The same test against
 the original unguarded template failed both missing-plugin conditions (exit 1,
 two subtest failures), and passed against the guarded template (exit 0). Both
@@ -151,10 +153,41 @@ requalification units, beads regression repair and AgentsView recipe rewire
 are the next candidate classes; this bounded wave does not establish complete
 ecosystem saturation or a model-quality improvement.
 
-Off-limit configuration-owner files, all `blueprints/us-equities/` files,
-historical receipts, prior decisions, dated catalogs and sweep manifests retain
-their bytes. Reports may display the intentional difference between current
-stack pins and older sealed landscape winners.
+Hosted evidence remains separate: W1 exercised jCodeMunch 1.108.327 through
+`get_session_stats`; it did not repeat `index_folder`, `search_symbols` or
+`get_symbol_source` against a frozen source oracle. The coordinator must retain
+the `native-token-e2e` result for the committed repair head to close that gap.
+Syft 1.54.0's first hosted `sbom-vuln` run against the reproduced
+`nautilus_trader` environment also remains a hosted qualification gap; the W1
+inventory comparison covered the equity-worker SDK. `publish-catalog` runs on
+dispatch or a `v*` tag, so PR CI does not exercise its updated Syft installation
+path. Its next dispatch/tag result must be retained as that path's first
+execution. This repair neither dispatches those workflows nor infers their
+results from local structural checks.
+
+Off-limit configuration-owner files, including `adoption/new-wsl-profile.json`,
+all `blueprints/us-equities/` files, historical receipts, prior decisions,
+dated catalogs and sweep manifests retain their bytes. The trading-owned
+`observability/paper-trading-live/collector-paper-trading.yaml` comment is
+restored to its base 0.161.0 text in R642. Reports may display the intentional
+difference between current stack pins and older sealed landscape winners.
+
+Owner handoffs for the next unit:
+
+- The configuration owner must reconcile `adoption/new-wsl-profile.json`:
+  it carries Inspector 2.9.0, Worktrunk 0.80.0 and Collector 0.162.0, while
+  mcporter 0.14.1, playwright-cli 0.1.21 and Syft 1.52.0 remain older than
+  the W1 selections. This file is outside the repair's edit scope.
+- The trading owner must update the canonical
+  `blueprints/us-equities/supply-chain/README.md` recipe for Syft 1.54.0,
+  including its 1.52.0 archive/hash instructions, using the W1 receipt's
+  publisher checksum URL and `54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860`.
+  The trading owner also owns the Collector version comment in
+  `observability/paper-trading-live/collector-paper-trading.yaml`.
+- The coordinator supplies the required CI buckets, macOS result, hosted
+  secret scans, PR labels/body and any required trading acknowledgement for
+  the committed repair head. No commit, push or PR metadata mutation is part
+  of this repair.
 
 ## Supplemental test environment correction
 
@@ -165,11 +198,67 @@ against the inherited home npm cache. A first scratch-cache attempt also used
 path with exit 1. Distinct empty scratch user/global files and a writable cache
 restored native packaging (exit 0). This follows the distinct npm config paths
 in the W1 installation records, preserves both failed attempts and does not
-change host configuration or repository test behavior. Both affected native
-npm fixture classes then passed (25 tests), and the original four-module
-supplemental suite passed with the isolated configuration; its complete
-returned test totals are retained in native-checks.json. The required build
-contract checks passed with their original command lines.
+change host configuration or repository test behavior. The retained
+four-module supplemental run reports 253 tests and `OK (skipped=33)` with
+the isolated configuration. Its complete returned totals are retained in
+native-checks.json; no separate 25-test result was retained, and the earlier
+claim that every original build-contract check passed lacked retained command
+output. Those unsupported specifics are withdrawn. R642's new checks retain
+their own command lines, exit codes and returned output in
+[review-repair-checks.json](../../evidence/artifacts/currency-wave-w1-20261003/review-repair-checks.json).
+
+## R642 bounded repair and completeness critic
+
+This review repair serves the same foundation maintenance and north-star
+research action as W1. Search-first selected the existing repository unittest
+and validation commands. No new installer, dependency or acceptance runner was
+needed. The installed Collector's help/version and the pinned HUD launcher
+source were checked before changing their integration paths. The alternative
+of leaving tests bound to 0.161.0 would continue to skip the current installed
+pin; hard-coding 0.162.0 would repeat the drift on the next move. The three
+current Collector selectors now read the component version from
+`manifests/stack.json`; `OTELCOL_TEST_BIN` permits a scratch binary without a
+host installation. SDK usage tests inherit that same selector.
+
+The selector variant search started with the exact stale tool-names selector,
+then widened the same path pattern to the repository root and checked skip
+messages. It found the run-correlation and writer-identity selectors and the
+inherited SDK guard. The 0.161.0 fake binary in
+`tests/test_observability_writer_identity_host.py` belongs to a copied, dated
+host-apply fixture, not the current native Collector pipeline, and is retained.
+Source review and historical receipt citations likewise keep their dates.
+
+Receipt command paths were restored from the hashed W1 packet before
+sanitization. Distinct npm user/global files, XDG directories and HUD config
+paths now survive as distinct scratch placeholders. Stack command citations
+use a component id and the component-relative JSON pointer `/commands`.
+Each archive/package receipt names its primary published digest URL; HUD
+explicitly has no publisher archive checksum and instead names its exact
+upstream source-tree integrity URL. The earlier review's DNS failure was a
+review-environment limitation; no mismatch was established and no pin or
+digest is changed for it.
+
+The new HUD mixed-install regression failed against the pre-repair template
+and passed after filtering entries before sorting. Those returned results are
+retained as local fixture evidence. This session exposed no scoped ai-memory
+MCP tool. Installed CLI help supports a scoped search with limit 2 but no
+pin-priority option; the initial R642 search returned HTTP 404 because the
+requested project was absent from the default workspace. This is a scope
+lookup failure, not evidence that the service is unavailable. The repair used
+the recipe's `local` workspace on retry and received no hits. It then used
+the exact decision and original source packet
+and adopted no memory claim. Completeness checks cover all requested findings,
+current selectors, canonical recipe entry points, reproducible receipt paths,
+component-relative citations and owner boundaries. Remaining source/runtime
+modalities feed the lifecycle sweep above; hosted and owner work is handed off.
+
+The staged publication check uses Git 2.43.0's documented
+[`GIT_INDEX_FILE`, `GIT_OBJECT_DIRECTORY` and read-only alternate objects](https://github.com/git/git/blob/v2.43.0/Documentation/git.txt)
+in writable repair scratch, so the ordinary worktree index remains untouched.
+Native `read-tree HEAD`, `git add -A` and `git reset -- .` provide the stage and
+cleanup. The installed Gitleaks wrapper could not create its host runtime lock
+in this sandbox; the bounded staged scan uses the pinned upstream Gitleaks
+8.30.1 executable. Its result does not qualify host-local guarded containment.
 
 ## Overturn condition and rollback
 

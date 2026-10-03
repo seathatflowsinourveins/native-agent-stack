@@ -37,12 +37,12 @@
       "prefix": "<qualification-root>/openresearch/prefix"
     },
     "version_recorded": {
-      "command": "D=<qualification-root>/openresearch; env -i HOME=$D/home XDG_CONFIG_HOME=$D<home> XDG_DATA_HOME=$D<home>/share XDG_STATE_HOME=$D<home>/state XDG_CACHE_HOME=$D<home> PATH=/usr/bin:/bin unshare -rn $D/prefix/bin/orx --version",
+      "command": "D=<qualification-root>/openresearch; env -i HOME=$D/<scratch-home> XDG_CONFIG_HOME=$D/<scratch-home>/.config XDG_DATA_HOME=$D/<scratch-home>/.local/share XDG_STATE_HOME=$D/<scratch-home>/.local/state XDG_CACHE_HOME=$D/<scratch-home>/.cache PATH=/usr/bin:/bin unshare -rn $D/prefix/bin/orx --version",
       "exit": 0,
       "output": "orx 0.2.15"
     },
     "smoke_recorded": {
-      "command": "orx --no-telemetry discover keyword \"local code retrieval\" --limit 3 ; orx --no-telemetry paper \"${PAPER_ID}\" --full   (the two commands of the row, manifests/stack.json:659-660)",
+      "command": "orx --no-telemetry discover keyword \"local code retrieval\" --limit 3 ; orx --no-telemetry paper \"${PAPER_ID}\" --full   (the two commands of the row, manifests/stack.json (component id openresearch, JSON pointer /commands))",
       "exit": -1,
       "ran": false,
       "output_excerpt": "NOT RUN. The -1 is a sentinel meaning 'not run', not an exit code. Both documented commands need a live network service: `orx discover keyword --help` on v0.2.15 reads 'alphaXiv full-text BM25 retrieval with match snippets' and `orx paper --help` reads 'Fetch a paper: alphaXiv report/full-text, or OpenAlex/bioRxiv/PubMed metadata'. The second also needs a value for ${PAPER_ID}, which the task does not supply. The repo's own prior qualification record (evidence/artifacts/sota-refresh-20260923/pins-tools/openresearch.json, limits) says functional search needs a stored alphaXiv/OpenAlex key or account."
@@ -117,6 +117,7 @@
       "bytes": 11890208,
       "matches_recorded_sha256": true,
       "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
-    }
+    },
+    "command_sanitization": "Restored from the hashed W1-moves.json packet. Qualification and host prefixes remain distinct; scratch HOME path segments use <scratch-home>, retaining all child paths including separate npm user/global config files and XDG directories."
   }
 }

@@ -137,7 +137,7 @@
       "command": "python3 -B -m unittest tests.test_adoption_docs_consistency tests.test_adoption_bootstrap_macos tests.test_catalog_freshness_pins tests.test_native_token_ci",
       "exit_code": 1,
       "decisive_output": "Ran 229 tests; FAILED (errors=2, skipped=33). Both errors were native npm pack returning exit 226.",
-      "classification": "Supplemental fixture setup failure; every build-contract acceptance command passed separately."
+      "classification": "Supplemental fixture setup failure; this run is not a build-contract acceptance result."
     },
     {
       "command": "Same supplemental unittest command with scratch npm cache and both npm config paths set to /dev/null",

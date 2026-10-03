@@ -33,7 +33,11 @@ _PINNED = {item["id"]: item["version"]
 _TOOLS = Path.home() / ".local/share/codex-ecosystem/tools"
 PROMTOOL = _TOOLS / f"ecosystem-prometheus-{_PINNED['prometheus']}/promtool"
 PROMETHEUS = _TOOLS / f"ecosystem-prometheus-{_PINNED['prometheus']}/prometheus"
-OTELCOL = _TOOLS / "otelcol-0.161.0/otelcol-contrib"  # observability/collector/README.md pins 0.161.0
+OTELCOL_VERSION = next(component["version"] for component in
+                       json.loads((ROOT / "manifests/stack.json").read_text())["components"]
+                       if component["id"] == "opentelemetry-collector-contrib")
+OTELCOL = Path(os.environ.get("OTELCOL_TEST_BIN", str(_TOOLS /
+               f"otelcol-{OTELCOL_VERSION}/otelcol-contrib")))
 
 try:
     import yaml
@@ -321,7 +325,8 @@ def free_port() -> int:
         return probe.getsockname()[1]
 
 
-@unittest.skipUnless(OTELCOL.exists() and HAVE_YAML, "otelcol-contrib 0.161.0 not installed at the documented path")
+@unittest.skipUnless(OTELCOL.exists() and HAVE_YAML,
+                     f"requires PyYAML and otelcol-contrib {OTELCOL_VERSION}; set OTELCOL_TEST_BIN for a scratch install")
 class NativeCollectorTests(unittest.TestCase):
     """The committed metrics pipeline on the pinned otelcol-contrib, with synthetic OTLP JSON (no model call)."""
 
