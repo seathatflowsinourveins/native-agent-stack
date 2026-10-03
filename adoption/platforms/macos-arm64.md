@@ -113,6 +113,9 @@ plans for is the labelled projection `macos-arm64-64gb-projected` in
 unified memory as the generation budget, `full` semantic-RAG tier, both drawn
 from one shared pool); for this page's embedding choice it follows the 48 GB
 rules. None of these sizes has a real qualification run yet.
+Corrected 2026-10-03 (port of #410): `mac-coordinator-64gb-20260925` ran a descriptive
+co-residency probe on 2026-09-27 that was not accepted as a qualification
+([port record](../../evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md)).
 
 ## Prerequisites
 
@@ -749,8 +752,14 @@ currently loaded from that same destination path, rename into place,
 confirmed loaded from its own destination path, or not loaded at all with a
 file present to clean up). On the hosted runner (run `35875188590`, "What a
 hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
-`qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
-three has run on a Mac workstation.
+`qdrant` and `llama-embed` agents.
+Corrected 2026-10-03 (port of #410): as of 2026-09-27 the `ai-memory` template
+had not run on that hosted runner. On 2026-09-27 `llama-embed` ran on the
+coordinator Mac and `embed_acceptance.py` returned pass without a discriminating
+control, so this is an observation. As of that date, the `qdrant` and `ai-memory`
+templates had not run on a Mac workstation; the pre-existing `local.agent-ecosystem.*`
+agents served those roles
+([port record](../../evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md)).
 
 **Credential boot receipt (added after `v2026.09.26.2`; documented, not
 run).** On Linux/WSL2 the `credential-boot-receipt.service` oneshot runs
