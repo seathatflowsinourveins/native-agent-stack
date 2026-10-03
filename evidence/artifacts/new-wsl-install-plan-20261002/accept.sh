@@ -401,8 +401,10 @@ local-model-server() {
       check local-model-server health 'OLLAMA_HOST=127.0.0.1:21434 ollama ls'
       ;;
     after_sign_in)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/v0.35.0/docs/cli.mdx#L73
-      check local-model-server smoke 'OLLAMA_HOST=127.0.0.1:21434 ollama run embeddinggemma "Hello world"'
+      # One embedding call to the settled embedder, which the embedding-model row creates. /api/embed answers 404 for a
+      # missing model and downloads nothing: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L975-L977
+      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659
+      check local-model-server smoke 'curl -fsS http://127.0.0.1:21434/api/embed -d '"'"'{"model":"qwen3-embedding-8k","input":"Hello world"}'"'"' | jq -e '"'"'(.embeddings | length) == 1'"'"' >/dev/null'
       ;;
     *) skipped local-model-server ;;
   esac

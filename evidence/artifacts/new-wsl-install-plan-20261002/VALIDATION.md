@@ -213,6 +213,13 @@ the systems measured; it is not a run of these plan rows' commands.
   another library manifest and another derived layer (embedding files); another context, another quantization and an
   empty answer (generation service); the server-wide context and 512 dimensions (embedding service). Taking any one of
   the nine conditions out of its program, in a scratch run of the test, made its planted case pass.
+- The `local-model-server` row's `after_sign_in` check, repaired on 2026-10-03: it ran upstream's example
+  `ollama run embeddinggemma "Hello world"`, which would pull EmbeddingGemma, the embedding arm that lost; it is now one
+  `/api/embed` call to `qwen3-embedding-8k` that must return one vector, and the endpoint downloads nothing
+  (SOURCES.md, "The service checks"). `check_plan.py` exit 0 with the counts above (the entry was replaced, not added);
+  `bash -n accept.sh` exit 0. `LocalModelAcceptance.test_the_server_smoke_check` checks that the program names the settled
+  embedder and no other model and runs it against the stub `curl`: one vector exits 0, no vector and an error answer
+  exit 1. With the `jq -e` condition taken out in a scratch run, the no-vector case exited 0.
 - The `ollama show` table that the service checks read is rendered by a table writer with an empty first column and
   space padding (`cmd/cmd.go:1362-1368`, parameter rows at `:1474-1480`, at v0.35.0); the measurement's record of that
   output squeezes the spaces (`raw/M15-a2-setup.txt` in the private measurement folder, listed by sha256 in that

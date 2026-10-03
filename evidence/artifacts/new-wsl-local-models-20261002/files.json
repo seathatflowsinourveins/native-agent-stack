@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "meaning": "Every file of the private measurement folder: the published copies in this folder with the original's and the copy's sha256, and every other file by path, size and sha256. Paths are relative to the measurement folder (~/.local/state/native-agent-stack/new-wsl-measure-20261002/ in the workstation distribution); nothing listed under private is published.",
+ "meaning": "Every file of the private measurement folder as it was listed on 2026-10-03, before the copy-out described under added_after_listing: the published copies in this folder with the original's and the copy's sha256, and every other file by path, size and sha256. Paths are relative to the measurement folder (~/.local/state/native-agent-stack/new-wsl-measure-20261002/ in the workstation distribution); nothing listed under private or added_after_listing is published.",
  "measurement_folder_files": 231,
  "artifact_map": {
   "name": "wsl-architecture-design-local-models-artifact-map-20261003.md",
@@ -16,6 +16,33 @@
   ],
   "combined_sha256": "bfd683a89316c30b58a598c44c7e135da9c523c3e47322e5bab04b59cca719d4",
   "method": "sha256 of the output of `find a2/logs partb/runs -type f -print0 | sort -z | xargs -0 sha256sum`, run inside retained-throwaway/; recomputed for this folder on 2026-10-03 and equal"
+ },
+ "added_after_listing": {
+  "meaning": "a copy-out of the throwaway distribution's measurement directories, added to retained-throwaway/ at about 2026-10-03T05:37Z (file times), after the listing above; listed here by its own checksum list, not file by file; its files were not checked against that list for this publication",
+  "folder": "retained-throwaway/copyout-20261003",
+  "files": 55649,
+  "top_level_files": {
+   ".ollama": 8,
+   "measure": 55640,
+   "measure-logs": 1
+  },
+  "sums": {
+   "path": "retained-throwaway/copyout-20261003.SHA256SUMS",
+   "bytes": 11133247,
+   "sha256": "a232de3771809061619f8f54940c7b87649b2d487ce9df907903abd920114896",
+   "lines": 55649
+  },
+  "errors": {
+   "path": "retained-throwaway/copyout-tar.err",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "measured_swift_modelfile": {
+   "path": "retained-throwaway/copyout-20261003/measure/s2o/Modelfile",
+   "bytes": 11758,
+   "sha256": "8911245e6678ee1fac043d31d20de14ea9ed3d8834ccee5beb92e726b769e8f6",
+   "relation": "the Modelfile the measurement created swift-iq3s-s2o from, with the sha256 it recorded; after its first line (FROM with an absolute path in the throwaway distribution) byte-identical to the install plan's models/swift-iq3s-s2o.Modelfile"
+  }
  },
  "published": [
   {
@@ -375,10 +402,16 @@
    "original_bytes": 5769,
    "original_sha256": "43254cf88c50540c6725148b03fcdc25e5373938a70516910775b0e9041783e2",
    "copy": "scripts/steps/W-partb-window.sh",
-   "copy_bytes": 5769,
-   "copy_sha256": "43254cf88c50540c6725148b03fcdc25e5373938a70516910775b0e9041783e2",
-   "identical": true,
-   "replacements": []
+   "copy_bytes": 5783,
+   "copy_sha256": "7f0e285d79c8bcaf812db7eb06e3f5ac05067e7038c9ffe53d38a5ffb8fd0fa2",
+   "identical": false,
+   "replacements": [
+    {
+     "what": "the throwaway distribution's name, the argument of wsl.exe -d in inside() (line 18)",
+     "written_as": "'<the throwaway distribution>' (quoted, so that the copy still parses with bash -n)",
+     "occurrences": 1
+    }
+   ]
   }
  ],
  "private": [

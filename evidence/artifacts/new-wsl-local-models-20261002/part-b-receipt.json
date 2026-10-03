@@ -74,7 +74,7 @@
   "With a server-wide context of 64,000 the embedder loaded at its full context and took 5.78 GB (Part A, A1b); the measured system sets the context per model (qwen3-embedding-8k, 8,192 tokens), never server-wide."
  ],
  "files": {
-  "files.json": "19ae0f1dfb8ed34056d1261ae9766ba4e41f4221f709945e7f1f68e6888a9872",
+  "files.json": "4e77359503133255d0dc30f44e6c577839bfa6124d1146f6ebb0ddff423f1893",
   "PREREGISTRATION-local-models.md": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b",
   "part-b/bootstrap.txt": "3715a13234ad46aa150dcebdfd1930c638998e73cd31c5319f473a5b09bf1302",
   "part-b/runs/E1-pb1/per-query.jsonl": "5229f9066eff87aa29d6213c70e997ae41cc0201e27049e75748f402c1bccbde",

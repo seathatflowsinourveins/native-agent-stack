@@ -15,7 +15,7 @@ GEN=swift-iq3s-s2o-64k
 say() { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*" | tee -a "$LOG"; }
 gpu() { nvidia-smi --query-gpu=memory.used --format=csv,noheader; }
 clean() { tr -d '\r\000' | grep -v 'Failed to translate'; }
-inside() { $W -d StackMeasure2604 -- bash -s 2>&1 | clean; }
+inside() { $W -d '<the throwaway distribution>' -- bash -s 2>&1 | clean; }
 restore() {
   inside <<EOF > /dev/null
 export PATH="\$HOME/.local/share/mise/shims:\$HOME/.local/bin:\$PATH" OLLAMA_HOST=127.0.0.1:21434

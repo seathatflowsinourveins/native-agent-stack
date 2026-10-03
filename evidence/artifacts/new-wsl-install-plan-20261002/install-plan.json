@@ -1437,18 +1437,18 @@
           }
         },
         "after_sign_in": {
-          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama run embeddinggemma \"Hello world\"",
+          "command": "curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '(.embeddings | length) == 1' >/dev/null",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/v0.35.0/docs/cli.mdx#L73",
-            "line": 73
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
+            "line": 1659
           }
         }
       },
       "config_paths": [
         "$config_root/ollama.env.example"
       ],
-      "notes": "Planned. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Smoke downloads/runs upstream example model; GPU inference remains unrun. Version mode exits without starting the daemon, warning when it is absent. List checks the running local server. The original model smoke is retained after a model route is provisioned; its inference behavior remains unverified.",
+      "notes": "Planned. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Version mode exits without starting the daemon, warning when it is absent. List checks the running local server. The after_sign_in smoke is one /api/embed call to qwen3-embedding-8k, the settled embedder, once the embedding-model row has created it; the endpoint answers 404 for a missing model and downloads nothing (server/routes.go:975-977 at cc4069396f). It replaced upstream's example `ollama run embeddinggemma` on 2026-10-03, which would pull EmbeddingGemma, a model no row selected. GPU inference on the destination remains unrun.",
       "mise_tool": "ollama"
     },
     {

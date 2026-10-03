@@ -1057,7 +1057,8 @@ class SkillAuthoringAcceptance(unittest.TestCase):
 class LocalModelAcceptance(unittest.TestCase):
     """The install plan's checks of the two local-model rows, run against stand-ins.
 
-    The programs that accept.sh runs for local-generation-model and embedding-model are run as accept.sh runs them
+    The programs that accept.sh runs for local-generation-model and embedding-model, and the local-model-server row's
+    after_sign_in smoke check (one embedding call to the settled embedder), are run as accept.sh runs them
     (bash -euo pipefail -c), with a scratch HOME and model store and with stub ollama and curl programs that print canned
     answers. The expected state passes, and each planted condition fails it. The fixtures are our own: no model server
     answers and no model runs. The embedder's library manifest is not published (the registry's copy carries its build
@@ -1076,6 +1077,7 @@ class LocalModelAcceptance(unittest.TestCase):
         rows = {r["slot"]: r for r in load(PLAN / "install-plan.json")["owners"]}
         cls.generation = rows["local-generation-model"]["acceptance"]
         cls.embedding = rows["embedding-model"]["acceptance"]
+        cls.server = rows["local-model-server"]["acceptance"]
 
     @staticmethod
     def table(num_ctx, quantization):
@@ -1109,6 +1111,8 @@ class LocalModelAcceptance(unittest.TestCase):
         for slot, acceptance in (("local-generation-model", self.generation), ("embedding-model", self.embedding)):
             self.assertEqual(checker.checks_of(functions[slot]),
                              [(stage, slot, "smoke", acceptance[stage]["command"]) for stage in ("post_install", "service_health")])
+        self.assertIn(("after_sign_in", "local-model-server", "smoke", self.server["after_sign_in"]["command"]),
+                      checker.checks_of(functions["local-model-server"]))
 
     def test_the_generation_files_check(self):
         cases = {"the expected state": (None, 0), "another 64k Modelfile": ("modelfile", 1),
@@ -1162,6 +1166,24 @@ class LocalModelAcceptance(unittest.TestCase):
                 scratch = Path(scratch)
                 (scratch / "home").mkdir()
                 status = self.run_program(program, scratch, show, reply)
+                self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
+
+    def test_the_server_smoke_check(self):
+        """The server row's after_sign_in check embeds with the settled embedder and runs or pulls no other model."""
+        program = self.server["after_sign_in"]["command"]
+        self.assertEqual(re.findall(r'"model":"([^"]*)"', program), ["qwen3-embedding-8k"])
+        for absent in ("ollama run", "ollama pull", "embeddinggemma"):
+            self.assertNotIn(absent, program)
+        cases = {
+            "one vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]}), 0),
+            "no vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), 1),
+            "an error answer": (json.dumps({"error": "model 'qwen3-embedding-8k' not found"}), 1),
+        }
+        for name, (reply, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                status = self.run_program(program, scratch, reply=reply)
                 self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
 
 

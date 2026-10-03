@@ -106,7 +106,7 @@ scorer and the bootstrap program by sha256, and five client tasks for Codex 0.16
 | S1b, Bonsai PQ2_0 on PrismML's server | 0 of 3 | not run | not run |
 | S2, Swift IQ3_S on PrismML's server | 0 of 3 | not run | not run |
 | S2o, Swift IQ3_S on Ollama | not applicable (the manifest's server); import gate passed | passed: 14.81 GiB and the embedder 2.66 GiB, each entirely on the GPU | 100 of 100, 100 of 100 |
-| C, `gpt-oss:20b` on Ollama | not applicable | passed (A1b): 12.97 GiB entirely on the GPU, the embedder resident | 87 of 100, 88 of 100 |
+| C, `gpt-oss:20b` on Ollama | not applicable | passed (A1b): 12.97 GB (12,968,494,366 bytes, 12.08 GiB; the preregistration's text says 12.97 GiB) entirely on the GPU, the embedder resident | 87 of 100, 88 of 100 |
 
 - The three PrismML arms failed G0 for the reason that settled the model-server slot: the server's log carries
   `unsupported Responses tool type 'namespace' skipped` and no call of the time server's tool is recorded. That is a
@@ -203,9 +203,19 @@ explanation; and it stated that neither selection establishes global SOTA or the
 acceptance.
 
 The map is posted and private (`wsl-architecture-design-local-models-artifact-map-20261003.md`, 32,231 bytes, sha256
-`bd269c02545d39a23bedaf1893de254b572065108d2f8a6581942b8f15d0237f`, 175 artifacts), and the published folder's
-`files.json` lists all 231 files of the measurement folder by sha256. The other family's acceptance of the native
-results after the map is not recorded here.
+`bd269c02545d39a23bedaf1893de254b572065108d2f8a6581942b8f15d0237f`, 175 artifacts). The Codex lane's binding read of the
+map (`CODEX-LOCAL-MODEL-MAP-BINDING-READ-20261003.md` in the private coordination folder, 2,387 bytes, sha256
+`8e14fc721add5805ffa11b44e59de0fbe863aa9e5d964a8048ef69d4f0760dc5`, written at 2026-10-03T03:18Z) states that it checked
+all 175 listed files against their declared sizes and sha256 (98,332,676 bytes; none missing, none different) and that
+it accepts the map's local file bindings only: record timestamps, process exits, scorer correctness, the copied
+collection's combined digest and remote-side identity are separate claims that matching hashes do not authenticate. It
+also states that a verdict on the exact head of the evidence pull request is still required. That verdict, and the other
+family's acceptance of the native results, are not recorded here.
+
+The published folder's `files.json` lists the 231 files the measurement folder held when it was listed, by sha256. A
+copy-out of the throwaway's measurement directories (55,649 files) was added to the private folder afterwards, at about
+2026-10-03T05:37Z; `files.json` lists it by the sha256 of its checksum list, and its files were not checked against that
+list for this publication.
 
 ## What the install plan does
 
@@ -214,10 +224,11 @@ results after the map is not recorded here.
 - `local-generation-model` downloads the IQ3_S file at the pinned Hugging Face revision and keeps it only with its
   sha256 `1333c6ea…a786` (11,771,546,912 bytes), places the repository's Modelfiles beside it and creates
   `swift-iq3s-s2o` and `swift-iq3s-s2o-64k`. The Swift Modelfile is the measured one with its `FROM` line written
-  relative to the Modelfile; the measured file was not retained, and
-  `evidence/artifacts/new-wsl-local-models-20261002/reconstruct_s2o_modelfile.py` rebuilds it from the library model's
-  blobs and reproduces its recorded sha256 `8911245e…`. The derived Modelfiles of both rows are byte-identical to the
-  ones the measurement wrote.
+  relative to the Modelfile. The measured file is in the copy-out added to the private folder after its listing (11,758
+  bytes, the recorded sha256 `8911245e…`), and after its `FROM` line it is byte-identical to the plan's copy;
+  `evidence/artifacts/new-wsl-local-models-20261002/reconstruct_s2o_modelfile.py` rebuilds it independently from the
+  library model's blobs and reproduces that sha256. The derived Modelfiles of both rows are byte-identical to the ones
+  the measurement wrote.
 - `embedding-model` pulls `qwen3-embedding:0.6b`, stops unless the server lists the pinned library manifest digest, and
   creates `qwen3-embedding-8k`.
 - The preregistration said the winners would be pulled with `ollama pull`. That holds for the embedder. The generation
@@ -225,6 +236,15 @@ results after the map is not recorded here.
   model, so the plan downloads that file pinned by revision and sha256 and creates the measured system from the
   measured Modelfile.
 - No server-wide context is set anywhere in the plan; each derived model carries its own.
+- The measurement's server, as `steps/M12-reprepare.sh` (private) started it after deviation 1 and before S2o's first
+  load, also ran with `OLLAMA_NUM_PARALLEL=1` and `OLLAMA_KEEP_ALIVE=-1`; no later step script starts it again. The plan
+  sets neither. Ollama v0.35.0's default for the first is 1, the measured value, so each model is served with one
+  request slot as measured; its default keep-alive is five minutes, so on the plan's server an idle model leaves the GPU
+  after five minutes, where the measured server never unloaded an idle model. Keeping both resident is a question for
+  the lifecycle design, with GPU ownership below.
+- The `local-model-server` row's `after_sign_in` smoke check ran upstream's example `ollama run embeddinggemma`, which
+  would pull EmbeddingGemma, the embedding arm that lost. It is now one `/api/embed` call to `qwen3-embedding-8k`, which
+  downloads nothing.
 - Both rows create their models through the running model server, which the plan does not start, so the default run
   skips them and `--only` installs each. Their acceptance reads files after the install (the placed Modelfiles, the
   library manifest's digest, the created models' layers) and, once the server answers, shows each model's own context
@@ -265,9 +285,10 @@ results after the map is not recorded here.
 - `evidence/artifacts/new-wsl-definitive-defaults-20261001/`: the two settlements; the assembler settles a split row
   that the convergence decisions added; the manifest, the tables of the definitive-defaults record and the handbook are
   regenerated.
-- `evidence/artifacts/new-wsl-install-plan-20261002/`: the two rows, their Modelfiles, both scripts, the checker and
-  the README, SOURCES and VALIDATION sections; `tests/test_new_wsl_definitive_defaults.py` (class
-  `LocalModelAcceptance`).
+- `.gitignore`: two exceptions to its `*.jsonl` rule, so that the per-case and per-query records are committed.
+- `evidence/artifacts/new-wsl-install-plan-20261002/`: the two rows, their Modelfiles, the `local-model-server` row's
+  `after_sign_in` check, both scripts, the checker and the README, SOURCES and VALIDATION sections;
+  `tests/test_new_wsl_definitive_defaults.py` (class `LocalModelAcceptance`).
 - `manifests/evidence.json`: the two receipts, kind `native_model_e2e`.
 
 ## Sources
@@ -277,11 +298,12 @@ results after the map is not recorded here.
 | `evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md` (published copy) | `454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b` |
 | The preregistration's final text (private; last entry of the chain) | `d161feaacd6b3082b3adf37e80a368b58bd6f68205efd399102b8d84d0d0f78b` |
 | `evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.sha256` | `7645e3a1bd9d94c478849ae20b07dc3f6b6f7a778ec0dfe74715b6123b71021a` |
-| `evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json` | `881e8f26c508d9029c3efc1e81de69f0773da8ee6e32398df3bf21ad109102a7` |
-| `evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json` | `c272b40ee96a54f660441eaf97bde5f4f59bcc9dcc58945c8e9d6fb6d67d5b58` |
-| `evidence/artifacts/new-wsl-local-models-20261002/files.json` | `19ae0f1dfb8ed34056d1261ae9766ba4e41f4221f709945e7f1f68e6888a9872` |
+| `evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json` | `55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577` |
+| `evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json` | `6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541` |
+| `evidence/artifacts/new-wsl-local-models-20261002/files.json` | `4e77359503133255d0dc30f44e6c577839bfa6124d1146f6ebb0ddff423f1893` |
 | `evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json` | `ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622` |
 | The artifact map (private) | `bd269c02545d39a23bedaf1893de254b572065108d2f8a6581942b8f15d0237f` |
+| The Codex lane's binding read of the map (private) | `8e14fc721add5805ffa11b44e59de0fbe863aa9e5d964a8048ef69d4f0760dc5` |
 
 - The other family's read: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5964331790
 - Upstream versions as run: Ollama 0.35.0 (tag on `cc4069396f3ad2c370c53eed2e4a42ac13adab84`), Inspect AI 0.3.273,

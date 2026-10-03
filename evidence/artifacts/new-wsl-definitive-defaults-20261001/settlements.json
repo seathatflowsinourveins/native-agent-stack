@@ -48,7 +48,7 @@
    },
    {
     "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
-    "sha256": "881e8f26c508d9029c3efc1e81de69f0773da8ee6e32398df3bf21ad109102a7"
+    "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577"
    }
   ],
   "label": "settled by the preregistered measurement: first-pass valid tool calls 200 of 200 against 175 of 200 for gpt-oss:20b (difference 0.125, 95% interval 0.065 to 0.19) on 100 BFCL cases through the server's chat and responses surfaces, both arms entirely on the GPU at 64,000 tokens with the embedder resident; Bonsai and Swift on PrismML's llama.cpp failed the function gate and qwen3.8:27b did not fit on the GPU; measured on one workstation; not a merit acceptance",
@@ -84,7 +84,7 @@
    },
    {
     "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
-    "sha256": "c272b40ee96a54f660441eaf97bde5f4f59bcc9dcc58945c8e9d6fb6d67d5b58"
+    "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541"
    }
   ],
   "label": "settled by the preregistered measurement: nDCG@10 0.49827 on CQADupstackUnixRetrieval against 0.41394 for EmbeddingGemma (difference 0.084331, 95% interval 0.067738 to 0.100656), with the generation model resident; Nemotron-3-Embed-1B tied (difference 0.003124, interval -0.012194 to 0.018141) and needs a second model server, and WeMM-Embedding-2B ran out of GPU memory; measured on one workstation; not a merit acceptance",

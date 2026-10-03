@@ -32,7 +32,7 @@ each receipt's `limitations` and in the preregistration.
 | `scripts/partb/` | The Part B arm builder, runner, fit gate, per-query scorer, statistic and two self-tests of amendment 4a |
 | `scripts/steps/` | The steps that ran A1 (`M6-a1.py`), A1b (`M6-a1b.py`), G0 (`M10-g0-setup.sh`, `M11-g0-run.sh`, `M11p-precheck.sh`), A1 of the extension (`M14-a1-ext.py`), both statistics (`M18-bootstrap.sh`, `M23-partb-bootstrap.sh`) and the Part B window (`W-partb-window.sh`) |
 | `reconstruct_s2o_modelfile.py` | Rebuilds the measured Swift Modelfile from the Ollama library's blobs and writes or checks the install plan's copy |
-| `files.json` | Every file of the measurement folder: the published copies with both hashes, and the 196 private files by path, size and sha256 |
+| `files.json` | Every file of the measurement folder as it was listed: the published copies with both hashes and the 196 private files by path, size and sha256; and the copy-out added to the folder after the listing, by its checksum list |
 
 The step scripts and runners name the measurement distribution's own paths (`$HOME/measure/...`) and its services; they
 document what ran and are not meant to run elsewhere unchanged. The two statistics are pure standard-library programs and do
@@ -67,7 +67,10 @@ The install plan creates both models from Modelfiles carried in this repository
 | `swift-iq3s-s2o-64k.Modelfile` | `6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e` | byte-identical to what the measurement's `printf` wrote (`FROM swift-iq3s-s2o`, `PARAMETER num_ctx 64000`) |
 | `qwen3-embedding-8k.Modelfile` | `a1e149022bb8bb7030eda3350d0e768ae92e2a0c8581408dbb2746aaa6f7fe06` | byte-identical to what the measurement's `printf` wrote (`FROM qwen3-embedding:0.6b`, `PARAMETER num_ctx 8192`) |
 
-The measured Swift Modelfile was not retained, so `reconstruct_s2o_modelfile.py` rebuilds it: it fetches the library model
+The measured Swift Modelfile was not among the files of the measurement folder when they were listed. The copy-out of the
+throwaway's measurement directories added to the private folder afterwards holds it (`files.json`, `added_after_listing`):
+11,758 bytes with the recorded sha256 `8911245e…`, and after its `FROM` line byte-identical to the install plan's copy.
+`reconstruct_s2o_modelfile.py` rebuilds it independently of that copy: it fetches the library model
 `qwen3.8:27b`'s manifest and its config, params and licence blobs from `registry.ollama.ai`, checks each against the digest the
 measurement recorded (manifest `aaee06c3…`), renders `ollama show --modelfile` as Ollama v0.35.0's source renders it (the
 lines are cited in the program) with the parameter order the measurement's own call printed, and removes the lines that
@@ -82,7 +85,10 @@ Raw model outputs and everything that names the workstation stay in the private 
 sha256 in `files.json`: the Inspect evaluation logs (`.eval`, up to 444 KB each), the client tasks' run records, the server
 logs, the window log, the run records of Part B (whose error texts carry the throwaway's paths) and the three prediction
 files of about 31 MB each. The retained copy of the throwaway's outputs (`retained-throwaway/`) has the combined digest
-`bfd683a89316c30b58a598c44c7e135da9c523c3e47322e5bab04b59cca719d4`, recomputed for this folder.
+`bfd683a89316c30b58a598c44c7e135da9c523c3e47322e5bab04b59cca719d4`, recomputed for this folder. A copy-out of the
+throwaway's measurement directories (55,649 files under `retained-throwaway/copyout-20261003/`) was added to that folder
+after `files.json` listed it. `files.json` gives the sha256 of the copy-out's checksum list; its files were not checked
+against that list for this publication.
 
 The artifact map that the other lane's read asked for is private as well:
 `wsl-architecture-design-local-models-artifact-map-20261003.md`, 32,231 bytes, sha256

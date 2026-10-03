@@ -39,7 +39,7 @@
           "a1": "passed: after the long prompt (56,847 prompt tokens, 64 output tokens) the generation model 14.81 GiB and the embedder 2.66 GiB were each entirely on the GPU; GPU memory 2,616 MiB before the load, 21,579 MiB after the long prompt, of 24,564 MiB",
           "a2": "200 of 200 first-pass valid tool calls (chat 100, responses 100); the package's own score 97 and 95 of 100"},
   "C": {"system": "gpt-oss:20b on Ollama 0.35.0 (library digest 17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7) as gpt-oss-20b-64k; the control and the holder of the historical result",
-        "a1": "A1 failed by the embedder's eviction (A1's written order); A1b in the order of use passed: 12.97 GiB entirely on the GPU with the embedder resident",
+        "a1": "A1 failed by the embedder's eviction (A1's written order); A1b in the order of use passed: 12.97 GB (12,968,494,366 bytes, 12.08 GiB; the preregistration's text says 12.97 GiB) entirely on the GPU with the embedder resident",
         "a2": "175 of 200 first-pass valid tool calls (chat 87, responses 88); invalid: 18 with arguments outside a schema's allowed values and 7 without a tool call; the package's own score 83 and 83 of 100"},
   "first_round_qwen": {"system": "qwen3.8:27b (Q4_K_M, library digest aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813) on Ollama 0.35.0", "outcome": "out: 92.6% GPU at 64,000 tokens (18.36 GB, 16.99 GB on the GPU) in A1 and in A1b"}
  },
@@ -63,7 +63,7 @@
  "decision": "By rule 2 of the extension the arm with the higher A2 share takes the slot and the interval excludes zero: S2o. Rule 3 (a second model server) does not apply: S2o and C are both served by the manifest's one server. The earlier result (gpt-oss:20b by A1b, before the extension) stays a historical result.",
  "reproduction": {
   "statistic": "rerun on 2026-10-03 from the published copies alone: python3 -B scripts/a2/a2_bootstrap.py S2o C chat=part-a/logs/s2o-chat/validity.jsonl,part-a/logs/c-chat/validity.jsonl responses=part-a/logs/s2o-responses/validity.jsonl,part-a/logs/c-responses/validity.jsonl printed the line of part-a/bootstrap.txt unchanged",
-  "modelfile": "reconstruct_s2o_modelfile.py rebuilds the measured S2o Modelfile from the library model's blobs, verified by digest at registry.ollama.ai on 2026-10-03; with the measurement's own FROM line it hashes to the recorded 8911245e6678ee1fac043d31d20de14ea9ed3d8834ccee5beb92e726b769e8f6"
+  "modelfile": "reconstruct_s2o_modelfile.py rebuilds the measured S2o Modelfile from the library model's blobs, verified by digest at registry.ollama.ai on 2026-10-03; with the measurement's own FROM line it hashes to the recorded 8911245e6678ee1fac043d31d20de14ea9ed3d8834ccee5beb92e726b769e8f6; the measured file itself, with that sha256, is in the copy-out added to the private folder after its listing (files.json, added_after_listing)"
  },
  "measured_ollama_digests": {
   "meaning": "manifest digests the measurement recorded; for comparison on another host, not an acceptance criterion (that Ollama's create gives the same digest on another host is not established)",
@@ -92,7 +92,7 @@
   "The Swift file's licence is the publisher's own (Swift Open License v1.0, with the original Qwen parts under Apache-2.0); the Modelfile's LICENSE block is the library model's Apache-2.0 text. Recorded, not judged."
  ],
  "files": {
-  "files.json": "19ae0f1dfb8ed34056d1261ae9766ba4e41f4221f709945e7f1f68e6888a9872",
+  "files.json": "4e77359503133255d0dc30f44e6c577839bfa6124d1146f6ebb0ddff423f1893",
   "PREREGISTRATION-local-models.md": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b",
   "part-a/bootstrap.txt": "3fe228c28e2ca7440989ad554507af6e212ef144f2136b64f48b3c56bc1f5c9f",
   "part-a/logs/s2o-chat/validity.jsonl": "c6911453b2aecb18b96a698950189c92b0a5def47f9805fbe776deb8cdbc5bef",

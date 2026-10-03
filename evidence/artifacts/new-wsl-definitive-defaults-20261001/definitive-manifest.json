@@ -19,7 +19,7 @@
   },
   "settlements": {
    "file": "settlements.json",
-   "sha256": "c5163a9bdd888befbcea883cd5d9c8a86108c962a2356b82cbff7f2d2613f540"
+   "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3"
   },
   "convergence": {
    "file": "convergence.json",
@@ -1117,7 +1117,7 @@
      },
      {
       "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
-      "sha256": "c272b40ee96a54f660441eaf97bde5f4f59bcc9dcc58945c8e9d6fb6d67d5b58"
+      "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541"
      }
     ]
    },
@@ -1731,7 +1731,7 @@
      },
      {
       "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
-      "sha256": "881e8f26c508d9029c3efc1e81de69f0773da8ee6e32398df3bf21ad109102a7"
+      "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577"
      }
     ]
    },
