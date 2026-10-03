@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_cli_integration_controls",
+  "source_base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "workflow_path": ".github/workflows/security-scan.yml",
+  "workflow_sha256": "1744bb958b1455bbd4462c6dd61ab2a08ce1e15eeca2522611826c146bbadfc2",
+  "exact_extracted_script_sha256": "f55f319bcfd2a1bf5fbbe19c1cd0b2155b75a8086b34586465b67c1db0d06625",
+  "observed_native_exit": 0,
+  "native_primary_statuses": {
+    "ordinary": 0,
+    "frozen-macos": 0,
+    "frozen-wsl": 0
+  },
+  "native_sarif_statuses": {
+    "ordinary": 0,
+    "frozen-macos": 0,
+    "frozen-wsl": 0
+  },
+  "native_guard_tests": {
+    "tests": 20,
+    "exit": 0
+  },
+  "authored_integrated_regression_tests": {
+    "tests": 46,
+    "exit": 0
+  },
+  "partitions": {
+    ".github/osv-scanner.toml": [
+      {
+        "path": ".github/requirements-ci.txt",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "adoption/sdk/accepted-constraints.txt",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+        "parser": null
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/uv.lock",
+        "parser": null
+      },
+      {
+        "path": "blueprints/memory-stack/native-qualification/uv.lock",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/adaptive-paper/requirements.txt",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/catalyst-provenance/requirements.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/data/requirements.in",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/data/requirements.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/requirements.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+        "parser": "packages.lock.json"
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json",
+        "parser": null
+      },
+      {
+        "path": "blueprints/us-equities/research-evaluation/requirements.in",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/research-evaluation/requirements.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/workers/requirements.txt",
+        "parser": null
+      },
+      {
+        "path": "tools/mlx-smoke/requirements.in",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "tools/mlx-smoke/requirements.lock.txt",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/mover-v3/data-tools/requirements.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/mover-v3/study/runtime-requirements.txt",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+        "parser": "requirements.txt"
+      },
+      {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+        "parser": "requirements.txt"
+      }
+    ],
+    ".github/osv-scanner-frozen-wsl-retrieval.toml": [
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+        "parser": null
+      }
+    ],
+    ".github/osv-scanner-frozen-macos.toml": [
+      {
+        "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+        "parser": null
+      }
+    ]
+  },
+  "expired_final_config_control": {
+    "native_exit": 1,
+    "advisory": "GHSA-vfj7-8cjw-p6xm",
+    "config_sha256": "a820c6eff5eed054a1d1b407e7fb186b1501bbf98b246fb0bb80fc846a5718da",
+    "only_changed_semantic_field": "IgnoredVulns[0].ignoreUntil from2026-10-31 to2026-10-01"
+  },
+  "unchanged_active_control": "Existing ordinary-active copy scan1 reports GHSA; exact lock input and unchanged ordinary config are reused, not a new execution. Dedicated config applies only one inventory input.",
+  "environment_contract": "env-i,PATH/usr/bin:/bin,ownedemptyHOME,ownedRUNNER_TEMP,WRITE_SARIF=true,bash--noprofile--norc; no manual credentials, global install or host service effects. Native script is exact extracted current workflow step, unchanged CLI invocations; generated artifact, not separately authored orchestration.",
+  "artifacts": [
+    {
+      "path": "final-scan-stdout.txt",
+      "bytes": 18417,
+      "sha256": "15bd287f37de30aef9dd02294dcb3445160f288eac9572d809a506123e7d678a"
+    },
+    {
+      "path": "final-scan-stderr.txt",
+      "bytes": 18363,
+      "sha256": "9063e604c63e35a3888e392a3cacc577bff8e7ad2ba65c221eabfdb5117f7a00"
+    },
+    {
+      "path": "final-scan-workflow-scan.sh",
+      "bytes": 4304,
+      "sha256": "f55f319bcfd2a1bf5fbbe19c1cd0b2155b75a8086b34586465b67c1db0d06625"
+    },
+    {
+      "path": "final-scan-final-config-expired.toml",
+      "bytes": 2330,
+      "sha256": "a820c6eff5eed054a1d1b407e7fb186b1501bbf98b246fb0bb80fc846a5718da"
+    },
+    {
+      "path": "final-scan-final-expired.stdout.json",
+      "bytes": 4268,
+      "sha256": "12e0886391e92655365a6e1dd67c99739fe4d1fa177207e98ef5e2a7adfabb12"
+    },
+    {
+      "path": "final-scan-final-expired.stderr.txt",
+      "bytes": 347,
+      "sha256": "e45f599be0d3d0dd13a76c710466aeb34a308e2ba634286b1530b4cb50cdf821"
+    },
+    {
+      "path": "osv-scanner-frozen-macos.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "osv-scanner.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "osv-scanner-frozen-wsl-retrieval.sarif",
+      "bytes": 1168,
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955"
+    },
+    {
+      "path": "integrated-osv-tests.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "integrated-osv-tests.stderr.txt",
+      "bytes": 7766,
+      "sha256": "266207212c8b17dfdd323d0ab321fcefd27ac03d5d70c6655ce1ceeccab80488"
+    }
+  ],
+  "claim_limits": [
+    "Native workflow/CLI integration, not upstream suite or target-host/provider/GPU qualification.",
+    "48/1/1 assignment and preserved parsers bind inventory and exact native script; no kernel execution tracing. Synthetic scope-refusal/status tests remain separate authored integration checks.",
+    "Archive native0 is a narrow dated policy disposition, not a dependency patch or activeQMD exception. Final source review/currenthead/sharedACK/CI remain necessary.",
+    "Output paths are role markers; digests bind published bytes only; private original native outputs remain outsidecheckout."
+  ]
+}

@@ -1,11 +1,15 @@
 """Offline regressions for selected WSL native retrieval evidence."""
 import hashlib
 import importlib.util
+from importlib.machinery import SourceFileLoader
+import io
 import json
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -17,6 +21,10 @@ SPEC.loader.exec_module(MODULE)
 RUN_SPEC = importlib.util.spec_from_file_location("wsl_retrieval_runner", ROOT/"run.py")
 RUNNER = importlib.util.module_from_spec(RUN_SPEC)
 RUN_SPEC.loader.exec_module(RUNNER)
+RECORDING_SPEC = importlib.util.spec_from_loader('wsl_retrieval_recording_archive',
+        SourceFileLoader('wsl_retrieval_recording_archive', str(ROOT/'run-recording-aid.py.txt')))
+RECORDING_ARCHIVE = importlib.util.module_from_spec(RECORDING_SPEC)
+RECORDING_SPEC.loader.exec_module(RECORDING_ARCHIVE)
 
 
 class WslRetrievalEvidenceTests(unittest.TestCase):
@@ -83,6 +91,11 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
             'qmd-attempt-1.json': '452901227a56f61229b249a56c8b4233faeb3763058610856d399149f81655e6',
             'qmd-receipt.json': 'cad5b3dc802323e5aad8fcdb4ca98f7d1c3e92749b8e891dc32149c70d3f9527',
             'install-receipt.json': '8a3f343e92aa6b0b4ce814ed1b21b56851a37e26f88488cc5ae1119f83063654',
+            'package-original.json.txt': '7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8',
+            'run-recording-aid.py.txt': 'be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12',
+            'package-lock.json': '5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb',
+            'source-review.json': '9ecd2bf01d7c19248b848dcbd0b77f286b4f1aee775068d7778fabf37721d423',
+            'verification.json': '1cb605f4574a662272194625d75689ab5cdcae3e3dbb3ba35afbbd827a474cbe',
         }
         for name, digest in originals.items():
             with self.subTest(artifact=name):
@@ -197,6 +210,27 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.audit(target)
 
+    def test_original_manifest_is_resolved_without_rewriting_receipt_names(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder)/'leaf'
+            shutil.copytree(ROOT, target)
+            archive = target/'package-original.json.txt'
+            (target/'package.json').write_text('{"private": true}\n')
+            try:
+                result = self.audit(target)
+            except ValueError as exc:
+                self.fail('historical manifest must resolve to its preserved archive: '+str(exc))
+            self.assertTrue(result['evidence_consistent'])
+
+    def test_changed_original_manifest_archive_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder)/'leaf'
+            shutil.copytree(ROOT, target)
+            archive = target/'package-original.json.txt'
+            archive.write_bytes(archive.read_bytes()+b'\n')
+            with self.assertRaisesRegex(ValueError, 'changed frozen input: package.json'):
+                self.audit(target)
+
     def test_unknown_usage_or_global_scope_claim_rejected(self):
         self.qmd['whole_task_provider_usage'] = 0
         with self.assertRaises(ValueError):
@@ -207,17 +241,17 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
             self.audit()
 
 
-class FutureCommandRecordingTests(unittest.TestCase):
+class ArchivedCommandRecordingTests(unittest.TestCase):
     def record(self, directory, response=None, error=None):
         run = Path(directory)
         argv = [run/'owned tools/node', '--index', 'named index', 'aéé.md',
                 '--input=' + str(run/'corpus/a file.md')]
         facts = []
         result = {'facts': facts, 'cleanup': {'timed_out_commands': 0}}
-        with patch.object(RUNNER.subprocess, 'run', return_value=response, side_effect=error) as invoked:
+        with patch.object(RECORDING_ARCHIVE.subprocess, 'run', return_value=response, side_effect=error) as invoked:
             try:
-                RUNNER.record_command('test', argv, run, {'LANG': 'C.UTF-8'},
-                                      {str(run): '<RUN>'}, facts, result)
+                RECORDING_ARCHIVE.record_command('test', argv, run, {'LANG': 'C.UTF-8'},
+                                                {str(run): '<RUN>'}, facts, result)
             except (subprocess.TimeoutExpired, OSError):
                 if error is None:
                     raise
@@ -254,6 +288,74 @@ class FutureCommandRecordingTests(unittest.TestCase):
             result = self.record(folder, error=FileNotFoundError('unavailable executable'))
             self.assertEqual(result['facts'][0]['failure'], 'launch_error')
             self.assertIsNone(result['facts'][0]['exit_code'])
+
+
+class RetiredRunnerTests(unittest.TestCase):
+    def test_old_modes_fail_before_subprocess_or_output_creation(self):
+        for mode in ['source', 'qmd']:
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as folder:
+                run = Path(folder)/'uncreated-output'
+                stderr, stdout = io.StringIO(), io.StringIO()
+                argv = [str(ROOT/'run.py'), '--mode', mode, '--run-dir', str(run)]
+                argv += ['--source', str(ROOT/'seed/planner.py'), '--rg', str(Path(folder)/'unused-rg'),
+                         '--ast-grep', str(Path(folder)/'unused-ast-grep'),
+                         '--node', str(Path(folder)/'unused-node'), '--package-prefix', folder]
+                with patch.object(sys, 'argv', argv), redirect_stderr(stderr), redirect_stdout(stdout), \
+                        patch.object(subprocess, 'run', side_effect=AssertionError('retired runner launched a subprocess')) as invoked:
+                    try:
+                        status = RUNNER.main()
+                    except SystemExit as exc:
+                        status = exc.code
+                self.assertEqual(status, 1)
+                self.assertFalse(run.exists(), 'retired mode created its output directory')
+                invoked.assert_not_called()
+                self.assertIn('retired', stderr.getvalue().lower())
+                self.assertEqual(stdout.getvalue(), '')
+
+    def test_offline_cli_rejects_changed_recording_aid_archive(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder)/'leaf'
+            shutil.copytree(ROOT, target)
+            archive = target/'run-recording-aid.py.txt'
+            archive.write_bytes(archive.read_bytes()+b'\n')
+            result = subprocess.run([sys.executable, str(target/'audit.py')],
+                                    text=True, capture_output=True, check=False)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn('changed retirement artifact: run-recording-aid.py.txt', result.stderr)
+
+    def test_offline_cli_checks_retirement_without_qualifying_history(self):
+        result = subprocess.run([sys.executable, str(ROOT/'audit.py')],
+                                text=True, capture_output=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        assessment = json.loads(result.stdout)
+        self.assertFalse(assessment['native_acceptance_established'])
+        self.assertEqual(assessment['status'], 'incomplete_historical_reference')
+        self.assertIn('current_retirement_assessment', assessment)
+        current = assessment['current_retirement_assessment']
+        self.assertTrue(current['artifacts_consistent'])
+        self.assertEqual(current['active_qmd_advisory_status'], 'unresolved')
+        self.assertFalse(current['native_npm_guard_acceptance_established'])
+
+    def test_offline_cli_rejects_restored_install_routes(self):
+        for change in ['missing-runtime-guard', 'restored-dependency', 'restored-script']:
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
+                target = Path(folder)/'leaf'
+                shutil.copytree(ROOT, target)
+                manifest = {
+                    'name': 'retired-wsl-retrieval', 'version': '1.0.0', 'private': True,
+                    'devEngines': {'runtime': {'name': 'retired-wsl-retrieval', 'onFail': 'error'}},
+                }
+                if change == 'missing-runtime-guard':
+                    del manifest['devEngines']
+                elif change == 'restored-dependency':
+                    manifest['dependencies'] = {'@tobilu/qmd': '2.8.3'}
+                else:
+                    manifest['scripts'] = {'install': 'node replay.js'}
+                (target/'package.json').write_text(json.dumps(manifest)+'\n')
+                result = subprocess.run([sys.executable, str(target/'audit.py')],
+                                        text=True, capture_output=True, check=False)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn('retirement manifest', result.stderr)
 
 
 if __name__ == '__main__':
