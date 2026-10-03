@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "status": "source_conditional_topology_native_connectivity_unverified",
+  "trigger": "Consequential architecture: loopback gateway reachability versus Harbor native egress enforcement",
+  "judgment": "Astra/max accepted a conditional stock-sidecar topology; root original-source reads confirmed the cited contracts",
+  "preferred": "Existing owner-qualified gateway hostname or IP reachable from the stock Harbor sidecar, included in native allowed_hosts; no custom networking on main",
+  "conditional_overlay": {"services": {"harbor-docker-egress-control-sidecar": {"extra_hosts": {"host.docker.internal": "host-gateway"}}}},
+  "rejected": ["main.network_mode: host excludes main from Harbor egress enforcement", "main.extra_hosts conflicts with Docker container-sharing network mode", "host-gateway alone proves neither rootless cross-host reachability nor destination gateway identity"],
+  "original_sources": [
+    {"repository": "harbor-framework/harbor", "ref": "1e5c5c6db929a10a140d05e606882c671ae20729", "file": "src/harbor/environments/docker/docker.py", "sha256": "8757d3fbc19e58c7ccd14c9b613a0d00dccd1b514375fa0e546ff41ca963a15e", "lines": "410-474", "claim": "Task-authored network_mode or networks excludes the service; otherwise Harbor creates its sidecar-sharing overlay"},
+    {"repository": "moby/moby", "version": "docker-v29.8.2", "ref": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03", "file": "daemon/internal/runconfig/hostconfig.go", "sha256": "d8bd0d50480008b1077ef12cf7b23585a3357b9d0a0791cc52a671a45cf5eeb1", "lines": "29-30", "claim": "ExtraHosts conflicts with container-sharing network mode"},
+    {"repository": "moby/moby", "ref": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03", "file": "daemon/container_operations_unix.go", "sha256": "4ff3d043153a14100867825cd6ac0d24bf1b1731a1af3cac6ec94874632bd8cd", "lines": "596-600", "claim": "Sharing container inherits namespace owner's hosts and resolver paths"},
+    {"repository": "moby/moby", "ref": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03", "file": "contrib/dockerd-rootless.sh", "sha256": "200203633806081a401e60aefdf68a8fa73fc7dc80aa854c52a69d47710a3488", "lines": "23-24", "claim": "Host-loopback access defaults disabled"},
+    {"repository": "docker/compose", "version": "v5.5.1", "ref": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de", "file": "pkg/compose/create.go", "sha256": "6b74d3e216b2984fc654193af30f3a6fcb0bef7fd5d93ef24f8ad0fbf7bfe314", "lines": "412", "claim": "Native ExtraHosts forwarded to Docker"},
+    {"repository": "diegosouzapw/OmniRoute", "ref": "0585aba5589d5a1f49243a13a8db249558e7c9e3", "file": "src/app/api/health/route.ts", "sha256": "129fdf8eebcb6667b978d0a75dae16b923bb17447fbe61374973ff3528ac44d5", "lines": "22-29", "claim": "Public liveness GET returns200 without a provider call"}
+  ],
+  "required_native_controls": ["Observed main under ready native sidecar enforcement", "Owner-qualified gateway allow200, native deny blocked, restored allow200", "Approved research source succeeds and excluded source is blocked", "Record native exit and HTTP status only; discard bodies"],
+  "limitations": ["Actual native networking, policy enforcement, gateway identity and model transport unverified", "No daemon, gateway or client configuration changes", "No custom proxy or new sidecar", "Moby initial v29.8.2 lookup404 corrected to docker-v29.8.2 by the reviewer"],
+  "executed_native_connectivity_controls": 0,
+  "provider_calls": 0,
+  "selected_defaults": 0
+}

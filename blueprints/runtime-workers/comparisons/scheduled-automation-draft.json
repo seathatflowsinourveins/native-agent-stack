@@ -3,9 +3,11 @@
   "study_id": "runtime-jobs-scheduled-automation-20261003",
   "status": "draft-not-frozen",
   "freeze_eligible": false,
+  "shared_execution_contract": "shared-execution-contract.json",
+  "routing": {"worker_model": "cx/gpt-6.1-sol-ultra", "consequential_model": "cx/gpt-6-astra-max", "native_effort_mapping": "unqualified", "wire_qualification": "Shared contract; delivered reasoning/parallel fields and correlated counters required"},
   "scope": "Scheduled useful agent work and bounded failure/recovery; existing host/trading services and timers are excluded",
   "arms": [
-    {"id": "dagu", "baseline": true, "version": "v2.18.1", "repository": "https://github.com/dagu-org/dagu", "ref": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7", "interface": "Native harness.run Codex payload inside a DAG; first-party Dagu skill and native harness definitions"},
+    {"id": "dagu", "baseline": true, "version": "v2.18.1", "repository": "https://github.com/dagucloud/dagu", "ref": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7", "interface": "Native harness.run Codex payload inside a DAG; first-party Dagu skill and native harness definitions"},
     {"id": "deerflow", "baseline": false, "version": "v2.1.0", "repository": "https://github.com/bytedance/deer-flow", "ref": "345f08be00c8a9495079b732a39b46aa9af1584e", "interface": "First-party scheduled task/occurrence service and native assistant; scheduler.enabled is source-default false", "extension_contract": "deerflow-extension-api==0.2.1"}
   ],
   "native_source_controls": [
@@ -27,7 +29,7 @@
   },
   "decision_rule": {
     "quality": "Require every frozen useful-task and declared lifecycle gate; no per-task regression, plus a quality improvement or the predeclared efficiency tie rule",
-    "efficiency_tie": "At least5 percent lower paired median native gross input-plus-output tokens, complete counters and no greater paired median agent time",
+    "efficiency_tie": "At least5 percent lower paired median uncached-input-plus-output tokens, complete authoritative counters/cache subsets and no greater paired median agent time",
     "fallback": "Keep the measured Dagu baseline; source fixtures on different semantics cannot produce a comparative scheduler win"
   },
   "required_before_freeze": [

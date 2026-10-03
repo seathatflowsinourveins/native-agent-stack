@@ -3,14 +3,15 @@
   "job": "multi_worker_orchestration",
   "status": "draft_not_frozen",
   "freeze_eligible": false,
+  "shared_execution_contract": "shared-execution-contract.json",
   "runs": [],
   "default": null,
   "arms": [
-    {"id": "native-codex-v2", "repository": "openai/codex", "version": "0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "form": "Native worker roles and V2 tool registration; qualify actual mode, fork and task identity"},
+    {"id": "native-codex-v2", "repository": "openai/codex", "version": "0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "baseline": true, "form": "Native worker roles and V2 tool registration; qualify actual mode, fork and task identity"},
     {"id": "openai-agents-native-codex", "repository": "openai/openai-agents-python", "version": "0.23.1", "ref": "c4a1d047b22488234b2ba81056e1b9b8db2127a5", "extension": "src/agents/extensions/experimental/codex", "form": "Org-maintained experimental codex_tool with a constructed native Codex instance; supported as_tool orchestration and native cleanup"},
     {"id": "langgraph-deepagents", "repository": "langchain-ai/langgraph", "version": "1.2.12", "ref": "49cce0ca852be4cfb567a1cbe0e511ff325a1682", "extension": {"repository": "langchain-ai/deepagents", "version": "0.7.21", "ref": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773"}, "form": "Org-maintained graph/subagent and retry interfaces; no assumed Codex two-sidecar adapter"}
   ],
-  "routing": {"gateway": "existing keyless OmniRoute", "worker_model": "cx/gpt-6.1-sol", "native_worker_effort": "ultra", "consequential_judge_model": "cx/gpt-6-astra-max", "native_judge_effort": "max", "qualified": false},
+  "routing": {"gateway": "existing keyless OmniRoute", "worker_model": "cx/gpt-6.1-sol-ultra", "native_worker_effort": "ultra", "consequential_judge_model": "cx/gpt-6-astra-max", "native_judge_effort": "max", "qualified": false},
   "native_lifecycle_controls": {
     "repository": "openai/codex",
     "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
@@ -49,6 +50,6 @@
     "Actual lifecycle, role-extension activation and matching native benchmark environment/task assignment for each runtime"
   ],
   "design": {"repeats": 2, "retry": 0, "order": "Rotate paired arm order on identical useful tasks", "concurrency": null, "per_child_limits": null, "window": null, "claude_pre_freeze_read": null},
-  "selection_rule": {"requirements": "Common useful-task oracle, actual route/role parity and separate spawn/resume/cancel/shutdown controls", "quality": "Paired no-regression on every task/repeat; improved native reward or successful useful artifacts", "tie": "Predeclared five-percent paired native-token reduction with complete comparable scopes and no greater median elapsed time; unknown totals do not establish a saving", "limits": "Lifecycle fixture success and broader API surfaces cannot select a default"},
+  "selection_rule": {"requirements": "Common useful-task oracle, actual route/role parity and separate spawn/resume/cancel/shutdown controls", "quality": "Paired no-regression on every task/repeat; improved native reward or successful useful artifacts", "tie": "Predeclared five-percent paired uncached-input-plus-output reduction with complete comparable scopes and no greater median elapsed time; unknown totals do not establish a saving", "limits": "Lifecycle fixture success and broader API surfaces cannot select a default"},
   "freeze_gaps": ["Common maintained benchmark integration", "Frozen dataset/patch/images/task IDs and worker-visible inputs", "Per-role tool/environment/model/effort and extension bindings", "Complete native attribution and counters", "Limits and numeric quality/recovery thresholds", "Consequential Astra source-conflict read", "Claude exact-head read and exclusive pool allocation"]
 }

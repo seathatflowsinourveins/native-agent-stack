@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "status": "draft_not_frozen",
+  "evaluator": {
+    "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+    "tag": "0.3.273",
+    "ref": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+    "adoption": "standing model/task evaluator; 0.3.276 remains an unadopted update candidate"
+  },
+  "native_scorer": {
+    "name": "model_graded_qa",
+    "model_role": {"name": "grader", "required": true},
+    "partial_credit": false,
+    "instructions": null,
+    "grade_pattern": null,
+    "template": null,
+    "criterion_binding": "Freeze the strict support/attribution rubric and independently retained numbered source passages in each native Sample.target. Bind FieldSpec.target when importing an upstream dataset; preserve original task identity.",
+    "rationale": "Keep the upstream default instructions and grade pattern so the final offered C/I verdict is validated. Custom instructions or a custom pattern remove that offered-grade guard. The criterion is a local integration rubric, not unchanged upstream acceptance."
+  },
+  "routing": {
+    "model": "openai/cx/gpt-6-astra-max",
+    "native_reasoning_effort": "max",
+    "base_url": "owner-qualified OmniRoute destination /v1",
+    "api_key": "nonsecret local gateway placeholder; native provider sign-ins remain native",
+    "extra_headers": {"X-OmniRoute-No-Cache": "true", "X-OmniRoute-Compression": "off", "X-Correlation-ID": "unique frozen grader-attempt identifier"},
+    "qualification": "Native Chat header mock passed. Owner wire max covers reviewed shapes only. Responses correlation ignored: exclusive-window and per-attempt client-row binding required before freeze."
+  },
+  "acceptance": {
+    "valid_values": {"C": 1, "I": 0},
+    "supported_report_pass": "C only, after all frozen rubric requirements hold",
+    "parse_failure": "Missing grade, malformed multi-letter grade, off-menu grade or P when partial_credit=false returns native Score.unscored(reason=grader_failed). Preserve the native record and classify the entire task-repeat block infrastructure-invalid under shared-execution-contract.json.",
+    "coverage": "Require zero UNSCORED/error records and exactly the frozen expected sample count before any quality decision. Native metrics exclude UNSCORED values; an aggregate accuracy alone cannot prove full coverage.",
+    "required_negative_controls": ["missing grade", "malformed CI grade", "off-menu grade", "unoffered partial grade", "wrong source", "wrong attribution", "unsupported material claim", "missing source", "temporal violation", "incorrect numeric value", "wrong unit", "wrong denominator"],
+    "test_status": "Inspect 0.3.273 unchanged mock controls: pytest 0, 15 passed, one trio skip. Shared QA parser and Chat-header control covered; live grader, Responses headers, rubric and complete usage unqualified."
+  },
+  "usage": {
+    "authoritative_scope": "One complete correlated aggregate per frozen grader attempt; do not sum overlapping gateway/provider/Inspect snapshots.",
+    "input_tokens": "Inspect normalized input_tokens already excludes cache-read and cache-write tokens; do not subtract them again.",
+    "cache_presence": "Inspect's converter collapses absent and zero cache details. Retain field presence from native ModelCall.response.usage to distinguish complete zero from unknown. Unknown values stay null.",
+    "cost": "Uncached input plus output is the efficiency basis; gross, cache and reasoning subsets and billing remain separately reported."
+  },
+  "sources": [
+    {"file": "src/inspect_ai/scorer/_model.py", "sha256": "75c525f7a869fcf829bd83b66ad2431acae80f2a6fef8f2bfa5c11ec5a0e2817"},
+    {"file": "src/inspect_ai/scorer/_metric.py", "sha256": "a79f798e23c760cbf1877539e1aa2f8ca5217752bbe485980ea87675c35b51b9"},
+    {"file": "src/inspect_ai/model/_providers/openai_responses.py", "sha256": "7a9f9998f4942e2fe18e86609c034f9eebf699cfa5600fd6382dbdef7aaa140a"},
+    {"file": "src/inspect_ai/model/_openai.py", "sha256": "febf8a04be8a97057f6f14aa59b4e58f2acf9bb0cda480b65788c0091fd32b19"},
+    {"file": "src/inspect_ai/model/_model_output.py", "sha256": "1e90d1ca41ca707c1de3b7393cafa69e322fa507fdd1a1fc80264cebc87fca73"}
+  ]
+}

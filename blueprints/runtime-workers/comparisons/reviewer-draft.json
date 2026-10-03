@@ -3,17 +3,18 @@
   "job": "reviewer",
   "status": "draft_not_frozen",
   "freeze_eligible": false,
+  "shared_execution_contract": "shared-execution-contract.json",
   "runs": [],
   "default": null,
   "purpose": "Compare useful defect review with the same hidden oracle and worker-visible revision/context. Source calibration is separate from reviewer performance.",
   "arms": [
-    {"id": "native-codex-review", "repository": "openai/codex", "version": "0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "form": "native exec review; pin base/head and native review instructions"},
-    {"id": "openhands-org-review", "repository": "OpenHands/software-agent-sdk", "version": "1.50.1", "ref": "1e1390acc8788346ba4804c34323284009bf3f5e", "extension": {"repository": "OpenHands/extensions", "ref": "62f34e3a7577fbb947687363fa0df485061d0b3d", "path": "skills/code-review", "manifest_version": "1.0.0", "activation_observed": false}},
-    {"id": "pr-agent-local-gap", "repository": "qodo-ai/pr-agent", "version": "v0.47", "ref": "8e5a9295973b24af4b70cafd0b660a230811ef9e", "package_version": "0.46.0", "form": "upstream local Git review, not an assumed native skill loader", "inclusion_condition": "Only a named reviewer gap; no automatic replacement of native cross-family review"}
+    {"id": "native-codex-review", "repository": "openai/codex", "version": "0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "baseline": true, "form": "native exec review; pin base/head and native review instructions"},
+    {"id": "openhands-org-review", "inclusion_condition": "Only a named native-review gap; proposed consensus amendment before freeze", "repository": "OpenHands/software-agent-sdk", "version": "1.50.1", "ref": "1e1390acc8788346ba4804c34323284009bf3f5e", "extension": {"repository": "OpenHands/extensions", "ref": "62f34e3a7577fbb947687363fa0df485061d0b3d", "path": "skills/code-review", "manifest_version": "1.0.0", "activation_observed": false}},
+    {"id": "pr-agent-local-gap", "repository": "The-PR-Agent/pr-agent", "version": "v0.47.0", "ref": "8e5a9295973b24af4b70cafd0b660a230811ef9e", "package_version": "0.46.0", "form": "upstream local Git review, not an assumed native skill loader", "inclusion_condition": "Only a named reviewer gap; no automatic replacement of native cross-family review"}
   ],
   "routing": {
     "gateway": "existing keyless OmniRoute; no new credential, sign-in copy or service switch",
-    "worker_model": "cx/gpt-6.1-sol",
+    "worker_model": "cx/gpt-6.1-sol-ultra",
     "native_worker_effort": "ultra",
     "judge_model": "cx/gpt-6-astra-max",
     "native_judge_effort": "max",
@@ -22,7 +23,7 @@
     "native_review_contract": "Clones parent configuration and selects review_model or the turn model; disables web search, Collab and MultiAgentV2; approval Never. No final-output JSON schema is passed to the review child. Source does not establish delivered effort or CLI structured capture."
   },
   "calibration": {
-    "evaluator": "promptfoo0.123.1@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "source_only_unadopted_evaluator": "promptfoo0.123.1@34f74d34e140b5e17d23770dfb2340057b1936b8",
     "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-codex-sdk/skill-comparison/promptfooconfig.yaml",
     "source_sha256": "9c86db1504b45412a2cdcee5bc6e5d075af5d3e516c1a2095ac9bfb5fff06507",
     "tasks": [
@@ -34,6 +35,7 @@
     "limits": "Two auth fixtures provide calibration only. Returning both IDs on the timing-only row yields score0.85 and passes; this is not a strict false-positive or clean-review oracle. Stock SDK generation is not native CLI ReviewOutputEvent."
   },
   "common_rubric_option": {
+    "eligibility": "Research alternative only: promptfoo adoption needs consensus amendment; standing Inspect0.3.273 native scorer binding is being researched.",
     "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/assertions/llmRubric.ts",
     "form": "Supported llm-rubric over unchanged final strings or serialized objects; no locally invented normalization or scorer",
     "required_judge_result": ["pass:boolean", "score:number", "reason:string"],
@@ -78,6 +80,6 @@
     "limits": "Observed dataset has no head_commit field. Establish native reconstruction and exclude later fixes/labels before any tool-based review. MIT repository attribution does not settle every underlying source licence. No reasoning-effort parameter is forwarded by pinned run_chat; Astra/max route remains unqualified."
   },
   "design": {"repeats": 2, "attempt_order": "blocked paired tasks; rotate arm order; retain all outcomes", "retry": 0, "comparison_attempts": null, "window": null, "claude_pre_freeze_read": null},
-  "selection_rule": {"prerequisites": "Same hidden oracle and worker-visible context; complete controls, lifecycle, route and useful org-extension activation", "quality": "Paired no-regression on every task/repeat and more accepted useful issue findings without new false positives; require independent consequential-judgment read", "tie": "Only complete native counter scopes permit the predeclared five-percent paired-token tie rule; otherwise retain native baseline without claiming a measured win", "precision": "Declare numeric thresholds against the eventual unchanged oracle before freeze; source features and toy calibration cannot select a default"},
-  "freeze_gaps": ["Executable maintained broader oracle or a frozen supported promptfoo rubric", "Original review-context/cutoff and licence bindings", "Useful activation of each selected own-org bundle", "Native capture contract for final review artifacts and complete counters", "Actual Sol/Ultra and Astra/Max route acceptance", "Frozen prompts, controls, limits, repeat order and numeric rule", "Claude exact-head read and exclusive throwaway allocation"]
+  "selection_rule": {"prerequisites": "Same hidden oracle and worker-visible context; complete controls, lifecycle, route and useful org-extension activation", "quality": "Paired no-regression on every task/repeat and more accepted useful issue findings without new false positives; accepted findings and false positives are defined only by the frozen oracle; independent consequential read is limited to protocol validity before freeze", "tie": "Only complete native counter scopes permit the predeclared five-percent paired uncached-input-plus-output tie rule with complete cache subsets; otherwise retain native baseline without claiming a measured win", "precision": "Declare numeric thresholds against the eventual unchanged oracle before freeze; source features and toy calibration cannot select a default"},
+  "freeze_gaps": ["Codex0.160 destination native review command qualification", "Shared contract with complete attempt order, wire reasoning/parallel observation and complete correlated authoritative usage","Executable maintained broader oracle and frozen standing Inspect rubric, or reviewed promptfoo amendment", "Original review-context/cutoff and licence bindings", "Useful activation of each selected own-org bundle", "Native capture contract for final review artifacts and complete counters", "Actual Sol/Ultra and Astra/Max route acceptance", "Frozen prompts, controls, limits, repeat order and numeric rule", "Claude exact-head read and exclusive throwaway allocation"]
 }

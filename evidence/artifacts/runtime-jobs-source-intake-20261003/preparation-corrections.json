@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "retained_preparation_failures_and_corrections",
+  "scope": "Preparation mistakes and their bounded verification paths; no quality or usage claims",
+  "corrections": [
+    {"mistake": "GH slurp with incompatible jq option, then an incomplete repository identifier", "observed": "native error and HTTP404", "correction": "Native gh with the complete repository and structured parsing", "verified": "native exit0"},
+    {"mistake": "Runtime catalog lookup used jobs instead of layers, including a later silent fallback", "observed": "KeyError on the initial attempt; the fallback later returned no rows", "correction": "Read the schema and require catalog['layers']", "verified": "eight existing layers returned; no catalog rows were removed"},
+    {"mistake": "Generated patch wrappers included a code-echo marker, and a reserialized JSON patch exceeded the output guard", "observed": "apply_patch invalid first line; guarded computation exited1 before printing a patch", "correction": "Select the emitted literal-newline patch marker and preserve existing JSON formatting with exact string replacements", "verified": "native apply_patch succeeded; final diff/validator remains a separate publication gate"},
+    {"mistake": "A coordination note named a future clock time", "observed": "native comment metadata showed the actual earlier time", "correction": "Use a date-only note title and preserve actual comment metadata", "verified": "native update exit0"},
+    {"mistake": "YAML parsing assumed a module in the context-mode Python runtime", "observed": "ModuleNotFoundError and native exit1", "correction": "Use the already-installed pinned DeerFlow environment's parser on the owned nonsecret profile", "verified": "native exit0; only request-control headers were printed"},
+    {"mistake": "Freshness collector search used scripts/github_freshness.py", "observed": "zero matches in the workflow", "correction": "Re-read the original workflow at tools/sota-convergence/github_freshness.py", "verified": "one command invocation plus a separate dynamic import; do not count both as two collector runs"},
+    {"mistake": "PR536 was associated with sealed coding-task bindings", "observed": "Original sources establish the OAuthlib lock lineage instead", "correction": "Keep historical sealed task binding unknown and retain the prospective protocol amendment", "verified": "coding-protocol-review-repair.json and pinned first task source"},
+    {"mistake": "A resumed coordination extraction exceeded its intended compact output budget", "observed": "Returned brief plus tracker excerpt was oversized", "correction": "Read only changed scoped entries and enforce byte guards before printing", "verified": "Subsequent source and comment reads stayed bounded"}
+  ],
+  "credential_values_read": false,
+  "provider_calls": 0,
+  "selected_defaults": 0
+}

@@ -4025,8 +4025,8 @@
     },
     {
       "path": ".github/workflows/runtime-worker-skills-freshness.yml",
-      "sha256": "af56deffb177f4692b39d75e6b541f42dae979d0faf25b4209e2c579f65c8695",
-      "bytes": 3651
+      "sha256": "9fd015cf990c339c1ab95447086b549ff577e577be374299acd9a9ce69ea7a53",
+      "bytes": 5398
     },
     {
       "path": ".github/workflows/security-scan.yml",
@@ -9191,13 +9191,13 @@
     },
     {
       "path": "blueprints/runtime-workers/PLAN.md",
-      "sha256": "bd0a90dfde0b4afc50d522f1e38eb1b611c0717e97146a956b89ef195b13ca14",
-      "bytes": 5353
+      "sha256": "af1f42844acf985cb73106d13522473422e30b7195c07c7e1aa12f23fe2aa5b6",
+      "bytes": 5697
     },
     {
       "path": "blueprints/runtime-workers/README.md",
-      "sha256": "7e5f75b1f6f3912b21c32ea909fabc4c1e1d76985601098692226484bddc8052",
-      "bytes": 7715
+      "sha256": "30cd00b4b050ba778db36cc24c35b64c7f13f76a885abe6db5ddbed5eeea13e3",
+      "bytes": 10444
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
@@ -9205,49 +9205,64 @@
       "bytes": 4792
     },
     {
+      "path": "blueprints/runtime-workers/comparisons/coding-source-policy.json",
+      "sha256": "a82998d636ab0f645cdfe426015bbd7c9ae411562f693b55b5f995ca1abe26c2",
+      "bytes": 9348
+    },
+    {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "7253f7187897287f93394fb344b8245790f206e12c2f8d1c704d9f2d7455864c",
-      "bytes": 7446
+      "sha256": "906dc4c9dc4396eae61c87fcc1c4ddbc762ed7f0028fed8190db3e5fa0bb7cc5",
+      "bytes": 19356
     },
     {
       "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
-      "sha256": "bf4540fba8d39240fc59bca4724a579b7e1bfb0f7cc8f33ced24d38bdcbd9141",
-      "bytes": 8796
+      "sha256": "dbe7fc87e24bf5ca025e4e3d826548810f9e356992a21b63c8d8bdd270080def",
+      "bytes": 10065
     },
     {
       "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
-      "sha256": "515c2851b905823efebcdd8fdbe4d685e62ca94e817c7a5d981914bd8166d16d",
-      "bytes": 5464
+      "sha256": "781051ffa3ad66056bc2cf3a31146f3d1aef67b3547b23ef714f6aba1207c912",
+      "bytes": 5887
     },
     {
       "path": "blueprints/runtime-workers/comparisons/github-workflow-draft.json",
-      "sha256": "74b202c07dda486ee84436d5436d3c304d4e5a08514553e5dea9204fa68b4fe4",
-      "bytes": 6696
+      "sha256": "a7411b4a81eb84f8fb702c22df1c65d58a1d7eb01d681aaa268c0f8df8f1cbe7",
+      "bytes": 7174
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/inspect-grader-binding.json",
+      "sha256": "0f8e5e96e13fbc5a26f908c626e3e2a1fc082c3e94486e763f911e803a054836",
+      "bytes": 4185
     },
     {
       "path": "blueprints/runtime-workers/comparisons/multi-worker-draft.json",
-      "sha256": "9be37f0116493d484b7efd612e2342dfa29b864394a6716ec3e57842de764a15",
-      "bytes": 7206
+      "sha256": "1e073ddbe16a1defb7cef0b061231c90d82719e6d38f11bc8d666744700b100d",
+      "bytes": 7309
     },
     {
       "path": "blueprints/runtime-workers/comparisons/research-gatherer-draft.json",
-      "sha256": "30515c51c1a4efadb806cf50383574cf891202db766c64ca25e36497b9ed7f1b",
-      "bytes": 7702
+      "sha256": "413445aaf085a1553b5c76e1bb1b9ff33674fcb53a69278e24c2bc30a1dba557",
+      "bytes": 10690
     },
     {
       "path": "blueprints/runtime-workers/comparisons/reviewer-draft.json",
-      "sha256": "cb773fd4e66d9cbf476f123f5799b169ea03fa915391408f456f466beafc59bf",
-      "bytes": 9241
+      "sha256": "e74e4da3ab3e65e5f8db8077aa96119811ecfc986628f9d1d14b9aa5c50bcc18",
+      "bytes": 9995
     },
     {
       "path": "blueprints/runtime-workers/comparisons/role-and-lifecycle-draft.md",
-      "sha256": "f914eda049ee3ddee72061ea736f805e6f702c789b79ad656b47d179dfab932d",
-      "bytes": 6753
+      "sha256": "348987ff9401d9e3dfa1461c6dac1c0c25c7047723f42668e9831e0dc0351139",
+      "bytes": 7438
     },
     {
       "path": "blueprints/runtime-workers/comparisons/scheduled-automation-draft.json",
-      "sha256": "6a4ad5b1ade45d10ae175c5c3e184feb16945d6558a9a9c80b9ee917cdc952ae",
-      "bytes": 5268
+      "sha256": "23e3ea9a14599b87f29931e72cd2399c2c5286b0be4d149f5457fc11a0127ecd",
+      "bytes": 5609
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
+      "sha256": "c71885acf86c83f239fe0fb689b9e16fe83c340fc00bb08f99685969f082cef6",
+      "bytes": 6378
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
@@ -15046,8 +15061,8 @@
     },
     {
       "path": "catalogs/foundation/runtime-jobs.json",
-      "sha256": "ed76b04e0d1c6e4da3ff2249499605bdee2ca279ea77418f7666bf1fdd7986a0",
-      "bytes": 15184
+      "sha256": "cf1a212177e8fa27c198d18c65dae3ed3c3c6549083fe84af1d0cbcd18e59a52",
+      "bytes": 18788
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -15881,8 +15896,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-runtime-job-qualification.md",
-      "sha256": "03b96475ec434178fd0d4ab3a9d2630339a1b4417ed6a0a51712b9ff60443c33",
-      "bytes": 16960
+      "sha256": "47611e94bfb3583fa418fd0bea51639f5eb78957bff26aa99dcafa6b60b65eea",
+      "bytes": 23882
     },
     {
       "path": "docs/direct-results.md",
@@ -41926,13 +41941,18 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/README.md",
-      "sha256": "4e9c8c5cfedd00a01ffb92514cc27723d029a7feb2a6afdd233cf731443382e8",
-      "bytes": 5414
+      "sha256": "f3d0073c77a26d5911b813c5317b59766bf0c035408f089ffc5965a3fd59ed83",
+      "bytes": 8576
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/checks.json",
       "sha256": "2c3948d035c5efd1c90f22ef97e16f3d89d9566d093460035a2ea006070c3e4d",
       "bytes": 5495
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-0160-native-readiness.json",
+      "sha256": "a942f7b8d3858db61beb761cd5b08fb3b359e8bc56bb6ecbff128f0a33ef10f6",
+      "bytes": 2582
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-manifests.json",
@@ -41945,9 +41965,29 @@
       "bytes": 3027
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-protocol-review-repair.json",
+      "sha256": "ff9f50c2f3dca26529df97e39bfe18034840c4aa934b0a222e47745555d3564e",
+      "bytes": 19725
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/deerflow-native-readiness.json",
+      "sha256": "38fc896da374cd54e973514a67215dcc74a13081136a319af463c27112e7bcb9",
+      "bytes": 20946
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/freshness-workflow-review-repair.json",
+      "sha256": "02015d38772b8e1ca7b7ca75d3132cb386e1704a469bd4073f3ee4798f43dee4",
+      "bytes": 2440
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-cache-controls.json",
       "sha256": "bc54801c0333353b2157090fcb858db65736b911b9e4c8f8d766c3e29c3758af",
       "bytes": 3779
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-destination-effort-source-read.json",
+      "sha256": "68b456e60c81bb3bde33d1ce9974821fc5c2a36d07de2bdf487831ca5b8df60d",
+      "bytes": 2676
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-offline-controls.json",
@@ -41960,14 +42000,39 @@
       "bytes": 1888
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-wire-owner-read.json",
+      "sha256": "a198ff1577bd9e6717f73137b3099a92a37fe180d42f589843133664acafdf61",
+      "bytes": 3274
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-chat-diagnostic-retrieval-failure.json",
+      "sha256": "f618cec6e04cc27aacc5b0da3c9fa16ebeda576240158a1a9a8eb3ad4156cd73",
+      "bytes": 4662
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-dependency-snapshot.json",
       "sha256": "c79238f68aa94ce6bde0bb73fe48f0263d0c3d17aa9f3aeffc9742eb635f879f",
       "bytes": 12211
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-live-canary-failure.json",
+      "sha256": "1fc382479505f3e963f6b4cd00b240e3dedd3b905d6a25593acd408d78e2fc10",
+      "bytes": 6352
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-offline-preflight.json",
       "sha256": "b6226cb5850f9a84b4c52f1f256df614b8ab7a08c71684bf7bc0d22df7decdff",
       "bytes": 4677
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-supplied-source-sdk-binding.json",
+      "sha256": "4df3420b14765c9c2707df43c3f08db01d5388aca2033893e80395a4d420e0b8",
+      "bytes": 24598
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-gateway-network-source-read.json",
+      "sha256": "e50a759ae2a638fd6a09b044b8b4f0c4d1d22660bb820c9fe98423f8acab8d27",
+      "bytes": 3485
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-offline-controls.json",
@@ -41980,6 +42045,21 @@
       "bytes": 3058
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-rootless-readiness.json",
+      "sha256": "5465788a2d77c1e861d787628671347fa04411d4bede1334662f579810825c9c",
+      "bytes": 6082
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-0273-native-controls.stdout.txt",
+      "sha256": "b5b5e9c79a2e65452b0590752dc919358279b8955d37d2d4a426a87f82534751",
+      "bytes": 2914
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-0273-native-readiness.json",
+      "sha256": "ab9d44ed1195c96607ca126c413a7d654bb917dbde69159e61e209b38d3da908",
+      "bytes": 19043
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-offline-controls.json",
       "sha256": "b7f62544d2b2d03e18ba44879c8f0fb36ae6b66d3b8f664851f229683ec7493c",
       "bytes": 4416
@@ -41990,6 +42070,11 @@
       "bytes": 998
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/keyless-search-readiness.json",
+      "sha256": "2de52ba731120d662c918706766b1c98ff3dd67928aab80ab0a0e4a1e961bc35",
+      "bytes": 13265
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/onyx-auth-source-gap.json",
       "sha256": "60a32bc25b77821c8e58bb0fcc7e48279ce72ae86a033f139e7d110f5960c603",
       "bytes": 1487
@@ -41998,6 +42083,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/pi-historical-custody.json",
       "sha256": "e6f3cdad6ce929b35ce1792206f2146e0e49a0a4aee850d64ef5eabd5e3d2a62",
       "bytes": 2592
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/preparation-corrections.json",
+      "sha256": "f965a7bfc031dc62da77e4c421418a88f137675f844bb20552d65102168a3833",
+      "bytes": 2887
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/promptfoo-config-control.json",

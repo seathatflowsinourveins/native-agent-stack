@@ -3,27 +3,93 @@
   "study_id": "runtime-jobs-gatherer-sol-ultra-20261003",
   "status": "draft_not_frozen",
   "freeze_eligible": false,
+  "shared_execution_contract": "shared-execution-contract.json",
   "scope": "Inherited DeerFlow2.1.0 versus Onyx4.8.3 comparison, with fixed GPTR3.7.0 as a matched baseline; source-only proposals do not decide the winner",
-  "task_source": {"repository": "https://github.com/imlrz/DeepResearch-Bench-II", "ref": "b38f360603db9531b102aef8c166cedb8509b6f6", "file": "tasks_and_rubrics.jsonl", "sha256": "263aaabb8c279fb16cbe7c9499afe82d657a8ab3ccfb07ace084387e367d921a", "rows": 132},
+  "task_source": {
+    "repository": "https://github.com/imlrz/DeepResearch-Bench-II",
+    "ref": "b38f360603db9531b102aef8c166cedb8509b6f6",
+    "file": "tasks_and_rubrics.jsonl",
+    "sha256": "263aaabb8c279fb16cbe7c9499afe82d657a8ab3ccfb07ace084387e367d921a",
+    "rows": 132
+  },
   "task_selection": {
     "seed_utf8": "runtime-jobs-gatherer-sol-ultra-v1\n",
     "rule": "Eight lowest SHA256(seed_utf8 + decimal idx) from the pinned132-row question pool. This small bilingual sample is not domain/language-balanced.",
     "tasks": [
-      {"idx": 14, "id": "task57", "prompt_bytes": 2676, "prompt_sha256": "0ad03a94ac688a6570e844ccf9efbee63e9620ad3446dd2616a683ea01372f30"},
-      {"idx": 67, "id": "task26+", "prompt_bytes": 2303, "prompt_sha256": "19c15f585a748fcb4a9b90ddc9e24c6bbf2f3130270bfe90fdf32a5c6efef4b2"},
-      {"idx": 128, "id": "task48", "prompt_bytes": 3758, "prompt_sha256": "c355132b0efeb62e938788be092e1a2e4f9ea9ec02606cd2ae7ee901d5366cad"},
-      {"idx": 104, "id": "task40", "prompt_bytes": 2422, "prompt_sha256": "5d6840ea8fe9408998e99c299be53b2dfb96abc323a366e666e62a17d9f654ee"},
-      {"idx": 34, "id": "task64", "prompt_bytes": 2587, "prompt_sha256": "501a415ff6c995b2090f3fbc0b60313ec01dda685cc055aea5e09084bc3f5803"},
-      {"idx": 106, "id": "task41", "prompt_bytes": 3212, "prompt_sha256": "441699fcab6225230cd8c7356fcd5966a979effb278ab9cffe13c03574af0004"},
-      {"idx": 79, "id": "task80", "prompt_bytes": 2333, "prompt_sha256": "044310a2514d4ddecc2d1811ab87ca166519106e9d74122f3c7719149e09a448"},
-      {"idx": 7, "id": "task53", "prompt_bytes": 2795, "prompt_sha256": "cb68eba4260dd38f61985c94e69411712d205ea90f3223dcac422c358fc86a22"}
+      {
+        "idx": 14,
+        "id": "task57",
+        "prompt_bytes": 2676,
+        "prompt_sha256": "0ad03a94ac688a6570e844ccf9efbee63e9620ad3446dd2616a683ea01372f30"
+      },
+      {
+        "idx": 67,
+        "id": "task26+",
+        "prompt_bytes": 2303,
+        "prompt_sha256": "19c15f585a748fcb4a9b90ddc9e24c6bbf2f3130270bfe90fdf32a5c6efef4b2"
+      },
+      {
+        "idx": 128,
+        "id": "task48",
+        "prompt_bytes": 3758,
+        "prompt_sha256": "c355132b0efeb62e938788be092e1a2e4f9ea9ec02606cd2ae7ee901d5366cad"
+      },
+      {
+        "idx": 104,
+        "id": "task40",
+        "prompt_bytes": 2422,
+        "prompt_sha256": "5d6840ea8fe9408998e99c299be53b2dfb96abc323a366e666e62a17d9f654ee"
+      },
+      {
+        "idx": 34,
+        "id": "task64",
+        "prompt_bytes": 2587,
+        "prompt_sha256": "501a415ff6c995b2090f3fbc0b60313ec01dda685cc055aea5e09084bc3f5803"
+      },
+      {
+        "idx": 106,
+        "id": "task41",
+        "prompt_bytes": 3212,
+        "prompt_sha256": "441699fcab6225230cd8c7356fcd5966a979effb278ab9cffe13c03574af0004"
+      },
+      {
+        "idx": 79,
+        "id": "task80",
+        "prompt_bytes": 2333,
+        "prompt_sha256": "044310a2514d4ddecc2d1811ab87ca166519106e9d74122f3c7719149e09a448"
+      },
+      {
+        "idx": 7,
+        "id": "task53",
+        "prompt_bytes": 2795,
+        "prompt_sha256": "cb68eba4260dd38f61985c94e69411712d205ea90f3223dcac422c358fc86a22"
+      }
     ],
     "worker_view": "Exact top-level prompt bytes plus one common frozen output contract only; content.rubric and content.blocked are grader-only."
   },
   "arms": [
-    {"id": "gpt-researcher", "tag": "v3.7.0", "package_version": "0.16.0", "ref": "0957c301ed06c2a5857b834358c7227c739041d4", "baseline": true},
-    {"id": "deerflow", "tag": "v2.1.0", "ref": "345f08be00c8a9495079b732a39b46aa9af1584e", "baseline": false},
-    {"id": "onyx", "tag": "v4.8.3", "ref": "23be912c204deb0a087ea2ca0ae476e83541297f", "baseline": false}
+    {
+      "id": "gpt-researcher",
+      "tag": "v3.7.0",
+      "package_version": "0.16.0",
+      "ref": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "baseline": false,
+      "role": "fixed matched reference; this study cannot replace GPTR"
+    },
+    {
+      "id": "deerflow",
+      "tag": "v2.1.0",
+      "ref": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "baseline": true,
+      "role": "standing second gatherer"
+    },
+    {
+      "id": "onyx",
+      "tag": "v4.8.3",
+      "ref": "23be912c204deb0a087ea2ca0ae476e83541297f",
+      "baseline": false,
+      "role": "challenger for the second-gatherer slot"
+    }
   ],
   "proposed_execution": {
     "model": "cx/gpt-6.1-sol-ultra",
@@ -31,24 +97,41 @@
     "repeats_per_question_arm": 2,
     "maximum_report_attempts": 48,
     "concurrent_model_tasks": 1,
-    "retries": 0,
-    "order": "Pinned question order; cycle GPTR/DeerFlow/Onyx, DeerFlow/Onyx/GPTR, Onyx/GPTR/DeerFlow by question index; reverse for repeat2.",
+    "independent_arm_retries": 0,
+    "native_internal_retries": "Unqualified; GPTR helper max_attempts10 differs from SDK max_retries0. Bind each runtime before freeze.",
+    "order": "For each question in pinned order, run repeat1 then repeat2; rotate GPTR/DeerFlow/Onyx, DeerFlow/Onyx/GPTR, Onyx/GPTR/DeerFlow by zero-based question position for repeat1 and reverse that arm list for repeat2. Freeze all48 attempt records and grading order before outputs.",
     "fresh_state": "One fresh native thread/session/index scope per attempt, identical public-source access rules and same frozen search/fetch services across arms.",
     "timeout_seconds_per_question_arm_repeat": 900,
-    "gross_input_plus_output_token_limit_per_question_arm_repeat": 200000,
+    "proposed_gross_input_plus_output_observation_threshold": 200000,
+    "token_bound_status": "Unenforced proposal; choose native enforcement, uncached/gross basis and breach disposition after canary and before freeze.",
     "maximum_searches": 40,
     "maximum_fetches": 80,
-    "quota_rule": "First quota/429 suspends all arms and records the partial block; no silent effort/model downgrade or independent retry.",
+    "quota_rule": "Shared contract:429/account rotation/planned window end invalidates the whole task-repeat block including grading; retain failures and recover the whole block in the next recorded window. Maximum2 invalid blocks, no excluded tasks; third invalid block aborts.",
     "source_policy": "Preserve each question's original time constraints. Bind an observation cutoff, archived/versioned eligibility where the prompt requires historical availability, URL/time/content hashes and fetch failures. Neither a current page nor a judge verdict proves historical availability.",
-    "compression": "off control; gateway token conditions require a separate reviewed amendment on the same task/source snapshots",
+    "compression": "off control; semantic no-cache bypass and unique correlation id required in every arm; retain upstream cache subsets and gateway interventions",
     "window": "Exclusive architecture-owned throwaway GPT-pool window coordinated with session0c and client-token/GPU trials"
   },
   "proposed_evaluation": {
-    "runner": {"repository": "https://github.com/promptfoo/promptfoo", "tag": "0.123.1", "ref": "34f74d34e140b5e17d23770dfb2340057b1936b8", "source_files": ["src/assertions/llmRubric.ts", "site/docs/configuration/expected-outputs/model-graded/llm-rubric.md", "src/providers/openai/codex-sdk.ts"]},
-    "citation_quality": "A blinded upstream promptfoo model grader evaluates each report against independently retained numbered source passages and the frozen strict support/attribution rubric. Missing/unavailable evidence, wrong citation attribution, failed temporal eligibility or any unsupported material factual claim fails the report. Exact rubric, source mapping/transport and negative controls must be bound before freeze.",
+    "runner": {
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "tag": "0.3.273",
+      "ref": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "source_files": [
+        "src/inspect_ai/scorer/_model.py",
+        "src/inspect_ai/scorer/_metric.py",
+        "src/inspect_ai/model/_providers/openai_responses.py",
+        "src/inspect_ai/model/_openai.py",
+        "src/inspect_ai/model/_model_output.py"
+      ],
+      "source_binding_status": "Root original sources read at adopted0.3.273 pin; native binary C/I scorer, required grader role, criterion-in-Sample.target and zero-UNSCORED/full-coverage contract declared in inspect-grader-binding.json. Unchanged adopted-version controls, local rubric negative controls and live grader transport remain unrun/unqualified."
+    },
+    "citation_quality": "Frozen locally authored strict support/attribution criterion in native Sample.target, run by standing Inspect model_graded_qa with unchanged default grading instructions/pattern, required grader role and partial_credit=false. Independently retained numbered passages are blinded to runtime identity. Missing evidence, wrong attribution, failed temporal eligibility, unsupported material claims, incorrect numeric values, units or denominators require I; only C counts as a supported report pass. Malformed/missing/off-menu/P verdicts are native UNSCORED, not success or quality zero; the whole matched task-repeat block becomes infrastructure-invalid. Require zero UNSCORED/errors and full frozen sample coverage.",
     "rubric_quality": "Retain the unchanged official DRB-II report-rubric grader separately. Its report-text evidence is not source entailment; its score is never substituted for citation support.",
-    "decision_rule": "A challenger replaces the matched GPTR baseline only with no lower strict-supported report success count on any question, no lower official rubric score per question, and at least one strict quality improvement. With identical quality on every question, require at least5% lower paired median gross input-plus-output tokens with complete same-scope native usage and no greater paired median agent time. For two eligible challengers use strict-supported report count, then official rubric score, then paired median gross tokens, then agent time. Otherwise preserve the measured baseline and report sampled failures/incomparability explicitly.",
-    "limitations": "No claim-level calibrated percentage, universal quality or statistical superiority follows this eight-question screen. A promptfoo rubric is a configured upstream scorer; a proposed rubric has not yet passed its negative controls."
+    "aggregation": "Per question/arm, sum strict-supported report passes across two valid repeats (denominator2) and take the arithmetic mean of the unchanged official DRB-II rubric scores across those repeats. Report per-question scores, not only a pooled mean.",
+    "footprint": "Decision-relevant acceptance gate for passwordless admission and declared host resources; measured CPU/RAM/disk/service footprint otherwise report-only, not a post-hoc tiebreaker.",
+    "decision_rule": "Lane reading of the inherited role labels: Onyx4.8.3 replaces DeerFlow2.1.0 only with no lower strict-supported report count and mean official rubric score on every matched question and at least one strict quality improvement. If every quality value ties, require at least5% lower paired median uncached-input-plus-output tokens with complete authoritative same-scope usage/cache subsets and no greater paired median agent time. Otherwise keep DeerFlow; incomparable admission or missing usage yields no claimed efficiency win. Fixed GPTR3.7.0 cannot be replaced by this study.",
+    "limitations": "No calibrated claim percentage, universal quality or statistical superiority follows this eight-question screen. The local citation rubric requires native fail-closed parse behavior and its negative controls before candidate outputs.",
+    "native_grader_binding": "inspect-grader-binding.json"
   },
   "required_before_freeze": [
     "Astra/max consequential read and Claude-lane read of finalized source/task/rubric/route/extension contract, exact accepted head/hash and freeze receipt",
@@ -56,6 +139,8 @@
     "Same source-backed keyless search/fetch service pins, exact engine/language/result-count/quotas, common output contract and automated clarification-off setting",
     "Exact org-owned extension/plugin/skill/MCP inventory and useful loader activation checks: GPTR plugin executable/Python-version contract; DeerFlow0.2 extensions; Onyx research/sandbox tools",
     "Native configured OmniRoute build/carry and actual all-call effort across main/child/summary/title/auxiliary calls; preserve differing native/API effort semantics",
+    "Shared execution-contract acceptance, all48 ordered attempt records, owner-observed delivered reasoning/parallel fields, correlation join and one complete authoritative usage aggregate per arm",
+    "Native binary C/I grader contract accepted and unchanged parse controls plus locally authored support/numeric negative controls pass; any UNSCORED invalidates the block and cannot shrink the denominator",
     "Source-backed evaluator/judge transport and frozen strict rubric; wrong-source, wrong-attribution, unsupported-claim, missing-source and temporal-violation negative controls before candidate outputs",
     "Observable all-call native usage and enforced time/token/search/fetch bounds, terminal results and independent actual report/source observations",
     "Exact independent archive/availability rules and blinded source/report/rubric bindings; all failed attempts and unknown counters retained"

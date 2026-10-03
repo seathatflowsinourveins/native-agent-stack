@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "local_integration_controls_passed_hosted_head_pending",
+  "scope": "Repair of the PR633 exact-head Claude review; no runtime/default acceptance",
+  "workflow": {
+    "path": ".github/workflows/runtime-worker-skills-freshness.yml",
+    "bytes": 5398,
+    "sha256": "9fd015cf990c339c1ab95447086b549ff577e577be374299acd9a9ce69ea7a53",
+    "repair_source_commit": "5be2ce220cae5f2a229cecff7be9f03aa726e448",
+    "integration_commit": "49a619689",
+    "controls": ["one hardened read-only job", "one pinned checkout with persist-credentials false", "collector and summary run after prior step failures unless cancelled", "deduplicated expected repository coverage", "fetch errors, partial coverage and empty/missing reports reported explicitly"],
+    "collector_entrypoint": "tools/sota-convergence/github_freshness.py",
+    "scope_limit": "Daily metadata coverage does not install candidates, select defaults, run quality evaluations or prove startup delivery"
+  },
+  "actionlint": {
+    "repository": "https://github.com/kjanat/actionlint",
+    "version": "v1.17.0",
+    "ref": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+    "upstream_readme_sha256": "3e39189f7c67999034728be8a0acd4df073807f8b50c7cad00da9224d35a7345",
+    "version_exit": 0,
+    "version_stdout": "actionlint.kjanat.dev 1.17.0\nhttps://github.com/kjanat/actionlint/releases/tag/v1.17.0\nbuilt with go1.27.1 compiler for linux/amd64\n",
+    "workflow_check_exit": 0,
+    "workflow_check_stdout": "",
+    "workflow_check_stderr": ""
+  },
+  "repository_integration_check": {
+    "command": "rtk python3 -m unittest tests.test_workflow_security_coverage.RuntimeWorkerSkillsFreshnessWorkflowTests",
+    "exit": 0,
+    "returned_output": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.480s\n\nOK\n",
+    "classification": "Locally authored integration check, not unchanged upstream runtime acceptance"
+  },
+  "retained_failure": {
+    "initial_check_exit": 1,
+    "finding": "The previous two-job workflow checked out twice and failed the repository's one-checkout security contract",
+    "repair": "A single hardened job preserves collector/summary coverage without a second checkout"
+  },
+  "publication": {"hosted_ci": "pending exact published repair head", "session_start": "not_wired; carrier handoff belongs to Claude architecture owner"},
+  "model_calls": 0,
+  "selected_default": null
+}

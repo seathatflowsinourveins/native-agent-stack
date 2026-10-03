@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "kind": "native_live_readiness_failure",
+  "recorded_date": "2026-10-03",
+  "scope": "One stock GPT Researcher landscape-discovery CLI invocation; not a frozen comparison, role/default acceptance or token-saving run.",
+  "runtime": {
+    "repository": "https://github.com/assafelovic/gpt-researcher",
+    "tag": "v3.7.0",
+    "ref": "0957c301ed06c2a5857b834358c7227c739041d4"
+  },
+  "gateway": {
+    "host_scope": "allocated workstation pool",
+    "native_loopback_url": "http://127.0.0.1:20128/v1",
+    "owner_reported_build": "cf6748d04",
+    "actual_build_full_pin_observed": false,
+    "configuration_mutated": false,
+    "auth_or_call_body_read": false
+  },
+  "requested": {
+    "all_role_alias": "openai:cx/gpt-6.1-sol-ultra",
+    "reasoning": {
+      "effort": "ultra"
+    },
+    "parallel_tool_calls": true,
+    "use_responses_api": true,
+    "semantic_cache_bypass": true,
+    "compression": "off",
+    "sdk_max_retries": 0,
+    "native_helper_max_attempts": 10,
+    "correlation_id": "lane:runtime-jobs-20261003:gptr-landscape-1"
+  },
+  "invocation": {
+    "native_entrypoint": "python cli.py <landscape query> --report_type research_report --report_source web --no-pdf --no-docx",
+    "start_clock_utc": "2026-10-03 06:39:23 UTC",
+    "cleared_environment": true,
+    "dotenv_disabled": true,
+    "bytecode_disabled": true,
+    "fresh_owned_output_scope": true,
+    "nonsecret_key_placeholder": true,
+    "native_timeout_seconds": 600,
+    "native_kill_after_seconds": 10
+  },
+  "result": {
+    "native_exit_code": 1,
+    "terminal_observed": true,
+    "report_accepted": false,
+    "returned_output_excerpts": [
+      "agent_creator.py, line 65, in choose_agent: agent_dict = json.loads(response)",
+      "TypeError: the JSON object must be str, bytes or bytearray, not list",
+      "agent_creator.py, line 102, in handle_json_error: json_string = extract_json_with_regex(response)",
+      "agent_creator.py, line 151, in extract_json_with_regex: json_match = re.search(r\"{.*}\", response, re.DOTALL)",
+      "TypeError: expected string or bytes-like object, got 'list'"
+    ],
+    "excerpt_policy": "Exact returned error text with owned host paths omitted; not a complete stdout or provider trace."
+  },
+  "primary_sources": [
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "ref": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/llm_provider/generic/base.py",
+      "bytes": 15044,
+      "sha256": "d4247a548188ca5e2a3710658884dbbda95a1096fb2c3e3a7a0a410134823818"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "ref": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "gpt_researcher/actions/agent_creator.py",
+      "bytes": 5307,
+      "sha256": "1f6a6cb89e12e33b89c3d3bdabdb787f63458173093c839c7077a7ef505600d3"
+    },
+    {
+      "repository": "langchain-ai/langchain",
+      "ref": "026c3da2b615abe52f8446e37de460b844d07a43",
+      "path": "libs/partners/openai/langchain_openai/chat_models/_compat.py",
+      "bytes": 20763,
+      "sha256": "e388d57dd362030f9ca10178e852ec8c514d1f8c3bccb20f0ca7903646894e15"
+    }
+  ],
+  "diagnosis": {
+    "stock_provider": "Forwards output.content unchanged; GPTR JSON/regex parser expects str.",
+    "bounded_sol_repair_investigation": "Pinned LangChain v0 compatibility also keeps a list; no provider retry or source patch made.",
+    "astra_max_trigger": "Failure remains unresolved after one bounded Sol repair investigation; supported transport choice needs consequential judgment.",
+    "astra_max_result": "CONDITIONAL string-contract repair using native Chat Completions configuration; REJECT equivalence to requested Responses/parallel-field profile. No native Astra provider trial or usage observed.",
+    "upstream_source_patch": false,
+    "proposed_configuration_applied": false,
+    "primary_verification": [
+      {
+        "repository": "diegosouzapw/OmniRoute",
+        "ref": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+        "path": "open-sse/translator/request/openai-responses/toResponses.ts",
+        "bytes": 21253,
+        "sha256": "8748f79212487ad1909db5ee9b62580ad2f2868c9319b49c9bab8aa97bee0da5"
+      },
+      {
+        "repository": "diegosouzapw/OmniRoute",
+        "ref": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+        "path": "open-sse/translator/index.ts",
+        "bytes": 43519,
+        "sha256": "142916a24d36690284c314465a076fd6d51fb3532ee44960a2c4166d0cce12de"
+      },
+      {
+        "repository": "diegosouzapw/OmniRoute",
+        "ref": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+        "path": "open-sse/handlers/responseTranslator.ts",
+        "bytes": 37621,
+        "sha256": "e4005ce9e27f856cb541f65498672c29d28926ca712fbe0ea1afac2e7a79d94d"
+      },
+      {
+        "repository": "diegosouzapw/OmniRoute",
+        "ref": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+        "path": "open-sse/handlers/chatCore/passthroughHelpers.ts",
+        "bytes": 13191,
+        "sha256": "bdb22304db8e8a3d95e64db8c734d93855a6164635cea28e2206638c5c03bcbf"
+      },
+      {
+        "repository": "openai/openai-python",
+        "ref": "03b3ec474241fe3a73c4818dc6b886da28faaf91",
+        "path": "src/openai/types/chat/chat_completion_message.py",
+        "bytes": 2828,
+        "sha256": "2616d7f61183c39dec4f26e8cbd6ded487defa505c8dfe67ab72295d147194b4"
+      }
+    ],
+    "followup": "Separate native attempt lane:runtime-jobs-20261003:gptr-chat-diagnostic-2 applied use_responses_api:false/reasoning:null/reasoning_effort:max with the Ultra model suffix. It passed choose_agent, ended native0 with zero retrieved sources; not full-profile or research acceptance."
+  },
+  "counter_scopes": {
+    "provider_requests": null,
+    "gross_input_tokens": null,
+    "gross_output_tokens": null,
+    "cache_read_tokens": null,
+    "reasoning_tokens": null,
+    "billing": null,
+    "delivered_reasoning": null,
+    "delivered_parallel_tools": null,
+    "correlation_join": null
+  },
+  "limits": [
+    "An actual native provider attempt does not establish complete request count or usage.",
+    "Neither an HTTP success nor correct Ultra delivery is inferred from the parser traceback.",
+    "Hardcoded helper retries are distinct from disabled SDK nested retries.",
+    "The failed attempt is preserved; later configuration trials are separate attempts."
+  ]
+}

@@ -3,16 +3,44 @@
   "study_id": "runtime-jobs-github-workflows-20261003",
   "status": "draft-not-frozen",
   "freeze_eligible": false,
+  "shared_execution_contract": "shared-execution-contract.json",
   "scope": "Native GitHub workflow-agent job; disposable issue/CI/review tasks, never production issues or existing lane PRs",
   "arms": [
-    {"id": "native-codex-gh", "baseline": true, "runtime_ref": "a956835d020762cb2b570053af06f643a11c0ecc", "bundle": "OpenAI own-org GitHub plugin and task-matched skills at the existing recorded pins"},
-    {"id": "codex-action", "baseline": false, "repository": "https://github.com/openai/codex-action", "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e", "version": "v1.12", "native_codex_version": "0.160.0"},
-    {"id": "github-agentic-workflows", "baseline": false, "repository": "https://github.com/github/gh-aw", "ref": "c35393777e5604a63721d09512263b1383301d4f", "version": "v0.89.21", "native_codex_version": "0.160.0", "bundle": "GitHub's native MCP and safe-output configuration; exact fixture/config hashes pending"}
+    {
+      "id": "native-codex-gh",
+      "baseline": true,
+      "runtime_ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "bundle": "OpenAI own-org GitHub plugin and task-matched skills at the existing recorded pins"
+    },
+    {
+      "id": "codex-action",
+      "baseline": false,
+      "repository": "https://github.com/openai/codex-action",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "version": "v1.12",
+      "native_codex_version": "0.160.0"
+    },
+    {
+      "id": "github-agentic-workflows",
+      "baseline": false,
+      "repository": "https://github.com/github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "version": "v0.89.21",
+      "native_codex_version": "0.160.0",
+      "bundle": "GitHub's native MCP and safe-output configuration; exact fixture/config hashes pending"
+    }
   ],
   "task_inputs": {
     "issue_to_patch": {
       "source": "coding-worker-draft.json: pinned SWE-bench Verified task instructions and unchanged swebench4.0.3 graders",
-      "task_ids": ["django__django-14034", "sympy__sympy-23824", "scikit-learn__scikit-learn-13496", "pytest-dev__pytest-6197", "pydata__xarray-7393", "matplotlib__matplotlib-25122"],
+      "task_ids": [
+        "django__django-14034",
+        "sympy__sympy-23824",
+        "scikit-learn__scikit-learn-13496",
+        "pytest-dev__pytest-6197",
+        "pydata__xarray-7393",
+        "matplotlib__matplotlib-25122"
+      ],
       "sampling": "First preregistered hash-ranked task within each of the six coding repositories, before any outcome; task/image/fixture bindings remain open",
       "native_quality_oracle": "Same unchanged FAIL_TO_PASS and PASS_TO_PASS task reward across all arms",
       "effects": "Exact triggering fixture issue, target checkout/base, resulting patch/branch/PR and immutable head; native posting lifecycle separately observed"
@@ -31,14 +59,36 @@
     }
   },
   "lifecycle_source_controls": [
-    {"path": "pkg/cli/workflows/test-claude-create-pull-request.md", "bytes": 445, "sha256": "fbc2a844a8e4a6718d9ee55272d555fb79d7b5219b43d143d0f4c30f95a7bf66", "limit": "PR creation recipe, not an issue-solving oracle; source frontmatter lacks an explicit PR safe-output declaration"},
-    {"path": "pkg/cli/workflows/test-copilot-create-pull-request-review-comment.md", "bytes": 400, "sha256": "4caea3a4605271784e7d1136e14cb4bc1f08fa233c4b1e99ebdf392f3e4b7c9c", "limit": "Posting lifecycle recipe, not known-defect finding quality"},
-    {"path": "actions/setup/js/create_pull_request_validation_push_parity.test.cjs", "git_blob": "45ff5f5d2bcab893e5d2873a02296eadb3498b36", "binding": "source lead pending final fixture read"},
-    {"path": "actions/setup/js/create_pr_review_comment.test.cjs", "git_blob": "7ef2d0a73823de1732492ea89a1359dd787558f6", "binding": "source lead pending final fixture read"},
-    {"path": "actions/setup/js/submit_pr_review.test.cjs", "git_blob": "82128e352684fec6657c174f92c17392b6f84709", "binding": "source lead pending final fixture read"}
+    {
+      "path": "pkg/cli/workflows/test-claude-create-pull-request.md",
+      "bytes": 445,
+      "sha256": "fbc2a844a8e4a6718d9ee55272d555fb79d7b5219b43d143d0f4c30f95a7bf66",
+      "limit": "PR creation recipe, not an issue-solving oracle; source frontmatter lacks an explicit PR safe-output declaration"
+    },
+    {
+      "path": "pkg/cli/workflows/test-copilot-create-pull-request-review-comment.md",
+      "bytes": 400,
+      "sha256": "4caea3a4605271784e7d1136e14cb4bc1f08fa233c4b1e99ebdf392f3e4b7c9c",
+      "limit": "Posting lifecycle recipe, not known-defect finding quality"
+    },
+    {
+      "path": "actions/setup/js/create_pull_request_validation_push_parity.test.cjs",
+      "git_blob": "45ff5f5d2bcab893e5d2873a02296eadb3498b36",
+      "binding": "source lead pending final fixture read"
+    },
+    {
+      "path": "actions/setup/js/create_pr_review_comment.test.cjs",
+      "git_blob": "7ef2d0a73823de1732492ea89a1359dd787558f6",
+      "binding": "source lead pending final fixture read"
+    },
+    {
+      "path": "actions/setup/js/submit_pr_review.test.cjs",
+      "git_blob": "82128e352684fec6657c174f92c17392b6f84709",
+      "binding": "source lead pending final fixture read"
+    }
   ],
   "routing": {
-    "model": "cx/gpt-6.1-sol",
+    "model": "cx/gpt-6.1-sol-ultra",
     "native_effort": "ultra",
     "native_v2_and_hint": "Must observe supported effective V2/config/catalog contract; action protected flags are restricted",
     "wire_and_gateway": "Exact running build/carry, alias transform and effective inference effort separately observed",
@@ -57,7 +107,11 @@
   "decision_rule": {
     "quality": "Require no lower useful-task outcome on every frozen task and greater on at least one; lifecycle and native keyless/no-prompt/route conditions are mandatory gates",
     "quality_tie": "Require at least5 percent lower paired median native input-plus-output tokens, complete counters and no greater paired median agent time",
-    "rank": ["successful trials descending", "paired median gross tokens ascending", "paired median agent time ascending"],
+    "rank": [
+      "successful trials descending",
+      "paired median uncached-input-plus-output tokens ascending, with complete authoritative same-scope cache subsets",
+      "paired median agent time ascending"
+    ],
     "fallback": "Keep the measured native baseline; record invalid/unqualified comparisons separately from task failures"
   },
   "required_before_freeze": [
