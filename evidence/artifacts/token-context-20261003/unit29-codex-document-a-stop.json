@@ -1,0 +1,108 @@
+{
+  "claims": {
+    "accepted_baseline": false,
+    "comparison": false,
+    "default": false,
+    "invoice": false,
+    "native_client_bug": false,
+    "protection": false,
+    "saving": false,
+    "winner": false
+  },
+  "date": "2026-10-03",
+  "interpretation_correction": {
+    "corrected_claim": "The child authored null error fields inside its JSON answer; this fails the frozen empty-string contract.",
+    "earlier_interpretation": "A prior raw child terminal error label and the parent explanation wrongly implied a native client error.",
+    "instruction_gap": "Original prompts did not explicitly encode successful error fields as an empty string, while the stronger frozen contract did.",
+    "native_selected_task_complete": "last_agent_message is a string; no native error field observed in the selected main/child terminal events.",
+    "original_STOP": "UNCHANGED; no normalization, schema weakening, retry or native client bug conclusion.",
+    "private_correction_sha256": "90cae1589450541277590f951b90d6923495452f1654f9ae998e727b05cbcac4"
+  },
+  "known_finalized_native_usage": {
+    "cache_write_input_subset": 0,
+    "cached_input_subset": 164352,
+    "child_total": 96144,
+    "child_unique_groups": 4,
+    "disjoint_groups": 9,
+    "input_including_cache": 219969,
+    "main_total": 133490,
+    "main_unique_groups": 5,
+    "native_prefix_final_and_export_alternatives_match": true,
+    "output_including_reasoning": 9665,
+    "overlapping_views_added": false,
+    "reasoning_output_subset": 4709,
+    "total": 229634,
+    "uncached_input": 55617
+  },
+  "limits": {
+    "effective_write_path_cause": "UNVERIFIED; no repair performed.",
+    "encrypted_assignment_plaintext": "UNKNOWN",
+    "independent_OS_closure_and_hidden_helper_census": "UNKNOWN outside this scoped endpoint",
+    "native_thread_turn_rollout_and_CLI_terminals": "Observed",
+    "older_R2_STOPs": "UNCHANGED",
+    "other_three_producers_and_later_structural_echoes_or_semantic_graders": "UNRUN_FINAL at programme STOP"
+  },
+  "native_observations": {
+    "all_frozen_bindings_unchanged": true,
+    "client_version": "0.160.0",
+    "effort": "max",
+    "elapsed_native_ms": 297226,
+    "frozen_binding_count": 124,
+    "model": "gpt-6.1-sol",
+    "native_parent_child_relation_independently_bound": true,
+    "outer_exit": 0,
+    "returned_original_passages_exact": {
+      "matched": 4,
+      "total": 4
+    },
+    "roles": "main plus one child",
+    "schema_errors": 0,
+    "schema_successes": 1,
+    "source_representation": "Original LF and final LF preserved; structural fidelity is separate from semantic grading.",
+    "source_windows_exact": {
+      "matched": 4,
+      "total": 4
+    }
+  },
+  "private_artifact_sha256": {
+    "closed_reconciliation": "e4e71fbe6100268b90b0f88eaa71628d2e6b39f6c642e3e02319f3db471d5bee",
+    "native_counter_reconciliation": "c1a4ae4e5a2dfdf39341acc2a8c4ec32a30cb263c289bea8614af15d2560d661",
+    "native_export": "27cedc7dbea8f52ab34f5dbe204980a081cfbb0fe7f3d38efd540d429472348a",
+    "root_independent_primary_read": "007a5b0a7f407411a1344ca3e39f4fdb06b84df7a05560d88dc8cf4efdd8956a"
+  },
+  "required_failure": {
+    "child_authored_JSON_error_fields": {
+      "count": 2,
+      "value": null
+    },
+    "frozen_success_error_contract": "Empty string required; model-authored null fields and nonempty parent strings fail this gate.",
+    "parent_authored_error_explanations": {
+      "characters_each": 48,
+      "count": 2
+    },
+    "semantic_fact_grading": "UNRUN_FINAL",
+    "weak_embedded_type_schema": "PASS; does not establish frozen task acceptance."
+  },
+  "schema_version": 1,
+  "scope": "Closed document-only designed A producer, main plus one max child. A denotes the intended original-source arm, not a qualified baseline.",
+  "source_pins": {
+    "openai/codex": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "promptfoo/promptfoo": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+  },
+  "source_urls": {
+    "assistant_text_protocol": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/protocol.rs#L1820",
+    "child_spawn_protocol": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L261",
+    "native_terminal_protocol": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/protocol.rs#L2150",
+    "provider": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts"
+  },
+  "status": "STOP_REQUIRED_FROZEN_EMPTY_STRING_CONTRACT",
+  "unfinalized_native_scope": {
+    "actual_cancelled_token_usage": null,
+    "cancelled_requests": 1,
+    "cancelled_usage": "UNKNOWN_NOT_ZERO",
+    "complete_charge_including_cancelled_or_unobserved_helpers": "UNKNOWN",
+    "invoice": "UNKNOWN",
+    "native_recovery": "One native reconstruction/continuation after the dropped stream; its finalized usage is included once, not an authored producer retry."
+  },
+  "unit": "unit29"
+}

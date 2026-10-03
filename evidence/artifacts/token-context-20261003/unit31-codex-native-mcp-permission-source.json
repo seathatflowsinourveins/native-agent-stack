@@ -1,0 +1,213 @@
+{
+  "alternative": "Server-wide default_tools_approval_mode is a broader supported grant; not selected or installed.",
+  "claims": {
+    "P2_protection": false,
+    "default": false,
+    "live_admission": false,
+    "permission_bypass": false,
+    "unit28_regrade": false
+  },
+  "date": "2026-10-03",
+  "enum": [
+    "auto",
+    "prompt",
+    "writes",
+    "approve"
+  ],
+  "installed_and_release_evidence": {
+    "client": "0.160.0",
+    "installed_exec_help": "Supports config and strict-config.",
+    "release": "rust-v0.160.0",
+    "release_body_limit": "The specific feature announcement was not found in the inspected release body; no broader capability absence claim.",
+    "release_published_utc": "2026-10-01T20:19:13Z"
+  },
+  "native_layer": "Supported per-call config override uses the normal SessionFlags loader and effective native configuration. Future provider delivery and User-file merge remain separately unqualified.",
+  "predicate": "Explicit Approve avoids ordinary prompting under policy Never when strict_auto_review is false. This does not override strict review.",
+  "private_artifact_sha256": {
+    "manifest": "5c9b57459140960db9cb12ec2110e74ef2c6da9f04ab99e5dae8d5952b014954",
+    "receipt": "e722f9244ad66db45dd6d5dba7a66ff3e516c6fcd901a176d7e4f035c3d2c4e7",
+    "source_bindings": "82a7456cdbfa10ec41c50c225e2a6db7c97209e3860d1311cc59f829dda05d55"
+  },
+  "production_precedence": [
+    "Raw-tool-specific approval_mode",
+    "Server default_tools_approval_mode",
+    "Auto"
+  ],
+  "retained_native_constraints": [
+    "readOnlyHint remains false",
+    "Sandbox and permission-profile authority",
+    "Read-only MCP filtering",
+    "disabled_tools after enabled_tools",
+    "Managed server restrictions",
+    "Conservative approval intersections where applicable"
+  ],
+  "schema_version": 1,
+  "scope": "Pinned production permission/config source review following the closed unit28 denial. No configuration change or native permission retry.",
+  "selected_primary_sources": [
+    {
+      "git_blob_sha1": "f0a95b95c6d082b0acc20b0dd38a18066d4ee589",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "selected_lines": [
+        [
+          170,
+          209
+        ],
+        [
+          262,
+          265
+        ]
+      ],
+      "sha256": "3b9f48ce4f861f979b465fb8ce4c3ef25a0ca0c2aa57d0a8b85429eb298a4ac8",
+      "upstream_path": "codex-rs/codex-mcp/src/binding.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/codex-mcp/src/binding.rs#L170-L209"
+    },
+    {
+      "git_blob_sha1": "df532ee1eac149b35e2a5fc2545a09452067489f",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "selected_lines": [
+        [
+          459,
+          485
+        ]
+      ],
+      "sha256": "d2f9d884db8e1e8639a719b0fe1029b7bb877cb59b716e8bc8e0b19de267d47b",
+      "upstream_path": "codex-rs/codex-mcp/src/server.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/codex-mcp/src/server.rs#L459-L485"
+    },
+    {
+      "git_blob_sha1": "7f466edb3c9b395d962a273a2536091cc064ba6f",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "selected_lines": [
+        [
+          220,
+          223
+        ],
+        [
+          1515,
+          1529
+        ],
+        [
+          1620,
+          1623
+        ],
+        [
+          2466,
+          2495
+        ]
+      ],
+      "sha256": "509b10168a9a1e99abd0f5722ad5bf377645dbb2e446ead6c324daef7a84af58",
+      "upstream_path": "codex-rs/core/src/mcp_tool_call.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/mcp_tool_call.rs#L220-L223"
+    },
+    {
+      "git_blob_sha1": "4b627edc7769cdbe3c20e8903bb06234b9f6f8b5",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "selected_lines": [
+        [
+          26,
+          48
+        ],
+        [
+          82,
+          93
+        ],
+        [
+          288,
+          314
+        ]
+      ],
+      "sha256": "08bdfe6bcc0ca607b1ead8b373029f895528604290f94bf1ba18c2dc83db8fd8",
+      "upstream_path": "codex-rs/config/src/mcp_types.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/mcp_types.rs#L26-L48"
+    },
+    {
+      "git_blob_sha1": "e44f737c18295dd33a9eb25cb61cc9521bd54f8a",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "selected_lines": [],
+      "sha256": "951d5b6a7ff5c7dd667039f1f0c44fe1028a2d8ab372d45632b60d325464631d",
+      "upstream_path": "codex-rs/config/src/types.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/types.rs"
+    },
+    {
+      "git_blob_sha1": "60c6f65353453265ad413ce6f4d093b17cbdc625",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "selected_lines": [
+        [
+          1507,
+          1540
+        ],
+        [
+          2174,
+          2197
+        ],
+        [
+          2235,
+          2247
+        ],
+        [
+          4154,
+          4155
+        ]
+      ],
+      "sha256": "854f5a6b184714740500b8d3eae2bb04cb88172efccf11d38a74f2f6189c0341",
+      "upstream_path": "codex-rs/core/src/config/mod.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs#L1507-L1540"
+    },
+    {
+      "git_blob_sha1": "2287f7db585dd85b857c6cd573cc2ae0772516df",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "selected_lines": [
+        [
+          9,
+          9
+        ],
+        [
+          244,
+          259
+        ]
+      ],
+      "sha256": "f52c5ea41ecdc41f0dad9a69494baf9ffbc23e90cd6bc6f8802b1c577775570d",
+      "upstream_path": "codex-rs/core/src/tools/handlers/mcp.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/tools/handlers/mcp.rs#L9-L9"
+    },
+    {
+      "git_blob_sha1": "a97f61cfaedbaaeaefc9c7be64c545c35af7bc0c",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "selected_lines": [
+        [
+          89,
+          109
+        ],
+        [
+          117,
+          121
+        ]
+      ],
+      "sha256": "3ad76e5dff1a60e597ea5a35270c2301d68654ec9d28ce07bcceb4fbd118ad1b",
+      "upstream_path": "codex-rs/codex-mcp/src/mcp/mod.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/codex-mcp/src/mcp/mod.rs#L89-L121"
+    }
+  ],
+  "source_supported_value": "approve",
+  "source_vs_execution": {
+    "configuration_authored": false,
+    "later_unit28_stages_and_grader": "UNRUN_FINAL",
+    "live_permission_delivery": "UNRUN",
+    "model_counter": "N/A; no model call in this source unit; no zero-token invoice inference.",
+    "native_or_provider_usage": "UNKNOWN_NOT_REPORTED",
+    "source_only": true,
+    "unit28_STOP": "UNCHANGED"
+  },
+  "status": "SOURCE_SUPPORTED_SPECIFIC_TOOL_ROUTE_LIVE_DELIVERY_UNRUN",
+  "supported_field": "mcp_servers.context_mode_container.tools.ctx_batch_execute.approval_mode",
+  "type": "McpServerToolConfig.approval_mode: Option<AppToolApproval>",
+  "unit": "unit31"
+}

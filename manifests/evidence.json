@@ -4048,8 +4048,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "b3ffd27e5ca28d7fd987dc7c594601e4532660ddfeb4992ae92b3916ecb45e9f",
-      "bytes": 467
+      "sha256": "5b26e1858d40e23de54d5d346dae2a5cea5a20e17f413ad09159fcb4a61bde97",
+      "bytes": 735
     },
     {
       "path": ".github/CODEOWNERS",
@@ -15909,8 +15909,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md",
-      "sha256": "4135783851cc0c8cdfc26ade8cf73e8b95935898e75a8343d315822ba67c61cf",
-      "bytes": 14002
+      "sha256": "8dc65f98e6e84f3b94621259b22914a63f4bce1a6e127c17f198f2c07870c96f",
+      "bytes": 14266
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
@@ -15923,9 +15923,14 @@
       "bytes": 11606
     },
     {
+      "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
+      "sha256": "ea1a9bf3e788caed923977d98050e735836b555a1fe9c8ef7e06e1a926391926",
+      "bytes": 12358
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
-      "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
-      "bytes": 8312
+      "sha256": "8aecf90eec8f7ab52087f4aec141b2a56e5caf90c482aa88eea020850823b805",
+      "bytes": 8576
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
@@ -15968,6 +15973,11 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-gpt-lane-omniroute-failover.md",
+      "sha256": "fc541ea35372fed4256af2927371fbd366b365ccbb27096bf9ce4a7b3f041946",
+      "bytes": 23761
+    },
+    {
       "path": "docs/decisions/2026-10-03-native-token-hook-metadata-stops.md",
       "sha256": "71be3a34bda745599f5ad1174610c8be57d098b1f9b5d1451aa07b545549a375",
       "bytes": 8081
@@ -15978,14 +15988,29 @@
       "bytes": 7269
     },
     {
+      "path": "docs/decisions/2026-10-03-native-token-programme-stops-and-permission-source.md",
+      "sha256": "1c84776d1b1d8abd93433fb9ca30b9f696b27cbfe3a01bf0f1ffb8f4be8d730d",
+      "bytes": 6939
+    },
+    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
     },
     {
+      "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
+      "sha256": "2c73507dea5faf517e4068b7a6efad57483250e0eb51f3dcba781d4fd922dfe9",
+      "bytes": 16044
+    },
+    {
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
       "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
       "bytes": 19619
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-pr508-token-stack-winner.md",
+      "sha256": "59f58e14e624f1783b5182ae0ea0bd3caa92298b4b5b6ebab556eae26d76c70d",
+      "bytes": 21398
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
@@ -16234,8 +16259,8 @@
     },
     {
       "path": "docs/native-memory-rag-lifecycle.md",
-      "sha256": "0585dc639571da9a46dec287029cd52d148561fdd1264f341e999c8ef8496425",
-      "bytes": 14822
+      "sha256": "f344de2a27114e9d36bc18036fe7cec4829c771d7b79230e6a603b96538c0b2c",
+      "bytes": 18641
     },
     {
       "path": "docs/native-returned-results.md",
@@ -32128,6 +32153,91 @@
       "bytes": 6571
     },
     {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
+      "sha256": "40880aa6aaf5ea3697d76168d8360e329d6eab2114dbdb1f8024f24346a4eb3b",
+      "bytes": 19947
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_555874dd-5a7.json",
+      "sha256": "02f6c023675a76952fa4f26df7ddd1ea660553c3629149ef1b1e7c5042e31c77",
+      "bytes": 371162
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_8066ceb5-b9a.json",
+      "sha256": "08d919b086fbcc2394b3e8a57e54c8da168a528afb31625bbd17fa933236526f",
+      "bytes": 45181
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-client-check-20261003.txt",
+      "sha256": "736029c51aaf60bab6ea6effbf38f845bbabf78a914136fcc07899a1b25711ef",
+      "bytes": 6252
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-upstream-check-20261003.json",
+      "sha256": "a70fececaa1d61b1d832be50fea8c7f79ea32f4b189dbbf655bb84546302a675",
+      "bytes": 3007
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/jobs.json",
+      "sha256": "652b5e1c777c1c8f1c10a9f5f88f97ea895b2bf4da1b7599d80fb29215fa39b0",
+      "bytes": 105780
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/code-navigation.json",
+      "sha256": "7308d5bc23dcf64b1b9e8c82af5b7d94d24243f65703af8fe2bc34ba7053f651",
+      "bytes": 20991
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/document-retrieval.json",
+      "sha256": "a2b9fe413be5321b0b0f552188e85f6301da3bb12e16452747564e83b22cd577",
+      "bytes": 18377
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/durable-memory.json",
+      "sha256": "6de4a467b1c234d7da0c6e29e1cf3722b2d153809b909b283ed94b10061bd382",
+      "bytes": 19887
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/instructions-skills.json",
+      "sha256": "e758581703af97a0baf7192c37bcc4e6f9e1d98b5971b9d9062171f1e5e16a7d",
+      "bytes": 20990
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/isolation.json",
+      "sha256": "73e9891c79c249e5742a6124949b1e0cbbe6364d5573b0b59e0b09f1afa56a3d",
+      "bytes": 17756
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/native-clients.json",
+      "sha256": "dbe53950782e3fabbd3546cbbd79ae6a23547f4348e8c3618ad92dc774a7f02f",
+      "bytes": 17879
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/semantic-rag.json",
+      "sha256": "2b2ef9927b9153ca2fba7acd8f671a9d23a7825ecfe0af1ea7f4c4e752d35e72",
+      "bytes": 19485
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/web-research.json",
+      "sha256": "f5d1305663ee50348ed12c57b379720c9dc6a8a9eba34eac12b1848a776a7ba8",
+      "bytes": 21107
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/workers.json",
+      "sha256": "9dd8324b62e7ca337ebb7abf33d2fce742287c491e94a5834677c34d6253cd44",
+      "bytes": 21465
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/provenance.json",
+      "sha256": "2eece801e62af156d518abc8ee9ceb8051101168419ee3334bf1797c17435bf8",
+      "bytes": 15903
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+      "sha256": "69484156d2ba6736ba7dd5dfe0f4eca89b83b41899c2379a0a8467db92797f5d",
+      "bytes": 175366
+    },
+    {
       "path": "evidence/artifacts/landscape-sweep-20260926/README.md",
       "sha256": "1c13638aa4679f300373147695b7b9431b1297d1a3b0e3e93caf0c799d3c1295",
       "bytes": 51061
@@ -46184,8 +46294,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "e4a5f144f74994a7f5c34ad174df66766d9bffb473cf715b96ad8f4138f8fe2e",
-      "bytes": 153317
+      "sha256": "f58df418cc070dc9091a05099aaf2963e4949d01191c67d8834fed8820f0820e",
+      "bytes": 159606
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -46361,6 +46471,26 @@
       "path": "evidence/artifacts/token-context-20261003/unit27-narrow-opus-source-read.json",
       "sha256": "3e9ec32ed02bb9a20f53d60a09be9dbee190c945027294a58c333e95faffa50c",
       "bytes": 2615
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit28-codex-owned-state-stage01-stop.json",
+      "sha256": "d7a45170db165dbc7fef176c572b2dab7df07598445fe8a15f64df45c47e0cea",
+      "bytes": 5006
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit29-codex-document-a-stop.json",
+      "sha256": "a71ebfa8b35093d477602fc5543d1c05ee4d8fe1a53118a33614b64fc70704d5",
+      "bytes": 5058
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit31-codex-native-mcp-permission-source.json",
+      "sha256": "e49964497d38135d678da8c55fd8c3317727e64d9b972f4ccc400fd4b289bbfb",
+      "bytes": 7466
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit34-scb-native-prompt-renderer.json",
+      "sha256": "d9052ec345ac671038eac702453b83fd80caefc85aa4db46f26b0272500fc157",
+      "bytes": 6999
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",
@@ -50229,8 +50359,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "a72c591c08b3efe59ed339ace3e141c90f57cb81ed41349e5c826d89f87f616d",
-      "bytes": 20092
+      "sha256": "af4e5bc44d826ceece379c51269de39c6f8b00460bbfa6a1350c0b10987b797c",
+      "bytes": 24324
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -50246,6 +50376,11 @@
       "path": "observability/memory-scheduled-20260928.json",
       "sha256": "1d204e72c5bc6300305fb539e50698f3ae5ea62551f6e01d6bb1cf853729a2c8",
       "bytes": 9430
+    },
+    {
+      "path": "observability/memory-scheduled-20260930.json",
+      "sha256": "7a52c79bf573ab1d72b2f04b58fd9e0288fbfceb6df3b3e09709b7a9d0df65a9",
+      "bytes": 10937
     },
     {
       "path": "observability/memory-scheduled-results-20260923.json",
@@ -51139,8 +51274,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "9039d3fce9dfe4ffb3193be0c7b5976bf95acd3545db5b4f1b8318a1391fb4c0",
-      "bytes": 277381
+      "sha256": "a92a6da603ac650ad49ad4ff0cd116146b21ad929cbaa3f3a946e02e7e38ab69",
+      "bytes": 309351
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -51884,13 +52019,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "5952807786a23be219e69ee7ed417b5141a1384dec02ec33df818ec06a6b3316",
-      "bytes": 94421
+      "sha256": "70e9b928087eac704b20e255b63447adac719e1dca6df9c7f362a22c38a7a584",
+      "bytes": 101473
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "fdc098c00c50bfd6f094edc19a5ccde3658c70853714101c38c814594950bcf2",
-      "bytes": 49765
+      "sha256": "0fbd99b30bd5a1225b1a251691f7b7d3fdf935b3df3e501f1fd29be86e6da0b5",
+      "bytes": 51492
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
@@ -51904,13 +52039,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "3cf095cb0f21538b606470442f547c0a6077e2df1d952da78fb09997161667a3",
-      "bytes": 70018
+      "sha256": "beae25c90f40f9ccaed90f940507dfb63ca4737bcba3e8681540373a767cde32",
+      "bytes": 81310
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "37d4d396da385727ee6d571589e7aa162a030501660a37fac133caf8cbeebba3",
-      "bytes": 46424
+      "sha256": "4a70bb84855deda2b6125c4e8dacbfc686e667ecf506ac5684cd911c8637caf8",
+      "bytes": 47756
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",

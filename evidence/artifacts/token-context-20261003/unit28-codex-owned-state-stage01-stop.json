@@ -1,0 +1,101 @@
+{
+  "claims": {
+    "baseline_acceptance": false,
+    "comparison": false,
+    "default": false,
+    "invoice": false,
+    "protection": false,
+    "provider_role_continuation_admission": false,
+    "saving": false,
+    "upstream_test_pass": false,
+    "winner": false
+  },
+  "corrections": [
+    "Top-level native usage records13; initial payload filter0 was erroneous.",
+    "Native CamelCase completed-item schema used after initial lowercase projection0.",
+    "Promptfoo raw return is a string.",
+    "Original grader snapshot workspace differs from actual candidate workspace; no grade/rebinding attempted.",
+    "Earlier preparation used an incorrect CircuitEval entrypoint. A separate maintained native renderer qualification now binds circopt.py; the stopped run and its grading state are unchanged."
+  ],
+  "date": "2026-10-03",
+  "limits": {
+    "actual_provider_hook_trust": "UNKNOWN; separate direct metadata is not model execution proof",
+    "continuation_stages_2_through_9": "UNRUN_FINAL",
+    "four_fact_semantic_quality": "UNRUN_FINAL",
+    "historical539_vs566_strict_failure": "UNCHANGED",
+    "hook_runtime_execution_and_shutdown": "UNKNOWN",
+    "local_authored_assertions": 594,
+    "native_permission_guard": "Retained, no bypass or readOnlyHint rewrite",
+    "natural_compaction_context_protection": "UNMEASURED",
+    "original_checkpoint7_child": "UNRUN_FINAL",
+    "original_quality_phases": "UNRUN_FINAL",
+    "upstream_grader_acceptance": "UNRUN_FINAL",
+    "wire_invoice_scope": "UNKNOWN"
+  },
+  "native_observations": {
+    "all_frozen_bindings_unchanged": true,
+    "client_version": "0.160.0",
+    "complete_helper_global_usage": null,
+    "effort": "max",
+    "elapsed_native_ms": 889308,
+    "frozen_binding_count": 76,
+    "known_main_cache_write": 0,
+    "known_main_cached_input_subset": 468608,
+    "known_main_input_including_cache": 552264,
+    "known_main_output": 25088,
+    "known_main_reasoning_output_subset": 9970,
+    "known_main_total": 577352,
+    "known_main_uncached_input": 83656,
+    "known_main_unique_response_groups": 13,
+    "main_native_prefix_and_SDK_alternatives_match": true,
+    "main_peak_input_tokens": 65064,
+    "model": "gpt-6.1-sol",
+    "observed_command_items": 17,
+    "observed_failed_MCP_calls": 1,
+    "outer_exit": 0,
+    "peak_context_comparison": "Descriptive only; no natural compaction or protection result.",
+    "provider_label": "omniroute",
+    "reported_context_window_tokens": 258400,
+    "schema_errors": 0,
+    "schema_failures": 0,
+    "schema_successes": 1,
+    "successful_MCP_execution_items": 0,
+    "wire_endpoint_and_backend_identity": "UNKNOWN"
+  },
+  "observation_type": "native-stage-required-call-failure",
+  "original_artifact_sha256": {
+    "frozen_inputs": "8dd513b7c109c2ca31b12264b56abf4fd7eab047735c70c1ed3b037bcae49868",
+    "independent_receipt": "27a1f4d40c6bd57e9e0d95253cba2190e8f0af0de18b314c97a8e0755037725f",
+    "later_native_renderer_completion": "35d12564ef0ab839418e0812c23e406637328ecc2fc3885983c75c3a2096c069",
+    "native_journal": "c7f1a428e47f27be5562aac23ca8eae29a340981f444394f1c224e08830afdd8",
+    "native_result": "12f08db2be5cddc3547c20f53b9e59ff820873ff7abcfc0bf80856d31fb755be",
+    "native_stderr": "d254c23c68eadba8427cdca6d032f4a7f4ac8b4f71235c0f8d848bc27b0ca5a2",
+    "native_stdout": "2af292ef5f9b3898d18ce0973878dc5f0fea0941375f9c2900c1b3437179d481",
+    "root_completion": "d009a807dee6f823aab899e675c0b6830bed483a606341f280523d314007947b",
+    "root_independent_native_primary_read": "007a5b0a7f407411a1344ca3e39f4fdb06b84df7a05560d88dc8cf4efdd8956a"
+  },
+  "required_failure": {
+    "argument_and_native_result_private_artifact_sha256": "8c1a7e8bb163f6951c21bd7847e181e0ae6edde62339224ca5127bbc439a2d32",
+    "duration_seconds": 0,
+    "error": "MCP tool call requires approval, but approval policy is never",
+    "native_status": "failed",
+    "readOnlyHint": false,
+    "tool": "ctx_batch_execute"
+  },
+  "schema_version": 1,
+  "scope": "Closed first cumulative CircuitEval checkpoint; required native MCP call failure. Later model and grader stages were stopped.",
+  "source_pins": {
+    "SprocketLab/slop-code-bench": "31ceea3add480edb33431e70475c4c70597e6b31",
+    "gabeorlanski/scb-problems": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+    "openai/codex": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "promptfoo/promptfoo": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+  },
+  "source_urls": {
+    "corpus": "https://github.com/gabeorlanski/scb-problems/tree/38d627ecf668a88f88f8d260f8df8df6116e9b03",
+    "native_never_guard": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/mcp_tool_call.rs#L1620-L1623",
+    "promptfoo_provider": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts",
+    "runner": "https://github.com/SprocketLab/slop-code-bench/tree/31ceea3add480edb33431e70475c4c70597e6b31"
+  },
+  "status": "STOP",
+  "unit": "unit28"
+}

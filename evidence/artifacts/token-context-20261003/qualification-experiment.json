@@ -116,7 +116,11 @@
       "unit25-hook-state-source-routes",
       "unit25-hook-state-astra-source-read",
       "unit26-native-owned-home-hook-state",
-      "unit27-narrow-opus-source-read"
+      "unit27-narrow-opus-source-read",
+      "unit28-codex-owned-state-stage01-stop",
+      "unit29-codex-document-a-stop",
+      "unit31-codex-native-mcp-permission-source",
+      "unit34-scb-native-prompt-renderer"
     ],
     "roles": [
       "command-worker",
@@ -282,7 +286,11 @@
     "Pinned parser/provider/native state source fields and unchanged metadata artifacts verified; source support only at closure, no model-task admission.",
     "Actual source judgment closed0 with main-only400669; helper/whole total UNKNOWN, native reconnect1 and unplanned-helper bounded orchestration unqualified. Conditional H choice rests on primary rereads.",
     "B-only native state metadata:6exact17-field objects trusted/enabled, unchangedkeys/hashes/definitions/order,diagnostics0,guards1185/1198ms,total4045ms;all138bindingsunchanged. No handler/role/resume/protection/winner claim.",
-    "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance."
+    "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance.",
+    "One unchanged first CircuitEval checkpoint closed0/schemaPASS but required MCP call failed native approval Never. Known main13groups577352 only; complete helper/provider usage UNKNOWN. Stages2\u20139 and grader UNRUN_FINAL.",
+    "Designed original-source A arm, not accepted baseline: main+maxchild closed0,4/4 source/quote fidelity, model-authored null error fields fail frozenempty-stringcontract. Known9 finalizedgroups229634; cancelled usage actualnull/UNKNOWN; later producers/graders UNRUN_FINAL.",
+    "Selected pinned production/config source and installed help support bounded raw-tool approval_mode approve with native constraints; no configchange or live grant trial. Model usage N/A, native/provider usage UNKNOWN.",
+    "Supported unchanged native render-prompts and installedhelp closed0:8parts,17inputs unchanged, actual circopt.py entrypoint/no placeholder. Rendering only; model/grader/comparison/protection UNRUN or UNMEASURED; native usage UNKNOWN."
   ],
   "observations": [
     {
@@ -3384,6 +3392,130 @@
         "total": 63827,
         "native_retries": null
       }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit28-codex-owned-state-stage01-stop.json",
+          "sha256": "d7a45170db165dbc7fef176c572b2dab7df07598445fe8a15f64df45c47e0cea"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 92,
+      "condition": "candidate",
+      "evidence_class": "model_task_execution",
+      "exit_code": 0,
+      "id": "unit28-codex-owned-state-stage01-stop",
+      "quality": {
+        "contract": false,
+        "semantic": false
+      },
+      "role": "coordinator",
+      "scope": "One unchanged first CircuitEval checkpoint closed0/schemaPASS but required MCP call failed native approval Never. Known main13groups577352 only; complete helper/provider usage UNKNOWN. Stages2\u20139 and grader UNRUN_FINAL.",
+      "status": "failed",
+      "task": "unit28-codex-owned-state-stage01-stop",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit29-codex-document-a-stop.json",
+          "sha256": "a71ebfa8b35093d477602fc5543d1c05ee4d8fe1a53118a33614b64fc70704d5"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 93,
+      "condition": "baseline",
+      "evidence_class": "model_task_execution",
+      "exit_code": 0,
+      "id": "unit29-codex-document-a-stop",
+      "quality": {
+        "contract": false,
+        "semantic": false
+      },
+      "role": "coordinator",
+      "scope": "Designed original-source A arm, not accepted baseline: main+maxchild closed0,4/4 source/quote fidelity, model-authored null error fields fail frozenempty-stringcontract. Known9 finalizedgroups229634; cancelled usage actualnull/UNKNOWN; later producers/graders UNRUN_FINAL.",
+      "status": "failed",
+      "task": "unit29-codex-document-a-stop",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit31-codex-native-mcp-permission-source.json",
+          "sha256": "e49964497d38135d678da8c55fd8c3317727e64d9b972f4ccc400fd4b289bbfb"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 94,
+      "condition": "candidate",
+      "evidence_class": "offline_artifact_check",
+      "exit_code": 0,
+      "id": "unit31-codex-native-mcp-permission-source",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Selected pinned production/config source and installed help support bounded raw-tool approval_mode approve with native constraints; no configchange or live grant trial. Model usage N/A, native/provider usage UNKNOWN.",
+      "status": "passed",
+      "task": "unit31-codex-native-mcp-permission-source",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit34-scb-native-prompt-renderer.json",
+          "sha256": "d9052ec345ac671038eac702453b83fd80caefc85aa4db46f26b0272500fc157"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 95,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 0,
+      "id": "unit34-scb-native-prompt-renderer",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Supported unchanged native render-prompts and installedhelp closed0:8parts,17inputs unchanged, actual circopt.py entrypoint/no placeholder. Rendering only; model/grader/comparison/protection UNRUN or UNMEASURED; native usage UNKNOWN.",
+      "status": "passed",
+      "task": "unit34-scb-native-prompt-renderer",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -3610,6 +3742,14 @@
     {
       "run_id": "unit27-narrow-opus-source-read",
       "reason": "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance."
+    },
+    {
+      "reason": "MCP tool call requires approval, but approval policy is never; outer0/schemaPASS does not admit the programme. Usage scope: Known finalized main only; complete helper/provider charge UNKNOWN.",
+      "run_id": "unit28-codex-owned-state-stage01-stop"
+    },
+    {
+      "reason": "Model-authored null error fields and nonempty parent explanations fail frozen empty-string contract; semantic grading UNRUN_FINAL. No native terminal error concluded. Usage scope: Known9 finalized groups; cancelled token_usage null and complete charge UNKNOWN.",
+      "run_id": "unit29-codex-document-a-stop"
     }
   ],
   "limitations": [

@@ -1,0 +1,162 @@
+{
+  "claims": {
+    "comparison": false,
+    "default": false,
+    "grader_pass": false,
+    "model_acceptance": false,
+    "protection": false,
+    "saving": false
+  },
+  "corrections": [
+    "Initial source layout glob expected checkpoint subdirectories; the pinned source uses root checkpoint_N.md. Corrected before freeze/render.",
+    "A large line-based JSON discovery projection was truncated; no conclusion used it. Selected structured fields were reread.",
+    "Initial completion receipt was provisional and was annotated only after actual native render/help closed0; input/output bytes did not change.",
+    "The old unit28 preparation entrypoint mistake stays retained; this is a separate native renderer operation, not a model retry or regrade."
+  ],
+  "date": "2026-10-03",
+  "limits": {
+    "comparison": "UNMEASURED",
+    "fresh_metadata_for_changed_hook_definitions": "Not observed by this renderer operation.",
+    "model_task": "UNRUN",
+    "model_usage": "N/A; native usage not reported; no zero-token inference.",
+    "protection": "UNMEASURED",
+    "task_quality": "UNMEASURED",
+    "unit28_and_unit29_STOPs": "UNCHANGED",
+    "upstream_grader": "UNRUN"
+  },
+  "native_operation": {
+    "actual_output_parts": 8,
+    "all_input_bindings_unchanged": true,
+    "all_output_hashes_independently_match": true,
+    "entry_command": "python circopt.py",
+    "entrypoint": "circopt.py",
+    "environment_recipe": "local-py",
+    "installed_help_exit": 0,
+    "method": "utils render-prompts",
+    "original_input_bindings": 17,
+    "problem": "circuit_eval",
+    "prompt_recipe": "just-solve",
+    "remaining_native_entrypoint_placeholders": 0,
+    "render_exit": 0,
+    "tool": "slop-code"
+  },
+  "outputs": [
+    {
+      "bytes": 6009,
+      "part": "part_1.md",
+      "sha256": "19fa3f16361cdd71248c1736ff565a3abdbc2efcab674392a1ea94cbb15240f0"
+    },
+    {
+      "bytes": 1073,
+      "part": "part_2.md",
+      "sha256": "0825d0e8a2c94bb7609cbc6f722e3d1ae2c68cf3557cc9c304997b05c12493c4"
+    },
+    {
+      "bytes": 5538,
+      "part": "part_3.md",
+      "sha256": "6c9071b0d332600677e62c9e3bd6e08899369c5d166fe4145285b5f093184c2b"
+    },
+    {
+      "bytes": 4517,
+      "part": "part_4.md",
+      "sha256": "285cc540998d7b89b21518a88bfc96351909c8616121e4eb4062158686505395"
+    },
+    {
+      "bytes": 4188,
+      "part": "part_5.md",
+      "sha256": "799e19f593491e8be61fb8389893098e7828a30bbb177e3bdd6d932590995830"
+    },
+    {
+      "bytes": 7220,
+      "part": "part_6.md",
+      "sha256": "458d62f33142b9fed84361d9a4862bd764fb9c3f6410fd7c804219e95b72cd28"
+    },
+    {
+      "bytes": 7442,
+      "part": "part_7.md",
+      "sha256": "4c5fc60ae107ec7cfa361fcd8fd0aa5ff9e60eae247a305e35dce674b28fb32b"
+    },
+    {
+      "bytes": 7320,
+      "part": "part_8.md",
+      "sha256": "c018eca71f8adf8f310e638d21c682649d3ef8a13c62bb53889f9f6e1322a867"
+    }
+  ],
+  "private_artifact_sha256": {
+    "earlier_provisional_completion": "629d8ebfab44ccd75e86ce67a846168078efcfc7abf17b07a8dbde0c546713ac",
+    "final_native_completion": "35d12564ef0ab839418e0812c23e406637328ecc2fc3885983c75c3a2096c069",
+    "frozen_inputs": "07ee1aa80064d5ebfba94b80a9e183099a252f87fee4b3277da43121b5d52acc",
+    "native_help_stdout": "3076bfbc5fbe3ec3c50d2e12dc665a1595e1a67b772e45742c09660b5d005bca",
+    "output_projection_correction": "61950f53b09f769dd20d5f16f8bc23eea7f6d794be92d42dd5aa67f468f5dc8d",
+    "source_bindings": "b274b51dfcc419421548fa1647b9fab4f2626b3c5839be2b27c85511591eadbb"
+  },
+  "schema_version": 1,
+  "scope": "Supported maintained prompt rendering and installed help; supporting source readiness for future CircuitEval work, not a model/grader run.",
+  "selected_source_hashes": [
+    {
+      "bytes": 7944,
+      "pin": "31ceea3add480edb33431e70475c4c70597e6b31",
+      "sha256": "37cd6b9e178e932190698ae8ad2f305864559a67804aaa163331ee36b07fc8bc",
+      "upstream_path": "src/slop_code/entrypoints/commands/render_prompts.py"
+    },
+    {
+      "bytes": 6363,
+      "pin": "31ceea3add480edb33431e70475c4c70597e6b31",
+      "sha256": "d73cbfb6a4e589716b3bfe47c03e408faca488150bfbe8893475498244d674e8",
+      "upstream_path": "src/slop_code/common/render.py"
+    },
+    {
+      "bytes": 4130,
+      "pin": "31ceea3add480edb33431e70475c4c70597e6b31",
+      "sha256": "d67fe23f7bb7bdf712ed628c7a52bf618b0ed485cd00f4de835373cb2d5a70b5",
+      "upstream_path": "src/slop_code/entrypoints/cli.py"
+    },
+    {
+      "bytes": 420,
+      "pin": "31ceea3add480edb33431e70475c4c70597e6b31",
+      "sha256": "663d8920c1f88f30f9fc51ff47328a083a61fd13e6db082a9707613a6aa725e3",
+      "upstream_path": "configs/prompts/just-solve.jinja"
+    },
+    {
+      "bytes": 219,
+      "pin": "31ceea3add480edb33431e70475c4c70597e6b31",
+      "sha256": "166c9a965e2bb1d3405e8dccdeaa0358dd8bae5e30f87333fbfbb6b7e00d0501",
+      "upstream_path": "configs/environments/local-py.yaml"
+    },
+    {
+      "bytes": 4883,
+      "pin": "31ceea3add480edb33431e70475c4c70597e6b31",
+      "sha256": "395e0edf428b2e6b7b1ab448af3d692050d426148fbd823f1848ceb13d3476f4",
+      "upstream_path": "pyproject.toml"
+    },
+    {
+      "bytes": 1342,
+      "git_blob_sha1": "0f446a37a6f75477ed214e53a43a67687aaa5536",
+      "pin": "38d627ecf668a88f88f8d260f8df8df6116e9b03",
+      "sha256": "5930e2160c3d614021f138f235c31851c5dea8bfdebac08e82dbc62e0b4df8cd",
+      "upstream_path": "circuit_eval/config.yaml"
+    }
+  ],
+  "source_pins": {
+    "SprocketLab/slop-code-bench": "31ceea3add480edb33431e70475c4c70597e6b31",
+    "gabeorlanski/scb-problems": "38d627ecf668a88f88f8d260f8df8df6116e9b03"
+  },
+  "source_urls": {
+    "CLI": "https://github.com/SprocketLab/slop-code-bench/blob/31ceea3add480edb33431e70475c4c70597e6b31/src/slop_code/entrypoints/cli.py",
+    "corpus": "https://github.com/gabeorlanski/scb-problems/tree/38d627ecf668a88f88f8d260f8df8df6116e9b03",
+    "environment_recipe": "https://github.com/SprocketLab/slop-code-bench/blob/31ceea3add480edb33431e70475c4c70597e6b31/configs/environments/local-py.yaml",
+    "native_renderer": "https://github.com/SprocketLab/slop-code-bench/blob/31ceea3add480edb33431e70475c4c70597e6b31/src/slop_code/entrypoints/commands/render_prompts.py",
+    "prompt_recipe": "https://github.com/SprocketLab/slop-code-bench/blob/31ceea3add480edb33431e70475c4c70597e6b31/configs/prompts/just-solve.jinja",
+    "rendering_common": "https://github.com/SprocketLab/slop-code-bench/blob/31ceea3add480edb33431e70475c4c70597e6b31/src/slop_code/common/render.py"
+  },
+  "status": "NATIVE_RENDERER_CLOSED0_SCOPE_ONLY",
+  "supporting_source_preparation_at_its_closure": {
+    "manifest_sha256": "10d82a4c4da00afc577cb2b10e922e3f066b3fa5d4cf4ed5cfd2bde5f5d53326",
+    "new_native_keys_or_hashes_not_reused": true,
+    "receipt_sha256": "619cb2cf1bd7e2cb41a99ab3b7b84cfd79874c5518fb5c300105a73f02a96a82",
+    "runnable_nine_config_copies_withheld": true,
+    "six_changed_hook_definitions": 6,
+    "unit32_status": "HOLD_NATIVE_RENDER_AND_NEW_NATIVE_HOOK_METADATA"
+  },
+  "unit": "unit34"
+}
