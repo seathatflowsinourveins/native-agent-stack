@@ -2,6 +2,32 @@
   "schema_version": 1,
   "status": "draft_not_frozen",
   "scope": "Shared execution rules for the eight job protocols; this file authorizes no freeze or default.",
+  "comparison_modes": {
+    "default": "full_usage",
+    "selected_mode": null,
+    "selection": "Absent or null selection retains the prior full_usage contract. quality_only can be selected only by an accepted prospective per-job/shared amendment and new preregistration before any candidate quality output; this draft selects no mode and admits no run.",
+    "full_usage": {
+      "semantics": "All prior complete-usage, original-operand, coverage, efficiency and selection requirements remain in force without change. Missing usage cannot fall through a usage tiebreak to elapsed time."
+    },
+    "quality_only": {
+      "status": "proposal_only_not_accepted_or_frozen",
+      "amendment": "quality-only-contract-amendment-20261003.md",
+      "usage_gate_scope": "Complete provider usage and original efficiency operands are not quality prerequisites in this mode. Original missingness, field presence/types, scoped observations and independent treatment identity remain required; no aggregate is described as complete without complete coverage.",
+      "attempt_inventory": "Retain every planned and emitted task/repeat/arm/role/grading attempt, native internal retry, helper call, interruption and recovery with original outcomes and disposition. Bind inventory to the frozen ordered list and independently observed execution. A replaced native trial summary or partial numeric aggregate does not establish exhaustive attempts or outcomes.",
+      "native_outcomes": "Retain original reward/value, reason, status, exception, refusal, no-response and timeout records before applying the frozen oracle and failure classes. A native success value, including CORRECT with no_response, does not override its frozen disposition. Infrastructure-invalid quality remains null and whole-block recovery remains mandatory.",
+      "partial_usage": "Retain each reported original field with presence/type, value, source, attempt/role identity and observed coverage. Complete-provider totals stay null when coverage is unknown or partial. Absent fields, normalized/history zeros, estimates and extrapolation never become observed zero or complete usage; keep main/child/helper/grader/infrastructure scopes distinct and do not double count.",
+      "independent_treatment_identity": "Require actual installed client/runtime version, configured and delivered route/model/effort/parallel metadata, native orchestration, helper/child/grader identities, request-to-attempt binding and gateway interventions independently of usage availability. Unknown treatment identity prevents freeze; counter availability cannot establish delivery.",
+      "quality_rule": "Before outputs, freeze each job's numeric useful-task quality rule, oracle/input bindings, all challenger ordering and incumbent tie retention. Use no usage, cost, savings, efficiency or elapsed-time tiebreak in quality_only; ties retain the standing incumbent. Unknown usage cannot qualify a challenger.",
+      "held_claims": [
+        "cost or billing",
+        "token efficiency or savings",
+        "token-feature adoption",
+        "complete-provider accounting from partial counters"
+      ],
+      "preserved_gates": "Keep native budget/tool enforcement and breach disposition, retries, deadlines, recovery, lifecycle, images/content identity, network/allowlist, task/oracle/negative controls, no-prompt, credential isolation, extensions and owner pool/window admission. The proposed 200000-token cap remains unenforced and a freeze gate; this patch introduces no uncapped exception. An uncapped study requires a separate source-bound prospective proposal and acceptance.",
+      "required_reads": "Exact amended shared/job contracts and preregistration require both-family and consequential reads plus existing owner admission before freeze. The source-proposal acceptance is not acceptance of this patch, study freeze, run admission or a measured default."
+    }
+  },
   "source": {
     "repository": "seathatflowsinourveins/native-agent-stack",
     "ref": "b095cd2e11e7387e1bcfa107558743429714d8b9",
@@ -102,6 +128,8 @@
     "recovery_receipt": "Names old/new allocation, original invalid attempts, unchanged hashes and recovery ordinal; not a silent retry"
   },
   "usage": {
+    "completeness_and_metric_gates_apply_to": "full_usage",
+    "common_requirements": "Missingness, original field presence/types, nonoverlapping scopes and request_controls.row_counting remain mandatory in both modes. quality_only follows comparison_modes.quality_only for scoped partial observations and held accounting claims.",
     "authoritative_aggregate": "Exactly one native or owner-returned complete aggregate per arm/attempt, named before freeze",
     "efficiency_metric": "Original gross input minus original cache reads only, plus original output; output includes reasoning",
     "required_cache_read_for_metric": true,

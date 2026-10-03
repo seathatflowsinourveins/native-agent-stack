@@ -5,6 +5,36 @@
   "freeze_eligible": false,
   "shared_execution_contract": "shared-execution-contract.json",
   "scope": "Inherited DeerFlow2.1.0 versus Onyx4.8.3 comparison, with fixed GPTR3.7.0 as a matched baseline; source-only proposals do not decide the winner",
+  "comparison_modes": {
+    "default": "full_usage",
+    "selected_mode": null,
+    "selection": "Absent or null selection preserves the prior full_usage rules. quality_only requires accepted exact shared/job/preregistration bindings before candidate outputs; this draft selects no mode and remains ineligible for freeze.",
+    "full_usage": {
+      "decision_rule": "proposed_evaluation.decision_rule",
+      "usage_requirements": "All prior complete authoritative aggregate, all-call usage, original-operand and efficiency-tie conditions remain unchanged. Unknown usage cannot fall through to agent time."
+    },
+    "quality_only": {
+      "status": "proposal_only_not_accepted_or_frozen",
+      "shared_binding": "shared-execution-contract.json#comparison_modes.quality_only",
+      "amendment": "quality-only-contract-amendment-20261003.md",
+      "quality_decision": {
+        "baseline": "deerflow",
+        "challenger": "onyx",
+        "fixed_reference": "gpt-researcher cannot be replaced by this study",
+        "strict_supported_reports": "Per unchanged question/arm, integer count from 0 to 2 of native C verdicts over exactly two valid repeats under the frozen Inspect strict criterion; I=0. Native UNSCORED/errors invalidate the whole matched block and cannot shrink the denominator.",
+        "official_rubric": "Per question/arm, arithmetic mean of the two unchanged official DRB-II total scores, with original rubric item values, dimension scores, blocked_rate, field presence and failures retained separately. Bind complete original rubric coverage and its native disposition before freeze; do not substitute the rubric total for strict citation support.",
+        "minimum": "Onyx strict-supported report count and mean official rubric score must each be greater than or equal to DeerFlow on every one of the eight matched questions.",
+        "improvement": "At least one question must have strict-supported count greater by at least 1 or mean official rubric score strictly greater than DeerFlow, without any loss under minimum. Freeze the native numeric field, complete-coverage and failure dispositions before outputs; no post-hoc rounding or tolerance.",
+        "qualifying_challenger_order": ["onyx is the sole challenger for the DeerFlow slot"],
+        "quality_tie": "If every quality value ties, retain DeerFlow2.1.0. No usage, elapsed-time or footprint tiebreak.",
+        "otherwise": "Keep DeerFlow2.1.0; GPTR3.7.0 stays the fixed matched reference."
+      },
+      "grader_binding_scope": "Keep inspect-grader-binding.json native scorer, default instructions/pattern, required grader role, partial_credit=false, strict Sample.target criterion, parse/coverage acceptance and all negative controls unchanged. Its original efficiency-operand and complete-accounting prerequisites apply to full_usage; quality_only still requires original missingness/presence, scoped grader/helper observations and independent actual grader delivery identity.",
+      "outcome_inventory": "Retain all 16 task-repeat blocks, 48 planned reports and every grading/helper/retry/invalid/recovery attempt, original report/source observations and native values/reasons/dispositions. No selective exclusions, altered denominator, replacement scorer or independent retry.",
+      "usage_and_identity": "Complete usage may remain null; partial counters retain original fields and explicit scope. Independently bind actual runtime/route/model/effort/parallel/child/helper/grader identities and attempt coverage. Cost, efficiency, savings and token-feature adoption remain HOLD.",
+      "budget_gate": "Keep enforced time/token/search/fetch limits and all shared non-usage gates. The proposed 200000-token envelope is still unenforced and blocks freeze; this amendment supplies no uncapped exception."
+    }
+  },
   "task_source": {
     "repository": "https://github.com/imlrz/DeepResearch-Bench-II",
     "ref": "b38f360603db9531b102aef8c166cedb8509b6f6",
@@ -129,7 +159,7 @@
     "rubric_quality": "Retain the unchanged official DRB-II report-rubric grader separately. Its report-text evidence is not source entailment; its score is never substituted for citation support.",
     "aggregation": "Per question/arm, sum strict-supported report passes across two valid repeats (denominator2) and take the arithmetic mean of the unchanged official DRB-II rubric scores across those repeats. Report per-question scores, not only a pooled mean.",
     "footprint": "Decision-relevant acceptance gate for passwordless admission and declared host resources; measured CPU/RAM/disk/service footprint otherwise report-only, not a post-hoc tiebreaker.",
-    "decision_rule": "Lane reading of the inherited role labels: Onyx4.8.3 replaces DeerFlow2.1.0 only with no lower strict-supported report count and mean official rubric score on every matched question and at least one strict quality improvement. If every quality value ties, require at least5% lower paired median uncached-input-plus-output tokens with complete authoritative same-scope original gross-input/cache-read/output operands and no greater paired median agent time. Otherwise keep DeerFlow; incomparable admission or missing usage yields no claimed efficiency win. Fixed GPTR3.7.0 cannot be replaced by this study.",
+    "decision_rule": "Full_usage mode, unchanged lane reading of the inherited role labels: Onyx4.8.3 replaces DeerFlow2.1.0 only with no lower strict-supported report count and mean official rubric score on every matched question and at least one strict quality improvement. If every quality value ties, require at least5% lower paired median uncached-input-plus-output tokens with complete authoritative same-scope original gross-input/cache-read/output operands and no greater paired median agent time. Otherwise keep DeerFlow; incomparable admission or missing usage yields no claimed efficiency win. Fixed GPTR3.7.0 cannot be replaced by this study.",
     "limitations": "No calibrated claim percentage, universal quality or statistical superiority follows this eight-question screen. The local citation rubric requires native fail-closed parse behavior and its negative controls before candidate outputs.",
     "native_grader_binding": "inspect-grader-binding.json"
   },
@@ -139,10 +169,11 @@
     "Same source-backed keyless search/fetch service pins, exact engine/language/result-count/quotas, common output contract and automated clarification-off setting",
     "Exact org-owned extension/plugin/skill/MCP inventory and useful loader activation checks: GPTR plugin executable/Python-version contract; DeerFlow0.2 extensions; Onyx research/sandbox tools",
     "Native configured OmniRoute build/carry and actual all-call effort across main/child/summary/title/auxiliary calls; preserve differing native/API effort semantics",
-    "Shared execution-contract acceptance, all48 ordered attempt records, owner-observed delivered reasoning/parallel fields, correlation join and one complete authoritative usage aggregate per arm",
+    "Shared execution-contract acceptance, all48 ordered attempt records, owner-observed delivered reasoning/parallel fields and request-to-attempt binding in both modes; one complete authoritative usage aggregate per arm additionally required in full_usage",
     "Native binary C/I grader contract accepted and unchanged parse controls plus locally authored support/numeric negative controls pass; any UNSCORED invalidates the block and cannot shrink the denominator",
     "Source-backed evaluator/judge transport and frozen strict rubric; wrong-source, wrong-attribution, unsupported-claim, missing-source and temporal-violation negative controls before candidate outputs",
-    "Observable all-call native usage and enforced time/token/search/fetch bounds, terminal results and independent actual report/source observations",
+    "Observable all-call native usage completeness in full_usage; original usage missingness/presence/types, scoped partial counters and independently bound treatment/attempt identities in quality_only; enforced time/token/search/fetch bounds, terminal results and independent actual report/source observations remain required in both modes",
+    "Quality_only requires accepted numeric per-question quality/challenger/tie rules and exact shared/job/preregistration reads; frozen strict Inspect and official DRB-II graders, original outcomes/coverage and all non-usage gates remain mandatory",
     "Exact independent archive/availability rules and blinded source/report/rubric bindings; all failed attempts and unknown counters retained"
   ],
   "failures_preserved": [

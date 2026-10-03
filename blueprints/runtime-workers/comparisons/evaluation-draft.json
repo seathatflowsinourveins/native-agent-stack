@@ -8,13 +8,39 @@
   "runs": [],
   "default": null,
   "purpose": "Qualify native evaluation orchestration with original outcomes, error classes, recovery and counter fidelity. Different native fixture suites are readiness controls; a useful-task comparison needs a common maintained oracle/input binding.",
+  "comparison_modes": {
+    "default": "full_usage",
+    "selected_mode": null,
+    "selection": "Absent or null selection preserves the prior full_usage rules. quality_only is selectable only by accepted exact shared/subjob/preregistration bindings before outputs; this draft admits no run or evaluator promotion.",
+    "full_usage": {
+      "decision_rule": "selection_rule",
+      "usage_requirements": "All prior complete original-operand, counter-fidelity, coverage and efficiency conditions remain unchanged. Missing usage cannot fall through to elapsed time."
+    },
+    "quality_only": {
+      "status": "proposal_only_not_accepted_or_frozen",
+      "shared_binding": "shared-execution-contract.json#comparison_modes.quality_only",
+      "amendment": "quality-only-contract-amendment-20261003.md",
+      "quality_decision": {
+        "subjobs": "Model/task and containerized-agent evaluation remain separate with Inspect0.3.273 and Harbor0.23.0 as their respective incumbents.",
+        "common_inputs_and_oracle": "Require matched useful-task IDs/source/input hashes, native task-format bindings and one unchanged maintained oracle per subjob before comparison. Different readiness suites, fixture pass counts, process exit or native normalized usage establish no winner.",
+        "outcome_coverage": "Exactly two repeats with no missing, duplicate or misclassified useful-task outcomes; retain original values/reasons/errors and complete artifact/recovery inventory under the frozen oracle and shared failure classes.",
+        "numeric_gain_rule": null,
+        "challenger_order": null,
+        "required_before_freeze": "Each subjob must bind its numeric useful-task quality metric, a positive numeric minimum gain, comparison direction, all challenger ordering and failure dispositions before any outputs. The unbound numeric_gain_rule/challenger_order remain freeze gaps; this proposal supplies no new oracle or post-hoc gain rule.",
+        "quality_tie": "Keep the corresponding standing Inspect0.3.273 or Harbor0.23.0 incumbent on a quality tie or tied greatest qualifying gains; no usage or elapsed-time tiebreak.",
+        "promotion": "Only an independently qualified candidate meeting the frozen numeric gains and required consensus amendment may replace its subjob incumbent; no universal evaluator winner."
+      },
+      "usage_and_identity": "Complete provider usage may remain null while original field presence/types/missingness and partial attempt/role scope are retained. Actual native client/route/model/effort/parallel/helper/grader identities and request-to-attempt binding remain mandatory independently. Cost, efficiency, savings and token-feature adoption remain HOLD.",
+      "preserved_gates": "Common tasks/native oracle/negative controls, native budget/retry/deadline/lifecycle/image/network/no-prompt/credential/owner-window gates and exact both-family/consequential reads remain required; no uncapped amendment is introduced."
+    }
+  },
   "arms": [
     {"id": "harbor", "repository": "harbor-framework/harbor", "version": "v0.23.0", "ref": "1e5c5c6db929a10a140d05e606882c671ae20729", "baseline_for": "containerized_agent"},
     {"id": "inspect", "repository": "UKGovernmentBEIS/inspect_ai", "version": "0.3.273", "ref": "9e44f1b77ed7c912bf58baf30db8560937e7ce53", "baseline_for": "model_and_task"},
     {"id": "inspect-update-candidate", "repository": "UKGovernmentBEIS/inspect_ai", "version": "0.3.276", "ref": "93f7182cf2ce9be22724b05e499cd1358d7ed41d", "eligibility": "unadopted update; consensus amendment before freeze"},
     {"id": "promptfoo", "repository": "promptfoo/promptfoo", "version": "0.123.1", "ref": "34f74d34e140b5e17d23770dfb2340057b1936b8", "eligibility": "unadopted research candidate; consensus amendment before evaluator use"}
   ],
-  "routing": {"gateway": "OmniRoute composition/endpoint from job catalog", "native_target_model": "cx/gpt-6.1-sol-ultra", "native_target_effort": "ultra orchestration where supported; per-runtime native mapping separately bound", "consequential_grader_model": "cx/gpt-6-astra-max", "grader_effort": "max", "qualified": false, "limits": "Owner-observed delivered reasoning/parallel fields and correlation/counters required by shared contract; evaluator estimates are not provider billing."},
+  "routing": {"gateway": "OmniRoute composition/endpoint from job catalog", "native_target_model": "cx/gpt-6.1-sol-ultra", "native_target_effort": "ultra orchestration where supported; per-runtime native mapping separately bound", "consequential_grader_model": "cx/gpt-6-astra-max", "grader_effort": "max", "qualified": false, "limits": "Owner-observed delivered reasoning/parallel fields and request-to-attempt identities required in both modes; complete counters required by full_usage, scoped partial observations/missingness by quality_only. Evaluator estimates are not provider billing."},
   "native_control_source_scope": {"harbor": "1e5c5c6db929a10a140d05e606882c671ae20729", "inspect": "93f7182cf2ce9be22724b05e499cd1358d7ed41d update candidate only; these hashes and five passing controls do not qualify standing0.3.273", "promptfoo": "34f74d34e140b5e17d23770dfb2340057b1936b8 research candidate only"},
   "native_control_sources": [
     {"arm": "harbor", "path": "examples/tasks/hello-world/tests/test_state.py", "bytes": 569, "sha256": "f219416b41d952452cc109c8aea5d4627d9793554dfa78535cee8a69123e048f", "ids": ["test_hello_file_exists", "test_hello_file_contents"], "contract": "Native verifier requires /app/hello.txt with stripped content exactly Hello, world!; bind native solution/oracle positive and fresh Nop negative with actual reward1/0"},
@@ -40,6 +66,6 @@
   ],
   "useful_task_comparison": {"task_ids": [], "source_refs": [], "input_hashes": [], "unchanged_upstream_oracle": null, "native_task_format_bindings": null, "frozen_outputs_option": "Supported offline output regrading where available; preserve target run and grading runs as distinct evidence/counter scopes", "limits": "The readiness controls above do not establish one common workload or evaluator winner; no custom scorer introduced"},
   "design": {"repeats": 2, "retry": 0, "concurrency": 1, "order": "Rotate paired useful-task arms; run offline native controls separately", "timeout_seconds": null, "token_limits": null, "window": null, "claude_pre_freeze_read": null},
-  "selection_rule": {"requirements": "Qualify model/task and containerized-agent evaluation as separate subjobs with their standing owners; common oracle and complete error/artifact recovery required", "quality": "No missing/duplicate/misclassified useful-task outcomes in either repeat; predeclare numeric comparison against each subjob's unchanged native oracle", "tie": "Keep Inspect0.3.273 for model/task and Harbor0.23.0 for containerized agents unless a reviewed candidate passes that subjob's frozen gains. Efficiency uses at least5% lower paired uncached-input-plus-output with complete authoritative original gross-input/cache-read/output operands; other cache/reasoning breakdowns stay separate and missing stays null and no greater median time", "limits": "No universal peer-runner winner from different workloads, fixtures, normalized zeros or process exit; promptfoo/update promotion requires a consensus amendment"},
-  "freeze_gaps": ["Exact supported native suite commands and fixture filters", "Common frozen useful tasks with maintained native format/oracle integration", "Harbor full task-tree/image bindings and end-to-end timeout fixture", "Actual Sol/Ultra target and Astra/Max grader route/extension acceptance", "Native/raw counter missingness and grader/cache scope binding", "Frozen original outputs, prompts, time/token/tool limits and numeric rule", "Claude exact-head read and exclusive throwaway allocation"]
+  "selection_rule": {"comparison_mode": "full_usage", "requirements": "Qualify model/task and containerized-agent evaluation as separate subjobs with their standing owners; common oracle and complete error/artifact recovery required", "quality": "No missing/duplicate/misclassified useful-task outcomes in either repeat; predeclare numeric comparison against each subjob's unchanged native oracle", "tie": "Keep Inspect0.3.273 for model/task and Harbor0.23.0 for containerized agents unless a reviewed candidate passes that subjob's frozen gains. Efficiency uses at least5% lower paired uncached-input-plus-output with complete authoritative original gross-input/cache-read/output operands; other cache/reasoning breakdowns stay separate and missing stays null and no greater median time", "limits": "No universal peer-runner winner from different workloads, fixtures, normalized zeros or process exit; promptfoo/update promotion requires a consensus amendment"},
+  "freeze_gaps": ["Exact supported native suite commands and fixture filters", "Common frozen useful tasks with maintained native format/oracle integration", "Harbor full task-tree/image bindings and end-to-end timeout fixture", "Actual Sol/Ultra target and Astra/Max grader route/extension acceptance", "Native/raw counter missingness and grader/cache scope binding in both modes; complete accounting/efficiency operands additionally required in full_usage", "Frozen original outputs, prompts, time/token/tool limits and numeric rule", "Quality_only numeric_gain_rule, all challenger ordering and incumbent tie retention for each common-task/native-oracle subjob before outputs", "Exact both-family/consequential amended-contract/preregistration reads and exclusive throwaway owner allocation"]
 }

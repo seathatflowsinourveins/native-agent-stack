@@ -4,6 +4,35 @@
   "status": "draft_not_frozen",
   "freeze_eligible": false,
   "scope": "Prospective matched-task comparison of standing OpenHands1.50.1 coding worker against native Codex0.160 and Pi1.0; no historical gate regrade or new default",
+  "comparison_modes": {
+    "default": "full_usage",
+    "selected_mode": null,
+    "selection": "Absent or null selection preserves the prior full_usage rules. quality_only is a proposal requiring accepted exact shared/job/preregistration bindings before outputs; this draft remains ineligible for freeze.",
+    "full_usage": {
+      "decision_rule": "proposed_decision_rule.selection",
+      "usage_requirements": "All prior usage_contract required_fields, complete authoritative coverage and efficiency conditions remain unchanged. Unknown usage cannot fall through to agent time."
+    },
+    "quality_only": {
+      "status": "proposal_only_not_accepted_or_frozen",
+      "shared_binding": "shared-execution-contract.json#comparison_modes.quality_only",
+      "amendment": "quality-only-contract-amendment-20261003.md",
+      "quality_decision": {
+        "baseline": "openhands-sdk",
+        "measure": "For each of the unchanged 24 tasks, count native reward=1 across exactly two valid admitted repeats; task count is an integer from 0 to 2. Preserve native reward=0 and all frozen failure dispositions. Each arm's total successful valid trials is an integer from 0 to 48.",
+        "minimum": "Every challenger task count must be greater than or equal to the OpenHands1.50.1 count on the same task.",
+        "improvement": "At least one challenger task count must exceed the baseline count by at least 1.",
+        "qualifying_challenger_order": [
+          "total successful valid trials descending",
+          "if greatest totals tie between qualifying challengers, retain standing OpenHands1.50.1"
+        ],
+        "quality_tie": "If all task counts tie the incumbent, retain standing OpenHands1.50.1; no usage or agent-time tiebreak.",
+        "otherwise": "Retain standing OpenHands1.50.1; no measured default before qualified decision acceptance."
+      },
+      "outcome_inventory": "All 48 task-repeat blocks and 144 planned arm attempts plus every invalid/recovery/helper/grading attempt remain bound and retained. Infrastructure-invalid quality is null; native non-infrastructure failures score 0 only under the unchanged frozen oracle/disposition. No selective exclusions, altered denominator or independent retry.",
+      "usage_and_identity": "Complete usage may remain null and partial counters retain original missingness/presence/types and explicit scope. Actual runtime/client/route/model/effort/parallel/child/helper identities and attempt binding remain required independently; cost, efficiency, savings and token-feature adoption remain HOLD.",
+      "budget_gate": "The proposed 200000-token envelope remains unenforced and blocks freeze until source-supported native enforcement and breach disposition are qualified. This amendment does not make the study uncapped; a separate source-bound prospective proposal is required for that change."
+    }
+  },
   "sources": {
     "harbor": {
       "tag": "v0.23.0",
@@ -157,6 +186,7 @@
   "proposed_decision_rule": {
     "quality": "Unchanged native FAIL_TO_PASS/PASS_TO_PASS reward for valid admitted attempts. Infrastructure-invalid carries null quality and whole-block recovery; native non-infrastructure failures score0 only under frozen rule",
     "selection": {
+      "comparison_mode": "full_usage",
       "baseline": "openhands-sdk",
       "quality": {
         "measure": "two-repeat success count per frozen task",
@@ -181,7 +211,7 @@
     "Existing owner binds applicable Gate A original sealed task/question/frozen-term identities and accepts prospective amendment; historical gates unchanged",
     "Exact repaired protocol/shared/config/source hashes receive Astra/max consequential read, Claude ACCEPT and root admission",
     "Retained complete ordered task-repeat-arm/role/grading list/hash; native internal retry policies; whole-block recovery receipt, maxinvalid2/maxexclusions0",
-    "Owner-returned21128 actual composition, delivered effort/parallel metadata, request correlation and complete per-arm/helper wire counters;20128 historical",
+    "Owner-returned21128 actual composition, delivered effort/parallel metadata and request-to-attempt binding in both modes; complete per-arm/helper wire counters additionally required in full_usage;20128 historical",
     "Every original task budget/tree/Dockerfile, platform manifests, actual source-policy enforcement and built-image identity; registry metadata is not build acceptance",
     "Actual installed Codex0.160/OpenHands1.50.1/Pi1.0 inside clean execution environments; workstationCodex0.159.3 is not target qualification",
     "Pinned native CodexUltra/V2 Harbor carrier qualification: unchanged installed model catalog and inline config, actual ResponsesLite delivery with parallel_tool_calls false, explicit V2 activation, child model/effort observation, native lifecycle and allowlist acceptance",
@@ -190,7 +220,8 @@
     "Actual worker reference isolation and identical natively enforced allowlist; host networking alone does not establish policy",
     "Named900-second modified setup, all native deadlines and setup/build/grading/cleanup bounds; adequate windows or accepted parallelism/timeout amendment",
     "Native token/tool enforcement and breach disposition or explicit uncapped amendment; no fabricated cap",
-    "One complete authoritative uncached-input-plus-output aggregate per arm/attempt, cache subsets/no-cache/correlation and all helper/grading scopes; unknown stays null",
+    "Full_usage only: one complete authoritative uncached-input-plus-output aggregate per arm/attempt, cache subsets/no-cache/correlation and all helper/grading scopes; unknown stays null",
+    "Quality_only: accepted numeric quality/challenger/tie rule, complete original attempt/outcome inventory, independent treatment identities and original field presence/missingness/scoped partial counters under the shared amendment; all non-usage gates still required",
     "Lifecycle interruption/recovery/no-prompt/no-credential-copy under frozen setup before comparison"
   ],
   "failures_preserved": [
@@ -228,7 +259,7 @@
       "arms": "Standing OpenHands1.50.1 baseline, native Codex0.160 agent arm and Pi1.0 challenger; owned final-form extensions remain separate pending bindings",
       "model_and_effort": "Common SolUltra across all coding arms; AstraMax requires a separate matched condition/amendment",
       "route": "Owner-proposed21128 composition; morning20128 is different historical readiness",
-      "metrics": "Native task reward plus complete authoritative uncached-input-plus-output efficiency; gross/cache/reasoning subsets separate",
+      "metrics": "Full_usage retains native task reward plus complete authoritative uncached-input-plus-output efficiency; gross/cache/reasoning subsets separate. quality_only uses only comparison_modes.quality_only.quality_decision and holds efficiency/cost/savings/token-feature claims",
       "limits": "144 planned arm attempts; named900-second agent deviation from native3000-second task budgets; verifier3000 retained; proposed token/tool envelopes remain unenforced",
       "environment_and_recovery": "Disposable native Harbor Docker, original tasks plus declarative image/network carriers, frozen ordered blocks and shared infrastructure-invalid recovery"
     },
@@ -260,6 +291,8 @@
     "pi_effort_gate": "Native Pi thinking/provider mapping is distinct from Codex Ultra orchestration; serialized effort labels do not establish parity"
   },
   "usage_contract": {
+    "required_fields_apply_to": "full_usage",
+    "quality_only_requirements": "Retain original usage field presence/types/missingness and explicitly partial attempt/role coverage; complete totals remain null when incomplete. Independent delivery/attempt identities, no-cache, compression-off, fresh state, helper/grading inventory and gateway interventions remain required. The full_usage operand/aggregate prerequisites are held accounting gates, not quality_only prerequisites.",
     "authoritative_aggregate_per_arm": null,
     "primary_efficiency": "Complete uncached input tokens plus output tokens",
     "required_fields": [

@@ -9211,13 +9211,13 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "0f3d23fd3071edbe97f1c5fb6892ddc44ed57aebf2cebf4b59bc0bdb08ed37e0",
-      "bytes": 19758
+      "sha256": "e8699f9aa49a875bcad12b6a8ae76b36b770d2ed6eaf5bead706e4449274225b",
+      "bytes": 23655
     },
     {
       "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
-      "sha256": "524a5c4a3561b7be928339176da8e96986d593cc04f54027fdf8d8e4c3ed5ea0",
-      "bytes": 10596
+      "sha256": "90a559504399984fa6e2706b0672a6c43a81a4ed10cd6101488140d8c2f83d76",
+      "bytes": 14002
     },
     {
       "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
@@ -9245,9 +9245,14 @@
       "bytes": 4404
     },
     {
+      "path": "blueprints/runtime-workers/comparisons/quality-only-contract-amendment-20261003.md",
+      "sha256": "d22715d03fbdb206bf0c5d53bee4ff49163656a9a06afb044d7998007be2f913",
+      "bytes": 12277
+    },
+    {
       "path": "blueprints/runtime-workers/comparisons/research-gatherer-draft.json",
-      "sha256": "3092a4eb0350c4a7bc12c6905dcd7898648d16cd5b127067117467a9fc28da30",
-      "bytes": 10718
+      "sha256": "ff58f1449140c99e100ccd2d2c51e1c5e9db34b54e8cbc88c67f267a1c2ceaea",
+      "bytes": 15063
     },
     {
       "path": "blueprints/runtime-workers/comparisons/reviewer-draft.json",
@@ -9266,8 +9271,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
-      "sha256": "2ef146220dca214d4d640332c1969656e7fd7923e3639d8f3220ba2e1ce4c4f4",
-      "bytes": 8365
+      "sha256": "4c0405134288d3155dbd3f5df651debe03df92e0363c70e9ffff933ca086c61b",
+      "bytes": 12624
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
@@ -9776,8 +9781,8 @@
     },
     {
       "path": "blueprints/runtime-workers/sdk-role-qualification.md",
-      "sha256": "82bf9ffc5459e9aefb622b475dc91787f2874111d08a37067c1f3570f0cb3a6d",
-      "bytes": 6767
+      "sha256": "f115071e02ffce455ac5549581f193e103b90cc47307b02a30a6bfb257deab27",
+      "bytes": 8251
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
@@ -15066,8 +15071,8 @@
     },
     {
       "path": "catalogs/foundation/runtime-jobs.json",
-      "sha256": "c8b6cac81e22d992296124ebaadf17c05079fe8153578b0e055cbe8753ae8018",
-      "bytes": 19898
+      "sha256": "a2ab6710550aaf18d8067084ee0a9214c0b45b2211a11c4d9104adbce5d75344",
+      "bytes": 20353
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -42043,6 +42048,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-source-and-native-readiness.json",
       "sha256": "9d0fc2bd7ff199fe4bad1a566bb56926dbd2280f97ecc84807571ca747881af1",
       "bytes": 25493
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-nonpausing-native-fixture-20261003.json",
+      "sha256": "c6e1661ae07a45f93fe7c6ebb340094f2f4e9edeee86aa52ebb8a705ffaf3533",
+      "bytes": 10115
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-nonpausing-setup-timeout-20261003.json",
