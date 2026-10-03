@@ -214,8 +214,8 @@
     {
       "workflow": ".github/workflows/catalog-freshness.yml",
       "job": "freshness",
-      "schedule": "17 6 * * 1",
-      "purpose": "Reruns extract_layers.py + github_freshness.py, rebuilds a manifest with build_manifest.py against an empty lanes.json (skips interactive lane review, still recomputes the real pin/upstream baseline), diffs it against catalogs/sota-convergence/manifest-20260922.json, and appends a fixed-tool pin-drift table to the job summary. Writes and commits nothing; uploads a 30-day artifact.",
+      "schedule": ["17 6 * * 1", "17 6 * * 0,2-6"],
+      "purpose": "Reports daily at 06:17 UTC through disjoint Monday and other-day triggers. Reruns extract_layers.py + github_freshness.py, rebuilds a manifest with build_manifest.py against an empty lanes.json (skips interactive lane review, still recomputes the real pin/upstream baseline), diffs it against catalogs/sota-convergence/manifest-20260922.json, and appends a fixed-tool pin-drift table to the job summary. This freshness job writes and commits nothing; it uploads a 30-day artifact. The separate guarded proposal job is eligible on Monday with CATALOG_FRESHNESS_PROPOSE=true, or by explicit manual open_pr=true dispatch.",
       "required_check": false
     },
     {

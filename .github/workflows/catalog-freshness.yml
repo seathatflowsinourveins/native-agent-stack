@@ -2,7 +2,10 @@ name: Catalog freshness (report-only)
 
 on:
   schedule:
-    - cron: '17 6 * * *'
+    # Daily at 06:17 UTC; github.event.schedule identifies Monday proposals.
+    # https://github.com/github/docs/blob/2bd66de8cea336061c9ea060c9b37385136e6ab3/data/reusables/repositories/actions-scheduled-workflow-example.md#L34-L51
+    - cron: '17 6 * * 1'
+    - cron: '17 6 * * 0,2-6'
   workflow_dispatch:
     inputs:
       max_repos:
@@ -72,11 +75,14 @@ jobs:
           # table in drift.md: every pinned trading component (selected us-equities
           # cards plus extract_layers.py's TRADING_PIN_SOURCES) vs upstream, with a
           # dormancy signal relative to --checked-at. The manifest itself is unchanged.
+          # --runtime-freshness-out does the same for the GPT runtime table: the runtime workers,
+          # SDKs and agents in extract_layers.py's RUNTIME_PIN_SOURCES and RUNTIME_WATCH_SOURCES.
           printf '{"lanes": [], "critic": null, "lost": []}\n' > "$RUNNER_TEMP/freshness/lanes.json"
           python3 tools/sota-convergence/build_manifest.py \
             --work-dir "$RUNNER_TEMP/freshness" --lanes "$RUNNER_TEMP/freshness/lanes.json" \
             --out "$RUNNER_TEMP/freshness/manifest-$(date -u +%Y%m%d).json" \
             --trading-freshness-out "$RUNNER_TEMP/freshness/trading-freshness.json" \
+            --runtime-freshness-out "$RUNNER_TEMP/freshness/runtime-freshness.json" \
             --checked-at "$(date -u +%Y-%m-%d)" --id "catalog-freshness-$(date -u +%Y%m%d)"
       - name: Diff the rebuilt manifest against the published pins/upstream
         id: diff
@@ -97,7 +103,9 @@ jobs:
           print((work_dir / "drift.md").read_text())
           print(f"drifted={len(result['drifted'])} unfetched={len(result['unfetched'])} "
                 f"no_release={len(result['no_release'])} trading={len(result['trading'])} "
-                f"dormant={len(result['dormant'])} archived={len(result['archived'])}")
+                f"dormant={len(result['dormant'])} archived={len(result['archived'])} "
+                f"runtime={len(result['runtime'])} runtime_behind={len(result['runtime_behind'])} "
+                f"runtime_unresolved={len(result['runtime_unresolved'])}")
           PYEOF
           {
             echo "drift=$(cat "$RUNNER_TEMP/freshness/drift-status.txt")"
@@ -168,6 +176,7 @@ jobs:
             ${{ runner.temp }}/freshness/manifest-*.json
             ${{ runner.temp }}/freshness/github-freshness.json
             ${{ runner.temp }}/freshness/trading-freshness.json
+            ${{ runner.temp }}/freshness/runtime-freshness.json
             ${{ runner.temp }}/freshness/drift.md
           if-no-files-found: error
           include-hidden-files: false
@@ -180,7 +189,7 @@ jobs:
   # registration -- it never selects, evaluates, or writes catalogs/sota-convergence/*,
   # catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* (owned by the
   # separate SOTA-convergence lane review). Off by default: it only runs from an explicit
-  # manual `open_pr: true` dispatch, or from a schedule when the repository variable
+  # manual `open_pr: true` dispatch, or from Monday's schedule when the repository variable
   # CATALOG_FRESHNESS_PROPOSE is set to 'true' -- and, either way, only when this run's own
   # freshness fetch was unbounded and free of both full fetch errors and partial errors (a
   # releases/tags/commit sub-fetch that failed and fell back, e.g. a 503 on releases papered
@@ -192,7 +201,8 @@ jobs:
       github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' &&
       (inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' &&
       needs.freshness.outputs.partial_errors == '0' &&
-      (inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
+      (inputs.open_pr == true || (github.event_name == 'schedule' &&
+      github.event.schedule == '17 6 * * 1' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     concurrency:
