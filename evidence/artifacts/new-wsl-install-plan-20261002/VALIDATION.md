@@ -169,18 +169,20 @@ Repository checks of the plan's files, run on the coordinating workstation from 
 
 ### What changed
 
-The wave-2 batch of the layer consensus made `memory-owner`, `code-search` and `context-supply` interim installs (amendment 3), added `statusline`, and revised `research-harnesses`, `tobi-qmd`, `gpt-gateway` and the three skills rows (README.md, section "Wave 2"; sources in SOURCES.md, section "Wave 2"). After the branch review of 2026-10-03: each interim row's install function calls `interim_acknowledged` first, and `check_plan.py` requires that; `memory-owner` runs ai-memory's own `install-hooks --agent codex --apply` once and checks its seven Codex events in `hooks.json`; `context-supply` checks that marketplace auto-update is off for context-mode.
+The wave-2 batch of the layer consensus made `memory-owner`, `code-search` and `context-supply` interim installs (amendment 3), added `statusline`, and revised `research-harnesses`, `tobi-qmd`, `gpt-gateway` and the three skills rows (README.md, section "Wave 2"; sources in SOURCES.md, section "Wave 2"). After the branch review of 2026-10-03: each interim row's install function calls `interim_acknowledged` first, and `check_plan.py` requires that; `memory-owner` runs ai-memory's own `install-hooks --agent codex --apply` once and checks its seven Codex events in `hooks.json`; `context-supply` checks that marketplace auto-update is off for context-mode. After the pull-request review of 2026-10-03: `statusline` runs upstream's helper (`scripts/setup.mjs inspect`, then `install --shell posix`), which copies the launcher that the configured status line runs, and adds `refreshInterval` 5 when absent; its acceptance runs the configured command instead of the cached launcher, which had passed with that copy missing.
 
 ### Checks run
 
-- `python3 -B check_plan.py`: exit 0, `OK: 70 rows: 42 installed by default, 3 measurement-only, 25 not installed; 85 commands and 62 acceptance entries agree with the scripts`.
+- `python3 -B check_plan.py`: exit 0, `OK: 70 rows: 42 installed by default, 3 measurement-only, 25 not installed; 87 commands and 62 acceptance entries agree with the scripts`.
 - `bash -n install.sh` and `bash -n accept.sh`: exit 0.
 - `tests/test_new_wsl_definitive_defaults.py`, class `InterimPlanChecks`: `check_plan.py` over a scratch copy of the plan fails, with its message, for an interim row set to `installed: false`, a plan owner that is not the interim's, an interim install function without the gate call first (each of the three rows) and a script without the gate function; the unchanged copy passes. The gate function itself, cut from `install.sh` and run with `bash` and `jq` against scratch `consensus.json` files, refuses while a family is owed, refuses a list it cannot read and passes an empty list; against the committed batch it refuses today, since both acknowledgements are owed.
 - The `jq` filter of `memory-owner`'s new acceptance line, against two scratch `hooks.json` files: false (exit 1) when an event has no ai-memory command, true when each named event has one.
+- `tests/test_new_wsl_definitive_defaults.py`, class `StatuslineInstallAndAcceptance` (our own fixtures: a scratch `HOME`, links to the system tools and a stand-in runtime; upstream's helper and launcher do not run): the helper command calls `setup.mjs inspect`, then `install`, with `--shell posix`, from the one cached 0.10.0, and refuses with no cached 0.10.0, with 0.10.0 in two marketplaces and with no `node` or `bun`; the `refreshInterval` command adds 5 only when absent, in the real file behind a link, with its mode kept; the acceptance passes the wired state and fails each planted condition: the copied launcher missing, no or another `refreshInterval`, another version's launcher copy, a second cached version, and a command that runs the cached launcher. Against the same missing-copy fixture, the acceptance as it was before the review exits 0.
 
 ### Not established
 
 - Whether ai-memory 2.5.2's installer writes the seven events with commands that name `ai-memory`, as the acceptance expects: read in its source (SOURCES.md), not run.
+- Whether claude-hud 0.10.0's helper, run through mise's `node` shim, records the runtime path the client configuration renders (`process.execPath`, setup.mjs line 32), and whether its launcher prints two lines on the destination: read in its source, not run.
 - Anything about a client: no Claude Code or Codex session ran, no hook was trusted and no marketplace was added.
 
 ## Round 1 install-plan repair (historical)

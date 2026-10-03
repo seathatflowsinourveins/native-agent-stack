@@ -325,6 +325,10 @@ statusline() {
   run_command 'claude plugin marketplace add jarrodwatts/claude-hud#v0.10.0 --scope user' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/README.md#L30 (plugin install)
   run_command 'claude plugin install claude-hud@claude-hud --scope user' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/commands/setup.md#L24 (the runtime; inspect at L35, install at L58); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/setup.mjs#L69 (install copies the launcher the status line runs to <config dir>/plugins/claude-hud/statusline.mjs and writes statusLine, L69-101); wave-2 usage ruling, change 3 (the helper, without prompts)
+  run_command 'c="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"; set -- "$c"/plugins/cache/*/claude-hud/0.10.0; [[ $# == 1 && -f "$1/scripts/setup.mjs" ]] || { printf "claude-hud 0.10.0 is not in exactly one marketplace cache under %s\n" "$c" >&2; exit 1; }; rt="$(command -v bun 2>/dev/null || command -v node 2>/dev/null)" || { printf "no node or bun for the claude-hud helper\n" >&2; exit 1; }; "$rt" "$1/scripts/setup.mjs" inspect --shell posix; "$rt" "$1/scripts/setup.mjs" install --shell posix' || return "$?"
+  # Planned. Source: https://code.claude.com/docs/en/statusline.md#L69 (refreshInterval); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/setup.mjs#L94 (install keeps earlier statusLine keys only when they were claude-hud's); wave-2 usage ruling, change 4 (refreshInterval 5 when absent: a temporary file in the same folder, then mv)
+  run_command 's="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"; t="$(readlink -f -- "$s")"; if jq -e ".statusLine.refreshInterval == null" "$t" >/dev/null; then n="$(mktemp "$t.XXXXXX")"; jq ".statusLine.refreshInterval = 5" "$t" > "$n" && chmod --reference="$t" -- "$n" && mv -f -- "$n" "$t" || { rm -f -- "$n"; exit 1; }; fi' || return "$?"
 }
 
 otel-collector-contrib() {

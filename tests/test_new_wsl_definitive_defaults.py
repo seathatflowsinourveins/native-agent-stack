@@ -2,7 +2,8 @@
 
 Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001, and the
 layer-consensus record that its assembler reads last). They do not judge any pick; they hold the manifest to its own rule.
-One class runs a committed program: the install plan's acceptance of the consensus row skill-authoring, against stand-ins.
+Two classes run committed programs against stand-ins: the install plan's acceptance of the consensus row skill-authoring,
+and the statusline row's helper commands and acceptance.
 """
 import hashlib
 import json
@@ -1381,6 +1382,153 @@ class SkillAuthoringAcceptance(unittest.TestCase):
             with self.subTest(case=name):
                 status, _, stderr = self.run_case(errexit=False, **case)
                 self.assertEqual(status, 1, stderr)
+
+
+class StatuslineInstallAndAcceptance(unittest.TestCase):
+    """The install plan's statusline row (claude-hud 0.10.0): its helper commands and its acceptance, against stand-ins.
+
+    Review of 2026-10-03 ("Run claude-hud setup before wiring its copied launcher"): the row stopped after the plugin
+    install, while the status line Claude Code runs names the launcher that upstream's helper copies to
+    <config dir>/plugins/claude-hud/statusline.mjs, and the acceptance ran the cached launcher directly, so it passed with
+    that copy missing. The row now runs the helper (scripts/setup.mjs inspect, then install, with --shell posix) and adds
+    refreshInterval 5 when absent; the acceptance runs the configured command. Each program here is the row's own string
+    in install-plan.json, run as install.sh and accept.sh run it (bash -euo pipefail -c), with a scratch HOME, a PATH of
+    links to the system tools the programs use and a stand-in runtime that records its arguments and, as node does for a
+    script file that is not there, fails unless its argument exists, else prints two lines. The fixtures are our own:
+    upstream's helper and launcher do not run here.
+    """
+
+    TOOLS = ("bash", "sh", "jq", "ls", "wc", "cmp", "readlink", "mktemp", "chmod", "mv", "rm", "cat")
+    LAUNCHER = "// claude-hud 0.10.0 launcher (stand-in)\n"
+    RUNTIME = ('#!/bin/sh\nprintf \'%s\\n\' "$*" >>"${STUB_LOG:-/dev/null}"\ncase "$1" in */setup.mjs) exit 0 ;; esac\n'
+               '[ -f "$1" ] || { printf "Error: Cannot find module %s\\n" "$1" >&2; exit 1; }\n'
+               'cat >/dev/null\nprintf \'HUD line 1\\nHUD line 2\\n\'\n')
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tools = {name: shutil.which(name) for name in cls.TOOLS}
+        if not all(cls.tools.values()):
+            raise unittest.SkipTest(f"needs {', '.join(n for n, p in cls.tools.items() if not p)} to run the programs")
+        cls.row = next(r for r in load(PLAN / "install-plan.json")["owners"] if r["slot"] == "statusline")
+        cls.program = cls.row["acceptance"]["post_install"]["command"]
+        cls.helper, cls.refresh = cls.row["commands"][2:]
+
+    def run_program(self, program, scratch, runtime=True):
+        """(exit status, stderr, the runtime's recorded calls) of one program, with HOME at <scratch>/home."""
+        bin_dir = scratch / "bin"
+        bin_dir.mkdir(exist_ok=True)
+        for name, path in self.tools.items():
+            if not (bin_dir / name).exists():
+                (bin_dir / name).symlink_to(path)
+        if runtime and not (bin_dir / "node").exists():
+            (bin_dir / "node").write_text(self.RUNTIME, encoding="utf-8")
+            (bin_dir / "node").chmod(0o755)
+        log = scratch / "calls"
+        env = {"HOME": str(scratch / "home"), "PATH": str(bin_dir), "STUB_LOG": str(log), "LANG": "C"}
+        result = subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
+                                timeout=60)
+        calls = log.read_text(encoding="utf-8").splitlines() if log.exists() else []
+        return result.returncode, result.stderr, calls
+
+    def cache(self, scratch, version="0.10.0", marketplace="claude-hud"):
+        scripts = scratch / "home/.claude/plugins/cache" / marketplace / "claude-hud" / version / "scripts"
+        scripts.mkdir(parents=True)
+        (scripts / "statusline.mjs").write_text(self.LAUNCHER, encoding="utf-8")
+        (scripts / "setup.mjs").write_text("// stand-in\n", encoding="utf-8")
+        return scripts
+
+    def test_the_programs_are_the_ones_the_scripts_run(self):
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        accept = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
+        self.assertEqual(checker.checks_of(accept["statusline"]), [("post_install", "statusline", "smoke", self.program)])
+        install = checker.functions((PLAN / "install.sh").read_text(encoding="utf-8"))
+        self.assertEqual(checker.run_commands("statusline", install, set()), self.row["commands"])
+
+    def test_the_helper_runs_inspect_then_install_from_the_one_pinned_cache(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            scripts = self.cache(scratch)
+            status, stderr, calls = self.run_program(self.helper, scratch)
+            self.assertEqual(status, 0, stderr)
+            self.assertEqual(calls, [f"{scripts}/setup.mjs inspect --shell posix", f"{scripts}/setup.mjs install --shell posix"])
+        for name, plant, message in (
+                ("no cached 0.10.0", lambda scratch: self.cache(scratch, version="0.9.0"), "not in exactly one marketplace"),
+                ("0.10.0 in two marketplaces", lambda scratch: (self.cache(scratch), self.cache(scratch, marketplace="m2")),
+                 "not in exactly one marketplace"),
+                ("no node or bun", lambda scratch: self.cache(scratch), "no node or bun")):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                plant(scratch)
+                status, stderr, calls = self.run_program(self.helper, scratch, runtime=name != "no node or bun")
+                self.assertEqual(status, 1, stderr)
+                self.assertIn(message, stderr)
+                self.assertEqual(calls, [])
+
+    def test_refresh_interval_5_is_added_only_when_absent_in_the_file_itself(self):
+        chmod = subprocess.run([self.tools["chmod"], "--version"], capture_output=True, text=True)
+        if "GNU coreutils" not in chmod.stdout:
+            self.skipTest("the command uses GNU chmod --reference and readlink -f, as on the plan's Ubuntu")
+        status_line = {"type": "command", "command": "'/x/node' '/x/statusline.mjs'"}
+        for name, before, link in (("absent", status_line, False), ("absent, through a link", status_line, True),
+                                   ("present", dict(status_line, refreshInterval=3), False)):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                config = scratch / "home/.claude"
+                config.mkdir(parents=True)
+                target = scratch / "dotfiles/settings.json" if link else config / "settings.json"
+                target.parent.mkdir(parents=True, exist_ok=True)
+                text = json.dumps({"theme": "dark", "statusLine": before}, indent=2) + "\n"
+                target.write_text(text, encoding="utf-8")
+                target.chmod(0o640)
+                if link:
+                    (config / "settings.json").symlink_to(target)
+                status, stderr, _ = self.run_program(self.refresh, scratch)
+                self.assertEqual(status, 0, stderr)
+                if "refreshInterval" in before:
+                    self.assertEqual(target.read_text(encoding="utf-8"), text)
+                else:
+                    self.assertEqual(load(target), {"theme": "dark", "statusLine": dict(before, refreshInterval=5)})
+                self.assertEqual(target.stat().st_mode & 0o777, 0o640)
+                self.assertEqual((config / "settings.json").is_symlink(), link)
+                self.assertEqual(sorted(p.name for p in target.parent.iterdir()), ["settings.json"])  # no temporary left
+
+    def acceptance(self, launcher="same", refresh=5, second_version=False, run_cached=False):
+        """The acceptance's exit status and stderr for one state of a scratch home."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            config = scratch / "home/.claude"
+            scripts = self.cache(scratch)
+            if second_version:
+                self.cache(scratch, version="0.9.0")
+            (config / "plugins/installed_plugins.json").write_text(json.dumps(
+                {"version": 2, "plugins": {"claude-hud@claude-hud": [{"scope": "user", "version": "0.10.0"}]}}), encoding="utf-8")
+            copy = config / "plugins/claude-hud/statusline.mjs"
+            if launcher is not None:
+                copy.parent.mkdir(parents=True)
+                copy.write_text(self.LAUNCHER if launcher == "same" else "// another version's launcher\n", encoding="utf-8")
+            runs = scripts / "statusline.mjs" if run_cached else copy
+            status_line = {"type": "command", "command": f"'{scratch}/bin/node' '{runs}'"}
+            if refresh is not None:
+                status_line["refreshInterval"] = refresh
+            (config / "settings.json").write_text(json.dumps({"theme": "dark", "statusLine": status_line}), encoding="utf-8")
+            status, stderr, _ = self.run_program(self.program, scratch)
+            return status, stderr
+
+    def test_the_acceptance_passes_the_wired_state_and_fails_each_planted_condition(self):
+        status, stderr = self.acceptance()
+        self.assertEqual(status, 0, stderr)
+        cases = {
+            "the copied launcher the configured command runs is missing (the reviewed case)": dict(launcher=None),
+            "no refreshInterval": dict(refresh=None),
+            "another refreshInterval": dict(refresh=3),
+            "the copied launcher is another version's": dict(launcher="other"),
+            "a second cached version": dict(second_version=True),
+            "the configured command runs the cached launcher, not the copy": dict(run_cached=True),
+        }
+        for name, case in cases.items():
+            with self.subTest(case=name):
+                status, stderr = self.acceptance(**case)
+                self.assertNotEqual(status, 0, stderr)
 
 
 if __name__ == "__main__":

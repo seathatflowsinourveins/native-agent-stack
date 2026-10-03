@@ -354,12 +354,15 @@ statusline() {
   # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/commands/setup.md#L72 (sample input: two HUD lines); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L29 (the launcher runs the highest cached version)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/commands/setup.md#L72 (sample input through the configured command, run through bash as Claude Code runs it, L10: two HUD lines); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/setup.mjs#L79 (the launcher copy the command runs); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L29 (the launcher runs the highest cached version)
       check statusline smoke 'config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 jq -e '\''[.plugins["claude-hud@claude-hud"][] | select(.scope == "user") | .version] == ["0.10.0"]'\'' "$config_dir/plugins/installed_plugins.json" >/dev/null
 versions="$(ls -d "$config_dir"/plugins/cache/*/claude-hud/*/ | wc -l)"
-lines="$(echo '\''{"model":{"display_name":"Opus"},"context_window":{"used_percentage":12,"context_window_size":200000}}'\'' | node "$(ls -d "$config_dir"/plugins/cache/*/claude-hud/0.10.0)/scripts/statusline.mjs" | wc -l)"
-[[ "$versions" == 1 && "$lines" -ge 2 ]]'
+cmp -s "$config_dir/plugins/claude-hud/statusline.mjs" "$(ls -d "$config_dir"/plugins/cache/*/claude-hud/0.10.0)/scripts/statusline.mjs"
+jq -e '\''.statusLine.type == "command" and .statusLine.refreshInterval == 5'\'' "$config_dir/settings.json" >/dev/null
+configured="$(jq -r '\''.statusLine.command'\'' "$config_dir/settings.json")"
+lines="$(echo '\''{"model":{"display_name":"Opus"},"context_window":{"used_percentage":12,"context_window_size":200000}}'\'' | bash -c "$configured" | wc -l)"
+[[ "$versions" == 1 && "$lines" -ge 2 && "$configured" == *"$config_dir/plugins/claude-hud/statusline.mjs"* ]]'
       ;;
     *) skipped statusline ;;
   esac
