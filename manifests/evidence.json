@@ -4048,8 +4048,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "b3ffd27e5ca28d7fd987dc7c594601e4532660ddfeb4992ae92b3916ecb45e9f",
-      "bytes": 467
+      "sha256": "5b26e1858d40e23de54d5d346dae2a5cea5a20e17f413ad09159fcb4a61bde97",
+      "bytes": 735
     },
     {
       "path": ".github/CODEOWNERS",
@@ -32101,6 +32101,91 @@
       "path": "evidence/artifacts/landscape-sweep-20260926-attempts/wf_a874897e-af1.json",
       "sha256": "df6dfb2796a1860d5c3b51921eb9bf51f4a7a217b5dd6de48bb29d26d77c01a2",
       "bytes": 6571
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
+      "sha256": "40880aa6aaf5ea3697d76168d8360e329d6eab2114dbdb1f8024f24346a4eb3b",
+      "bytes": 19947
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_555874dd-5a7.json",
+      "sha256": "02f6c023675a76952fa4f26df7ddd1ea660553c3629149ef1b1e7c5042e31c77",
+      "bytes": 371162
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_8066ceb5-b9a.json",
+      "sha256": "08d919b086fbcc2394b3e8a57e54c8da168a528afb31625bbd17fa933236526f",
+      "bytes": 45181
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-client-check-20261003.txt",
+      "sha256": "736029c51aaf60bab6ea6effbf38f845bbabf78a914136fcc07899a1b25711ef",
+      "bytes": 6252
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-upstream-check-20261003.json",
+      "sha256": "a70fececaa1d61b1d832be50fea8c7f79ea32f4b189dbbf655bb84546302a675",
+      "bytes": 3007
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/jobs.json",
+      "sha256": "652b5e1c777c1c8f1c10a9f5f88f97ea895b2bf4da1b7599d80fb29215fa39b0",
+      "bytes": 105780
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/code-navigation.json",
+      "sha256": "7308d5bc23dcf64b1b9e8c82af5b7d94d24243f65703af8fe2bc34ba7053f651",
+      "bytes": 20991
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/document-retrieval.json",
+      "sha256": "a2b9fe413be5321b0b0f552188e85f6301da3bb12e16452747564e83b22cd577",
+      "bytes": 18377
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/durable-memory.json",
+      "sha256": "6de4a467b1c234d7da0c6e29e1cf3722b2d153809b909b283ed94b10061bd382",
+      "bytes": 19887
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/instructions-skills.json",
+      "sha256": "e758581703af97a0baf7192c37bcc4e6f9e1d98b5971b9d9062171f1e5e16a7d",
+      "bytes": 20990
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/isolation.json",
+      "sha256": "73e9891c79c249e5742a6124949b1e0cbbe6364d5573b0b59e0b09f1afa56a3d",
+      "bytes": 17756
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/native-clients.json",
+      "sha256": "dbe53950782e3fabbd3546cbbd79ae6a23547f4348e8c3618ad92dc774a7f02f",
+      "bytes": 17879
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/semantic-rag.json",
+      "sha256": "2b2ef9927b9153ca2fba7acd8f671a9d23a7825ecfe0af1ea7f4c4e752d35e72",
+      "bytes": 19485
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/web-research.json",
+      "sha256": "f5d1305663ee50348ed12c57b379720c9dc6a8a9eba34eac12b1848a776a7ba8",
+      "bytes": 21107
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/workers.json",
+      "sha256": "9dd8324b62e7ca337ebb7abf33d2fce742287c491e94a5834677c34d6253cd44",
+      "bytes": 21465
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/provenance.json",
+      "sha256": "2eece801e62af156d518abc8ee9ceb8051101168419ee3334bf1797c17435bf8",
+      "bytes": 15903
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+      "sha256": "69484156d2ba6736ba7dd5dfe0f4eca89b83b41899c2379a0a8467db92797f5d",
+      "bytes": 175366
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/README.md",
