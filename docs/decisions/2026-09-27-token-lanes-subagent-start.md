@@ -752,7 +752,9 @@ The parsed TOML stays unchanged. The two probe files are copied byte for byte fr
 head; their README describes that original change, including its original Codex scope. The
 residuals below define what this port actually carries.
 
-**Size at the port base.** The worktree's base is `1f5a791b02a230aced670c88bab3d3d0ebcf401a`.
+**Size at the port base.** The sizes were measured at `1f5a791b02a230aced670c88bab3d3d0ebcf401a`,
+the builder's worktree base. The four blocks and every other port path are byte-identical between
+it and the PR base `463a57b983eec540ae90eb45c2b1a7c6fc469aed`, so the figures hold there.
 Each block keeps the existing **4,100-byte** bound. Clause bytes include the terminating
 semicolon or period; default/researcher clauses have the menu form, builder/reviewer omit it.
 
@@ -791,8 +793,9 @@ The general lesson is also ported as one row in the anti-pattern log of
 [harness defaults](../harness-defaults.md#anti-pattern-log). The new tests failed against the
 old text first: `python3 -m unittest tests.test_token_lanes_subagent_start` returned exit 1,
 `Ran 19 tests`, `FAILED (failures=10)`. Five failing subtests covered the required role
-contexts, four covered the old carrier files and one covered the handbook. Corrected text
-must pass the same module and the full contract's local acceptance before publication.
+contexts, four covered the old carrier files and one covered the handbook. With the corrected
+text at `e0c6b38d`, the same module ran 19 tests, OK, and the targeted suite ran 739 tests, OK
+(12 skips).
 
 **Evidence classes.**
 
@@ -823,8 +826,8 @@ ec7c6b2a80c58e0156daab25b7cfd4eea6f2e3eac77137067051601045f9d2f8  token-lanes-bl
 **Residuals and overturn.**
 
 - The Codex managed-block section is not ported. The configuration-owner coupling in
-  `tests/test_new_wsl_client_config.py` L2861-2869 at this base (L2828-2838 in the contract's
-  earlier locator) requires that owner's record to describe
+  `tests/test_new_wsl_client_config.py` L2861-2869 at this base (L2828-2838 at `dcae68bd`)
+  requires that owner's record to describe
   its dropped template clauses. The decision belongs to the configuration owner or token
   lane. The two original Codex test edits and the two instruction templates stay unchanged.
 - The three custom Codex agents and host rollout are out of scope. Installed carriers keep
