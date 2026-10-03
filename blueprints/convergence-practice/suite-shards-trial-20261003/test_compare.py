@@ -754,7 +754,7 @@ class VerdictTests(TreeCase):
 
     def test_another_runner_image_with_the_same_python_version_is_only_a_flag(self):
         # R4-1: an image rollout that left the interpreter and the machine unchanged is reported, never judged.
-        # Previous head: no flag.
+        # Previous head: no flag. R5-1 keeps it: no record differs from S here.
         self.tree.full()
         rewrite_json(self.tree.run_dir(f"{OS}-G4T-r3") / "meta.json", runner_image="20260907.0337.1")
         result = self.tree.result()
@@ -765,6 +765,62 @@ class VerdictTests(TreeCase):
                                             f"fixture: [{OS}-G4-r1, {OS}-G4-r2, {OS}-G4-r3, {OS}-G4T-r1, {OS}-G4T-r2, "
                                             "...] (8)): the outcome record must address it"])
         self.assertIn("- FLAG ubuntu-24.04: the arm runs ran on 2 runner images", compare.summary_markdown(result))
+
+    def test_a_record_mismatch_beside_another_runner_image_is_incomplete_not_a_rule_outcome(self):
+        # R5-1: an image provides tools and versions that tests gate on, so a record that differs from S while the arm
+        # runs ran on two images may come from the image, not from sharding. Previous head: only the image flag, so a
+        # mismatch in G4 r2 handed the decision to G4T (adopt G4T), and one in both arms rejected. Kept: on one image
+        # the mismatch is the arm's failure; a run ineligible only through a step that never wrote its exit status stays
+        # rule 5's flagged case on two images too.
+        image, g4, g4t = "20260907.0337.1", f"{OS}-G4-r2", f"{OS}-G4T-r1"
+        every_run = [f"{OS}-{arm}-r{repeat}" for arm in compare.arms_of(OS) for repeat in (1, 2, 3)]
+
+        def differ(tree: Tree, name: str):
+            shard = tree.run_dir(name) / "shard-0.log"
+            self.edit(shard, "test_passes (tests.test_alpha.AlphaTests.test_passes) ... ok",
+                      "test_passes (tests.test_alpha.AlphaTests.test_passes) ... skipped 'tool not on PATH'")
+            self.edit(shard, "OK (skipped=1, expected failures=1)", "OK (skipped=2, expected failures=1)")
+
+        for label, differing, imaged in (("one arm differs, which must not hand over", [g4], [g4]),
+                                         ("both arms differ, which must not reject", [g4, g4t], [g4]),
+                                         ("the other image is an S run's", [g4], [f"{OS}-S-r3"])):
+            with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
+                tree = Tree(Path(tmp)).full()
+                for name in differing:
+                    differ(tree, name)
+                for name in imaged:
+                    rewrite_json(tree.run_dir(name) / "meta.json", runner_image=image)
+                verdict = tree.result()["verdicts"][OS]
+                self.assertIncomplete(verdict, f"the records of sharded runs [{', '.join(differing)}] ({len(differing)}) "
+                                               "differ from the S baseline while the arm runs ran on 2 runner images "
+                                               f"({image}: [{', '.join(imaged)}] (1); fixture: [")
+                self.assertIncomplete(verdict, "the difference may come from the image (tools or versions the tests "
+                                               "gate on), not from sharding")
+                self.assertFalse(verdict["arms"]["G4"]["eligible"])
+                self.assertEqual(verdict["arms"]["G4T"]["eligible"], g4t not in differing)
+                self.assertEqual(len(verdict["flags"]), 1, verdict["flags"])
+                self.assertIn("the arm runs ran on 2 runner images", verdict["flags"][0])
+        with self.subTest("kept: every arm run on one image, the new one"), tempfile.TemporaryDirectory() as tmp:
+            tree = Tree(Path(tmp)).full()
+            differ(tree, g4)
+            for name in every_run:
+                rewrite_json(tree.run_dir(name) / "meta.json", runner_image=image)
+            verdict = tree.result()["verdicts"][OS]
+            self.assertEqual((verdict["outcome"], verdict["selected_arm"], verdict["flags"]), ("adopt", "G4T", []),
+                             verdict["reasons"])
+        with self.subTest("kept: a step that never wrote its exit status, on two images"), \
+                tempfile.TemporaryDirectory() as tmp:
+            tree = Tree(Path(tmp)).full()
+            run = tree.run_dir(g4)
+            (run / "shard-2.log").write_text((run / "shard-2.log").read_text().split("\n", 1)[0] + "\n")
+            (run / "shard-2.exit").unlink()
+            rewrite_json(run / "meta.json", runner_image=image)
+            result = tree.result()
+            verdict = result["verdicts"][OS]
+            self.assertGreater(self.run_entry(result, g4)["mismatch_total"], 0)
+            self.assertEqual(verdict["arms"]["G4"]["unfinished_steps"], {g4: ["shard-2"]})
+            self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("adopt", "G4T"), verdict["reasons"])
+            self.assertEqual(len(verdict["flags"]), 2, verdict["flags"])
 
     def test_a_serial_step_lost_to_a_runner_fault_is_incomplete_not_no_verdict(self):
         # R4-2: the clock step succeeded, but the S step left none of its files: its script never ran (a runner

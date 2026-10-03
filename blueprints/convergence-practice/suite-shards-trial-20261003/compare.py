@@ -773,6 +773,11 @@ def described(seen: dict) -> str:
     return "; ".join(f"{value}: {_cap(names)}" for value, names in seen.items())
 
 
+def runner_images(runs: list) -> dict:
+    """{runner image: [run names]} of the runs that record one (meta.json runner_image, the runner's ImageVersion)."""
+    return recorded(runs, lambda run: (run.meta or {}).get("runner_image"))
+
+
 def rerun_reasons(runs: list, controls: dict, compare_attempt) -> list:
     """Every sign of a re-run (README.md, "Trigger, repetition and re-runs"): the compare job's own run attempt other
     than "1", or a recorded run_attempt of any run or control directory other than "1". Checked first, before the
@@ -833,6 +838,19 @@ def partial_reasons(os_name: str, runs: list, needs, controls: dict, min_repeats
         if len(seen) > 1:
             reasons.append(f"the arm runs recorded {len(seen)} {label} ({described(seen)}): the runtime changed "
                            "during the run (an environment fault)")
+    # A sharded run whose records differ from the S baseline while the arm runs ran on more than one runner image
+    # (README.md, "Limits"): an image provides tools and versions that tests gate on, so the difference may come from
+    # the image, not from sharding. Not counted: a run whose test phase never started (incomplete above) and a run
+    # ineligible only through steps that never wrote an exit status (rule 5 flags it). compare_with_baseline writes the
+    # differences, so before it (an unusable inventory) there is none.
+    images = runner_images(runs)
+    differing = sorted(run.name for run in runs if run.arm != SERIAL_ARM and not run.unstarted
+                       and any(DIFFER_RE.match(problem) for problem in run.problems)
+                       and not unfinished_steps(run, inventory))
+    if differing and len(images) > 1:
+        reasons.append(f"the records of sharded runs {_cap(differing)} differ from the S baseline while the arm runs "
+                       f"ran on {len(images)} runner images ({described(images)}): the difference may come from the "
+                       "image (tools or versions the tests gate on), not from sharding")
     if not controls.get("present"):
         reasons.append("no control run directory")
     elif not controls.get("started"):
@@ -925,9 +943,11 @@ def verdict_for_os(os_name: str, runs: list, inventory: Inventory, controls: dic
     ineligible S baseline or unmeasurable controls (no verdict); then the rule (reject or adopt)."""
     report = {"outcome": None, "selected_arm": None, "reasons": [], "arms": {}, "flags": [],
               "baseline": {"flaky_ids": [], "flaky_total": 0}}
-    images = recorded(runs, lambda run: (run.meta or {}).get("runner_image"))
+    images = runner_images(runs)
     if len(images) > 1:
-        # Reported, never judged, whatever the outcome (README.md, "Limits"): an image rollout takes days.
+        # The flag is reported, never judged, whatever the outcome (README.md, "Limits"): an image rollout takes days.
+        # Beside a sharded run whose records differ from the S baseline, the images also make the OS incomplete
+        # (partial_reasons).
         report["flags"].append(f"the arm runs ran on {len(images)} runner images ({described(images)}): the outcome "
                                "record must address it")
     reruns = rerun_reasons(runs, controls, compare_attempt)
@@ -1177,8 +1197,11 @@ def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, o
                           "(its clock-start step did not succeed or timing.json records no start), an S run whose test "
                           "phase started but which left no command.txt, log.txt or exit-code.txt (a step lost to a "
                           "runner fault), arm runs that recorded more than one python version or machine (the runtime "
-                          "changed during the run), a missing control run or one whose parallel group never started, "
-                          "control steps that left no probe, log or "
+                          "changed during the run), a sharded run whose records differ from the S baseline while the "
+                          "arm runs ran on more than one runner image, unless that run is ineligible only through "
+                          "steps that never wrote an exit status (the difference may come from the image, which "
+                          "provides the tools and versions that tests gate on, not from sharding), a missing control "
+                          "run or one whose parallel group never started, control steps that left no probe, log or "
                           "exit status although the group started while no other control evidence failed (a runner "
                           "fault inside the control group), a controls-check job that failed although this job's own "
                           "check of the same control artifact passed, an inventory job that failed without a "
@@ -1191,8 +1214,10 @@ def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, o
                           "unrecorded, no recorded one is wrong, and every other control expectation holds)",
             "not_measured": "the OS that this run did not measure is listed as not measured, which decides nothing",
             "flags": "a sharded arm that was ineligible only because steps never wrote an exit status is flagged when "
-                     "the rule rejects or adopts, and arm runs on more than one runner image whatever the outcome; the "
-                     "outcome record must address every flag; reported, never judged",
+                     "the rule rejects or adopts, and arm runs on more than one runner image whatever the outcome "
+                     "(beside a sharded run whose records differ from the S baseline they also make the OS "
+                     "incomplete, under incomplete); the outcome record must address every flag; a flag itself is "
+                     "reported, never judged",
             "protocol": " ".join(PROTOCOL) + " compare.py does not see a protocol deviation; the outcome record names it.",
         },
         "inputs": {"expected_sha": expected_sha, "os": os_name, "min_repeats": min_repeats,

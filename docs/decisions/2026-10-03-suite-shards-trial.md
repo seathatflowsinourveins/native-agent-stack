@@ -27,7 +27,10 @@ oracle, generator and records in
 [`blueprints/convergence-practice/suite-shards-trial-20261003/`](../../blueprints/convergence-practice/suite-shards-trial-20261003/README.md),
 preregistered in its `experiment.json` (status `planned`). Besides these, it changes only the expected-workflow set of
 `tests/test_workflow_security_coverage.py` and registers its files in `manifests/evidence.json`. None of the trial's
-job names is a required context.
+job names is a required context. On 2026-10-03, before the first push, the branch is re-based onto that day's main
+with every trial file byte-identical (the 16 frozen sha256s in `experiment.json` are unchanged): `base_revision`
+still names `9b0b8d6d`, the revision the inputs were measured against, and the pull request description names the
+main commit actually used.
 
 Why this candidate: the first trial (unittest-parallel 1.8.6, draft pull request #646, run 37109532421) failed its
 rule on Linux because that runner pickles live `TestCase` instances: `IsolatedAsyncioTestCase` holds a
@@ -109,17 +112,21 @@ The full text is `experiment.json`'s `quality_rule`; `README.md` gives the same 
   test phase never started (its clock-start step did not succeed: a setup failure, never ineligibility and never a
   hand-over to the other arm), an S run whose step was lost to a runner fault (no `command.txt`, `log.txt` or
   `exit-code.txt` although its test phase started), arm runs that recorded more than one Python version or machine
-  (the runtime changed during the run), a control run that is missing or whose group never started, control steps
-  lost to a runner fault while no other control evidence failed, a controls-check job that failed although the
-  compare job's own check passes, an inventory job that failed without a `report.json` that records a gate finding
-  (the gate never reported, or its own child interpreter was stopped from outside), or an inventory job that
+  (the runtime changed during the run), a sharded run whose records differ from the S baseline while the arm runs ran
+  on more than one runner image, unless that run is ineligible only through steps that never wrote an exit status
+  (the difference may come from the image, not from sharding), a control run that is missing or whose group never
+  started, control steps lost to a runner fault while no other control evidence failed, a controls-check job that
+  failed although the compare job's own check passes, an inventory job that failed without a `report.json` that
+  records a gate finding (the gate never reported, or its own child interpreter was stopped from outside), or an
+  inventory job that
   succeeded although a file of its artifact is absent from the compare job's download (a partly downloaded artifact
   set); an inventory gate that failed on a finding, or an inventory artifact that is present but unusable, gives no
   verdict. The order: re-runs first; then a failed or unreported inventory gate; then the other incomplete
   conditions; then an unusable inventory artifact, an ineligible S or unmeasurable controls; then the rule. A shard
   step that never reached its command or exit status makes its run ineligible even after a runner fault;
   `result.json` flags a sharded arm that the rule passed over while it was ineligible only so, and arm runs on more
-  than one runner image whatever the outcome, and the outcome record must address every flag.
+  than one runner image whatever the outcome (beside a sharded run whose records differ from the S baseline they also
+  make the OS incomplete, above), and the outcome record must address every flag.
 - **Which run decides, and the protocol.** A run decides an OS when its result.json, or, only if result.json is
   absent from the compare artifact, the outcome line compare.py printed, gives adopt, reject or no verdict for that
   OS; a run in which neither exists is incomplete. A result.json lists the OS that its run did not measure as not
@@ -158,9 +165,9 @@ The full text is `experiment.json`'s `quality_rule`; `README.md` gives the same 
    hosted runner; the hosted jobs run no model; hosted behaviour that no run has measured is stated as an
    expectation with the first-run check that settles it (`README.md`, "First-run checklist").
 5. **Self-review and independent review before the first push**: arithmetic, retention, coverage gaps and design
-   holes; four rounds of independent review of this preregistration (evidence reviews in all four, security reviews
-   in the first two) were resolved before any hosted run (`experiment.json`, `discovery_provenance`; the third and
-   fourth rounds below).
+   holes; five rounds of independent review of this preregistration (evidence reviews in all five, security reviews
+   in the first two) were resolved before any hosted run (`experiment.json`, `discovery_provenance`; the third to
+   fifth rounds below).
 
 ## Alternatives considered
 
@@ -230,8 +237,8 @@ Each line relays only what was read at the cited source; the comparison came fro
   steps") defines it: a lost S step, or a lost control step while no other recorded control evidence fails, makes the
   OS incomplete, while a shard step that is lost or stopped before its command or exit status makes its run
   ineligible, flagged when the rule passes over its arm.
-- **Python runtime.** Premise verified on 2026-10-03 with GET requests: the actions/runner-images release
-  `macos-15-arm64/20260829.0321` (published 2026-09-01) moved the image's cached Python 3.13 from 3.13.14 to
+- **Python runtime and runner image.** Premise verified on 2026-10-03 with GET requests: the actions/runner-images
+  release `macos-15-arm64/20260829.0321` (published 2026-09-01) moved the image's cached Python 3.13 from 3.13.14 to
   3.13.15, and an image deployment usually takes 2 to 3 days (actions/runner-images `README.md` at `6d942e63`, line
   198), so the jobs of one multi-hour run can land on images that cache different patch releases. Every macOS job,
   the ubuntu-24.04 inventory job included, takes the exact release 3.13.15 with `check-latest: false`, the one the
@@ -239,8 +246,11 @@ Each line relays only what was read at the cited source; the comparison came fro
   cache, else downloads it (`src/find-python.ts` lines 102-123), and actions/python-versions lists 3.13.15 for darwin
   arm64 and linux 24.04 x64 (`versions-manifest.json` at `52ee1aa0`). Each job's interpreter check asserts CPython
   3.13.15 before the clock starts. On either OS, arm runs that recorded more than one Python version or machine make
-  the OS incomplete, and arm runs on more than one runner image with one runtime are only flagged, never judged
-  (`README.md`, "Limits"). `validate-macos` takes whatever 3.13 patch its image caches.
+  the OS incomplete. An image with one runtime can still differ in a tool or version that tests gate on, which can
+  flip a test between the S runs and a sharded run on another image: arm runs on more than one runner image are
+  flagged whatever the outcome, and beside a sharded run whose records differ from the S baseline, unless that run is
+  ineligible only through steps that never wrote an exit status, they make the OS incomplete (`README.md`,
+  "Limits"). `validate-macos` takes whatever 3.13 patch its image caches.
 - **The inventory gate's own child interpreter.** A child stopped from outside (SIGKILL from the out-of-memory killer,
   or SIGTERM, SIGINT or SIGHUP from a runner) is recorded in `report.json` as an execution problem, not a finding, and
   makes the run incomplete; any other failure of a child is a finding, and a failed gate with a finding gives no
@@ -304,7 +314,7 @@ Each line relays only what was read at the cited source; the comparison came fro
 No usage claim. The hosted jobs run deterministic commands and no model; the model usage of the sessions that built
 this trial is not recorded and stays unknown. Evidence classes so far: local integration (the coordinator's preflight,
 the inventory gate at the base, the oracle's dry run on real logs), synthetic fixtures (real local runs of a fixture
-suite and of the controls, on which the oracle's 117 tests pass on CPython 3.13.16 and 3.12.3), a local probe of
+suite and of the controls, on which the oracle's 118 tests pass on CPython 3.13.16 and 3.12.3), a local probe of
 zizmor on planted constructs, and source review (the GitHub documentation, GitHub's workflow schema, the runner
 source, CPython and the alternatives at their pins). Nothing here is native execution on a hosted runner or upstream
 acceptance; the controls, once run, are synthetic fixtures executed on the hosted runner.
@@ -389,16 +399,18 @@ This revision, still before any hosted run, resolved them:
   verdict). The premise was verified with GET requests ("Risks", "Python runtime"). Every macOS job now takes the
   exact release 3.13.15 and asserts it in its interpreter check before the clock starts; arm runs that recorded
   more than one Python version or machine make the OS incomplete; arm runs on more than one runner image are only
-  flagged. The check that every step ran its job's Python stays an ineligibility. `compare.py` holds no copy of the
-  pin: the workflow's pin, asserted before each clock starts, and the equality across runs are the control.
+  flagged (the fifth round adds the incomplete case beside a record mismatch). The check that every step ran its
+  job's Python stays an ineligibility. `compare.py` holds no copy of the pin: the workflow's pin, asserted before
+  each clock starts, and the equality across runs are the control.
 - **R4-2.** An S run whose test phase started but whose step left no `command.txt`, `log.txt` or `exit-code.txt`
   (lost to a runner fault) makes the OS incomplete, as a lost control step does; `README.md` "Limits" ("Lost steps")
   defines lost steps once, and `experiment.json` and "Risks" point to it.
 - **R4-3 to R4-9.** Both headers drop "a protocol deviation" from the reopen clause of their "Re-runs" paragraph;
   the first-run checklist points to "Protocol deviations (preregistered)"; the third round's claim about its new
-  tests now names the commit exported (`f0d54bdf`, whose trial files equal `1809afba`'s) and the two tests that pin
-  kept behaviour, the second round's claim names its one such test, and `README.md` no longer keeps that history; the pull request claims word-for-word identity only
-  for the seven `compare.PROTOCOL` sentences; `README.md` rule 5 states once when the controls fail, and the other
+  tests now names the commit exported (`f0d54bdf`, whose trial files equal `1809afba`'s) and says that two of them
+  pin kept behaviour (the fifth round names them), the second round's claim names its one such test, and
+  `README.md` no longer keeps that history; the pull request claims word-for-word identity only for the seven
+  `compare.PROTOCOL` sentences; `README.md` rule 5 states once when the controls fail, and the other
   documents point to it; the deciding run is the first that decides an OS before that OS's trial ended, a deviation
   ends a trial at the moment it occurs, and the printed outcome line decides only if `result.json` is absent from the
   compare artifact; the GET of `download-artifact.ts` lines 185-198 is credited to this trial's builder unit, the
@@ -427,9 +439,40 @@ Accepted residual risks:
   final. A shard step lost to a runner fault still makes its run ineligible (flagged), as preregistered.
 - A macOS image that no longer caches 3.13.15 makes `actions/setup-python` download it before the clock starts; a
   failed download fails the job before its test phase (incomplete).
-- Arm runs on different runner images with one runtime are flagged, not judged: an image change can shift timing,
-  which n = 3 bounds only loosely (runner noise). Linux's system python3 is not pinned; the comparison across runs
-  covers it.
+- Arm runs on different runner images with one runtime are flagged whatever the outcome. An image change can shift
+  timing, which n = 3 bounds only loosely (runner noise), and it can flip a test that gates on a tool or version the
+  image provides, which would make a sharded run ineligible through a record mismatch that sharding did not cause
+  and give reject or a hand-over to the other arm; since the fifth review round, such a mismatch beside more than
+  one image makes the OS incomplete instead (`README.md`, "Limits"). Still accepted: a run ineligible only through
+  steps that never wrote an exit status stays the sharded arm's failure (flagged) even if the image caused the stop,
+  and whether two consecutive images differ in a gated tool is unverified. Linux's system python3 is not pinned; the
+  comparison across runs covers it.
+
+## Fifth review round (2026-10-03)
+
+An evidence delta review before the first push approved the fourth round's changes and found one high finding, which
+predates that round, and one low finding (R5-1, R5-2). This revision, still before any hosted run, resolved them:
+
+- **R5-1.** A runner image provides tools and versions that tests gate on, so a test can run on the image of the S
+  runs and be skipped on that of a sharded run; that run was then ineligible through a record mismatch, which could
+  give reject or a hand-over to the other arm while the image difference was only flagged. A sharded run whose
+  records differ from the S baseline while the arm runs ran on more than one runner image now makes the OS
+  incomplete, unless that run is ineligible only through steps that never wrote an exit status; on one image a
+  record mismatch still makes the run ineligible, and more than one image without a mismatch stays a flag.
+  `README.md` rule 5, the `quality_rule`, "Decision" above and `decision_rule` list the condition; "Risks",
+  `README.md` "Limits" and `experiment.json` limitation [19] name the mechanism.
+- **R5-2.** `experiment.json`'s entry for the third round names its two tests that pin kept behaviour:
+  `test_a_wrong_recorded_outcome_beside_an_unrecorded_one_rejects` passes on the export of `f0d54bdf`, and
+  `test_a_lost_control_step_beside_wrong_recorded_evidence_rejects` gives the kept reject there but errors on the
+  `lost_steps` field that the export lacks, so every new test of that round but the first fails or errors there
+  (measured again in this revision).
+
+`test_compare.py` has 118 tests after this revision. The new test,
+`test_a_record_mismatch_beside_another_runner_image_is_incomplete_not_a_rule_outcome`, fails on an export of the
+previous head `d6a8d6ce` with only `test_compare.py` replaced, in its three subtests of the new rule (one sharded arm
+differs, which must not hand over; both arms differ, which must not reject; the other image is an S run's), and
+passes on this one; its two subtests of kept behaviour (every arm run on one image; a step that never wrote its exit
+status, on two images) pass on both, and the other 117 tests pass on both. The protocol sentences are unchanged.
 
 ## SOTA sources
 
