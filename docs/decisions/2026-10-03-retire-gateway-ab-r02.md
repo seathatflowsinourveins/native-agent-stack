@@ -165,6 +165,21 @@ establish an explicit user release.[^freeze][^rebuild][^roadmap]
 nothing.** It records the historical conflict without rewriting the freeze, its ordering condition or any
 pinned artifact.[^freeze]
 
+**Failed condition.** The unmet F-WK-3 item is a recorded condition that failed, not only a historical conflict.
+The roadmap's F-WK-3 gateway record "goes in the rebuild's receipt PR" and lists "the user's R02 freeze release"
+(`main:docs/decisions/2026-09-28-ecosystem-roadmap.md:185-188`). The rebuild record, which replaced the unpublished
+`81c9b6da` receipt package as the published account (`main:docs/decisions/2026-09-30-omniroute-rebuild.md:30-32`),
+carries no release, and the freeze it overtook was recorded as holding "with no end date"
+(`main:evidence/artifacts/omniroute-routing-20260928/decisions.json:33`). This assigns no fault, since the basis of
+the 2026-09-29 switch is unpublished. The rule it supports: before restarting a host or switching its build, search
+the decision records, evidence decisions and roadmap for freezes and ordering conditions on that host, and record
+each one's release, with the user's direction, in the switch's own record; without a release, the switch waits. A
+switch that has already overtaken one is recorded as overtaken in fact, with no release supplied and its open items
+carried forward, as this record does for part (ii). The general-engineering row belongs in the anti-pattern log that
+`main:AGENTS.md:5` names (`main:docs/harness-defaults.md:85`). That file is outside this retirement's scope, so the
+row is left to a foundation follow-up that can cite this paragraph. Class: `source_review`; no check enforces the
+rule yet.[^roadmap][^rebuild][^freeze]
+
 **Owner.** Main's `decisions.json:33` recorded the run owner as inactive. The #445 timeline shows no comment or
 review before the custody notice; its last commit, `bddb0072`, is dated 2026-09-28T01:28:15Z. Session 0c reports
 that its 2026-10-02T23:58Z triage found no live owner; that triage is unpublished. No lane claimed R02 during the
