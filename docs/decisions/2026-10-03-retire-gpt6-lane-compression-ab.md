@@ -42,14 +42,14 @@ a new preregistration for work whose bindings have changed.
 ## Scope: the instrument only. It does not decide compression on 20128.
 
 Main's open decision (a) is unchanged. The relevant wording in
-[2026-09-30-omniroute-rebuild.md L276-279][decision-a] is:
+[2026-09-30-omniroute-rebuild.md L276-279][decision-a-quote] is:
 
 > **Open user decisions.** (a) Compression on 20128 (the Codex lane itself; it would rewrite real Codex CLI traffic). The
 > user's conditional answer of 2026-09-30 about 02:25Z, relayed by another session and not seen first-hand here, was "yes
 > if SOTA converged, the quality itself needs to be maintained at suitable high output": a reproduced saving on real
 > traffic and no output regression. It is **not applied**.
 
-The unchanged [foundation-stack.md L250][foundation-compression] says:
+The unchanged [foundation-stack.md L250][foundation-l250] says:
 
 > On 20128, the global switch is off and `codex/*` is excluded: our choice for byte-identical passthrough of native Codex traffic. Upstream's own comment ([`chatCore.ts` L1429-1449](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1429-L1449) at `a58000c7`, the same comment above `isCompressionExcluded` at `2f42a9ac1`) says native Codex passthrough is deliberately not part of the exclusion, compresses through an adapter with Codex tool-output guards when compression is on, and that operators who want byte-identical passthrough can add `codex/*`. Turning it on is an open user decision: the pi-practice session's 3-arm measurement on real Codex jobs found the headerless lane compressed 0 tokens (see the 2026-09-30 record).
 
@@ -61,12 +61,12 @@ the instrument would change its treatments, harness qualification and scope.
 
 | Binding | Value at `73fc873e` | Main now (file and line) |
 | --- | --- | --- |
-| Build | OmniRoute 3.8.51, installed build `dd6e9607e`, pinned source `a58000c7` ([JSON L38-65][old-build]); the 2026-09-28 custodian identifies `a58000c7` + #14904 + #13788 ([20:51:13Z comment][custody]). | Rebuilt on release/v3.8.51 `2f42a9ac1` ([rebuild L1][rebuild]); 20128 carries upstream PR 15167 since 2026-09-30T06:32Z ([foundation-stack.md L246][effort-carry], [#534](https://github.com/seathatflowsinourveins/native-agent-stack/pull/534)). |
-| D0/D1 | Headerless `[session-dedup, ccr, lite, headroom]`; registered-key 60-minute live zone; output styles on for D1 ([JSON L1196-1241][cells], [PREREGISTRATION.md L136-150][old-cell-prose]). | Headerless `[session-dedup, ccr, lite]`, headroom off in the engines map, no output style; live-zone scoping removed ([rebuild L66-85][settings], [L117][removed-scoping], [foundation-stack.md L251][foundation-compression]). Stored combos can still name headroom; this is not a claim that every header-selected route has it off. |
-| A0/A1 | Twelve engines including omniglyph; `allow-lossy` header; styles on for A1 ([JSON L1242-1297][cells]). | Omniglyph off and inert on GPT-6 ([rebuild L115][mitigations]); `allow-lossy` selects the stored peer combo, not the engines map ([foundation-stack.md L251][foundation-compression], [rebuild L81-85][settings]). |
+| Build | OmniRoute 3.8.51, per the [#431 PR body](https://github.com/seathatflowsinourveins/native-agent-stack/pull/431) (its line 27) and the [20:51:13Z comment][custody]; installed build `dd6e9607e` and pinned source `a58000c7` ([JSON L38-65][old-build]); the 2026-09-28 custodian identifies the installed build as `a58000c7` + #14904 + #13788 ([20:51:13Z comment][custody]). | Rebuilt on release/v3.8.51 `2f42a9ac1` ([rebuild L1][rebuild]); 20128 carries upstream PR 15167 since 2026-09-30T06:32Z ([foundation-stack.md L246][effort-carry], [#534](https://github.com/seathatflowsinourveins/native-agent-stack/pull/534)). |
+| D0/D1 | Headerless `[session-dedup, ccr, lite, headroom]`; registered-key 60-minute live zone; output styles on for D1 ([JSON L1197-1238][cells-d], [PREREGISTRATION.md L135-146][old-cell-engines]). | Headerless `[session-dedup, ccr, lite]`, headroom off in the engines map, no output style; live-zone scoping removed ([rebuild L64-85][settings], [L117][removed-scoping], [foundation-stack.md L251][foundation-l251]). Stored combos can still name headroom; this is not a claim that every header-selected route has it off. |
+| A0/A1 | Twelve engines including omniglyph; `allow-lossy` header; styles on for A1 ([JSON L1239-1296][cells-a]). | Omniglyph off and inert on GPT-6 ([rebuild L115][omniglyph-off]); `allow-lossy` selects the stored peer combo, not the engines map ([foundation-stack.md L251][foundation-l251], [rebuild L81-85][stored-combos]). |
 | 2026-09-28 W2-W15 digests | Applied and read back, then unchanged at 20:48:28Z ([03:51:17Z apply comment][apply], [20:51:13Z custody comment][custody]). | Historical configuration superseded by the rebuild's settings and T10 ([rebuild L64-85][settings], especially L68). |
 | Model | Canonical `gpt-6-astra-max` targets; Harbor emits that bare argument ([JSON L943-998][old-client], [cells][cells]). | For unpinned work, `gpt-6.1-sol` is the primary coordinator/worker policy ([AGENTS.md L38][model-policy]); this is a dispatch policy, not a replacement model result. |
-| Clients | Codex 0.157.1; Harbor 0.23.0 ([JSON L943-944][old-client], [PREREGISTRATION.md L33-49][old-runner]). | The rebuild announces Codex 0.159.1 ([rebuild L1][rebuild]). This states the rebuild's announced version, not the installed client's current version or a claim that Harbor changed. |
+| Clients | Codex 0.157.1; Harbor 0.23.0 ([JSON L943-944][old-client-version], [PREREGISTRATION.md L33-49][old-runner-choice]). | The rebuild announces Codex 0.159.1 ([rebuild L1][rebuild]). This states the rebuild's announced version, not the installed client's current version or a claim that Harbor changed. |
 | Bases | [PR body](https://github.com/seathatflowsinourveins/native-agent-stack/pull/431) says `e82e6be7`; JSON L9 says `0f76651d` ([JSON][old-json]). The actual parent of the original authoring commit `e33a0717` is `55fc8d17f530851a3a4dff0564eef3e450967231`. | Read-only git inspection found `git rev-list --count 73fc873e..dcae68bd0` = 163; that is the planning comparison, not the count against this record's later `9b0b8d6d2` base. |
 
 ## What main already records about the question
@@ -82,10 +82,11 @@ main's dated record, not a new model run or a rerun of its probes:
 - **Lossy header:** 0.36% of the input over 55 rows with `gpt6-safe-lossy`
   through 20129 (**reported, not reproduced here**, L285-287). This is not a
   measurement of #431's `allow-lossy` cell.
-- **Offline real bodies:** 0.34%, or 908 of 265,483 tokens, on eight of those
-  jobs' request bodies; the regex count lost 47 file-path occurrences, 1 hex id
-  and 1 error line (L288-292). This is the recorded offline gateway-step probe,
-  distinct from the reported live arms.
+- **Offline real bodies:** on eight of those jobs' real request bodies, the
+  lossy lane saved 0.34% (908 of 265,483 tokens) while, by that record's regex
+  count, losing 47 file-path occurrences, 1 hex id and 1 error line; the
+  headerless lane changed 0 items of 60 to 78 per body (L287-291). This is the
+  recorded offline gateway-step probe, distinct from the reported live arms.
 - Main's conclusion is **"neither lane meets the condition"**: a reproduced
   saving with no exact value lost (L292-293). String-shaped shell outputs of
   older models and very long sessions with large tool outputs remain untested
@@ -100,8 +101,8 @@ main's dated record, not a new model run or a rerun of its probes:
 plus output tokens, subject to paired quality, exact-record and transport gates.
 Its ceiling is the six named task domains per role. It cannot authorize moving
 a production builder, reviewer or researcher role. Reviewer/researcher
-output-style conclusions cover JSON-only records; prose verdicts, narrative
-research and evidence-writing need representative frozen tasks in a new
+output-style conclusions cover JSON-only records; prose verdicts, research
+narrative and evidence-writing need representative frozen tasks in a new
 preregistration. JSON L3040 identifies the optimization objective as minimum
 total billed tokens among non-inferior cells ([decision rule][old-rule]).
 
@@ -130,23 +131,23 @@ styles and disables legacy caveman output mode. The downstream D/A model is
 ### Sealing gates
 
 All eleven gates have **`passed: null`** at `73fc873e`. The following keeps
-their identifiers and one-line requirements as a checklist for any future
-gateway A/B, without accepting their obsolete pins or authorizing a run.
-Source: [JSON L3430-3486][gates].
+their identifiers and requirement strings, verbatim from
+[JSON L3430-3486][gates], as a checklist for any future gateway A/B, without
+accepting their obsolete pins or authorizing a run.
 
-| Gate id | One-line requirement | `passed` |
+| Gate id | Requirement, verbatim | `passed` |
 | --- | --- | --- |
-| `runner-route` | Supported 20129 slashless route, canonical metadata, full five-item/prompt equivalence, coordinator live 200 at max, and C route equivalence; no mapping qualified. | `null` |
-| `merged-profile` | Hash the native semantic base plus stack-worker merge; omit profile keys; match resolved config and prompt-input against the `-p` reference before and after Harbor's forced flags. | `null` |
-| `network-containment` | Hash the compose overlay, prove actual container reachability, and separately qualify upstream-supported management-API containment; trusted tasks alone do not supply it. | `null` |
-| `header-capture` | Hash and qualify the upstream-hook response-header observer, privacy/SSE/cache behavior, failed-attempt `X-Correlation-Id` entry joins and separate exact second-hop effort join. | `null` |
-| `effort-detail` | Qualify detail selectors; inspect `reasoning.effort` at joined hops; allow null corroboration columns and keep missing bodies unknown. | `null` |
-| `two-hop` | Freeze Responses transport; prove three native steps, real call IDs/encrypted reasoning replay, cache key, session/account affinity and arm account spread/cache rate. | `null` |
-| `effective-config` | Read back C off/exclusions, keyed D/A engines/styles, 60-minute live zone, dependencies and safety compaction; an existing key/TTL is not reuse acceptance. | `null` |
-| `native-harnesses` | Qualify Harbor 0.23.0, Codex 0.157.1, observer, statistics, real task dependencies/images and exact build/config hashes with supported upstream commands. | `null` |
-| `native-controls` | Hash three-turn wrappers/graders; run native known-pass/fail/malformed controls, four numeric shapes and rebuilt Chat collision; separately observe native reachability. | `null` |
-| `pilot-power-resources` | Complete the excluded pilot; calibrate non-inferiority at the margin, simulate power and operational stops; freeze sample size, budget, reserve, wall time and schedule. | `null` |
-| `usage-sensitivity` | Confirm usage/finalization fields, missing-row input/output bounds, all-corner sensitivity and simultaneous cost bounds; actual dollar prices remain unknown. | `null` |
+| `runner-route` | Supported 20129 slashless route preserving canonical native metadata, five-item/full prompt equivalence and coordinator live 200 at max; C route equivalence too. No mapping has been found/qualified. | `null` |
+| `merged-profile` | Materialize/hash native semantic base+stack-worker merge; no profile/profiles keys; same resolved config and prompt-input versus -p reference before/after Harbor forced flags. | `null` |
+| `network-containment` | Hash extra_docker_compose overlay; prove actual container reachability and separately qualify upstream-supported containment of passwordless admin APIs; trusted-task constraints alone are not a security boundary. | `null` |
+| `header-capture` | Materialize/hash upstream-hook response-header observer, qualify privacy/SSE/cache semantics and X-Correlation-Id entry joins including failures; demonstrate a separate exact second-hop effort join. | `null` |
+| `effort-detail` | Qualify detail-API selectors and inspect only reasoning.effort at joined hops; null corroboration columns are allowed, missing body stays unknown. | `null` |
+| `two-hop` | Freeze Responses wire format and prove three native steps, genuine call IDs/encrypted reasoning replay, prompt_cache_key, session/account affinity and arm account spread/cache rate. | `null` |
+| `effective-config` | Read back C off/exclusions; keyed D/A engine/style plans, 60-minute live zone, optional dependencies and safety compaction. Existing key/TTL are facts, reuse is not accepted. | `null` |
+| `native-harnesses` | Harbor 0.23.0, Codex 0.157.1, chosen observer, statistics, actual task dependencies/images and exact build/config hashes through supported upstream commands. | `null` |
+| `native-controls` | Materialize/hash three-turn wrappers and graders; native known-pass/fail/malformed controls, four numeric output shapes, rebuilt Chat collision plus separately observed native reachability. | `null` |
+| `pilot-power-resources` | Complete excluded pre-confirmatory pilot; calibrate NI at margin, simulate power and operational stops; freeze powered n, complete token budget, reserve, wall time and schedule. | `null` |
+| `usage-sensitivity` | Confirm usage fields and finalization, missing-row input/output bounds, all-corner sensitivity and simultaneous cost bounds; actual dollar prices remain unknown. | `null` |
 
 ### Source reads dated 2026-09-27, not re-verified
 
@@ -201,9 +202,10 @@ and the PR body's sandbox note and local-commands section.
 
 The ten general `anti_pattern_log` entries below retain their exact text and
 pin context. B, M and m entries remain available in
-[JSON L3184-3414][anti-patterns] and the [repair disposition rows][repair].
-The first eight general entries are [JSON L3143-3183][anti-patterns]; the
-last two are L3415-3428. Paths and line numbers inside the quotes are
+[JSON L3184-3414][anti-patterns-review] and the
+[repair disposition rows][repair]. The first eight general entries are
+[JSON L3143-3183][anti-patterns-general]; the last two are
+[L3415-3428][anti-patterns-late]. Paths and line numbers inside the quotes are
 historical verification locators, not instructions to inspect host state.
 
 1. **Mistake:** Treating safe-default classification as proven losslessness.
@@ -324,36 +326,51 @@ It documents fetching `pull/ID/head`; the page read on 2026-10-03 does not
 explicitly promise persistence after closing. The #554 observation supplies
 that narrower evidence.
 
-Recovery commands for a future authorized checkout follow that documented
-fetch form; the retirement builder does not run the fetch or alter git state:
+Recovery commands for a future authorized checkout use plain git and the
+page's documented form, `git fetch origin pull/ID/head:BRANCH_NAME`, which
+creates a local branch (here `retired-pr-431`); the retirement builder does
+not run the fetch or alter git state:
 
 ```sh
-rtk git fetch origin refs/pull/431/head
-rtk proxy git show 73fc873e1da52ac68a731d33e482a7ae0444f6b2:blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md
-rtk proxy git show 73fc873e1da52ac68a731d33e482a7ae0444f6b2:blueprints/gpt6-lane-compression-ab/preregistration.json
-rtk proxy git show 73fc873e1da52ac68a731d33e482a7ae0444f6b2:tests/test_gpt6_lane_compression_ab_preregistration.py
+git fetch origin pull/431/head:retired-pr-431
+git show 73fc873e1da52ac68a731d33e482a7ae0444f6b2:blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md
+git show 73fc873e1da52ac68a731d33e482a7ae0444f6b2:blueprints/gpt6-lane-compression-ab/preregistration.json
+git show 73fc873e1da52ac68a731d33e482a7ae0444f6b2:tests/test_gpt6_lane_compression_ab_preregistration.py
 ```
 
 ## References on main to #431
 
-This change updates only the control-default sentence in
-[blueprints/runtime-workers/openhands/README.md L148-151][openhands].
+At the source-review base, `git grep -n -w '#431'` finds thirteen lines in
+ten files. This change updates only one of them, the control-default sentence
+in [blueprints/runtime-workers/openhands/README.md L148-151][openhands].
 The engines-on arm and its implementation remain available; a new
 preregistration on the current gateway build is required to select it.
 
-These references stay unchanged:
+The other twelve stay unchanged as dated, frozen or convergence-bound records:
 
-- [2026-09-30-omniroute-rebuild.md L276-295][decision-a] and
-  [foundation-stack.md L249-252][foundation-compression], including open
-  decision (a) and every "reported, not reproduced here" qualification.
+- `blueprints/runtime-workers/openhands/research.md:555`, a row in the dated
+  section "Takeover phase 2 corrections (2026-09-28)" that says "Control
+  stays the default arm until the #431 A/B." It carries the same contingency
+  as the README sentence; the updated README sentence and this record give the
+  current condition.
 - `blueprints/convergence-practice/omniroute-routing-20260928/README.md:161`
   and `experiment.json:502`. Their conditional "#431 cache comparison"
   clause goes moot; neither convergence-pinned file changes and no rebind is
   needed.
-- `docs/decisions/2026-09-28-ecosystem-roadmap.md:225`, a dated snapshot.
-- Frozen `evidence/artifacts/omniroute-routing-20260928/ab-requirements.md`
-  and `README.md`, and
-  `evidence/artifacts/delegated-decisions-20260928/coordination.md`.
+- `docs/decisions/2026-09-28-ecosystem-roadmap.md:201` and `:225`, both in
+  that dated snapshot.
+- Frozen receipts in `evidence/artifacts/omniroute-routing-20260928/`:
+  `ab-requirements.md` (L31, L34, L40), `adjudication.json` (L1, six
+  mentions) and `decisions.json` (L147), each pinned by SHA-256 in the bound
+  record's `experiment.json` (L75, L309 and L190), and the directory's dated
+  `README.md` (L33).
+- `evidence/artifacts/delegated-decisions-20260928/coordination.md:35`,
+  coordination evidence retained on 2026-09-28.
+
+Related decision text that does not name #431 also stays unchanged:
+[2026-09-30-omniroute-rebuild.md L276-295][decision-a] and
+[foundation-stack.md L249-252][foundation-compression], including open
+decision (a) and every "reported, not reproduced here" qualification.
 
 The [lane protocol L94-149][lanes] supplies the evidence-registration and
 report-regeneration procedure. Registration does not change what historical
@@ -385,10 +402,14 @@ cannot supply it.
 [vela]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-25-retire-vela-velanext.md
 [rebuild]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L1
 [decision-a]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L276-L295
+[decision-a-quote]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L276-L279
 [settings]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L64-L85
-[mitigations]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L112-L118
+[stored-combos]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L81-L85
+[omniglyph-off]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L115
 [removed-scoping]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L117
 [foundation-compression]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/foundation-stack.md#L249-L252
+[foundation-l250]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/foundation-stack.md#L250
+[foundation-l251]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/foundation-stack.md#L251
 [effort-carry]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/foundation-stack.md#L246
 [model-policy]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/AGENTS.md#L38
 [builder-key]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/tools/sota-convergence/landscape-sweep/build_args.py#L116
@@ -397,18 +418,25 @@ cannot supply it.
 [old-json]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json
 [old-build]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L38-L65
 [old-client]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L943-L998
+[old-client-version]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L943-L944
 [cells]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L1183-L1297
+[cells-d]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L1197-L1238
+[cells-a]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L1239-L1296
 [old-cell-prose]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md#L126-L158
+[old-cell-engines]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md#L135-L146
 [objective]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md#L9-L15
 [old-rule]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L3040
 [gates]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L3430-L3486
 [old-runner]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md#L31-L112
+[old-runner-choice]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md#L33-L49
 [old-sources]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L36-L942
 [old-review]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md#L387-L419
 [old-checks]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md#L441
 [repair]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L3558
 [m9]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L3724-L3731
-[anti-patterns]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L3143-L3428
+[anti-patterns-general]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L3143-L3183
+[anti-patterns-review]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L3184-L3414
+[anti-patterns-late]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/blueprints/gpt6-lane-compression-ab/preregistration.json#L3415-L3428
 [old-manifest]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/73fc873e1da52ac68a731d33e482a7ae0444f6b2/manifests/evidence.json#L6884-L6893
 [old-ci]: https://github.com/seathatflowsinourveins/native-agent-stack/pull/431/checks
 [old-validation]: https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36353719576/job/108717193576
