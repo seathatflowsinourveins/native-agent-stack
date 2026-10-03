@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "native_runtime_capability_acceptance_plan",
+  "lane": "foundation",
+  "frozen_at": "2026-09-30T22:47:00Z",
+  "base_revision": "29458b4342422c979ad3b9bc62532ea6f05073c1",
+  "scope": "Separately versioned OpenHands CLI and standalone SDK native capability setup; role resolution across maintained runtimes. No change to frozen O1 sandbox recipe or shared defaults.",
+  "sources": [
+    {
+      "repository": "OpenHands/OpenHands-CLI",
+      "version": "1.16.0",
+      "revision": "2963442dacc7cea44e39b7c4e73724295c853465",
+      "native_install": "uv tool install openhands==1.16.0 --python 3.12 with explicit patched LiteLLM constraint and private UV_TOOL_DIR/UV_TOOL_BIN_DIR"
+    },
+    {
+      "repository": "OpenHands/software-agent-sdk",
+      "version": "1.50.1",
+      "revision": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "native_install": "uv venv then uv pip compile/sync explicit SDK/tools requirements with LiteLLM1.93.2; original upstream lock preserved separately"
+    },
+    {
+      "repository": "OpenHands/extensions",
+      "version": "0.25.0",
+      "revision": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880"
+    },
+    {
+      "repository": "openai/openai-agents-python",
+      "version": "0.22.3",
+      "revision": "fdf21db62c303a3db54b0dfbee82de2141fa2799",
+      "status": "architecture review before additional setup"
+    }
+  ],
+  "baseline": {
+    "cli": "Installed PATH openhands --version/--help exits127; uv tool list has no OpenHands",
+    "sdk": "Declared O1 prefix absent; current selected interpreter has no SDK/tools/server metadata",
+    "retained_worker": "CodexSDK0.159.2 Sol-Max/Astra-Max through OmniRoute, prior scoped evidence in draftPR551; not rerun here"
+  },
+  "acceptance": [
+    {
+      "id": "cli-install",
+      "required": "Native installed CLI1.16.0 version/help and dependency metadata consistent on Python3.12; uv pip check passes; private state paths from native environment interfaces."
+    },
+    {
+      "id": "sdk-install",
+      "required": "Native installed SDK/tools1.50.1 and explicit LiteLLM1.93.2 metadata; uv pip check passes."
+    },
+    {
+      "id": "native-capabilities",
+      "required": "Unchanged pinned upstream tests selected before execution for native LLM/Responses, skills/plugins, MCP and condenser; exact names/results/skips retained. Test/mocks remain offline native upstream tests, not provider acceptance."
+    },
+    {
+      "id": "dependency-scan",
+      "required": "Native OSV scan of actual resolved target lock/environment, advisory ranges and dependency overrides reported; failed scan retained."
+    },
+    {
+      "id": "negative-controls",
+      "required": "Missing executable/dependency baseline and at least one capability condition absent/wrong that fails the same integration oracle; qualification cannot rely on empty tests or placeholder verifier."
+    },
+    {
+      "id": "peer-review",
+      "required": "Astra consequential architecture review plus bounded native Claude peer review when available; a failed native call or posted handoff remains separate from completed review."
+    }
+  ],
+  "provider_trials": {
+    "precondition": "Source-supported native configuration, dependency checks and role-specific bounded task/oracle frozen before any provider request; original failures retained.",
+    "model": "cx/gpt-6.1-sol-max",
+    "effort": "max",
+    "gateway": "Existing OmniRoute20128 Responses lane; native parent sessions retain accounts/routes",
+    "status": "not started"
+  },
+  "token_practice": [
+    "On-demand selected skill bodies and tools only; do not preload full skill or framework catalogs.",
+    "Keep native caching/condenser/compaction supported configuration; compression savings require measured comparison.",
+    "Preserve every failed attempt; do not add child/parent cumulative or observer/provider duplicate counters.",
+    "Provider usage remains unknown for offline tests and failed pre-request readiness, never invented as zero-cost."
+  ],
+  "ownership": {
+    "implementation": "examples/openhands-native-capabilities/ only; fresh isolated worktree",
+    "shared": "Existing runtime/O1, gateway, pinned manifests, live untracked landscape and Claude defaults remain owner-managed",
+    "rollback": "Delete only the new owned private CLI/SDK environments and native candidate state; no global uninstall"
+  }
+}

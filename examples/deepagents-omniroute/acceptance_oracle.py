@@ -1,0 +1,125 @@
+"""Independent fixture oracle for the bounded native DeepAgents trial.
+
+This is a local integration check, not an upstream test or a benchmark.
+It reads returned native events and independently produced workspace files.
+"""
+
+import argparse
+import json
+import re
+from pathlib import Path
+
+DEEPAGENTS = "4394bcd00b8eb46e7c423939643a0dfcfb5d8773"
+SQLITE = "b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4"
+
+
+def nested_messages(value):
+    if isinstance(value, dict):
+        if value.get("type") in {"ai", "tool", "human"}:
+            yield value
+        for child in value.values():
+            yield from nested_messages(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from nested_messages(child)
+
+
+def read_events(path):
+    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+
+
+def messages(events, event):
+    seen = set()
+    for row in events:
+        if row.get("event") != event:
+            continue
+        for message in nested_messages(row.get("native")):
+            identity = message.get("id") or json.dumps(message, sort_keys=True)
+            if identity not in seen:
+                seen.add(identity)
+                yield message
+
+
+def tool_calls(events):
+    seen = set()
+    for message in messages(events, "graph_update"):
+        for call in message.get("tool_calls", []):
+            identity = call.get("id") or json.dumps(call, sort_keys=True)
+            if identity not in seen:
+                seen.add(identity)
+                yield call
+
+
+def checkpoint_contains(events, event, marker):
+    return any(marker in json.dumps(row.get("native"), ensure_ascii=False)
+               for row in events if row.get("event") == event)
+
+
+def check(args):
+    events = read_events(args.events)
+    marker = args.expected_marker.read_text().strip()
+    if not marker:
+        raise ValueError("empty expected fixture marker")
+    if args.phase == "empty-thread":
+        return {"checkpoint_contains_marker": checkpoint_contains(
+            events, "checkpoint_before", marker)}
+    if args.phase == "resume":
+        calls = list(tool_calls(events))
+        recovered = (args.workspace / "artifacts/resume-marker.txt").read_text().strip()
+        return {
+            "restored_before_new_turn": checkpoint_contains(events, "checkpoint_before", marker),
+            "marker_recovered": recovered == marker,
+            "new_events_avoid_reread_and_delegation": all(
+                call.get("name") not in {"read_file", "task"} for call in calls),
+        }
+    report = json.loads((args.workspace / "artifacts/research.json").read_text())
+    specialist = (args.workspace / "artifacts/specialist.md").read_text()
+    calls = list(tool_calls(events))
+    task_calls = [call for call in calls if call.get("name") == "task"]
+    native_messages = list(messages(events, "graph_update"))
+    skill_reads = [call for call in calls if call.get("name") == "read_file"
+                   and call.get("args", {}).get("file_path") == "/skills/research/SKILL.md"]
+    source_pins = report.get("source_pins", {})
+    checks = {
+        "filesystem_os_isolation": report.get("filesystem_os_isolation") is False,
+        "checkpoint_context_closes_connection": report.get("checkpoint_context_closes_connection") is True,
+        "source_pins": source_pins == {"deepagents": DEEPAGENTS, "sqlite": SQLITE},
+        "specialist_artifact_and_citations": len(specialist.strip()) > 40
+            and all(re.search(r"/sources/" + name + r"\.py:\d+", specialist)
+                    for name in ["local_shell", "sqlite"]),
+        "exactly_one_native_task": len(task_calls) == 1,
+        "task_returned": any(m.get("type") == "tool" and m.get("name") == "task"
+                             for m in native_messages),
+        "actual_selected_skill_read": bool(skill_reads),
+        "marker_in_native_checkpoint": checkpoint_contains(events, "checkpoint_after", marker),
+    }
+    for key, source in [("filesystem_quote", "sources/local_shell.py"),
+                        ("sqlite_quote", "sources/sqlite.py")]:
+        quote = report.get(key)
+        checks[key] = isinstance(quote, str) and 8 <= len(quote) <= 240 and quote in (
+            args.workspace / source).read_text()
+    checks["quotes_support_claims"] = (
+        "NO sandboxing or isolation" in report.get("filesystem_quote", "")
+        and "with closing(" in report.get("sqlite_quote", ""))
+    return checks
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--phase", choices=["initial", "resume", "empty-thread"], required=True)
+    parser.add_argument("--workspace", type=Path, required=True)
+    parser.add_argument("--events", type=Path, required=True)
+    parser.add_argument("--expected-marker", type=Path, required=True)
+    args = parser.parse_args()
+    try:
+        checks = check(args)
+        passed = bool(checks) and all(checks.values())
+        print(json.dumps({"phase": args.phase, "checks": checks, "passed": passed}))
+    except (OSError, ValueError, TypeError, KeyError) as error:
+        print(json.dumps({"phase": args.phase, "passed": False, "error_type": type(error).__name__}))
+        passed = False
+    raise SystemExit(0 if passed else 2)
+
+
+if __name__ == "__main__":
+    main()

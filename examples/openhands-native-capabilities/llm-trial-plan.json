@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "native_runtime_llm_trial_plan",
+  "status": "frozen_before_provider_execution",
+  "frozen_at": "2026-10-01 00:45:04 UTC",
+  "source_pins": {
+    "sdk": "1e1390acc8788346ba4804c34323284009bf3f5e",
+    "litellm": "cd1bd0f4b8af865f8d05fbd938392fdd4703babc"
+  },
+  "script": "examples/openhands-native-capabilities/native-llm-trial.py",
+  "script_sha256": "0f119e83a5367e12e1729d0376e71cc250b776b7c56afcab8d97a785435fca9b",
+  "contract": {
+    "api_key_kind": "public-local-loopback-placeholder",
+    "api_mode": "responses",
+    "base_url": "http://127.0.0.1:25371/v1",
+    "expected_output": "OH_NATIVE_LLM_OK_20260930",
+    "generate_calls": 1,
+    "litellm_version": "1.93.2",
+    "max_output_tokens": 1024,
+    "model": "openai/cx/gpt-6.1-sol-max",
+    "model_canonical_name": "gpt-6.1-sol",
+    "num_retries": 0,
+    "outer_deadline_seconds": 240,
+    "prompt_sha256": "dd6f400b842836fe57042634311c53afc349d902fcbe78674dc589f6aa3eb29b",
+    "reasoning_effort": "max",
+    "sdk_version": "1.50.1",
+    "store": false,
+    "stream": false,
+    "timeout_seconds": 180,
+    "tools": 0,
+    "transport_max_retries": 0,
+    "wire_model": "cx/gpt-6.1-sol-max"
+  },
+  "source_hashes": [
+    {
+      "path": "openhands-sdk/openhands/sdk/llm/llm.py",
+      "sha256": "a3261d1d021eebeb81114acdf3e36c38ea08e0bbb1d037def25c0ad8995f92d3",
+      "matches_installed": true
+    },
+    {
+      "path": "openhands-sdk/openhands/sdk/llm/message.py",
+      "sha256": "df8b5a0081d87b3111b6373f306e538db8729295691a55f29ff2d0bf5e045d37",
+      "matches_installed": true
+    },
+    {
+      "path": "openhands-sdk/openhands/sdk/llm/llm_response.py",
+      "sha256": "0da0550648a3e12cfe46c62145bdd451cbc9093cc205c39843d221170378ba42",
+      "matches_installed": true
+    },
+    {
+      "path": "openhands-sdk/openhands/sdk/llm/utils/litellm_provider.py",
+      "sha256": "cfe2724ff06a9bdbc07fe16a4440926a394d5efaf9cf6f4001fd52e1963ae7b2",
+      "matches_installed": true
+    },
+    {
+      "path": "litellm/litellm_core_utils/get_llm_provider_logic.py",
+      "sha256": "e14f509638fd4d5d2a0c4b6724ee648d8f346f78394b5dc79ef6d31fee5ca394",
+      "matches_installed": true
+    }
+  ],
+  "pre_provider_controls": {
+    "syntax_exit": 0,
+    "metadata_exit": 0,
+    "exact_output_exit": 0,
+    "wrong_output_exit": 2
+  },
+  "observer": {
+    "source_sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97",
+    "endpoint": "http://127.0.0.1:25371/v1",
+    "underlying_lane": "http://127.0.0.1:20128/v1",
+    "prior_completed_deepagents_event_count": 81
+  },
+  "acceptance": "One native LLM.generate call returns the exact expected assistant text with no tool calls; wrong-output input fails the same exact oracle. Actual normalized result and local independent request/status metadata retained.",
+  "limits": [
+    "One exact-output generation is API interoperability acceptance, not an agent, tool, skill, MCP, condenser or model-quality trial.",
+    "CLI1.16.0 strict Jinja cache isolation remains unqualified.",
+    "Public loopback placeholder; no credential values read.",
+    "Wire model/effort does not attest backend identity.",
+    "No token savings or complete billing claim."
+  ],
+  "failure_policy": "Preserve actual failure and usage; no automatic repeat or quality promotion."
+}
