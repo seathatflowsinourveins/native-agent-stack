@@ -345,5 +345,10 @@ Decision rights stay as recorded:
   (`2026-09-30-omniroute-rebuild.md:3-8,30-32,43-55`, which names neither R02 nor #445). The freeze ended in fact no
   later than 2026-09-29 00:42Z, when 20128 was running `5fc47d970` at `81c9b6da` instead of the frozen `dd6e9607e`
   (`2026-09-30-omniroute-rebuild.md:30-32`). The apply-after-R02 order was broken in fact no later than the 2026-09-30
-  rebuild, the first published record of the affinity patch on 20128. No explicit user release is on record, and this
-  update releases nothing. Evidence class: `source_review` of the retained records.
+  rebuild, which records the affinity patch `045aa81f3` on 20128 (`2026-09-30-omniroute-rebuild.md:54-55`). PR #425's
+  records, on main since 2026-09-28T22:57:18Z, already label `045aa81f3` as 20128's build
+  (`2026-09-28-openhands-resolver-isolation.md:281`). That label comes from a source read, not an observed version
+  read, and read as the running build it conflicts with the rebuild record
+  (`2026-09-30-omniroute-rebuild.md:30-31,135-136`). The sources do not settle whether either break came earlier, and
+  this update neither asserts nor rules out an earlier date. No explicit user release is on record, and this update
+  releases nothing. Evidence class: `source_review` of the retained records.
