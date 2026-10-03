@@ -5806,8 +5806,8 @@
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/README.md",
-      "sha256": "9db0823f48a6007881fbf7848d126cb8a6814f1649461d80b644cee73388f328",
-      "bytes": 15796
+      "sha256": "aeff7a02de32d0fc0436b6ceb3991a2fe204f128674311466c040cda463a0e6c",
+      "bytes": 16574
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
@@ -15711,8 +15711,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "9b3115f672526723e242d0d99bdcdd4fc9e536dc2529ecb54dfa64b61365204a",
-      "bytes": 33379
+      "sha256": "58d1b99d97939bafa08e46733ab5eb4cec8bde39465f36953a0e146908eff1b9",
+      "bytes": 33981
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -15803,6 +15803,11 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "64d49f2de46d3309d7802678039caac1609027b8f00b561987e464e94432847f",
       "bytes": 21453
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
+      "sha256": "c3c486a70d61170b29ba35356f01f09a117977aaea0d9ce2333a0d7fac5db78a",
+      "bytes": 20673
     },
     {
       "path": "docs/direct-results.md",
