@@ -4007,8 +4007,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "3c44cc475010380ab18985ce2715bcd9d1290e2ced7c161d80c4d8c73b816f46",
-      "bytes": 23346
+      "sha256": "5c05254b9697920813e84203e58a8e690a8fc1022d67b48ebb9206e19e3a94df",
+      "bytes": 23663
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -4037,8 +4037,8 @@
     },
     {
       "path": ".github/workflows/practice-references-freshness.yml",
-      "sha256": "ab326a1206266459a256727411662a81f29dc31534aaeadf9a792c7f8d7f0364",
-      "bytes": 3190
+      "sha256": "e361cfb8c1f4be6ec0060e23abd19b8b04289aaa2d09d91e7a0de7ede3ce7b84",
+      "bytes": 3254
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
@@ -4052,8 +4052,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "76219f352b6eee1e498e7bcea91daaffc52a235ebf908e53fbf1e2e75e6a607a",
-      "bytes": 14553
+      "sha256": "b07ace2d27deebb1aa1f07fbdfdc2ed6ea531d8579122e81e6abb1633725edff",
+      "bytes": 14571
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -14963,8 +14963,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "ae37c318ba29ed51c3845db7a26db847f185f656310915be7846f7d986483a7f",
-      "bytes": 34731
+      "sha256": "ccf259a9b7bca8cf81cfa0ddfbe5f54e7bc95a073defebc74a28877bfee5f084",
+      "bytes": 34986
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -15653,8 +15653,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
-      "sha256": "a53ed6d5a13702b5f612d81221fe25ed23ff9363a97d5c0e682e90c71a157bf1",
-      "bytes": 50057
+      "sha256": "98ab05b6283e6baad7ce711a2101af6ed7b690c801c9711ebbc6df8a4a7762e9",
+      "bytes": 50598
     },
     {
       "path": "docs/decisions/2026-09-26-telemetry-writer-identity.md",
@@ -17050,6 +17050,26 @@
       "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
       "sha256": "ec6f40a94567c8f0a95a3d22688ec7cefc412ef97de94f99a2803676e6954290",
       "bytes": 166445
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-residuals-20261003/README.md",
+      "sha256": "902cd7f7213347de21a828b7614a89da1f4f78b72250c515f5ec48e165ceb37e",
+      "bytes": 4686
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-residuals-20261003/docs.stdout.txt",
+      "sha256": "4203624a5b50036ffd75b554a8842d4f84484c09176d093ba06dd6d0d3844088",
+      "bytes": 191
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-residuals-20261003/integration.stdout.txt",
+      "sha256": "ed7379d2aa099e85a67219e6076d8c5ecd3179bec09595760fd873bdfae52f27",
+      "bytes": 229
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-residuals-20261003/pr613-source-review.json",
+      "sha256": "ca7cc90d94684da52b3b952ecb84c2c15565dcf3ba832a1e09f36bcc7021febc",
+      "bytes": 25478
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -49938,8 +49958,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "572d280922a42d62159c545094225d93d30cc3d6ca3f0253f794a044675a60d3",
-      "bytes": 59111
+      "sha256": "8b47c2850f86d2ac3d6fbf6f83aff5679d8f185011065c0b3f18579a92417229",
+      "bytes": 59524
     },
     {
       "path": "tests/test_catalogs.py",
@@ -50533,8 +50553,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "7ac9da4a5e9ae0d4fa19a4b632c9466ba59ce750fb241bfa8cee8ea261f0a66a",
-      "bytes": 42808
+      "sha256": "c53c41f48c564094c92501537e973139ce703d89c82eb9126d4f9d620e623a35",
+      "bytes": 42807
     },
     {
       "path": "tests/test_sim_capacity.py",
@@ -51043,8 +51063,8 @@
     },
     {
       "path": "tools/sota-convergence/practice_references.py",
-      "sha256": "78ec4a71101cabf078a5118804f7912198658b995c4c30af1af208481b88b6ea",
-      "bytes": 31688
+      "sha256": "a61b67ac806bdc8fe7f028405640c8765e3a1030cd30d1b67edb2c22e0f03242",
+      "bytes": 31717
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
