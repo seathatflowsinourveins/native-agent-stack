@@ -1,0 +1,50 @@
+{
+  "kind": "native_dependency_scan",
+  "recorded_at": "2026-09-30T16:39:29Z",
+  "evidence_scope": "Three newly introduced SDK uv script locks only; no whole-repository security or model quality claim.",
+  "source": {
+    "repository": "https://github.com/google/osv-scanner",
+    "tag": "v2.6.0",
+    "revision": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+    "binary_asset": "osv-scanner_linux_amd64",
+    "published_and_downloaded_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "native_version": "2.6.0",
+    "native_scalibr_version": "0.5.2",
+    "parser_source": "https://github.com/google/osv-scanner/blob/e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6/pkg/osvscanner/internal/scanners/lockfile.go#L62"
+  },
+  "command": "rtk <owned-osv-scanner-v2.6.0> scan source --no-resolve --all-packages --format json --lockfile=uv.lock:examples/omniroute-codex-sdk/worker.py.lock --lockfile=uv.lock:examples/omniroute-codex-sdk/test_worker.py.lock --lockfile=uv.lock:examples/claude-runtime-sdk/worker.py.lock --output-file <new-private-result>",
+  "exit_code": 0,
+  "selected_actual_results": [
+    {
+      "source_type": "lockfile",
+      "source_path": "examples/omniroute-codex-sdk/worker.py.lock",
+      "packages": 8,
+      "vulnerabilities": 0
+    },
+    {
+      "source_type": "lockfile",
+      "source_path": "examples/omniroute-codex-sdk/test_worker.py.lock",
+      "packages": 8,
+      "vulnerabilities": 0
+    },
+    {
+      "source_type": "lockfile",
+      "source_path": "examples/claude-runtime-sdk/worker.py.lock",
+      "packages": 32,
+      "vulnerabilities": 0
+    }
+  ],
+  "native_returned_summary": "0 dirs visited, 3 inodes visited, 3 Extract calls",
+  "registry_correction": "The required pre-push tracked-lock inventory failed on these three paths. Added the supported uv.lock extractor override to the existing inventory and allowed parser set. Extended the existing suppression guard to recognize that explicit parser as well as literal uv.lock basenames.",
+  "local_guard_checks": {
+    "command": "rtk python3 -m unittest tests.test_osv_lockfile_coverage",
+    "exit_code": 0,
+    "returned_output": "Ran 30 tests in 0.234s\nOK",
+    "scope": "Authored registry and adversarial ignore-policy checks; forced script-lock test retains findings for deliberately vulnerable nltk/setuptools pins."
+  },
+  "limitations": [
+    "No exclusions, expiry rules, allowed advisory scopes or hooks were bypassed.",
+    "Package counts are per file, including duplicate locks and conditional package entries; they are not a unique installed-package count.",
+    "Scanner reports no known vulnerability in these locked inventories at this observation; future database updates and unscanned native/runtime dependencies remain separate."
+  ]
+}

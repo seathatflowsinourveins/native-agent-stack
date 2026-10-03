@@ -24,6 +24,10 @@ node_modules/
 # inventory them by hash.
 !evidence/artifacts/local-model-server-gate-20261001/runs/*/events.jsonl
 !evidence/artifacts/local-model-server-gate-confirmatory-20261001/runs/*/events.jsonl
+# The local-model measurement's per-case validity files and per-query nDCG@10 files: both decision statistics reproduce
+# from them, and both receipts inventory them by hash (evidence/artifacts/new-wsl-local-models-20261002/README.md).
+!evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/*/validity.jsonl
+!evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/*/per-query.jsonl
 # Codex app-server hooks/list oracle answers behind scripts/adoption_status.py's Codex model (throwaway homes shown
 # as $BASE, no hash value): evidence/artifacts/adoption-status-truth-20260926/README.md.
 !evidence/artifacts/adoption-status-truth-20260926/*.jsonl
