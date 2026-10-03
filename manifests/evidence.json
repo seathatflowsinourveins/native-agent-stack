@@ -15766,8 +15766,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
-      "sha256": "2224a0cd04b60d7ebcc346621cc2c92adfbde33c0d7dc01d277120e63d838b16",
-      "bytes": 16698
+      "sha256": "9dd19986428443be40e3a073ef74905595dc97e0cabcd5182afafea9c3790563",
+      "bytes": 19868
     },
     {
       "path": "docs/direct-results.md",
@@ -45280,14 +45280,49 @@
       "bytes": 2739
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+      "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b",
+      "bytes": 5180
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/protocol-opus-read.json",
+      "sha256": "b4adf401452c5f8788c3654c700d3ad3b4b9fc136d7b2218ad8809631efea56d",
+      "bytes": 3270
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/protocol.md",
-      "sha256": "2fa8bc1252a179548ac7e5a5465e1fa8db3d98620d78eb5b861e4e512705d881",
-      "bytes": 14257
+      "sha256": "906db8a2cbce740fae65d7356ea5a9b849200008d6bef432a9df381f7d41287e",
+      "bytes": 21999
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
+      "sha256": "a58f0e909043bebce03ff3753d35931743b963482285c7b4fefb29a702b3c4af",
+      "bytes": 21021
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/rtk-artifact-qualification.json",
+      "sha256": "04b742c80f1f26d72ab78dd3fdec1c304cb0440b1dcb49b4e14906ce259ebff4",
+      "bytes": 5824
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+      "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9",
+      "bytes": 4938
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/rtk-repair-astra-read.json",
+      "sha256": "f70eabd08db3501b1dc0550dbccdf0e7f06d2f7fe2dc4662c87dcbd1e4ba207b",
+      "bytes": 2077
     },
     {
       "path": "evidence/artifacts/token-context-20261003/source-qualification.md",
-      "sha256": "ce94021a191e91257d60699458d85c321c26df1e81e9d30f9cd493e3b1ef375e",
-      "bytes": 7083
+      "sha256": "ebcb6d5a713a41027e2547109231083fac8d71b5b7e4fbff11d9a94ec7e176b9",
+      "bytes": 12589
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
+      "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c",
+      "bytes": 2544
     },
     {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
@@ -50509,28 +50544,29 @@
     "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",
+    "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",
     "blueprints/convergence-practice/ci-security/experiment.json",
     "blueprints/convergence-practice/document-ingestion/experiment.json",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
     "blueprints/convergence-practice/gpu-inference/experiment.json",
     "blueprints/convergence-practice/job-recovery/experiment-macos.json",
     "blueprints/convergence-practice/job-recovery/experiment-wsl.json",
+    "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/mac-memory-patch/experiment.json",
     "blueprints/convergence-practice/native-recovery/claude/experiment.json",
     "blueprints/convergence-practice/native-recovery/experiment.json",
     "blueprints/convergence-practice/native-worker/experiment.json",
+    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
     "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json",
     "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
+    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
     "blueprints/convergence-practice/wsl-retrieval/experiment.json",
     "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
-    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/us-equities/sim-capacity/experiment.json",
-    "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
     "evidence/artifacts/local-model-workloads-20260924/experiment.json",
     "evidence/artifacts/memory-stack-20260925/experiment.json",
-    "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
-    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
-    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
-    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
+    "evidence/artifacts/token-context-20261003/qualification-experiment.json"
   ]
 }
