@@ -42120,6 +42120,11 @@
       "bytes": 18304
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-retained-content-identity-20261003.json",
+      "sha256": "040bb133fceee86e5940686881f4139a5b6740af33fe08b327b7a78519f30d29",
+      "bytes": 12899
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-stopped-network-amendment.json",
       "sha256": "e1640b16584fd403d9785bef098acc63e0491004b2e2eb0164f9917bff6222fb",
       "bytes": 13337

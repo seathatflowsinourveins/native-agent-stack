@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "scope": "Retained coding-image content identity; native export plus local integration observer",
+  "reviewed_repository_head": "b6d41a5085bac83bfc364dd189f03e5f7d386b3c",
+  "parent_readiness_artifact": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-native-readiness-20261003.json",
+  "preregister": {
+    "original": {
+      "bytes": 15804,
+      "sha256": "fb1088992a71cc2aee63e1d91444055959c00bd0c323c0eddda0f9bcfa32755d",
+      "preserved_unchanged": true,
+      "save_phase_admitted": true,
+      "observer_recipe": "SOURCE-REJECTED before hash/parser: configuration media type not validated"
+    },
+    "prospective_observer_amendment": {
+      "bytes": 17166,
+      "sha256": "6c466e8dfe418e04d0b2566734a70584ee7e6b44dc939c1bfa6188307c64cbfb",
+      "frozen_after_export_before_hash_or_parser": true,
+      "seven_leaf_changes_verified": true,
+      "changes": [
+        "Validate OCI or supported Docker config media type before reading opaque config bytes",
+        "Bind parser argv to the amended packet and updated inline parser source",
+        "Record parent binding and prospective amendment provenance"
+      ],
+      "deadlines": {
+        "export_seconds": 300,
+        "hash_seconds": 120,
+        "parser_seconds": 120,
+        "termination_signal": "TERM",
+        "kill_after_seconds": 10
+      },
+      "prior_deadline_note": "Earlier coordination note proposed 60 seconds; explicitly amended to retain final original packet's 120-second observer phases before their execution"
+    }
+  },
+  "native": {
+    "save": {
+      "exit_code": 0,
+      "tool_chunk": "79be1e",
+      "number_of_exports": 1,
+      "number_of_build_retries": 0,
+      "platform_argument_supplied": false,
+      "operation": "Docker image save of the two exact retained target digests; native exporter preserves each original target"
+    },
+    "archive_hash": {
+      "exit_code": 0,
+      "tool_chunk": "787d31",
+      "actual_result": {
+        "bytes": 1324093952,
+        "sha256": "366479e1d5df497205e16d207c8fd9a4fc8fb13254d82809efeabd3a49afa5fe"
+      }
+    },
+    "content_observer": {
+      "exit_code": 0,
+      "tool_chunk": "36ac68",
+      "classification": "Locally authored read-only integration observation using native tarfile and pinned upstream descriptor formats; not an unchanged upstream acceptance test",
+      "actual_result": {
+        "archive_member_headers": 32,
+        "wrapper_sha256": "8cb352ddd8d10e5db5c74e529bf2422b37d5d5aa4901779fc750f3c78622f90c",
+        "wrapper_is_generated": true,
+        "target_count": 2,
+        "images": [
+          {
+            "target": "sha256:3200c5c12603d1760582936e0c85d2bbc882c7fe17f8b2058556085e08c3d595",
+            "target_type": "application/vnd.oci.image.index.v1+json",
+            "manifest": "sha256:ff3f1c0248f0a9b398d8105ee9f70f5280a5807d4ffb0ff185bedb4621c0fb41",
+            "manifest_type": "application/vnd.oci.image.manifest.v1+json",
+            "config": "sha256:e409b4d3c8d2879bd1b1d99e5a18a54effd06126d3aa1d7817b89f65592e059f",
+            "config_type": "application/vnd.oci.image.config.v1+json",
+            "target_bytes": 856,
+            "manifest_bytes": 2766,
+            "config_bytes": 4999,
+            "platform": "linux/amd64",
+            "platform_source": "index_descriptor",
+            "target_manifest_config_links_verified": true,
+            "layers_read": false,
+            "config_json_parsed": false
+          },
+          {
+            "target": "sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5",
+            "target_type": "application/vnd.oci.image.manifest.v1+json",
+            "manifest": "sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5",
+            "manifest_type": "application/vnd.oci.image.manifest.v1+json",
+            "config": "sha256:27933730df224df80c41f4e5a9b33fa78831a79fd31903df3bb7deb49363422f",
+            "config_type": "application/vnd.oci.image.config.v1+json",
+            "target_bytes": 2261,
+            "manifest_bytes": 2261,
+            "config_bytes": 2667,
+            "platform": "linux/amd64",
+            "platform_source": "separate_native_image_inspect",
+            "target_manifest_config_links_verified": true,
+            "layers_read": false,
+            "config_json_parsed": false
+          }
+        ],
+        "layer_payloads_read_by_parser": false
+      }
+    },
+    "captures": [
+      {
+        "phase": "ONE-native-save",
+        "stream": "stdout",
+        "read_exit": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "actual_text": ""
+      },
+      {
+        "phase": "ONE-native-save",
+        "stream": "stderr",
+        "read_exit": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "actual_text": ""
+      },
+      {
+        "phase": "archive-hash",
+        "stream": "stdout",
+        "read_exit": 0,
+        "bytes": 100,
+        "sha256": "5f53608839e9663cd0eec67e9e5e914955466a484795fa2c5e78f1df098069f6",
+        "actual_text": "{\"bytes\": 1324093952, \"sha256\": \"366479e1d5df497205e16d207c8fd9a4fc8fb13254d82809efeabd3a49afa5fe\"}\n"
+      },
+      {
+        "phase": "archive-hash",
+        "stream": "stderr",
+        "read_exit": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "actual_text": ""
+      },
+      {
+        "phase": "archive-content-parser",
+        "stream": "stdout",
+        "read_exit": 0,
+        "bytes": 1509,
+        "sha256": "fdf73c07ffb0265629749af0b5a865058754cdfaa7001ecf29de4deac660c625",
+        "actual_text": "{\"archive_member_headers\":32,\"wrapper_sha256\":\"8cb352ddd8d10e5db5c74e529bf2422b37d5d5aa4901779fc750f3c78622f90c\",\"wrapper_is_generated\":true,\"target_count\":2,\"images\":[{\"target\":\"sha256:3200c5c12603d1760582936e0c85d2bbc882c7fe17f8b2058556085e08c3d595\",\"target_type\":\"application/vnd.oci.image.index.v1+json\",\"manifest\":\"sha256:ff3f1c0248f0a9b398d8105ee9f70f5280a5807d4ffb0ff185bedb4621c0fb41\",\"manifest_type\":\"application/vnd.oci.image.manifest.v1+json\",\"config\":\"sha256:e409b4d3c8d2879bd1b1d99e5a18a54effd06126d3aa1d7817b89f65592e059f\",\"config_type\":\"application/vnd.oci.image.config.v1+json\",\"target_bytes\":856,\"manifest_bytes\":2766,\"config_bytes\":4999,\"platform\":\"linux/amd64\",\"platform_source\":\"index_descriptor\",\"target_manifest_config_links_verified\":true,\"layers_read\":false,\"config_json_parsed\":false},{\"target\":\"sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5\",\"target_type\":\"application/vnd.oci.image.manifest.v1+json\",\"manifest\":\"sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5\",\"manifest_type\":\"application/vnd.oci.image.manifest.v1+json\",\"config\":\"sha256:27933730df224df80c41f4e5a9b33fa78831a79fd31903df3bb7deb49363422f\",\"config_type\":\"application/vnd.oci.image.config.v1+json\",\"target_bytes\":2261,\"manifest_bytes\":2261,\"config_bytes\":2667,\"platform\":\"linux/amd64\",\"platform_source\":\"separate_native_image_inspect\",\"target_manifest_config_links_verified\":true,\"layers_read\":false,\"config_json_parsed\":false}],\"layer_payloads_read_by_parser\":false}\n"
+      },
+      {
+        "phase": "archive-content-parser",
+        "stream": "stderr",
+        "read_exit": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "actual_text": ""
+      }
+    ],
+    "native_executables": {
+      "docker_sha256": "172b72539365fab1b04c79839fab0bb44dfec1c5a932ad1dbff170298b3475b3",
+      "python_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+      "tarfile_module_sha256": "c0db1a21e56ccf002147bffd10d97f452ad842820963ef793117f92a0cdaaad4",
+      "gnu_timeout_sha256": "1ba715580334044dbd32873bddd7f8a19687cda1cf5e9f44be7266af6c048766"
+    }
+  },
+  "source_consistency": {
+    "python_version": "3.14.4",
+    "upstream_tarfile": {
+      "pin": "23116f998f6789d8c2fbe5ed5b8146854c8c2a4f",
+      "bytes": 118109,
+      "sha256": "ec88f2affb5b23464dc9df50e98cb12d1516fca2ce6a78d83c57c9ce2ad93f5c"
+    },
+    "native_tarfile": {
+      "bytes": 118582,
+      "sha256": "c0db1a21e56ccf002147bffd10d97f452ad842820963ef793117f92a0cdaaad4",
+      "whole_file_differs": true,
+      "used_read_methods_match_upstream": [
+        "open",
+        "getmember",
+        "getmembers",
+        "extractfile",
+        "next",
+        "_getmember",
+        "_load"
+      ],
+      "changed_methods_not_used": [
+        "_get_filtered_attrs",
+        "TarFile.extract"
+      ],
+      "comparison": "AST comparison ignoring source line positions; no filesystem extraction"
+    }
+  },
+  "independent_read": {
+    "role": "Astra consequential source/custody read",
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "max",
+    "actual_delivered_model": null,
+    "actual_delivered_effort": null,
+    "provider_usage": null,
+    "verdict": "ACCEPT retained target-to-selected-manifest-to-opaque-config identity only",
+    "separate_archive_read_exit_code": 0,
+    "verified": [
+      "Both immutable packet identities and seven amended leaf changes",
+      "All six actual capture hashes",
+      "32 unique member headers and current archive size",
+      "Both target descriptors, selected AMD64 manifest and both opaque configuration blobs against size/digest"
+    ],
+    "whole_archive_hash_repeated": false,
+    "original_parser_replayed": false,
+    "docker_operation_executed": false
+  },
+  "failures_preserved": [
+    {
+      "scope": "Original coding build freeze",
+      "result": "FAILED container/image ID equals configuration digest predicate",
+      "corrected_interpretation": "This containerd image store uses the target descriptor digest as image ID; manifest/configuration digests remain separately verified",
+      "original_failure_reclassified": false
+    },
+    {
+      "scope": "First content observer recipe",
+      "result": "SOURCE-REJECTED for missing configuration media-type assertion",
+      "native_parser_execution": false,
+      "immutable_original_retained": true
+    },
+    {
+      "scope": "Source inspection",
+      "result": "Docker CLI and Moby v29.8.2 GitHub release lookups returned HTTP404/native exit1",
+      "recovery": "Annotated tag peeled to exact commit and original source reread; no capability absence inferred"
+    },
+    {
+      "scope": "Native tarfile AST comparison",
+      "result": "Initial comparison included source line positions and falsely marked shifted methods as changed",
+      "recovery": "Compare semantic AST without positions; seven used native read methods match pinned upstream"
+    }
+  ],
+  "sources": {
+    "cli_save": "https://github.com/docker/cli/blob/7fc2dff9bceb96b266a3b2c3117c0955a0d9e616/cli/command/image/save.go",
+    "native_export": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/containerd/image_exporter.go",
+    "archive_export": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/vendor/github.com/containerd/containerd/v2/core/images/archive/exporter.go",
+    "descriptor": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/vendor/github.com/opencontainers/image-spec/specs-go/v1/descriptor.go",
+    "manifest": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/vendor/github.com/opencontainers/image-spec/specs-go/v1/manifest.go",
+    "tarfile": "https://github.com/python/cpython/blob/23116f998f6789d8c2fbe5ed5b8146854c8c2a4f/Lib/tarfile.py",
+    "docker_config_media_types": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/vendor/github.com/containerd/containerd/v2/core/images/mediatypes.go",
+    "native_image_id": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/containerd/image_inspect.go#L95",
+    "native_container_image": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/inspect.go#L133"
+  },
+  "acceptance": {
+    "retained_content_identity": "PASS",
+    "prior_scoped_builder_cleanup": "PASS independent; separate prior receipt",
+    "hermetic_inputs": "NOT ESTABLISHED",
+    "all_platform_content": "NOT ESTABLISHED; native exporter can omit missing platform content",
+    "stopped_main_creation": "NOT EXECUTED",
+    "task_execution": "NOT EXECUTED",
+    "model_provider_execution": "NOT EXECUTED",
+    "cross_arm_reuse": "HOLD",
+    "coding_comparison": "HOLD",
+    "all_runtime_defaults": "HOLD",
+    "token_efficiency": "HOLD",
+    "private_archive_retained": true,
+    "configuration_json_parsed": false,
+    "layer_payloads_read_by_parser": false,
+    "whole_archive_hash_reads_raw_bytes": true
+  }
+}
