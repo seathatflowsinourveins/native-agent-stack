@@ -45,7 +45,7 @@ is `openai/codex@01fc69f4026735edfdf6789820549727a4867b11` (`rust-v0.159.3`).
   still uses `CODEX_HOME`; project and managed layers remain separate.
 - [Provider fields and retry configuration](https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/model-provider-info/src/lib.rs#L193)
   support Responses providers and standalone search. `retry_429` is hardcoded
-  false at line 447; a terminal retry-limit report therefore cannot distinguish
+  false at line 450; a terminal retry-limit report therefore cannot distinguish
   exhausted accounts from a transient HTTP 429. The
   [exec event schema](https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/exec/src/exec_events.rs#L22)
   supplies `error.message` and `turn.failed.error.message`.
@@ -86,23 +86,39 @@ Its inline provider sets `wire_api = "responses"`, `requires_openai_auth = false
 `env_key = "OMNIROUTE_API_KEY"` and `supports_standalone_web_search = true`.
 Standalone search is enabled, shell snapshots are disabled, and the key is
 excluded from model-run shells. A missing key receives the keyless loopback
-placeholder. The requested gateway model is `cx/<native model>-max`, preserving
-the gateway owner's max-effort convention.
+placeholder. The requested gateway model is `cx/<native model>-<request_effort>`:
+`high` stays `high`, and native `ultra` on Astra/6.1 Sol resolves to `xhigh`.
+The pinned suffix parser accepts low through xhigh for bare models and max only
+for its seven exact max-alias models. Both the stager and runner refuse a fallback
+without the matching alias. The suffix takes precedence over explicit request
+effort in the [pinned executor](https://github.com/HouMinXi/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex.ts#L1403).
+`gateway_effort` records this requested wire effort; delivered effort and stronger
+server force rules remain unobserved.
 
 `inputs.json` stays byte-identical. `route.json` records the requested provider,
 fallback origin/reason, native and gateway models, the archived native attempt
-number and `omniroute:/alpha/search`. A direct gateway job has a null native
+number, the sanitized loopback `base_url`, `gateway_effort` and
+`omniroute:/alpha/search`. The receipt is written after process launch; a hold,
+insufficient reserve or failed launch carries no actual gateway route. A direct gateway job has a null native
 attempt number. `result` and archived attempt summaries expose the route.
 Conversion reads the original receipt because `sweep.js` copies fixed fields;
 raw returns and GPT fit votes retain it. Later capacity/idle retries archive and
-restore the same route receipt, and every failed attempt remains accounted for.
+write the same route receipt after launch, and every failed attempt remains accounted for.
+A successful fallback result is reused only while its bound inputs and current
+fallback provider, endpoint, model and effort match the route receipt. Disabling
+fallback or changing the endpoint archives that result and runs the job again.
 
 `LIMIT-native` contains JSON `reason` and `reset_time`; an unreported reset stays
 null. Before each new held job with that marker, the native probe runs without a
 quota threshold or model turn. Only a successful report with explicit
 `ordinary_usage_allowed: true` removes the marker. Otherwise the job goes directly
 to the gateway. A native quota threshold can fail over before any native model
-call. This threshold is not applied to the gateway pool.
+call. This threshold is not applied to the gateway pool. Recovery and quota
+probes receive the job's absolute deadline; helper and parent timeouts are capped
+by the remaining budget, and expired budgets prevent probe launch. Failed probes
+remain recorded. Failover needs the existing 300-second retry reserve. Without
+it, exit 3 and the latest native limit remain terminal, including after an earlier
+capacity or idle failure.
 
 A gateway HTTP-429 retry-limit report counts only in `error` or `turn.failed`
 events. Item content and stderr quotes do not count. It writes global `LIMIT`
@@ -111,9 +127,13 @@ exhausted. Native-only LIMIT/quota behavior remains covered by the existing suit
 
 Workflow resume caches a GPT wrapper that completed with `failed_exit_3`.
 Clearing the marker cannot invalidate that completed agent return. Recovery uses
-a new Workflow run with the primary provider and frozen prompts unchanged:
-successful GPT jobs return `already done`, failed jobs rerun with their attempt
-history, and Claude agents rerun. Automatic failover keeps the intermediate
+a new Workflow run with the primary provider and frozen templates unchanged.
+Successful GPT jobs return `already done` only while their bound inputs remain
+byte-identical and their fallback route still matches. Pre-written first-round
+discovery prompts can meet that condition. Rerun Claude stages rebuild fit and
+follow-up prompts from new proposals and critic output; changed prompt bytes
+rerun those GPT jobs, moving earlier successes to `attempts/<n>/` at new GPT
+cost. Failed jobs also rerun with their attempt history. Automatic failover keeps the intermediate
 native failure within a single held job.
 
 ## Acceptance evidence and boundaries
@@ -162,7 +182,7 @@ structured-output request. Schema-byte equality is checked by the synthetic
 runner test; search operation and outgoing effort parity remain separate gaps.
 No model inference was made for this build's acceptance.
 
-Final repository command results:
+Original FO repository command results (retained failed publication condition):
 
 | Command | Exit | Decisive returned output |
 | --- | --- | --- |
@@ -184,17 +204,17 @@ The full-suite optional skips are the installed context-mode security fixture
 returned exit 1, and the Python module availability check returned false;
 conditional `ruff check` and `ruff format --check` were therefore not run.
 
-Publication validation is not green. `manifests/evidence.json` still holds the
-old hashes/byte counts for `tests/test_landscape_sweep_harness.py` and the edited
+At that first run, publication validation failed because `manifests/evidence.json`
+held old hashes/byte counts for `tests/test_landscape_sweep_harness.py` and the edited
 `README.md`, `build_args.py`, `codex_job.py` and `convert.py` in the harness.
-That shared hot file is outside contract FO's allowed write scope. The integrating
-coordinator must re-register those five paths through
-[the hot-file protocol](../lanes.md#hot-file-protocol) and rerun publication
-validation. This unit supplies the proposed entries through the existing
-`scripts/host_receipts.py` registration function in a disposable snapshot; it does
-not change the checkout's manifest or relabel the failed command as passing.
-The working tree contains the five modified paths and this new decision record;
-no commit or push was made.
+That shared hot file was outside contract FO's allowed write scope. The first
+unit handed registration to the integrating coordinator through
+[the hot-file protocol](../lanes.md#hot-file-protocol). It supplied proposed
+entries through `scripts/host_receipts.py` in a disposable snapshot, preserving
+the failed command as a failed condition.
+The later registration at `ef4c764d252ad66b754824222e2d700d4e62c89b`
+updated all six owned entries. R649 rechecks publication after its repairs and
+registration; its addendum below retains the current returned result.
 
 ## Limitations and overturn condition
 
@@ -235,3 +255,91 @@ usage. This opt-in change does not assert a max-quality gateway acceptance.
   sweep should check upstream provider failover, nullable recovery behavior,
   deployed pool exhaustion/effort and full web-operation parity. Live settings
   and inference acceptance remain unqualified, as required by this build contract.
+
+## R649 repair and post-registration addendum (2026-10-03)
+
+The bounded PR #649 repair corrects the effort, probe deadline, gateway stderr,
+route launch/provenance, route reuse, retry reserve and resume-cost findings.
+Its north-star action remains preserving research/refutation votes without
+misstating their requested route, effort or attempt cost. The existing runner
+and unittest fixtures were extended against the supported pinned Codex provider
+interface and OmniRoute suffix parser/executor; no new runtime or dependency
+was selected. Keeping the hardcoded max suffix and accepting a route receipt
+before process launch were rejected by the reproduced failures. Unsupported
+aliases are refused; native provider failover or measured gateway parity failure
+still overturns this integration.
+
+The initial R649 regression command returned exit 1: `Ran 8 tests in 1.676s`,
+`FAILED (failures=11, errors=1)`. Decisive failures included a high request
+selecting `cx/gpt-6.1-sol-max`, probe timeouts `(600.0, 630.0)` instead of
+`(1.0, 1.0)`, a gateway stderr quote returning `(3, True, True)` instead of
+`(7, False, False)`, a false route on an operator hold, stale `already done`
+reuse after changing the endpoint, and timeout 124 instead of terminal native
+limit 3. The missing deadline argument was the error. These are synthetic
+integration observations, with no provider/model execution. One failed high
+subcase left its marker for the following ultra subcase; the fixture now clears
+the marker before each independent subcase.
+
+After repair, the focused command returned exit 0: `Ran 32 tests in 7.834s`,
+`OK`. An expanded focused run returned exit 1 (`Ran 24 tests in 6.424s`, one
+failure): its capacity-then-limit clock selected the second time based on an
+exact zero comparison that subprocess waiting had already advanced. The fixture
+now uses the attempt ordinal. Its focused rerun returned exit 0 (`Ran 1 test in
+0.078s`, `OK`). The final full suite below includes that corrected fixture.
+
+All 17 originally linked external sources were re-fetched, including the release,
+15 pinned source files and official configuration reference; the pinned
+OmniRoute executor was fetched separately. None was unavailable. The source
+check confirms suffix precedence, the seven exact max aliases, nullable recovery,
+event fields, inline provider/config behavior, search-operation restrictions,
+debug input scope and emergency fallback. Correction: `retry_429: false` is at
+line 450 in the pinned provider file; line 447 begins the enclosing retry block.
+Installed `codex --version` and `exec --help` still report 0.159.3 and the
+supported overrides; the matching release was read with `gh api` before source
+verification. The web tool's `open` request failed with HTTP 400 for the carried
+search adapter; direct official-page retrieval succeeded. Scoped and automatic
+ai-memory searches each returned the existing default-workspace project 404;
+its installed help still exposes no `pin_first`. Those unavailable memory
+results supplied no authority.
+
+Post-registration `python3 scripts/validate.py` returned exit **0**, with the
+actual decisive output:
+
+```text
+{"components": 69, "hashed_files": 9421, "profiles": 4, "receipts": 187, "status": "passed"}
+Integrity and scope checks only; no live provider or GPU execution.
+```
+
+Each changed tracked file was registered with `host_receipts.register_file`,
+with `manifests/evidence.json` written last. This passing observation follows
+registration; it does not replace or relabel the original FO exit-1 condition.
+
+| R649 check | Exit | Decisive output |
+| --- | --- | --- |
+| `python3 -B -m unittest tests.test_landscape_sweep_harness` | 0 | `Ran 224 tests in 56.627s`; `OK (skipped=3)` |
+| `python3 scripts/validate.py` after registration | 0 | `status: passed`; exact output above |
+| `python3 scripts/validate_convergence.py --all-recorded --root . --json` | 0 | `valid: true`, 26 recorded entries |
+| The three pre-push registry tests listed above | 0 | `Ran 3 tests in 0.297s`; `OK` |
+| `git diff --check` | 0 | No whitespace errors |
+
+The three optional skips retain their original scope. `which ruff` returned
+exit 1 and Python module discovery returned false, so conditional Ruff checks
+were unavailable. The required worktree-parent scratch directory was absent,
+and its creation returned exit 1 (`Read-only file system`). The commands above
+used this worker's dedicated writable builds scratch as `TMPDIR`, outside the
+checkout and outside `/tmp`. That is an environment exception to R649's exact
+parent-scratch requirement, pending a writable parent path; these results do
+not attest that required location. No reset credit or consume/reset endpoint
+was used, and no live inference/parity qualification was attempted.
+
+R649 completeness critic: the missed source class was alias support independent
+of the native catalog, and the missed failure/timing cases were recovery probe
+exhaustion, capacity followed by a native limit, quota failover without reserve,
+gateway launch failure, operator holds and stderr/item quotations. The suite
+now exercises those cases, route reuse after endpoint/enablement changes, and
+conversion with and without a launched receipt. `convert.py` needs no repair:
+without a route file it reports no gateway provenance or added gateway search
+limitation. The next client/gateway sweep should revisit upstream provider
+failover, deployed force/clamp behavior and full search-operation parity through
+the existing upstream comparison harness. Delivered effort, served model,
+provider usage and live pool exhaustion remain unqualified.

@@ -51,6 +51,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import codex_job  # noqa: E402
 import make_prompt  # noqa: E402
 from sweep_common import REPO_ROOT, load_json, prompts_sha256, sha256_bytes, work_dir, write_json  # noqa: E402
 
@@ -514,6 +515,13 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
           slots: int, lock_dir, skills_checked_at: str | None, embed_script: bool, force: bool,
           repo_root: Path = REPO_ROOT, quota_stop_percent: float | None = None, lane: dict | None = None,
           fallback: dict | None = None) -> dict:
+    if fallback is not None:
+        if lane is not None or "/" in gpt6_model:
+            raise UsageError("codex.fallback needs the native provider and a model without a provider segment")
+        try:
+            codex_job.fallback_model(gpt6_model, codex_job.request_effort(gpt6_model, "max"))
+        except codex_job.UsageError as error:
+            raise UsageError(str(error)) from error
     jobs = [path.name for path in (work / "gpt6").glob("*") if path.is_dir()] if (work / "gpt6").is_dir() else []
     if jobs and not force:
         raise ValueError(f"{work}/gpt6 already holds {len(jobs)} job(s) from an earlier run; move gpt6/ and prompts/ "

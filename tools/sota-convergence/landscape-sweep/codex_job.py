@@ -53,7 +53,8 @@ Opt-in native failover (staged.json codex.fallback, build_args.py --gpt6-fallbac
 quota gate archives the native attempt unchanged, writes LIMIT-native with its reason and reported reset time,
 and reruns the same prompt/schema at the same effort in the held slot and total deadline. The transport-only inline
 provider keeps --ignore-user-config and the caller's CODEX_HOME/AGENTS.md, enables standalone web search, disables
-shell snapshots, excludes OMNIROUTE_API_KEY from model-run shells, and uses cx/<native model>-max. inputs.json stays
+shell snapshots, excludes OMNIROUTE_API_KEY from model-run shells, and uses cx/<native model>-<request effort>
+where the pinned gateway supports that reasoning alias. inputs.json stays
 byte-identical; route.json and result.route describe the actual route and OmniRoute's /alpha/search backend.
 While LIMIT-native exists, a no-model account/rateLimits/read probe precedes each new job: only explicit
 ordinaryUsageAllowed true removes that marker; otherwise the job goes directly to the gateway. No reset credit is
@@ -209,6 +210,11 @@ PROVIDERS = ("native", "omniroute")
 LOOPBACK_V1_URL = re.compile(r"http://(?:127\.0\.0\.1|localhost):([0-9]{1,5})/v1")
 FALLBACK_KEY_ENV = "OMNIROUTE_API_KEY"
 FALLBACK_SEARCH_BACKEND = "omniroute:/alpha/search"
+# HouMinXi/OmniRoute@0585aba5589d5a1f49243a13a8db249558e7c9e3,
+# open-sse/executors/codex/reasoningSuffix.ts:11-19,35-62. Low through xhigh aliases strip any base;
+# max strips only these exact models. Ultra is resolved by the native client before choosing the suffix.
+FALLBACK_MAX_ALIAS_MODELS = frozenset(("gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-6-astra",
+                                       "gpt-6-sol", "gpt-6-luna", "gpt-6.1-sol"))
 ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]{0,63}")
 PROFILE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Everything one attempt writes; an earlier attempt's files move together to attempts/<n>/.
@@ -331,6 +337,7 @@ def settings(base: Path) -> dict:
             raise UsageError("codex.fallback must stage the omniroute provider")
         if out["provider"] != "native" or "/" in out["model"]:
             raise UsageError("codex.fallback needs the native provider and a model without a provider segment")
+        fallback_model(out["model"], out["request_effort"])
         url = fallback.get("base_url")
         match = LOOPBACK_V1_URL.fullmatch(url) if isinstance(url, str) else None
         if match is None or not 1 <= int(match[1]) <= 65535:
@@ -549,11 +556,10 @@ def limit_kind(directory: Path, provider: str | None = None) -> str | None:
             continue  # item.* events carry model content: never evidence of a limit
         if isinstance(message, str):
             kinds.update(kind for kind, pattern in LIMIT_PATTERNS if pattern.search(message))
-    if not kinds and not any(event.get("type") == "turn.completed" for event in parsed):
+    if provider != "omniroute" and not kinds and not any(event.get("type") == "turn.completed" for event in parsed):
         for line in (read(directory / "stderr.txt") or "").splitlines():
             if STDERR_ERROR_LINE.match(line):
-                kinds.update(kind for kind, pattern in LIMIT_PATTERNS
-                             if pattern.search(line) and (kind != "http_429" or provider != "omniroute"))
+                kinds.update(kind for kind, pattern in LIMIT_PATTERNS if pattern.search(line))
     return "usage" if "usage" in kinds else ("http_429" if kinds else None)
 
 
@@ -591,6 +597,14 @@ def codex_env(lane: dict | None = None) -> dict:
 
 def sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def fallback_model(model: str, effort: str) -> str:
+    """The pinned OmniRoute suffix must select the native request effort; unsupported aliases are refused."""
+    if effort not in ("low", "medium", "high", "xhigh") and not (
+            effort == "max" and model in FALLBACK_MAX_ALIAS_MODELS):
+        raise UsageError(f"codex.fallback has no OmniRoute reasoning alias for {model!r} at request effort {effort!r}")
+    return f"cx/{model}-{effort}"
 
 
 def request_effort(model: str, effort: str) -> str:
@@ -733,6 +747,13 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
                         config["effort"], config["web_search"])
     if (directory / "done").exists() and exit_code(directory) == 0:
         matches = same_inputs(read_json(directory / "inputs.json"), inputs)
+        route = read_json(directory / "route.json") or {}
+        if route.get("fallback_from") == "native":
+            fallback = config["fallback"]
+            matches = (matches and fallback is not None and route.get("provider") == fallback["provider"]
+                       and route.get("base_url") == fallback["base_url"]
+                       and route.get("gateway_model") == fallback_model(config["model"], config["request_effort"])
+                       and route.get("gateway_effort") == config["request_effort"])
         if matches and completion_error(directory) is None:
             print(f"already done: {job}")
             return 0
@@ -829,22 +850,27 @@ def quota_script(script_dir: Path = HERE) -> Path | None:
     return checkout if checkout.is_file() else None
 
 
-def quota_gate(base: Path, directory: Path, config: dict) -> str | None:
+def quota_gate(base: Path, directory: Path, config: dict, deadline: float | None = None) -> str | None:
     """Run the quota probe with --gate and record it in <job>/quota.json; the reason when the gate is reached, else
     None. A failed probe is recorded and never blocks the job."""
     percent = config["quota_stop_percent"]
     record = {"checked_at": utc_now(), "stop_percent": percent, "status": "probe_failed", "exit": None,
               "report": None}
+    remaining = deadline - time.monotonic() if deadline is not None else math.inf
+    helper_timeout = min(config["quota_timeout_s"], remaining)
+    parent_timeout = min(config["quota_timeout_s"] + QUOTA_BACKSTOP_S, remaining)
     script = quota_script()
-    if script is None:
+    if remaining <= 0:
+        record["error"] = "the job deadline expired before the quota probe could start"
+    elif script is None:
         record["error"] = f"{QUOTA_SCRIPT} is neither beside the runner nor in the checkout's scripts/"
     else:
         try:
             done = subprocess.run([sys.executable, "-B", str(script), "--json",
                                    *(["--gate", repr(float(percent))] if percent is not None else []),
-                                   "--timeout", repr(float(config['quota_timeout_s']))],
+                                   "--timeout", repr(float(helper_timeout))],
                                   cwd=str(base / "empty"), stdin=subprocess.DEVNULL, capture_output=True, text=True,
-                                  timeout=config["quota_timeout_s"] + QUOTA_BACKSTOP_S, env=codex_env(), check=False)
+                                  timeout=parent_timeout, env=codex_env(), check=False)
             lines = (done.stdout or "").strip().splitlines()
             try:
                 report = json.loads(lines[-1]) if lines else None
@@ -858,7 +884,7 @@ def quota_gate(base: Path, directory: Path, config: dict) -> str | None:
                 record["error"] = (f"{error.get('stage')}: {error.get('message')}" if isinstance(error, dict)
                                    else (done.stderr or "").strip()[-400:] or f"exit {done.returncode}")
         except subprocess.TimeoutExpired:
-            record["error"] = f"the quota probe did not finish within {config['quota_timeout_s'] + QUOTA_BACKSTOP_S:g} s"
+            record["error"] = f"the quota probe did not finish within {parent_timeout:g} s"
         except (OSError, subprocess.SubprocessError) as error:
             record["error"] = f"the quota probe could not run ({type(error).__name__})"
     write_atomic(directory / "quota.json", json.dumps(record, sort_keys=True) + "\n")
@@ -916,32 +942,33 @@ def mark_native_limit(base: Path, directory: Path, reason: str | None = None) ->
     return reason
 
 
-def refresh_native_limit(base: Path, directory: Path, config: dict) -> None:
+def refresh_native_limit(base: Path, directory: Path, config: dict, deadline: float) -> None:
     """A no-model account/rateLimits/read probe; only explicit ordinaryUsageAllowed true clears the marker.
 
     Percentages and reset timestamps are not recovery evidence (openai/codex rust-v0.159.3,
     app-server-protocol/src/protocol/v2/account.rs, GetAccountRateLimitsResponse).
     """
-    quota_gate(base, directory, {**config, "quota_stop_percent": None})
+    quota_gate(base, directory, {**config, "quota_stop_percent": None}, deadline)
     record = read_json(directory / "quota.json") or {}
     report = record.get("report") or {}
     if record.get("status") == "ok" and report.get("ordinary_usage_allowed") is True:
         (base / "LIMIT-native").unlink(missing_ok=True)
 
 
-def fallback_route(base: Path, directory: Path, config: dict, *, reason: str | None = None,
+def fallback_route(base: Path, config: dict, *, reason: str | None = None,
                    native_attempt: int | None = None) -> dict:
-    """Record the transport separately from bound native inputs, and return the gateway attempt settings."""
+    """Select the transport separately from bound native inputs; its receipt is written after process launch."""
     marker = read_json(base / "LIMIT-native") or {}
     model = config["model"]
-    gateway_model = f"cx/{model if model.endswith('-max') else model + '-max'}"
+    gateway_model = fallback_model(model, config["request_effort"])
     route = {"provider": "omniroute", "fallback_from": "native",
              "reason": reason or marker.get("reason") or "LIMIT-native marker present",
              "native_model": model, "gateway_model": gateway_model, "native_attempt": native_attempt,
+             "base_url": config["fallback"]["base_url"], "gateway_effort": config["request_effort"],
              "search_backend": FALLBACK_SEARCH_BACKEND}
-    write_atomic(directory / "route.json", json.dumps(route, sort_keys=True) + "\n")
     return {**config, **config["fallback"], "model": gateway_model, "transport_only": True,
-            "api_key_env": FALLBACK_KEY_ENV, "api_key_placeholder": "local-loopback", "quota_stop_percent": None}
+            "api_key_env": FALLBACK_KEY_ENV, "api_key_placeholder": "local-loopback", "quota_stop_percent": None,
+            "route": route}
 
 
 def signal_group(pgid: int, signum: int) -> bool:
@@ -1088,19 +1115,24 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
              if (directory / name).exists()}
     attempt_config = config
     if config["fallback"] is not None and (base / "LIMIT-native").exists():
-        refresh_native_limit(base, directory, config)
+        refresh_native_limit(base, directory, config, deadline)
         if (base / "LIMIT-native").exists():
-            attempt_config = fallback_route(base, directory, config)
-            saved["route.json"] = (directory / "route.json").read_bytes()
+            attempt_config = fallback_route(base, config)
             lane = attempt_config
     capacity_retries = idle_retries = 0
+    native_failure = None
+    gateway_started = False
     while True:
         if (base / "LIMIT").exists():
+            if native_failure is not None:
+                archive_attempt(directory, keep_runner_log=True)
+                for name, data in saved.items():
+                    (directory / name).write_bytes(data)
             write_atomic(directory / "stderr.txt", "LIMIT marker present; retry did not start\n")
             finish(directory, EXIT_LIMIT, "limit")
             return EXIT_LIMIT
         if attempt_config["quota_stop_percent"] is not None:
-            reason = quota_gate(base, directory, attempt_config)
+            reason = quota_gate(base, directory, attempt_config, deadline)
             if reason is not None:
                 text = (f"quota gate: {reason}; codex.quota_stop_percent {config['quota_stop_percent']:g}; checked "
                         f"{utc_now()} before {job} started")
@@ -1108,11 +1140,8 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
                 if config["fallback"] is not None:
                     mark_native_limit(base, directory, text)
                     finish(directory, EXIT_LIMIT, "quota", terminal=False)
-                    number = archive_attempt(directory, keep_runner_log=True)
-                    for name, data in saved.items():
-                        (directory / name).write_bytes(data)
-                    attempt_config = fallback_route(base, directory, config, reason=text, native_attempt=number)
-                    saved["route.json"] = (directory / "route.json").read_bytes()
+                    native_failure = "quota"
+                    attempt_config = fallback_route(base, config, reason=text)
                     lane = attempt_config
                     continue
                 mark_limit(base, text)
@@ -1123,6 +1152,10 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
             finish(directory, EXIT_LIMIT, "limit")
             return EXIT_LIMIT
         remaining = deadline - time.monotonic()
+        if native_failure is not None and remaining < RETRY_MIN_REMAINING_S:
+            # Keep the latest native limit as terminal, including after earlier capacity/idle retries.
+            finish(directory, EXIT_LIMIT, native_failure)
+            return EXIT_LIMIT
         if (capacity_retries or idle_retries) and remaining < RETRY_MIN_REMAINING_S:
             # A probe can spend the retry reserve, even past the deadline. Keep the original failure.
             write_atomic(directory / "failure.json", json.dumps(previous_record, sort_keys=True) + "\n")
@@ -1131,27 +1164,37 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
         if remaining <= 0:
             finish(directory, EXIT_TIMEOUT, "timeout")
             return EXIT_TIMEOUT
-        write_atomic(directory / "started", utc_now() + "\n")
-        write_atomic(directory / "slot", f"{slot}\n")
-        write_atomic(directory / "model", attempt_config["model"] + "\n")
-        if version:
-            write_atomic(directory / "codex_version", version + "\n")
+        if attempt_config.get("transport_only") and not gateway_started and remaining < RETRY_MIN_REMAINING_S:
+            finish(directory, EXIT_LIMIT, "limit")
+            return EXIT_LIMIT
+        if native_failure is not None:
+            # Archive only after the hold and reserve checks; otherwise the native limit stays terminal.
+            number = archive_attempt(directory, keep_runner_log=True)
+            for name, data in saved.items():
+                (directory / name).write_bytes(data)
+            attempt_config["route"]["native_attempt"] = number
+            native_failure = None
         with open(directory / "events.jsonl", "wb") as output, open(directory / "stderr.txt", "wb") as errors:
             process = subprocess.Popen(codex_argv(codex, directory, attempt_config["model"], prompt, lane, version,
                                                  config["effort"], config["web_search"]),
                                        cwd=str(base / "empty"), stdin=subprocess.DEVNULL, stdout=output, stderr=errors,
                                        pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env(lane))
+            write_atomic(directory / "started", utc_now() + "\n")
+            write_atomic(directory / "slot", f"{slot}\n")
+            write_atomic(directory / "model", attempt_config["model"] + "\n")
+            if version:
+                write_atomic(directory / "codex_version", version + "\n")
+            if attempt_config.get("route") is not None:
+                write_atomic(directory / "route.json", json.dumps(attempt_config["route"], sort_keys=True) + "\n")
+                gateway_started = True
             code, failure = wait_process(process, directory, config, deadline)
         kind = limit_kind(directory, attempt_config["provider"])
         incomplete = completion_error(directory) if code == 0 else None
         if kind is not None and config["fallback"] is not None and attempt_config["provider"] == "native":
             reason = mark_native_limit(base, directory)
             finish(directory, EXIT_LIMIT, kind, terminal=False)
-            number = archive_attempt(directory, keep_runner_log=True)
-            for name, data in saved.items():
-                (directory / name).write_bytes(data)
-            attempt_config = fallback_route(base, directory, config, reason=reason, native_attempt=number)
-            saved["route.json"] = (directory / "route.json").read_bytes()
+            native_failure = kind
+            attempt_config = fallback_route(base, config, reason=reason)
             lane = attempt_config
             continue
         if kind == "http_429" and attempt_config["provider"] == "omniroute":

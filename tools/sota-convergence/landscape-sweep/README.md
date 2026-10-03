@@ -359,32 +359,46 @@ python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --l
 
 The fallback is off unless `staged.json` carries `codex.fallback`. The host flag names the gateway's loopback
 address and port (default `127.0.0.1:20128`). The stager requires a native primary provider and a bare native model
-name. It records the fallback provider and base URL without creating a lane home. Restaging changes no frozen
+name whose requested effort has a reasoning alias in the pinned gateway. It records the fallback provider and
+base URL without creating a lane home. Restaging changes no frozen
 templates, `prompts_sha256.txt`, workflow arguments or embedded script when only provider/fallback flags change.
 Stop an active Workflow before updating its staged runtime; an existing work directory needs `--force` to restage.
 
 When the native attempt reports a limit, the runner archives that attempt unchanged under `attempts/<n>/`, writes
 `<W>/LIMIT-native`, and sends the same prompt and schema through OmniRoute in the held slot, within the same total
-deadline. A staged native quota gate can take this path before making a native model call. `LIMIT-native` holds a
+deadline, with at least 300 seconds remaining for the gateway launch. Without that reserve, the job ends with
+exit 3 and keeps the native limit as its terminal attempt. A staged native quota gate can take this path before
+making a native model call. `LIMIT-native` holds a
 JSON reason and `reset_time`; a missing reset time stays `null`. New jobs with that marker first run the existing
 `codex_quota.py --json` probe, which calls `account/rateLimits/read` without a model turn. Only a successful report
 with explicit `ordinaryUsageAllowed: true` clears the marker. Otherwise those jobs go directly to the gateway.
-Percentages, a passed reset timestamp and a failed or nullable probe do not establish native recovery.
+Percentages, a passed reset timestamp and a failed or nullable probe do not establish native recovery. The recovery
+probe and quota gate share the job's absolute deadline: both the helper and parent subprocess timeout are bounded
+by the remaining budget, and an expired budget prevents probe launch. Failed probes remain in `quota.json`.
 
 The fallback keeps the native `CODEX_HOME`, its global `AGENTS.md`, `--ignore-user-config`, read-only sandbox,
 staged effort and web-search mode. Its inline provider has `wire_api = "responses"`, `requires_openai_auth = false`,
 `env_key = "OMNIROUTE_API_KEY"` and `supports_standalone_web_search = true`. It enables standalone web search,
-disables shell snapshots, filters the key out of model-run shells, and requests `cx/<native model>-max` under the
-gateway's suffix convention. An unset key variable receives the `local-loopback` placeholder. It loads no new
+disables shell snapshots, filters the key out of model-run shells, and requests
+`cx/<native model>-<request_effort>` under the
+[pinned gateway's suffix convention](https://github.com/HouMinXi/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L35).
+For example, `high` requests `-high`; native `ultra` on Astra or 6.1 Sol resolves to `xhigh` and requests `-xhigh`.
+The gateway strips `-max` only for its seven listed models (5.6 Sol/Terra/Luna, 6 Astra/Sol/Luna and 6.1 Sol).
+Unsupported model/effort aliases are refused before staging or launch; the CLI stager requests `max`.
+An unset key variable receives the `local-loopback` placeholder. It loads no new
 lane-local profile or MCP configuration. The supported overrides follow
 [Codex 0.159.3's provider schema](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/model-provider-info/src/lib.rs).
 
 `inputs.json` remains byte-identical to the native attempt. The separate `route.json` records `provider`,
-`fallback_from`, `reason`, `native_model`, `gateway_model`, `native_attempt` and `search_backend`. A job that goes
+`fallback_from`, `reason`, `native_model`, `gateway_model`, `gateway_effort`, the sanitized loopback `base_url`,
+`native_attempt` and `search_backend`. The receipt is written only after the gateway process launches. Holds,
+insufficient reserve and failed process launches produce no gateway route in `result` or conversion. A job that goes
 directly to the gateway has `native_attempt: null`, because it has no native attempt of its own. `result` returns
 the route and each archived route; later retries preserve it. `convert.py` reads the original sibling receipt,
 because the Workflow wrapper copies a fixed set of result fields. It retains the route in raw metadata and GPT-6
-fit votes and adds the gateway search limitation to the lane.
+fit votes and adds the gateway search limitation to the lane. A successful fallback job is reused only while its
+bound inputs and requested fallback route still match; changing the endpoint or disabling fallback reruns that job
+and archives the earlier result.
 
 The installed gateway's carried
 [search adapter](https://github.com/amsjavan/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/src/app/api/v1/alpha/search/route.ts)
@@ -927,8 +941,12 @@ new run from the latest retained record, and say so when no record exists yet.
 - **Resume.** `Workflow({scriptPath: "<W>/sweep.embedded.js", resumeFromRunId: "wf_..."})` replays the unchanged
   agent calls from the cache. This includes a GPT wrapper that returned `failed_exit_3`: it is a completed agent
   result, so resume does not call `start` again even after capacity returns. After confirming capacity and clearing
-  `LIMIT`, start a **new Workflow run with the provider and frozen prompts unchanged**. Successful GPT jobs return
-  `already done`; failed GPT jobs archive the old attempt and rerun. Claude agents rerun too. A coordinator can also
+  `LIMIT`, start a **new Workflow run with the provider and frozen templates unchanged**. Successful GPT jobs return
+  `already done` only while their bound inputs are byte-identical and their fallback route still matches.
+  First-round discovery prompts are pre-written and can meet that condition. Claude agents rerun, rebuilding GPT
+  fit and follow-up prompts from their new proposals and critic output. Jobs with changed prompt bytes rerun and
+  move their earlier successful attempts to `attempts/<n>/`, at new GPT cost. Failed GPT jobs also archive the old
+  attempt and rerun. A coordinator can also
   explicitly start a failed GPT job with `codex_call.sh start`, but a cached Workflow return will not pick up its new
   result. Restaging the primary provider changes job inputs and reruns finished GPT jobs as well. The automatic
   fallback avoids caching the intermediate native limit by completing both attempts within the same held job.
