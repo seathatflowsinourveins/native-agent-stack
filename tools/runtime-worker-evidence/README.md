@@ -14,7 +14,7 @@ rtk uv tool run --from mitmproxy==12.2.3 mitmdump --quiet \
 
 For that acceptance run alone, point the worker's scoped gateway URL to the observer. Keep existing client and gateway settings. Do not use flow recording, local capture, TLS interception or another session's traffic. Stop only the owned observer process after the run.
 
-The addon records model, effort, tool names/count, body length/hash, cache-key hash, status and selected Responses usage counters. It retains no credential values, request content, tool arguments or returned text, and returns response chunks unchanged. Request and flow IDs stay private. A frame over 2 MiB marks usage capture incomplete. Missing usage stays unknown. Gateway/provider counters are not a savings measurement; reasoning and cached-token counters are subsets and must not be added to totals.
+The addon records model, effort, tool names/count, body length/hash, cache-key hash, status and selected Responses usage counters. It retains no credential values, request content, tool arguments or returned text, and returns response chunks unchanged. Request and flow IDs stay private. It extracts complete SSE lines before checking the remaining incomplete frame against the 2 MiB bound. A large chunk of complete short frames therefore retains terminal usage; an oversized incomplete frame marks usage capture incomplete. Missing usage stays unknown. Gateway/provider counters are not a savings measurement; reasoning and cached-token counters are subsets and must not be added to totals.
 
 Run the authored observer checks in the same pinned dependency environment:
 
@@ -25,5 +25,6 @@ rtk uv run --with mitmproxy==12.2.3 python -m unittest discover \
 
 Bare system Python does not supply mitmproxy; that invocation failed on import.
 The checks preserve every fragmented streaming byte, reject unrelated endpoints,
-retain unknown/overflow usage and observe native ResponsesLite tools under
+retain unknown/overflow usage, capture terminal usage from a single chunk larger
+than 2 MiB containing valid short frames, and observe native ResponsesLite tools under
 `input[].type=additional_tools`. The namespace count is not a leaf-tool count.

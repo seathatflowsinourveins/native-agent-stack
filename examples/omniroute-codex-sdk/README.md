@@ -67,7 +67,10 @@ cache reuse; no prompt rewrite, extra skill carrier or outer agent loop is added
 Pass one bounded task on stdin. The worker emits a compact `thread_ready` JSON
 line before the turn, then a result with the final answer, item counts and native
 usage. To retain the actual full tool items, add `--native-result` with a new
-private output path. The writer creates it with mode 0600 and refuses overwrite.
+private output path. The writer reserves it with `O_EXCL` and mode 0600 before
+SDK startup or thread creation, so an existing destination refuses before the
+turn. It fills the file with the completed native result, or a sanitized failure
+record if the operation fails before completion.
 Raw tool output and private thread IDs stay outside public evidence.
 
 `--sandbox workspace-write` and `--approval-mode deny_all` are the defaults:
@@ -83,6 +86,13 @@ and recoverable state to the child process. The example neither reads nor copies
 authentication stores. The selected keyless loopback gateway owns its upstream
 account handling; for another accepted gateway configuration, `--api-key-env`
 names an existing credential variable without accepting or printing its value.
+The worker excludes that validated name through native
+`shell_environment_policy.filters` and disables shell snapshots for the keyed
+child; the starter home also excludes `OMNIROUTE_API_KEY`. It enables both the
+custom provider's `supports_standalone_web_search` capability and the native
+`standalone_web_search` feature, matching the repository's OmniRoute profile.
+These settings preserve the native search path; provider endpoint readiness
+still needs its own live qualification.
 
 ## Resume, judgment and recovery
 
@@ -171,6 +181,10 @@ The production override is asserted directly and exercised in a fixture home
 without a `[features]` table. Delayed real native startup fixtures cover both
 worker and preflight deadlines, including an unresolved cleanup bound. A
 post-turn read failure preserves the completed native result already saved.
+Six additional B3 tests cover the gateway credential filters and search switches
+in the process overrides/starter template, refusal of an existing native-result
+destination before thread creation, and a private failure record after an
+incomplete turn. The final suite contains 25 tests.
 The other fixture homes also disable plugins, and teardown checks that no
 `.tmp/plugins-clone-*` directories remain. No descendant-process or global egress
 assertion is made. Missing terminal events and an

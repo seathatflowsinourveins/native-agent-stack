@@ -242,3 +242,94 @@ earlier “final” attempt IDs are labeled pre-B2. Keep the project skill throu
 the dated exception in `adoption/skills/lifecycle.md`; the reusable graph has
 task-configured skill requirements rather than a fixed `using-superpowers`
 dependency. None of these repairs launches a new live model task.
+
+## B3 review-bot repairs (2026-10-03)
+
+This bounded repair serves reliable native workers for complex systems and
+north-star R&D, and addresses all five Codex bot threads on PR #628 from base
+`7c9d7214d`. It keeps the same SDK/native runtime and dependency pins. The
+diagnosing-bugs workflow supplied failing regression commands before production
+changes; the five reported causes were already specified, so a separate
+hypothesis/instrumentation round was unnecessary. Official OpenAI documentation,
+the exact pinned upstream sources and the existing OmniRoute profile establish
+the configuration choices; no replacement runtime or test runner is introduced.
+
+`--api-key-env` now excludes its validated name through the canonical keyed
+`shell_environment_policy.filters` override alongside the provider's `env_key`.
+The starter home excludes `OMNIROUTE_API_KEY`; keyed worker launches also disable
+shell snapshots, matching the template and OmniRoute profile. At a956835d,
+[the policy struct and keyed conversion](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/shell_environment_policy.rs#L28-L35)
+and [exclude mapping](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/shell_environment_policy.rs#L137-L162)
+define this supported form; [mixing keyed and legacy filters is rejected](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/shell_environment_policy.rs#L106-L110).
+
+The custom provider now sets `supports_standalone_web_search=true`, and its
+process overrides and starter home enable `features.standalone_web_search`.
+[The custom-provider field defaults to false](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/model-provider-info/src/lib.rs#L194-L196)
+and [the native feature is separately off by default](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/features/src/lib.rs#L1128-L1132).
+The [official configuration reference](https://developers.openai.com/codex/config-reference)
+confirms the two gates. Configuration checks establish the switches, not a
+successful live gateway search or keyed-shell confidentiality trial.
+
+Claude SDK connection now shares the query's operation deadline. A `finally`
+block calls the native exit/disconnect path even if entry times out or throws;
+only interrupt/drain and shielded disconnect receive cleanup grace. The pinned
+[client entry/exit methods](https://github.com/anthropics/claude-agent-sdk-python/blob/f2204bb956bab02907aaf3cb88eb9dead28eaa35/src/claude_agent_sdk/client.py#L623-L631)
+and [AnyIO finalization guidance](https://anyio.readthedocs.io/en/stable/cancellation.html#finalization)
+are the reference. Native [query cleanup](https://github.com/anthropics/claude-agent-sdk-python/blob/f2204bb956bab02907aaf3cb88eb9dead28eaa35/src/claude_agent_sdk/_internal/query.py#L1149-L1182)
+has its own shields and transport bounds; the wrapper does not override those
+native termination guarantees. Slow and failing connection fixtures both reach
+disconnect without starting a query.
+
+The observer now splits complete SSE lines once before bounding the remaining
+incomplete frame. Its test returns a chunk over 2 MiB byte-identically and
+captures its terminal usage, while the fragmented overflow control still fails
+capture. The supported callback remains mitmproxy v12.2.3's
+[streaming addon](https://github.com/mitmproxy/mitmproxy/blob/6c09d56e4c29a92f5ad01b03199977584b8ea14f/examples/addons/http-stream-modify.py#L17-L29).
+`--native-result` now reserves its 0600 `O_EXCL` file before SDK initialization or
+thread creation. It saves completed items before the post-turn read and writes a
+sanitized failure record on earlier failure. The existing retention mechanism
+uses the supported [Python `os.open`](https://docs.python.org/3.13/library/os.html#os.open)
+flags; no destination is overwritten.
+
+The red Codex command returned `Ran 6 tests` and
+`FAILED (failures=4, errors=3)`; the red Claude connection command returned
+`Ran 2 tests` and `FAILED (failures=2)`; the red observer command returned
+`Ran 1 test` and `FAILED (failures=1)`. The same commands passed after repair.
+Final Codex acceptance passed **12 of 12 invocations, 25 tests each**; the final
+Claude suite passed 26 tests and the observer suite passed six. The documented
+disarmed route oracle returned exit 1, and the armed oracle returned exit 0.
+Ruff check and format check passed on all six changed Python files. Commands,
+actual excerpts and private-log hashes are retained in the updated receipt;
+B2 and September 30 results remain historical. No B3 live model task ran.
+
+The same-session builder completeness self-review checked the starter template,
+arbitrary validated key names, both independent search gates, failed entry and
+shielded cleanup, fragmented and batched SSE, and early result reservation.
+It identified the remaining live keyed-shell/search path, native connection
+faults and MCP/workspace-write qualification as work for the next worker
+lifecycle sweep. These are limitations of local fixture evidence, not an
+independent review or a new provider acceptance claim. The narrower alternatives
+(exclude arrays, only one search gate, connection grace, chunk-size bounding and
+post-turn destination checks) are rejected by the cited native configuration or
+the failing controls. Revisit these choices if upstream changes the APIs or a
+matched native lifecycle run disproves the fixture behavior.
+
+The first B3 publication check caught an incomplete evidence seal: the registry's
+receipt claim/limitations still described B2, and unittest's shortened failure
+repr retained a personal path prefix that escaped full-path substitution. The
+first convergence check also rejected qualification IDs whose scope differed
+from the new decision scope. Those actual failed outputs remain in the receipt.
+The correction synchronizes this receipt's registry metadata, sanitizes the
+shortened prefix, and assigns the three current candidate suites one explicit
+qualification scope; historical B2 observations remain recorded separately.
+These were record consistency repairs and did not change the passing Python
+implementation or require another model run.
+
+Corrected publication acceptance returned 9,392 hashed files and 190 receipts;
+all 29 recorded convergence experiments validated. Component matrix and new-host
+reports passed without regeneration, and the real checkout index passed all
+38 OSV tests and the three required pre-push registry tests. Those returned
+outputs are sealed in the receipt before the final read-only publication and
+convergence rerun. `host_receipts.register_file` re-registers the owned files
+after their last change, with the receipt claim/limitations synchronized in the
+registry; the coordinator retains commit, push and final merge ownership.

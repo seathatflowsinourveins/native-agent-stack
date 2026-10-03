@@ -2,7 +2,7 @@
   "schema_version": 1,
   "evidence_class": "local_integration_synthetic_provider",
   "checked_on": "2026-10-03",
-  "scope": "SDK/native CLI 0.160.0 B2 final authored loopback integration fixtures; separate pre-B2 builder live and coordinator non-nested shell observations remain attributed historical evidence. No B2 live model execution or SDK winner comparison.",
+  "scope": "SDK/native CLI 0.160.0 B3 final authored loopback fixtures (25 tests, 12/12 invocations), 26 local Claude SDK tests and six observer tests. Separate pre-B2 live/coordinator observations remain historical; no B3 live model execution or SDK winner comparison.",
   "sources": [
     {
       "repository": "https://github.com/openai/codex",
@@ -20,7 +20,10 @@
         "codex-rs/core/src/responses_retry.rs:66-171",
         "codex-rs/prompts/src/model_messages.rs:57,229-236",
         "codex-rs/uds/src/daemon_directory.rs:1-38",
-        "codex-rs/linux-sandbox/src/bwrap.rs:425-430"
+        "codex-rs/linux-sandbox/src/bwrap.rs:425-430",
+        "codex-rs/config/src/shell_environment_policy.rs:28-35,106-110,137-162",
+        "codex-rs/model-provider-info/src/lib.rs:194-196",
+        "codex-rs/features/src/lib.rs:1014-1018,1128-1132"
       ]
     },
     {
@@ -72,6 +75,35 @@
     {
       "url": "https://developers.openai.com/api/docs/guides/agents/sdk",
       "claim_scope": "In-application agent-loop role split"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "revision": "f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "paths": [
+        "src/claude_agent_sdk/client.py:125-139,623-631",
+        "src/claude_agent_sdk/_internal/query.py:1149-1182"
+      ],
+      "claim_scope": "Native entry, partial-connect disconnect and shielded cleanup"
+    },
+    {
+      "repository": "https://github.com/mitmproxy/mitmproxy",
+      "revision": "6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+      "paths": [
+        "examples/addons/http-stream-modify.py:17-29"
+      ],
+      "claim_scope": "Supported response streaming callback, returning original chunks"
+    },
+    {
+      "url": "https://anyio.readthedocs.io/en/stable/cancellation.html#finalization",
+      "claim_scope": "Operation deadlines and separately shielded resource cleanup"
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/os.html#os.open",
+      "claim_scope": "Existing exclusive private result-file reservation mechanism"
+    },
+    {
+      "url": "https://developers.openai.com/codex/config-reference",
+      "claim_scope": "Provider capability defaults false; the standalone search feature is a separate gate"
     }
   ],
   "versions": {
@@ -87,11 +119,11 @@
   "source_closure": [
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "33057e8b5bcb042bed8f517d759b00936767d2a8df7055dd2179df5d93ace618"
+      "sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01"
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py",
-      "sha256": "3497536133785b5fe3584265973941910a50826f410f62b0f95de67b206464ff"
+      "sha256": "14018bd65c39f18683ce83833abe23c9238419c7c1fde99f5521ae752dbd1c43"
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
@@ -103,7 +135,7 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
-      "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048"
+      "sha256": "49b2958498238c032cee9eb0b3ca8603bc17b633aaf72d348398a671873affb2"
     },
     {
       "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
@@ -116,18 +148,34 @@
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
       "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc"
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py",
+      "sha256": "4cf3dcadabf497e05f10656e24cc796e8619c9601141a6d069bef6eba45fe155"
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/test_worker.py",
+      "sha256": "282de47c359375d6fcfbb756ff30c4a52dcf6756236b4e532124f64043685990"
+    },
+    {
+      "path": "tools/runtime-worker-evidence/gateway_observer.py",
+      "sha256": "2412d0b58adbad028993cbd6e4835c2b0cf40f406384de7d99867a3de74bbcef"
+    },
+    {
+      "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
+      "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d"
     }
   ],
   "receipt": {
     "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
-    "sha256": "942e8a810334f14118ffb75fd6f16afb6637704a48efd6b30ba08c2e5ebb5052"
+    "sha256": "ab0473fbc596af6256fb55175eacbf92b37f523a44b13cce3eab2e61fe90be92"
   },
   "fixture_acceptance": {
     "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
     "invocations": 12,
     "passed_invocations": 12,
     "failed_invocations": 0,
-    "tests_per_invocation": 19,
+    "tests_per_invocation": 25,
     "source_formatted_before_final_invocations": true,
     "evidence_class": "local_integration_synthetic_provider",
     "provider_usage": null,
@@ -136,7 +184,7 @@
       "native_default_five_retries": 6
     },
     "content_filter_continuation": "Explicit permitted continuation resumes with persisted guidance; no automatic blocked-task replay.",
-    "phase": "B2-final-repair-bytes"
+    "phase": "B3-final-repair-bytes"
   },
   "attempts": [
     {
@@ -1032,6 +1080,594 @@
       "evidence_scope": "Actual native tool return in this B2 session; no separate raw log was retained. Only the personal shared UV cache path was sanitized.",
       "correction": "Use the owned private UV cache for B2 acceptance. b2-worker-help-final then returned exit 0 on final source bytes.",
       "model_inference_submitted": false
+    },
+    {
+      "id": "b3-red-codex",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py NativeTransportTests.test_gateway_key_binding_is_excluded_from_worker_shells NativeTransportTests.test_private_home_template_excludes_gateway_key NativeTransportTests.test_custom_provider_enables_standalone_web_search NativeTransportTests.test_private_home_template_enables_standalone_web_search NativeTransportTests.test_existing_native_result_refuses_before_thread_creation NativeTransportTests.test_reserved_native_result_records_failure_before_completion",
+      "exit_code": 1,
+      "candidate_phase": "B3-before-production-repair",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/red-codex.log",
+        "sha256": "bb1e9dca04f1d8e3d5bf0784481a8458b94bb5ea6a30c0ffb1b91afa3a645c9c"
+      },
+      "actual_returned_excerpt": "ERROR: test_private_home_template_excludes_gateway_key (__main__.NativeTransportTests.test_private_home_template_excludes_gateway_key)\nKeyError: 'shell_environment_policy'\nERROR: test_private_home_template_enables_standalone_web_search (__main__.NativeTransportTests.test_private_home_template_enables_standalone_web_search)\nKeyError: 'standalone_web_search'\nERROR: test_reserved_native_result_records_failure_before_completion (__main__.NativeTransportTests.test_reserved_native_result_records_failure_before_completion)\nFileNotFoundError: [Errno 2] No such file or directory: '<owned-builds>/B-homes/B3-repair/tmp/tmpy5loil_p/failed-native-result.json'\nFAIL: test_gateway_key_binding_is_excluded_from_worker_shells (__main__.NativeTransportTests.test_gateway_key_binding_is_excluded_from_worker_shells) (name='OMNIROUTE_API_KEY')\nAssertionError: 'shell_environment_policy.filters.\"OMNIROUTE_API_KEY\"=\"exclude\"' not found in ('model_provider=\"omniroute_runtime\"', 'model=\"cx/gpt-6.1-sol-max\"', 'model_reasoning_effort=\"max\"', 'features.plugins=false', 'model_providers.omniroute_runtime.name=\"OmniRoute runtime workers\"', 'model_providers.omniroute_runtime.base_url=\"http://127.0.0.1:20128/v1\"', 'model_providers.omniroute_runtime.wire_api=\"responses\"', 'model_providers.omniroute_runtime.requires_openai_auth=false', 'model_providers.omniroute_runtime.supports_websockets=false', 'model_providers.omniroute_runtime.http_headers={\"x-request-id\"=\"fixture-owned-request\"}', 'model_providers.omniroute_runtime.env_key=\"OMNIROUTE_API_KEY\"', 'model_providers.omniroute_runtime.request_max_retries=0', 'model_providers.omniroute_runtime.stream_max_retries=0')\nFAIL: test_gateway_key_binding_is_excluded_from_worker_shells (__main__.NativeTransportTests.test_gateway_key_binding_is_excluded_from_worker_shells) (name='WORKER_GATEWAY_TOKEN')\nAssertionError: 'shell_environment_policy.filters.\"WORKER_GATEWAY_TOKEN\"=\"exclude\"' not found in ('model_provider=\"omniroute_runtime\"', 'model=\"cx/gpt-6.1-sol-max\"', 'model_reasoning_effort=\"max\"', 'features.plugins=false', 'model_providers.omniroute_runtime.name=\"OmniRoute runtime workers\"', 'model_providers.omniroute_runtime.base_url=\"http://127.0.0.1:20128/v1\"', 'model_providers.omniroute_runtime.wire_api=\"responses\"', 'model_providers.omniroute_runtime.requires_openai_auth=false', 'model_providers.omniroute_runtime.supports_websockets=false', 'model_providers.omniroute_runtime.http_headers={\"x-request-id\"=\"fixture-owned-request\"}', 'model_providers.omniroute_runtime.env_key=\"WORKER_GATEWAY_TOKEN\"', 'model_providers.omniroute_runtime.request_max_retries=0', 'model_providers.omniroute_runtime.stream_max_retries=0')\nFAIL: test_custom_provider_enables_standalone_web_search (__main__.NativeTransportTests.test_custom_provider_enables_standalone_web_search)\nAssertionError: 'model_providers.omniroute_runtime.supports_standalone_web_search=true' not found in ('model_provider=\"omniroute_runtime\"', 'model=\"cx/gpt-6.1-sol-max\"', 'model_reasoning_effort=\"max\"', 'features.plugins=false', 'model_providers.omniroute_runtime.name=\"OmniRoute runtime workers\"', 'model_providers.omniroute_runtime.base_url=\"http://127.0.0.1:20128/v1\"', 'model_providers.omniroute_runtime.wire_api=\"responses\"', 'model_providers.omniroute_runtime.requires_openai_auth=false', 'model_providers.omniroute_runtime.supports_websockets=false', 'model_providers.omniroute_runtime.http_headers={\"x-request-id\"=\"fixture-owned-request\"}', 'model_providers.omniroute_runtime.request_max_retries=0', 'model_providers.omniroute_runtime.stream_max_retries=0')\nFAIL: test_existing_native_result_refuses_before_thread_creation (__main__.NativeTransportTests.test_existing_native_result_refuses_before_thread_creation)\nAssertionError: Lists differ: [{'ephemeral': False, 'cwd': '<private-home>/[267 chars]l'>}] != []\nRan 6 tests in 2.201s\nFAILED (failures=4, errors=3)",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-red-claude",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python -m unittest discover -s examples/claude-runtime-sdk/tests -v -k connection",
+      "exit_code": 1,
+      "candidate_phase": "B3-before-production-repair",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/red-claude.log",
+        "sha256": "7e2034330606958e9573f2f6639064438701ede086027c51334888a6361aecff"
+      },
+      "actual_returned_excerpt": "FAIL: test_connection_error_still_cleans_up_without_exposing_error_text (test_worker.LifecycleTests.test_connection_error_still_cleans_up_without_exposing_error_text)\nAssertionError: Lists differ: ['connect'] != ['connect', 'disconnect']\nFAIL: test_slow_connection_uses_operation_deadline_and_still_cleans_up (test_worker.LifecycleTests.test_slow_connection_uses_operation_deadline_and_still_cleans_up)\nAssertionError: Lists differ: ['connect', 'query', 'interrupt', 'disconnect'] != ['connect', 'disconnect']\nRan 2 tests in 0.346s\nFAILED (failures=2)",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-red-observer",
+      "command": "rtk proxy uv run --with mitmproxy==12.2.3 python -m unittest discover -s tools/runtime-worker-evidence -p 'test_*.py' -k large_chunk",
+      "exit_code": 1,
+      "candidate_phase": "B3-before-production-repair",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/red-observer.log",
+        "sha256": "2b264abd18c4ab0741949859beef1e202b9fb05fd2b7580d6681045682f24bbe"
+      },
+      "actual_returned_excerpt": "FAIL: test_large_chunk_of_short_frames_retains_terminal_usage (test_gateway_observer.GatewayObserverTests.test_large_chunk_of_short_frames_retains_terminal_usage)\nAssertionError: True is not false\nRan 1 test in 0.271s\nFAILED (failures=1)",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-green-codex",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py NativeTransportTests.test_gateway_key_binding_is_excluded_from_worker_shells NativeTransportTests.test_private_home_template_excludes_gateway_key NativeTransportTests.test_custom_provider_enables_standalone_web_search NativeTransportTests.test_private_home_template_enables_standalone_web_search NativeTransportTests.test_existing_native_result_refuses_before_thread_creation NativeTransportTests.test_reserved_native_result_records_failure_before_completion",
+      "exit_code": 0,
+      "candidate_phase": "B3-after-repair-before-final-format",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/green-codex.log",
+        "sha256": "44a0876f442b4ac270d2d19322cd0e48981c2bc76ab0a4fd95f5a9a8acdecbb5"
+      },
+      "actual_returned_excerpt": "Ran 6 tests in 1.653s\nOK",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-green-claude",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python -m unittest discover -s examples/claude-runtime-sdk/tests -v -k connection",
+      "exit_code": 0,
+      "candidate_phase": "B3-after-repair-before-final-format",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/green-claude.log",
+        "sha256": "daa57ec6fa7e8fd3e1b63b143c1ff8ed5042b2f114c3a15030eee22482282890"
+      },
+      "actual_returned_excerpt": "Ran 2 tests in 0.208s\nOK",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-green-observer",
+      "command": "rtk proxy uv run --with mitmproxy==12.2.3 python -m unittest discover -s tools/runtime-worker-evidence -p 'test_*.py' -k large_chunk",
+      "exit_code": 0,
+      "candidate_phase": "B3-after-repair-before-final-format",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/green-observer.log",
+        "sha256": "59e0bd5263758b7f82dfcd1ed1ed5ded635d34d24a5d5792b549c1b91b5bd829"
+      },
+      "actual_returned_excerpt": "Ran 1 test in 0.137s\nOK",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-ruff-check",
+      "command": "rtk proxy uv run --with ruff==0.15.8 ruff check --select E,F,I,B,C4 --ignore E501 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py examples/claude-runtime-sdk/worker.py examples/claude-runtime-sdk/tests/test_worker.py tools/runtime-worker-evidence/gateway_observer.py tools/runtime-worker-evidence/test_gateway_observer.py",
+      "exit_code": 1,
+      "candidate_phase": "B3-after-repair-before-final-Ruff-cleanup",
+      "evidence_class": "structural_validation",
+      "private_log": {
+        "locator": "<B3-logs>/ruff-check.log",
+        "sha256": "30665501e2b788973ad51bcfc9de7e7750a9db1c0023b33d47ca37b408485b7d"
+      },
+      "actual_returned_excerpt": "34 | |\n35 | | import worker\n36 | | from openai_codex import AsyncCodex, AsyncThread\n37 | | from openai_codex.client import CodexClient\n   | |___________________________________________^\n38 |\n39 |   MCP_FIXTURE = r\"\"\"\n   |\nhelp: Organize imports\n\nFound 2 errors.\n[*] 1 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-ruff-format",
+      "command": "rtk proxy uv run --with ruff==0.15.8 ruff format --check --line-length 100 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py examples/claude-runtime-sdk/worker.py examples/claude-runtime-sdk/tests/test_worker.py tools/runtime-worker-evidence/gateway_observer.py tools/runtime-worker-evidence/test_gateway_observer.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-after-repair-before-final-Ruff-cleanup",
+      "evidence_class": "structural_validation",
+      "private_log": {
+        "locator": "<B3-logs>/ruff-format.log",
+        "sha256": "ef7d13d02214e98ca902b05257cdbe6a8e84f3b4714508efdc19766460b54209"
+      },
+      "actual_returned_excerpt": "6 files already formatted",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-claude-tests",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python -m unittest discover -s examples/claude-runtime-sdk/tests -v",
+      "exit_code": 0,
+      "candidate_phase": "B3-after-repair-before-final-Ruff-cleanup",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/claude-tests.log",
+        "sha256": "f3f25a305942a58f1bc188d8010609765c4a49e8350d33bd80e91cd5eff70234"
+      },
+      "actual_returned_excerpt": "Ran 26 tests in 0.344s\nOK",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-observer-tests",
+      "command": "rtk proxy uv run --with mitmproxy==12.2.3 python -m unittest discover -s tools/runtime-worker-evidence -p 'test_*.py'",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/observer-tests.log",
+        "sha256": "3fa898754fc96e13f544e52500287384b12a56bbe2d0737dcb6ffe2570eb0225"
+      },
+      "actual_returned_excerpt": "Ran 6 tests in 0.142s\nOK",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-claude-controls-disarmed",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python examples/claude-runtime-sdk/tests/check_controls.py --disarm-route",
+      "exit_code": 1,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/claude-controls-disarmed.log",
+        "sha256": "84ce22f46678d94b15151449d1c17ede493a7f50895b4aa6bbe9ab7814b150ad"
+      },
+      "actual_returned_excerpt": "FAIL: test_wrong_route_is_rejected_before_a_client_exists (test_worker.ConfigurationTests.test_wrong_route_is_rejected_before_a_client_exists) (gateway='https://api.anthropic.com')\nAssertionError: ValueError not raised\nFAIL: test_wrong_route_is_rejected_before_a_client_exists (test_worker.ConfigurationTests.test_wrong_route_is_rejected_before_a_client_exists) (gateway='http://127.0.0.1:20128/v1')\nAssertionError: ValueError not raised\nFAIL: test_wrong_route_is_rejected_before_a_client_exists (test_worker.ConfigurationTests.test_wrong_route_is_rejected_before_a_client_exists) (gateway='http://user:fixture-secret@127.0.0.1:20128')\nAssertionError: ValueError not raised\nFAIL: test_wrong_route_is_rejected_before_a_client_exists (test_worker.ConfigurationTests.test_wrong_route_is_rejected_before_a_client_exists) (gateway='http://127.0.0.1:20128?token=fixture-secret')\nAssertionError: ValueError not raised\nFAIL: test_wrong_route_is_rejected_before_a_client_exists (test_worker.ConfigurationTests.test_wrong_route_is_rejected_before_a_client_exists) (gateway='http://127.0.0.1:99999')\nAssertionError: ValueError not raised\nRan 1 test in 0.004s\nFAILED (failures=5)",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-claude-controls-armed",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python examples/claude-runtime-sdk/tests/check_controls.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/claude-controls-armed.log",
+        "sha256": "b725c6d3046883da7212a9e0132a0037a4f32a3ea1890efa5bf13df3dcaa4a45"
+      },
+      "actual_returned_excerpt": "Ran 1 test in 0.003s\nOK",
+      "start_utc": null,
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-ruff-check-final",
+      "command": "rtk proxy uv run --with ruff==0.15.8 ruff check --select E,F,I,B,C4 --ignore E501 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py examples/claude-runtime-sdk/worker.py examples/claude-runtime-sdk/tests/test_worker.py tools/runtime-worker-evidence/gateway_observer.py tools/runtime-worker-evidence/test_gateway_observer.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "structural_validation",
+      "private_log": {
+        "locator": "<B3-logs>/ruff-check-final.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "actual_returned_excerpt": "All checks passed!",
+      "start_utc": "2026-10-03T04:29:23.178Z",
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-ruff-format-final",
+      "command": "rtk proxy uv run --with ruff==0.15.8 ruff format --check --line-length 100 examples/omniroute-codex-sdk/worker.py examples/omniroute-codex-sdk/test_worker.py examples/claude-runtime-sdk/worker.py examples/claude-runtime-sdk/tests/test_worker.py tools/runtime-worker-evidence/gateway_observer.py tools/runtime-worker-evidence/test_gateway_observer.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "structural_validation",
+      "private_log": {
+        "locator": "<B3-logs>/ruff-format-final.log",
+        "sha256": "ef7d13d02214e98ca902b05257cdbe6a8e84f3b4714508efdc19766460b54209"
+      },
+      "actual_returned_excerpt": "6 files already formatted",
+      "start_utc": "2026-10-03T04:29:23.185Z",
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-claude-tests-final",
+      "command": "rtk proxy uv run --with claude-agent-sdk==0.2.162 python -m unittest discover -s examples/claude-runtime-sdk/tests -v",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_fixture",
+      "private_log": {
+        "locator": "<B3-logs>/claude-tests-final.log",
+        "sha256": "f3f25a305942a58f1bc188d8010609765c4a49e8350d33bd80e91cd5eff70234"
+      },
+      "actual_returned_excerpt": "Ran 26 tests in 0.344s\nOK",
+      "start_utc": "2026-10-03T04:29:23.185Z",
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-worker-help-final",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py --help",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "structural_validation",
+      "private_log": {
+        "locator": "<B3-logs>/worker-help-final.log",
+        "sha256": "1d4b672b42e73ccd0b0745d99efb5bcb655188944c0aba46724458b2aa6382f5"
+      },
+      "actual_returned_excerpt": "                 [--api-key-env API_KEY_ENV] [--no-provider-retries]\n                 [--native-result NATIVE_RESULT]\n  --api-key-env API_KEY_ENV\n  --native-result NATIVE_RESULT",
+      "start_utc": "2026-10-03T04:29:23.185Z",
+      "end_utc": null,
+      "timing_scope": "Exact start/end times were not recorded for this command; no inferred duration."
+    },
+    {
+      "id": "b3-codex-final-01",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-01.log",
+        "sha256": "4de752092a9413e0af2ebacc6af5f1eb79c7c2c5d6ac9129211db07233048270"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 30.642s\nOK",
+      "start_utc": "2026-10-03T04:30:26.498Z",
+      "end_utc": "2026-10-03T04:30:58.024Z"
+    },
+    {
+      "id": "b3-codex-final-02",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-02.log",
+        "sha256": "d03c85499387126178449133d1f1685439b145a202c4362e700355aba8831980"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 28.452s\nOK",
+      "start_utc": "2026-10-03T04:30:58.025Z",
+      "end_utc": "2026-10-03T04:31:27.347Z"
+    },
+    {
+      "id": "b3-codex-final-03",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-03.log",
+        "sha256": "4f1061044d8f1a834432c4db4d3f629e9e61654cf32c5fa1089825e41567a239"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 30.733s\nOK",
+      "start_utc": "2026-10-03T04:31:27.347Z",
+      "end_utc": "2026-10-03T04:31:58.988Z"
+    },
+    {
+      "id": "b3-codex-final-04",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-04.log",
+        "sha256": "e0776059beba3cf23dff9039f0d6571bb6acbe0daf5f821fa84aee6eb05006c5"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 28.254s\nOK",
+      "start_utc": "2026-10-03T04:31:58.988Z",
+      "end_utc": "2026-10-03T04:32:28.169Z"
+    },
+    {
+      "id": "b3-codex-final-05",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-05.log",
+        "sha256": "de7db0dd2567b18db75c8cbc29cb8fbe4143c426f764b0b1dc12c75137ffa67b"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 30.095s\nOK",
+      "start_utc": "2026-10-03T04:32:28.169Z",
+      "end_utc": "2026-10-03T04:32:59.106Z"
+    },
+    {
+      "id": "b3-codex-final-06",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-06.log",
+        "sha256": "f4e94be141d4ac1fc31693fdf56e1db6f0224e975aef8bb75ec13b165245da07"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 28.930s\nOK",
+      "start_utc": "2026-10-03T04:32:59.106Z",
+      "end_utc": "2026-10-03T04:33:28.969Z"
+    },
+    {
+      "id": "b3-codex-final-07",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-07.log",
+        "sha256": "65be7f7aa8f1befe9077e6fb2e648a7984cdcf1ecdad652a75542ed60bb9aeff"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 28.941s\nOK",
+      "start_utc": "2026-10-03T04:33:28.969Z",
+      "end_utc": "2026-10-03T04:33:58.790Z"
+    },
+    {
+      "id": "b3-codex-final-08",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-08.log",
+        "sha256": "5c08836150da01a20080bac9487a5eff78c6f93926aaf578e5943e80c976b997"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 29.616s\nOK",
+      "start_utc": "2026-10-03T04:33:58.790Z",
+      "end_utc": "2026-10-03T04:34:29.269Z"
+    },
+    {
+      "id": "b3-codex-final-09",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-09.log",
+        "sha256": "41925756a5e4a9140b0bfee4a13a2242f614b4fc573287c733c89e9bb61041ca"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 29.101s\nOK",
+      "start_utc": "2026-10-03T04:34:29.269Z",
+      "end_utc": "2026-10-03T04:34:59.221Z"
+    },
+    {
+      "id": "b3-codex-final-10",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-10.log",
+        "sha256": "c3be1d57185989d5337d36b0cc5d0acc97c6fa1d7ffd9f53b51ad5d1b525059c"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 29.276s\nOK",
+      "start_utc": "2026-10-03T04:34:59.221Z",
+      "end_utc": "2026-10-03T04:35:29.356Z"
+    },
+    {
+      "id": "b3-codex-final-11",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-11.log",
+        "sha256": "bc68c4219aa68b0815c099accf57f7172b9e0ad818341e56effb4d23be16cefe"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 30.382s\nOK",
+      "start_utc": "2026-10-03T04:35:29.357Z",
+      "end_utc": "2026-10-03T04:36:00.708Z"
+    },
+    {
+      "id": "b3-codex-final-12",
+      "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/test_worker.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source",
+      "evidence_class": "local_integration_synthetic_provider",
+      "private_log": {
+        "locator": "<B3-logs>/codex-final-12.log",
+        "sha256": "d5473a4d5a735dd981bdae19f5d01f6ed21d254f498c9d46008c1e06d3e5abe3"
+      },
+      "actual_returned_excerpt": "Ran 25 tests in 29.201s\nOK",
+      "start_utc": "2026-10-03T04:36:00.708Z",
+      "end_utc": "2026-10-03T04:36:30.834Z"
+    },
+    {
+      "id": "b3-validate-before-seal",
+      "command": "rtk proxy python3 scripts/validate.py",
+      "exit_code": 1,
+      "candidate_phase": "B3-before-publication-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; existing force-added project skill tracked",
+      "start_utc": "2026-10-03T04:43:53.362Z",
+      "end_utc": "2026-10-03T04:44:31.366Z",
+      "private_log": {
+        "locator": "<B3-logs>/validate-before-seal.log",
+        "sha256": "f7e84c9be3883051bb390c3f4b0e275d3dea12ffde5bfbfb68167827e556f4b3"
+      },
+      "actual_returned_output": "Publication validation failed:\nreceipt omniroute-sdk-worker-0160-20261003: payload claim differs from manifest\nreceipt omniroute-sdk-worker-0160-20261003: payload limitations differs from manifest\nevidence/receipts/omniroute-sdk-worker-0160-20261003.json: contains possible personal home path\nexamples/omniroute-codex-sdk/checks.json: contains possible personal home path"
+    },
+    {
+      "id": "b3-convergence-before-seal",
+      "command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded",
+      "exit_code": 1,
+      "candidate_phase": "B3-before-publication-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; existing force-added project skill tracked",
+      "start_utc": "2026-10-03T04:43:53.362Z",
+      "end_utc": "2026-10-03T04:44:31.366Z",
+      "private_log": {
+        "locator": "<B3-logs>/convergence-before-seal.log",
+        "sha256": "8508cc3940bb9eb2fc4649e66e66a0bbd52d59df619427204dfd77d17bcc29d7"
+      },
+      "actual_returned_output": "record[0]: valid\nrecord[1]: valid\nrecord[2]: valid\nrecord[3]: valid\nrecord[4]: valid\nrecord[5]: valid\nrecord[6]: valid\nrecord[7]: valid\nrecord[8]: valid\nrecord[9]: valid\nrecord[10]: valid\nrecord[11]: valid\nrecord[12]: valid\nrecord[13]: valid\nrecord[14]: valid\nrecord[15]: valid\nrecord[16]: valid\nrecord[17]: valid\nrecord[18]: invalid\n  qualification_run_ids: successful candidate execution in exact scope required\n  qualification_run_ids: successful candidate execution in exact scope required\n  qualification_run_ids: successful candidate execution in exact scope required\n  qualification_run_ids: successful candidate execution in exact scope required\nrecord[19]: valid\nrecord[20]: valid\nrecord[21]: valid\nrecord[22]: valid\nrecord[23]: valid\nrecord[24]: valid\nrecord[25]: valid\nrecord[26]: valid\nrecord[27]: valid\nrecord[28]: valid"
+    },
+    {
+      "id": "b3-component-matrix",
+      "command": "rtk proxy python3 scripts/component_matrix.py --check",
+      "exit_code": 0,
+      "candidate_phase": "B3-before-publication-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; existing force-added project skill tracked",
+      "start_utc": "2026-10-03T04:43:53.363Z",
+      "end_utc": null,
+      "private_log": {
+        "locator": "<B3-logs>/component-matrix.log",
+        "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd"
+      },
+      "actual_returned_output": "{\"rows\": 32, \"status\": \"checked\"}"
+    },
+    {
+      "id": "b3-new-host-grand-list",
+      "command": "rtk proxy python3 scripts/new_host_grand_list.py --check",
+      "exit_code": 0,
+      "candidate_phase": "B3-before-publication-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; existing force-added project skill tracked",
+      "start_utc": "2026-10-03T04:43:53.363Z",
+      "end_utc": null,
+      "private_log": {
+        "locator": "<B3-logs>/new-host-grand-list.log",
+        "sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226"
+      },
+      "actual_returned_output": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}"
+    },
+    {
+      "id": "b3-osv-tests",
+      "command": "rtk proxy python3 -B -m unittest tests.test_osv_lockfile_coverage",
+      "exit_code": 0,
+      "candidate_phase": "B3-before-publication-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; existing force-added project skill tracked",
+      "start_utc": "2026-10-03T04:43:53.363Z",
+      "end_utc": null,
+      "private_log": {
+        "locator": "<B3-logs>/osv-tests.log",
+        "sha256": "b3e2c1fcfee0d3d5c4288818fd7b9bf416c5d7a1887f841b98d2a7be57f0a146"
+      },
+      "actual_returned_output": "......................................\n----------------------------------------------------------------------\nRan 38 tests in 0.268s\n\nOK"
+    },
+    {
+      "id": "b3-pre-push-registry",
+      "command": "rtk proxy python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "candidate_phase": "B3-before-publication-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; existing force-added project skill tracked",
+      "start_utc": "2026-10-03T04:43:53.363Z",
+      "end_utc": null,
+      "private_log": {
+        "locator": "<B3-logs>/pre-push-registry.log",
+        "sha256": "a1f8485b7ad0a6193c6ecbfb64c72338622ec19d45ee6bd665734ebd18a97923"
+      },
+      "actual_returned_output": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.268s\n\nOK"
+    },
+    {
+      "id": "b3-validate-final",
+      "command": "rtk proxy python3 scripts/validate.py",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source-before-returned-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; project skill tracked at base 7c9d7214d",
+      "timing_scope": "Exact start/end times not separately recorded; observed_tool_return_utc is the first tool return, not the command start.",
+      "observed_tool_return_utc": "2026-10-03T04:47:00.003Z",
+      "private_log": {
+        "locator": "<B3-logs>/validate-final.log",
+        "sha256": "b1465a951220024b70109e7fbab6d4398d1584a88d3a061fb1c7c90a721d5aeb"
+      },
+      "actual_returned_output": "{\"components\": 69, \"hashed_files\": 9392, \"profiles\": 4, \"receipts\": 190, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+    },
+    {
+      "id": "b3-convergence-final",
+      "command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source-before-returned-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; project skill tracked at base 7c9d7214d",
+      "timing_scope": "Exact start/end times not separately recorded; observed_tool_return_utc is the first tool return, not the command start.",
+      "observed_tool_return_utc": "2026-10-03T04:47:00.007Z",
+      "private_log": {
+        "locator": "<B3-logs>/convergence-final.log",
+        "sha256": "2e2cb59d7e86bd664480e5a763a93b1b8ec6faa809e75511fff22873cb951b42"
+      },
+      "actual_returned_output": "record[0]: valid\nrecord[1]: valid\nrecord[2]: valid\nrecord[3]: valid\nrecord[4]: valid\nrecord[5]: valid\nrecord[6]: valid\nrecord[7]: valid\nrecord[8]: valid\nrecord[9]: valid\nrecord[10]: valid\nrecord[11]: valid\nrecord[12]: valid\nrecord[13]: valid\nrecord[14]: valid\nrecord[15]: valid\nrecord[16]: valid\nrecord[17]: valid\nrecord[18]: valid\nrecord[19]: valid\nrecord[20]: valid\nrecord[21]: valid\nrecord[22]: valid\nrecord[23]: valid\nrecord[24]: valid\nrecord[25]: valid\nrecord[26]: valid\nrecord[27]: valid\nrecord[28]: valid"
+    },
+    {
+      "id": "b3-component-matrix-final",
+      "command": "rtk proxy python3 scripts/component_matrix.py --check",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source-before-returned-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; project skill tracked at base 7c9d7214d",
+      "timing_scope": "Exact start/end times not separately recorded; observed_tool_return_utc is the first tool return, not the command start.",
+      "observed_tool_return_utc": "2026-10-03T04:46:59.219Z",
+      "private_log": {
+        "locator": "<B3-logs>/component-matrix-final.log",
+        "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd"
+      },
+      "actual_returned_output": "{\"rows\": 32, \"status\": \"checked\"}"
+    },
+    {
+      "id": "b3-new-host-grand-list-final",
+      "command": "rtk proxy python3 scripts/new_host_grand_list.py --check",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source-before-returned-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; project skill tracked at base 7c9d7214d",
+      "timing_scope": "Exact start/end times not separately recorded; observed_tool_return_utc is the first tool return, not the command start.",
+      "observed_tool_return_utc": "2026-10-03T04:46:59.099Z",
+      "private_log": {
+        "locator": "<B3-logs>/new-host-grand-list-final.log",
+        "sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226"
+      },
+      "actual_returned_output": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}"
+    },
+    {
+      "id": "b3-osv-tests-final",
+      "command": "rtk proxy python3 -B -m unittest tests.test_osv_lockfile_coverage",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source-before-returned-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; project skill tracked at base 7c9d7214d",
+      "timing_scope": "Exact start/end times not separately recorded; observed_tool_return_utc is the first tool return, not the command start.",
+      "observed_tool_return_utc": "2026-10-03T04:46:59.412Z",
+      "private_log": {
+        "locator": "<B3-logs>/osv-tests-final.log",
+        "sha256": "3253f3f4020949cd2886efd0fa58d3ed7a0963069ab6da76a18900cafe205c96"
+      },
+      "actual_returned_output": "......................................\n----------------------------------------------------------------------\nRan 38 tests in 0.379s\n\nOK"
+    },
+    {
+      "id": "b3-pre-push-registry-final",
+      "command": "rtk proxy python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "candidate_phase": "B3-final-Python-source-before-returned-result-seal",
+      "evidence_class": "structural_validation",
+      "index_scope": "checkout real index; project skill tracked at base 7c9d7214d",
+      "timing_scope": "Exact start/end times not separately recorded; observed_tool_return_utc is the first tool return, not the command start.",
+      "observed_tool_return_utc": "2026-10-03T04:46:59.283Z",
+      "private_log": {
+        "locator": "<B3-logs>/pre-push-registry-final.log",
+        "sha256": "c7f765c1b30d30d1ba25b738fc51c8a23e8a437be057a5578db42742c6588ec4"
+      },
+      "actual_returned_output": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.227s\n\nOK"
     }
   ],
   "negative_controls": [
@@ -1107,6 +1743,126 @@
         "layers": 32,
         "winners": 66,
         "status": "passed"
+      }
+    }
+  },
+  "b3_repair": {
+    "checked_on": "2026-10-03",
+    "base_revision": "7c9d7214deb4961262c796da1cd971f070184bb1",
+    "native_model_tasks_started": 0,
+    "source_scope": "Owned Codex/Claude examples, observer, related decision/evidence/convergence and registry; no stack/adoption/SDK-pair pin changes",
+    "regression_before_repair": {
+      "codex": {
+        "tests": 6,
+        "failures": 4,
+        "errors": 3,
+        "exit_code": 1
+      },
+      "claude_connection": {
+        "tests": 2,
+        "failures": 2,
+        "exit_code": 1
+      },
+      "observer_chunk": {
+        "tests": 1,
+        "failures": 1,
+        "exit_code": 1
+      }
+    },
+    "final_suites": {
+      "codex": {
+        "invocations": 12,
+        "passed_invocations": 12,
+        "tests_per_invocation": 25,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "claude": {
+        "tests": 26,
+        "exit_code": 0
+      },
+      "observer": {
+        "tests": 6,
+        "exit_code": 0
+      }
+    },
+    "credential_binding_scope": "Native configuration only; named key exclusion, snapshots disabled and template checked. No credential value read or printed.",
+    "search_scope": "Both native configuration gates enabled; no live standalone-search endpoint run.",
+    "baseline_source_scope": "Production source at base_revision; new regression assertions ran before production repair. Exact unformatted regression-file bytes were not separately frozen; final formatted tests and raw private red/green logs are retained.",
+    "completeness_critic": {
+      "kind": "same-session builder self-review",
+      "covered": [
+        "starter template and arbitrary validated credential name",
+        "provider capability and feature gate",
+        "slow/failed SDK entry and shielded disconnect",
+        "fragmented overflow and large batches of complete SSE lines",
+        "result reservation before native thread creation and retained failure"
+      ],
+      "next_lifecycle_sweep": [
+        "live keyed-shell and standalone search qualification",
+        "native SDK connection fault injection",
+        "MCP transport and workspace-write qualification"
+      ]
+    },
+    "generated_report_writes_performed": false,
+    "publication_seal_corrections": [
+      "Receipt registry metadata claim/limitations synchronized through the hot-file protocol",
+      "Shortened unittest failure repr personal path prefix sanitized; original raw log remains private",
+      "Current convergence qualification IDs use the exact current decision scope; B2 observations remain historical"
+    ],
+    "structural_validation_scope": "All six structural checks passed after correcting the preserved initial record-seal failures. These returned results precede this metadata seal; publication and convergence validators are rerun read-only on the sealed bytes and reported separately outside the checkout to avoid a receipt/hash cycle.",
+    "generated_report_checks": {
+      "component_matrix": {
+        "exit_code": 0,
+        "rows": 32,
+        "status": "checked"
+      },
+      "new_host_grand_list": {
+        "exit_code": 0,
+        "layers": 32,
+        "winners": 66,
+        "status": "passed"
+      }
+    },
+    "structural_acceptance": {
+      "publication": {
+        "exit_code": 0,
+        "hashed_files": 9392,
+        "receipts": 190
+      },
+      "convergence": {
+        "exit_code": 0,
+        "valid_records": 29
+      },
+      "component_matrix": {
+        "exit_code": 0,
+        "rows": 32
+      },
+      "new_host_grand_list": {
+        "exit_code": 0,
+        "layers": 32,
+        "winners": 66
+      },
+      "osv": {
+        "exit_code": 0,
+        "tests": 38
+      },
+      "pre_push_registry": {
+        "exit_code": 0,
+        "tests": 3,
+        "index_scope": "real checkout index"
       }
     }
   }

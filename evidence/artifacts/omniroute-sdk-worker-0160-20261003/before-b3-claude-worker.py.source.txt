@@ -88,7 +88,9 @@ def loopback_root(value: str) -> str:
 def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
     """Compose SDK options; opaque explicit gateway credentials stay in memory."""
     if "CLAUDE_CODE_EFFORT_LEVEL" in os.environ:
-        raise ValueError("inherited CLAUDE_CODE_EFFORT_LEVEL must be unset before launch")
+        raise ValueError(
+            "inherited CLAUDE_CODE_EFFORT_LEVEL must be unset before launch"
+        )
     if not MODEL_ID.fullmatch(args.model):
         raise ValueError("worker model must be an explicit Claude-family model ID")
     if not args.cwd.is_dir():
@@ -113,14 +115,18 @@ def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
     auth_token = "omniroute-no-auth"
     if args.gateway_token_env is not None:
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", args.gateway_token_env):
-            raise ValueError("gateway-token-env must name an application environment variable")
+            raise ValueError(
+                "gateway-token-env must name an application environment variable"
+            )
         if args.gateway_token_env.startswith("ANTHROPIC_"):
             raise ValueError(
                 "use a gateway-specific token binding, separate from native Anthropic credentials"
             )
         auth_token = os.environ.get(args.gateway_token_env)
         if not auth_token or not auth_token.strip():
-            raise ValueError("the explicit gateway token environment binding is missing or empty")
+            raise ValueError(
+                "the explicit gateway token environment binding is missing or empty"
+            )
     return ClaudeAgentOptions(
         system_prompt={"type": "preset", "preset": "claude_code"},
         model=args.model,
@@ -134,7 +140,9 @@ def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
         },
         setting_sources=args.setting_source or ["user", "project"],
         skills=skills,
-        plugins=[{"type": "local", "path": str(p.resolve())} for p in args.plugin or []],
+        plugins=[
+            {"type": "local", "path": str(p.resolve())} for p in args.plugin or []
+        ],
         mcp_servers=str(args.mcp_config.resolve()) if args.mcp_config else {},
         allowed_tools=args.allow_tool or [],
         permission_mode=args.permission_mode,
@@ -244,7 +252,9 @@ class Observation:
                 if isinstance(block, ToolUseBlock):
                     self.tool_calls[block.name] = self.tool_calls.get(block.name, 0) + 1
                     event = {"id": block.id, "name": block.name}
-                    if block.name == "Skill" and isinstance(block.input.get("skill"), str):
+                    if block.name == "Skill" and isinstance(
+                        block.input.get("skill"), str
+                    ):
                         event["skill"] = block.input["skill"]
                     self.tool_events.append(event)
         elif isinstance(message, UserMessage) and isinstance(message.content, list):
@@ -317,8 +327,7 @@ async def run_worker(
 ) -> Observation:
     """Use the native client lifecycle and interrupt; no retry or model loop."""
     observation = Observation()
-    client = None
-    connected = False
+    deadline = anyio.current_time() + timeout
 
     async def timed_interrupt(client: Any) -> None:
         assert interrupt_after is not None
@@ -327,48 +336,39 @@ async def run_worker(
         observation.interrupt_sent = True
 
     try:
-        try:
-            # Enter belongs to the operation deadline. __aexit__ must also run
-            # when __aenter__ is cancelled (f2204bb client.py:623-630).
-            with anyio.move_on_after(timeout) as scope:
-                client = client_factory(options=options)
-                await client.__aenter__()
-                connected = True
-                async with anyio.create_task_group() as group:
-                    if interrupt_after is not None:
-                        group.start_soon(timed_interrupt, client)
-                    await client.query(prompt)
-                    async for message in client.receive_response():
-                        observation.observe(message)
-                    group.cancel_scope.cancel()
-            if scope.cancel_called:
-                observation.status = "timeout"
-                # A partial connect has no query to interrupt or drain.
-                if connected:
+        # SDK cleanup is shielded and terminates/kills its own CLI subprocess.
+        with anyio.fail_after(timeout + 5):
+            async with client_factory(options=options) as client:
+                with anyio.move_on_after(
+                    max(0, deadline - anyio.current_time())
+                ) as scope:
+                    async with anyio.create_task_group() as group:
+                        if interrupt_after is not None:
+                            group.start_soon(timed_interrupt, client)
+                        await client.query(prompt)
+                        async for message in client.receive_response():
+                            observation.observe(message)
+                        group.cancel_scope.cancel()
+                if scope.cancel_called:
+                    observation.status = "timeout"
                     with anyio.move_on_after(4, shield=True):
                         await client.interrupt()
                         observation.interrupt_sent = True
                         async for message in client.receive_response():
                             observation.observe(message)
-                observation.status = "timeout"
-            elif observation.last_result is None:
-                observation.status = "missing_native_result"
-            elif observation.last_result["terminal_reason"] in {
-                "aborted_streaming",
-                "aborted_tools",
-            }:
-                observation.status = "interrupted"
-            elif observation.last_result["terminal_reason"] not in {
-                None,
-                "completed",
-            }:
-                observation.status = "native_incomplete"
-        finally:
-            if client is not None:
-                # Only cleanup receives the extra grace, shielded from the
-                # operation/parent cancellation as in AnyIO's finalization guide.
-                with anyio.fail_after(5, shield=True):
-                    await client.__aexit__(*sys.exc_info())
+                    observation.status = "timeout"
+                elif observation.last_result is None:
+                    observation.status = "missing_native_result"
+                elif observation.last_result["terminal_reason"] in {
+                    "aborted_streaming",
+                    "aborted_tools",
+                }:
+                    observation.status = "interrupted"
+                elif observation.last_result["terminal_reason"] not in {
+                    None,
+                    "completed",
+                }:
+                    observation.status = "native_incomplete"
     except TimeoutError:
         observation.status = "timeout"
     except Exception as error:
@@ -398,11 +398,15 @@ def parser() -> argparse.ArgumentParser:
         default=DEFAULT_MODEL,
         help="explicit advertised Claude-family candidate",
     )
-    cli.add_argument("--setting-source", action="append", choices=["user", "project", "local"])
+    cli.add_argument(
+        "--setting-source", action="append", choices=["user", "project", "local"]
+    )
     cli.add_argument(
         "--skill", action="append", help="all or repeat exact task-matched skill names"
     )
-    cli.add_argument("--plugin", type=Path, action="append", help="selected local plugin directory")
+    cli.add_argument(
+        "--plugin", type=Path, action="append", help="selected local plugin directory"
+    )
     cli.add_argument(
         "--mcp-config",
         type=Path,
@@ -425,7 +429,9 @@ def parser() -> argparse.ArgumentParser:
         type=float,
         help="send one native interrupt after this many seconds",
     )
-    cli.add_argument("--resume", help="same native session UUID and cwd; no implicit resubmission")
+    cli.add_argument(
+        "--resume", help="same native session UUID and cwd; no implicit resubmission"
+    )
     cli.add_argument("--fork-session", action="store_true")
     cli.add_argument(
         "--result-output",
@@ -440,8 +446,13 @@ def main() -> int:
     try:
         if not math.isfinite(args.timeout) or args.timeout <= 0 or args.max_turns <= 0:
             raise ValueError("timeout and max-turns must be positive")
-        if args.interrupt_after is not None and not 0 < args.interrupt_after < args.timeout:
-            raise ValueError("interrupt-after must be positive and smaller than timeout")
+        if (
+            args.interrupt_after is not None
+            and not 0 < args.interrupt_after < args.timeout
+        ):
+            raise ValueError(
+                "interrupt-after must be positive and smaller than timeout"
+            )
         options = build_options(args)
         configuration = preflight(options)
         if args.preflight:
@@ -453,7 +464,9 @@ def main() -> int:
         if args.result_output is not None and args.result_output.exists():
             raise ValueError("result-output must be a new private file")
         # This CLI process is the owned worker child, not the native coordinator.
-        configuration["native_anthropic_env_keys_removed"] = prepare_worker_environment()
+        configuration["native_anthropic_env_keys_removed"] = (
+            prepare_worker_environment()
+        )
         observation = anyio.run(
             lambda: run_worker(
                 options,
@@ -465,7 +478,9 @@ def main() -> int:
         if args.result_output is not None and observation.result is not None:
             flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
             try:
-                with os.fdopen(os.open(args.result_output, flags, 0o600), "w") as output:
+                with os.fdopen(
+                    os.open(args.result_output, flags, 0o600), "w"
+                ) as output:
                     output.write(observation.result)
             except OSError:
                 # Keep native usage and identifiers even when artifact writing fails.
@@ -480,7 +495,9 @@ def main() -> int:
     except (ValueError, OSError) as error:
         # Configuration errors are authored here; OS errors may carry private paths.
         message = str(error) if isinstance(error, ValueError) else type(error).__name__
-        print(json.dumps({"status": "preflight_failed", "error": message}, sort_keys=True))
+        print(
+            json.dumps({"status": "preflight_failed", "error": message}, sort_keys=True)
+        )
         return 2
 
 

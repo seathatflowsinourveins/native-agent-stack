@@ -101,10 +101,15 @@ rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py \
 ```
 
 `--interrupt-after SECONDS` sends one supported `ClaudeSDKClient.interrupt()`
-request. A timeout sends that native interrupt, drains for up to four seconds,
+request. A timeout after connection sends that native interrupt, drains for up to four seconds,
 then uses the SDK's shielded subprocess cleanup. Connection has the same overall
-deadline; native cleanup has its own termination/kill grace. This does not prove
-remote-provider cancellation or reverse external effects. A later run may use
+deadline; native cleanup has its own termination/kill grace.
+Connection expiry or an exception during connection still reaches shielded
+disconnect, even when the async context's entry did not finish. The local
+slow-connection fixture proves that no query starts after connection consumes
+the deadline and that delayed cleanup can finish during its separate grace.
+This does not prove remote-provider cancellation or reverse external effects.
+A later run may use
 `--resume SESSION_UUID` with the same cwd and native session storage. Inspect
 completed effects before resuming; there is no automatic resubmission.
 `--fork-session` uses the native fork option when explicitly requested.
