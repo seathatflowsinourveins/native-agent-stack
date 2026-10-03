@@ -93,16 +93,19 @@ Use the selected Promptfoo 0.123.1 and a supported Node runtime. From this folde
 
 ```sh
 node --test test-contract.cjs
-REQUEST_TIMEOUT_MS=15000 timeout 180s promptfoo eval -c promptfooconfig.yaml \
-  --env-file /private/path/to/this-project.env \
+REQUEST_TIMEOUT_MS=15000 python3 ../../tools/credentials/credential_run.py typesafe -- \
+  timeout 180s promptfoo eval -c promptfooconfig.yaml \
   --no-cache --max-concurrency 1 --repeat 1 --no-share --no-write --no-table \
   --output /private/path/to/results.json
 ```
 
 Disable Promptfoo telemetry/update checks on a new PC, as the adopted native
-launcher does. Supply only that project's authorized `TYPESAFE_API_KEY`. The
-upstream provider has zero retries; the request and whole-process deadlines are
-separate. Review raw results privately before publishing a sanitized receipt.
+launcher does. The [key runner](../../docs/secret-storage.md#using-a-key) reads
+the `typesafe` inventory entry's `0600` file and adds `TYPESAFE_API_KEY` to this
+one promptfoo process only, so no key file goes on the command line; the
+2026-09-21 run passed the key with `--env-file` instead. The upstream provider
+has zero retries; the request and whole-process deadlines are separate. Review
+raw results privately before publishing a sanitized receipt.
 
 The [fresh result](typesafe-result.json) records TypeSafe `jev-1.13.0` at **7/8**
 frozen labels versus **3/8** for weak literal containment. It made eight uncached
@@ -120,3 +123,73 @@ source verification, not an independent matched model benchmark. No general
 accuracy, latency, token savings, trading value or universal SOTA claim follows
 from these small selected tests. Current native results and failed attempts are
 recorded in the selection record and its linked receipt.
+
+## Jev rules (2026-10-03)
+
+These rules adopt Jev, TypeSafe's typed-judgment model, for no feature. They come
+from section 3.1 of the design report "Jev and TypeSafe: typed judgments for the
+foundation and north-star R&D" (2026-10-03, revision r1, sha256 `6fdd8bc2…`),
+which is kept outside the repository. Jev sets no final status anywhere: the
+report's section 7 rejects that until two preregistered, held-out,
+human-labelled replications pass (P1, then P1b with the P1 threshold frozen).
+
+- **A1 Version pin and drift canary.** Name `jev-1.13.0` in every client, config
+  and receipt, never the moving `jev-latest` or `jev-preview` alias that the
+  Python SDK and deepeval default to, and log the response `model` field.
+  `response.cjs` and `validate()` in `tools/sota-convergence/gap_crosswalk.py`
+  refuse any other model, and `test-contract.cjs` tests that refusal. TypeSafe
+  states no retirement window, so a pinned version can stop answering without
+  notice, and frozen research columns cannot be regenerated after that. Every
+  run therefore starts with a canary: 10 frozen cases are re-scored and compared
+  with their stored answers, and the run records how many answers changed,
+  because two third-party evaluations saw answers move under the same version
+  ID. The P1 freeze packet names the 10 cases.
+- **A2 Custody.** Send only public or research-grade text whose terms allow
+  third-party processing. Never send broker or account state, positions, orders,
+  credentials, private receipts, host paths, licensed news, the SEC contact
+  string or unpublished hypotheses. Assume every byte sent persists: TypeSafe's
+  Master Customer Agreement (updated 2026-09-23, §4.1 and §4.3) lets it derive
+  Telemetry from inputs in perpetuity and use that without restriction. Before
+  any call, run the stack's pinned gitleaks 8.30.1
+  (`catalogs/sota-convergence/manifest-20260929.json`, secrets layer) and a
+  deterministic host-path and identity rule over the exact bytes, then a literal
+  search for the host's home path and user name, and freeze those bytes so that
+  every arm and the labeller see the same bytes. Each preregistration reports
+  the share of cases the rule changed. The rule removes paths and identities
+  only, never model or tool names, which claims name; the packet scrubber of
+  `tools/token-e2e/judge.py` replaces tool names and stays a judge-blinding tool.
+  Record each call's request ID, usage and attempt count, keep SDK logging below
+  debug in receipt runs, and treat zero data retention as unavailable until an
+  enterprise contract is recorded.
+- **A3 Jaggedness controls.** TypeSafe's jaggedness page for jev-1.13 lists nine
+  failure modes, and each has a control. Questions and criteria are checked
+  against the labelling rule, and against each other, before freeze. Questions
+  are single-hop, and code cuts the state to what the decision needs. Every
+  frozen Jev case set carries permuted option orders with a stable-answer
+  requirement, and adversarial state in the vendor's three forms: an injected
+  instruction, a misleading framing, and text that argues for its own
+  classification. Counts, arithmetic and date comparison stay in code.
+  Extraction stays with code or a generative model; Jev only picks among options
+  that code lists. Jev never closes a claim whose support depends on a number or
+  a date: code sends every claim that contains a digit to Opus.
+- **A4 Reviewer schema at the call site.** The reviewer roles return the object
+  that [`semantic-evidence-reviewer.schema.json`](semantic-evidence-reviewer.schema.json)
+  describes: per case `case_id`, `final_disposition` (supported, contradicted or
+  insufficient) and `retained_provider_disposition`, with source references, a
+  correction and limits. Agent frontmatter has no schema field, so the caller
+  supplies the schema. Inside a multi-stage workflow, dispatch the role through
+  `agent({agentType, schema})`, which validates the return and fails the call
+  after five invalid attempts ([workflows](https://code.claude.com/docs/en/workflows)).
+  A single review is one Agent-tool call, not a workflow, and the coordinator
+  validates its return against the same schema. A Codex caller passes the schema
+  with `codex exec --output-schema`. Validation checks the shape, not whether a
+  disposition is right.
+- **A7 Crosswalk routing.** `tools/sota-convergence/gap_crosswalk.py` records a
+  pair that no reviewer saw as `screened_out`: it has no final status, counts
+  toward no gap status, and consumers treat it as unknown. A pair whose gap text
+  contains a digit always goes to review (A3). Every crosswalk built after
+  2026-10-03 takes this rule and records it in `method.routing`. The retained
+  92bb279 crosswalk keeps the 2026-09-23 rule, so `build --check` still
+  reproduces it: its 725 unreviewed pairs read `not_addressed`, which is a screen
+  output, not a review decision. Re-recording it under the new rule first needs
+  reviews of the 369 unreviewed pairs whose gap text contains a digit.
